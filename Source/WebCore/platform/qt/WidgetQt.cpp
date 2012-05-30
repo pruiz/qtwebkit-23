@@ -41,6 +41,7 @@
 #include "QWebPageClient.h"
 #include "ScrollView.h"
 
+#include <QApplication>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QPaintEngine>
@@ -76,6 +77,9 @@ void Widget::setFocus(bool focused)
 
 void Widget::setCursor(const Cursor& cursor)
 {
+    if (QApplication::type() == QApplication::Tty)
+        return;
+
 #ifndef QT_NO_CURSOR
     ScrollView* view = root();
     if (!view)

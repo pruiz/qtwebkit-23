@@ -89,7 +89,13 @@ static ScrollbarTheme* scrollbarTheme;
 RenderThemeQt::RenderThemeQt(Page* page)
     : RenderTheme()
     , m_page(page)
+    , m_fallbackStyle(0)
 {
+    if (QApplication::type() == QApplication::Tty) {
+        m_buttonFontFamily = "sans-serif";
+        return;
+    }
+
     m_buttonFontFamily = QGuiApplication::font().family();
 }
 
@@ -277,6 +283,9 @@ Color RenderThemeQt::systemColor(int cssValueId) const
 
 int RenderThemeQt::minimumMenuListSize(RenderStyle*) const
 {
+    if (QApplication::type() == QApplication::Tty)
+        return 1;
+
     // FIXME: Later we need a way to query the UI process for the dpi
     const QFontMetrics fm(QGuiApplication::font());
     return fm.width(QLatin1Char('x'));

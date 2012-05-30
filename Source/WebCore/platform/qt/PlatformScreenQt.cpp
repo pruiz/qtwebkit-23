@@ -60,6 +60,9 @@ static int screenNumber(Widget* w)
 
 int screenDepth(Widget* w)
 {
+    if (QApplication::type() == QApplication::Tty)
+        return 32;
+
 #if HAVE(QT5)
     return QGuiApplication::screens().value(screenNumber(w))->depth();
 #else
@@ -69,6 +72,9 @@ int screenDepth(Widget* w)
 
 int screenDepthPerComponent(Widget* w)
 {
+    if (QApplication::type() == QApplication::Tty)
+        return 8;
+
 #if HAVE(QT5)
     int depth = QGuiApplication::primaryScreen()->depth();
     // FIXME: Use widget's screen
@@ -103,6 +109,9 @@ int screenDepthPerComponent(Widget* w)
 
 bool screenIsMonochrome(Widget* w)
 {
+    if (QApplication::type() == QApplication::Tty)
+        return false;
+
 #if HAVE(QT5)
     Q_UNUSED(w);
     // FIXME: In Qt 5 colorCount() isn't even implemented beyond returning 256 :)
@@ -114,6 +123,9 @@ bool screenIsMonochrome(Widget* w)
 
 FloatRect screenRect(Widget* widget)
 {
+    if (QApplication::type() == QApplication::Tty)
+        return FloatRect(0,0,800,600);
+
 #if HAVE(QT5)
     QRect r = QGuiApplication::screens().value(screenNumber(widget))->geometry();
 #else
@@ -124,6 +136,9 @@ FloatRect screenRect(Widget* widget)
 
 FloatRect screenAvailableRect(Widget* widget)
 {
+    if (QApplication::type() == QApplication::Tty)
+        return FloatRect(0,0,800,600);
+
 #if HAVE(QT5)
     QRect r = QGuiApplication::screens().value(screenNumber(widget))->availableGeometry();
 #else

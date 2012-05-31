@@ -216,6 +216,12 @@ namespace WebCore {
 #if ENABLE(WKHTMLTOPDF_MODE)
         void setPrintingMediaType(const String&);
         const String& printingMediaType() const { return m_printingMediaType; }
+
+        void setPrintingMinimumShrinkFactor(float);
+        float printingMinimumShrinkFactor() const { return m_printingMinimumShrinkFactor; }
+
+        void setPrintingMaximumShrinkFactor(float);
+        float printingMaximumShrinkFactor() const { return m_printingMaximumShrinkFactor; }
 #endif
 
         void setCSSCustomFilterEnabled(bool enabled) { m_isCSSCustomFilterEnabled = enabled; }
@@ -307,6 +313,8 @@ namespace WebCore {
         String m_mediaTypeOverride;
 #if ENABLE(WKHTMLTOPDF_MODE)
         String m_printingMediaType;
+        float m_printingMinimumShrinkFactor;
+        float m_printingMaximumShrinkFactor;
 #endif
         KURL m_userStyleSheetLocation;
         ScriptFontFamilyMap m_standardFontFamilyMap;

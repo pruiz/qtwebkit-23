@@ -131,6 +131,8 @@ Settings::Settings(Page* page)
     , m_mediaTypeOverride("screen")
 #if ENABLE(WKHTMLTOPDF_MODE)
     , m_printingMediaType("print")
+    , m_printingMinimumShrinkFactor(0.0)
+    , m_printingMaximumShrinkFactor(0.0)
 #endif
     , m_minimumFontSize(0)
     , m_minimumLogicalFontSize(0)
@@ -553,6 +555,16 @@ void Settings::setApplicationChromeMode(bool mode)
 void Settings::setPrintingMediaType(const String& type)
 {
     m_printingMediaType = type;
+}
+
+void Settings::setPrintingMinimumShrinkFactor(float printingMinimumShrinkFactor)
+{
+    m_printingMinimumShrinkFactor = printingMinimumShrinkFactor;
+}
+
+void Settings::setPrintingMaximumShrinkFactor(float printingMaximumShrinkFactor)
+{
+    m_printingMaximumShrinkFactor = printingMaximumShrinkFactor;
 }
 #endif
 

@@ -127,8 +127,16 @@ public:
     QString defaultTextEncoding() const;
 
 #if ENABLE(WKHTMLTOPDF_MODE)
+
     void setPrintingMediaType(const QString &type);
     QString printingMediaType() const;
+
+    void setPrintingMinimumShrinkFactor(qreal printingMinimumShrinkFactor);
+    qreal printingMinimumShrinkFactor() const;
+
+    void setPrintingMaximumShrinkFactor(qreal printingMaximimShrinkFactor);
+    qreal printingMaximumShrinkFactor() const;
+
 #endif
 
     static void setIconDatabasePath(const QString &location);

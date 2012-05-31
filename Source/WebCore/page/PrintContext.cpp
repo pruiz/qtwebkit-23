@@ -25,6 +25,9 @@
 #include "Frame.h"
 #include "FrameView.h"
 #include "RenderView.h"
+#if ENABLE(WKHTMLTOPDF_MODE)
+#include "Settings.h"
+#endif
 #include "StyleInheritedData.h"
 #include <wtf/text/WTFString.h>
 
@@ -166,7 +169,24 @@ void PrintContext::begin(float width, float height)
     m_isPrinting = true;
 
     FloatSize originalPageSize = FloatSize(width, height);
+
+#if ENABLE(WKHTMLTOPDF_MODE)
+    float minimumShrinkFactor = m_frame->settings() ?
+        m_frame->settings()->printingMinimumShrinkFactor() : 0.0f;
+    float maximumShrinkFactor = m_frame->settings() ?
+        m_frame->settings()->printingMaximumShrinkFactor() : 0.0f;
+
+    if (maximumShrinkFactor < minimumShrinkFactor || minimumShrinkFactor <= 0.0f) {
+        minimumShrinkFactor = printingMinimumShrinkFactor;
+        maximumShrinkFactor = printingMaximumShrinkFactor;
+    }
+
+    FloatSize minLayoutSize = FloatSize(width * minimumShrinkFactor, height * minimumShrinkFactor);
+#else
+    float minimumShrinkFactor = printingMinimumShrinkFactor;
+    float maximumShrinkFactor = printingMaximumShrinkFactor;
     FloatSize minLayoutSize = m_frame->resizePageRectsKeepingRatio(originalPageSize, FloatSize(width * printingMinimumShrinkFactor, height * printingMinimumShrinkFactor));
+#endif
 
     // This changes layout, so callers need to make sure that they don't paint to screen while in printing mode.
     m_frame->setPrinting(true, minLayoutSize, originalPageSize, printingMaximumShrinkFactor / printingMinimumShrinkFactor, AdjustViewSize);

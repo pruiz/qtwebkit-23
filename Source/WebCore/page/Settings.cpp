@@ -129,6 +129,9 @@ static const double defaultIncrementalRenderingSuppressionTimeoutInSeconds = 5;
 Settings::Settings(Page* page)
     : m_page(0)
     , m_mediaTypeOverride("screen")
+#if ENABLE(WKHTMLTOPDF_MODE)
+    , m_printingMediaType("print")
+#endif
     , m_minimumFontSize(0)
     , m_minimumLogicalFontSize(0)
     , m_defaultFontSize(0)
@@ -545,6 +548,13 @@ void Settings::setApplicationChromeMode(bool mode)
 {
     m_inApplicationChromeMode = mode;
 }
+
+#if ENABLE(WKHTMLTOPDF_MODE)
+void Settings::setPrintingMediaType(const String& type)
+{
+    m_printingMediaType = type;
+}
+#endif
 
 #if USE(SAFARI_THEME)
 void Settings::setShouldPaintNativeControls(bool shouldPaintNativeControls)

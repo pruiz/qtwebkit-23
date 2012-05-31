@@ -126,6 +126,11 @@ public:
     void setDefaultTextEncoding(const QString &encoding);
     QString defaultTextEncoding() const;
 
+#if ENABLE(WKHTMLTOPDF_MODE)
+    void setPrintingMediaType(const QString &type);
+    QString printingMediaType() const;
+#endif
+
     static void setIconDatabasePath(const QString &location);
     static QString iconDatabasePath();
     static void clearIconDatabase();

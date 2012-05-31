@@ -213,6 +213,11 @@ namespace WebCore {
         void setApplicationChromeMode(bool);
         bool inApplicationChromeMode() const { return m_inApplicationChromeMode; }
 
+#if ENABLE(WKHTMLTOPDF_MODE)
+        void setPrintingMediaType(const String&);
+        const String& printingMediaType() const { return m_printingMediaType; }
+#endif
+
         void setCSSCustomFilterEnabled(bool enabled) { m_isCSSCustomFilterEnabled = enabled; }
         bool isCSSCustomFilterEnabled() const { return m_isCSSCustomFilterEnabled; }
 
@@ -300,6 +305,9 @@ namespace WebCore {
         Page* m_page;
 
         String m_mediaTypeOverride;
+#if ENABLE(WKHTMLTOPDF_MODE)
+        String m_printingMediaType;
+#endif
         KURL m_userStyleSheetLocation;
         ScriptFontFamilyMap m_standardFontFamilyMap;
         ScriptFontFamilyMap m_serifFontFamilyMap;

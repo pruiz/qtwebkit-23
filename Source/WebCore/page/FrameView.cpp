@@ -1345,7 +1345,13 @@ void FrameView::adjustMediaTypeForPrinting(bool printing)
     if (printing) {
         if (m_mediaTypeWhenNotPrinting.isNull())
             m_mediaTypeWhenNotPrinting = mediaType();
-            setMediaType("print");
+
+#if ENABLE(WKHTMLTOPDF_MODE)
+        String mediaType = (m_frame && m_frame->settings())?m_frame->settings()->printingMediaType():"print";
+#else
+	String mediaType = "print";
+#endif
+        setMediaType(mediaType);
     } else {
         if (!m_mediaTypeWhenNotPrinting.isNull())
             setMediaType(m_mediaTypeWhenNotPrinting);

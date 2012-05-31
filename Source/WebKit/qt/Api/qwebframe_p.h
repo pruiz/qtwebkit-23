@@ -37,6 +37,11 @@ using QTM_NAMESPACE::QOrientationSensor;
 #include "wtf/RefPtr.h"
 #include "Frame.h"
 #include "ViewportArguments.h"
+#ifdef WKHTMLTOPDF_MODE
+#include <qpainter.h>
+#include "PrintContext.h"
+#include "GraphicsContext.h"
+#endif
 #include <wtf/text/WTFString.h>
 
 #if USE(ACCELERATED_COMPOSITING)
@@ -71,6 +76,21 @@ public:
     int marginWidth;
     int marginHeight;
 };
+
+#ifdef WKHTMLTOPDF_MODE
+class QWebPrinterPrivate {
+public:
+    WebCore::PrintContext printContext;
+    QPainter & painter;
+    const QWebFrame * frame;
+    WebCore::GraphicsContext graphicsContext;
+    int printWidth;
+    QHash<const WebCore::Node*, const WebCore::RenderObject *> elementToRenderObject;
+    
+    QWebPrinterPrivate(const QWebFrame * frame, QPaintDevice *printer, QPainter &p);
+    ~QWebPrinterPrivate();
+};
+#endif
 
 class QWebFramePrivate {
 public:

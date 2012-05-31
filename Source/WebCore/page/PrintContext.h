@@ -79,6 +79,10 @@ public:
     // (pageSizeInPixels.height() + 1) * number-of-pages - 1
     static void spoolAllPagesWithBoundaries(Frame*, GraphicsContext&, const FloatSize& pageSizeInPixels);
 
+#ifdef WKHTMLTOPDF_MODE
+public:
+    const Vector<IntRect> & getPageRects() const {return m_pageRects;}
+#endif
 protected:
     Frame* m_frame;
     Vector<IntRect> m_pageRects;

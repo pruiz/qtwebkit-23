@@ -157,6 +157,9 @@ private:
     friend class QWebPage;
     friend class QWebPagePrivate;
     friend class QtWebElementRuntime;
+#ifdef WKHTMLTOPDF_MODE
+    friend class QWebPrinter;
+#endif
 
     QWebElementPrivate* d;
     WebCore::Element* m_element;

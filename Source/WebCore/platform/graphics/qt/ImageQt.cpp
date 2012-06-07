@@ -39,6 +39,9 @@
 #include "ImageObserver.h"
 #include "ShadowBlur.h"
 #include "StillImageQt.h"
+#if ENABLE(WKHTMLTOPDF_MODE)
+#include "SharedBuffer.h"
+#endif
 #include <wtf/text/WTFString.h>
 
 #include <QCoreApplication>
@@ -314,7 +317,12 @@ void BitmapImage::draw(GraphicsContext* ctxt, const FloatRect& dst,
         }
     }
 
+#if ENABLE(WKHTMLTOPDF_MODE)
+    QByteArray a = QByteArray::fromRawData(data()->data(), data()->size());
+    ctxt->platformContext()->drawPixmap(normalizedDst, *image, normalizedSrc, &a);
+#else
     ctxt->platformContext()->drawPixmap(normalizedDst, *image, normalizedSrc);
+#endif
 
     ctxt->setCompositeOperation(previousOperator);
 

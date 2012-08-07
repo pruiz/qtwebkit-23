@@ -110,6 +110,7 @@ HEADERS += \
     PassTraits.h \
     Platform.h \
     PossiblyNull.h \
+    qt/UtilsQt.h \
     RandomNumber.h \
     RandomNumberSeed.h \
     RedBlackTree.h \

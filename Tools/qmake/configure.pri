@@ -5,7 +5,7 @@
 # See 'Tools/qmake/README' for an overview of the build system
 # -------------------------------------------------------------------
 
-!quick_check {
+haveQt(5):!quick_check {
     load(configure)
     QMAKE_CONFIG_TESTS_DIR = $$PWD/config.tests
 

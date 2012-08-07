@@ -23,13 +23,23 @@
 #include <QEvent>
 #include <QTimer>
 
+#if defined(HAVE_QT5) && HAVE_QT5
 #include <QWindow>
+#else
+#include <QWidget>
+#endif
 
 namespace WebCore {
 
 class HTMLVideoElement;
 
-class FullScreenVideoWindow: public QWindow {
+#if defined(HAVE_QT5) && HAVE_QT5
+typedef QWindow Base;
+#else
+typedef QWidget Base;
+#endif
+
+class FullScreenVideoWindow: public Base {
 Q_OBJECT
 public:
     FullScreenVideoWindow();

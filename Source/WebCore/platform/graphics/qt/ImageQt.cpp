@@ -52,7 +52,7 @@
 
 #include <math.h>
 
-#if OS(WINDOWS)
+#if OS(WINDOWS) && HAVE(QT5)
 Q_GUI_EXPORT QPixmap qt_pixmapFromWinHBITMAP(HBITMAP, int hbitmapFormat = 0);
 #endif
 
@@ -299,7 +299,11 @@ void BitmapImage::checkForSolidColor()
 #if OS(WINDOWS)
 PassRefPtr<BitmapImage> BitmapImage::create(HBITMAP hBitmap)
 {
+#if HAVE(QT5)
     QImage* nativeImage = new QImage(qt_pixmapFromWinHBITMAP(hBitmap).toImage());
+#else
+    QImage* nativeImage = new QImage(QPixmap::fromWinHBITMAP(hBitmap).toImage());
+#endif
 
     return BitmapImage::create(nativeImage);
 }

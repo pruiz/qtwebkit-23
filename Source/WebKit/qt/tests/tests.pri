@@ -16,7 +16,10 @@ INCLUDEPATH += \
     $$PWD \
     $$PWD/../Api
 
-QT += testlib network webkit widgets
+QT += testlib network webkit
+haveQt(5): QT += widgets
+
+haveQt(4): haveQtModule(declarative): QT += declarative
 
 # This define is used by some tests to look up resources in the source tree
 DEFINES += TESTS_SOURCE_DIR=\\\"$$PWD/\\\"

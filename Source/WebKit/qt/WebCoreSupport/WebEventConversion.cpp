@@ -243,9 +243,11 @@ WebKitPlatformTouchEvent::WebKitPlatformTouchEvent(QTouchEvent* event)
     case QEvent::TouchEnd:
         m_type = PlatformEvent::TouchEnd;
         break;
+#if HAVE(QT5)
     case QEvent::TouchCancel:
         m_type = PlatformEvent::TouchCancel;
         break;
+#endif
     }
 
     const QList<QTouchEvent::TouchPoint>& points = event->touchPoints();

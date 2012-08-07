@@ -65,7 +65,9 @@
 #include <QFile>
 #include <QFontMetrics>
 
+#if QT_VERSION >= 0x050000
 #include <QStyleHints>
+#endif
 
 namespace WebCore {
 

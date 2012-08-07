@@ -38,7 +38,11 @@
 
 #if PLATFORM(QT)
 #include "NativeImageQt.h"
+#if HAVE(QT5)
 #include <QOpenGLContext>
+#else
+#include <QGLContext>
+#endif // QT_VERSION
 #elif OS(WINDOWS)
 #include <windows.h>
 #elif OS(MAC_OS_X)
@@ -58,11 +62,19 @@ namespace WebCore {
 struct TextureMapperGLData {
     struct SharedGLData : public RefCounted<SharedGLData> {
 #if PLATFORM(QT)
+#if QT_VERSION >= 0x050000
         typedef QOpenGLContext* GLContext;
         static GLContext getCurrentGLContext()
         {
             return QOpenGLContext::currentContext();
         }
+#else
+        typedef const QGLContext* GLContext;
+        static GLContext getCurrentGLContext()
+        {
+            return QGLContext::currentContext();
+        }
+#endif
 #elif OS(WINDOWS)
         typedef HGLRC GLContext;
         static GLContext getCurrentGLContext()

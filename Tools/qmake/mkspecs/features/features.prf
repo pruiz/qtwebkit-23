@@ -31,17 +31,30 @@ load(mobilityconfig, true)
 # by having the feature disabled in features.pri. Nor do you have to
 # unset the opposite value, that's handled automatically for you.
 
-DEFINES += WTF_USE_ICU_UNICODE=1
-DEFINES -= WTF_USE_QT4_UNICODE=1
+# For Mac we do not rely on QT_CONFIG, because icu is not officially supported for all of qt.
+haveQt(5):if(contains(QT_CONFIG,icu)|mac) {
+    DEFINES += WTF_USE_ICU_UNICODE=1
+    DEFINES -= WTF_USE_QT4_UNICODE=1
+} else {
+    DEFINES += WTF_USE_QT4_UNICODE=1
+    DEFINES -= WTF_USE_ICU_UNICODE=1
+}
 
 !contains(DEFINES, HAVE_QRAWFONT=.) {
     # Use of QRawFont in Qt 5:
-    DEFINES += HAVE_QRAWFONT=1
+    haveQt(5): DEFINES += HAVE_QRAWFONT=1
 }
 
 # We need fontconfig to set up the test fonts for DumpRenderTree and WebKitTestRunner.
-config_fontconfig:!mac {
-    DEFINES += HAVE_FONTCONFIG=1
+haveQt(5) {
+    config_fontconfig:!mac {
+        DEFINES += HAVE_FONTCONFIG=1
+    }
+} else {
+    # Qt 4
+    unix:!mac:!embedded {
+        DEFINES += HAVE_FONTCONFIG=1
+    }
 }
 
 # We need libxml2 config test to determine to use libxml2 or not
@@ -67,7 +80,7 @@ config_fontconfig:!mac {
 
 # Nescape plugins support (NPAPI)
 !contains(DEFINES, ENABLE_NETSCAPE_PLUGIN_API=.) {
-    xlibAvailable() {
+    haveQt(5):xlibAvailable() {
         DEFINES += ENABLE_NETSCAPE_PLUGIN_API=1
         CONFIG += plugin_backend_xlib
     } else: unix|win32-*:!embedded:!wince* {
@@ -92,7 +105,7 @@ config_fontconfig:!mac {
 }
 
 # QStyle detection
-haveQtModule(widgets): DEFINES += HAVE_QSTYLE=1
+haveQt(4)|haveQtModule(widgets): DEFINES += HAVE_QSTYLE=1
 
 # WebGL support
 !contains(DEFINES, ENABLE_WEBGL=.) {
@@ -121,9 +134,17 @@ haveQtModule(widgets): DEFINES += HAVE_QSTYLE=1
 }
 
 # orientation support
-haveQtModule(sensors) {
-    !contains(DEFINES, ENABLE_ORIENTATION_EVENTS=.): DEFINES += ENABLE_ORIENTATION_EVENTS=1
-    !contains(DEFINES, ENABLE_DEVICE_ORIENTATION=.): DEFINES += ENABLE_DEVICE_ORIENTATION=1
+haveQt(5) {
+    haveQtModule(sensors) {
+        !contains(DEFINES, ENABLE_ORIENTATION_EVENTS=.): DEFINES += ENABLE_ORIENTATION_EVENTS=1
+        !contains(DEFINES, ENABLE_DEVICE_ORIENTATION=.): DEFINES += ENABLE_DEVICE_ORIENTATION=1
+    }
+} else {
+    # Qt 4 with Qt Mobility
+    contains(MOBILITY_CONFIG, sensors) {
+        !contains(DEFINES, ENABLE_ORIENTATION_EVENTS=.): DEFINES += ENABLE_ORIENTATION_EVENTS=1
+        !contains(DEFINES, ENABLE_DEVICE_ORIENTATION=.): DEFINES += ENABLE_DEVICE_ORIENTATION=1
+    }
 }
 
 # HTML5 Media Support
@@ -148,8 +169,15 @@ haveQtModule(sensors) {
     !no_webkit2: DEFINES += ENABLE_FULLSCREEN_API=1
 }
 
+haveQt(4) {
+    haveQtModule(declarative): DEFINES += HAVE_QQUICK1=1
+} else {
+    # FIXME: Add Qt 5 QQuick1 support once QDeclarativeEngine in QQuick2
+    # is called QmlEngine and it is safe for us to use QQuick1 again.
+}
+
 # Xcomposite Support
-linux-*:config_libXcomposite: DEFINES += HAVE_XCOMPOSITE=1
+haveQt(5):linux-*:config_libXcomposite: DEFINES += HAVE_XCOMPOSITE=1
 
 # Xrender Support
 haveQt(5):linux-*:config_libXrender: DEFINES += HAVE_XRENDER=1
@@ -159,9 +187,11 @@ haveQt(5):linux-*:config_glx: DEFINES += HAVE_GLX=1
 
 # Support for Graphics Surface
 !contains(DEFINES, WTF_USE_GRAPHICS_SURFACE=.) {
-    mac: DEFINES += WTF_USE_GRAPHICS_SURFACE=1
-    # On linux we require GLX, libXcomposite and libXrender to enable graphics surface.
-    linux-*:contains(DEFINES, HAVE_GLX=1):contains(DEFINES, HAVE_XCOMPOSITE=1):contains(DEFINES, HAVE_XRENDER=1): DEFINES += WTF_USE_GRAPHICS_SURFACE=1
+    haveQt(5) {
+        mac: DEFINES += WTF_USE_GRAPHICS_SURFACE=1
+        # On linux we require GLX, libXcomposite and libXrender to enable graphics surface.
+        linux-*:contains(DEFINES, HAVE_GLX=1):contains(DEFINES, HAVE_XCOMPOSITE=1):contains(DEFINES, HAVE_XRENDER=1): DEFINES += WTF_USE_GRAPHICS_SURFACE=1
+    }
 }
 
 # -------------- Fill in static defaults --------------
@@ -207,10 +237,13 @@ for(define, DEFINES) {
 !contains(DEFINES, WTF_USE_3D_GRAPHICS=.) {
     # Disable USE(3D_GRAPHICS) on Windows temporarily, see https://bugs.webkit.org/show_bug.cgi?id=90850 for details.
     !win32-* {
-        DEFINES += WTF_USE_3D_GRAPHICS=1
+        haveQt(5)|contains(QT_CONFIG, opengl): DEFINES += WTF_USE_3D_GRAPHICS=1
     }
 }
 
+haveQt(4):contains(DEFINES, ENABLE_WEBGL=1):contains(DEFINES, WTF_USE_3D_GRAPHICS=0) {
+    error("WebGL requires Qt to be configured with OpenGL. Please reconfigure Qt with OpenGL, or build WebKit without WebGL.")
+}
 
 # Slider Touch is sensible to use when compiling WebKit2
 haveQt(5):contains(DEFINES, ENABLE_TOUCH_EVENTS=1) {

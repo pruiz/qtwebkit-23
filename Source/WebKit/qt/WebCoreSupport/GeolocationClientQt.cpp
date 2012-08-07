@@ -38,7 +38,11 @@
 #include "qwebpage.h"
 #include "qwebpage_p.h"
 
+#if !HAVE(QT5)
+#include <QGeoPositionInfoSource>
+#elif HAVE(QT5)
 #include <QtLocation/QGeoPositionInfoSource>
+#endif
 
 namespace WebCore {
 

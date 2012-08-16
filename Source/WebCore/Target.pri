@@ -100,7 +100,6 @@ SOURCES += \
      bindings/js/JSClipboardCustom.cpp \
      bindings/js/JSConsoleCustom.cpp \
      bindings/js/JSCoordinatesCustom.cpp \
-     bindings/js/JSCustomVoidCallback.cpp \
      bindings/js/JSCustomXPathNSResolver.cpp \
      bindings/js/JSDictionary.cpp \
      bindings/js/JSDOMBinding.cpp \
@@ -1287,7 +1286,6 @@ HEADERS += \
     bindings/js/JSArrayBufferViewHelper.h \
     bindings/js/JSCSSStyleDeclarationCustom.h \
     bindings/js/JSCallbackData.h \
-    bindings/js/JSCustomVoidCallback.h \
     bindings/js/JSCustomXPathNSResolver.h \
     bindings/js/JSDictionary.h \
     bindings/js/JSDOMBinding.h \

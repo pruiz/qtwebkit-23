@@ -1,3 +1,72 @@
+2012-08-16  Mike West  <mkwst@chromium.org>
+
+        Refactor CSPDirective to support non-sourcelist types.
+        https://bugs.webkit.org/show_bug.cgi?id=94252
+
+        Reviewed by Adam Barth.
+
+        The 'CSPDirective' was built to support source list Content Security
+        Policy directives like 'script-src' or 'object-src'. It doesn't support
+        new directive types like 'script-nonce' or 'plugin-types'. That
+        functionality has been implemented by hanging state off of
+        CSPDirectiveList, which isn't a great solution.
+
+        This patch pulls the source list functionality out of CSPDirective and
+        into SourceListDirective, and likewise pulls the nonce and media list
+        functionality into NonceDirective and MediaListDirective.
+
+        No new tests have been added; this refactoring should be externally
+        transparent, and the current CSP tests should continue to pass.
+
+        * page/ContentSecurityPolicy.cpp:
+        (WebCore::CSPDirective::CSPDirective):
+        (CSPDirective):
+        (WebCore::CSPDirective::text):
+        (WebCore::CSPDirective::policy):
+            CSPDirective is now a parent class for NonceDirective,
+            MediaListDirective, and SourceListDirective. It stores a pointer
+            to the ContentSecurityPolicy object in order to facilitate logging,
+            which now needs to happen at this level, rather than higher up in
+            CSPDirectiveList.
+        (WebCore):
+        (NonceDirective):
+        (WebCore::NonceDirective::NonceDirective):
+        (WebCore::NonceDirective::allows):
+        (WebCore::NonceDirective::parse):
+            Pull the nonce parsing code and state out of CSPDirectiveList
+            and into this new class.
+        (MediaListDirective):
+        (WebCore::MediaListDirective::MediaListDirective):
+        (WebCore::MediaListDirective::allows):
+        (WebCore::MediaListDirective::parse):
+            Pull the media list parsing code and state out of CSPDirectiveList
+            and into this new class.
+        (SourceListDirective):
+        (WebCore::SourceListDirective::SourceListDirective):
+        (WebCore::SourceListDirective::allows):
+            Pull the source list functionality out of CSPDirective
+            and into this new class.
+        (CSPDirectiveList):
+        (WebCore::CSPDirectiveList::checkEval):
+        (WebCore::CSPDirectiveList::checkInline):
+        (WebCore::CSPDirectiveList::checkNonce):
+        (WebCore::CSPDirectiveList::checkSource):
+        (WebCore::CSPDirectiveList::checkMediaType):
+        (WebCore::CSPDirectiveList::operativeDirective):
+        (WebCore::CSPDirectiveList::checkEvalAndReportViolation):
+        (WebCore::CSPDirectiveList::checkNonceAndReportViolation):
+        (WebCore::CSPDirectiveList::checkMediaTypeAndReportViolation):
+        (WebCore::CSPDirectiveList::checkInlineAndReportViolation):
+        (WebCore::CSPDirectiveList::checkSourceAndReportViolation):
+        (WebCore::CSPDirectiveList::allowJavaScriptURLs):
+        (WebCore::CSPDirectiveList::allowInlineEventHandlers):
+        (WebCore::CSPDirectiveList::allowScriptNonce):
+        (WebCore::CSPDirectiveList::allowPluginType):
+        (WebCore::CSPDirectiveList::setCSPDirective):
+        (WebCore::CSPDirectiveList::addDirective):
+            Use the new classes rather than CSPDirective (or no directive
+            at all, in the case of nonces and plugin types).
+
 2012-08-16  Adam Barth  <abarth@webkit.org>
 
         Null checks of m_frame->document()->domWindow() aren't needed

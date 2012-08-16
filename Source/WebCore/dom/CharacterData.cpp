@@ -94,7 +94,7 @@ unsigned CharacterData::parserAppendData(const UChar* data, unsigned dataLength,
 
 void CharacterData::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<CharacterData> info(memoryObjectInfo, this, MemoryInstrumentation::DOM);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::DOM);
     Node::reportMemoryUsage(memoryObjectInfo);
     info.addMember(m_data);
 }
@@ -209,14 +209,16 @@ void CharacterData::dispatchModifiedEvent(const String& oldData)
     if (OwnPtr<MutationObserverInterestGroup> mutationRecipients = MutationObserverInterestGroup::createForCharacterDataMutation(this))
         mutationRecipients->enqueueMutationRecord(MutationRecord::createCharacterData(this, oldData));
 #endif
-    if (parentNode())
-        parentNode()->childrenChanged();
-    if (document()->hasListenerType(Document::DOMCHARACTERDATAMODIFIED_LISTENER))
-        dispatchScopedEvent(MutationEvent::create(eventNames().DOMCharacterDataModifiedEvent, true, 0, oldData, m_data));
-    dispatchSubtreeModifiedEvent();
+    if (!isInShadowTree()) {
+        if (parentNode())
+            parentNode()->childrenChanged();
+        if (document()->hasListenerType(Document::DOMCHARACTERDATAMODIFIED_LISTENER))
+            dispatchScopedEvent(MutationEvent::create(eventNames().DOMCharacterDataModifiedEvent, true, 0, oldData, m_data));
+        dispatchSubtreeModifiedEvent();
 #if ENABLE(INSPECTOR)
-    InspectorInstrumentation::characterDataModified(document(), this);
+        InspectorInstrumentation::characterDataModified(document(), this);
 #endif
+    }
 }
 
 void CharacterData::checkCharDataOperation(unsigned offset, ExceptionCode& ec)

@@ -50,9 +50,11 @@ my (
     $channelMessagingSupport,
     $cspNextSupport,
     $css3FlexboxSupport,
+    $css3TextDecorationSupport,
     $cssBoxDecorationBreakSupport,
     $cssExclusionsSupport,
     $cssFiltersSupport,
+    $cssHierarchiesSupport,
     $cssImageOrientationSupport,
     $cssImageResolutionSupport,
     $cssRegionsSupport,
@@ -168,6 +170,12 @@ my @features = (
     { option => "css3-flexbox", desc => "Toggle CSS3 Flexbox support",
       define => "ENABLE_CSS3_FLEXBOX", default => 1, value => \$css3FlexboxSupport },
 
+    { option => "css3-text-decoration", desc => "Toggle CSS3 Text Decoration support",
+      define => "ENABLE_CSS3_TEXT_DECORATION", default => 0, value => \$css3TextDecorationSupport },
+
+    { option => "css-hierarchies", desc => "Toggle CSS Hierarchy support",
+      define => "ENABLE_CSS_HIERARCHIES", default => 0, value => \$cssHierarchiesSupport },
+
     { option => "css-box-decoration-break", desc => "Toggle CSS box-decoration-break support",
       define => "ENABLE_CSS_BOX_DECORATION_BREAK", default => 1, value => \$cssBoxDecorationBreakSupport },
 
@@ -187,7 +195,7 @@ my @features = (
       define => "ENABLE_CSS_COMPOSITING", default => 0, value => \$cssCompositingSupport },
 
     { option => "css-variables", desc => "Toggle CSS Variable support",
-      define => "ENABLE_CSS_VARIABLES", default => isEfl(), value => \$cssVariablesSupport },
+      define => "ENABLE_CSS_VARIABLES", default => (isBlackBerry() || isEfl()), value => \$cssVariablesSupport },
 
     { option => "custom-scheme-handler", desc => "Toggle Custom Scheme Handler support",
       define => "ENABLE_CUSTOM_SCHEME_HANDLER", default => (isBlackBerry() || isEfl()), value => \$customSchemeHandlerSupport },
@@ -226,7 +234,7 @@ my @features = (
       define => "ENABLE_FULLSCREEN_API", default => (isAppleMacWebKit() || isEfl() || isGtk() || isBlackBerry() || isQt()), value => \$fullscreenAPISupport },
 
     { option => "gamepad", desc => "Toggle Gamepad support",
-      define => "ENABLE_GAMEPAD", default => (isEfl() || isGtk()), value => \$gamepadSupport },
+      define => "ENABLE_GAMEPAD", default => (isEfl() || isGtk() || isQt()), value => \$gamepadSupport },
 
     { option => "geolocation", desc => "Toggle Geolocation support",
       define => "ENABLE_GEOLOCATION", default => (isAppleWebKit() || isGtk() || isBlackBerry()), value => \$geolocationSupport },

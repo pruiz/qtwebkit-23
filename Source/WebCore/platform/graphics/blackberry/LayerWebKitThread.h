@@ -107,6 +107,8 @@ public:
 
     void setPosition(const FloatPoint& position) { m_position = position; setNeedsCommit(); }
 
+    void setBoundsOrigin(const FloatPoint& boundsOrigin) { m_boundsOrigin = boundsOrigin; setNeedsCommit(); }
+
     const LayerWebKitThread* rootLayer() const;
 
     void removeAllSublayers();
@@ -131,6 +133,8 @@ public:
     Image* contents() const { return m_contents.get(); }
 
     void setOwner(GraphicsLayerBlackBerry* owner) { m_owner = owner; }
+    // NOTE: Can be 0.
+    GraphicsLayerBlackBerry* owner() const { return m_owner; }
 
     bool drawsContent() const { return m_owner && m_owner->drawsContent(); }
     void setDrawable(bool);
@@ -161,7 +165,6 @@ protected:
 
     void setNeedsTexture(bool needsTexture) { m_needsTexture = needsTexture; }
     void setLayerProgramShader(LayerData::LayerProgramShader shader) { m_layerProgramShader = shader; }
-    void createFrontBufferLock();
     bool isDrawable() const { return m_isDrawable; }
 
     void startAnimations(double time);
@@ -170,6 +173,7 @@ protected:
 
     virtual void boundsChanged() { }
     virtual void updateTextureContentsIfNeeded();
+    virtual void commitPendingTextureUploads();
 
 private:
     void updateLayerHierarchy();

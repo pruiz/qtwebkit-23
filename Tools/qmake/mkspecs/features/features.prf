@@ -57,6 +57,22 @@ haveQt(5) {
     }
 }
 
+!contains(DEFINES, HAVE_QTQUICK=.) {
+    haveQtModule(quick): DEFINES += HAVE_QTQUICK=1
+}
+
+!contains(DEFINES, HAVE_QTPRINTSUPPORT=.) {
+    haveQtModule(printsupport): DEFINES += HAVE_QTPRINTSUPPORT=1
+}
+
+!contains(DEFINES, HAVE_QTTESTLIB=.) {
+    haveQt(4)|haveQtModule(testlib) {
+        DEFINES += HAVE_QTTESTLIB=1
+    } else {
+        message("Missing QtTest module, disabling DumpRenderTree, WebKitTestRunner and tests")
+    }
+}
+
 # We need libxml2 config test to determine to use libxml2 or not
 !contains(DEFINES, WTF_USE_LIBXML2=.) {
     config_libxml2: DEFINES += WTF_USE_LIBXML2=1
@@ -169,11 +185,17 @@ haveQt(5) {
     !no_webkit2: DEFINES += ENABLE_FULLSCREEN_API=1
 }
 
+
 haveQt(4) {
     haveQtModule(declarative): DEFINES += HAVE_QQUICK1=1
 } else {
     # FIXME: Add Qt 5 QQuick1 support once QDeclarativeEngine in QQuick2
     # is called QmlEngine and it is safe for us to use QQuick1 again.
+}
+
+# Gamepad API Support
+linux-*:!contains(DEFINES, ENABLE_GAMEPAD=.) {
+    packagesExist(libudev): DEFINES += ENABLE_GAMEPAD=1
 }
 
 # Xcomposite Support
@@ -183,7 +205,7 @@ haveQt(5):linux-*:config_libXcomposite: DEFINES += HAVE_XCOMPOSITE=1
 haveQt(5):linux-*:config_libXrender: DEFINES += HAVE_XRENDER=1
 
 # GLX Support
-haveQt(5):linux-*:config_glx: DEFINES += HAVE_GLX=1
+haveQt(5):linux-*:config_glx:!contains(QT_CONFIG, opengles2): DEFINES += HAVE_GLX=1
 
 # Support for Graphics Surface
 !contains(DEFINES, WTF_USE_GRAPHICS_SURFACE=.) {
@@ -243,6 +265,14 @@ for(define, DEFINES) {
 
 haveQt(4):contains(DEFINES, ENABLE_WEBGL=1):contains(DEFINES, WTF_USE_3D_GRAPHICS=0) {
     error("WebGL requires Qt to be configured with OpenGL. Please reconfigure Qt with OpenGL, or build WebKit without WebGL.")
+}
+
+contains(DEFINES, ENABLE_GAMEPAD=1) {
+    !packagesExist(libudev) {
+        error("Gamepad API requires libudev to build. Please install libudev development files, or build WebKit without gamepad.")
+    } else:!linux-* {
+        error("Currently the Gamepad API is supported only on Linux, build WebKit without gamepad.")
+    }
 }
 
 # Slider Touch is sensible to use when compiling WebKit2

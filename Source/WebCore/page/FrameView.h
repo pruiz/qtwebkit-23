@@ -246,6 +246,10 @@ public:
     void setLastPaintTime(double lastPaintTime) { m_lastPaintTime = lastPaintTime; }
     void setNodeToDraw(Node*);
 
+    enum SelectionInSnaphot { IncludeSelection, ExcludeSelection };
+    enum CoordinateSpaceForSnapshot { DocumentCoordinates, ViewCoordinates };
+    void paintContentsForSnapshot(GraphicsContext*, const IntRect& imageRect, SelectionInSnaphot shouldPaintSelection, CoordinateSpaceForSnapshot);
+
     virtual void paintOverhangAreas(GraphicsContext*, const IntRect& horizontalOverhangArea, const IntRect& verticalOverhangArea, const IntRect& dirtyRect);
     virtual void paintScrollCorner(GraphicsContext*, const IntRect& cornerRect);
     virtual void paintScrollbar(GraphicsContext*, Scrollbar*, const IntRect&) OVERRIDE;
@@ -338,6 +342,8 @@ public:
     // On Mac WebKit1 the underlying NSScrollView just does the scrolling, but on most other platforms
     // we need this function in order to do the scroll ourselves.
     bool wheelEvent(const PlatformWheelEvent&);
+
+    void setScrollingPerformanceLoggingEnabled(bool);
 
 protected:
     virtual bool scrollContentsFastPath(const IntSize& scrollDelta, const IntRect& rectToScroll, const IntRect& clipRect);

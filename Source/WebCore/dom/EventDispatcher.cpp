@@ -27,6 +27,7 @@
 #include "EventDispatcher.h"
 
 #include "ComposedShadowTreeWalker.h"
+#include "ContainerNode.h"
 #include "ElementShadow.h"
 #include "EventContext.h"
 #include "EventDispatchMediator.h"
@@ -150,41 +151,6 @@ inline static EventTarget* eventTargetRespectingSVGTargetRules(Node* referenceNo
     return referenceNode;
 }
 
-void EventDispatcher::dispatchScopedEvent(Node* node, PassRefPtr<EventDispatchMediator> mediator)
-{
-    // We need to set the target here because it can go away by the time we actually fire the event.
-    mediator->event()->setTarget(eventTargetRespectingSVGTargetRules(node));
-    ScopedEventQueue::instance()->enqueueEventDispatchMediator(mediator);
-}
-
-void EventDispatcher::dispatchSimulatedClick(Node* node, PassRefPtr<Event> underlyingEvent, bool sendMouseEvents, bool showPressedLook)
-{
-    if (node->disabled())
-        return;
-
-    EventDispatcher dispatcher(node);
-
-    if (!gNodesDispatchingSimulatedClicks)
-        gNodesDispatchingSimulatedClicks = new HashSet<Node*>;
-    else if (gNodesDispatchingSimulatedClicks->contains(node))
-        return;
-
-    gNodesDispatchingSimulatedClicks->add(node);
-
-    // send mousedown and mouseup before the click, if requested
-    if (sendMouseEvents)
-        dispatcher.dispatchEvent(SimulatedMouseEvent::create(eventNames().mousedownEvent, node->document()->defaultView(), underlyingEvent));
-    node->setActive(true, showPressedLook);
-    if (sendMouseEvents)
-        dispatcher.dispatchEvent(SimulatedMouseEvent::create(eventNames().mouseupEvent, node->document()->defaultView(), underlyingEvent));
-    node->setActive(false);
-
-    // always send click
-    dispatcher.dispatchEvent(SimulatedMouseEvent::create(eventNames().clickEvent, node->document()->defaultView(), underlyingEvent));
-
-    gNodesDispatchingSimulatedClicks->remove(node);
-}
-
 void EventDispatcher::adjustRelatedTarget(Event* event, PassRefPtr<EventTarget> prpRelatedTarget)
 {
     if (!prpRelatedTarget)
@@ -201,6 +167,9 @@ void EventDispatcher::adjustRelatedTarget(Event* event, PassRefPtr<EventTarget> 
 EventDispatcher::EventDispatcher(Node* node)
     : m_node(node)
     , m_ancestorsInitialized(false)
+#ifndef NDEBUG
+    , m_eventDispatched(false)
+#endif
 {
     ASSERT(node);
     m_view = node->document()->view();
@@ -236,9 +205,48 @@ void EventDispatcher::ensureEventAncestors(Event* event)
     }
 }
 
+void EventDispatcher::dispatchScopedEvent(Node* node, PassRefPtr<EventDispatchMediator> mediator)
+{
+    // We need to set the target here because it can go away by the time we actually fire the event.
+    mediator->event()->setTarget(eventTargetRespectingSVGTargetRules(node));
+    ScopedEventQueue::instance()->enqueueEventDispatchMediator(mediator);
+}
+
+void EventDispatcher::dispatchSimulatedClick(Node* node, PassRefPtr<Event> underlyingEvent, bool sendMouseEvents, bool showPressedLook)
+{
+    if (node->disabled())
+        return;
+
+    if (!gNodesDispatchingSimulatedClicks)
+        gNodesDispatchingSimulatedClicks = new HashSet<Node*>;
+    else if (gNodesDispatchingSimulatedClicks->contains(node))
+        return;
+
+    gNodesDispatchingSimulatedClicks->add(node);
+
+    // send mousedown and mouseup before the click, if requested
+    if (sendMouseEvents)
+        EventDispatcher(node).dispatchEvent(SimulatedMouseEvent::create(eventNames().mousedownEvent, node->document()->defaultView(), underlyingEvent));
+    node->setActive(true, showPressedLook);
+    if (sendMouseEvents)
+        EventDispatcher(node).dispatchEvent(SimulatedMouseEvent::create(eventNames().mouseupEvent, node->document()->defaultView(), underlyingEvent));
+    node->setActive(false);
+
+    // always send click
+    EventDispatcher(node).dispatchEvent(SimulatedMouseEvent::create(eventNames().clickEvent, node->document()->defaultView(), underlyingEvent));
+
+    gNodesDispatchingSimulatedClicks->remove(node);
+}
+
 bool EventDispatcher::dispatchEvent(PassRefPtr<Event> prpEvent)
 {
+#ifndef NDEBUG
+    ASSERT(!m_eventDispatched);
+    m_eventDispatched = true;
+#endif
     RefPtr<Event> event = prpEvent;
+    ChildNodesLazySnapshot::takeChildNodesLazySnapshot();
+
     event->setTarget(eventTargetRespectingSVGTargetRules(m_node.get()));
     ASSERT(!eventDispatchForbidden());
     ASSERT(event->target());

@@ -414,7 +414,7 @@ Node::~Node()
 
     Document* doc = m_document;
     if (AXObjectCache::accessibilityEnabled() && doc && doc->axObjectCacheExists())
-        doc->axObjectCache()->removeNodeForUse(this);
+        doc->axObjectCache()->remove(this);
     
     if (m_previous)
         m_previous->setNextSibling(0);
@@ -1283,6 +1283,10 @@ void Node::attach()
 
     setAttached();
     clearNeedsStyleRecalc();
+
+    Document* doc = m_document;
+    if (AXObjectCache::accessibilityEnabled() && doc && doc->axObjectCacheExists())
+        doc->axObjectCache()->updateCacheAfterNodeIsAttached(this);
 }
 
 #ifndef NDEBUG
@@ -2132,7 +2136,7 @@ void Node::showNodePathForThis() const
         const Node* node = chain[index - 1];
         if (node->isShadowRoot()) {
             int count = 0;
-            for (ShadowRoot* shadowRoot = oldestShadowRootFor(node); shadowRoot && shadowRoot != node; shadowRoot = shadowRoot->youngerShadowRoot())
+            for (ShadowRoot* shadowRoot = oldestShadowRootFor(toShadowRoot(node)->host()); shadowRoot && shadowRoot != node; shadowRoot = shadowRoot->youngerShadowRoot())
                 ++count;
             fprintf(stderr, "/#shadow-root[%d]", count);
             continue;
@@ -2817,7 +2821,7 @@ void Node::removedLastRef()
 
 void Node::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<Node> info(memoryObjectInfo, this, MemoryInstrumentation::DOM);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::DOM);
     TreeShared<Node, ContainerNode>::reportMemoryUsage(memoryObjectInfo);
     ScriptWrappable::reportMemoryUsage(memoryObjectInfo);
     info.addInstrumentedMember(m_document);

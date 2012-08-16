@@ -60,6 +60,7 @@ from webkitpy.layout_tests.port import driver
 from webkitpy.layout_tests.port import http_lock
 from webkitpy.layout_tests.port import image_diff
 from webkitpy.layout_tests.port import server_process
+from webkitpy.layout_tests.port.factory import PortFactory
 from webkitpy.layout_tests.servers import apache_http_server
 from webkitpy.layout_tests.servers import http_server
 from webkitpy.layout_tests.servers import websocket_server
@@ -142,6 +143,7 @@ class Port(object):
         self._test_configuration = None
         self._reftest_list = {}
         self._results_directory = None
+        self._root_was_set = hasattr(options, 'root') and options.root
 
     def additional_drt_flag(self):
         return []
@@ -197,7 +199,7 @@ class Port(object):
 
 
     def baseline_search_path(self):
-        return self.get_option('additional_platform_directory', []) + self.default_baseline_search_path()
+        return self.get_option('additional_platform_directory', []) + self._compare_baseline() + self.default_baseline_search_path()
 
     def default_baseline_search_path(self):
         """Return a list of absolute paths to directories to search under for
@@ -210,11 +212,19 @@ class Port(object):
             search_paths.append(self.port_name)
         return map(self._webkit_baseline_path, search_paths)
 
+    @memoized
+    def _compare_baseline(self):
+        factory = PortFactory(self.host)
+        target_port = self.get_option('compare_port')
+        if target_port:
+            return factory.get(target_port).default_baseline_search_path()
+        return []
+
     def check_build(self, needs_http):
         """This routine is used to ensure that the build is up to date
         and all the needed binaries are present."""
         # If we're using a pre-built copy of WebKit (--root), we assume it also includes a build of DRT.
-        if not self.get_option('root') and self.get_option('build') and not self._build_driver():
+        if not self._root_was_set and self.get_option('build') and not self._build_driver():
             return False
         if not self._check_driver():
             return False
@@ -318,7 +328,7 @@ class Port(object):
         return expected_audio != actual_audio
 
     def diff_image(self, expected_contents, actual_contents, tolerance=None):
-        """Compare two images and return a tuple of an image diff, and a percentage difference (0-100).
+        """Compare two images and return a tuple of an image diff, a percentage difference (0-100), and an error string.
 
         |tolerance| should be a percentage value (0.0 - 100.0).
         If it is omitted, the port default tolerance value is used.
@@ -326,9 +336,9 @@ class Port(object):
         If an error occurs (like ImageDiff isn't found, or crashes, we log an error and return True (for a diff).
         """
         if not actual_contents and not expected_contents:
-            return (None, 0)
+            return (None, 0, None)
         if not actual_contents or not expected_contents:
-            return (True, 0)
+            return (True, 0, None)
         if not self._image_differ:
             self._image_differ = image_diff.ImageDiffer(self)
         self.set_option_default('tolerance', 0.1)
@@ -1167,6 +1177,8 @@ class Port(object):
                 root_directory = self._config.build_directory(self.get_option('configuration'))
             # Set --root so that we can pass this to subprocesses and avoid making the
             # slow call to config.build_directory() N times in each worker.
+            # FIXME: This is like @memoized, but more annoying and fragile; there should be another
+            # way to propagate values without mutating the options list.
             self.set_option_default('root', root_directory)
         return self._filesystem.join(self._filesystem.abspath(root_directory), *comps)
 

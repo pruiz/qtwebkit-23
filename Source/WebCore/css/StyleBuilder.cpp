@@ -45,7 +45,6 @@
 #include <wtf/UnusedParam.h>
 
 #if ENABLE(CSS_EXCLUSIONS)
-#include "CSSWrapShapes.h"
 #include "WrapShapeFunctions.h"
 #include "WrapShapes.h"
 #endif
@@ -720,7 +719,7 @@ public:
         bool parentIsAbsoluteSize = false;
         float size = 0;
 
-        if (styleResolver->hasParentNode()) {
+        if (styleResolver->parentStyle()) {
             parentSize = styleResolver->parentStyle()->fontDescription().specifiedSize();
             parentIsAbsoluteSize = styleResolver->parentStyle()->fontDescription().isAbsoluteSize();
         }
@@ -1933,6 +1932,9 @@ StyleBuilder::StyleBuilder()
     setPropertyHandler(CSSPropertyTabSize, ApplyPropertyDefault<unsigned, &RenderStyle::tabSize, unsigned, &RenderStyle::setTabSize, unsigned, &RenderStyle::initialTabSize>::createHandler());
     setPropertyHandler(CSSPropertyTextAlign, ApplyPropertyTextAlign::createHandler());
     setPropertyHandler(CSSPropertyTextDecoration, ApplyPropertyTextDecoration::createHandler());
+#if ENABLE(CSS3_TEXT_DECORATION)
+    setPropertyHandler(CSSPropertyWebkitTextDecorationLine, ApplyPropertyTextDecoration::createHandler());
+#endif // CSS3_TEXT_DECORATION
     setPropertyHandler(CSSPropertyTextIndent, ApplyPropertyLength<&RenderStyle::textIndent, &RenderStyle::setTextIndent, &RenderStyle::initialTextIndent>::createHandler());
     setPropertyHandler(CSSPropertyTextOverflow, ApplyPropertyDefault<TextOverflow, &RenderStyle::textOverflow, TextOverflow, &RenderStyle::setTextOverflow, TextOverflow, &RenderStyle::initialTextOverflow>::createHandler());
     setPropertyHandler(CSSPropertyTextRendering, ApplyPropertyFont<TextRenderingMode, &FontDescription::textRenderingMode, &FontDescription::setTextRenderingMode, AutoTextRendering>::createHandler());

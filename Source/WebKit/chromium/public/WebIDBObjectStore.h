@@ -26,10 +26,12 @@
 #ifndef WebIDBObjectStore_h
 #define WebIDBObjectStore_h
 
-#include "WebExceptionCode.h"
 #include "WebDOMStringList.h"
+#include "WebExceptionCode.h"
 #include "WebIDBCallbacks.h"
+#include "WebIDBCursor.h"
 #include "WebIDBKeyPath.h"
+#include "WebIDBTransaction.h"
 #include "platform/WebCommon.h"
 #include "platform/WebString.h"
 
@@ -61,6 +63,8 @@ public:
         WEBKIT_ASSERT_NOT_REACHED();
         return 0;
     }
+    virtual void setIndexKeys(const WebIDBKey&, const WebVector<WebString>&, const WebVector<WebIndexKeys>&, const WebIDBTransaction&) { WEBKIT_ASSERT_NOT_REACHED(); }
+    virtual void setIndexesReady(const WebVector<WebString>&, const WebIDBTransaction&) { WEBKIT_ASSERT_NOT_REACHED(); };
     // Transfers ownership of the WebIDBIndex to the caller.
     virtual WebIDBIndex* index(const WebString& name, WebExceptionCode&)
     {
@@ -68,7 +72,12 @@ public:
         return 0;
     }
     virtual void deleteIndex(const WebString& name, const WebIDBTransaction&, WebExceptionCode&) { WEBKIT_ASSERT_NOT_REACHED(); }
-    virtual void openCursor(const WebIDBKeyRange&, unsigned short direction, WebIDBCallbacks*, const WebIDBTransaction&, WebExceptionCode&) { WEBKIT_ASSERT_NOT_REACHED(); }
+    // FIXME: Remove this version of openCursor when TaskType is plumbed through chromium.
+    virtual void openCursor(const WebIDBKeyRange& range, unsigned short direction, WebIDBCallbacks* callbacks, const WebIDBTransaction& transaction, WebExceptionCode& ec)
+    {
+        openCursor(range, static_cast<WebIDBCursor::Direction>(direction), callbacks, WebIDBTransaction::NormalTask, transaction, ec);
+    }
+    virtual void openCursor(const WebIDBKeyRange&, WebIDBCursor::Direction direction, WebIDBCallbacks*, WebIDBTransaction::TaskType, const WebIDBTransaction&, WebExceptionCode&) { WEBKIT_ASSERT_NOT_REACHED(); }
     virtual void count(const WebIDBKeyRange&, WebIDBCallbacks*, const WebIDBTransaction&, WebExceptionCode&) { WEBKIT_ASSERT_NOT_REACHED(); }
 
 protected:

@@ -24,12 +24,11 @@
  */
 
 #include "config.h"
-#include "platform/WebLayer.h"
+#include <public/WebLayer.h>
 
-#include "Color.h"
 #include "LayerChromium.h"
 #include "SkMatrix44.h"
-#include "TransformationMatrix.h"
+#include "WebAnimationImpl.h"
 #include "WebLayerImpl.h"
 #include <public/WebFilterOperations.h>
 #include <public/WebFloatPoint.h>
@@ -334,9 +333,9 @@ void WebLayer::setAnimationDelegate(WebAnimationDelegate* delegate)
     m_private->setLayerAnimationDelegate(delegate);
 }
 
-bool WebLayer::addAnimation(const WebAnimation& animation)
+bool WebLayer::addAnimation(WebAnimation* animation)
 {
-    return m_private->addAnimation(animation);
+    return m_private->addAnimation(static_cast<WebAnimationImpl*>(animation)->cloneToCCAnimation());
 }
 
 void WebLayer::removeAnimation(int animationId)
@@ -362,6 +361,11 @@ void WebLayer::suspendAnimations(double monotonicTime)
 void WebLayer::resumeAnimations(double monotonicTime)
 {
     m_private->resumeAnimations(monotonicTime);
+}
+
+bool WebLayer::hasActiveAnimation()
+{
+    return m_private->hasActiveAnimation();
 }
 
 void WebLayer::transferAnimationsTo(WebLayer* other)

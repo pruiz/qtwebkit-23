@@ -557,6 +557,7 @@ public:
 
     virtual void childrenChanged() { }
     virtual void contentChanged() { }
+    virtual void updateAccessibilityRole() { }
     const AccessibilityChildrenVector& children();
     virtual void addChildren() { }
     virtual bool canHaveChildren() const { return true; }
@@ -638,6 +639,8 @@ public:
     virtual String nameForMSAA() const { return String(); }
     virtual String descriptionForMSAA() const { return String(); }
     virtual AccessibilityRole roleValueForMSAA() const { return roleValue(); }
+
+    virtual String passwordFieldValue() const { return String(); }
 
     // Used by an ARIA tree to get all its rows.
     void ariaTreeRows(AccessibilityChildrenVector&);

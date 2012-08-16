@@ -29,6 +29,7 @@
 #include "CSSValueKeywords.h"
 #include "GraphicsContext.h"
 #include "HTMLInputElement.h"
+#include "InputType.h"
 #include "NotImplemented.h"
 #include "Page.h"
 #include "PaintInfo.h"
@@ -451,8 +452,6 @@ void RenderThemeEfl::createEdje()
         else if (!edje_object_file_set(m_edje, m_themePath.utf8().data(), "webkit/base")) {
             Edje_Load_Error err = edje_object_load_error_get(m_edje);
             const char* errmsg = edje_load_error_str(err);
-            EINA_LOG_ERR("Could not load 'webkit/base' from theme %s: %s",
-                         m_themePath.utf8().data(), errmsg);
             evas_object_del(m_edje);
             m_edje = 0;
         } else {
@@ -747,8 +746,15 @@ LayoutUnit RenderThemeEfl::baselinePosition(const RenderObject* object) const
 bool RenderThemeEfl::paintSliderTrack(RenderObject* object, const PaintInfo& info, const IntRect& rect)
 {
     if (object->style()->appearance() == SliderHorizontalPart)
-        return paintThemePart(object, SliderHorizontal, info, rect);
-    return paintThemePart(object, SliderVertical, info, rect);
+        paintThemePart(object, SliderHorizontal, info, rect);
+    else
+        paintThemePart(object, SliderVertical, info, rect);
+
+#if ENABLE(DATALIST_ELEMENT)
+    paintSliderTicks(object, info, rect);
+#endif
+
+    return false;
 }
 
 void RenderThemeEfl::adjustSliderTrackStyle(StyleResolver* styleResolver, RenderStyle* style, Element* element) const
@@ -792,16 +798,26 @@ void RenderThemeEfl::adjustSliderThumbSize(RenderStyle* style, Element*) const
 #if ENABLE(DATALIST_ELEMENT)
 IntSize RenderThemeEfl::sliderTickSize() const
 {
-    // FIXME: We need to set this to the size of one tick mark.
-    return IntSize(0, 0);
+    return IntSize(1, 6);
 }
 
 int RenderThemeEfl::sliderTickOffsetFromTrackCenter() const
 {
-    // FIXME: We need to set this to the position of the tick marks.
-    return 0;
+    static const int sliderTickOffset = -12;
+
+    return sliderTickOffset;
 }
 #endif
+
+bool RenderThemeEfl::supportsDataListUI(const AtomicString& type) const
+{
+#if ENABLE(DATALIST_ELEMENT)
+    // FIXME: We need to support other types.
+    return type == InputTypeNames::range();
+#else
+    return false;
+#endif
+}
 
 bool RenderThemeEfl::paintSliderThumb(RenderObject* object, const PaintInfo& info, const IntRect& rect)
 {
@@ -1222,7 +1238,7 @@ bool RenderThemeEfl::paintMediaSliderTrack(RenderObject* object, const PaintInfo
         IntPoint sliderTopRight = sliderTopLeft;
         sliderTopRight.move(0, rangeRect.height());
 
-        context->fillRect(FloatRect(rect), m_mediaPanelColor, ColorSpaceDeviceRGB);
+        context->fillRect(FloatRect(rangeRect), m_mediaPanelColor, ColorSpaceDeviceRGB);
     }
     context->restore();
     return true;

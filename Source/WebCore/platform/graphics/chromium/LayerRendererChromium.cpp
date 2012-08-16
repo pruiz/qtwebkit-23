@@ -186,8 +186,10 @@ bool LayerRendererChromium::initialize()
         return false;
 
     m_context->setContextLostCallback(this);
+    m_context->pushGroupMarkerEXT("CompositorContext");
 
-    String extensionsString = m_context->getString(GraphicsContext3D::EXTENSIONS);
+    WebKit::WebString extensionsWebString = m_context->getString(GraphicsContext3D::EXTENSIONS);
+    String extensionsString(extensionsWebString.data(), extensionsWebString.length());
     Vector<String> extensionsList;
     extensionsString.split(' ', extensionsList);
     HashSet<String> extensions;
@@ -283,35 +285,24 @@ void LayerRendererChromium::viewportChanged()
     m_isViewportChanged = true;
 }
 
-void LayerRendererChromium::clearFramebuffer(DrawingFrame& frame, const FloatRect& framebufferDamageRect)
+void LayerRendererChromium::clearFramebuffer(DrawingFrame& frame)
 {
-    // On DEBUG builds, opaque render passes are cleared to blue to easily see regions that were not drawn on the screen. If we
-    // are using partial swap / scissor optimization, then the surface should only
-    // clear the damaged region, so that we don't accidentally clear un-changed portions
-    // of the screen.
-
+    // On DEBUG builds, opaque render passes are cleared to blue to easily see regions that were not drawn on the screen.
     if (frame.currentRenderPass->hasTransparentBackground())
         GLC(m_context, m_context->clearColor(0, 0, 0, 0));
     else
         GLC(m_context, m_context->clearColor(0, 0, 1, 1));
 
-    if (m_capabilities.usingPartialSwap)
-        setScissorToRect(frame, enclosingIntRect(framebufferDamageRect));
-    else
-        GLC(m_context, m_context->disable(GraphicsContext3D::SCISSOR_TEST));
-
 #if defined(NDEBUG)
     if (frame.currentRenderPass->hasTransparentBackground())
 #endif
         m_context->clear(GraphicsContext3D::COLOR_BUFFER_BIT);
-
-    GLC(m_context, m_context->enable(GraphicsContext3D::SCISSOR_TEST));
 }
 
 // static
 IntSize LayerRendererChromium::renderPassTextureSize(const CCRenderPass* pass)
 {
-    return pass->framebufferOutputRect().size();
+    return pass->outputRect().size();
 }
 
 // static
@@ -362,7 +353,7 @@ bool LayerRendererChromium::haveCachedResourcesForRenderPassId(int id) const
     return texture && texture->id() && texture->isComplete();
 }
 
-void LayerRendererChromium::drawFrame(const CCRenderPassList& renderPassesInDrawOrder, const CCRenderPassIdHashMap& renderPassesById, const FloatRect& rootScissorRect)
+void LayerRendererChromium::drawFrame(const CCRenderPassList& renderPassesInDrawOrder, const CCRenderPassIdHashMap& renderPassesById)
 {
     const CCRenderPass* rootRenderPass = renderPassesInDrawOrder.last();
     ASSERT(rootRenderPass);
@@ -371,16 +362,17 @@ void LayerRendererChromium::drawFrame(const CCRenderPassList& renderPassesInDraw
     frame.renderPassesById = &renderPassesById;
     frame.rootRenderPass = rootRenderPass;
 
+    frame.rootDamageRect = m_capabilities.usingPartialSwap ? frame.rootRenderPass->damageRect() : frame.rootRenderPass->outputRect();
+    frame.rootDamageRect.intersect(IntRect(IntPoint::zero(), viewportSize()));
+
     beginDrawingFrame();
 
-    for (size_t i = 0; i < renderPassesInDrawOrder.size(); ++i) {
-        const CCRenderPass* renderPass = renderPassesInDrawOrder[i];
-
-        FloatRect rootScissorRectInCurrentSurface = renderPass->targetSurface()->computeRootScissorRectInCurrentSurface(rootScissorRect);
-        drawRenderPass(frame, renderPass, rootScissorRectInCurrentSurface);
-    }
+    for (size_t i = 0; i < renderPassesInDrawOrder.size(); ++i)
+        drawRenderPass(frame, renderPassesInDrawOrder[i]);
 
     finishDrawingFrame();
+
+    m_swapBufferRect.unite(enclosingIntRect(frame.rootDamageRect));
 }
 
 void LayerRendererChromium::beginDrawingFrame()
@@ -417,27 +409,38 @@ void LayerRendererChromium::doNoOp()
     GLC(m_context, m_context->flush());
 }
 
-void LayerRendererChromium::drawRenderPass(DrawingFrame& frame, const CCRenderPass* renderPass, const FloatRect& framebufferDamageRect)
+void LayerRendererChromium::drawRenderPass(DrawingFrame& frame, const CCRenderPass* renderPass)
 {
     if (!useRenderPass(frame, renderPass))
         return;
 
-    clearFramebuffer(frame, framebufferDamageRect);
+    FloatRect scissorRect = renderPass->outputRect();
+    if (frame.rootDamageRect != frame.rootRenderPass->outputRect()) {
+        WebTransformationMatrix inverseTransformToRoot = renderPass->transformToRootTarget().inverse();
+        scissorRect.intersect(CCMathUtil::projectClippedRect(inverseTransformToRoot, frame.rootDamageRect));
+    }
+
+    if (scissorRect != renderPass->outputRect())
+        setScissorToRect(frame, enclosingIntRect(scissorRect));
+    else
+        GLC(m_context, m_context->disable(GraphicsContext3D::SCISSOR_TEST));
+
+    clearFramebuffer(frame);
 
     const CCQuadList& quadList = renderPass->quadList();
     for (CCQuadList::constBackToFrontIterator it = quadList.backToFrontBegin(); it != quadList.backToFrontEnd(); ++it)
-        drawQuad(frame, it->get());
+        drawQuad(frame, it->get(), scissorRect);
+
+    CachedTexture* texture = m_renderPassTextures.get(renderPass->id());
+    if (texture)
+        texture->setIsComplete(!renderPass->hasOcclusionFromOutsideTargetSurface());
 }
 
-void LayerRendererChromium::drawQuad(DrawingFrame& frame, const CCDrawQuad* quad)
+void LayerRendererChromium::drawQuad(DrawingFrame& frame, const CCDrawQuad* quad, FloatRect scissorRect)
 {
-    IntRect scissorRect = quad->scissorRect();
-
-    ASSERT(!scissorRect.isEmpty());
+    scissorRect.intersect(quad->clippedRectInTarget());
     if (scissorRect.isEmpty())
         return;
-
-    setScissorToRect(frame, scissorRect);
 
     if (quad->needsBlending())
         GLC(m_context, m_context->enable(GraphicsContext3D::BLEND));
@@ -507,6 +510,7 @@ void LayerRendererChromium::drawDebugBorderQuad(DrawingFrame& frame, const CCDeb
     ASSERT(program && program->initialized());
     GLC(context(), context()->useProgram(program->program()));
 
+    // Use the full quadRect for debug quads to not move the edges based on partial swaps.
     const IntRect& layerRect = quad->quadRect();
     WebTransformationMatrix renderMatrix = quad->quadTransform();
     renderMatrix.translate(0.5 * layerRect.width() + layerRect.x(), 0.5 * layerRect.height() + layerRect.y());
@@ -578,7 +582,7 @@ PassOwnPtr<CCScopedTexture> LayerRendererChromium::drawBackgroundFilters(Drawing
     deviceRect.move(-left, -top);
     deviceRect.expand(left + right, top + bottom);
 
-    deviceRect.intersect(frame.currentRenderPass->framebufferOutputRect());
+    deviceRect.intersect(frame.currentRenderPass->outputRect());
 
     OwnPtr<CCScopedTexture> deviceBackgroundTexture = CCScopedTexture::create(m_resourceProvider);
     if (!getFramebufferTexture(deviceBackgroundTexture.get(), deviceRect))
@@ -685,6 +689,8 @@ void LayerRendererChromium::drawRenderPassQuad(DrawingFrame& frame, const CCRend
     int shaderQuadLocation = -1;
     int shaderEdgeLocation = -1;
     int shaderMaskSamplerLocation = -1;
+    int shaderMaskTexCoordScaleLocation = -1;
+    int shaderMaskTexCoordOffsetLocation = -1;
     int shaderMatrixLocation = -1;
     int shaderAlphaLocation = -1;
     if (useAA && maskTextureId) {
@@ -695,6 +701,8 @@ void LayerRendererChromium::drawRenderPassQuad(DrawingFrame& frame, const CCRend
         shaderQuadLocation = program->vertexShader().pointLocation();
         shaderEdgeLocation = program->fragmentShader().edgeLocation();
         shaderMaskSamplerLocation = program->fragmentShader().maskSamplerLocation();
+        shaderMaskTexCoordScaleLocation = program->fragmentShader().maskTexCoordScaleLocation();
+        shaderMaskTexCoordOffsetLocation = program->fragmentShader().maskTexCoordOffsetLocation();
         shaderMatrixLocation = program->vertexShader().matrixLocation();
         shaderAlphaLocation = program->fragmentShader().alphaLocation();
     } else if (!useAA && maskTextureId) {
@@ -703,6 +711,8 @@ void LayerRendererChromium::drawRenderPassQuad(DrawingFrame& frame, const CCRend
         GLC(context(), context()->uniform1i(program->fragmentShader().samplerLocation(), 0));
 
         shaderMaskSamplerLocation = program->fragmentShader().maskSamplerLocation();
+        shaderMaskTexCoordScaleLocation = program->fragmentShader().maskTexCoordScaleLocation();
+        shaderMaskTexCoordOffsetLocation = program->fragmentShader().maskTexCoordOffsetLocation();
         shaderMatrixLocation = program->vertexShader().matrixLocation();
         shaderAlphaLocation = program->fragmentShader().alphaLocation();
     } else if (useAA && !maskTextureId) {
@@ -724,8 +734,12 @@ void LayerRendererChromium::drawRenderPassQuad(DrawingFrame& frame, const CCRend
     }
 
     if (shaderMaskSamplerLocation != -1) {
+        ASSERT(shaderMaskTexCoordScaleLocation != 1);
+        ASSERT(shaderMaskTexCoordOffsetLocation != 1);
         GLC(context(), context()->activeTexture(GraphicsContext3D::TEXTURE1));
         GLC(context(), context()->uniform1i(shaderMaskSamplerLocation, 1));
+        GLC(context(), context()->uniform2f(shaderMaskTexCoordScaleLocation, quad->maskTexCoordScaleX(), quad->maskTexCoordScaleY()));
+        GLC(context(), context()->uniform2f(shaderMaskTexCoordOffsetLocation, quad->maskTexCoordOffsetX(), quad->maskTexCoordOffsetY()));
         context()->bindTexture(GraphicsContext3D::TEXTURE_2D, maskTextureId);
         GLC(context(), context()->activeTexture(GraphicsContext3D::TEXTURE0));
     }
@@ -787,7 +801,7 @@ static void tileUniformLocation(T program, TileProgramUniforms& uniforms)
 
 void LayerRendererChromium::drawTileQuad(DrawingFrame& frame, const CCTileDrawQuad* quad)
 {
-    const IntRect& tileRect = quad->quadVisibleRect();
+    IntRect tileRect = quad->quadVisibleRect();
 
     FloatRect clampRect(tileRect);
     // Clamp texture coordinates to avoid sampling outside the layer
@@ -804,7 +818,7 @@ void LayerRendererChromium::drawTileQuad(DrawingFrame& frame, const CCTileDrawQu
     FloatSize clampOffset = clampRect.minXMinYCorner() - FloatRect(tileRect).minXMinYCorner();
 
     FloatPoint textureOffset = quad->textureOffset() + clampOffset +
-                               IntPoint(quad->quadVisibleRect().location() - quad->quadRect().location());
+                               IntPoint(tileRect.location() - quad->quadRect().location());
 
     // Map clamping rectangle to unit square.
     float vertexTexTranslateX = -clampRect.x() / clampRect.width();
@@ -895,7 +909,7 @@ void LayerRendererChromium::drawTileQuad(DrawingFrame& frame, const CCTileDrawQu
         CCLayerQuad::Edge topEdge(topLeft, topRight);
         CCLayerQuad::Edge rightEdge(topRight, bottomRight);
 
-        // Only apply anti-aliasing to edges not clipped during culling.
+        // Only apply anti-aliasing to edges not clipped by culling or scissoring.
         if (quad->topEdgeAA() && tileRect.y() == quad->quadRect().y())
             topEdge = deviceLayerEdges.top();
         if (quad->leftEdgeAA() && tileRect.x() == quad->quadRect().x())
@@ -1208,7 +1222,7 @@ void LayerRendererChromium::finish()
     m_context->finish();
 }
 
-bool LayerRendererChromium::swapBuffers(const IntRect& subBuffer)
+bool LayerRendererChromium::swapBuffers()
 {
     ASSERT(m_visible);
     ASSERT(!m_isFramebufferDiscarded);
@@ -1218,14 +1232,16 @@ bool LayerRendererChromium::swapBuffers(const IntRect& subBuffer)
 
     if (m_capabilities.usingPartialSwap) {
         // If supported, we can save significant bandwidth by only swapping the damaged/scissored region (clamped to the viewport)
-        IntRect clippedSubBuffer = subBuffer;
-        clippedSubBuffer.intersect(IntRect(IntPoint::zero(), viewportSize()));
-        int flippedYPosOfRectBottom = viewportHeight() - clippedSubBuffer.y() - clippedSubBuffer.height();
-        m_context->postSubBufferCHROMIUM(clippedSubBuffer.x(), flippedYPosOfRectBottom, clippedSubBuffer.width(), clippedSubBuffer.height());
-    } else
+        m_swapBufferRect.intersect(IntRect(IntPoint(), viewportSize()));
+        int flippedYPosOfRectBottom = viewportHeight() - m_swapBufferRect.y() - m_swapBufferRect.height();
+        m_context->postSubBufferCHROMIUM(m_swapBufferRect.x(), flippedYPosOfRectBottom, m_swapBufferRect.width(), m_swapBufferRect.height());
+    } else {
         // Note that currently this has the same effect as swapBuffers; we should
         // consider exposing a different entry point on WebGraphicsContext3D.
         m_context->prepareTexture();
+    }
+
+    m_swapBufferRect = IntRect();
 
     return true;
 }
@@ -1381,19 +1397,16 @@ bool LayerRendererChromium::useRenderPass(DrawingFrame& frame, const CCRenderPas
     if (renderPass == frame.rootRenderPass) {
         frame.currentFramebufferLock.clear();
         GLC(m_context, m_context->bindFramebuffer(GraphicsContext3D::FRAMEBUFFER, 0));
-        setDrawFramebufferRect(frame, renderPass->framebufferOutputRect(), true);
+        setDrawFramebufferRect(frame, renderPass->outputRect(), true);
         return true;
     }
 
     CachedTexture* texture = m_renderPassTextures.get(renderPass->id());
     ASSERT(texture);
-
-    texture->setIsComplete(!renderPass->hasOcclusionFromOutsideTargetSurface());
-
     if (!texture->id() && !texture->allocate(CCRenderer::ImplPool, renderPassTextureSize(renderPass), renderPassTextureFormat(renderPass), CCResourceProvider::TextureUsageFramebuffer))
         return false;
 
-    return bindFramebufferToTexture(frame, texture, renderPass->framebufferOutputRect());
+    return bindFramebufferToTexture(frame, texture, renderPass->outputRect());
 }
 
 bool LayerRendererChromium::useScopedTexture(DrawingFrame& frame, const CCScopedTexture* texture, const IntRect& viewportRect)
@@ -1430,7 +1443,7 @@ bool LayerRendererChromium::bindFramebufferToTexture(DrawingFrame& frame, const 
 // scissorRect has its origin at the top left corner of the current visible rect.
 void LayerRendererChromium::setScissorToRect(DrawingFrame& frame, const IntRect& scissorRect)
 {
-    IntRect framebufferOutputRect = frame.currentRenderPass->framebufferOutputRect();
+    IntRect framebufferOutputRect = frame.currentRenderPass->outputRect();
 
     GLC(m_context, m_context->enable(GraphicsContext3D::SCISSOR_TEST));
 

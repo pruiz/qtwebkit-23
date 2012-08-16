@@ -724,26 +724,26 @@ void Element::attributeChanged(const Attribute& attribute)
     const QualifiedName& attrName = attribute.name();
     if (attrName == aria_activedescendantAttr) {
         // any change to aria-activedescendant attribute triggers accessibility focus change, but document focus remains intact
-        document()->axObjectCache()->handleActiveDescendantChanged(renderer());
+        document()->axObjectCache()->handleActiveDescendantChanged(this);
     } else if (attrName == roleAttr) {
         // the role attribute can change at any time, and the AccessibilityObject must pick up these changes
-        document()->axObjectCache()->handleAriaRoleChanged(renderer());
+        document()->axObjectCache()->handleAriaRoleChanged(this);
     } else if (attrName == aria_valuenowAttr) {
         // If the valuenow attribute changes, AX clients need to be notified.
-        document()->axObjectCache()->postNotification(renderer(), AXObjectCache::AXValueChanged, true);
+        document()->axObjectCache()->postNotification(this, AXObjectCache::AXValueChanged, true);
     } else if (attrName == aria_labelAttr || attrName == aria_labeledbyAttr || attrName == altAttr || attrName == titleAttr) {
         // If the content of an element changes due to an attribute change, notify accessibility.
-        document()->axObjectCache()->contentChanged(renderer());
+        document()->axObjectCache()->contentChanged(this);
     } else if (attrName == aria_checkedAttr)
-        document()->axObjectCache()->checkedStateChanged(renderer());
+        document()->axObjectCache()->checkedStateChanged(this);
     else if (attrName == aria_selectedAttr)
-        document()->axObjectCache()->selectedChildrenChanged(renderer());
+        document()->axObjectCache()->selectedChildrenChanged(this);
     else if (attrName == aria_expandedAttr)
-        document()->axObjectCache()->handleAriaExpandedChange(renderer());
+        document()->axObjectCache()->handleAriaExpandedChange(this);
     else if (attrName == aria_hiddenAttr)
-        document()->axObjectCache()->childrenChanged(renderer());
+        document()->axObjectCache()->childrenChanged(this);
     else if (attrName == aria_invalidAttr)
-        document()->axObjectCache()->postNotification(renderer(), AXObjectCache::AXInvalidStatusChanged, true);
+        document()->axObjectCache()->postNotification(this, AXObjectCache::AXInvalidStatusChanged, true);
 }
 
 // Returns true is the given attribute is an event handler.
@@ -1205,14 +1205,6 @@ ShadowRoot* Element::userAgentShadowRoot() const
     return 0;
 }
 
-ShadowRoot* Element::ensureShadowRoot()
-{
-    if (ElementShadow* shadow = this->shadow())
-        return shadow->oldestShadowRoot();
-
-    return ShadowRoot::create(this, ShadowRoot::UserAgentShadowRoot).get();
-}
-
 const AtomicString& Element::shadowPseudoId() const
 {
     return hasRareData() ? elementRareData()->m_shadowPseudoId : nullAtom;
@@ -1498,12 +1490,12 @@ void Element::removeAttribute(size_t index)
     mutableAttributeData()->removeAttribute(index, this);
 }
 
-void Element::removeAttribute(const String& name)
+void Element::removeAttribute(const AtomicString& name)
 {
     if (!attributeData())
         return;
 
-    String localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
+    AtomicString localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
     size_t index = attributeData()->getAttributeItemIndex(localName, false);
     if (index == notFound)
         return;
@@ -1511,12 +1503,12 @@ void Element::removeAttribute(const String& name)
     mutableAttributeData()->removeAttribute(index, this);
 }
 
-void Element::removeAttributeNS(const String& namespaceURI, const String& localName)
+void Element::removeAttributeNS(const AtomicString& namespaceURI, const AtomicString& localName)
 {
     removeAttribute(QualifiedName(nullAtom, localName, namespaceURI));
 }
 
-PassRefPtr<Attr> Element::getAttributeNode(const String& name)
+PassRefPtr<Attr> Element::getAttributeNode(const AtomicString& name)
 {
     const ElementAttributeData* attributeData = updatedAttributeData();
     if (!attributeData)
@@ -1524,7 +1516,7 @@ PassRefPtr<Attr> Element::getAttributeNode(const String& name)
     return attributeData->getAttributeNode(name, shouldIgnoreAttributeCase(this), this);
 }
 
-PassRefPtr<Attr> Element::getAttributeNodeNS(const String& namespaceURI, const String& localName)
+PassRefPtr<Attr> Element::getAttributeNodeNS(const AtomicString& namespaceURI, const AtomicString& localName)
 {
     const ElementAttributeData* attributeData = updatedAttributeData();
     if (!attributeData)
@@ -1532,18 +1524,18 @@ PassRefPtr<Attr> Element::getAttributeNodeNS(const String& namespaceURI, const S
     return attributeData->getAttributeNode(QualifiedName(nullAtom, localName, namespaceURI), this);
 }
 
-bool Element::hasAttribute(const String& name) const
+bool Element::hasAttribute(const AtomicString& name) const
 {
     if (!attributeData())
         return false;
 
     // This call to String::lower() seems to be required but
     // there may be a way to remove it.
-    String localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
+    AtomicString localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
     return updatedAttributeData()->getAttributeItem(localName, false);
 }
 
-bool Element::hasAttributeNS(const String& namespaceURI, const String& localName) const
+bool Element::hasAttributeNS(const AtomicString& namespaceURI, const AtomicString& localName) const
 {
     const ElementAttributeData* attributeData = updatedAttributeData();
     if (!attributeData)

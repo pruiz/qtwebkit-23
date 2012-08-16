@@ -47,7 +47,6 @@
 #include "Cookie.h"
 #include "CookieJar.h"
 #include "DOMEditor.h"
-#include "DOMNodeHighlighter.h"
 #include "DOMPatchSupport.h"
 #include "DOMWindow.h"
 #include "Document.h"
@@ -68,6 +67,7 @@
 #include "InjectedScriptManager.h"
 #include "InspectorFrontend.h"
 #include "InspectorHistory.h"
+#include "InspectorOverlay.h"
 #include "InspectorPageAgent.h"
 #include "InspectorState.h"
 #include "InstrumentingAgents.h"
@@ -104,10 +104,6 @@ using namespace HTMLNames;
 
 namespace DOMAgentState {
 static const char documentRequested[] = "documentRequested";
-
-#if ENABLE(TOUCH_EVENTS)
-static const char touchEventEmulationEnabled[] = "touchEventEmulationEnabled";
-#endif
 };
 
 static const size_t maxTextSize = 10000;
@@ -240,9 +236,6 @@ void InspectorDOMAgent::clearFrontend()
     m_frontend = 0;
     m_instrumentingAgents->setInspectorDOMAgent(0);
     m_state->setBoolean(DOMAgentState::documentRequested, false);
-#if ENABLE(TOUCH_EVENTS)
-    updateTouchEventEmulationInPage(false);
-#endif
     reset();
 }
 
@@ -251,9 +244,6 @@ void InspectorDOMAgent::restore()
     // Reset document to avoid early return from setDocument.
     m_document = 0;
     setDocument(m_pageAgent->mainFrame()->document());
-#if ENABLE(TOUCH_EVENTS)
-    updateTouchEventEmulationInPage(m_state->getBoolean(DOMAgentState::touchEventEmulationEnabled));
-#endif
 }
 
 Vector<Document*> InspectorDOMAgent::documents()
@@ -459,14 +449,18 @@ void InspectorDOMAgent::discardBindings()
     m_childrenRequested.clear();
 }
 
-#if ENABLE(TOUCH_EVENTS)
-void InspectorDOMAgent::updateTouchEventEmulationInPage(bool enabled)
+int InspectorDOMAgent::pushNodeToFrontend(ErrorString* errorString, int documentNodeId, Node* nodeToPush)
 {
-    m_state->setBoolean(DOMAgentState::touchEventEmulationEnabled, enabled);
-    if (m_pageAgent->mainFrame() && m_pageAgent->mainFrame()->settings())
-        m_pageAgent->mainFrame()->settings()->setTouchEventEmulationEnabled(enabled);
+    Document* document = assertDocument(errorString, documentNodeId);
+    if (!document)
+        return 0;
+    if (nodeToPush->document() != document) {
+        *errorString = "Node is not part of the document with given id";
+        return 0;
+    }
+
+    return pushNodePathToFrontend(nodeToPush);
 }
-#endif
 
 Node* InspectorDOMAgent::nodeForId(int id)
 {
@@ -1108,19 +1102,6 @@ void InspectorDOMAgent::moveTo(ErrorString* errorString, int nodeId, int targetE
     *newNodeId = pushNodePathToFrontend(node);
 }
 
-void InspectorDOMAgent::setTouchEmulationEnabled(ErrorString* error, bool enabled)
-{
-#if ENABLE(TOUCH_EVENTS)
-    if (m_state->getBoolean(DOMAgentState::touchEventEmulationEnabled) == enabled)
-        return;
-    UNUSED_PARAM(error);
-    updateTouchEventEmulationInPage(enabled);
-#else
-    *error = "Touch events emulation not supported";
-    UNUSED_PARAM(enabled);
-#endif
-}
-
 void InspectorDOMAgent::undo(ErrorString* errorString)
 {
     ExceptionCode ec = 0;
@@ -1280,15 +1261,17 @@ PassRefPtr<TypeBuilder::Array<String> > InspectorDOMAgent::buildArrayForElementA
 PassRefPtr<TypeBuilder::Array<TypeBuilder::DOM::Node> > InspectorDOMAgent::buildArrayForContainerChildren(Node* container, int depth, NodeToIdMap* nodesMap)
 {
     RefPtr<TypeBuilder::Array<TypeBuilder::DOM::Node> > children = TypeBuilder::Array<TypeBuilder::DOM::Node>::create();
-    Node* child = innerFirstChild(container);
-
     if (depth == 0) {
         // Special-case the only text child - pretend that container's children have been requested.
-        if (child && child->nodeType() == Node::TEXT_NODE && !innerNextSibling(child))
-            return buildArrayForContainerChildren(container, 1, nodesMap);
+        Node* firstChild = container->firstChild();
+        if (firstChild && firstChild->nodeType() == Node::TEXT_NODE && !firstChild->nextSibling()) {
+            children->addItem(buildObjectForNode(firstChild, 0, nodesMap));
+            m_childrenRequested.add(bind(container, nodesMap));
+        }
         return children.release();
     }
 
+    Node* child = innerFirstChild(container);
     depth--;
     m_childrenRequested.add(bind(container, nodesMap));
 

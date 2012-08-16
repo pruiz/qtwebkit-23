@@ -385,7 +385,7 @@ static void printNavigationErrorMessage(Frame* frame, const KURL& activeURL)
                      frame->document()->url().string() + " from frame with URL " + activeURL.string() + ".\n";
 
     // FIXME: should we print to the console of the document performing the navigation instead?
-    frame->domWindow()->printErrorMessage(message);
+    frame->document()->domWindow()->printErrorMessage(message);
 }
 
 static HashSet<Document*>* documentsThatNeedStyleRecalc = 0;
@@ -611,6 +611,10 @@ Document::~Document()
     ASSERT(!m_styleRecalcTimer.isActive());
     ASSERT(!m_parentTreeScope);
     ASSERT(!m_guardRefCount);
+
+    // FIXME: Should we clear m_domWindow when we detach from the Frame?
+    if (m_domWindow)
+        m_domWindow->clear();
 
     m_scriptRunner.clear();
 
@@ -2043,6 +2047,7 @@ void Document::setIsViewSource(bool isViewSource)
         return;
 
     setSecurityOrigin(SecurityOrigin::createUnique());
+    didUpdateSecurityOrigin();
 }
 
 void Document::combineCSSFeatureFlags()
@@ -2161,7 +2166,7 @@ void Document::detach()
 
     if (render)
         render->destroy();
-    
+
     // This is required, as our Frame might delete itself as soon as it detaches
     // us. However, this violates Node::detach() semantics, as it's never
     // possible to re-attach. Eventually Document::detach() should be renamed,
@@ -3853,17 +3858,8 @@ bool Document::setFocusedNode(PassRefPtr<Node> prpNewFocusedNode)
     }
 
 #if PLATFORM(MAC) || PLATFORM(WIN) || PLATFORM(GTK) || PLATFORM(CHROMIUM)
-    if (!focusChangeBlocked && m_focusedNode && AXObjectCache::accessibilityEnabled()) {
-        RenderObject* oldFocusedRenderer = 0;
-        RenderObject* newFocusedRenderer = 0;
-
-        if (oldFocusedNode)
-            oldFocusedRenderer = oldFocusedNode->renderer();
-        if (newFocusedNode)
-            newFocusedRenderer = newFocusedNode->renderer();
-
-        axObjectCache()->handleFocusedUIElementChanged(oldFocusedRenderer, newFocusedRenderer);
-    }
+    if (!focusChangeBlocked && m_focusedNode && AXObjectCache::accessibilityEnabled())
+        axObjectCache()->handleFocusedUIElementChanged(oldFocusedNode.get(), newFocusedNode.get());
 #endif
     if (!focusChangeBlocked)
         page()->chrome()->focusedNodeChanged(m_focusedNode.get());
@@ -4035,18 +4031,28 @@ void Document::textNodeSplit(Text* oldNode)
     // FIXME: This should update markers for spelling and grammar checking.
 }
 
-// FIXME: eventually, this should return a DOMWindow stored in the document.
-DOMWindow* Document::domWindow() const
+void Document::createDOMWindow()
 {
-    if (!frame())
-        return 0;
+    ASSERT(m_frame);
+    ASSERT(!m_domWindow);
 
-    // The m_frame pointer is not (not always?) zeroed out when the document is put into b/f cache, so the frame can hold an unrelated document/window pair.
-    // FIXME: We should always zero out the frame pointer on navigation to avoid accidentally accessing the new frame content.
-    if (m_frame->document() != this)
-        return 0;
+    m_domWindow = DOMWindow::create(this);
 
-    return frame()->domWindow();
+    ASSERT(m_domWindow->document() == this);
+    ASSERT(m_domWindow->frame() == m_frame);
+}
+
+void Document::takeDOMWindowFrom(Document* document)
+{
+    ASSERT(m_frame);
+    ASSERT(!m_domWindow);
+    ASSERT(document->domWindow());
+
+    m_domWindow = document->m_domWindow.release();
+    m_domWindow->didSecureTransitionTo(this);
+
+    ASSERT(m_domWindow->document() == this);
+    ASSERT(m_domWindow->frame() == m_frame);
 }
 
 void Document::setWindowAttributeEventListener(const AtomicString& eventType, PassRefPtr<EventListener> listener)
@@ -5014,6 +5020,8 @@ void Document::initSecurityContext()
                 securityOrigin()->enforceFilePathSeparation();
             }
         }
+        if (settings->thirdPartyStorageBlockingEnabled())
+            securityOrigin()->blockThirdPartyStorage();
     }
 
     Document* parentDocument = ownerElement() ? ownerElement()->document() : 0;
@@ -5069,9 +5077,6 @@ void Document::didUpdateSecurityOrigin()
 {
     if (!m_frame)
         return;
-    // FIXME: We should remove DOMWindow::m_securityOrigin so that we don't need to keep them in sync.
-    // See <https://bugs.webkit.org/show_bug.cgi?id=75793>.
-    m_frame->domWindow()->setSecurityOrigin(securityOrigin());
     m_frame->script()->updateSecurityOrigin();
 }
 
@@ -6089,10 +6094,16 @@ void Document::setContextFeatures(PassRefPtr<ContextFeatures> features)
 
 void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<Document> info(memoryObjectInfo, this, MemoryInstrumentation::DOM);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::DOM);
     info.addInstrumentedMember(m_styleResolver);
     ContainerNode::reportMemoryUsage(memoryObjectInfo);
     info.addVector(m_customFonts);
+    info.addMember(m_url);
+    info.addMember(m_baseURL);
+    info.addMember(m_baseURLOverride);
+    info.addMember(m_baseElementURL);
+    info.addMember(m_cookieURL);
+    info.addMember(m_firstPartyForCookies);
     info.addMember(m_documentURI);
     info.addMember(m_baseTarget);
     info.addInstrumentedMember(m_frame);
@@ -6124,6 +6135,7 @@ void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     info.addHashSet(m_mediaVolumeCallbackElements);
     info.addHashSet(m_privateBrowsingStateChangedElements);
     info.addHashMap(m_elementsByAccessKey);
+    info.addInstrumentedMember(m_eventQueue);
     info.addHashSet(m_mediaCanStartListeners);
     info.addVector(m_pendingTasks);
 }

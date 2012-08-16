@@ -92,8 +92,6 @@ public:
 #if ENABLE(VIDEO)
         , m_mediaPlayer(0)
 #endif
-        , m_texID(0)
-        , m_frontBufferLock(0)
         , m_suspendTime(0)
         , m_doubleSided(true)
         , m_masksToBounds(false)
@@ -143,15 +141,14 @@ public:
 
     FloatPoint position() const { return m_position; }
 
+    FloatPoint boundsOrigin() const { return m_boundsOrigin; }
+
     // This is currently only used for perspective transform, see GraphicsLayer::setChildrenTransform()
     const TransformationMatrix& sublayerTransform() const { return m_sublayerTransform; }
 
     const TransformationMatrix& transform() const { return m_transform; }
 
     bool preserves3D() const { return m_preserves3D; }
-
-    unsigned getTextureID() const { return m_texID; }
-    void setTextureID(unsigned int value) { m_texID = value; }
 
     bool needsTexture() const { return m_layerType == WebGLLayer || m_layerType == CanvasLayer || m_needsTexture; }
 
@@ -193,6 +190,7 @@ protected:
     IntSize m_bounds;
     FloatPoint m_position;
     FloatPoint m_anchorPoint;
+    FloatPoint m_boundsOrigin;
     Color m_backgroundColor;
     Color m_borderColor;
 
@@ -215,10 +213,6 @@ protected:
     IntRect m_holePunchClipRect;
 #endif
     IntRect m_holePunchRect;
-
-    unsigned m_texID;
-
-    pthread_mutex_t* m_frontBufferLock;
 
     double m_suspendTime;
 

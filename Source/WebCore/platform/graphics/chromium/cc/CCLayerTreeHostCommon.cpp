@@ -65,50 +65,6 @@ IntRect CCLayerTreeHostCommon::calculateVisibleRect(const IntRect& targetSurface
     return layerRect;
 }
 
-template<typename LayerType, typename RenderSurfaceType>
-static IntRect calculateLayerScissorRect(LayerType* layer, const FloatRect& rootScissorRect)
-{
-    LayerType* renderTarget = layer->renderTarget();
-    RenderSurfaceType* targetSurface = renderTarget->renderSurface();
-
-    FloatRect rootScissorRectInTargetSurface = targetSurface->computeRootScissorRectInCurrentSurface(rootScissorRect);
-    FloatRect clipAndDamage = intersection(rootScissorRectInTargetSurface, layer->drawableContentRect());
-
-    return enclosingIntRect(clipAndDamage);
-}
-
-template<typename LayerType, typename RenderSurfaceType>
-static IntRect calculateSurfaceScissorRect(LayerType* layer, const FloatRect& rootScissorRect)
-{
-    LayerType* parentLayer = layer->parent();
-    LayerType* renderTarget = parentLayer->renderTarget();
-
-    RenderSurfaceType* targetSurface = renderTarget->renderSurface();
-    ASSERT(targetSurface);
-
-    RenderSurfaceType* currentSurface = layer->renderSurface();
-    ASSERT(currentSurface);
-
-    FloatRect clipRect = currentSurface->clipRect();
-
-    // For surfaces, empty clipRect means that the surface does not clip anything.
-    if (clipRect.isEmpty())
-        clipRect = intersection(targetSurface->contentRect(), currentSurface->drawableContentRect());
-    else
-        clipRect.intersect(currentSurface->drawableContentRect());
-
-    FloatRect rootScissorRectInTargetSurface = targetSurface->computeRootScissorRectInCurrentSurface(rootScissorRect);
-
-    FloatRect clipAndDamage = intersection(rootScissorRectInTargetSurface, clipRect);
-
-    // If the layer has background filters that move pixels, we cannot scissor as tightly.
-    // FIXME: this should be able to be a tighter scissor, perhaps expanded by the filter outsets?
-    if (layer->backgroundFilters().hasFilterThatMovesPixels())
-        clipAndDamage = rootScissorRectInTargetSurface;
-
-    return enclosingIntRect(clipAndDamage);
-}
-
 template<typename LayerType>
 static inline bool layerIsInExisting3DRenderingContext(LayerType* layer)
 {
@@ -546,10 +502,10 @@ static void calculateDrawTransformsInternal(LayerType* layer, LayerType* rootLay
     // The drawTransform that gets computed below is effectively the layer's drawTransform, unless
     // the layer itself creates a renderSurface. In that case, the renderSurface re-parents the transforms.
     WebTransformationMatrix drawTransform = combinedTransform;
+    // M[draw] = M[parent] * LT * Tr[anchor2center] * Tr[center2origin]
+    drawTransform.translate(-layer->bounds().width() / 2.0, -layer->bounds().height() / 2.0);
     if (!layer->contentBounds().isEmpty() && !layer->bounds().isEmpty()) {
-        // M[draw] = M[parent] * LT * Tr[anchor2center] * Tr[center2anchor]
-        drawTransform.translate(-layer->bounds().width() / 2.0, -layer->bounds().height() / 2.0);
-        // M[draw] = M[parent] * LT * Tr[anchor2origin] * S[content2layer]
+        // M[draw] = M[parent] * LT * Tr[anchor2origin] * S[layer2content]
         drawTransform.scaleNonUniform(layer->bounds().width() / static_cast<double>(layer->contentBounds().width()),
                                       layer->bounds().height() / static_cast<double>(layer->contentBounds().height()));
     }
@@ -819,7 +775,7 @@ static void calculateDrawTransformsInternal(LayerType* layer, LayerType* rootLay
 // tree pass, revise calculateVisibleContentRect() so that this can be done in a single
 // pass inside calculateDrawTransformsInternal<>().
 template<typename LayerType, typename LayerList, typename RenderSurfaceType>
-static void calculateVisibleAndScissorRectsInternal(const LayerList& renderSurfaceLayerList, const FloatRect& rootScissorRect)
+static void calculateVisibleRectsInternal(const LayerList& renderSurfaceLayerList)
 {
     // Use BackToFront since it's cheap and this isn't order-dependent.
     typedef CCLayerIterator<LayerType, LayerList, RenderSurfaceType, CCLayerIteratorActions::BackToFront> CCLayerIteratorType;
@@ -836,12 +792,6 @@ static void calculateVisibleAndScissorRectsInternal(const LayerList& renderSurfa
         } else if (it.representsItself()) {
             IntRect visibleContentRect = calculateVisibleContentRect(*it);
             it->setVisibleContentRect(visibleContentRect);
-
-            IntRect scissorRect = calculateLayerScissorRect<LayerType, RenderSurfaceType>(*it, rootScissorRect);
-            it->setScissorRect(scissorRect);
-        } else if (it.representsContributingRenderSurface()) {
-            IntRect scissorRect = calculateSurfaceScissorRect<LayerType, RenderSurfaceType>(*it, rootScissorRect);
-            it->renderSurface()->setScissorRect(scissorRect);
         }
     }
 }
@@ -874,14 +824,14 @@ void CCLayerTreeHostCommon::calculateDrawTransforms(CCLayerImpl* rootLayer, cons
                                                                                                                 rootLayer->renderSurface()->layerList(), layerSorter, maxTextureSize, deviceScaleFactor, totalDrawableContentRect);
 }
 
-void CCLayerTreeHostCommon::calculateVisibleAndScissorRects(Vector<RefPtr<LayerChromium> >& renderSurfaceLayerList, const FloatRect& rootScissorRect)
+void CCLayerTreeHostCommon::calculateVisibleRects(Vector<RefPtr<LayerChromium> >& renderSurfaceLayerList)
 {
-    calculateVisibleAndScissorRectsInternal<LayerChromium, Vector<RefPtr<LayerChromium> >, RenderSurfaceChromium>(renderSurfaceLayerList, rootScissorRect);
+    calculateVisibleRectsInternal<LayerChromium, Vector<RefPtr<LayerChromium> >, RenderSurfaceChromium>(renderSurfaceLayerList);
 }
 
-void CCLayerTreeHostCommon::calculateVisibleAndScissorRects(Vector<CCLayerImpl*>& renderSurfaceLayerList, const FloatRect& rootScissorRect)
+void CCLayerTreeHostCommon::calculateVisibleRects(Vector<CCLayerImpl*>& renderSurfaceLayerList)
 {
-    calculateVisibleAndScissorRectsInternal<CCLayerImpl, Vector<CCLayerImpl*>, CCRenderSurface>(renderSurfaceLayerList, rootScissorRect);
+    calculateVisibleRectsInternal<CCLayerImpl, Vector<CCLayerImpl*>, CCRenderSurface>(renderSurfaceLayerList);
 }
 
 static bool pointHitsRect(const IntPoint& viewportPoint, const WebTransformationMatrix& localSpaceToScreenSpaceTransform, FloatRect localSpaceRect)

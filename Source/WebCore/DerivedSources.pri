@@ -443,9 +443,9 @@ IDL_BINDINGS += \
     $$PWD/plugins/DOMMimeTypeArray.idl \
     $$PWD/storage/Storage.idl \
     $$PWD/storage/StorageEvent.idl \
-    $$PWD/testing/FastMallocStatistics.idl \
     $$PWD/testing/Internals.idl \
     $$PWD/testing/InternalSettings.idl \
+    $$PWD/testing/MallocStatistics.idl \
     $$PWD/workers/AbstractWorker.idl \
     $$PWD/workers/DedicatedWorkerContext.idl \
     $$PWD/workers/SharedWorker.idl \
@@ -613,6 +613,13 @@ contains(DEFINES, ENABLE_SVG=1) {
     $$PWD/svg/SVGZoomEvent.idl
 }
 
+contains(DEFINES, ENABLE_GAMEPAD=1) {
+  IDL_BINDINGS += \
+    $$PWD/Modules/gamepad/Gamepad.idl \
+    $$PWD/Modules/gamepad/GamepadList.idl \
+    $$PWD/Modules/gamepad/NavigatorGamepad.idl
+}
+
 contains(DEFINES, ENABLE_VIDEO_TRACK=1) {
   IDL_BINDINGS += \
     $$PWD/html/track/TextTrack.idl \
@@ -624,6 +631,7 @@ contains(DEFINES, ENABLE_VIDEO_TRACK=1) {
 
 contains(DEFINES, ENABLE_MEDIA_SOURCE=1) {
   IDL_BINDINGS += \
+    $$PWD/Modules/mediasource/MediaSource.idl \
     $$PWD/Modules/mediasource/SourceBuffer.idl \
     $$PWD/Modules/mediasource/SourceBufferList.idl
 }
@@ -706,19 +714,29 @@ generateBindings.commands = perl -I$$PWD/bindings/scripts $$generateBindings.scr
                             --include $$PWD/Modules/filesystem \
                             --include $$PWD/Modules/geolocation \
                             --include $$PWD/Modules/indexeddb \
+                            --include $$PWD/Modules/mediasource \
+                            --include $$PWD/Modules/notifications \
                             --include $$PWD/Modules/quota \
                             --include $$PWD/Modules/webaudio \
                             --include $$PWD/Modules/webdatabase \
                             --include $$PWD/Modules/websockets \
+                            --include $$PWD/css \
                             --include $$PWD/dom \
+                            --include $$PWD/editing \
                             --include $$PWD/fileapi \
                             --include $$PWD/html \
-                            --include $$PWD/xml \
-                            --include $$PWD/svg \
+                            --include $$PWD/html/canvas \
+                            --include $$PWD/html/shadow \
+                            --include $$PWD/html/track \
+                            --include $$PWD/inspector \
+                            --include $$PWD/loader/appcache \
+                            --include $$PWD/page \
+                            --include $$PWD/plugins \
                             --include $$PWD/storage \
-                            --include $$PWD/css \
+                            --include $$PWD/svg \
                             --include $$PWD/testing \
                             --include $$PWD/workers \
+                            --include $$PWD/xml \
                             --outputDir ${QMAKE_FUNC_FILE_OUT_PATH} \
                             --supplementalDependencyFile ${QMAKE_FUNC_FILE_OUT_PATH}/$$SUPPLEMENTAL_DEPENDENCY_FILE \
                             --preprocessor \"$${QMAKE_MOC} -E\" ${QMAKE_FILE_NAME}

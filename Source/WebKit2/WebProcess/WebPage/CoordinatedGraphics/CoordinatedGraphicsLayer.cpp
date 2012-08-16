@@ -116,6 +116,8 @@ CoordinatedGraphicsLayer::CoordinatedGraphicsLayer(GraphicsLayerClient* client)
     , m_shouldUpdateVisibleRect(true)
     , m_shouldSyncLayerState(true)
     , m_shouldSyncChildren(true)
+    , m_shouldSyncFilters(true)
+    , m_shouldSyncAnimatedProperties(true)
     , m_fixedToViewport(false)
     , m_canvasNeedsDisplay(false)
     , m_CoordinatedGraphicsLayerClient(0)
@@ -794,7 +796,7 @@ bool CoordinatedGraphicsLayer::addAnimation(const KeyframeValueList& valueList, 
     if (valueList.property() == AnimatedPropertyWebkitTransform)
         listsMatch = validateTransformOperations(valueList, ignoredHasBigRotation) >= 0;
 
-    m_animations.add(keyframesName, GraphicsLayerAnimation(valueList, boxSize, anim, timeOffset, listsMatch));
+    m_animations.add(GraphicsLayerAnimation(keyframesName, valueList, boxSize, anim, timeOffset, listsMatch));
     m_animationStartedTimer.startOneShot(0);
     didChangeLayerState();
     return true;

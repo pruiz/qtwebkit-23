@@ -42,6 +42,7 @@
 #include "WrapperTypeInfo.h"
 #include <v8.h>
 #include <wtf/Forward.h>
+#include <wtf/HashMap.h>
 #include <wtf/PassRefPtr.h> // so generated bindings don't have to
 #include <wtf/Vector.h>
 #include <wtf/text/TextPosition.h>
@@ -61,7 +62,7 @@ namespace WebCore {
     class ScriptExecutionContext;
     class ScriptSourceCode;
     class SecurityOrigin;
-    class V8BindingPerContextData;
+    class V8PerContextData;
     class V8EventListener;
     class V8IsolatedContext;
     class WorldContextHandle;
@@ -71,17 +72,18 @@ namespace WebCore {
     // The list of extensions that are registered for use with V8.
     typedef WTF::Vector<v8::Extension*> V8Extensions;
 
+    // Note: although the pointer is raw, the instance is kept alive by a strong
+    // reference to the v8 context it contains, which is not made weak until we
+    // call world->destroy().
+    //
+    // FIXME: We want to eventually be holding window shells instead of the
+    //        IsolatedContext directly.
+    typedef HashMap<int, V8IsolatedContext*> IsolatedWorldMap;
+
+    typedef HashMap<int, RefPtr<SecurityOrigin> > IsolatedWorldSecurityOriginMap;
+
     class V8Proxy {
     public:
-        // The types of javascript errors that can be thrown.
-        enum ErrorType {
-            RangeError,
-            ReferenceError,
-            SyntaxError,
-            TypeError,
-            GeneralError
-        };
-
         explicit V8Proxy(Frame*);
 
         ~V8Proxy();
@@ -92,14 +94,6 @@ namespace WebCore {
         void clearForClose();
 
         void finishedWithEvent(Event*) { }
-
-        // Evaluate JavaScript in a new isolated world. The script gets its own
-        // global scope, its own prototypes for intrinsic JavaScript objects (String,
-        // Array, and so-on), and its own wrappers for all DOM nodes and DOM
-        // constructors.
-        v8::Local<v8::Array> evaluateInIsolatedWorld(int worldID, const Vector<ScriptSourceCode>& sources, int extensionGroup);
-
-        void setIsolatedWorldSecurityOrigin(int worldID, PassRefPtr<SecurityOrigin>);
 
         // Evaluate a script file in the current execution environment.
         // The caller must hold an execution context.
@@ -125,7 +119,7 @@ namespace WebCore {
         // a context.
         static Frame* retrieveFrame(v8::Handle<v8::Context>);
 
-        static V8BindingPerContextData* retrievePerContextData(Frame*);
+        static V8PerContextData* retrievePerContextData(Frame*);
 
         // Returns V8 Context of a frame. If none exists, creates
         // a new context. It is potentially slow and consumes memory.
@@ -136,20 +130,7 @@ namespace WebCore {
         // is disabled and it returns true.
         static bool handleOutOfMemory();
 
-        static v8::Handle<v8::Value> checkNewLegal(const v8::Arguments&);
-
         static v8::Handle<v8::Script> compileScript(v8::Handle<v8::String> code, const String& fileName, const TextPosition& scriptStartPosition, v8::ScriptData* = 0);
-
-        // If the exception code is different from zero, a DOM exception is
-        // schedule to be thrown.
-        static v8::Handle<v8::Value> setDOMException(int exceptionCode, v8::Isolate*);
-
-        // Schedule an error object to be thrown.
-        static v8::Handle<v8::Value> throwError(ErrorType, const char* message, v8::Isolate* = 0);
-
-        // Helpers for throwing syntax and type errors with predefined messages.
-        static v8::Handle<v8::Value> throwTypeError(const char* = 0, v8::Isolate* = 0);
-        static v8::Handle<v8::Value> throwNotEnoughArgumentsError(v8::Isolate*);
 
         v8::Local<v8::Context> context();
         v8::Local<v8::Context> mainWorldContext();
@@ -161,22 +142,23 @@ namespace WebCore {
 
         bool setContextDebugId(int id);
         static int contextDebugId(v8::Handle<v8::Context>);
-        void collectIsolatedContexts(Vector<std::pair<ScriptState*, SecurityOrigin*> >&);
 
         // Registers a v8 extension to be available on webpages. Will only
         // affect v8 contexts initialized after this call. Takes ownership of
         // the v8::Extension object passed.
-        static void registerExtension(v8::Extension*);
-        static bool registeredExtensionWithV8(v8::Extension*);
-
+        static void registerExtensionIfNeeded(v8::Extension*);
         static V8Extensions& extensions();
 
         static void reportUnsafeAccessTo(Document* targetDocument);
 
+        // FIXME: Move m_isolatedWorlds to ScriptController and remove this getter.
+        IsolatedWorldMap& isolatedWorlds() { return m_isolatedWorlds; }
+
+        // FIXME: Move m_isolatedWorldSecurityOrigins to ScriptController and remove this getter.
+        IsolatedWorldSecurityOriginMap& isolatedWorldSecurityOrigins() { return m_isolatedWorldSecurityOrigins; }
+
     private:
         void resetIsolatedWorlds();
-
-        void hintForGCIfNecessary();
 
         PassOwnPtr<v8::ScriptData> precompileScript(v8::Handle<v8::String>, CachedScript*);
 
@@ -191,35 +173,12 @@ namespace WebCore {
         // The isolated worlds we are tracking for this frame. We hold them alive
         // here so that they can be used again by future calls to
         // evaluateInIsolatedWorld().
-        //
-        // Note: although the pointer is raw, the instance is kept alive by a strong
-        // reference to the v8 context it contains, which is not made weak until we
-        // call world->destroy().
-        //
-        // FIXME: We want to eventually be holding window shells instead of the
-        //        IsolatedContext directly.
-        typedef HashMap<int, V8IsolatedContext*> IsolatedWorldMap;
         IsolatedWorldMap m_isolatedWorlds;
         
-        typedef HashMap<int, RefPtr<SecurityOrigin> > IsolatedWorldSecurityOriginMap;
         IsolatedWorldSecurityOriginMap m_isolatedWorldSecurityOrigins;
     };
 
     v8::Local<v8::Context> toV8Context(ScriptExecutionContext*, const WorldContextHandle& worldContext);
-
-    inline v8::Handle<v8::Primitive> throwError(ExceptionCode ec, v8::Isolate* isolate = 0)
-    {
-        if (!v8::V8::IsExecutionTerminating())
-            V8Proxy::setDOMException(ec, isolate);
-        return v8::Undefined();
-    }
-
-    inline v8::Handle<v8::Primitive> throwError(v8::Local<v8::Value> exception, v8::Isolate* isolate = 0)
-    {
-        if (!v8::V8::IsExecutionTerminating())
-            v8::ThrowException(exception);
-        return v8::Undefined();
-    }
 }
 
 #endif // V8Proxy_h

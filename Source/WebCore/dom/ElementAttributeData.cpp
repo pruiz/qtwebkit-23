@@ -286,7 +286,7 @@ void ElementAttributeData::detachAttrObjectsFromElement(Element* element) const
 
 void ElementAttributeData::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<ElementAttributeData> info(memoryObjectInfo, this, MemoryInstrumentation::DOM);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::DOM);
     info.addInstrumentedMember(m_inlineStyleDecl);
     info.addInstrumentedMember(m_attributeStyle);
     info.addMember(m_classNames);
@@ -295,6 +295,8 @@ void ElementAttributeData::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo)
         info.addVectorPtr(m_mutableAttributeVector);
     else
         info.addRawBuffer(m_attributes, m_arraySize * sizeof(Attribute));
+    for (unsigned i = 0, len = length(); i < len; i++)
+        info.addInstrumentedMember(*attributeItem(i));
 }
 
 size_t ElementAttributeData::getAttributeItemIndexSlowCase(const AtomicString& name, bool shouldIgnoreAttributeCase) const

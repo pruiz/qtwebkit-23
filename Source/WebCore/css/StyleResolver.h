@@ -141,7 +141,7 @@ public:
 
     void keyframeStylesForAnimation(Element*, const RenderStyle*, KeyframeList&);
 
-    PassRefPtr<RenderStyle> pseudoStyleForElement(PseudoId, Element*, RenderStyle* parentStyle = 0);
+    PassRefPtr<RenderStyle> pseudoStyleForElement(PseudoId, Element*, RenderStyle* parentStyle);
 
     PassRefPtr<RenderStyle> styleForPage(int pageIndex);
 
@@ -274,14 +274,14 @@ public:
     void loadPendingResources();
 
     struct RuleFeature {
-        RuleFeature(StyleRule* rule, CSSSelector* selector, bool hasDocumentSecurityOrigin)
+        RuleFeature(StyleRule* rule, unsigned selectorIndex, bool hasDocumentSecurityOrigin)
             : rule(rule)
-            , selector(selector)
+            , selectorIndex(selectorIndex)
             , hasDocumentSecurityOrigin(hasDocumentSecurityOrigin) 
         { 
         }
         StyleRule* rule;
-        CSSSelector* selector;
+        unsigned selectorIndex;
         bool hasDocumentSecurityOrigin;
     };
     struct Features {

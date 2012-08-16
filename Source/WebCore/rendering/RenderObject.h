@@ -26,8 +26,7 @@
 #ifndef RenderObject_h
 #define RenderObject_h
 
-#include "CachedImage.h"
-#include "Document.h"
+#include "CachedImageClient.h"
 #include "Element.h"
 #include "FractionalLayoutUnit.h"
 #include "FloatQuad.h"
@@ -46,6 +45,7 @@ namespace WebCore {
 class AffineTransform;
 class AnimationController;
 class Cursor;
+class Document;
 class HitTestPoint;
 class HitTestResult;
 class InlineBox;
@@ -851,7 +851,6 @@ public:
 
     // Virtual function helpers for the deprecated Flexible Box Layout (display: -webkit-box).
     virtual bool isDeprecatedFlexibleBox() const { return false; }
-    virtual bool isFlexingChildren() const { return false; }
     virtual bool isStretchingChildren() const { return false; }
 
     // Virtual function helper for the new FlexibleBox Layout (display: -webkit-flex).

@@ -245,9 +245,6 @@ private:
 
     bool handleMouseDoubleClickEvent(const PlatformMouseEvent&);
 
-    static Node* targetNode(const MouseEventWithHitTestResults&);
-    static Node* targetNode(const HitTestResult&);
-
     bool handleMousePressEvent(const MouseEventWithHitTestResults&);
     bool handleMousePressEventSingleClick(const MouseEventWithHitTestResults&);
     bool handleMousePressEventDoubleClick(const MouseEventWithHitTestResults&);

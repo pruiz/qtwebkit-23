@@ -32,7 +32,7 @@
 
 #if ENABLE(CSS_SHADERS)
 
-#include "GraphicsTypes.h"
+#include "CustomFilterProgramInfo.h"
 
 #include <wtf/HashCountedSet.h>
 #include <wtf/RefCounted.h>
@@ -43,19 +43,6 @@ namespace WebCore {
 class GraphicsContext3D;
 class CustomFilterCompiledProgram;
 class CustomFilterProgramClient;
-
-typedef struct CustomFilterProgramMixSettings {
-    CustomFilterProgramMixSettings()
-        : enabled(false)
-        , blendMode(BlendModeNormal)
-        , compositeOperator(CompositeSourceOver)
-    {
-    }
-    
-    bool enabled;
-    BlendMode blendMode;
-    CompositeOperator compositeOperator;
-} CustomFilterProgramMixSettings;
 
 // This is the base class for the StyleCustomFilterProgram class which knows how to keep
 // references to the cached shaders.
@@ -70,9 +57,7 @@ public:
     void addClient(CustomFilterProgramClient*);
     void removeClient(CustomFilterProgramClient*);
     
-#if USE(3D_GRAPHICS)
-    PassRefPtr<CustomFilterCompiledProgram> compileProgramWithContext(GraphicsContext3D*);
-#endif
+    CustomFilterProgramInfo programInfo() const;
 
     // StyleCustomFilterProgram has the only implementation for the following method. That means, it casts to StyleCustomFilterProgram
     // withouth checking the type. If you add another implementation, also add a mechanism to check for the correct type.

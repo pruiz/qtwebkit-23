@@ -199,11 +199,12 @@ if (primitiveValue) \
 
 class RuleData {
 public:
-    RuleData(StyleRule*, CSSSelector*, unsigned position, bool hasDocumentSecurityOrigin, bool canUseFastCheckSelector, bool inRegionRule);
+    RuleData(StyleRule*, unsigned selectorIndex, unsigned position, bool hasDocumentSecurityOrigin, bool canUseFastCheckSelector, bool inRegionRule);
 
     unsigned position() const { return m_position; }
     StyleRule* rule() const { return m_rule; }
-    CSSSelector* selector() const { return m_selector; }
+    CSSSelector* selector() const { return m_rule->selectorList().selectorAt(m_selectorIndex); }
+    unsigned selectorIndex() const { return m_selectorIndex; }
 
     bool hasFastCheckableSelector() const { return m_hasFastCheckableSelector; }
     bool hasMultipartSelector() const { return m_hasMultipartSelector; }
@@ -222,11 +223,11 @@ public:
 
 private:
     StyleRule* m_rule;
-    CSSSelector* m_selector;
-    unsigned m_specificity;
+    unsigned m_selectorIndex : 12;
     // This number was picked fairly arbitrarily. We can probably lower it if we need to.
     // Some simple testing showed <100,000 RuleData's on large sites.
-    unsigned m_position : 24;
+    unsigned m_position : 20;
+    unsigned m_specificity : 24;
     unsigned m_hasFastCheckableSelector : 1;
     unsigned m_hasMultipartSelector : 1;
     unsigned m_hasRightmostSelectorMatchingHTMLBasedOnRuleHash : 1;
@@ -240,10 +241,9 @@ private:
     
 struct SameSizeAsRuleData {
     void* a;
-    void* b;
+    unsigned b;
     unsigned c;
-    unsigned d;
-    unsigned e[4];
+    unsigned d[4];
 };
 
 COMPILE_ASSERT(sizeof(RuleData) == sizeof(SameSizeAsRuleData), RuleData_should_stay_small);
@@ -258,7 +258,7 @@ public:
     void addRulesFromSheet(StyleSheetContents*, const MediaQueryEvaluator&, StyleResolver* = 0, const ContainerNode* = 0);
 
     void addStyleRule(StyleRule*, bool hasDocumentSecurityOrigin, bool canUseFastCheckSelector, bool isInRegionRule = false);
-    void addRule(StyleRule*, CSSSelector*, bool hasDocumentSecurityOrigin, bool canUseFastCheckSelector, bool isInRegionRule = false);
+    void addRule(StyleRule*, unsigned selectorIndex, bool hasDocumentSecurityOrigin, bool canUseFastCheckSelector, bool isInRegionRule = false);
     void addPageRule(StyleRulePage*);
     void addToRuleSet(AtomicStringImpl* key, AtomRuleMap&, const RuleData&);
     void addRegionRule(StyleRuleRegion*, bool hasDocumentSecurityOrigin);
@@ -481,7 +481,7 @@ static PassOwnPtr<RuleSet> makeRuleSet(const Vector<StyleResolver::RuleFeature>&
         return nullptr;
     OwnPtr<RuleSet> ruleSet = RuleSet::create();
     for (size_t i = 0; i < size; ++i)
-        ruleSet->addRule(rules[i].rule, rules[i].selector, rules[i].hasDocumentSecurityOrigin, false);
+        ruleSet->addRule(rules[i].rule, rules[i].selectorIndex, rules[i].hasDocumentSecurityOrigin, false);
     ruleSet->shrinkToFit();
     return ruleSet.release();
 }
@@ -738,7 +738,7 @@ void StyleResolver::Features::clear()
 
 void StyleResolver::Features::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<StyleResolver::Features> info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
     info.addHashSet(idsInRules);
     info.addHashSet(attrsInRules);
     info.addVector(siblingRules);
@@ -1908,6 +1908,7 @@ void StyleResolver::keyframeStylesForAnimation(Element* e, const RenderStyle* el
 
 PassRefPtr<RenderStyle> StyleResolver::pseudoStyleForElement(PseudoId pseudo, Element* e, RenderStyle* parentStyle)
 {
+    ASSERT(m_parentStyle);
     if (!e)
         return 0;
 
@@ -1915,9 +1916,7 @@ PassRefPtr<RenderStyle> StyleResolver::pseudoStyleForElement(PseudoId pseudo, El
 
     initForStyleResolve(e, parentStyle, pseudo);
     m_style = RenderStyle::create();
-
-    if (m_parentStyle)
-        m_style->inheritFrom(m_parentStyle);
+    m_style->inheritFrom(m_parentStyle);
 
     // Since we don't use pseudo-elements in any of our quirk/print user agent rules, don't waste time walking
     // those rules.
@@ -2068,8 +2067,19 @@ static bool doesNotInheritTextDecoration(RenderStyle* style, Element* e)
         || style->isFloating() || style->isOutOfFlowPositioned();
 }
 
+static bool isDisplayFlexibleBox(EDisplay display)
+{
+#if ENABLE(CSS3_FLEXBOX)
+    return display == FLEX || display == INLINE_FLEX;
+#else
+    return false;
+#endif
+}
+
 void StyleResolver::adjustRenderStyle(RenderStyle* style, RenderStyle* parentStyle, Element *e)
 {
+    ASSERT(parentStyle);
+
     // Cache our original display.
     style->setOriginalDisplay(style->display());
 
@@ -2129,7 +2139,7 @@ void StyleResolver::adjustRenderStyle(RenderStyle* style, RenderStyle* parentSty
 
         // FIXME: Don't support this mutation for pseudo styles like first-letter or first-line, since it's not completely
         // clear how that should work.
-        if (style->display() == INLINE && style->styleType() == NOPSEUDO && parentStyle && style->writingMode() != parentStyle->writingMode())
+        if (style->display() == INLINE && style->styleType() == NOPSEUDO && style->writingMode() != parentStyle->writingMode())
             style->setDisplay(INLINE_BLOCK);
 
         // After performing the display mutation, check table rows. We do not honor position:relative on
@@ -2153,14 +2163,14 @@ void StyleResolver::adjustRenderStyle(RenderStyle* style, RenderStyle* parentSty
         if (style->writingMode() != TopToBottomWritingMode && (style->display() == BOX || style->display() == INLINE_BOX))
             style->setWritingMode(TopToBottomWritingMode);
 
-        if (e && e->parentNode() && e->parentNode()->renderer() && e->parentNode()->renderer()->isFlexibleBox()) {
+        if (isDisplayFlexibleBox(parentStyle->display())) {
             style->setFloating(NoFloat);
             style->setDisplay(equivalentBlockDisplay(style->display(), style->isFloating(), m_checker.strictParsing()));
         }
     }
 
     // Make sure our z-index value is only applied if the object is positioned.
-    if (style->position() == StaticPosition)
+    if (style->position() == StaticPosition && !isDisplayFlexibleBox(parentStyle->display()))
         style->setHasAutoZIndex();
 
     // Auto z-index becomes 0 for the root element and transparent objects. This prevents
@@ -2495,25 +2505,27 @@ static inline bool containsUncommonAttributeSelector(const CSSSelector* selector
     return false;
 }
 
-RuleData::RuleData(StyleRule* rule, CSSSelector* selector, unsigned position, bool hasDocumentSecurityOrigin, bool canUseFastCheckSelector, bool inRegionRule)
+RuleData::RuleData(StyleRule* rule, unsigned selectorIndex, unsigned position, bool hasDocumentSecurityOrigin, bool canUseFastCheckSelector, bool inRegionRule)
     : m_rule(rule)
-    , m_selector(selector)
-    , m_specificity(selector->specificity())
+    , m_selectorIndex(selectorIndex)
     , m_position(position)
-    , m_hasFastCheckableSelector(canUseFastCheckSelector && SelectorChecker::isFastCheckableSelector(selector))
-    , m_hasMultipartSelector(!!selector->tagHistory())
-    , m_hasRightmostSelectorMatchingHTMLBasedOnRuleHash(isSelectorMatchingHTMLBasedOnRuleHash(selector))
-    , m_containsUncommonAttributeSelector(WebCore::containsUncommonAttributeSelector(selector))
-    , m_linkMatchType(SelectorChecker::determineLinkMatchType(selector))
+    , m_specificity(selector()->specificity())
+    , m_hasFastCheckableSelector(canUseFastCheckSelector && SelectorChecker::isFastCheckableSelector(selector()))
+    , m_hasMultipartSelector(!!selector()->tagHistory())
+    , m_hasRightmostSelectorMatchingHTMLBasedOnRuleHash(isSelectorMatchingHTMLBasedOnRuleHash(selector()))
+    , m_containsUncommonAttributeSelector(WebCore::containsUncommonAttributeSelector(selector()))
+    , m_linkMatchType(SelectorChecker::determineLinkMatchType(selector()))
     , m_hasDocumentSecurityOrigin(hasDocumentSecurityOrigin)
     , m_isInRegionRule(inRegionRule)
 {
-    SelectorChecker::collectIdentifierHashes(m_selector, m_descendantSelectorIdentifierHashes, maximumIdentifierCount);
+    ASSERT(m_position == position);
+    ASSERT(m_selectorIndex == selectorIndex);
+    SelectorChecker::collectIdentifierHashes(selector(), m_descendantSelectorIdentifierHashes, maximumIdentifierCount);
 }
 
 void RuleData::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<RuleData> info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
 }
 
 RuleSet::RuleSet()
@@ -2522,8 +2534,7 @@ RuleSet::RuleSet()
 {
 }
 
-
-static void reportAtomRuleMap(MemoryClassInfo<RuleSet>* info, const RuleSet::AtomRuleMap& atomicRuleMap)
+static void reportAtomRuleMap(MemoryClassInfo* info, const RuleSet::AtomRuleMap& atomicRuleMap)
 {
     info->addHashMap(atomicRuleMap);
     for (RuleSet::AtomRuleMap::const_iterator it = atomicRuleMap.begin(); it != atomicRuleMap.end(); ++it)
@@ -2532,7 +2543,7 @@ static void reportAtomRuleMap(MemoryClassInfo<RuleSet>* info, const RuleSet::Ato
 
 void RuleSet::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<RuleSet> info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
     reportAtomRuleMap(&info, m_idRules);
     reportAtomRuleMap(&info, m_classRules);
     reportAtomRuleMap(&info, m_tagRules);
@@ -2546,7 +2557,7 @@ void RuleSet::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 
 void RuleSet::RuleSetSelectorPair::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<RuleSet::RuleSetSelectorPair> info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
     info.addInstrumentedMember(ruleSet);
 }
 
@@ -2589,9 +2600,9 @@ static void collectFeaturesFromRuleData(StyleResolver::Features& features, const
             foundSiblingSelector = true;
     }
     if (foundSiblingSelector)
-        features.siblingRules.append(StyleResolver::RuleFeature(ruleData.rule(), ruleData.selector(), ruleData.hasDocumentSecurityOrigin()));
+        features.siblingRules.append(StyleResolver::RuleFeature(ruleData.rule(), ruleData.selectorIndex(), ruleData.hasDocumentSecurityOrigin()));
     if (ruleData.containsUncommonAttributeSelector())
-        features.uncommonAttributeRules.append(StyleResolver::RuleFeature(ruleData.rule(), ruleData.selector(), ruleData.hasDocumentSecurityOrigin()));
+        features.uncommonAttributeRules.append(StyleResolver::RuleFeature(ruleData.rule(), ruleData.selectorIndex(), ruleData.hasDocumentSecurityOrigin()));
 }
     
 void RuleSet::addToRuleSet(AtomicStringImpl* key, AtomRuleMap& map, const RuleData& ruleData)
@@ -2604,10 +2615,12 @@ void RuleSet::addToRuleSet(AtomicStringImpl* key, AtomRuleMap& map, const RuleDa
     rules->append(ruleData);
 }
 
-void RuleSet::addRule(StyleRule* rule, CSSSelector* selector, bool hasDocumentSecurityOrigin, bool canUseFastCheckSelector, bool inRegionRule)
+void RuleSet::addRule(StyleRule* rule, unsigned selectorIndex, bool hasDocumentSecurityOrigin, bool canUseFastCheckSelector, bool inRegionRule)
 {
-    RuleData ruleData(rule, selector, m_ruleCount++, hasDocumentSecurityOrigin, canUseFastCheckSelector, inRegionRule);
+    RuleData ruleData(rule, selectorIndex, m_ruleCount++, hasDocumentSecurityOrigin, canUseFastCheckSelector, inRegionRule);
     collectFeaturesFromRuleData(m_features, ruleData);
+
+    CSSSelector* selector = ruleData.selector();
 
     if (selector->m_match == CSSSelector::Id) {
         addToRuleSet(selector->value().impl(), m_idRules, ruleData);
@@ -2749,8 +2762,8 @@ void RuleSet::addRulesFromSheet(StyleSheetContents* sheet, const MediaQueryEvalu
 
 void RuleSet::addStyleRule(StyleRule* rule, bool hasDocumentSecurityOrigin, bool canUseFastCheckSelector, bool isInRegionRule)
 {
-    for (CSSSelector* s = rule->selectorList().first(); s; s = CSSSelectorList::next(s))
-        addRule(rule, s, hasDocumentSecurityOrigin, canUseFastCheckSelector, isInRegionRule);
+    for (size_t selectorIndex = 0; selectorIndex != notFound; selectorIndex = rule->selectorList().indexOfNextSelectorAfter(selectorIndex))
+        addRule(rule, selectorIndex, hasDocumentSecurityOrigin, canUseFastCheckSelector, isInRegionRule);
 }
 
 static inline void shrinkMapVectorsToFit(RuleSet::AtomRuleMap& map)
@@ -4400,6 +4413,9 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
 #endif
     case CSSPropertyWebkitRtlOrdering:
     case CSSPropertyWebkitTextCombine:
+#if ENABLE(CSS3_TEXT_DECORATION)
+    case CSSPropertyWebkitTextDecorationLine:
+#endif // CSS3_TEXT_DECORATION
     case CSSPropertyWebkitTextEmphasisColor:
     case CSSPropertyWebkitTextEmphasisPosition:
     case CSSPropertyWebkitTextEmphasisStyle:
@@ -5667,25 +5683,25 @@ void StyleResolver::loadPendingResources()
 
 void StyleResolver::MatchedProperties::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<StyleResolver::MatchedProperties> info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
     info.addInstrumentedMember(properties);
 }
 
 void StyleResolver::MatchedPropertiesCacheItem::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<StyleResolver::MatchedPropertiesCacheItem> info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
     info.addInstrumentedVector(matchedProperties);
 }
 
 void MediaQueryResult::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<MediaQueryResult> info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
     info.addInstrumentedMember(m_expression);
 }
 
 void StyleResolver::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<StyleResolver> info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
     info.addMember(m_style);
     info.addInstrumentedMember(m_authorStyle);
     info.addInstrumentedMember(m_userStyle);

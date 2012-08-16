@@ -291,7 +291,7 @@ public:
     WebCore::Node* bestNodeForZoomUnderPoint(const WebCore::IntPoint&);
     WebCore::Node* bestChildNodeForClickRect(WebCore::Node* parentNode, const WebCore::IntRect& clickRect);
     WebCore::Node* nodeForZoomUnderPoint(const WebCore::IntPoint&);
-    WebCore::Node* adjustedBlockZoomNodeForZoomLimits(WebCore::Node*);
+    WebCore::Node* adjustedBlockZoomNodeForZoomAndExpandingRatioLimits(WebCore::Node*);
     WebCore::IntRect rectForNode(WebCore::Node*);
     WebCore::IntRect blockZoomRectForNode(WebCore::Node*);
     WebCore::IntRect adjustRectOffsetForFrameOffset(const WebCore::IntRect&, const WebCore::Node*);
@@ -413,8 +413,8 @@ public:
     void commitRootLayer(const WebCore::IntRect&, const WebCore::IntSize&, bool);
     bool isAcceleratedCompositingActive() const { return m_compositor; }
     WebPageCompositorPrivate* compositor() const { return m_compositor.get(); }
-    void setCompositor(PassRefPtr<WebPageCompositorPrivate>, EGLContext compositingContext);
-    void setCompositorHelper(PassRefPtr<WebPageCompositorPrivate>, EGLContext compositingContext);
+    void setCompositor(PassRefPtr<WebPageCompositorPrivate>);
+    void setCompositorHelper(PassRefPtr<WebPageCompositorPrivate>);
     void setCompositorBackgroundColor(const WebCore::Color&);
     bool createCompositor();
     void destroyCompositor();
@@ -423,6 +423,8 @@ public:
     void suspendRootLayerCommit();
     void resumeRootLayerCommit();
     void blitVisibleContents();
+
+    void scheduleCompositingRun();
 #endif
 
     bool dispatchTouchEventToFullScreenPlugin(WebCore::PluginView*, const Platform::TouchEvent&);
@@ -516,9 +518,6 @@ public:
 #endif
 
 #if ENABLE(FULLSCREEN_API)
-#if ENABLE(EVENT_MODE_METATAGS)
-    WebCore::TouchEventMode m_touchEventModePriorGoingFullScreen;
-#endif
 #if ENABLE(VIDEO)
     double m_scaleBeforeFullScreen;
     int m_xScrollOffsetBeforeFullScreen;

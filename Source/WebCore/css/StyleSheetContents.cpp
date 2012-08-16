@@ -250,7 +250,10 @@ void StyleSheetContents::parserAddNamespace(const AtomicString& prefix, const At
 {
     if (uri.isNull() || prefix.isNull())
         return;
-    m_namespaces.add(prefix, uri);
+    PrefixNamespaceURIMap::AddResult result = m_namespaces.add(prefix, uri);
+    if (result.isNewEntry)
+        return;
+    result.iterator->second = uri;
 }
 
 const AtomicString& StyleSheetContents::determineNamespace(const AtomicString& prefix)
@@ -484,8 +487,9 @@ void StyleSheetContents::removedFromMemoryCache()
 
 void StyleSheetContents::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<StyleSheetContents> info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
     info.addMember(m_originalURL);
+    info.addMember(m_finalURL);
     info.addMember(m_encodingFromCharsetRule);
     info.addVector(m_importRules);
     info.addInstrumentedVector(m_childRules);

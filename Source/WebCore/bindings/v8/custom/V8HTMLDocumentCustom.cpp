@@ -46,6 +46,7 @@
 #include "V8Node.h"
 #include "V8Proxy.h"
 #include "V8RecursionScope.h"
+#include <wtf/text/StringBuilder.h>
 #include <wtf/OwnArrayPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/StdLibExtras.h>
@@ -83,17 +84,17 @@ v8::Local<v8::Object> V8HTMLDocument::WrapInShadowObject(v8::Local<v8::Object> w
 v8::Handle<v8::Value> V8HTMLDocument::GetNamedProperty(HTMLDocument* htmlDocument, const AtomicString& key, v8::Isolate* isolate)
 {
     if (!htmlDocument->hasNamedItem(key.impl()) && !htmlDocument->hasExtraNamedItem(key.impl()))
-        return v8::Handle<v8::Value>();
+        return v8Undefined();
 
     RefPtr<HTMLCollection> items = htmlDocument->documentNamedItems(key);
     if (items->isEmpty())
-        return v8::Handle<v8::Value>();
+        return v8Undefined();
 
     if (items->hasExactlyOneItem()) {
         Node* node = items->item(0);
         Frame* frame = 0;
         if (node->hasTagName(HTMLNames::iframeTag) && (frame = static_cast<HTMLIFrameElement*>(node)->contentFrame()))
-            return toV8(frame->domWindow(), isolate);
+            return toV8(frame->document()->domWindow(), isolate);
 
         return toV8(node, isolate);
     }
@@ -109,10 +110,10 @@ v8::Handle<v8::Value> V8HTMLDocument::GetNamedProperty(HTMLDocument* htmlDocumen
 //   document.write() --> document.write("")
 static String writeHelperGetString(const v8::Arguments& args)
 {
-    String str = "";
+    StringBuilder builder;
     for (int i = 0; i < args.Length(); ++i)
-        str += toWebCoreString(args[i]);
-    return str;
+        builder.append(toWebCoreString(args[i]));
+    return builder.toString();
 }
 
 v8::Handle<v8::Value> V8HTMLDocument::writeCallback(const v8::Arguments& args)
@@ -150,7 +151,7 @@ v8::Handle<v8::Value> V8HTMLDocument::openCallback(const v8::Arguments& args)
             v8::Local<v8::Value> function = global->Get(v8::String::New("open"));
             // If the open property is not a function throw a type error.
             if (!function->IsFunction())
-                return V8Proxy::throwTypeError("open is not a function", args.GetIsolate());
+                return throwTypeError("open is not a function", args.GetIsolate());
             // Wrap up the arguments and call the function.
             OwnArrayPtr<v8::Local<v8::Value> > params = adoptArrayPtr(new v8::Local<v8::Value>[args.Length()]);
             for (int i = 0; i < args.Length(); i++)

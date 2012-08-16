@@ -28,11 +28,11 @@
 
 #include "CCSchedulerTestCommon.h"
 #include "CCTiledLayerTestCommon.h"
+#include "FakeWebCompositorOutputSurface.h"
 #include "FakeWebGraphicsContext3D.h"
-#include "GraphicsContext3DPrivate.h"
-#include "WebCompositor.h"
 #include "cc/CCSingleThreadProxy.h" // For DebugScopedSetImplThread
-#include "platform/WebThread.h"
+#include <public/WebCompositor.h>
+#include <public/WebThread.h>
 
 #include <gtest/gtest.h>
 #include <wtf/RefPtr.h>
@@ -174,8 +174,7 @@ protected:
         OwnPtr<WebThread> thread;
         WebCompositor::initialize(thread.get());
 
-        m_context = CCGraphicsContext::create3D(
-                    adoptPtr(new WebGraphicsContext3DForUploadTest(this)));
+        m_context = FakeWebCompositorOutputSurface::create(adoptPtr(new WebGraphicsContext3DForUploadTest(this)));
         DebugScopedSetImplThread implThread;
         m_resourceProvider = CCResourceProvider::create(m_context.get());
     }

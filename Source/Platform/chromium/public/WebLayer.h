@@ -152,7 +152,7 @@ public:
     WEBKIT_EXPORT void setAnimationDelegate(WebAnimationDelegate*);
 
     // Returns false if the animation cannot be added.
-    WEBKIT_EXPORT bool addAnimation(const WebAnimation&);
+    WEBKIT_EXPORT bool addAnimation(WebAnimation*);
 
     // Removes all animations with the given id.
     WEBKIT_EXPORT void removeAnimation(int animationId);
@@ -167,6 +167,9 @@ public:
     // is assumed to use the same time base as monotonicallyIncreasingTime().
     WEBKIT_EXPORT void suspendAnimations(double monotonicTime);
     WEBKIT_EXPORT void resumeAnimations(double monotonicTime);
+
+    // Returns true if this layer has any active animations - useful for tests.
+    WEBKIT_EXPORT bool hasActiveAnimation();
 
     // Transfers all animations running on the current layer.
     WEBKIT_EXPORT void transferAnimationsTo(WebLayer*);

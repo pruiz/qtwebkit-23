@@ -31,19 +31,30 @@ namespace TestWebKitAPI {
 
 TEST(WTF, StringImplCreationFromLiteral)
 {
+    // Constructor using the template to determine the size.
     RefPtr<StringImpl> stringWithTemplate = StringImpl::createFromLiteral("Template Literal");
     ASSERT_EQ(strlen("Template Literal"), stringWithTemplate->length());
     ASSERT_TRUE(equal(stringWithTemplate.get(), "Template Literal"));
     ASSERT_TRUE(stringWithTemplate->is8Bit());
     ASSERT_TRUE(stringWithTemplate->hasTerminatingNullCharacter());
 
+    // Constructor taking the size explicitely.
     const char* programmaticStringData = "Explicit Size Literal";
-    RefPtr<StringImpl> programmaticString = StringImpl::createFromLiteral(reinterpret_cast<const LChar*>(programmaticStringData), strlen(programmaticStringData));
+    RefPtr<StringImpl> programmaticString = StringImpl::createFromLiteral(programmaticStringData, strlen(programmaticStringData));
     ASSERT_EQ(strlen(programmaticStringData), programmaticString->length());
     ASSERT_TRUE(equal(programmaticString.get(), programmaticStringData));
     ASSERT_EQ(programmaticStringData, reinterpret_cast<const char*>(programmaticString->characters8()));
     ASSERT_TRUE(programmaticString->is8Bit());
     ASSERT_TRUE(programmaticString->hasTerminatingNullCharacter());
+
+    // Constructor without explicit size.
+    const char* stringWithoutLengthLiteral = "No Size Literal";
+    RefPtr<StringImpl> programmaticStringNoLength = StringImpl::createFromLiteral(stringWithoutLengthLiteral);
+    ASSERT_EQ(strlen(stringWithoutLengthLiteral), programmaticStringNoLength->length());
+    ASSERT_TRUE(equal(programmaticStringNoLength.get(), stringWithoutLengthLiteral));
+    ASSERT_EQ(stringWithoutLengthLiteral, reinterpret_cast<const char*>(programmaticStringNoLength->characters8()));
+    ASSERT_TRUE(programmaticStringNoLength->is8Bit());
+    ASSERT_TRUE(programmaticStringNoLength->hasTerminatingNullCharacter());
 }
 
 TEST(WTF, StringImplFromLiteralLoop16BitConversion)

@@ -59,10 +59,13 @@ CachedCSSStyleSheet::~CachedCSSStyleSheet()
 void CachedCSSStyleSheet::didAddClient(CachedResourceClient* c)
 {
     ASSERT(c->resourceClientType() == CachedStyleSheetClient::expectedType());
+    // CachedResource::didAddClient() must be before setCSSStyleSheet(),
+    // because setCSSStyleSheet() may cause scripts to be executed, which could destroy 'c' if it is an instance of HTMLLinkElement.
+    // see the comment of HTMLLinkElement::setCSSStyleSheet.
+    CachedResource::didAddClient(c);
+
     if (!isLoading())
         static_cast<CachedStyleSheetClient*>(c)->setCSSStyleSheet(m_resourceRequest.url(), m_response.url(), m_decoder->encoding().name(), this);
-
-    CachedResource::didAddClient(c);
 }
 
 void CachedCSSStyleSheet::setEncoding(const String& chs)
@@ -201,7 +204,7 @@ void CachedCSSStyleSheet::saveParsedStyleSheet(PassRefPtr<StyleSheetContents> sh
 
 void CachedCSSStyleSheet::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<CachedCSSStyleSheet> info(memoryObjectInfo, this, MemoryInstrumentation::CachedResourceCSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CachedResourceCSS);
     CachedResource::reportMemoryUsage(memoryObjectInfo);
     info.addMember(m_decoder);
     info.addInstrumentedMember(m_parsedStyleSheetCache);

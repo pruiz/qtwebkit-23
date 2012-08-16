@@ -62,7 +62,7 @@ RenderView::RenderView(Node* node, FrameView* view)
     , m_pageLogicalHeightChanged(false)
     , m_layoutState(0)
     , m_layoutStateDisableCount(0)
-    , m_renderQuoteCount(0)
+    , m_renderQuoteHead(0)
     , m_renderCounterCount(0)
 {
     // Clear our anonymous bit, set because RenderObject assumes
@@ -961,12 +961,12 @@ void RenderView::setFixedPositionedObjectsNeedLayout()
 {
     ASSERT(m_frameView);
 
-    PositionedObjectsListHashSet* positionedObjects = this->positionedObjects();
+    ListHashSet<RenderBox*>* positionedObjects = this->positionedObjects();
     if (!positionedObjects)
         return;
 
-    PositionedObjectsListHashSet::const_iterator end = positionedObjects->end();
-    for (PositionedObjectsListHashSet::const_iterator it = positionedObjects->begin(); it != end; ++it) {
+    ListHashSet<RenderBox*>::const_iterator end = positionedObjects->end();
+    for (ListHashSet<RenderBox*>::const_iterator it = positionedObjects->begin(); it != end; ++it) {
         RenderBox* currBox = *it;
         currBox->setNeedsLayout(true);
     }

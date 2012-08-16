@@ -42,7 +42,9 @@ public:
     RenderBox(Node*);
     virtual ~RenderBox();
 
-    virtual bool requiresLayer() const OVERRIDE { return isRoot() || isOutOfFlowPositioned() || isRelPositioned() || isTransparent() || hasOverflowClip() || hasTransform() || hasHiddenBackface() || hasMask() || hasReflection() || hasFilter() || style()->specifiesColumns(); }
+    // hasAutoZIndex only returns true if the element is positioned or a flex-item since
+    // position:static elements that are not flex-items get their z-index coerced to auto.
+    virtual bool requiresLayer() const OVERRIDE { return isRoot() || isOutOfFlowPositioned() || isRelPositioned() || isTransparent() || hasOverflowClip() || hasTransform() || hasHiddenBackface() || hasMask() || hasReflection() || hasFilter() || style()->specifiesColumns() || !style()->hasAutoZIndex(); }
 
     // Use this with caution! No type checking is done!
     RenderBox* firstChildBox() const;
@@ -342,6 +344,7 @@ public:
 
     LayoutUnit computeLogicalWidthInRegionUsing(SizeType, LayoutUnit availableLogicalWidth, const RenderBlock* containingBlock, RenderRegion*, LayoutUnit offsetFromLogicalTopOfFirstPage);
     LayoutUnit computeLogicalHeightUsing(SizeType, const Length& height);
+    LayoutUnit computeLogicalClientHeight(SizeType, const Length& height);
     LayoutUnit computeContentLogicalHeightUsing(SizeType, const Length& height);
     LayoutUnit computeReplacedLogicalWidthUsing(SizeType, Length width) const;
     LayoutUnit computeReplacedLogicalWidthRespectingMinMaxWidth(LayoutUnit logicalWidth, bool includeMaxWidth = true) const;

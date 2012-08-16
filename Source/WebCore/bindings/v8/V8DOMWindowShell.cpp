@@ -50,7 +50,6 @@
 #include "StorageNamespace.h"
 #include "StylePropertySet.h"
 #include "V8Binding.h"
-#include "V8BindingPerContextData.h"
 #include "V8Collection.h"
 #include "V8DOMMap.h"
 #include "V8DOMWindow.h"
@@ -60,6 +59,7 @@
 #include "V8HiddenPropertyName.h"
 #include "V8History.h"
 #include "V8Location.h"
+#include "V8PerContextData.h"
 #include "V8Proxy.h"
 #include "WorkerContextExecutionProxy.h"
 
@@ -299,7 +299,11 @@ bool V8DOMWindowShell::initContextIfNeeded()
 #if ENABLE(JAVASCRIPT_DEBUGGER)
         ScriptProfiler::initialize();
 #endif
-        V8BindingPerIsolateData::ensureInitialized(v8::Isolate::GetCurrent());
+        V8PerIsolateData::ensureInitialized(v8::Isolate::GetCurrent());
+
+        // FIXME: Remove the following 2 lines when V8 default has changed.
+        const char es5ReadonlyFlag[] = "--es5_readonly";
+        v8::V8::SetFlagsFromString(es5ReadonlyFlag, sizeof(es5ReadonlyFlag));
 
         isV8Initialized = true;
     }
@@ -324,13 +328,13 @@ bool V8DOMWindowShell::initContextIfNeeded()
 #endif
     }
 
-    m_perContextData = V8BindingPerContextData::create(m_context);
+    m_perContextData = V8PerContextData::create(m_context);
     if (!m_perContextData->init()) {
         disposeContextHandles();
         return false;
     }
 
-    if (!installDOMWindow(v8Context, m_frame->domWindow())) {
+    if (!installDOMWindow(v8Context, m_frame->document()->domWindow())) {
         disposeContextHandles();
         return false;
     }
@@ -366,13 +370,12 @@ v8::Persistent<v8::Context> V8DOMWindowShell::createNewContext(v8::Handle<v8::Ob
         return result;
 
     // Used to avoid sleep calls in unload handlers.
-    if (!V8Proxy::registeredExtensionWithV8(DateExtension::get()))
-        V8Proxy::registerExtension(DateExtension::get());
+    V8Proxy::registerExtensionIfNeeded(DateExtension::get());
 
 #if ENABLE(JAVASCRIPT_I18N_API)
     // Enables experimental i18n API in V8.
-    if (RuntimeEnabledFeatures::javaScriptI18NAPIEnabled() && !V8Proxy::registeredExtensionWithV8(v8_i18n::Extension::get()))
-        V8Proxy::registerExtension(v8_i18n::Extension::get());
+    if (RuntimeEnabledFeatures::javaScriptI18NAPIEnabled())
+        V8Proxy::registerExtensionIfNeeded(v8_i18n::Extension::get());
 #endif
 
     // Dynamically tell v8 about our extensions now.
@@ -417,7 +420,7 @@ bool V8DOMWindowShell::installDOMWindow(v8::Handle<v8::Context> context, DOMWind
     // Wrap the window.
     V8DOMWrapper::setDOMWrapper(jsWindow, &V8DOMWindow::info, window);
     V8DOMWrapper::setDOMWrapper(v8::Handle<v8::Object>::Cast(jsWindow->GetPrototype()), &V8DOMWindow::info, window);
-    V8DOMWrapper::setJSWrapperForDOMObject(PassRefPtr<DOMWindow>(window), v8::Persistent<v8::Object>::New(jsWindow));
+    V8DOMWrapper::setJSWrapperForDOMObject(PassRefPtr<DOMWindow>(window), jsWindow);
 
     // Insert the window instance as the prototype of the shadow object.
     v8::Handle<v8::Object> v8RealGlobal = v8::Handle<v8::Object>::Cast(context->Global()->GetPrototype());
@@ -485,6 +488,12 @@ void V8DOMWindowShell::updateDocumentWrapperCache()
     }
     ASSERT(documentWrapper->IsObject());
     m_context->Global()->ForceSet(v8::String::New("document"), documentWrapper, static_cast<v8::PropertyAttribute>(v8::ReadOnly | v8::DontDelete));
+
+    // We also stash a reference to the document on the real global object so that
+    // DOMWindow objects we obtain from JavaScript references are guaranteed to have
+    // live Document objects.
+    v8::Handle<v8::Object> v8RealGlobal = v8::Handle<v8::Object>::Cast(m_context->Global()->GetPrototype());
+    v8RealGlobal->SetHiddenValue(V8HiddenPropertyName::document(), documentWrapper);
 }
 
 void V8DOMWindowShell::clearDocumentWrapperCache()
@@ -553,7 +562,7 @@ void V8DOMWindowShell::updateDocument()
 v8::Handle<v8::Value> getter(v8::Local<v8::String> property, const v8::AccessorInfo& info)
 {
     // FIXME(antonm): consider passing AtomicStringImpl directly.
-    AtomicString name = v8ValueToAtomicWebCoreString(property);
+    AtomicString name = toWebCoreAtomicString(property);
     HTMLDocument* htmlDocument = V8HTMLDocument::toNative(info.Holder());
     ASSERT(htmlDocument);
     v8::Handle<v8::Value> result = V8HTMLDocument::GetNamedProperty(htmlDocument, name, info.GetIsolate());

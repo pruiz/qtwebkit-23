@@ -162,9 +162,6 @@ public:
     const IntRect& visibleContentRect() const { return m_visibleContentRect; }
     void setVisibleContentRect(const IntRect& visibleContentRect) { m_visibleContentRect = visibleContentRect; }
 
-    const IntRect& scissorRect() const { return m_scissorRect; }
-    void setScissorRect(const IntRect& scissorRect) { m_scissorRect = scissorRect; }
-
     void setScrollPosition(const IntPoint&);
     const IntPoint& scrollPosition() const { return m_scrollPosition; }
 
@@ -200,8 +197,8 @@ public:
     void setUseParentBackfaceVisibility(bool useParentBackfaceVisibility) { m_useParentBackfaceVisibility = useParentBackfaceVisibility; }
     bool useParentBackfaceVisibility() const { return m_useParentBackfaceVisibility; }
 
-    virtual void setIsNonCompositedContent(bool);
-    bool isNonCompositedContent() const { return m_isNonCompositedContent; }
+    virtual void setUseLCDText(bool);
+    bool useLCDText() const { return m_useLCDText; }
 
     virtual void setLayerTreeHost(CCLayerTreeHost*);
 
@@ -350,10 +347,6 @@ private:
     // Uses layer's content space.
     IntRect m_visibleContentRect;
 
-    // During drawing, identifies the region outside of which nothing should be drawn.
-    // This is the intersection of the layer's drawableContentRect and damage (if damage tracking is enabled).
-    // Uses target surface's space.
-    IntRect m_scissorRect;
     IntPoint m_scrollPosition;
     IntSize m_maxScrollPosition;
     bool m_scrollable;
@@ -377,7 +370,7 @@ private:
     bool m_masksToBounds;
     bool m_opaque;
     bool m_doubleSided;
-    bool m_isNonCompositedContent;
+    bool m_useLCDText;
     bool m_preserves3D;
     bool m_useParentBackfaceVisibility;
     bool m_alwaysReserveTextures;

@@ -175,12 +175,8 @@ void RenderBox::removeFloatingOrPositionedChildFromBlockLists()
         }
     }
 
-    if (isOutOfFlowPositioned()) {
-        for (RenderObject* curr = parent(); curr; curr = curr->parent()) {
-            if (curr->isRenderBlock())
-                toRenderBlock(curr)->removePositionedObject(this);
-        }
-    }
+    if (isOutOfFlowPositioned())
+        RenderBlock::removePositionedObject(this);
 }
 
 void RenderBox::styleWillChange(StyleDifference diff, const RenderStyle* newStyle)
@@ -2061,6 +2057,14 @@ LayoutUnit RenderBox::computeLogicalHeightUsing(SizeType heightType, const Lengt
     return logicalHeight;
 }
 
+LayoutUnit RenderBox::computeLogicalClientHeight(SizeType heightType, const Length& height)
+{
+    LayoutUnit heightIncludingScrollbar = computeContentLogicalHeightUsing(heightType, height);
+    if (heightIncludingScrollbar == -1)
+        return -1;
+    return std::max(LayoutUnit(0), computeContentBoxLogicalHeight(heightIncludingScrollbar) - scrollbarLogicalHeight());
+}
+
 LayoutUnit RenderBox::computeContentLogicalHeightUsing(SizeType heightType, const Length& height)
 {
     if (height.isAuto())
@@ -2266,7 +2270,7 @@ LayoutUnit RenderBox::computeReplacedLogicalHeightUsing(SizeType sizeType, Lengt
                 }
             }
             availableHeight = computeContentBoxLogicalHeight(valueForLength(logicalHeight, availableHeight));
-            if (cb->style()->logicalHeight().isFixed())
+            if (cb->isBox() && cb->style()->logicalHeight().isFixed())
                 availableHeight = max<LayoutUnit>(0, availableHeight - toRenderBox(cb)->scrollbarLogicalHeight());
             return availableHeight;
         }
@@ -3998,6 +4002,10 @@ RenderObject* RenderBox::splitAnonymousBoxesAroundChild(RenderObject* beforeChil
             RenderBox* postBox = boxToSplit->createAnonymousBoxWithSameTypeAs(this);
             postBox->setChildrenInline(boxToSplit->childrenInline());
             RenderBox* parentBox = toRenderBox(boxToSplit->parent());
+            // We need to invalidate the |parentBox| before inserting the new node
+            // so that the table repainting logic knows the structure is dirty.
+            // See for example RenderTableCell:clippedOverflowRectForRepaint.
+            markBoxForRelayoutAfterSplit(parentBox);
             parentBox->virtualChildren()->insertChildNode(parentBox, postBox, boxToSplit->nextSibling());
             boxToSplit->moveChildrenTo(postBox, beforeChild, 0, true);
 

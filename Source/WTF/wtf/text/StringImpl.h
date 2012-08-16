@@ -46,7 +46,7 @@ typedef const struct __CFString * CFStringRef;
 // FIXME: This is a temporary layering violation while we move string code to WTF.
 // Landing the file moves in one patch, will follow on with patches to change the namespaces.
 namespace JSC {
-struct IdentifierCStringTranslator;
+struct IdentifierASCIIStringTranslator;
 namespace LLInt { class Data; }
 class LLIntOffsetsExtractor;
 template <typename T> struct IdentifierCharBufferTranslator;
@@ -56,9 +56,9 @@ struct IdentifierLCharFromUCharTranslator;
 namespace WTF {
 
 struct CStringTranslator;
-struct HashAndCharactersTranslator;
+template<typename CharacterType> struct HashAndCharactersTranslator;
 struct HashAndUTF8CharactersTranslator;
-struct LCharBufferFromLiteralDataTranslator;
+struct CharBufferFromLiteralDataTranslator;
 struct SubstringTranslator;
 struct UCharBufferTranslator;
 
@@ -69,14 +69,14 @@ typedef bool (*IsWhiteSpaceFunctionPtr)(UChar);
 
 class StringImpl {
     WTF_MAKE_NONCOPYABLE(StringImpl); WTF_MAKE_FAST_ALLOCATED;
-    friend struct JSC::IdentifierCStringTranslator;
+    friend struct JSC::IdentifierASCIIStringTranslator;
     friend struct JSC::IdentifierCharBufferTranslator<LChar>;
     friend struct JSC::IdentifierCharBufferTranslator<UChar>;
     friend struct JSC::IdentifierLCharFromUCharTranslator;
     friend struct WTF::CStringTranslator;
-    friend struct WTF::HashAndCharactersTranslator;
+    template<typename CharacterType> friend struct WTF::HashAndCharactersTranslator;
     friend struct WTF::HashAndUTF8CharactersTranslator;
-    friend struct WTF::LCharBufferFromLiteralDataTranslator;
+    friend struct WTF::CharBufferFromLiteralDataTranslator;
     friend struct WTF::SubstringTranslator;
     friend struct WTF::UCharBufferTranslator;
     friend class AtomicStringImpl;
@@ -166,10 +166,10 @@ private:
     }
 
     enum ConstructFromLiteralTag { ConstructFromLiteral };
-    StringImpl(const LChar* characters, unsigned length, ConstructFromLiteralTag)
+    StringImpl(const char* characters, unsigned length, ConstructFromLiteralTag)
         : m_refCount(s_refCountIncrement)
         , m_length(length)
-        , m_data8(characters)
+        , m_data8(reinterpret_cast<const LChar*>(characters))
         , m_buffer(0)
         , m_hashAndFlags(s_hashFlag8BitBuffer | BufferInternal | s_hashFlagHasTerminatingNullCharacter)
     {
@@ -297,15 +297,16 @@ public:
         return adoptRef(new StringImpl(rep->m_data16 + offset, length, ownerRep));
     }
 
-    WTF_EXPORT_STRING_API static PassRefPtr<StringImpl> createFromLiteral(const LChar* characters, unsigned length);
+    WTF_EXPORT_STRING_API static PassRefPtr<StringImpl> createFromLiteral(const char* characters, unsigned length);
     template<unsigned charactersCount>
     ALWAYS_INLINE static PassRefPtr<StringImpl> createFromLiteral(const char (&characters)[charactersCount])
     {
         COMPILE_ASSERT(charactersCount > 1, StringImplFromLiteralNotEmpty);
         COMPILE_ASSERT((charactersCount - 1 <= ((unsigned(~0) - sizeof(StringImpl)) / sizeof(LChar))), StringImplFromLiteralCannotOverflow);
 
-        return createFromLiteral(reinterpret_cast<const LChar*>(characters), charactersCount - 1);
+        return createFromLiteral(characters, charactersCount - 1);
     }
+    WTF_EXPORT_STRING_API static PassRefPtr<StringImpl> createFromLiteral(const char* characters);
 
     WTF_EXPORT_STRING_API static PassRefPtr<StringImpl> createUninitialized(unsigned length, LChar*& data);
     WTF_EXPORT_STRING_API static PassRefPtr<StringImpl> createUninitialized(unsigned length, UChar*& data);

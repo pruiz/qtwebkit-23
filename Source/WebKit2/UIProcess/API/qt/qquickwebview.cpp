@@ -296,6 +296,7 @@ void QQuickWebViewPrivate::initialize(WKContextRef contextRef, WKPageGroupRef pa
 
     context = contextRef ? QtWebContext::create(toImpl(contextRef)) : QtWebContext::defaultContext();
     webPageProxy = context->createWebPage(&pageClient, pageGroup.get());
+    webPageProxy->setUseFixedLayout(s_flickableViewportEnabled);
 #if ENABLE(FULLSCREEN_API)
     webPageProxy->fullScreenManager()->setWebView(q_ptr);
 #endif
@@ -842,7 +843,6 @@ QQuickWebViewFlickablePrivate::~QQuickWebViewFlickablePrivate()
 void QQuickWebViewFlickablePrivate::initialize(WKContextRef contextRef, WKPageGroupRef pageGroupRef)
 {
     QQuickWebViewPrivate::initialize(contextRef, pageGroupRef);
-    webPageProxy->setUseFixedLayout(true);
 }
 
 void QQuickWebViewFlickablePrivate::onComponentComplete()

@@ -30,12 +30,12 @@
 #ifndef InspectorDOMAgent_h
 #define InspectorDOMAgent_h
 
-#include "DOMNodeHighlighter.h"
 #include "EventTarget.h"
 #include "InjectedScript.h"
 #include "InjectedScriptManager.h"
 #include "InspectorBaseAgent.h"
 #include "InspectorFrontend.h"
+#include "InspectorOverlay.h"
 #include "InspectorValues.h"
 #include "Timer.h"
 
@@ -144,7 +144,6 @@ public:
     virtual void highlightNode(ErrorString*, int nodeId, const RefPtr<InspectorObject>& highlightConfig);
     virtual void highlightFrame(ErrorString*, const String& frameId, const RefPtr<InspectorObject>* color, const RefPtr<InspectorObject>* outlineColor);
     virtual void moveTo(ErrorString*, int nodeId, int targetNodeId, const int* anchorNodeId, int* newNodeId);
-    virtual void setTouchEmulationEnabled(ErrorString*, bool);
     virtual void undo(ErrorString*);
     virtual void redo(ErrorString*);
     virtual void markUndoableState(ErrorString*);
@@ -169,6 +168,7 @@ public:
     void didPushShadowRoot(Element* host, ShadowRoot*);
     void willPopShadowRoot(Element* host, ShadowRoot*);
 
+    int pushNodeToFrontend(ErrorString*, int documentNodeId, Node*);
     Node* nodeForId(int nodeId);
     int boundNodeId(Node*);
     void setDOMListener(DOMListener*);
@@ -193,6 +193,7 @@ public:
     static bool isWhitespace(Node*);
 
     Node* assertNode(ErrorString*, int nodeId);
+    Element* assertElement(ErrorString*, int nodeId);
     Document* assertDocument(ErrorString*, int nodeId);
 
     // Methods called from other agents.
@@ -209,7 +210,6 @@ private:
     int bind(Node*, NodeToIdMap*);
     void unbind(Node*, NodeToIdMap*);
 
-    Element* assertElement(ErrorString*, int nodeId);
     Node* assertEditableNode(ErrorString*, int nodeId);
     Element* assertEditableElement(ErrorString*, int nodeId);
 
@@ -228,10 +228,6 @@ private:
     Node* nodeForPath(const String& path);
 
     void discardBindings();
-
-#if ENABLE(TOUCH_EVENTS)
-    void updateTouchEventEmulationInPage(bool);
-#endif
 
     InspectorPageAgent* m_pageAgent;
     InjectedScriptManager* m_injectedScriptManager;

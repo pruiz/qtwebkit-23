@@ -26,10 +26,6 @@ CONFIG += staticlib
     }
 }
 
-wince* {
-    SOURCES += $$QT.core.sources/../3rdparty/ce-compat/ce_time.c
-}
-
 include(yarr/yarr.pri)
 
 INSTALLDEPS += all
@@ -50,6 +46,7 @@ SOURCES += \
     assembler/LinkBuffer.cpp \
     assembler/MacroAssemblerARM.cpp \
     assembler/MacroAssemblerSH4.cpp \
+    bytecode/ArrayProfile.cpp \
     bytecode/CallLinkInfo.cpp \
     bytecode/CallLinkStatus.cpp \
     bytecode/CodeBlock.cpp \

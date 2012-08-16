@@ -1491,10 +1491,6 @@ bool FrameView::scrollContentsFastPath(const IntSize& scrollDelta, const IntRect
             regionToUpdate.unite(updateRect);
     }
 
-    // The area to be painted by fixed objects exceeds 50% of the area of the view, we cannot use the fast path.
-    if (regionToUpdate.totalArea() > (clipRect.width() * clipRect.height() * 0.5))
-        return false;
-
     // 1) scroll
     hostWindow()->scroll(scrollDelta, rectToScroll, clipRect);
 
@@ -3150,6 +3146,42 @@ void FrameView::setNodeToDraw(Node* node)
     m_nodeToDraw = node;
 }
 
+void FrameView::paintContentsForSnapshot(GraphicsContext* context, const IntRect& imageRect, SelectionInSnaphot shouldPaintSelection, CoordinateSpaceForSnapshot coordinateSpace)
+{
+    updateLayoutAndStyleIfNeededRecursive();
+
+    // Cache paint behavior and set a new behavior appropriate for snapshots.
+    PaintBehavior oldBehavior = paintBehavior();
+    setPaintBehavior(oldBehavior | PaintBehaviorFlattenCompositingLayers);
+
+    // If the snapshot should exclude selection, then we'll clear the current selection
+    // in the render tree only. This will allow us to restore the selection from the DOM
+    // after we paint the snapshot.
+    if (shouldPaintSelection == ExcludeSelection) {
+        for (Frame* frame = m_frame.get(); frame; frame = frame->tree()->traverseNext(m_frame.get())) {
+            if (RenderView* root = frame->contentRenderer())
+                root->clearSelection();
+        }
+    }
+
+    if (coordinateSpace == DocumentCoordinates)
+        paintContents(context, imageRect);
+    else {
+        // A snapshot in ViewCoordinates will include a scrollbar, and the snapshot will contain
+        // whatever content the document is currently scrolled to.
+        paint(context, imageRect);
+    }
+
+    // Restore selection.
+    if (shouldPaintSelection == ExcludeSelection) {
+        for (Frame* frame = m_frame.get(); frame; frame = frame->tree()->traverseNext(m_frame.get()))
+            frame->selection()->updateAppearance();
+    }
+
+    // Restore cached paint behavior.
+    setPaintBehavior(oldBehavior);
+}
+
 void FrameView::paintOverhangAreas(GraphicsContext* context, const IntRect& horizontalOverhangArea, const IntRect& verticalOverhangArea, const IntRect& dirtyRect)
 {
     if (context->paintingDisabled())
@@ -3575,4 +3607,12 @@ AXObjectCache* FrameView::axObjectCache() const
     return 0;
 }
     
+void FrameView::setScrollingPerformanceLoggingEnabled(bool flag)
+{
+#if USE(ACCELERATED_COMPOSITING)
+    if (TiledBacking* tiledBacking = this->tiledBacking())
+        tiledBacking->setScrollingPerformanceLoggingEnabled(flag);
+#endif
+}
+
 } // namespace WebCore

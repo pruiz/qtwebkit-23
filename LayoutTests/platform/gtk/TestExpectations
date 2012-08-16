@@ -36,6 +36,9 @@
 // Tests that require new results.
 //////////////////////////////////////////////////////////////////////////////////////////
 
+// Require rebaselining after  https://bugs.webkit.org/show_bug.cgi?id=89826
+BUGWK89826 : fast/css/word-space-extra.html = TEXT
+
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Expected failures
@@ -249,8 +252,7 @@ BUGWKGTK SKIP : fast/events/page-visibility-transition-test.html = TEXT
 BUGWK61661 : editing/pasteboard/drag-drop-list.html = TEXT
 
 // Tests for MediaSource API. Feature is not yet functional.
-BUGWK64731 : http/tests/media/media-source = TEXT
-BUGWK64731 SKIP : http/tests/media/media-source/video-media-source-event-attributes.html = TEXT
+BUGWK64731 SKIP : http/tests/media/media-source = TEXT
 
 // Encrypted Media Extensions are not enabled.
 BUGWKGTK SKIP : media/encrypted-media = TEXT
@@ -360,6 +362,9 @@ BUGWK85262 SKIP : fast/css/image-resolution = PASS TEXT
 // CSS image-orientation is not yet enabled.
 BUGWK89052 SKIP : fast/css/image-orientation = PASS
 
+// CSS3 Text Decoration support is not yet enabled (needs ENABLE_CSS3_TEXT_DECORATION).
+BUGWK58491 SKIP : fast/css3-text-decoration = PASS
+
 // No CORS support for media elements is implemented yet.
 BUGWKGTK SKIP : http/tests/security/video-cross-origin-readback.html = TEXT
 
@@ -403,8 +408,6 @@ BUGWK92942 SKIP : fast/events/constructors/device-proximity-event-constructor.ht
 
 BUGWK74297 : http/tests/security/cross-origin-xsl-redirect-BLOCKED.html = CRASH PASS
 
-BUGWK63611 DEBUG : editing/pasteboard/interchange-newline-2.html = CRASH PASS
-
 BUGWK85811 DEBUG : fast/events/message-port-close.html = CRASH PASS
 
 BUGWK86443 : plugins/npruntime/delete-plugin-within-getProperty.html = CRASH
@@ -415,6 +418,22 @@ BUGWK86176 DEBUG : ietestcenter/css3/valuesandunits/units-000.htm = CRASH
 BUGWK89188 RELEASE : storage/websql/quota-tracking.html = CRASH PASS
 
 BUGWK90589 RELEASE : fast/css/user-drag-none.html = CRASH TIMEOUT
+
+BUGWK93501 : editing/inserting/insert-character-in-first-letter-crash.html = CRASH PASS
+BUGWK93501 : fast/css/first-letter-text-fragment-crash.html = CRASH PASS
+
+BUGWK93502 : fast/history/nested-visited-test.html = CRASH PASS
+
+BUGWK93247 DEBUG : fast/lists/list-marker-remove-crash.html = CRASH
+
+BUGWK93727 DEBUG : fast/events/keyevent-iframe-removed-crash.html = CRASH PASS
+BUGWK93727 DEBUG : fullscreen/full-screen-iframe-zIndex.html = CRASH PASS
+BUGWK93727 DEBUG : fullscreen/full-screen-iframe-allowed.html = CRASH PASS
+BUGWK93727 DEBUG : fullscreen/full-screen-iframe-not-allowed.html = CRASH PASS
+BUGWK93727 DEBUG : fullscreen/exit-full-screen-iframe.html = CRASH PASS
+BUGWK93727 DEBUG : svg/custom/use-instanceRoot-as-event-target.xhtml = CRASH PASS
+
+BUGWK90957 DEBUG : fast/js/random-array-gc-stress.html = CRASH PASS
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // End of Crashing tests
@@ -500,8 +519,6 @@ BUGWK84859 : fast/workers/storage/use-same-database-in-page-and-workers.html = P
 BUGWK83878 : media/track/track-mode.html = PASS TEXT
 BUGWK88867 : media/track/track-cue-rendering-snap-to-lines-not-set.html = PASS TEXT
 
-BUGWK63611 DEBUG : editing/pasteboard/interchange-newline-3.html = TEXT PASS
-
 BUGWK89663 : editing/deleting/delete-3800834-fix.html = PASS TEXT
 
 BUGWK49179 : animations/stop-animation-on-suspend.html = PASS TEXT
@@ -518,6 +535,16 @@ BUGWK88061 : fast/replaced/border-radius-clip.html = PASS TEXT
 BUGWK91314 : http/tests/misc/webtiming-origins.html = PASS TEXT
 
 BUGWK70485 : fast/events/drag-selects-image.html = PASS TEXT
+
+BUGWK94119 : storage/websql/database-lock-after-reload.html = TEXT PASS
+
+BUGWK93727 RELEASE : fast/events/keyevent-iframe-removed-crash.html = TEXT PASS
+BUGWK93727 RELEASE : fullscreen/full-screen-iframe-allowed.html = TEXT PASS
+BUGWK93727 RELEASE : fullscreen/full-screen-iframe-legacy.html = TEXT PASS
+BUGWK93727 RELEASE : fullscreen/full-screen-iframe-not-allowed.html = TEXT PASS
+BUGWK93727 RELEASE : fullscreen/exit-full-screen-iframe.html = TEXT PASS
+BUGWK93727 RELEASE : fullscreen/full-screen-iframe-zIndex.html = TEXT PASS
+BUGWK93727 RELEASE : svg/custom/use-instanceRoot-as-event-target.xhtml = TEXT PASS
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // End of Flaky tests
@@ -589,6 +616,7 @@ BUGWKGTK : accessibility/aria-text-role.html = TEXT
 BUGWKGTK : accessibility/aria-used-on-image-maps.html = TEXT
 BUGWKGTK : accessibility/button-press-action.html = TEXT
 BUGWKGTK : accessibility/canvas.html = TEXT
+BUGWKGTK : accessibility/canvas-fallback-content.html = TEXT
 BUGWKGTK : accessibility/editable-webarea-context-menu-point.html = TEXT
 BUGWKGTK : accessibility/ellipsis-text.html = TEXT
 BUGWKGTK : accessibility/ignore-spacer-elements.html = TEXT
@@ -893,27 +921,15 @@ BUGWKGTK : canvas/philip/tests/2d.text.draw.baseline.ideographic.html = TEXT
 BUGWKGTK : canvas/philip/tests/2d.text.draw.baseline.middle.html = TEXT
 BUGWKGTK : canvas/philip/tests/2d.text.draw.baseline.top.html = TEXT
 BUGWKGTK : canvas/philip/tests/2d.text.draw.space.collapse.end.html = TEXT
-BUGWKGTK : canvas/philip/tests/2d.text.draw.space.collapse.nonspace.html = TEXT
 BUGWKGTK : canvas/philip/tests/2d.text.draw.space.collapse.other.html = TEXT
 BUGWKGTK : canvas/philip/tests/2d.text.draw.space.collapse.space.html = TEXT
 BUGWKGTK : canvas/philip/tests/2d.text.draw.space.collapse.start.html = TEXT
-BUGWKGTK : canvas/philip/tests/2d.text.font.parse.basic.html = TEXT
-BUGWKGTK : canvas/philip/tests/2d.text.font.parse.complex.html = TEXT
-BUGWKGTK : canvas/philip/tests/2d.text.font.parse.invalid.html = TEXT
-BUGWKGTK : canvas/philip/tests/2d.text.font.parse.size.percentage.html = TEXT
-BUGWKGTK : canvas/philip/tests/2d.text.font.parse.size.percentage.default.html = TEXT
-BUGWKGTK : canvas/philip/tests/2d.text.font.parse.system.html = TEXT
 BUGWKGTK : canvas/philip/tests/2d.text.measure.width.space.html = TEXT
 BUGWKGTK : canvas/philip/tests/type.prototype.html = TEXT
 
 
 // These tests are failing for us, but not for Mac. This likely
 // indicates platform specific problems.
-
-// When drawing canvas into itself, WebCore draws canvas's buffer into the same buffer. This
-// results in recursive drawing into cairo surface. We should either use groups when drawing
-// with cairo or copy the buffer every time the HTMLCanvasElement gets repainted.
-BUGWKGTK : canvas/philip/tests/2d.drawImage.self.2.html = TEXT
 
 // A testcase for this failure is already in cairo tree, but has not yet been fixed.
 // http://cgit.freedesktop.org/cairo/commit/?id=4d4056872db94573183473610ad1d81d5439fdc6
@@ -1198,8 +1214,6 @@ BUGWK86137 : ietestcenter/css3/namespaces/prefix-007.xml = IMAGE
 BUGWK86139 : ietestcenter/css3/namespaces/prefix-010.xml = IMAGE
 BUGWK86142 : ietestcenter/css3/namespaces/syntax-021.xml = IMAGE
 
-BUGWK86310 : media/media-continues-playing-after-replace-source.html = TEXT
-
 BUGWK86443 : plugins/npruntime/delete-plugin-within-hasProperty-return-false.html = TEXT
 BUGWK86443 : plugins/npruntime/delete-plugin-within-hasProperty-return-true.html = TEXT
 BUGWK86443 : plugins/npruntime/delete-plugin-within-setProperty.html = TEXT
@@ -1268,7 +1282,6 @@ BUGWK92063 : fast/css/sticky/parsing-position-sticky.html = TEXT
 BUGWK92100 : accessibility/canvas-accessibilitynodeobject.html = TEXT
 
 // These tests depend on subpixel layout.
-BUGWK92352 : css3/flexbox/content-height-with-scrollbars.html = IMAGE
 BUGWK92352 : css3/flexbox/flex-rounding.html = TEXT
 
 BUGWK93073 : mathml/presentation/attributes.xhtml = TEXT
@@ -1292,7 +1305,18 @@ BUGWK93073 : mathml/presentation/tokenElements.xhtml = TEXT
 BUGWK93073 : mathml/presentation/under.xhtml = TEXT
 BUGWK93073 : mathml/presentation/underover.xhtml = TEXT
 
-BUGWK93247 : fast/lists/list-marker-remove-crash.html = CRASH
+BUGWK93976 : fast/css-generated-content/quotes-lang.html = IMAGE
+
+// Tests added by https://bugs.webkit.org/show_bug.cgi?id=89826
+BUGWK94008 : fast/css/word-spacing-characters.html = IMAGE
+BUGWK94003 : fast/css/word-spacing-characters-complex-text.html = IMAGE
+// This has always failed on Gtk/Efl - exposed by bug 89826
+BUGWK94009 : css2.1/20110323/c541-word-sp-000.htm = IMAGE
+
+BUGWK94080 : fast/overflow/line-clamp-and-columns.html = IMAGE
+
+BUGWK94083 SKIP : media/video-controls-fullscreen-volume.html = TEXT
+
 //////////////////////////////////////////////////////////////////////////////////////////
 // End of Tests failing
 //////////////////////////////////////////////////////////////////////////////////////////

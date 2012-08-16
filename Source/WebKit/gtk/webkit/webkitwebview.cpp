@@ -2290,7 +2290,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass)
      *
      * The default bindings for this signal is Ctrl-a.
      */
-    webkit_web_view_signals[SELECT_ALL] = g_signal_new("select-all",
+    webkit_web_view_signals[::SELECT_ALL] = g_signal_new("select-all",
             G_TYPE_FROM_CLASS(webViewClass),
             (GSignalFlags)(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
             G_STRUCT_OFFSET(WebKitWebViewClass, select_all),
@@ -2655,7 +2655,7 @@ static void webkit_web_view_class_init(WebKitWebViewClass* webViewClass)
 
     webkit_web_view_signals[SHOULD_SHOW_DELETE_INTERFACE_FOR_ELEMENT] = g_signal_new("should-show-delete-interface-for-element",
         G_TYPE_FROM_CLASS(webViewClass), static_cast<GSignalFlags>(G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION),
-        G_STRUCT_OFFSET(WebKitWebViewClass, should_allow_editing_action), g_signal_accumulator_first_wins, 0,
+        0, g_signal_accumulator_first_wins, 0,
         webkit_marshal_BOOLEAN__OBJECT, G_TYPE_BOOLEAN, 1, WEBKIT_TYPE_DOM_HTML_ELEMENT);
 
     webkit_web_view_signals[SHOULD_CHANGE_SELECTED_RANGE] = g_signal_new("should-change-selected-range",
@@ -4419,7 +4419,7 @@ void webkit_web_view_select_all(WebKitWebView* webView)
 {
     g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
 
-    g_signal_emit(webView, webkit_web_view_signals[SELECT_ALL], 0);
+    g_signal_emit(webView, webkit_web_view_signals[::SELECT_ALL], 0);
 }
 
 /**

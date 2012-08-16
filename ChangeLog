@@ -1,3 +1,222 @@
+2012-08-15  Bruno de Oliveira Abinader  <bruno.abinader@basyskom.com>
+
+        [css3-text] Add CSS3 Text decoration compile flag
+        https://bugs.webkit.org/show_bug.cgi?id=93863
+
+        Reviewed by Julien Chaffraix.
+
+        This patch handles the compile flag implementation, which will come disabled by
+        default, thus not exposing the CSS3 text decoration features to the web, unless
+        when explicitly enabling it with "--css3-text-decoration" build parameter.
+
+        * Source/cmake/WebKitFeatures.cmake:
+        * Source/cmakeconfig.h.cmake:
+        * configure.ac:
+
+2012-08-15  Brady Eidson  <beidson@apple.com>
+
+        Removing a plug-in element from a page opened in a background tab in Safari crashes
+        <rdar://problem/12057991> and https://bugs.webkit.org/show_bug.cgi?id=93913
+
+        Reviewed by Beth Dakin.
+
+        * Source/autotools/symbols.filter: Allow this symbol through for DRT's sake.
+
+2012-08-14  Keishi Hattori  <keishi@webkit.org>
+
+        Share common code between calendar picker and color suggestion picker
+        https://bugs.webkit.org/show_bug.cgi?id=93802
+
+        Reviewed by Kent Tamura.
+
+        * ManualTests/forms/calendar-picker.html:
+        * ManualTests/forms/color-suggestion-picker.html:
+
+2012-08-14  Milian Wolff  <milian.wolff@kdab.com>
+
+        [Qt] QtWebKit linking fails for QNX cross build
+        https://bugs.webkit.org/show_bug.cgi?id=93460
+
+        Reviewed by Simon Hausmann.
+
+        The GCC 4.4.2 used by the QNX BBNDK 2.0.1 fails to link QtWebKit.
+        Apparently it does not properly support the linker invokation using
+        -Wl,-whole-archive -l... -Wl,-no-whole-archive
+        yielding a "cc: no files to process" error. This patch works around
+        this issue by adding an empty dummy file (and thus object file) to
+        the linking stage.
+
+        * Source/api.pri:
+
+2012-08-14  Keishi Hattori  <keishi@webkit.org>
+
+        Move page popup resources to separate directory
+        https://bugs.webkit.org/show_bug.cgi?id=93932
+
+        Reviewed by Kent Tamura.
+
+        * ManualTests/forms/calendar-picker.html:
+        * ManualTests/forms/color-suggestion-picker.html:
+
+2012-08-11  Raphael Kubo da Costa  <rakuco@webkit.org>
+
+        [CMake] Rewrite FindLibSoup2.cmake.
+        https://bugs.webkit.org/show_bug.cgi?id=93191
+
+        Reviewed by Rob Buis.
+
+        The existing LibSoup2 was imported from somewhere else and not
+        only did it contain a lot of unnecessary cruft to look for libsoup
+        2.2 (which we do not support anyway), but it also relied on the
+        paths returned by pkg-config for setting the library and include
+        paths.
+
+        For one, this meant "-lsoup-2.4" was passed to the linked instead
+        of "-L/path/to/libsoup-2.4.so", which would sometimes make a
+        system version of libsoup to be picked up instead of the one
+        installed by, say, jhbuild.
+
+        The new FindLibSoup.cmake now only looks for libsoup 2.4 and
+        relies on pkg-config solely for retrieving the current LibSoup
+        version.
+
+        * Source/cmake/FindLibSoup.cmake: Added.
+        * Source/cmake/FindLibSoup2.cmake: Removed.
+        * Source/cmake/OptionsEfl.cmake: Look for LibSoup instead of
+        LibSoup2, look for the GObject component of Glib.
+
+2012-08-13  Raphael Kubo da Costa  <rakuco@webkit.org>
+
+        [CMake] Remove glib-related Find modules and write single new one instead.
+        https://bugs.webkit.org/show_bug.cgi?id=93786
+
+        Reviewed by Rob Buis.
+
+        As part of the ongoing effort to write proper Find modules that use
+        absolute include and library paths instead of the short ones from
+        pkg-config, replace Find{GIO,Glib,Gthread}.cmake with a single
+        FindGLIB.cmake that optionally detects components such as GIO and
+        GObject.
+
+        Library paths are now defined as "/full/path/to/libfoo.so" instead of
+        simply "foo", so that the linker receives a full path and we can then
+        avoid accidentally picking up a libfoo.so installed into /usr/lib
+        instead of a local one built with jhbuild.
+
+        * Source/cmake/FindGIO.cmake: Removed.
+        * Source/cmake/FindGLIB.cmake: Added.
+        * Source/cmake/FindGlib.cmake: Removed.
+        * Source/cmake/FindGthread.cmake: Removed.
+        * Source/cmake/OptionsEfl.cmake: Look for GLIB with the GIO component.
+
+2012-08-13  Zan Dobersek  <zandobersek@gmail.com>
+
+        [Gtk] Remove SVG_FEATURES and HTML_FEATURES from Source/WebCore/GNUmakefile.am
+        https://bugs.webkit.org/show_bug.cgi?id=90693
+
+        Reviewed by Philippe Normand.
+
+        Remove exportation of SVG_FLAGS and HTML_FLAGS as Automake conditionals
+        as they are not required anymore.
+
+        * configure.ac:
+
+2012-08-12  Loïc Yhuel  <loic.yhuel@softathome.com>
+
+        [Qt] Make it possible to build without QtTest/QtPrintSupport
+        https://bugs.webkit.org/show_bug.cgi?id=93492
+
+        Reviewed by Tor Arne Vestbø.
+
+        * Source/QtWebKit.pro: Disable tests if no testlib
+
+2012-08-10  Rob Buis  <rbuis@rim.com>
+
+        [BlackBerry] Enable relro link option for JSC executable
+        https://bugs.webkit.org/show_bug.cgi?id=93726
+
+        Reviewed by Yong Li.
+
+        Enable relro link option for JSC executable.
+
+        * Source/cmake/OptionsBlackBerry.cmake:
+
+2012-08-09  Raphael Kubo da Costa  <rakuco@webkit.org>
+
+        [CMake] Bump minimum required version to 2.8.3.
+        https://bugs.webkit.org/show_bug.cgi?id=93450
+
+        Reviewed by Daniel Bates.
+
+        Following the discussion in bug 93189, it was decided that bumping
+        the minimum required version from 2.8.0 to 2.8.3 was a good thing
+        due to additional features, such as improved
+        FIND_PACKAGE_HANDLE_STANDARD_ARGS() support and better argument
+        handling in the PKG_CHECK_MODULES() call.
+
+        CMake 2.8.3 was released almost two years ago, so people are
+        expected to have it or a later version installed.
+
+        * CMakeLists.txt:
+
+2012-08-08  Shane Stephens  <shanestephens@google.com>
+
+        Compile flag for CSS Hierarchies
+        https://bugs.webkit.org/show_bug.cgi?id=92433
+
+        Reviewed by Tony Chang.
+
+        * Source/cmake/WebKitFeatures.cmake:
+
+2012-08-08  Ming Xie  <mxie@rim.com>
+
+        [BlackBerry] Fix "-fPIC" define in the BlackBerry build
+        https://bugs.webkit.org/show_bug.cgi?id=93548
+
+        Reviewed by Rob Buis.
+
+        In the current CMake release (version 2.8.5), ${CMAKE_SHARED
+        _LIBRARY_C_FLAGS} and ${CMAKE_SHARED_LIBRARY_CXX_FLAGS} is
+        set to empty (See cmake/Modules/Platform/QNX.cmake)
+
+        This breaks the assumption which WebKit CMake build system 
+        makes in Source/cmake/WebKitHelper.cmake
+
+        * Source/cmake/OptionsBlackBerry.cmake:
+
+2012-08-08  Philippe Normand  <pnormand@igalia.com>
+
+        [GStreamer] 0.11 build broken (again)
+        https://bugs.webkit.org/show_bug.cgi?id=93474
+
+        Reviewed by Martin Robinson.
+
+        * configure.ac: Disable media-stream build if GStreamer 0.11
+        support is enabled, due to farstream-0.1 still messing up with
+        gstreamer-0.10 include path.
+
+2012-08-07  YoungTaeck Song  <youngtaeck.song@samsung.com>
+
+        [WK2][EFL] Implement accelerated compositing on WK2 Efl port
+        https://bugs.webkit.org/show_bug.cgi?id=89840
+
+        Reviewed by Noam Rosenthal.
+
+        Implement accelerated composition with TiledBackingStore on WK2 Efl port.
+        This implementation is based on COORDINATED_GRAPHICS.
+        Add COORDINATED_GRAPHICS related definitions in OptionsEfl.cmake.
+
+        * Source/cmake/OptionsEfl.cmake:
+
+2012-08-07  No'am Rosenthal  <noam.rosenthal@nokia.com>
+
+        [Qt] Make it possible to build without QtQuick
+
+        Reviewed by Simon Hausmann.
+
+        * Source/QtWebKit.pro:
+        * Source/tests.pri:
+
 2012-08-06  Gyuyoung Kim  <gyuyoung.kim@samsung.com>
 
         [EFL] Enable link prefetch

@@ -485,6 +485,17 @@ void RenderLayer::computeRepaintRects(LayoutPoint* offsetFromRoot)
     m_outlineBox = renderer()->outlineBoundsForRepaint(repaintContainer, offsetFromRoot);
 }
 
+
+void RenderLayer::computeRepaintRectsIncludingDescendants()
+{
+    // FIXME: computeRepaintRects() has to walk up the parent chain for every layer to compute the rects.
+    // We should make this more efficient.
+    computeRepaintRects();
+
+    for (RenderLayer* layer = firstChild(); layer; layer = layer->nextSibling())
+        layer->computeRepaintRectsIncludingDescendants();
+}
+
 void RenderLayer::clearRepaintRects()
 {
     ASSERT(!m_hasVisibleContent);
@@ -1446,7 +1457,7 @@ void RenderLayer::convertToLayerCoords(const RenderLayer* ancestorLayer, LayoutP
         // If the fixed layer's container is the root, just add in the offset of the view. We can obtain this by calling
         // localToAbsolute() on the RenderView.
         FloatPoint absPos = renderer()->localToAbsolute(FloatPoint(), true);
-        location += flooredLayoutSize(absPos);
+        location += LayoutSize(absPos.x(), absPos.y());
         return;
     }
 

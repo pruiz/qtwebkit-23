@@ -1656,6 +1656,21 @@ void WebPageProxy::getContentsAsString(PassRefPtr<StringCallback> prpCallback)
     process()->send(Messages::WebPage::GetContentsAsString(callbackID), m_pageID);
 }
 
+#if ENABLE(MHTML)
+void WebPageProxy::getContentsAsMHTMLData(PassRefPtr<DataCallback> prpCallback, bool useBinaryEncoding)
+{
+    RefPtr<DataCallback> callback = prpCallback;
+    if (!isValid()) {
+        callback->invalidate();
+        return;
+    }
+
+    uint64_t callbackID = callback->callbackID();
+    m_dataCallbacks.set(callbackID, callback.get());
+    process()->send(Messages::WebPage::GetContentsAsMHTMLData(callbackID, useBinaryEncoding), m_pageID);
+}
+#endif
+
 void WebPageProxy::getSelectionOrContentsAsString(PassRefPtr<StringCallback> prpCallback)
 {
     RefPtr<StringCallback> callback = prpCallback;
@@ -2191,7 +2206,7 @@ void WebPageProxy::didReceiveIntentForFrame(uint64_t frameID, const IntentData& 
     WebFrameProxy* frame = process()->webFrame(frameID);
     MESSAGE_CHECK(frame);
 
-    RefPtr<WebIntentData> webIntentData = WebIntentData::create(intentData);
+    RefPtr<WebIntentData> webIntentData = WebIntentData::create(intentData, process());
     m_loaderClient.didReceiveIntentForFrame(this, frame, webIntentData.get(), userData.get());
 }
 #endif
@@ -2635,11 +2650,6 @@ void WebPageProxy::setMediaVolume(float volume)
 }
 
 #if PLATFORM(QT)
-void WebPageProxy::didChangeContentsSize(const IntSize& size)
-{
-    m_pageClient->didChangeContentsSize(size);
-}
-
 void WebPageProxy::didFindZoomableArea(const IntPoint& target, const IntRect& area)
 {
     m_pageClient->didFindZoomableArea(target, area);
@@ -2680,6 +2690,13 @@ void WebPageProxy::handleDownloadRequest(DownloadProxy* download)
     m_pageClient->handleDownloadRequest(download);
 }
 #endif // PLATFORM(QT) || PLATFORM(EFL)
+
+#if PLATFORM(QT) || PLATFORM(EFL)
+void WebPageProxy::didChangeContentsSize(const IntSize& size)
+{
+    m_pageClient->didChangeContentsSize(size);
+}
+#endif
 
 #if ENABLE(TOUCH_EVENTS)
 void WebPageProxy::needTouchEvents(bool needTouchEvents)

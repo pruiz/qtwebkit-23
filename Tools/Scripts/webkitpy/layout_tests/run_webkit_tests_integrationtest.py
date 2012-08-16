@@ -764,7 +764,7 @@ class MainTest(unittest.TestCase, StreamTestingMixin):
         self.assertEquals(res, 1)
         self.assertTrue('Clobbering old results' in err.getvalue())
         self.assertTrue('flaky/text.html' in err.getvalue())
-        self.assertTrue('Unexpected text diff' in out.getvalue())
+        self.assertTrue('Unexpected text failures' in out.getvalue())
         self.assertFalse('Unexpected flakiness' in out.getvalue())
         self.assertTrue(host.filesystem.exists('/tmp/layout-test-results/failures/flaky/text-actual.txt'))
         self.assertFalse(host.filesystem.exists('retries'))
@@ -783,7 +783,7 @@ class MainTest(unittest.TestCase, StreamTestingMixin):
         class ImageDiffTestPort(TestPort):
             def diff_image(self, expected_contents, actual_contents, tolerance=None):
                 self.tolerance_used_for_diff_image = self._options.tolerance
-                return (True, 1)
+                return (True, 1, None)
 
         def get_port_for_run(args):
             options, parsed_args = run_webkit_tests.parse_args(args)

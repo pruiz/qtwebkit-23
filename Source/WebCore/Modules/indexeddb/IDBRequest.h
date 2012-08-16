@@ -52,6 +52,7 @@ typedef int ExceptionCode;
 class IDBRequest : public IDBCallbacks, public EventTarget, public ActiveDOMObject {
 public:
     static PassRefPtr<IDBRequest> create(ScriptExecutionContext*, PassRefPtr<IDBAny> source, IDBTransaction*);
+    static PassRefPtr<IDBRequest> create(ScriptExecutionContext*, PassRefPtr<IDBAny> source, IDBTransactionBackendInterface::TaskType, IDBTransaction*);
     virtual ~IDBRequest();
 
     PassRefPtr<IDBAny> result(ExceptionCode&) const;
@@ -82,12 +83,12 @@ public:
     virtual void onError(PassRefPtr<IDBDatabaseError>);
     virtual void onSuccess(PassRefPtr<DOMStringList>);
     virtual void onSuccess(PassRefPtr<IDBDatabaseBackendInterface>);
-    virtual void onSuccess(PassRefPtr<IDBCursorBackendInterface>);
+    virtual void onSuccess(PassRefPtr<IDBCursorBackendInterface>, PassRefPtr<IDBKey>, PassRefPtr<IDBKey> primaryKey, PassRefPtr<SerializedScriptValue>);
     virtual void onSuccess(PassRefPtr<IDBKey>);
     virtual void onSuccess(PassRefPtr<IDBTransactionBackendInterface>);
     virtual void onSuccess(PassRefPtr<SerializedScriptValue>);
     virtual void onSuccess(PassRefPtr<SerializedScriptValue>, PassRefPtr<IDBKey>, const IDBKeyPath&);
-    virtual void onSuccessWithContinuation();
+    virtual void onSuccess(PassRefPtr<IDBKey>, PassRefPtr<IDBKey> primaryKey, PassRefPtr<SerializedScriptValue>);
     virtual void onSuccessWithPrefetch(const Vector<RefPtr<IDBKey> >&, const Vector<RefPtr<IDBKey> >&, const Vector<RefPtr<SerializedScriptValue> >&) { ASSERT_NOT_REACHED(); } // Not implemented. Callback should not reach the renderer side.
     virtual void onBlocked();
 
@@ -105,9 +106,13 @@ public:
     using ThreadSafeRefCounted<IDBCallbacks>::ref;
     using ThreadSafeRefCounted<IDBCallbacks>::deref;
 
+    IDBTransactionBackendInterface::TaskType taskType() { return m_taskType; }
+
 protected:
-    IDBRequest(ScriptExecutionContext*, PassRefPtr<IDBAny> source, IDBTransaction*);
+    IDBRequest(ScriptExecutionContext*, PassRefPtr<IDBAny> source, IDBTransactionBackendInterface::TaskType, IDBTransaction*);
     void enqueueEvent(PassRefPtr<Event>);
+    bool shouldEnqueueEvent() const;
+
     RefPtr<IDBAny> m_result;
     unsigned short m_errorCode;
     String m_errorMessage;
@@ -121,9 +126,10 @@ private:
     virtual EventTargetData* ensureEventTargetData();
 
     PassRefPtr<IDBCursor> getResultCursor();
-    void setResultCursor(PassRefPtr<IDBCursor>);
+    void setResultCursor(PassRefPtr<IDBCursor>, PassRefPtr<IDBKey>, PassRefPtr<IDBKey> primaryKey, PassRefPtr<SerializedScriptValue>);
 
     RefPtr<IDBAny> m_source;
+    const IDBTransactionBackendInterface::TaskType m_taskType;
     RefPtr<IDBTransaction> m_transaction;
 
     ReadyState m_readyState;
@@ -135,6 +141,9 @@ private:
     IDBCursorBackendInterface::CursorType m_cursorType;
     IDBCursor::Direction m_cursorDirection;
     RefPtr<IDBCursor> m_pendingCursor;
+    RefPtr<IDBKey> m_cursorKey;
+    RefPtr<IDBKey> m_cursorPrimaryKey;
+    RefPtr<SerializedScriptValue> m_cursorValue;
 
     EventTargetData m_eventTargetData;
 };

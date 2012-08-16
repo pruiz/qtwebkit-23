@@ -64,7 +64,7 @@ CCLayerImpl::CCLayerImpl(int id)
     , m_preserves3D(false)
     , m_useParentBackfaceVisibility(false)
     , m_drawCheckerboardForMissingTiles(false)
-    , m_isNonCompositedContent(false)
+    , m_useLCDText(false)
     , m_drawsContent(false)
     , m_forceRenderSurface(false)
     , m_isContainerForFixedPositionLayers(false)
@@ -146,7 +146,7 @@ bool CCLayerImpl::descendantDrawsContent()
 
 PassOwnPtr<CCSharedQuadState> CCLayerImpl::createSharedQuadState(int id) const
 {
-    return CCSharedQuadState::create(id, m_drawTransform, m_visibleContentRect, m_scissorRect, m_drawOpacity, m_opaque);
+    return CCSharedQuadState::create(id, m_drawTransform, m_visibleContentRect, m_drawableContentRect, m_drawOpacity, m_opaque);
 }
 
 void CCLayerImpl::willDraw(CCResourceProvider*)

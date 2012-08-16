@@ -56,7 +56,6 @@
 #include "SharedWorkerRepository.h"
 #include "Storage.h"
 #include "V8Binding.h"
-#include "V8BindingMacros.h"
 #include "V8EventListener.h"
 #include "V8GCForContextDispose.h"
 #include "V8HiddenPropertyName.h"
@@ -80,7 +79,7 @@ v8::Handle<v8::Value> WindowSetTimeoutImpl(const v8::Arguments& args, bool singl
     ScriptExecutionContext* scriptContext = static_cast<ScriptExecutionContext*>(imp->document());
 
     if (!scriptContext)
-        return V8Proxy::setDOMException(INVALID_ACCESS_ERR, args.GetIsolate());
+        return setDOMException(INVALID_ACCESS_ERR, args.GetIsolate());
 
     v8::Handle<v8::Value> function = args[0];
     WTF::String functionString;
@@ -304,7 +303,7 @@ static v8::Handle<v8::Value> handlePostMessageCallback(const v8::Arguments& args
 
     // If called directly by WebCore we don't have a calling context.
     if (!source)
-        return V8Proxy::throwTypeError(0, args.GetIsolate());
+        return throwTypeError(0, args.GetIsolate());
 
     // This function has variable arguments and can be:
     // Per current spec:
@@ -324,7 +323,7 @@ static v8::Handle<v8::Value> handlePostMessageCallback(const v8::Arguments& args
                 targetOriginArgIndex = 2;
                 transferablesArgIndex = 1;
             }
-            if (!extractTransferables(args[transferablesArgIndex], portArray, arrayBufferArray))
+            if (!extractTransferables(args[transferablesArgIndex], portArray, arrayBufferArray, args.GetIsolate()))
                 return v8::Undefined();
         } 
         targetOrigin = toWebCoreStringWithNullOrUndefinedCheck(args[targetOriginArgIndex]);
@@ -346,7 +345,7 @@ static v8::Handle<v8::Value> handlePostMessageCallback(const v8::Arguments& args
 
     ExceptionCode ec = 0;
     window->postMessage(message.release(), &portArray, targetOrigin, source, ec);
-    return throwError(ec, args.GetIsolate());
+    return setDOMException(ec, args.GetIsolate());
 }
 
 v8::Handle<v8::Value> V8DOMWindow::postMessageCallback(const v8::Arguments& args)
@@ -472,17 +471,17 @@ v8::Handle<v8::Value> V8DOMWindow::indexedPropertyGetter(uint32_t index, const v
 
     DOMWindow* window = V8DOMWindow::toNative(info.Holder());
     if (!window)
-        return v8::Handle<v8::Value>();
+        return v8Undefined();
 
     Frame* frame = window->frame();
     if (!frame)
-        return v8::Handle<v8::Value>();
+        return v8Undefined();
 
     Frame* child = frame->tree()->scopedChild(index);
     if (child)
-        return toV8(child->domWindow(), info.GetIsolate());
+        return toV8(child->document()->domWindow(), info.GetIsolate());
 
-    return v8::Handle<v8::Value>();
+    return v8Undefined();
 }
 
 
@@ -492,22 +491,22 @@ v8::Handle<v8::Value> V8DOMWindow::namedPropertyGetter(v8::Local<v8::String> nam
 
     DOMWindow* window = V8DOMWindow::toNative(info.Holder());
     if (!window)
-        return v8::Handle<v8::Value>();
+        return v8Undefined();
 
     Frame* frame = window->frame();
     // window is detached from a frame.
     if (!frame)
-        return v8::Handle<v8::Value>();
+        return v8Undefined();
 
     // Search sub-frames.
-    AtomicString propName = v8ValueToAtomicWebCoreString(name);
+    AtomicString propName = toWebCoreAtomicString(name);
     Frame* child = frame->tree()->scopedChild(propName);
     if (child)
-        return toV8(child->domWindow(), info.GetIsolate());
+        return toV8(child->document()->domWindow(), info.GetIsolate());
 
     // Search IDL functions defined in the prototype
     if (!info.Holder()->GetRealNamedProperty(name).IsEmpty())
-        return v8::Handle<v8::Value>();
+        return v8Undefined();
 
     // Search named items in the document.
     Document* doc = frame->document();
@@ -523,7 +522,7 @@ v8::Handle<v8::Value> V8DOMWindow::namedPropertyGetter(v8::Local<v8::String> nam
         }
     }
 
-    return v8::Handle<v8::Value>();
+    return v8Undefined();
 }
 
 
@@ -606,7 +605,7 @@ v8::Handle<v8::Value> toV8(DOMWindow* window, v8::Isolate* isolate)
     // of the frame.
     Frame* frame = window->frame();
     if (!frame)
-        return v8::Handle<v8::Object>();
+        return v8Undefined();
 
     // Special case: Because of evaluateInIsolatedWorld() one DOMWindow can have
     // multiple contexts and multiple global objects associated with it. When
@@ -624,7 +623,7 @@ v8::Handle<v8::Value> toV8(DOMWindow* window, v8::Isolate* isolate)
     // Otherwise, return the global object associated with this frame.
     v8::Handle<v8::Context> context = V8Proxy::context(frame);
     if (context.IsEmpty())
-        return v8::Handle<v8::Object>();
+        return v8Undefined();
 
     v8::Handle<v8::Object> global = context->Global();
     ASSERT(!global.IsEmpty());

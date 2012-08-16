@@ -107,11 +107,18 @@ SET(WebCore_INCLUDE_DIRECTORIES
 )
 
 SET(WebCore_IDL_INCLUDES
+    Modules/battery
     Modules/filesystem
     Modules/gamepad
     Modules/geolocation
     Modules/indexeddb
+    Modules/intents
+    Modules/mediastream
+    Modules/networkinfo
+    Modules/notifications
     Modules/quota
+    Modules/speech
+    Modules/vibration
     Modules/webaudio
     Modules/webdatabase
     Modules/websockets
@@ -121,6 +128,8 @@ SET(WebCore_IDL_INCLUDES
     fileapi
     html
     html/canvas
+    html/shadow
+    html/track
     inspector
     loader/appcache
     page
@@ -194,6 +203,7 @@ SET(WebCore_IDL_FILES
     Modules/intents/IntentResultCallback.idl
     Modules/intents/NavigatorIntents.idl
 
+    Modules/mediasource/MediaSource.idl
     Modules/mediasource/SourceBuffer.idl
     Modules/mediasource/SourceBufferList.idl
 
@@ -824,6 +834,7 @@ SET(WebCore_SOURCES
     Modules/intents/IntentRequest.cpp
     Modules/intents/NavigatorIntents.cpp
 
+    Modules/mediasource/MediaSource.cpp
     Modules/mediasource/SourceBuffer.cpp
     Modules/mediasource/SourceBufferList.cpp
 
@@ -971,6 +982,7 @@ SET(WebCore_SOURCES
     bindings/ScriptControllerBase.cpp
 
     bindings/generic/ActiveDOMCallback.cpp
+    bindings/generic/BindingSecurity.cpp
     bindings/generic/RuntimeEnabledFeatures.cpp
 
     css/CSSAspectRatioValue.cpp
@@ -1506,7 +1518,6 @@ SET(WebCore_SOURCES
     inspector/ConsoleMessage.cpp
     inspector/ContentSearchUtils.cpp
     inspector/DOMEditor.cpp
-    inspector/DOMNodeHighlighter.cpp
     inspector/DOMPatchSupport.cpp
     inspector/IdentifiersFactory.cpp
     inspector/InjectedScript.cpp
@@ -1538,6 +1549,7 @@ SET(WebCore_SOURCES
     inspector/InspectorIndexedDBAgent.cpp
     inspector/InspectorInstrumentation.cpp
     inspector/InspectorMemoryAgent.cpp
+    inspector/InspectorOverlay.cpp
     inspector/InspectorProfilerAgent.cpp
     inspector/InspectorResourceAgent.cpp
     inspector/InspectorRuntimeAgent.cpp
@@ -1593,6 +1605,7 @@ SET(WebCore_SOURCES
     loader/SinkDocument.cpp
     loader/SubframeLoader.cpp
     loader/SubresourceLoader.cpp
+    loader/SubstituteData.cpp
     loader/TextResourceDecoder.cpp
     loader/TextTrackLoader.cpp
     loader/ThreadableLoader.cpp
@@ -1844,6 +1857,7 @@ SET(WebCore_SOURCES
     platform/graphics/filters/CustomFilterMesh.cpp
     platform/graphics/filters/CustomFilterOperation.cpp
     platform/graphics/filters/CustomFilterProgram.cpp
+    platform/graphics/filters/CustomFilterProgramInfo.cpp
     platform/graphics/filters/DistantLightSource.cpp
     platform/graphics/filters/FEBlend.cpp
     platform/graphics/filters/FEColorMatrix.cpp
@@ -2530,9 +2544,22 @@ IF (WTF_USE_3D_GRAPHICS)
     LIST(APPEND WebCore_LIBRARIES
         ${OPENGL_gl_LIBRARY}
     )
+
+    IF (BISON_VERSION EQUAL "2.5")
+        # Bison 2.5 can not compile generated glslang.
+        # See https://bugs.webkit.org/show_bug.cgi?id=93487
+        LIST(APPEND WebCore_SOURCES
+            ${THIRDPARTY_DIR}/ANGLE/src/compiler/glslang_lex.cpp
+            ${THIRDPARTY_DIR}/ANGLE/src/compiler/glslang_tab.cpp
+        )
+    ELSE ()
+        LIST(APPEND WebCore_SOURCES
+            ${DERIVED_SOURCES_WEBCORE_DIR}/glslang.cpp
+            ${DERIVED_SOURCES_WEBCORE_DIR}/glslang_tab.cpp
+        )
+    ENDIF ()
+
     LIST(APPEND WebCore_SOURCES
-        ${DERIVED_SOURCES_WEBCORE_DIR}/glslang.cpp
-        ${DERIVED_SOURCES_WEBCORE_DIR}/glslang_tab.cpp
         ${THIRDPARTY_DIR}/ANGLE/src/compiler/BuiltInFunctionEmulator.cpp
         ${THIRDPARTY_DIR}/ANGLE/src/compiler/CodeGenGLSL.cpp
         ${THIRDPARTY_DIR}/ANGLE/src/compiler/Compiler.cpp
@@ -2552,8 +2579,6 @@ IF (WTF_USE_3D_GRAPHICS)
         ${THIRDPARTY_DIR}/ANGLE/src/compiler/DetectDiscontinuity.h
         ${THIRDPARTY_DIR}/ANGLE/src/compiler/DetectRecursion.cpp
         ${THIRDPARTY_DIR}/ANGLE/src/compiler/ForLoopUnroll.cpp
-        ${THIRDPARTY_DIR}/ANGLE/src/compiler/glslang_lex.cpp
-        ${THIRDPARTY_DIR}/ANGLE/src/compiler/glslang_tab.cpp
         ${THIRDPARTY_DIR}/ANGLE/src/compiler/InfoSink.cpp
         ${THIRDPARTY_DIR}/ANGLE/src/compiler/Initialize.cpp
         ${THIRDPARTY_DIR}/ANGLE/src/compiler/InitializeDll.cpp
@@ -2661,9 +2686,9 @@ SET(WebCoreTestSupport_IDL_INCLUDES
 )
 
 SET(WebCoreTestSupport_IDL_FILES
-    testing/FastMallocStatistics.idl
     testing/Internals.idl
     testing/InternalSettings.idl
+    testing/MallocStatistics.idl
 )
 
 SET(WebCoreTestSupport_SOURCES

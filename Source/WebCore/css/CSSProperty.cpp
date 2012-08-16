@@ -340,6 +340,9 @@ bool CSSProperty::isInheritedProperty(CSSPropertyID propertyID)
     case CSSPropertyWebkitPrintColorAdjust:
     case CSSPropertyWebkitRtlOrdering:
     case CSSPropertyWebkitTextCombine:
+#if ENABLE(CSS3_TEXT_DECORATION)
+    case CSSPropertyWebkitTextDecorationLine:
+#endif // CSS3_TEXT_DECORATION
     case CSSPropertyWebkitTextDecorationsInEffect:
     case CSSPropertyWebkitTextEmphasis:
     case CSSPropertyWebkitTextEmphasisColor:
@@ -697,7 +700,7 @@ bool CSSProperty::isInheritedProperty(CSSPropertyID propertyID)
 
 void CSSProperty::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<CSSProperty> info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
     info.addInstrumentedMember(m_value);
 }
 

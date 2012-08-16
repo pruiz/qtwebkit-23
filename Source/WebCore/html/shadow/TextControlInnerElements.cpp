@@ -45,6 +45,7 @@
 #include "SpeechInputEvent.h"
 #include "TextEvent.h"
 #include "TextEventInputType.h"
+#include "WheelEvent.h"
 
 namespace WebCore {
 
@@ -101,13 +102,7 @@ void TextControlInnerTextElement::defaultEventHandler(Event* event)
 
 RenderObject* TextControlInnerTextElement::createRenderer(RenderArena* arena, RenderStyle*)
 {
-    bool multiLine = false;
-    Element* shadowAncestor = shadowHost();
-    if (shadowAncestor && shadowAncestor->renderer()) {
-        ASSERT(shadowAncestor->renderer()->isTextField() || shadowAncestor->renderer()->isTextArea());
-        multiLine = shadowAncestor->renderer()->isTextArea();
-    }
-    return new (arena) RenderTextControlInnerBlock(this, multiLine);
+    return new (arena) RenderTextControlInnerBlock(this);
 }
 
 PassRefPtr<RenderStyle> TextControlInnerTextElement::customStyleForRenderer()
@@ -340,6 +335,22 @@ void SpinButtonElement::defaultEventHandler(Event* event)
 
     if (!event->defaultHandled())
         HTMLDivElement::defaultEventHandler(event);
+}
+
+void SpinButtonElement::forwardEvent(Event* event)
+{
+    if (!renderBox())
+        return;
+
+    if (!event->hasInterface(eventNames().interfaceForWheelEvent))
+        return;
+
+    HTMLInputElement* input = static_cast<HTMLInputElement*>(shadowHost());
+    if (input->disabled() || input->readOnly() || !input->focused())
+        return;
+
+    doStepAction(static_cast<WheelEvent*>(event)->wheelDeltaY());
+    event->setDefaultHandled();
 }
 
 bool SpinButtonElement::willRespondToMouseMoveEvents()
@@ -616,8 +627,7 @@ void InputFieldSpeechButtonElement::startSpeechInput()
     RefPtr<HTMLInputElement> input = static_cast<HTMLInputElement*>(shadowHost());
     AtomicString language = input->computeInheritedLanguage();
     String grammar = input->getAttribute(webkitgrammarAttr);
-    // FIXME: this should probably respect transforms
-    IntRect rect = pixelSnappedIntRect(renderer()->view()->frameView()->contentsToWindow(renderer()->absoluteBoundingBoxRectIgnoringTransforms()));
+    IntRect rect = document()->view()->contentsToRootView(getPixelSnappedRect());
     if (speechInput()->startRecognition(m_listenerId, rect, language, grammar, document()->securityOrigin()))
         setState(Recording);
 }

@@ -173,6 +173,12 @@ void NetworkJob::handleNotifyStatusReceived(int status, const String& message)
     if (isInfo(status))
         return; // ignore
 
+    // Load up error page and ask the user to change their wireless proxy settings
+    if (status == 407) {
+        const ResourceError error = ResourceError(ResourceError::httpErrorDomain, BlackBerry::Platform::FilterStream::StatusWifiProxyAuthError, m_response.url().string(), emptyString());
+        m_handle->client()->didFail(m_handle.get(), error);
+    }
+
     m_statusReceived = true;
 
     // Convert non-HTTP status codes to generic HTTP codes.
@@ -186,9 +192,7 @@ void NetworkJob::handleNotifyStatusReceived(int status, const String& message)
 
     m_response.setHTTPStatusText(message);
 
-    if (!isError(m_extendedStatusCode))
-        storeCredentials();
-    else if (isUnauthorized(m_extendedStatusCode)) {
+    if (isUnauthorized(m_extendedStatusCode)) {
         purgeCredentials();
         BlackBerry::Platform::log(BlackBerry::Platform::LogLevelCritical, "Authentication failed, purge the stored credentials for this site.");
     }
@@ -277,10 +281,11 @@ void NetworkJob::notifyAuthReceived(BlackBerry::Platform::NetworkRequest::AuthTy
                                                                                          challenge.error());
             }
         }
+        storeCredentials();
         return;
-    }
-
-    m_newJobWithCredentialsStarted = sendRequestWithCredentials(serverType, scheme, realm, requireCredentials);
+    } else if (serverType != ProtectionSpaceProxyHTTP)
+        // If a wifi proxy auth failed, there is no point of trying anymore because the credentials are wrong.
+        m_newJobWithCredentialsStarted = sendRequestWithCredentials(serverType, scheme, realm, requireCredentials);
 }
 
 void NetworkJob::notifyStringHeaderReceived(const String& key, const String& value)
@@ -349,14 +354,14 @@ void NetworkJob::handleNotifyMultipartHeaderReceived(const String& key, const St
         }
 
         m_multipartResponse->setIsMultipartPayload(true);
-    } else {
-        if (key.lower() == "content-type") {
-            String contentType = value.lower();
-            m_multipartResponse->setMimeType(extractMIMETypeFromMediaType(contentType));
-            m_multipartResponse->setTextEncodingName(extractCharsetFromMediaType(contentType));
-        }
-        m_multipartResponse->setHTTPHeaderField(key, value);
     }
+
+    if (key.lower() == "content-type") {
+        String contentType = value.lower();
+        m_multipartResponse->setMimeType(extractMIMETypeFromMediaType(contentType));
+        m_multipartResponse->setTextEncodingName(extractCharsetFromMediaType(contentType));
+    }
+    m_multipartResponse->setHTTPHeaderField(key, value);
 }
 
 void NetworkJob::handleSetCookieHeader(const String& value)
@@ -708,15 +713,8 @@ bool NetworkJob::sendRequestWithCredentials(ProtectionSpaceServerType type, Prot
 
     String host;
     int port;
-    if (type == ProtectionSpaceProxyHTTP) {
-        String proxyAddress = BlackBerry::Platform::Client::get()->getProxyAddress(newURL.string().ascii().data()).c_str();
-        KURL proxyURL(KURL(), proxyAddress);
-        host = proxyURL.host();
-        port = proxyURL.port();
-    } else {
-        host = m_response.url().host();
-        port = m_response.url().port();
-    }
+    host = m_response.url().host();
+    port = m_response.url().port();
 
     ProtectionSpace protectionSpace(host, port, type, realm, scheme);
 
@@ -743,11 +741,6 @@ bool NetworkJob::sendRequestWithCredentials(ProtectionSpaceServerType type, Prot
         String username;
         String password;
 
-        if (type == ProtectionSpaceProxyHTTP) {
-            username = BlackBerry::Platform::Client::get()->getProxyUsername().c_str();
-            password = BlackBerry::Platform::Client::get()->getProxyPassword().c_str();
-        }
-
         if (username.isEmpty() || password.isEmpty()) {
             // Before asking the user for credentials, we check if the URL contains that.
             if (!m_handle->getInternal()->m_user.isEmpty() && !m_handle->getInternal()->m_pass.isEmpty()) {
@@ -759,6 +752,8 @@ bool NetworkJob::sendRequestWithCredentials(ProtectionSpaceServerType type, Prot
                 m_handle->getInternal()->m_user = "";
                 m_handle->getInternal()->m_pass = "";
             } else {
+                if (m_handle->firstRequest().targetType() != ResourceRequest::TargetIsMainFrame && BlackBerry::Platform::Client::isChromeProcess())
+                    return false;
                 Credential inputCredential;
                 if (!m_frame->page()->chrome()->client()->platformPageClient()->authenticationChallenge(newURL, protectionSpace, inputCredential))
                     return false;

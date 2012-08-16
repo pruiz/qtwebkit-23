@@ -32,7 +32,7 @@
 
 vars = {
   'chromium_svn': 'http://src.chromium.org/svn/trunk/src',
-  'chromium_rev': '150169'
+  'chromium_rev': '151672'
 }
 
 deps = {
@@ -58,6 +58,8 @@ deps = {
     From('chromium_deps', 'src/third_party/skia/src'),
   'third_party/skia/include':
     From('chromium_deps', 'src/third_party/skia/include'),
+  'third_party/skia/gyp':
+    From('chromium_deps', 'src/third_party/skia/gyp'),
 
   # testing
   'testing':
@@ -179,12 +181,12 @@ deps_os = {
       From('chromium_deps', 'src/third_party/openssl'),
   },
   'android': {
-    'tools/android':
-      Var('chromium_svn') + '/tools/android@' + Var('chromium_rev'),
+    'third_party/android_tools':
+      From('chromium_deps', 'src/third_party/android_tools'),
     'third_party/freetype':
       From('chromium_deps', 'src/third_party/freetype'),
-    'third_party/aosp':
-      From('chromium_deps', 'src/third_party/aosp'),
+    'tools/android':
+      Var('chromium_svn') + '/tools/android@' + Var('chromium_rev'),
   },
 }
 

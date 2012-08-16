@@ -43,6 +43,7 @@
 
 #include <BlackBerryPlatformGraphics.h>
 #include <BlackBerryPlatformLog.h>
+#include <EGL/egl.h>
 #include <limits>
 #include <wtf/text/CString.h>
 
@@ -159,8 +160,15 @@ LayerRenderer::LayerRenderer(GLES2Context* context)
     , m_currentLayerRendererSurface(0)
     , m_clearSurfaceOnDrawLayers(true)
     , m_context(context)
+    , m_isRobustnessSupported(false)
     , m_needsCommit(false)
 {
+    if (makeContextCurrent()) {
+        m_isRobustnessSupported = String(reinterpret_cast<const char*>(::glGetString(GL_EXTENSIONS))).contains("GL_EXT_robustness");
+        if (m_isRobustnessSupported)
+            m_glGetGraphicsResetStatusEXT = reinterpret_cast<PFNGLGETGRAPHICSRESETSTATUSEXTPROC>(eglGetProcAddress("glGetGraphicsResetStatusEXT"));
+    }
+
     for (int i = 0; i < LayerData::NumberOfLayerProgramShaders; ++i)
         m_layerProgramObject[i] = 0;
 
@@ -800,6 +808,7 @@ void LayerRenderer::updateLayersRecursive(LayerCompositingThread* layer, const T
     // The matrix passed down to the sublayers is therefore:
     // M[s] = M * Tr[-center]
     localMatrix.translate3d(-bounds.width() * 0.5, -bounds.height() * 0.5, 0);
+    localMatrix.translate(-layer->boundsOrigin().x(), -layer->boundsOrigin().y());
 
     const Vector<RefPtr<LayerCompositingThread> >& sublayers = layer->getSublayers();
     for (size_t i = 0; i < sublayers.size(); i++)
@@ -997,7 +1006,14 @@ void LayerRenderer::updateScissorIfNeeded(const FloatRect& clipRect)
 
 bool LayerRenderer::makeContextCurrent()
 {
-    return m_context->makeCurrent();
+    bool ret = m_context->makeCurrent();
+    if (ret && m_isRobustnessSupported) {
+        if (m_glGetGraphicsResetStatusEXT() != GL_NO_ERROR) {
+            BlackBerry::Platform::logAlways(BlackBerry::Platform::LogLevelCritical, "Robust OpenGL context has been reset. Aborting.");
+            CRASH();
+        }
+    }
+    return ret;
 }
 
 // Binds the given attribute name to a common location across all programs

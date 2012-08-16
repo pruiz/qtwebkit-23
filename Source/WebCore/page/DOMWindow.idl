@@ -781,10 +781,12 @@ module window {
 
         attribute [Conditional=BLOB&LEGACY_WEBKIT_BLOB_BUILDER] WebKitBlobBuilderConstructor WebKitBlobBuilder;
 
-        attribute [Conditional=BLOB] DOMURLConstructor webkitURL;
+        attribute [Conditional=BLOB] DOMURLConstructor URL;
+        attribute [Conditional=BLOB] DOMURLConstructor webkitURL; // FIXME: deprecate this.
 
         attribute [Conditional=MUTATION_OBSERVERS] MutationObserverConstructor WebKitMutationObserver;
 
+        attribute [Conditional=MEDIA_SOURCE, V8EnabledAtRuntime=mediaSource] MediaSourceConstructor MediaSource;
         attribute [Conditional=MEDIA_SOURCE, V8EnabledAtRuntime=mediaSource] SourceBufferConstructor SourceBuffer;
         attribute [Conditional=MEDIA_SOURCE, V8EnabledAtRuntime=mediaSource] SourceBufferListConstructor SourceBufferList;
 

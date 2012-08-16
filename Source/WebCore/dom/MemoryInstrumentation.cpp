@@ -31,6 +31,7 @@
 #include "config.h"
 #include "MemoryInstrumentation.h"
 
+#include "KURL.h"
 #include <wtf/text/StringImpl.h>
 #include <wtf/text/WTFString.h>
 
@@ -46,6 +47,15 @@ void MemoryInstrumentation::addObject(const StringImpl* stringImpl, ObjectType o
     if (!stringImpl || visited(stringImpl))
         return;
     countObjectSize(objectType, stringImpl->sizeInBytes());
+}
+
+void MemoryInstrumentation::addObject(const KURL& url, ObjectType objectType)
+{
+    if (visited(&url))
+        return;
+    addObject(url.string(), objectType);
+    if (url.innerURL())
+        addObject(url.innerURL(), objectType);
 }
 
 } // namespace WebCore

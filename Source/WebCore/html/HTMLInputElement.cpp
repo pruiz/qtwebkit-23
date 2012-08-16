@@ -56,7 +56,6 @@
 #include "SearchInputType.h"
 #include "ShadowRoot.h"
 #include "ScriptEventListener.h"
-#include "WheelEvent.h"
 #include <wtf/MathExtras.h>
 #include <wtf/StdLibExtras.h>
 
@@ -626,6 +625,12 @@ void HTMLInputElement::parseAttribute(const Attribute& attribute)
     } else if (attribute.name() == typeAttr) {
         updateType();
     } else if (attribute.name() == valueAttr) {
+        // Changes to the value attribute may change whether or not this element has a default value.
+        // If this field is autocomplete=off that might affect the return value of needsSuspensionCallback.
+        if (m_autocomplete == Off) {
+            unregisterForSuspensionCallbackIfNeeded();
+            registerForSuspensionCallbackIfNeeded();
+        }
         // We only need to setChanged if the form is looking at the default value right now.
         if (!hasDirtyValue()) {
             updatePlaceholderVisibility(false);
@@ -844,7 +849,7 @@ void HTMLInputElement::setChecked(bool nowChecked, TextFieldEventBehavior eventB
     // RenderTextView), but it's not possible to do it at the moment
     // because of the way the code is structured.
     if (renderer() && AXObjectCache::accessibilityEnabled())
-        renderer()->document()->axObjectCache()->checkedStateChanged(renderer());
+        renderer()->document()->axObjectCache()->checkedStateChanged(this);
 
     // Only send a change event for items in the document (avoid firing during
     // parsing) and don't send a change event for a radio button that's getting
@@ -1149,12 +1154,6 @@ void HTMLInputElement::defaultEventHandler(Event* evt)
     if (evt->isBeforeTextInsertedEvent())
         m_inputType->handleBeforeTextInsertedEvent(static_cast<BeforeTextInsertedEvent*>(evt));
 
-    if (evt->hasInterface(eventNames().interfaceForWheelEvent)) {
-        m_inputType->handleWheelEvent(static_cast<WheelEvent*>(evt));
-        if (evt->defaultHandled())
-            return;
-    }
-
     if (evt->isMouseEvent() && evt->type() == eventNames().mousedownEvent) {
         m_inputType->handleMouseDownEvent(static_cast<MouseEvent*>(evt));
         if (evt->defaultHandled())
@@ -1379,7 +1378,17 @@ bool HTMLInputElement::isOutOfRange() const
 
 bool HTMLInputElement::needsSuspensionCallback()
 {
-    return m_autocomplete == Off || m_inputType->shouldResetOnDocumentActivation();
+    if (m_inputType->shouldResetOnDocumentActivation())
+        return true;
+
+    // Sensitive input elements are marked with autocomplete=off, and we want to wipe them out
+    // when going back; returning true here arranges for us to call reset at the time
+    // the page is restored. Non-empty textual default values indicate that the field
+    // is not really sensitive -- there's no default value for an account number --
+    // and we would see unexpected results if we reset to something other than blank.
+    bool isSensitive = m_autocomplete == Off && !(m_inputType->isTextType() && !defaultValue().isEmpty());
+
+    return isSensitive;
 }
 
 void HTMLInputElement::registerForSuspensionCallbackIfNeeded()

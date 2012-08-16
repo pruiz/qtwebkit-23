@@ -182,7 +182,7 @@ void IDBTransaction::objectStoreDeleted(const String& name)
 
 void IDBTransaction::setActive(bool active)
 {
-    ASSERT(m_state != Finished);
+    ASSERT_WITH_MESSAGE(m_state != Finished, "A finished transaction tried to setActive(%s)", active ? "true" : "false");
     if (m_state == Finishing)
         return;
     ASSERT(m_state == Unused || m_state == Used);
@@ -262,6 +262,7 @@ void IDBTransaction::unregisterRequest(IDBRequest* request)
 
 void IDBTransaction::onAbort()
 {
+    IDB_TRACE("IDBTransaction::onAbort");
     ASSERT(m_state != Finished);
 
     if (m_state != Finishing) {
@@ -294,6 +295,7 @@ void IDBTransaction::onAbort()
 
 void IDBTransaction::onComplete()
 {
+    IDB_TRACE("IDBTransaction::onComplete");
     ASSERT(m_state != Finished);
     m_state = Finishing;
     m_objectStoreCleanupMap.clear();

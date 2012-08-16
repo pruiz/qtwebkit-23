@@ -28,7 +28,7 @@
  * @constructor
  * @extends {WebInspector.PropertiesSection}
  * @param {WebInspector.RemoteObject=} object
- * @param {string=} title
+ * @param {string|Element=} title
  * @param {string=} subtitle
  * @param {string=} emptyPlaceholder
  * @param {boolean=} ignoreHasOwnProperty
@@ -45,7 +45,7 @@ WebInspector.ObjectPropertiesSection = function(object, title, subtitle, emptyPl
     this.editable = true;
     this.skipProto = false;
 
-    WebInspector.PropertiesSection.call(this, title, subtitle);
+    WebInspector.PropertiesSection.call(this, title || "", subtitle);
 }
 
 WebInspector.ObjectPropertiesSection._arrayLoadThreshold = 100;
@@ -551,7 +551,6 @@ WebInspector.FunctionScopeMainTreeElement.prototype = {
 
         }
         DebuggerAgent.getFunctionDetails(this._remoteObject.objectId, didGetDetails.bind(this));
-
     }
 };
 
@@ -600,7 +599,7 @@ WebInspector.ArrayGroupingTreeElement = function(object, fromIndex, toIndex, pro
     this._populated = false;
 }
 
-WebInspector.ArrayGroupingTreeElement._bucketThreshold = 20;
+WebInspector.ArrayGroupingTreeElement._bucketThreshold = 100;
 
 /**
  * @param {TreeElement|TreeOutline} treeElement
@@ -639,14 +638,11 @@ WebInspector.ArrayGroupingTreeElement._populateRanges = function(treeElement, ob
                 ++count;
         }
 
-        var bucketSize;
-        if (count < bucketThreshold)
+        var bucketSize = count;
+        if (count <= bucketThreshold)
             bucketSize = count;
-        else {
-            bucketSize = Math.ceil(count / bucketThreshold);
-            if (bucketSize < bucketThreshold)
-                bucketSize = Math.floor(Math.sqrt(count));
-        }
+        else
+            bucketSize = Math.pow(bucketThreshold, Math.floor(Math.log(count) / Math.log(bucketThreshold)));
 
         var ranges = [];
         count = 0;

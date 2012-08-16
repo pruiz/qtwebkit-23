@@ -141,8 +141,8 @@ public:
     // in style attribute or one of the SVG animation attributes.
     bool hasAttributesWithoutUpdate() const;
 
-    bool hasAttribute(const String& name) const;
-    bool hasAttributeNS(const String& namespaceURI, const String& localName) const;
+    bool hasAttribute(const AtomicString& name) const;
+    bool hasAttributeNS(const AtomicString& namespaceURI, const AtomicString& localName) const;
 
     const AtomicString& getAttribute(const AtomicString& name) const;
     const AtomicString& getAttributeNS(const AtomicString& namespaceURI, const AtomicString& localName) const;
@@ -201,13 +201,13 @@ public:
     // Returns the absolute bounding box translated into screen coordinates:
     IntRect screenRect() const;
 
-    void removeAttribute(const String& name);
-    void removeAttributeNS(const String& namespaceURI, const String& localName);
+    void removeAttribute(const AtomicString& name);
+    void removeAttributeNS(const AtomicString& namespaceURI, const AtomicString& localName);
 
     PassRefPtr<Attr> detachAttribute(size_t index);
 
-    PassRefPtr<Attr> getAttributeNode(const String& name);
-    PassRefPtr<Attr> getAttributeNodeNS(const String& namespaceURI, const String& localName);
+    PassRefPtr<Attr> getAttributeNode(const AtomicString& name);
+    PassRefPtr<Attr> getAttributeNodeNS(const AtomicString& namespaceURI, const AtomicString& localName);
     PassRefPtr<Attr> setAttributeNode(Attr*, ExceptionCode&);
     PassRefPtr<Attr> setAttributeNodeNS(Attr*, ExceptionCode&);
     PassRefPtr<Attr> removeAttributeNode(Attr*, ExceptionCode&);
@@ -276,10 +276,6 @@ public:
     virtual void willAddAuthorShadowRoot() { }
 
     ShadowRoot* userAgentShadowRoot() const;
-
-    // FIXME: Remove Element::ensureShadowRoot
-    // https://bugs.webkit.org/show_bug.cgi?id=77608
-    ShadowRoot* ensureShadowRoot();
 
     virtual const AtomicString& shadowPseudoId() const;
     void setShadowPseudoId(const AtomicString&, ExceptionCode& = ASSERT_NO_EXCEPTION);
@@ -438,7 +434,7 @@ public:
 
     virtual void reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     {
-        MemoryClassInfo<Element> info(memoryObjectInfo, this, MemoryInstrumentation::DOM);
+        MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::DOM);
         ContainerNode::reportMemoryUsage(memoryObjectInfo);
         info.addInstrumentedMember(m_tagName);
         info.addInstrumentedMember(m_attributeData);

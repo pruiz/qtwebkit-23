@@ -131,8 +131,6 @@ SOURCES += \
      bindings/js/JSEventTargetCustom.cpp \
      bindings/js/JSExceptionBase.cpp \
      bindings/js/JSFileReaderCustom.cpp \
-     bindings/js/JSFloat32ArrayCustom.cpp \
-     bindings/js/JSFloat64ArrayCustom.cpp \
      bindings/js/JSGeolocationCustom.cpp \
      bindings/js/JSHTMLAllCollectionCustom.cpp \
      bindings/js/JSHTMLAppletElementCustom.cpp \
@@ -158,9 +156,6 @@ SOURCES += \
      bindings/js/JSInjectedScriptHostCustom.cpp \
      bindings/js/JSInjectedScriptManager.cpp \
      bindings/js/JSInspectorFrontendHostCustom.cpp \
-     bindings/js/JSInt16ArrayCustom.cpp \
-     bindings/js/JSInt32ArrayCustom.cpp \
-     bindings/js/JSInt8ArrayCustom.cpp \
      bindings/js/JSLazyEventListener.cpp \
      bindings/js/JSLocationCustom.cpp \
      bindings/js/JSMainThreadExecState.cpp \
@@ -192,10 +187,6 @@ SOURCES += \
      bindings/js/JSTouchCustom.cpp \
      bindings/js/JSTouchListCustom.cpp \
      bindings/js/JSTreeWalkerCustom.cpp \
-     bindings/js/JSUint16ArrayCustom.cpp \
-     bindings/js/JSUint32ArrayCustom.cpp \
-     bindings/js/JSUint8ArrayCustom.cpp \
-     bindings/js/JSUint8ClampedArrayCustom.cpp \
      bindings/js/JSWebKitAnimationCustom.cpp \
      bindings/js/JSWebKitAnimationListCustom.cpp \
      bindings/js/JSWebKitCSSKeyframeRuleCustom.cpp \
@@ -741,7 +732,6 @@ SOURCES += \
     inspector/ConsoleMessage.cpp \
     inspector/ContentSearchUtils.cpp \
     inspector/DOMEditor.cpp \
-    inspector/DOMNodeHighlighter.cpp \
     inspector/DOMPatchSupport.cpp \
     inspector/IdentifiersFactory.cpp \
     inspector/InjectedScript.cpp \
@@ -770,6 +760,7 @@ SOURCES += \
     inspector/InspectorHistory.cpp \
     inspector/InspectorInstrumentation.cpp \
     inspector/InspectorMemoryAgent.cpp \
+    inspector/InspectorOverlay.cpp \
     inspector/InspectorPageAgent.cpp \
     inspector/InspectorProfilerAgent.cpp \
     inspector/InspectorResourceAgent.cpp \
@@ -852,6 +843,7 @@ SOURCES += \
     loader/SinkDocument.cpp \
     loader/SubframeLoader.cpp \
     loader/SubresourceLoader.cpp \
+    loader/SubstituteData.cpp \
     loader/TextResourceDecoder.cpp \
     loader/ThreadableLoader.cpp \
     page/animation/AnimationBase.cpp \
@@ -1847,7 +1839,6 @@ HEADERS += \
     inspector/ConsoleMessage.h \
     inspector/ContentSearchUtils.h \
     inspector/DOMEditor.h \
-    inspector/DOMNodeHighlighter.h \
     inspector/DOMPatchSupport.h \
     inspector/IdentifiersFactory.h \
     inspector/InjectedScript.h \
@@ -1878,6 +1869,7 @@ HEADERS += \
     inspector/InspectorHistory.h \
     inspector/InspectorInstrumentation.h \
     inspector/InspectorMemoryAgent.h \
+    inspector/InspectorOverlay.h \
     inspector/InspectorPageAgent.h \
     inspector/InspectorProfilerAgent.h \
     inspector/InspectorResourceAgent.h \
@@ -1947,6 +1939,7 @@ HEADERS += \
     loader/ProgressTracker.h \
     loader/ResourceLoader.h \
     loader/SubresourceLoader.h \
+    loader/SubstituteData.h \
     loader/TextResourceDecoder.h \
     loader/TextTrackLoader.h \
     loader/ThreadableLoader.h \
@@ -2103,6 +2096,7 @@ HEADERS += \
     platform/graphics/IntPointHash.h \
     platform/graphics/IntRect.h \
     platform/graphics/MediaPlayer.h \
+    platform/graphics/NativeImagePtr.h \
     platform/graphics/opentype/OpenTypeVerticalData.h \
     platform/graphics/Path.h \
     platform/graphics/PathTraversalState.h \
@@ -2659,9 +2653,9 @@ HEADERS += \
     svg/SVGVKernElement.h \
     svg/SVGZoomAndPan.h \
     svg/SVGZoomEvent.h \
-    testing/FastMallocStatistics.h \
     testing/Internals.h \
     testing/InternalSettings.h \
+    testing/MallocStatistics.h \
     workers/AbstractWorker.h \
     workers/DedicatedWorkerContext.h \
     workers/DedicatedWorkerThread.h \
@@ -3028,9 +3022,13 @@ contains(DEFINES, ENABLE_FILE_SYSTEM=1) {
 
 contains(DEFINES, ENABLE_MEDIA_SOURCE=1) {
     HEADERS += \
+        Modules/mediasource/MediaSource.h \
+        Modules/mediasource/MediaSourceRegistry.h \
         Modules/mediasource/SourceBuffer.h \
         Modules/mediasource/SourceBufferList.h
     SOURCES += \
+        Modules/mediasource/MediaSource.cpp \
+        Modules/mediasource/MediaSourceRegistry.cpp \
         Modules/mediasource/SourceBuffer.cpp \
         Modules/mediasource/SourceBufferList.cpp
 }
@@ -3102,6 +3100,22 @@ contains(DEFINES, ENABLE_QUOTA=1) {
     SOURCES += \
         Modules/quota/DOMWindowQuota.cpp
         Modules/quota/StorageInfo.cpp
+}
+
+contains(DEFINES, ENABLE_GAMEPAD=1) {
+    HEADERS += \
+        Modules/gamepad/Gamepad.h\
+        Modules/gamepad/GamepadList.h \
+        Modules/gamepad/NavigatorGamepad.h \
+        platform/linux/GamepadDeviceLinux.h \
+        platform/Gamepads.h
+
+    SOURCES += \
+        Modules/gamepad/Gamepad.cpp \
+        Modules/gamepad/GamepadList.cpp \
+        Modules/gamepad/NavigatorGamepad.cpp \
+        platform/linux/GamepadDeviceLinux.cpp \
+        platform/qt/GamepadsQt.cpp
 }
 
 contains(DEFINES, ENABLE_VIDEO=1) {

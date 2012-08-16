@@ -57,6 +57,7 @@
 #include "StylePropertyShorthand.h"
 #include "WebKitCSSTransformValue.h"
 #include "WebKitFontFamilyNames.h"
+#include <wtf/text/StringBuilder.h>
 
 #if ENABLE(CSS_EXCLUSIONS)
 #include "CSSWrapShapes.h"
@@ -176,6 +177,9 @@ static const CSSPropertyID computedProperties[] = {
     CSSPropertyTabSize,
     CSSPropertyTextAlign,
     CSSPropertyTextDecoration,
+#if ENABLE(CSS3_TEXT_DECORATION)
+    CSSPropertyWebkitTextDecorationLine,
+#endif // CSS3_TEXT_DECORATION
     CSSPropertyTextIndent,
     CSSPropertyTextRendering,
     CSSPropertyTextShadow,
@@ -1060,18 +1064,18 @@ void CSSComputedStyleDeclaration::deref()
 
 String CSSComputedStyleDeclaration::cssText() const
 {
-    String result("");
+    StringBuilder result;
 
     for (unsigned i = 0; i < numComputedProperties; i++) {
         if (i)
-            result += " ";
-        result += getPropertyName(computedProperties[i]);
-        result += ": ";
-        result += getPropertyValue(computedProperties[i]);
-        result += ";";
+            result.append(' ');
+        result.append(getPropertyName(computedProperties[i]));
+        result.append(": ", 2);
+        result.append(getPropertyValue(computedProperties[i]));
+        result.append(';');
     }
 
-    return result;
+    return result.toString();
 }
 
 void CSSComputedStyleDeclaration::setCssText(const String&, ExceptionCode& ec)
@@ -1190,6 +1194,7 @@ static PassRefPtr<CSSValue> renderUnicodeBidiFlagsToCSSValue(EUnicodeBidi unicod
 
 static PassRefPtr<CSSValue> renderTextDecorationFlagsToCSSValue(int textDecoration)
 {
+    // Blink value is ignored.
     RefPtr<CSSValueList> list = CSSValueList::createSpaceSeparated();
     if (textDecoration & UNDERLINE)
         list->append(cssValuePool().createIdentifierValue(CSSValueUnderline));
@@ -1197,8 +1202,6 @@ static PassRefPtr<CSSValue> renderTextDecorationFlagsToCSSValue(int textDecorati
         list->append(cssValuePool().createIdentifierValue(CSSValueOverline));
     if (textDecoration & LINE_THROUGH)
         list->append(cssValuePool().createIdentifierValue(CSSValueLineThrough));
-    if (textDecoration & BLINK)
-        list->append(cssValuePool().createIdentifierValue(CSSValueBlink));
 
     if (!list->length())
         return cssValuePool().createIdentifierValue(CSSValueNone);
@@ -1948,6 +1951,9 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(CSSPropert
         case CSSPropertyTextAlign:
             return cssValuePool().createValue(style->textAlign());
         case CSSPropertyTextDecoration:
+#if ENABLE(CSS3_TEXT_DECORATION)
+        case CSSPropertyWebkitTextDecorationLine:
+#endif // CSS3_TEXT_DECORATION
             return renderTextDecorationFlagsToCSSValue(style->textDecoration());
         case CSSPropertyWebkitTextDecorationsInEffect:
             return renderTextDecorationFlagsToCSSValue(style->textDecorationsInEffect());
@@ -2697,7 +2703,7 @@ PassRefPtr<StylePropertySet> CSSComputedStyleDeclaration::copyPropertiesInSet(co
 
 void CSSComputedStyleDeclaration::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<CSSComputedStyleDeclaration> info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
     info.addInstrumentedMember(m_node);
 }
 

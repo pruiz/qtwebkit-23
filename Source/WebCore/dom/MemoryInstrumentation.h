@@ -41,6 +41,7 @@
 namespace WebCore {
 
 template <typename T> class DataRef;
+class KURL;
 class MemoryObjectInfo;
 
 class MemoryInstrumentation {
@@ -86,7 +87,7 @@ private:
     virtual bool visited(const void*) = 0;
     virtual void processDeferredInstrumentedPointers() = 0;
 
-    template <typename T> friend class MemoryClassInfo;
+    friend class MemoryClassInfo;
     template <typename T> class InstrumentedPointer : public InstrumentedPointerBase {
     public:
         explicit InstrumentedPointer(const T* pointer, ObjectType ownerObjectType) : m_pointer(pointer), m_ownerObjectType(ownerObjectType) { }
@@ -103,6 +104,7 @@ private:
     }
     void addObject(const String&, ObjectType);
     void addObject(const StringImpl*, ObjectType);
+    void addObject(const KURL&, ObjectType);
     template <typename T> void addInstrumentedObject(const T& t, ObjectType ownerObjectType) { OwningTraits<T>::addInstrumentedObject(this, t, ownerObjectType); }
     template <typename HashMapType> void addHashMap(const HashMapType&, ObjectType, bool contentOnly = false);
     template <typename HashSetType> void addHashSet(const HashSetType&, ObjectType, bool contentOnly = false);
@@ -160,9 +162,9 @@ public:
     MemoryInstrumentation* memoryInstrumentation() { return m_memoryInstrumentation; }
 
 private:
-    template <typename T> friend class MemoryClassInfo;
+    friend class MemoryClassInfo;
 
-    template <typename T> void reportObjectInfo(const T*, MemoryInstrumentation::ObjectType objectType)
+    template <typename T> void reportObjectInfo(MemoryInstrumentation::ObjectType objectType)
     {
         if (!m_objectSize) {
             m_objectSize = sizeof(T);
@@ -176,14 +178,14 @@ private:
     size_t m_objectSize;
 };
 
-template <typename T>
 class MemoryClassInfo {
 public:
-    MemoryClassInfo(MemoryObjectInfo* memoryObjectInfo, const T* ptr, MemoryInstrumentation::ObjectType objectType)
+    template <typename T>
+    MemoryClassInfo(MemoryObjectInfo* memoryObjectInfo, const T*, MemoryInstrumentation::ObjectType objectType)
         : m_memoryObjectInfo(memoryObjectInfo)
         , m_memoryInstrumentation(memoryObjectInfo->memoryInstrumentation())
     {
-        m_memoryObjectInfo->reportObjectInfo(ptr, objectType);
+        m_memoryObjectInfo->reportObjectInfo<T>(objectType);
         m_objectType = memoryObjectInfo->objectType();
     }
 
@@ -207,6 +209,7 @@ public:
     void addMember(const String& string) { m_memoryInstrumentation->addObject(string, m_objectType); }
     void addMember(const AtomicString& string) { m_memoryInstrumentation->addObject((const String&)string, m_objectType); }
     void addMember(const StringImpl* string) { m_memoryInstrumentation->addObject(string, m_objectType); }
+    void addMember(const KURL& url) { m_memoryInstrumentation->addObject(url, m_objectType); }
 
 private:
     MemoryObjectInfo* m_memoryObjectInfo;

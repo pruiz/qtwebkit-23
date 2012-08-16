@@ -105,6 +105,8 @@ void GraphicsLayerBlackBerry::willBeDestroyed()
         m_contentsLayer->setOwner(0);
     if (m_transformLayer)
         m_transformLayer->setOwner(0);
+
+    GraphicsLayer::willBeDestroyed();
 }
 
 void GraphicsLayerBlackBerry::setName(const String& inName)
@@ -312,6 +314,16 @@ bool GraphicsLayerBlackBerry::setFilters(const FilterOperations& filters)
     return canCompositeFilters;
 }
 #endif
+
+void GraphicsLayerBlackBerry::setBoundsOrigin(const FloatPoint& origin)
+{
+    if (origin == m_boundsOrigin)
+        return;
+
+    GraphicsLayer::setBoundsOrigin(origin);
+    updateBoundsOrigin();
+
+}
 
 void GraphicsLayerBlackBerry::setBackgroundColor(const Color& color)
 {
@@ -696,6 +708,11 @@ void GraphicsLayerBlackBerry::updateAnchorPoint()
     primaryLayer()->setAnchorPoint(FloatPoint(m_anchorPoint.x(), m_anchorPoint.y()));
     primaryLayer()->setAnchorPointZ(m_anchorPoint.z());
     updateLayerPosition();
+}
+
+void GraphicsLayerBlackBerry::updateBoundsOrigin()
+{
+    primaryLayer()->setBoundsOrigin(m_boundsOrigin);
 }
 
 void GraphicsLayerBlackBerry::updateTransform()

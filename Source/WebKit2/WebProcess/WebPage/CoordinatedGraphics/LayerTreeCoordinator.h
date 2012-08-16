@@ -20,6 +20,8 @@
 #ifndef LayerTreeCoordinator_h
 #define LayerTreeCoordinator_h
 
+#if USE(COORDINATED_GRAPHICS)
+
 #include "CoordinatedGraphicsLayer.h"
 #include "LayerTreeContext.h"
 #include "LayerTreeHost.h"
@@ -51,6 +53,7 @@ public:
     virtual void setNonCompositedContentsNeedDisplay(const WebCore::IntRect&);
     virtual void scrollNonCompositedContents(const WebCore::IntRect& scrollRect, const WebCore::IntSize& scrollOffset);
     virtual void forceRepaint();
+    virtual bool forceRepaintAsync(uint64_t callbackID);
     virtual void sizeDidChange(const WebCore::IntSize& newSize);
 
     virtual void didInstallPageOverlay();
@@ -88,9 +91,7 @@ public:
     virtual void syncFixedLayers();
 
     virtual PassOwnPtr<WebCore::GraphicsContext> beginContentUpdate(const WebCore::IntSize&, ShareableBitmap::Flags, ShareableSurface::Handle&, WebCore::IntPoint&);
-#if USE(COORDINATED_GRAPHICS)
     virtual void scheduleAnimation() OVERRIDE;
-#endif
 
 protected:
     explicit LayerTreeCoordinator(WebPage*);
@@ -122,7 +123,7 @@ private:
 
     HashSet<WebCore::CoordinatedGraphicsLayer*> m_registeredLayers;
     HashMap<int64_t, int> m_directlyCompositedImageRefCounts;
-    Vector<UpdateAtlas> m_updateAtlases;
+    Vector<OwnPtr<UpdateAtlas> > m_updateAtlases;
 
     bool m_notifyAfterScheduledLayerFlush;
     bool m_isValid;
@@ -139,8 +140,11 @@ private:
     void layerFlushTimerFired(WebCore::Timer<LayerTreeCoordinator>*);
     WebCore::Timer<LayerTreeCoordinator> m_layerFlushTimer;
     bool m_layerFlushSchedulingEnabled;
+    uint64_t m_forceRepaintAsyncCallbackID;
 };
 
 }
+
+#endif
 
 #endif // LayerTreeCoordinator_h

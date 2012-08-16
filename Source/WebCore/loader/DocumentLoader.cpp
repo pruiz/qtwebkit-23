@@ -357,7 +357,7 @@ void DocumentLoader::commitData(const char* bytes, size_t length)
 
 void DocumentLoader::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<DocumentLoader> info(memoryObjectInfo, this, MemoryInstrumentation::Loader);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::Loader);
     info.addInstrumentedMember(m_frame);
     info.addInstrumentedMember(m_mainResourceLoader);
     info.addInstrumentedHashSet(m_subresourceLoaders);
@@ -422,7 +422,7 @@ void DocumentLoader::checkLoadComplete()
         return;
     ASSERT(this == frameLoader()->activeDocumentLoader());
 
-    if (DOMWindow* window = m_frame->existingDOMWindow())
+    if (DOMWindow* window = m_frame->document()->domWindow())
         window->finishedLoading();
 }
 

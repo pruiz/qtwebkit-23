@@ -85,7 +85,7 @@ private:
     LayoutUnit mainAxisExtent() const;
     LayoutUnit crossAxisContentExtent() const;
     LayoutUnit mainAxisContentExtent();
-    LayoutUnit computeLogicalClientHeight(SizeType, const Length& height);
+    LayoutUnit computeMainAxisExtentForChild(RenderBox* child, SizeType, const Length& size, LayoutUnit maximumValue);
     WritingMode transformedWritingMode() const;
     LayoutUnit flowAwareBorderStart() const;
     LayoutUnit flowAwareBorderEnd() const;
@@ -119,6 +119,7 @@ private:
     LayoutUnit availableAlignmentSpaceForChild(LayoutUnit lineCrossAxisExtent, RenderBox*);
     LayoutUnit marginBoxAscentForChild(RenderBox*);
 
+    LayoutUnit computeMarginValue(Length margin, LayoutUnit availableSize, RenderView*);
     void computeMainAxisPreferredSizes(bool relayoutChildren, OrderHashSet&);
     LayoutUnit lineBreakLength();
     LayoutUnit adjustChildSizeForMinAndMax(RenderBox*, LayoutUnit childSize, LayoutUnit flexboxAvailableContentExtent);

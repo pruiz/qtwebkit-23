@@ -31,6 +31,7 @@
 #include "cc/CCLayerSorter.h"
 #include "cc/CCRenderPass.h"
 #include "cc/CCRenderer.h"
+#include <public/WebCompositorOutputSurfaceClient.h>
 #include <wtf/PassOwnPtr.h>
 #include <wtf/RefPtr.h>
 
@@ -54,13 +55,16 @@ class CCLayerTreeHostImplClient {
 public:
     virtual void didLoseContextOnImplThread() = 0;
     virtual void onSwapBuffersCompleteOnImplThread() = 0;
+    virtual void onVSyncParametersChanged(double monotonicTimebase, double intervalInSeconds) = 0;
     virtual void setNeedsRedrawOnImplThread() = 0;
     virtual void setNeedsCommitOnImplThread() = 0;
     virtual void postAnimationEventsToMainThreadOnImplThread(PassOwnPtr<CCAnimationEventsVector>, double wallClockTime) = 0;
 };
 
 // CCLayerTreeHostImpl owns the CCLayerImpl tree as well as associated rendering state
-class CCLayerTreeHostImpl : public CCInputHandlerClient, CCRendererClient {
+class CCLayerTreeHostImpl : public CCInputHandlerClient,
+                            public CCRendererClient,
+                            public WebKit::WebCompositorOutputSurfaceClient {
     WTF_MAKE_NONCOPYABLE(CCLayerTreeHostImpl);
     typedef Vector<CCLayerImpl*> CCLayerList;
 
@@ -112,6 +116,9 @@ public:
     virtual void releaseContentsTextures() OVERRIDE;
     virtual void setMemoryAllocationLimitBytes(size_t) OVERRIDE;
 
+    // WebCompositorOutputSurfaceClient implementation.
+    virtual void onVSyncParametersChanged(double monotonicTimebase, double intervalInSeconds) OVERRIDE;
+
     // Implementation
     bool canDraw();
     CCGraphicsContext* context() const;
@@ -145,7 +152,8 @@ public:
     int sourceFrameNumber() const { return m_sourceFrameNumber; }
     void setSourceFrameNumber(int frameNumber) { m_sourceFrameNumber = frameNumber; }
 
-    bool contentsTexturesWerePurgedSinceLastCommit() const { return m_contentsTexturesWerePurgedSinceLastCommit; }
+    bool contentsTexturesPurged() const { return m_contentsTexturesPurged; }
+    void resetContentsTexturesPurged() { m_contentsTexturesPurged = false; }
     size_t memoryAllocationLimitBytes() const { return m_memoryAllocationLimitBytes; }
 
     void setViewportSize(const IntSize& layoutViewportSize, const IntSize& deviceViewportSize);
@@ -265,7 +273,7 @@ private:
     IntSize m_deviceViewportSize;
     float m_deviceScaleFactor;
     bool m_visible;
-    bool m_contentsTexturesWerePurgedSinceLastCommit;
+    bool m_contentsTexturesPurged;
     size_t m_memoryAllocationLimitBytes;
 
     float m_pageScale;
@@ -288,8 +296,6 @@ private:
     OwnPtr<CCLayerTreeHostImplTimeSourceAdapter> m_timeSourceClientAdapter;
 
     CCLayerSorter m_layerSorter;
-
-    FloatRect m_rootScissorRect;
 
     // List of visible layers for the most recently prepared frame. Used for
     // rendering and input event hit testing.

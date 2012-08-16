@@ -19,6 +19,10 @@ INCLUDEPATH += \
     $${ROOT_WEBKIT_DIR}/Source/WTF
 
 QT = core gui network testlib webkit
+haveQt(5) {
+    QT += widgets
+    contains(DEFINES, HAVE_QTPRINTSUPPORT=1): QT += printsupport
+}
 macx: QT += xml
 haveQt(5): QT += widgets printsupport
 
@@ -31,7 +35,7 @@ HEADERS += \
     EventSenderQt.h \
     TextInputControllerQt.h \
     WorkQueueItemQt.h \
-    LayoutTestControllerQt.h \
+    TestRunnerQt.h \
     GCControllerQt.h \
     QtInitializeTestFonts.h \
     testplugin.h
@@ -43,7 +47,7 @@ SOURCES += \
     EventSenderQt.cpp \
     TextInputControllerQt.cpp \
     WorkQueueItemQt.cpp \
-    LayoutTestControllerQt.cpp \
+    TestRunnerQt.cpp \
     GCControllerQt.cpp \
     QtInitializeTestFonts.cpp \
     testplugin.cpp \

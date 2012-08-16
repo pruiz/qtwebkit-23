@@ -1091,6 +1091,10 @@ http/tests/misc/link-rel-prefetch-and-subresource.html
 fast/dom/HTMLLinkElement/subresource.html
 http/tests/misc/prefetch-purpose.html
 
+# link prerender is disabled.
+fast/dom/HTMLLinkElement/prerender-insert-after-stop.html
+fast/dom/HTMLLinkElement/prerender-remove-after-stop.html
+
 # LayoutTestController::pageProperty is not implemented for WIN yet.
 printing/page-rule-selection.html
 
@@ -1965,3 +1969,13 @@ fast/forms/validation-message-user-modify.html
 
 # The textInputController.setComposition() implementation is missing
 fast/forms/input-set-composition-scroll.html
+
+# https://bugs.webkit.org/show_bug.cgi?id=93667
+# Test times out
+fast/forms/select/menulist-popup-crash.html
+
+# This test causes any following plugins test to crash
+plugins/nested-plugin-objects.html
+
+#Require rebaselining after  https://bugs.webkit.org/show_bug.cgi?id=89826
+fast/css/word-space-extra.html

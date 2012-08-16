@@ -185,6 +185,9 @@ void PluginProxy::didCreatePluginInternal(bool wantsWheelEvents, uint32_t remote
 
 void PluginProxy::didFailToCreatePluginInternal()
 {
+    // Calling out to the connection and the controller could potentially cause the plug-in proxy to go away, so protect it here.
+    RefPtr<PluginProxy> protect(this);
+
     m_connection->removePluginProxy(this);
     controller()->didFailToInitializePlugin();
 
@@ -196,10 +199,12 @@ void PluginProxy::didFailToCreatePluginInternal()
 
 void PluginProxy::destroy()
 {
-    m_connection->connection()->sendSync(Messages::WebProcessConnection::DestroyPlugin(m_pluginInstanceID, m_waitingOnAsynchronousInitialization), Messages::WebProcessConnection::DestroyPlugin::Reply(), 0);
-
     m_isStarted = false;
 
+    if (!m_connection)
+        return;
+
+    m_connection->connection()->sendSync(Messages::WebProcessConnection::DestroyPlugin(m_pluginInstanceID, m_waitingOnAsynchronousInitialization), Messages::WebProcessConnection::DestroyPlugin::Reply(), 0);
     m_connection->removePluginProxy(this);
 }
 

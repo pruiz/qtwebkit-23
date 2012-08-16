@@ -127,13 +127,12 @@ public:
 
     // Exposed for tests.
     WebKit::WebLayer contentsLayer() const { return m_contentsLayer; }
+    float contentsScale() const;
 
 private:
     virtual void willBeDestroyed();
 
-    WebKit::WebLayer primaryLayer() const  { return m_transformLayer.isNull() ? m_layer : m_transformLayer; }
-    WebKit::WebLayer hostLayerForChildren() const;
-    WebKit::WebLayer layerForParent() const;
+    WebKit::WebLayer primaryLayer() const;
 
     void updateNames();
     void updateChildList();
@@ -153,7 +152,6 @@ private:
     void updateContentsScale();
 
     void setupContentsLayer(WebKit::WebLayer);
-    float contentsScale() const;
 
     int mapAnimationNameToId(const String& animationName);
 

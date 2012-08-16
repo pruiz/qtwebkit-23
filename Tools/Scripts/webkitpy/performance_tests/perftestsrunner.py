@@ -96,14 +96,16 @@ class PerfTestsRunner(object):
                 help="Set the timeout for each test"),
             optparse.make_option("--pause-before-testing", dest="pause_before_testing", action="store_true", default=False,
                 help="Pause before running the tests to let user attach a performance monitor."),
-            optparse.make_option("--no-results", action="store_true", default=False,
+            optparse.make_option("--no-results", action="store_false", dest="generate_results", default=True,
                 help="Do no generate results JSON and results page."),
             optparse.make_option("--output-json-path",
-                help="Filename of the JSON file that summaries the results."),
+                help="Path to generate a JSON file at; may contain previous results if it already exists."),
             optparse.make_option("--source-json-path",
-                help="Path to a JSON file to be merged into the JSON file when --output-json-path is present."),
+                help="Only used on bots. Path to a JSON file to be merged into the JSON file when --output-json-path is present."),
             optparse.make_option("--description",
                 help="Add a description to the output JSON file if one is generated"),
+            optparse.make_option("--no-show-results", action="store_false", default=True, dest="show_results",
+                help="Don't launch a browser with results after the tests are done"),
             optparse.make_option("--test-results-server",
                 help="Upload the generated JSON file to the specified server when --output-json-path is present."),
             optparse.make_option("--webkit-test-runner", "-2", action="store_true",
@@ -159,19 +161,22 @@ class PerfTestsRunner(object):
                 return self.EXIT_CODE_BAD_PREPARATION
 
         unexpected = self._run_tests_set(sorted(list(tests), key=lambda test: test.test_name()), self._port)
-        if not self._options.no_results:
+        if self._options.generate_results:
             exit_code = self._generate_and_show_results()
             if exit_code:
                 return exit_code
 
         return unexpected
 
+    def _output_json_path(self):
+        output_json_path = self._options.output_json_path
+        if output_json_path:
+            return output_json_path
+        return self._host.filesystem.join(self._port.perf_results_directory(), self._DEFAULT_JSON_FILENAME)
+
     def _generate_and_show_results(self):
         options = self._options
-        output_json_path = options.output_json_path
-        if not output_json_path:
-            output_json_path = self._host.filesystem.join(self._port.perf_results_directory(), self._DEFAULT_JSON_FILENAME)
-
+        output_json_path = self._output_json_path()
         output = self._generate_results_dict(self._timestamp, options.description, options.platform, options.builder_name, options.build_number)
 
         if options.source_json_path:
@@ -192,7 +197,7 @@ class PerfTestsRunner(object):
         if test_results_server:
             if not self._upload_json(test_results_server, output_json_path):
                 return self.EXIT_CODE_FAILED_UPLOADING
-        else:
+        elif options.show_results:
             self._port.show_results_html_file(results_page_path)
 
     def _generate_results_dict(self, timestamp, description, platform, builder_name, build_number):
@@ -236,14 +241,12 @@ class PerfTestsRunner(object):
         filesystem.write_text_file(output_json_path, json_output)
 
         if results_page_path:
-            jquery_path = filesystem.join(self._port.perf_tests_dir(), 'Dromaeo/resources/dromaeo/web/lib/jquery-1.6.4.js')
-            jquery = filesystem.read_text_file(jquery_path)
-
             template_path = filesystem.join(self._port.perf_tests_dir(), 'resources/results-template.html')
             template = filesystem.read_text_file(template_path)
 
-            results_page = template.replace('<?WebKitPerfTestRunnerInsertionPoint?>',
-                '<script>%s</script><script id="json">%s</script>' % (jquery, json_output))
+            absolute_path_to_trunk = filesystem.dirname(self._port.perf_tests_dir())
+            results_page = template.replace('%AbsolutePathToWebKitTrunk%', absolute_path_to_trunk)
+            results_page = results_page.replace('%PeformanceTestsResultsJSON%', json_output)
 
             filesystem.write_text_file(results_page_path, results_page)
 

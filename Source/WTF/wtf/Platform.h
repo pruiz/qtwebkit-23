@@ -480,8 +480,11 @@
 #endif
 #endif
 
-#if PLATFORM(BLACKBERRY)
+#if OS(QNX)
 #define USE_SYSTEM_MALLOC 1
+#endif
+
+#if PLATFORM(BLACKBERRY)
 #define WTF_USE_MERSENNE_TWISTER_19937 1
 #define WTF_USE_SKIA 1
 #endif
@@ -532,6 +535,7 @@
 #define ENABLE_GESTURE_EVENTS 1
 #define ENABLE_RUBBER_BANDING 1
 #define WTF_USE_SCROLLBAR_PAINTER 1
+#define HAVE_XPC 1
 #endif
 #if !defined(ENABLE_JAVA_BRIDGE)
 #define ENABLE_JAVA_BRIDGE 1

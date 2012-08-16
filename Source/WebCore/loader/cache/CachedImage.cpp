@@ -25,7 +25,7 @@
 #include "CachedImage.h"
 
 #include "BitmapImage.h"
-#include "MemoryCache.h"
+#include "CachedImageClient.h"
 #include "CachedResourceClient.h"
 #include "CachedResourceClientWalker.h"
 #include "CachedResourceLoader.h"
@@ -33,6 +33,7 @@
 #include "FrameLoaderClient.h"
 #include "FrameLoaderTypes.h"
 #include "FrameView.h"
+#include "MemoryCache.h"
 #include "Page.h"
 #include "RenderObject.h"
 #include "Settings.h"
@@ -469,9 +470,13 @@ void CachedImage::changedInRect(const Image* image, const IntRect& rect)
 
 void CachedImage::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo<CachedImage> info(memoryObjectInfo, this, MemoryInstrumentation::CachedResourceImage);
+    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CachedResourceImage);
     CachedResource::reportMemoryUsage(memoryObjectInfo);
-    info.addMember(m_image);
+    if (m_image) {
+        if (m_image->data())
+            info.addRawBuffer(m_image->data(), m_image->data()->size());
+        info.addRawBuffer(m_image.get(), decodedSize());
+    }
 #if ENABLE(SVG)
     info.addMember(m_svgImageCache);
 #endif

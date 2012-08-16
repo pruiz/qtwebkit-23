@@ -169,6 +169,13 @@ contains(DEFINES, WTF_USE_QT_MOBILITY_SYSTEMINFO=1) {
      MOBILITY *= systeminfo
 }
 
+contains(DEFINES, ENABLE_GAMEPAD=1) {
+    INCLUDEPATH += \
+        $$SOURCE_DIR/platform/linux \
+        $$SOURCE_DIR/Modules/gamepad
+    PKGCONFIG += libudev
+}
+
 contains(DEFINES, ENABLE_VIDEO=1) {
     contains(DEFINES, WTF_USE_QTKIT=1) {
         INCLUDEPATH += $$SOURCE_DIR/platform/graphics/mac
@@ -271,7 +278,11 @@ mac {
     LIBS_PRIVATE += -framework Carbon -framework AppKit
 }
 
-unix:!mac:*-g++*:QMAKE_CXXFLAGS += -ffunction-sections -fdata-sections
+# -ffunction-section conflicts with -pg option
+!contains(CONFIG, gprof) {
+    unix:!mac:*-g++*:QMAKE_CXXFLAGS += -ffunction-sections
+}
+unix:!mac:*-g++*:QMAKE_CXXFLAGS += -fdata-sections
 unix:!mac:*-g++*:QMAKE_LFLAGS += -Wl,--gc-sections
 linux*-g++*:QMAKE_LFLAGS += $$QMAKE_LFLAGS_NOUNDEF
 

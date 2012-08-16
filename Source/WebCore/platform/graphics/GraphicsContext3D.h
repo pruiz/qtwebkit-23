@@ -79,7 +79,7 @@ typedef QGLWidget* PlatformGraphicsSurface3D;
 typedef void* PlatformGraphicsContext3D;
 #endif
 
-#if PLATFORM(CHROMIUM) && USE(SKIA)
+#if (PLATFORM(CHROMIUM) || PLATFORM(BLACKBERRY)) && USE(SKIA)
 class GrContext;
 #endif
 
@@ -488,7 +488,7 @@ public:
     PlatformGraphicsContext3D platformGraphicsContext3D() const { return m_contextObj; }
     Platform3DObject platformTexture() const { return m_compositorTexture; }
     CALayer* platformLayer() const { return reinterpret_cast<CALayer*>(m_webGLLayer.get()); }
-#elif PLATFORM(CHROMIUM)
+#elif PLATFORM(CHROMIUM) || PLATFORM(BLACKBERRY)
     PlatformGraphicsContext3D platformGraphicsContext3D() const;
     Platform3DObject platformTexture() const;
 #if USE(SKIA)
@@ -524,7 +524,7 @@ public:
 #endif
     bool makeContextCurrent();
 
-#if PLATFORM(MAC) || PLATFORM(CHROMIUM) || PLATFORM(GTK) || PLATFORM(QT) || PLATFORM(EFL)
+#if PLATFORM(MAC) || PLATFORM(CHROMIUM) || PLATFORM(GTK) || PLATFORM(QT) || PLATFORM(EFL) || PLATFORM(BLACKBERRY)
     // With multisampling on, blit from multisampleFBO to regular FBO.
     void prepareTexture();
 #endif
@@ -818,6 +818,10 @@ public:
     PassRefPtr<ImageData> paintRenderingResultsToImageData(DrawingBuffer*);
     bool paintCompositedResultsToCanvas(ImageBuffer*);
 
+#if PLATFORM(BLACKBERRY)
+    bool paintsIntoCanvasBuffer() const;
+#endif
+
     // Support for buffer creation and deletion
     Platform3DObject createBuffer();
     Platform3DObject createFramebuffer();
@@ -920,7 +924,7 @@ public:
                     AlphaOp alphaOp,
                     void* destinationData);
 
-#if PLATFORM(MAC) || PLATFORM(GTK) || PLATFORM(QT) || PLATFORM(EFL)
+#if PLATFORM(MAC) || PLATFORM(GTK) || PLATFORM(QT) || PLATFORM(EFL) || PLATFORM(BLACKBERRY)
     // Take into account the user's requested context creation attributes,
     // in particular stencil and antialias, and determine which could or
     // could not be honored based on the capabilities of the OpenGL
@@ -959,11 +963,15 @@ public:
 #endif
 
 #if PLATFORM(MAC) || PLATFORM(GTK) || PLATFORM(QT) || PLATFORM(EFL) || PLATFORM(BLACKBERRY)
-    typedef struct {
+    struct ShaderSourceEntry {
         String source;
         String log;
         bool isValid;
-    } ShaderSourceEntry;
+        ShaderSourceEntry()
+            : isValid(0)
+        {
+        }
+    };
     HashMap<Platform3DObject, ShaderSourceEntry> m_shaderSourceMap;
 
     ANGLEWebKitBridge m_compiler;

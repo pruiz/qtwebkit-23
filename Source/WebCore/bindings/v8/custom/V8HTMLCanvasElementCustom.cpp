@@ -94,7 +94,7 @@ v8::Handle<v8::Value> V8HTMLCanvasElement::getContextCallback(const v8::Argument
         // 3D canvas contexts can hold on to lots of GPU resources, and we want to take an
         // opportunity to get rid of them as soon as possible when we navigate away from pages using
         // them.
-        V8BindingPerIsolateData* perIsolateData = V8BindingPerIsolateData::current(args.GetIsolate());
+        V8PerIsolateData* perIsolateData = V8PerIsolateData::current(args.GetIsolate());
         perIsolateData->setShouldCollectGarbageSoon();
 
         v8::Handle<v8::Value> v8Result = toV8(static_cast<WebGLRenderingContext*>(result), args.GetIsolate());
@@ -127,7 +127,7 @@ v8::Handle<v8::Value> V8HTMLCanvasElement::toDataURLCallback(const v8::Arguments
     }
 
     String result = canvas->toDataURL(type, qualityPtr, ec);
-    V8Proxy::setDOMException(ec, args.GetIsolate());
+    setDOMException(ec, args.GetIsolate());
     return v8StringOrUndefined(result, args.GetIsolate());
 }
 

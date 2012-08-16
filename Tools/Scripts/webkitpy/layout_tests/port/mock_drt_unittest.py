@@ -60,6 +60,9 @@ class MockDRTPortTest(port_testcase.PortTestCase):
     def test_diff_image(self):
         pass
 
+    def test_diff_image_crashed(self):
+        pass
+
     def test_uses_apache(self):
         pass
 
@@ -86,6 +89,10 @@ class MockDRTPortTest(port_testcase.PortTestCase):
 
     def test_get_crash_log(self):
         pass
+
+    def test_check_build(self):
+        pass
+
 
 class MockDRTTest(unittest.TestCase):
     def input_line(self, port, test_name, checksum=None):

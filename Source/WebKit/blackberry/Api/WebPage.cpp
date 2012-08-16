@@ -71,12 +71,14 @@
 #include "IconDatabaseClientBlackBerry.h"
 #include "InPageSearchManager.h"
 #include "InRegionScrollableArea.h"
+#include "InRegionScroller_p.h"
 #include "InputHandler.h"
 #include "InspectorBackendDispatcher.h"
 #include "InspectorClientBlackBerry.h"
 #include "InspectorController.h"
 #include "InspectorOverlay.h"
 #include "JavaScriptDebuggerBlackBerry.h"
+#include "JavaScriptVariant_p.h"
 #include "LayerWebKitThread.h"
 #include "NetworkManager.h"
 #include "NodeRenderStyle.h"
@@ -145,6 +147,7 @@
 
 #if USE(ACCELERATED_COMPOSITING)
 #include "FrameLayers.h"
+#include "WebPageCompositorClient.h"
 #include "WebPageCompositor_p.h"
 #endif
 
@@ -371,9 +374,6 @@ WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const In
 #if ENABLE(EVENT_MODE_METATAGS)
     , m_cursorEventMode(ProcessedCursorEvents)
     , m_touchEventMode(ProcessedTouchEvents)
-#if ENABLE(FULLSCREEN_API)
-    , m_touchEventModePriorGoingFullScreen(ProcessedTouchEvents)
-#endif
 #endif
 #if ENABLE(FULLSCREEN_API) && ENABLE(VIDEO)
     , m_scaleBeforeFullScreen(-1.0)
@@ -536,6 +536,7 @@ void WebPagePrivate::init(const WebString& pageGroupName)
 
     m_webSettings = WebSettings::createFromStandardSettings();
     m_webSettings->setUserAgentString(defaultUserAgent());
+    m_page->setDeviceScaleFactor(m_webSettings->devicePixelRatio());
 
 #if USE(ACCELERATED_COMPOSITING)
     m_tapHighlight = DefaultTapHighlight::create(this);
@@ -596,6 +597,7 @@ void WebPagePrivate::init(const WebString& pageGroupName)
     Platform::userInterfaceThreadMessageClient()->dispatchSyncMessage(
             createMethodCallMessage(&WebPagePrivate::createCompositor, this));
 #endif
+    m_page->settings()->setDNSPrefetchingEnabled(true);
 }
 
 class DeferredTaskLoadManualScript: public DeferredTask<&WebPagePrivate::m_wouldLoadManualScript> {
@@ -846,24 +848,25 @@ bool WebPage::executeJavaScriptInIsolatedWorld(const char* script, JavaScriptDat
     return d->executeJavaScriptInIsolatedWorld(sourceCode, returnType, returnValue);
 }
 
-bool WebPage::executeJavaScriptFunction(const std::vector<std::string> &function, const std::vector<std::string> &args, JavaScriptDataType& returnType, WebString& returnValue)
+void WebPage::executeJavaScriptFunction(const std::vector<std::string> &function, const std::vector<JavaScriptVariant> &args, JavaScriptVariant& returnValue)
 {
-    if (!d->m_mainFrame)
-        return false;
+    if (!d->m_mainFrame) {
+        returnValue.setType(JavaScriptVariant::Exception);
+        return;
+    }
+
     JSC::Bindings::RootObject* root = d->m_mainFrame->script()->bindingRootObject();
-    if (!root)
-        return false;
+    if (!root) {
+        returnValue.setType(JavaScriptVariant::Exception);
+        return;
+    }
+
     JSC::ExecState* exec = root->globalObject()->globalExec();
     JSGlobalContextRef ctx = toGlobalRef(exec);
 
-    WTF::Vector<JSStringRef> argList(args.size());
     WTF::Vector<JSValueRef> argListRef(args.size());
-    for (unsigned i = 0; i < args.size(); ++i) {
-        JSStringRef str = JSStringCreateWithUTF8CString(args[i].c_str());
-        argList[i] = str;
-        JSValueRef strRef = JSValueMakeString(ctx, str);
-        argListRef[i] = strRef;
-    }
+    for (unsigned i = 0; i < args.size(); ++i)
+        argListRef[i] = BlackBerryJavaScriptVariantToJSValueRef(ctx, args[i]);
 
     JSValueRef windowObjectValue = windowObject();
     JSObjectRef obj = JSValueToObject(ctx, windowObjectValue, 0);
@@ -882,49 +885,12 @@ bool WebPage::executeJavaScriptFunction(const std::vector<std::string> &function
     if (functionObject && thisObject)
         result = JSObjectCallAsFunction(ctx, functionObject, thisObject, args.size(), argListRef.data(), 0);
 
-    for (unsigned i = 0; i < args.size(); ++i)
-        JSStringRelease(argList[i]);
-
-    JSC::JSValue value = toJS(exec, result);
-
-    if (!value) {
-        returnType = JSException;
-        return false;
+    if (!result) {
+        returnValue.setType(JavaScriptVariant::Exception);
+        return;
     }
 
-    JSType type = JSValueGetType(ctx, result);
-
-    switch (type) {
-    case kJSTypeNull:
-        returnType = JSNull;
-        break;
-    case kJSTypeBoolean:
-        returnType = JSBoolean;
-        break;
-    case kJSTypeNumber:
-        returnType = JSNumber;
-        break;
-    case kJSTypeString:
-        returnType = JSString;
-        break;
-    case kJSTypeObject:
-        returnType = JSObject;
-        break;
-    case kJSTypeUndefined:
-    default:
-        returnType = JSUndefined;
-        break;
-    }
-
-    if (returnType == JSBoolean || returnType == JSNumber || returnType == JSString || returnType == JSObject) {
-        JSStringRef stringRef = JSValueToStringCopy(ctx, result, 0);
-        size_t bufferSize = JSStringGetMaximumUTF8CStringSize(stringRef);
-        WTF::Vector<char> buffer(bufferSize);
-        JSStringGetUTF8CString(stringRef, buffer.data(), bufferSize);
-        returnValue = WebString::fromUtf8(buffer.data());
-    }
-
-    return true;
+    returnValue = JSValueRefToBlackBerryJavaScriptVariant(ctx, result);
 }
 
 void WebPagePrivate::stopCurrentLoad()
@@ -1523,7 +1489,7 @@ bool WebPagePrivate::scrollBy(int deltaX, int deltaY, bool scrollMainFrame)
             delta.width() < 0 ? -untransformedCopiedDelta.width() : untransformedCopiedDelta.width(),
             delta.height() < 0 ? -untransformedCopiedDelta.height(): untransformedCopiedDelta.height());
 
-        if (m_inRegionScroller->scrollBy(delta)) {
+        if (m_inRegionScroller->d->scrollBy(delta)) {
             m_selectionHandler->selectionPositionChanged();
             // FIXME: We have code in place to handle scrolling and clipping tap highlight
             // on in-region scrolling. As soon as it is fast enough (i.e. we have it backed by
@@ -1549,9 +1515,9 @@ bool WebPage::scrollBy(const Platform::IntSize& delta, bool scrollMainFrame)
 
 void WebPagePrivate::notifyInRegionScrollStatusChanged(bool status)
 {
-    if (!status && m_inRegionScroller->hasNode()) {
-        enqueueRenderingOfClippedContentOfScrollableNodeAfterInRegionScrolling(m_inRegionScroller->node());
-        m_inRegionScroller->reset();
+    if (!status && m_inRegionScroller->d->hasNode()) {
+        enqueueRenderingOfClippedContentOfScrollableNodeAfterInRegionScrolling(m_inRegionScroller->d->node());
+        m_inRegionScroller->d->reset();
     }
 }
 
@@ -2554,6 +2520,8 @@ IntSize WebPagePrivate::fixedLayoutSize(bool snapToIncrement) const
         // If we detect an overflow larger than the contents size then use that instead since
         // it'll still be clamped by the maxWidth below...
         int width = std::max(absoluteVisibleOverflowSize().width(), contentsSize().width());
+        if (m_pendingOrientation != -1 && !m_nestedLayoutFinishedCount)
+            width = 0;
 
         if (snapToIncrement) {
             // Snap to increments of defaultLayoutWidth / 2.0.
@@ -2634,8 +2602,8 @@ void WebPagePrivate::clearDocumentData(const Document* documentGoingAway)
     if (m_currentBlockZoomAdjustedNode && m_currentBlockZoomAdjustedNode->document() == documentGoingAway)
         m_currentBlockZoomAdjustedNode = 0;
 
-    if (m_inRegionScroller->hasNode() && m_inRegionScroller->node()->document() == documentGoingAway)
-        m_inRegionScroller->reset();
+    if (m_inRegionScroller->d->hasNode() && m_inRegionScroller->d->node()->document() == documentGoingAway)
+        m_inRegionScroller->d->reset();
 
     if (documentGoingAway->frame())
         m_inputHandler->frameUnloaded(documentGoingAway->frame());
@@ -2842,7 +2810,7 @@ Node* WebPagePrivate::bestNodeForZoomUnderPoint(const IntPoint& point)
     if (!originalNode)
         return 0;
     Node* node = bestChildNodeForClickRect(originalNode, clickRect);
-    return node ? adjustedBlockZoomNodeForZoomLimits(node) : adjustedBlockZoomNodeForZoomLimits(originalNode);
+    return node ? adjustedBlockZoomNodeForZoomAndExpandingRatioLimits(node) : adjustedBlockZoomNodeForZoomAndExpandingRatioLimits(originalNode);
 }
 
 Node* WebPagePrivate::bestChildNodeForClickRect(Node* parentNode, const IntRect& clickRect)
@@ -2910,31 +2878,24 @@ Node* WebPagePrivate::nodeForZoomUnderPoint(const IntPoint& point)
     return node;
 }
 
-Node* WebPagePrivate::adjustedBlockZoomNodeForZoomLimits(Node* node)
+Node* WebPagePrivate::adjustedBlockZoomNodeForZoomAndExpandingRatioLimits(Node* node)
 {
     Node* initialNode = node;
     RenderObject* renderer = node->renderer();
     bool acceptableNodeSize = newScaleForBlockZoomRect(rectForNode(node), 1.0, 0) < maxBlockZoomScale();
+    IntSize actualVisibleSize = this->actualVisibleSize();
 
     while (!renderer || !acceptableNodeSize) {
         node = node->parentNode();
+        IntRect nodeRect = rectForNode(node);
 
-        if (!node)
+        // Don't choose a node if the width of the node size is very close to the width of the actual visible size,
+        // as block zoom can do nothing on such kind of node.
+        if (!node || static_cast<double>(actualVisibleSize.width() - nodeRect.width()) / actualVisibleSize.width() < minimumExpandingRatio)
             return initialNode;
 
         renderer = node->renderer();
         acceptableNodeSize = newScaleForBlockZoomRect(rectForNode(node), 1.0, 0) < maxBlockZoomScale();
-    }
-
-    // Don't use a node if it is too close to the size of the actual contents.
-    if (initialNode != node) {
-        IntRect nodeRect = rectForNode(node);
-        nodeRect = adjustRectOffsetForFrameOffset(nodeRect, node);
-        nodeRect.intersect(IntRect(IntPoint::zero(), contentsSize()));
-        int nodeArea = nodeRect.width() * nodeRect.height();
-        int pageArea = contentsSize().width() * contentsSize().height();
-        if (static_cast<double>(pageArea - nodeArea) / pageArea < minimumExpandingRatio)
-            return initialNode;
     }
 
     return node;
@@ -3566,18 +3527,15 @@ void WebPage::resetVirtualViewportOnCommitted(bool reset)
 IntSize WebPagePrivate::recomputeVirtualViewportFromViewportArguments()
 {
     static const ViewportArguments defaultViewportArguments;
-    if (m_viewportArguments == defaultViewportArguments) {
-        m_page->setDeviceScaleFactor(1.0);
+    if (m_viewportArguments == defaultViewportArguments)
         return IntSize();
-    }
 
     int desktopWidth = defaultMaxLayoutSize().width();
     int deviceWidth = Platform::Graphics::Screen::primaryScreen()->width();
     int deviceHeight = Platform::Graphics::Screen::primaryScreen()->height();
     ViewportAttributes result = computeViewportAttributes(m_viewportArguments, desktopWidth, deviceWidth, deviceHeight, m_webSettings->devicePixelRatio(), m_defaultLayoutSize);
-    m_page->setDeviceScaleFactor(result.devicePixelRatio);
 
-    setUserScalable(m_userScalable && result.userScalable);
+    setUserScalable(m_webSettings->isUserScalable() && result.userScalable);
     if (result.initialScale > 0)
         setInitialScale(result.initialScale * result.devicePixelRatio);
     if (result.minimumScale > 0)
@@ -3894,16 +3852,25 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
         }
     }
 
-    if (needsLayout)
-        setNeedsLayout();
-
     // Need to resume so that the backingstore will start recording the invalidated
     // rects from below.
     m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::None);
 
     // We might need to layout here to get a correct contentsSize so that zoomToFit
     // is calculated correctly.
-    requestLayoutIfNeeded();
+    while (needsLayout) {
+        setNeedsLayout();
+        requestLayoutIfNeeded();
+        needsLayout = false;
+
+        // Emulate the zoomToFitWidthOnLoad algorithm if we're rotating.
+        ++m_nestedLayoutFinishedCount;
+        if (needsLayoutToFindContentSize) {
+            if (setViewMode(viewMode()))
+                needsLayout = true;
+        }
+    }
+    m_nestedLayoutFinishedCount = 0;
 
     // As a special case if we were zoomed to the initial scale at the beginning
     // of the rotation then preserve that zoom level even when it is zoomToFit.
@@ -3921,6 +3888,8 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
         IntRect actualVisibleRect = enclosingIntRect(rotationMatrix.inverse().mapRect(FloatRect(viewportRect)));
         m_mainFrame->view()->setFixedReportedSize(actualVisibleRect.size());
         m_mainFrame->view()->repaintFixedElementsAfterScrolling();
+        requestLayoutIfNeeded();
+        m_mainFrame->view()->updateFixedElementsAfterScrolling();
     }
 
     // We're going to need to send a resize event to JavaScript because
@@ -4213,12 +4182,14 @@ bool WebPage::touchEvent(const Platform::TouchEvent& event)
 
 void WebPagePrivate::setScrollOriginPoint(const Platform::IntPoint& point)
 {
-    m_inRegionScroller->reset();
+    m_inRegionScroller->d->reset();
 
     if (!m_hasInRegionScrollableAreas)
         return;
 
-    m_client->notifyInRegionScrollingStartingPointChanged(m_inRegionScroller->inRegionScrollableAreasForPoint(point));
+    m_inRegionScroller->d->calculateInRegionScrollableAreasForPoint(point);
+    if (!m_inRegionScroller->d->activeInRegionScrollableAreas().empty())
+        m_client->notifyInRegionScrollingStartingPointChanged(m_inRegionScroller->d->activeInRegionScrollableAreas());
 }
 
 void WebPage::setScrollOriginPoint(const Platform::IntPoint& point)
@@ -4654,6 +4625,11 @@ void WebPage::selectAtPoint(const Platform::IntPoint& location)
 BackingStore* WebPage::backingStore() const
 {
     return d->m_backingStore;
+}
+
+InRegionScroller* WebPage::inRegionScroller() const
+{
+    return d->m_inRegionScroller.get();
 }
 
 bool WebPage::zoomToFit()
@@ -5629,7 +5605,7 @@ GraphicsLayer* WebPagePrivate::overlayLayer()
     return m_overlayLayer.get();
 }
 
-void WebPagePrivate::setCompositor(PassRefPtr<WebPageCompositorPrivate> compositor, EGLContext compositingContext)
+void WebPagePrivate::setCompositor(PassRefPtr<WebPageCompositorPrivate> compositor)
 {
     using namespace BlackBerry::Platform;
 
@@ -5640,20 +5616,15 @@ void WebPagePrivate::setCompositor(PassRefPtr<WebPageCompositorPrivate> composit
     if (m_compositor || m_client->window())
         m_backingStore->d->suspendScreenAndBackingStoreUpdates();
 
-    // This method call always round-trips on the WebKit thread (see WebPageCompositor::WebPageCompositor() and ~WebPageCompositor()),
-    // and the compositing context must be set on the WebKit thread. How convenient!
-    if (compositingContext != EGL_NO_CONTEXT)
-        BlackBerry::Platform::Graphics::setCompositingContext(compositingContext);
-
     // The m_compositor member has to be modified during a sync call for thread
     // safe access to m_compositor and its refcount.
-    userInterfaceThreadMessageClient()->dispatchSyncMessage(createMethodCallMessage(&WebPagePrivate::setCompositorHelper, this, compositor, compositingContext));
+    userInterfaceThreadMessageClient()->dispatchSyncMessage(createMethodCallMessage(&WebPagePrivate::setCompositorHelper, this, compositor));
 
     if (m_compositor || m_client->window()) // the new compositor, if one was set
         m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
 }
 
-void WebPagePrivate::setCompositorHelper(PassRefPtr<WebPageCompositorPrivate> compositor, EGLContext compositingContext)
+void WebPagePrivate::setCompositorHelper(PassRefPtr<WebPageCompositorPrivate> compositor)
 {
     using namespace BlackBerry::Platform;
 
@@ -6086,19 +6057,12 @@ void WebPagePrivate::enterFullScreenForElement(Element* element)
         // is so that exitFullScreenForElement() gets called later.
         enterFullscreenForNode(element);
     } else {
-        // When an element goes fullscreen, it gets cloned and added to a higher index
-        // wrapper/container node, created out of the DOM tree. This wrapper is fixed
-        // position, but since our fixed position logic respects only the 'y' coordinate,
-        // we temporarily scroll the WebPage to x:0 so that the wrapper gets properly
-        // positioned. The original scroll position is restored once element leaves fullscreen.
+        // When an element goes fullscreen, the viewport size changes and the scroll
+        // position might change. So we keep track of it here, in order to restore it
+        // once element leaves fullscreen.
         WebCore::IntPoint scrollPosition = m_mainFrame->view()->scrollPosition();
         m_xScrollOffsetBeforeFullScreen = scrollPosition.x();
-        m_mainFrame->view()->setScrollPosition(WebCore::IntPoint(0, scrollPosition.y()));
 
-#if ENABLE(EVENT_MODE_METATAGS)
-        m_touchEventModePriorGoingFullScreen = m_touchEventMode;
-        didReceiveTouchEventMode(PureTouchEventsWithMouseConversion);
-#endif
         // The current scale can be clamped to a greater minimum scale when we relayout contents during
         // the change of the viewport size. Cache the current scale so that we can restore it when
         // leaving fullscreen. Otherwise, it is possible that we will use the wrong scale.
@@ -6133,10 +6097,6 @@ void WebPagePrivate::exitFullScreenForElement(Element* element)
             WebCore::IntPoint(m_xScrollOffsetBeforeFullScreen, scrollPosition.y()));
         m_xScrollOffsetBeforeFullScreen = -1;
 
-#if ENABLE(EVENT_MODE_METATAGS)
-        didReceiveTouchEventMode(m_touchEventModePriorGoingFullScreen);
-        m_touchEventModePriorGoingFullScreen = ProcessedTouchEvents;
-#endif
         if (m_scaleBeforeFullScreen > 0) {
             // Restore the scale when leaving fullscreen. We can't use TransformationMatrix::scale(double) here, as it
             // will multiply the scale rather than set the scale.
@@ -6303,6 +6263,18 @@ void WebPagePrivate::blitVisibleContents()
 
     m_backingStore->d->blitVisibleContents();
 }
+
+void WebPagePrivate::scheduleCompositingRun()
+{
+    if (WebPageCompositorClient* compositorClient = compositor()->client()) {
+        double animationTime = compositorClient->requestAnimationFrame();
+        compositorClient->invalidate(animationTime);
+        return;
+    }
+
+    blitVisibleContents();
+}
+
 #endif
 
 void WebPage::setWebGLEnabled(bool enabled)
@@ -6464,10 +6436,11 @@ void WebPagePrivate::setTextZoomFactor(float textZoomFactor)
 
 void WebPagePrivate::restoreHistoryViewState(Platform::IntSize contentsSize, Platform::IntPoint scrollPosition, double scale, bool shouldReflowBlock)
 {
-    if (!m_mainFrame)
+    if (!m_mainFrame) {
+        m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
         return;
+    }
 
-    m_backingStore->d->suspendScreenAndBackingStoreUpdates(); // don't flash checkerboard for the setScrollPosition call
     m_mainFrame->view()->setContentsSizeFromHistory(contentsSize);
 
     // Here we need to set scroll position what we asked for.

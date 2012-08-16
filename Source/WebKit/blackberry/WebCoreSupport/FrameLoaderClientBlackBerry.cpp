@@ -76,6 +76,7 @@
 #include <JavaScriptCore/APICast.h>
 #include <network/FilterStream.h>
 #include <network/NetworkRequest.h>
+#include <wtf/text/Base64.h>
 
 using WTF::String;
 using namespace WebCore;
@@ -107,6 +108,7 @@ FrameLoaderClientBlackBerry::FrameLoaderClientBlackBerry()
     , m_pluginView(0)
     , m_hasSentResponseToPlugin(false)
     , m_cancelLoadOnNextData(false)
+    , m_wasProvisionalLoadTriggeredByUserGesture(true) // To avoid affecting the first load.
 {
 }
 
@@ -213,24 +215,23 @@ void FrameLoaderClientBlackBerry::dispatchDecidePolicyForNavigationAction(FrameP
         bool isFragmentScroll = url.hasFragmentIdentifier() && url != currentUrl && equalIgnoringFragmentIdentifier(currentUrl, url);
         decision = decidePolicyForExternalLoad(request, isFragmentScroll);
 
-        // Let the client have a chance to say whether this navigation should
-        // be ignored or not.
+        // Let the client have a chance to say whether this navigation should be ignored or not.
         NetworkRequest platformRequest;
         request.initializePlatformRequest(platformRequest, cookiesEnabled());
         if (platformRequest.getTargetType() == NetworkRequest::TargetIsUnknown)
             platformRequest.setTargetType(isMainFrame() ? NetworkRequest::TargetIsMainFrame : NetworkRequest::TargetIsSubframe);
 
-        if (isMainFrame() && !m_webPagePrivate->m_client->acceptNavigationRequest(
-            platformRequest, BlackBerry::Platform::NavigationType(action.type()))) {
-            if (action.type() == NavigationTypeFormSubmitted
-                || action.type() == NavigationTypeFormResubmitted)
-                m_frame->loader()->resetMultipleFormSubmissionProtection();
-
-            if (action.type() == NavigationTypeLinkClicked && url.hasFragmentIdentifier()) {
-                ResourceRequest emptyRequest;
-                m_frame->loader()->activeDocumentLoader()->setLastCheckedRequest(emptyRequest);
-            }
+        if (!m_webPagePrivate->m_client->acceptNavigationRequest(platformRequest, BlackBerry::Platform::NavigationType(action.type()))) {
             decision = PolicyIgnore;
+            if (isMainFrame()) {
+                if (action.type() == NavigationTypeFormSubmitted || action.type() == NavigationTypeFormResubmitted)
+                    m_frame->loader()->resetMultipleFormSubmissionProtection();
+
+                if (action.type() == NavigationTypeLinkClicked && url.hasFragmentIdentifier()) {
+                    ResourceRequest emptyRequest;
+                    m_frame->loader()->activeDocumentLoader()->setLastCheckedRequest(emptyRequest);
+                }
+            }
         }
     }
 
@@ -346,9 +347,9 @@ PassRefPtr<Widget> FrameLoaderClientBlackBerry::createPlugin(const IntSize& plug
 
 void FrameLoaderClientBlackBerry::redirectDataToPlugin(Widget* pluginWidget)
 {
-    ASSERT(!m_pluginView);
     m_pluginView = static_cast<PluginView*>(pluginWidget);
-    m_hasSentResponseToPlugin = false;
+    if (pluginWidget)
+        m_hasSentResponseToPlugin = false;
 }
 
 void FrameLoaderClientBlackBerry::receivedData(const char* data, int length, const String& textEncoding)
@@ -504,6 +505,8 @@ void FrameLoaderClientBlackBerry::dispatchDidStartProvisionalLoad()
 
     if (m_webPagePrivate->m_dumpRenderTree)
         m_webPagePrivate->m_dumpRenderTree->didStartProvisionalLoadForFrame(m_frame);
+
+    m_wasProvisionalLoadTriggeredByUserGesture = ScriptController::processingUserGesture();
 }
 
 void FrameLoaderClientBlackBerry::dispatchDidReceiveResponse(DocumentLoader*, unsigned long identifier, const ResourceResponse& response)
@@ -1088,6 +1091,10 @@ void FrameLoaderClientBlackBerry::restoreViewState()
     if (orientationChanged && viewState.isZoomToFitScale)
         scale = BlackBerry::Platform::Graphics::Screen::primaryScreen()->width() * scale / static_cast<double>(BlackBerry::Platform::Graphics::Screen::primaryScreen()->height());
 
+    // Don't flash checkerboard before WebPagePrivate::restoreHistoryViewState() finished.
+    // This call will be balanced by BackingStorePrivate::resumeScreenAndBackingStoreUpdates() in WebPagePrivate::restoreHistoryViewState().
+    m_webPagePrivate->m_backingStore->d->suspendScreenAndBackingStoreUpdates();
+
     // It is not safe to render the page at this point. So we post a message instead. Messages have higher priority than timers.
     BlackBerry::Platform::webKitThreadMessageClient()->dispatchMessage(BlackBerry::Platform::createMethodCallMessage(
         &WebPagePrivate::restoreHistoryViewState, m_webPagePrivate, contentsSize, scrollPosition, scale, viewState.shouldReflowBlock));
@@ -1246,6 +1253,24 @@ void FrameLoaderClientBlackBerry::dispatchDidLoadFromApplicationCache(const Reso
         return;
 
     m_webPagePrivate->m_client->notifyDidLoadFromApplicationCache();
+}
+
+PassRefPtr<SecurityOrigin> FrameLoaderClientBlackBerry::securityOriginForNewDocument(const KURL& url)
+{
+    // What we are trying to do here is to keep using the old path as origin when a file-based html page
+    // changes its location to some html in a subfolder. This will allow some file-based html packages
+    // to work smoothly even with security checks enabled.
+
+    RefPtr<SecurityOrigin> newSecurityOrigin = SecurityOrigin::create(url);
+
+    if (m_wasProvisionalLoadTriggeredByUserGesture || !url.isLocalFile())
+        return newSecurityOrigin;
+
+    RefPtr<SecurityOrigin> currentSecurityOrigin = m_frame->document()->securityOrigin();
+    if (currentSecurityOrigin && currentSecurityOrigin->containsInFolder(newSecurityOrigin.get()))
+        return currentSecurityOrigin;
+
+    return newSecurityOrigin;
 }
 
 } // WebCore

@@ -172,7 +172,7 @@ public:
     static InspectorInstrumentationCookie willReceiveResourceData(Frame*, unsigned long identifier, int length);
     static void didReceiveResourceData(const InspectorInstrumentationCookie&);
     static InspectorInstrumentationCookie willReceiveResourceResponse(Frame*, unsigned long identifier, const ResourceResponse&);
-    static void didReceiveResourceResponse(const InspectorInstrumentationCookie&, unsigned long identifier, DocumentLoader*, const ResourceResponse&);
+    static void didReceiveResourceResponse(const InspectorInstrumentationCookie&, unsigned long identifier, DocumentLoader*, const ResourceResponse&, ResourceLoader*);
     static void continueAfterXFrameOptionsDenied(Frame*, DocumentLoader*, unsigned long identifier, const ResourceResponse&);
     static void continueWithPolicyDownload(Frame*, DocumentLoader*, unsigned long identifier, const ResourceResponse&);
     static void continueWithPolicyIgnore(Frame*, DocumentLoader*, unsigned long identifier, const ResourceResponse&);
@@ -202,9 +202,9 @@ public:
     static void addMessageToConsole(WorkerContext*, MessageSource, MessageType, MessageLevel, const String& message, const String&, unsigned lineNumber);
 #endif
     static void consoleCount(Page*, PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
-    static void startConsoleTiming(Page*, const String& title);
-    static void stopConsoleTiming(Page*, const String& title, PassRefPtr<ScriptCallStack>);
-    static void consoleTimeStamp(Page*, PassRefPtr<ScriptArguments>);
+    static void startConsoleTiming(Frame*, const String& title);
+    static void stopConsoleTiming(Frame*, const String& title, PassRefPtr<ScriptCallStack>);
+    static void consoleTimeStamp(Frame*, PassRefPtr<ScriptArguments>);
 
     static void didRequestAnimationFrame(Document*, int callbackId);
     static void didCancelAnimationFrame(Document*, int callbackId);
@@ -351,7 +351,7 @@ private:
     static InspectorInstrumentationCookie willReceiveResourceDataImpl(InstrumentingAgents*, unsigned long identifier, Frame*, int length);
     static void didReceiveResourceDataImpl(const InspectorInstrumentationCookie&);
     static InspectorInstrumentationCookie willReceiveResourceResponseImpl(InstrumentingAgents*, unsigned long identifier, const ResourceResponse&, Frame*);
-    static void didReceiveResourceResponseImpl(const InspectorInstrumentationCookie&, unsigned long identifier, DocumentLoader*, const ResourceResponse&);
+    static void didReceiveResourceResponseImpl(const InspectorInstrumentationCookie&, unsigned long identifier, DocumentLoader*, const ResourceResponse&, ResourceLoader*);
     static void didReceiveResourceResponseButCanceledImpl(Frame*, DocumentLoader*, unsigned long identifier, const ResourceResponse&);
     static void continueAfterXFrameOptionsDeniedImpl(Frame*, DocumentLoader*, unsigned long identifier, const ResourceResponse&);
     static void continueWithPolicyDownloadImpl(Frame*, DocumentLoader*, unsigned long identifier, const ResourceResponse&);
@@ -378,9 +378,9 @@ private:
     static void addMessageToConsoleImpl(InstrumentingAgents*, MessageSource, MessageType, MessageLevel, const String& message, PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
     static void addMessageToConsoleImpl(InstrumentingAgents*, MessageSource, MessageType, MessageLevel, const String& message, const String& scriptId, unsigned lineNumber);
     static void consoleCountImpl(InstrumentingAgents*, PassRefPtr<ScriptArguments>, PassRefPtr<ScriptCallStack>);
-    static void startConsoleTimingImpl(InstrumentingAgents*, const String& title);
-    static void stopConsoleTimingImpl(InstrumentingAgents*, const String& title, PassRefPtr<ScriptCallStack>);
-    static void consoleTimeStampImpl(InstrumentingAgents*, PassRefPtr<ScriptArguments>);
+    static void startConsoleTimingImpl(InstrumentingAgents*, Frame*, const String& title);
+    static void stopConsoleTimingImpl(InstrumentingAgents*, Frame*, const String& title, PassRefPtr<ScriptCallStack>);
+    static void consoleTimeStampImpl(InstrumentingAgents*, Frame*, PassRefPtr<ScriptArguments>);
 
     static void didRequestAnimationFrameImpl(InstrumentingAgents*, int callbackId, Frame*);
     static void didCancelAnimationFrameImpl(InstrumentingAgents*, int callbackId, Frame*);
@@ -1082,11 +1082,11 @@ inline InspectorInstrumentationCookie InspectorInstrumentation::willReceiveResou
     return InspectorInstrumentationCookie();
 }
 
-inline void InspectorInstrumentation::didReceiveResourceResponse(const InspectorInstrumentationCookie& cookie, unsigned long identifier, DocumentLoader* loader, const ResourceResponse& response)
+inline void InspectorInstrumentation::didReceiveResourceResponse(const InspectorInstrumentationCookie& cookie, unsigned long identifier, DocumentLoader* loader, const ResourceResponse& response, ResourceLoader* resourceLoader)
 {
 #if ENABLE(INSPECTOR)
     // Call this unconditionally so that we're able to log to console with no front-end attached.
-    didReceiveResourceResponseImpl(cookie, identifier, loader, response);
+    didReceiveResourceResponseImpl(cookie, identifier, loader, response, resourceLoader);
 #endif
 }
 

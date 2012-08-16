@@ -674,7 +674,7 @@ InspectorInstrumentationCookie InspectorInstrumentation::willReceiveResourceResp
     return InspectorInstrumentationCookie(instrumentingAgents, timelineAgentId);
 }
 
-void InspectorInstrumentation::didReceiveResourceResponseImpl(const InspectorInstrumentationCookie& cookie, unsigned long identifier, DocumentLoader* loader, const ResourceResponse& response)
+void InspectorInstrumentation::didReceiveResourceResponseImpl(const InspectorInstrumentationCookie& cookie, unsigned long identifier, DocumentLoader* loader, const ResourceResponse& response, ResourceLoader* resourceLoader)
 {
     if (InspectorTimelineAgent* timelineAgent = retrieveTimelineAgent(cookie))
         timelineAgent->didReceiveResourceResponse();
@@ -684,7 +684,7 @@ void InspectorInstrumentation::didReceiveResourceResponseImpl(const InspectorIns
     if (!instrumentingAgents)
         return;
     if (InspectorResourceAgent* resourceAgent = instrumentingAgents->inspectorResourceAgent())
-        resourceAgent->didReceiveResponse(identifier, loader, response);
+        resourceAgent->didReceiveResponse(identifier, loader, response, resourceLoader);
     if (InspectorConsoleAgent* consoleAgent = instrumentingAgents->inspectorConsoleAgent())
         consoleAgent->didReceiveResponse(identifier, response); // This should come AFTER resource notification, front-end relies on this.
 }
@@ -692,7 +692,7 @@ void InspectorInstrumentation::didReceiveResourceResponseImpl(const InspectorIns
 void InspectorInstrumentation::didReceiveResourceResponseButCanceledImpl(Frame* frame, DocumentLoader* loader, unsigned long identifier, const ResourceResponse& r)
 {
     InspectorInstrumentationCookie cookie = InspectorInstrumentation::willReceiveResourceResponse(frame, identifier, r);
-    InspectorInstrumentation::didReceiveResourceResponse(cookie, identifier, loader, r);
+    InspectorInstrumentation::didReceiveResourceResponse(cookie, identifier, loader, r, 0);
 }
 
 void InspectorInstrumentation::continueAfterXFrameOptionsDeniedImpl(Frame* frame, DocumentLoader* loader, unsigned long identifier, const ResourceResponse& r)
@@ -907,28 +907,28 @@ void InspectorInstrumentation::consoleCountImpl(InstrumentingAgents* instrumenti
         consoleAgent->count(arguments, stack);
 }
 
-void InspectorInstrumentation::startConsoleTimingImpl(InstrumentingAgents* instrumentingAgents, const String& title)
+void InspectorInstrumentation::startConsoleTimingImpl(InstrumentingAgents* instrumentingAgents, Frame* frame, const String& title)
 {
     if (InspectorTimelineAgent* timelineAgent = instrumentingAgents->inspectorTimelineAgent())
-        timelineAgent->time(title);
+        timelineAgent->time(frame, title);
     if (InspectorConsoleAgent* consoleAgent = instrumentingAgents->inspectorConsoleAgent())
         consoleAgent->startTiming(title);
 }
 
-void InspectorInstrumentation::stopConsoleTimingImpl(InstrumentingAgents* instrumentingAgents, const String& title, PassRefPtr<ScriptCallStack> stack)
+void InspectorInstrumentation::stopConsoleTimingImpl(InstrumentingAgents* instrumentingAgents, Frame* frame, const String& title, PassRefPtr<ScriptCallStack> stack)
 {
     if (InspectorConsoleAgent* consoleAgent = instrumentingAgents->inspectorConsoleAgent())
         consoleAgent->stopTiming(title, stack);
     if (InspectorTimelineAgent* timelineAgent = instrumentingAgents->inspectorTimelineAgent())
-        timelineAgent->timeEnd(title);
+        timelineAgent->timeEnd(frame, title);
 }
 
-void InspectorInstrumentation::consoleTimeStampImpl(InstrumentingAgents* instrumentingAgents, PassRefPtr<ScriptArguments> arguments)
+void InspectorInstrumentation::consoleTimeStampImpl(InstrumentingAgents* instrumentingAgents, Frame* frame, PassRefPtr<ScriptArguments> arguments)
 {
     if (InspectorTimelineAgent* timelineAgent = instrumentingAgents->inspectorTimelineAgent()) {
         String message;
         arguments->getFirstArgumentAsString(message);
-        timelineAgent->didTimeStamp(message);
+        timelineAgent->didTimeStamp(frame, message);
      }
 }
 

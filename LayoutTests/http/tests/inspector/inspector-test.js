@@ -515,3 +515,38 @@ function clearOutput()
         outputElement = null;
     }
 }
+
+function StandaloneTestRunnerStub()
+{
+}
+
+StandaloneTestRunnerStub.prototype = {
+    dumpAsText: function()
+    {
+    },
+
+    waitUntilDone: function()
+    {
+    },
+
+    closeWebInspector: function()
+    {
+        window.opener.postMessage(["closeWebInspector"], "*");
+    },
+
+    notifyDone: function()
+    {
+        var actual = document.body.innerText + "\n";
+        window.opener.postMessage(["notifyDone", actual], "*");
+    },
+
+    evaluateInWebInspector: function(callId, script)
+    {
+        window.opener.postMessage(["evaluateInWebInspector", callId, script], "*");
+    },
+
+    display: function() { }
+}
+
+if (!window.testRunner && window.opener)
+    window.testRunner = new StandaloneTestRunnerStub();

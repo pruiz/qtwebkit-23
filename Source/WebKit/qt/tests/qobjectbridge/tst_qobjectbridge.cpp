@@ -1887,7 +1887,7 @@ void tst_QObjectBridge::objectDeleted()
     evalJS("bar.intProperty = 123;");
     QCOMPARE(qobj->intProperty(), 123);
     qobj->resetQtFunctionInvoked();
-    evalJS("bar.myInvokable.call(bar);");
+    evalJS("bar.myInvokable(bar);");
     QCOMPARE(qobj->qtFunctionInvoked(), 0);
 
     // do this, to ensure that we cache that it implements call
@@ -2156,15 +2156,15 @@ void tst_QObjectBridge::introspectQtMethods_data()
     QTest::addColumn<QStringList>("expectedPropertyNames");
 
     QTest::newRow("myObject.mySignal")
-        << "myObject" << "mySignal" << (QStringList() << "connect" << "disconnect" << "name");
+        << "myObject" << "mySignal" << (QStringList() << "connect" << "disconnect" << "length" << "name");
     QTest::newRow("myObject.mySlot")
-        << "myObject" << "mySlot" << (QStringList() << "connect" << "disconnect" << "name");
+        << "myObject" << "mySlot" << (QStringList() << "connect" << "disconnect" << "length" << "name");
     QTest::newRow("myObject.myInvokable")
-        << "myObject" << "myInvokable" << (QStringList() << "connect" << "disconnect" << "name");
+        << "myObject" << "myInvokable" << (QStringList() << "connect" << "disconnect" << "length" << "name");
     QTest::newRow("myObject.mySignal.connect")
-        << "myObject.mySignal" << "connect" << (QStringList() << "name");
+        << "myObject.mySignal" << "connect" << (QStringList() << "length" << "name");
     QTest::newRow("myObject.mySignal.disconnect")
-        << "myObject.mySignal" << "disconnect" << (QStringList() << "name");
+        << "myObject.mySignal" << "disconnect" << (QStringList() << "length" << "name");
 }
 
 void tst_QObjectBridge::introspectQtMethods()
@@ -2185,7 +2185,7 @@ void tst_QObjectBridge::introspectQtMethods()
         QCOMPARE(evalJS("descriptor.set"), sUndefined);
         QCOMPARE(evalJS(QString::fromLatin1("descriptor.value === %0['%1']").arg(methodLookup).arg(name)), sTrue);
         QCOMPARE(evalJS(QString::fromLatin1("descriptor.enumerable")), sFalse);
-        QCOMPARE(evalJS(QString::fromLatin1("descriptor.configurable")), sFalse);
+        QCOMPARE(evalJS(QString::fromLatin1("descriptor.configurable")), sTrue);
     }
 
     QVERIFY(evalJSV("var props=[]; for (var p in myObject.deleteLater) {props.push(p);}; props.sort()").toStringList().isEmpty());

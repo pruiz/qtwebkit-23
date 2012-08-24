@@ -463,7 +463,8 @@ public:
 
     enum RenderStyle {
         RenderOffscreen,
-        RenderDirectlyToHostWindow
+        RenderDirectlyToHostWindow,
+        RenderToCurrentGLContext
     };
 
     class ContextLostCallback {
@@ -482,6 +483,7 @@ public:
     void setErrorMessageCallback(PassOwnPtr<ErrorMessageCallback>);
 
     static PassRefPtr<GraphicsContext3D> create(Attributes, HostWindow*, RenderStyle = RenderOffscreen);
+    static PassRefPtr<GraphicsContext3D> createForCurrentGLContext();
     ~GraphicsContext3D();
 
 #if PLATFORM(MAC)
@@ -872,7 +874,7 @@ public:
     static unsigned getChannelBitsByFormat(GC3Denum);
 
   private:
-    GraphicsContext3D(Attributes attrs, HostWindow* hostWindow, bool renderDirectlyToHostWindow);
+    GraphicsContext3D(Attributes, HostWindow*, RenderStyle = RenderOffscreen);
 
     // Each platform must provide an implementation of this method.
     //
@@ -987,6 +989,7 @@ public:
     friend class Extensions3DOpenGLCommon;
 
     Attributes m_attrs;
+    RenderStyle m_renderStyle;
     Vector<Vector<float> > m_vertexArray;
 
     GC3Duint m_texture;

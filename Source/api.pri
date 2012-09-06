@@ -94,6 +94,8 @@ WEBKIT += webcore
 
 # ------------- Install rules -------------
 
+contains(DEFINES, WTF_USE_3D_GRAPHICS=1): WEBKIT += angle
+
 haveQt(5) {
     # Install rules handled by Qt's module system
 } else {

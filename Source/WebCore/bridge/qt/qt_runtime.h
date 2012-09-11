@@ -114,7 +114,8 @@ public:
     const QByteArray& name() { return m_identifier; }
 
 private:
-    static QtRuntimeMethod* toRuntimeMethod(JSContextRef, JSObjectRef);
+    static const JSStaticFunction connectFunction;
+    static const JSStaticFunction disconnectFunction;
 
     static JSValueRef connectOrDisconnect(JSContextRef ctx, JSObjectRef function, JSObjectRef thisObject, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception, bool connect);
     QPointer<QObject> m_object;
@@ -166,7 +167,7 @@ typedef JSValue (*ConvertToJSValueFunction)(ExecState* exec, WebCore::JSDOMGloba
 void registerCustomType(int qtMetaTypeId, ConvertToVariantFunction, ConvertToJSValueFunction);
 
 QVariant convertValueToQVariant(ExecState* exec, JSValue value, QMetaType::Type hint, int *distance);
-JSValue convertQVariantToValue(ExecState* exec, PassRefPtr<RootObject> root, const QVariant& variant);
+JSValueRef convertQVariantToValue(JSContextRef, PassRefPtr<RootObject>, const QVariant&, JSValueRef* exception);
 
 void setException(JSContextRef, JSValueRef* exception, const QString& text);
 

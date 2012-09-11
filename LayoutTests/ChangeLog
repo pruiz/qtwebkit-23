@@ -1,3 +1,2055 @@
+2012-08-23  Hajime Morrita  <morrita@chromium.org>
+
+        Unreviewed Chromium gardeing.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-23  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        notifications-event-listener-crash.html test has non-deterministic
+        output on Chromium XP debug.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-23  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL] Gardening after r126350
+        https://bugs.webkit.org/show_bug.cgi?id=94787
+
+        Unreviewed gardening.
+
+        Gardening of media/track/track-cue-rendering-snap-to-lines-not-set.html.
+
+        * platform/efl/TestExpectations:
+
+2012-08-23  Hajime Morrita  <morrita@chromium.org>
+
+        Unreviewed Chromium gardeing.
+
+        * platform/chromium-mac-snowleopard/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/media/track/track-cue-rendering-vertical-expected.txt: Added.
+
+2012-08-23  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed gardening.
+
+        A follow-up to r126400, updating various baselines for fast/js/constructor-length.html
+        so they are correct.
+
+        * platform/gtk/fast/js/constructor-length-expected.txt:
+        * platform/mac/fast/js/constructor-length-expected.txt:
+        * platform/qt/fast/js/constructor-length-expected.txt:
+
+2012-08-23  KwangYong Choi  <ky0.choi@samsung.com>
+
+        [EFL] Added missing SKIP keyword to platform/efl/TestExpectations
+        https://bugs.webkit.org/show_bug.cgi?id=94781
+
+        Unreviewed. Some layout tests which are expected missing should not make
+        expected result files during layout test.
+
+        * platform/efl/TestExpectations:
+
+2012-08-23  KwangYong Choi  <ky0.choi@samsung.com>
+
+        [EFL] Use vertical slider theme when the slider is vertical
+        https://bugs.webkit.org/show_bug.cgi?id=93838
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Updated expected result because theme of the slider is changed.
+
+        The size of the renderSlider is changed to 129x12 from 129x11
+        because it has the slider thumb 12x12 and it is not resized when
+        the size is not specified.
+
+        * platform/efl/fast/dom/HTMLInputElement/input-slider-update-expected.txt:
+        * platform/efl/fast/forms/box-shadow-override-expected.png:
+        * platform/efl/fast/forms/box-shadow-override-expected.txt:
+        * platform/efl/fast/forms/datalist/input-appearance-range-with-datalist-expected.png: Added.
+        * platform/efl/fast/forms/datalist/input-appearance-range-with-datalist-zoomed-expected.png: Added.
+        * platform/efl/fast/forms/input-appearance-height-expected.png:
+        * platform/efl/fast/forms/input-appearance-height-expected.txt:
+        * platform/efl/fast/forms/range/input-appearance-range-expected.png:
+        * platform/efl/fast/forms/range/input-appearance-range-expected.txt:
+        * platform/efl/fast/forms/range/slider-padding-expected.png:
+        * platform/efl/fast/forms/range/slider-padding-expected.txt:
+        * platform/efl/fast/forms/range/slider-thumb-shared-style-expected.png:
+        * platform/efl/fast/forms/range/slider-thumb-shared-style-expected.txt:
+        * platform/efl/fast/repaint/slider-thumb-drag-release-expected.txt:
+
+2012-08-23  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed gardening.
+
+        After the TextTrackCue constructor was updated in r126350 the
+        expected constructor length is 3. Updating fast/js/constructor-length.html
+        to reflect that.
+
+        * fast/js/constructor-length.html:
+
+2012-08-23  Hajime Morrita  <morrita@chromium.org>
+
+        Unreviewed Chromium gardeing.
+
+        * platform/chromium-linux/media/track/track-cue-rendering-horizontal-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/media/track/track-cue-rendering-horizontal-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/media/track/track-cue-rendering-vertical-expected.txt: Removed.
+        * platform/chromium-win-xp/media/track/track-cue-rendering-horizontal-expected.png: Removed.
+        * platform/chromium-win-xp/media/track/track-cue-rendering-horizontal-expected.txt: Removed.
+        * platform/chromium-win-xp/media/track/track-cue-rendering-vertical-expected.txt: Removed.
+
+2012-08-23  Philippe Normand  <pnormand@igalia.com>
+
+        [GTK] media/video-duration-known-after-eos.html and media/media-element-play-after-eos.html are flaky
+        https://bugs.webkit.org/show_bug.cgi?id=83790
+
+        Reviewed by Eric Seidel.
+
+        Refactor the tests to wait the loadedmetadata event before
+        starting playback and attempting any access to the duration
+        attribute. This is an attempt to eliminate flakyness of the tests.
+
+        * media/media-element-play-after-eos-expected.txt:
+        * media/media-element-play-after-eos.html:
+        * media/video-duration-known-after-eos.html:
+        * platform/gtk/TestExpectations:
+
+2012-08-22  Hajime Morrita  <morrita@chromium.org>
+
+        Unreviewed Chromium gardeing.
+        
+        * platform/chromium-mac-snowleopard/media/track/track-cue-rendering-horizontal-expected.png: Added.
+        * platform/chromium-mac-snowleopard/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/media/track/track-cue-rendering-vertical-expected.png: Added.
+        * platform/chromium-mac-snowleopard/media/track/track-cue-rendering-vertical-expected.txt: Added.
+        * platform/chromium-mac/media/track/track-cue-rendering-horizontal-expected.png: Added.
+        * platform/chromium-mac/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/chromium-mac/media/track/track-cue-rendering-vertical-expected.png: Added.
+        * platform/chromium-mac/media/track/track-cue-rendering-vertical-expected.txt: Added.
+        * platform/chromium-win-xp/media/track/track-cue-rendering-horizontal-expected.png: Added.
+        * platform/chromium-win-xp/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/chromium-win-xp/media/track/track-cue-rendering-vertical-expected.png: Added.
+        * platform/chromium-win-xp/media/track/track-cue-rendering-vertical-expected.txt: Added.
+        * platform/chromium-win/media/track/track-cue-rendering-horizontal-expected.png: Added.
+        * platform/chromium-win/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/chromium-win/media/track/track-cue-rendering-vertical-expected.png: Added.
+        * platform/chromium-win/media/track/track-cue-rendering-vertical-expected.txt: Added.
+
+2012-08-22  Sukolsak Sakshuwong  <sukolsak@google.com>
+
+        Implement UndoManager's item() method
+        https://bugs.webkit.org/show_bug.cgi?id=94671
+
+        Reviewed by Ryosuke Niwa.
+
+        * editing/undomanager/undomanager-item-expected.txt: Added.
+        * editing/undomanager/undomanager-item.html: Added.
+
+2012-08-22  Dominic Mazzoni  <dmazzoni@google.com>
+
+        AX: Focusable elements without a role should not be ignored
+        https://bugs.webkit.org/show_bug.cgi?id=94302
+
+        Reviewed by Chris Fleizach.
+
+        Adds a new test to make sure that a generic focusable element (like a div with tabindex=0)
+        can get focus and return an appropriate title, just like a form control or element with
+        an ARIA role.
+
+        Modifies three existing tests that were previously assuming that a focusable node
+        with no role would be ignored for accessibility ("accessibilityIsIgnored").
+
+        * accessibility/editable-webarea-context-menu-point.html:
+        * accessibility/focusable-div-expected.txt: Added.
+        * accessibility/focusable-div.html: Added.
+        * accessibility/table-detection.html:
+        * platform/mac/accessibility/listbox-hit-test.html:
+
+2012-08-22  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed Chromium gardening. Optimized baselines from yesterday
+        with dpranke's new algorithm in webkit-patch optimize-baselines
+        from r126374 and r126380.
+
+        * platform/chromium-linux/fast/canvas/canvas-scale-shadowBlur-expected.txt: Removed.
+        * platform/chromium-linux/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Removed.
+        * platform/chromium-linux/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Removed.
+        * platform/chromium-linux/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/canvas/canvas-scale-shadowBlur-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Removed.
+        * platform/chromium-mac/fast/canvas/canvas-scale-shadowBlur-expected.txt: Removed.
+        * platform/chromium-mac/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Removed.
+        * platform/chromium-mac/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Removed.
+        * platform/chromium-mac/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Removed.
+        * platform/chromium-win-xp/fast/canvas/canvas-scale-shadowBlur-expected.txt: Removed.
+        * platform/chromium-win-xp/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Removed.
+        * platform/chromium-win-xp/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Removed.
+        * platform/chromium-win-xp/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Removed.
+        * platform/chromium-win/fast/canvas/canvas-scale-shadowBlur-expected.txt: Removed.
+        * platform/chromium-win/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Removed.
+        * platform/chromium-win/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Removed.
+        * platform/chromium-win/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Removed.
+        * platform/chromium/fast/canvas/canvas-scale-shadowBlur-expected.txt: Renamed from LayoutTests/platform/chromium-linux-x86/fast/canvas/canvas-scale-shadowBlur-expected.txt.
+        * platform/chromium/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Renamed from LayoutTests/platform/chromium-linux-x86/fast/canvas/canvas-scale-strokePath-shadow-expected.txt.
+        * platform/chromium/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Renamed from LayoutTests/platform/chromium-linux-x86/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt.
+        * platform/chromium/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Renamed from LayoutTests/platform/chromium-linux-x86/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt.
+
+2012-08-22  Victor Carbune  <victor@rosedu.org>
+
+        Display a TextTrackCue when snap-to-lines flag is set
+        https://bugs.webkit.org/show_bug.cgi?id=79751
+
+        Reviewed by Tony Chang.
+
+        Test cases covering snap-to-lines horizontal and vertical positioning of cues.
+
+        * media/track/captions-webvtt/captions-snap-to-lines-set.vtt: Added.
+        * media/track/track-cue-rendering-horizontal.html: Added.
+        * media/track/track-cue-rendering-snap-to-lines-not-set-expected.txt: Updated.
+        * media/track/track-cue-rendering-vertical.html: Added.
+        * media/video-test.js: Updated to support pixel test dumps.
+        * platform/chromium-linux/media/track/track-cue-rendering-horizontal-expected.png: Added.
+        * platform/chromium-linux/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/chromium-linux/media/track/track-cue-rendering-vertical-expected.png: Added.
+        * platform/chromium-linux/media/track/track-cue-rendering-vertical-expected.txt: Added.
+        * platform/chromium/TestExpectations: Marking these temporarily as IMAGE fail, as they will
+        anyway require new baselines.
+        * platform/mac/media/track/track-cue-rendering-horizontal-expected.png: Added.
+        * platform/mac/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/mac/media/track/track-cue-rendering-vertical-expected.png: Added.
+        * platform/mac/media/track/track-cue-rendering-vertical-expected.txt: Added.
+
+2012-08-22  Alejandro Piñeiro  <apinheiro@igalia.com>
+
+        [Gtk] Dojo toggle buttons should expose ROLE_TOGGLE_BUTTON not ROLE_PUSH_BUTTON
+        https://bugs.webkit.org/show_bug.cgi?id=73819
+
+        Reviewed by Chris Fleizach.
+
+        Added a test to verify that when aria-pressed is present, buttons
+        will have the appropiate role.
+
+        * platform/gtk/accessibility/aria-toggle-button-role-expected.txt: Added.
+        * platform/gtk/accessibility/aria-toggle-button-role.html: Added.
+
+2012-08-22  Kenneth Russell  <kbr@google.com>
+
+        [Chromium] Need baselines for new paged-x and paged-y tests in fast/overflow after r126343
+        https://bugs.webkit.org/show_bug.cgi?id=94748
+
+        Unreviewed Chromium gardening. Added baselines via garden-o-matic.
+
+        * platform/chromium-linux/fast/overflow/paged-x-div-expected.png: Added.
+        * platform/chromium-linux/fast/overflow/paged-x-on-root-expected.png: Added.
+        * platform/chromium-linux/fast/overflow/paged-y-div-expected.png: Added.
+        * platform/chromium-linux/fast/overflow/paged-y-on-root-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/overflow/paged-x-div-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/overflow/paged-x-on-root-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/overflow/paged-y-div-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/overflow/paged-y-on-root-expected.png: Added.
+        * platform/chromium-mac/fast/overflow/paged-x-div-expected.png: Added.
+        * platform/chromium-mac/fast/overflow/paged-x-on-root-expected.png: Added.
+        * platform/chromium-mac/fast/overflow/paged-y-div-expected.png: Added.
+        * platform/chromium-mac/fast/overflow/paged-y-on-root-expected.png: Added.
+        * platform/chromium-win/fast/overflow/paged-x-div-expected.png: Added.
+        * platform/chromium-win/fast/overflow/paged-x-div-expected.txt: Added.
+        * platform/chromium-win/fast/overflow/paged-x-on-root-expected.png: Added.
+        * platform/chromium-win/fast/overflow/paged-x-on-root-expected.txt: Added.
+        * platform/chromium-win/fast/overflow/paged-y-div-expected.png: Added.
+        * platform/chromium-win/fast/overflow/paged-y-div-expected.txt: Added.
+        * platform/chromium-win/fast/overflow/paged-y-on-root-expected.png: Added.
+        * platform/chromium-win/fast/overflow/paged-y-on-root-expected.txt: Added.
+        * platform/chromium/TestExpectations:
+            Removed expected failures.
+
+2012-08-22  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: revert int version when version change transaction aborts
+        https://bugs.webkit.org/show_bug.cgi?id=94662
+
+        Reviewed by Tony Chang.
+
+        This is tested in some other layout tests but it should have its own,
+        so add intversion-revert-on-abort.html.
+
+        * storage/indexeddb/intversion-abort-in-initial-upgradeneeded-expected.txt:
+        FAIL event.target.result.version should be 0 will be resolved at least
+        when we figure out if we can make the default version an integer
+        during the transition period.
+
+        * storage/indexeddb/intversion-revert-on-abort-expected.txt: Added.
+        * storage/indexeddb/intversion-revert-on-abort.html: Added.
+        * storage/indexeddb/resources/intversion-revert-on-abort.js: Added.
+        (test):
+        (deleteSuccess):
+        (firstUpgradeNeededCallback):
+        (openSuccess):
+        (secondUpgradeNeededCallback):
+        (errorAfterAbortCallback):
+        (finalSuccessCallback):
+
+2012-08-17  Jeffrey Pfau  <jpfau@apple.com>
+
+        Allow blocking of Web SQL databases in third-party web workers
+        https://bugs.webkit.org/show_bug.cgi?id=94170
+
+        Reviewed by Adam Barth.
+
+        Created tests for accessing openDatabase from a third party and first party dedicated workers when third-party blocking is on and off.
+
+        * http/tests/security/cross-origin-worker-websql-allowed-expected.txt: Added.
+        * http/tests/security/cross-origin-worker-websql-allowed.html: Added.
+        * http/tests/security/cross-origin-worker-websql-expected.txt: Added.
+        * http/tests/security/cross-origin-worker-websql.html: Added.
+        * http/tests/security/resources/cross-origin-iframe-for-worker-websql.html: Added.
+        * http/tests/security/resources/document-for-cross-origin-worker-websql.html: Added.
+        * http/tests/security/resources/worker-for-websql.js: Added.
+        (self.onmessage):
+
+2012-08-22  Anna Cavender  <annacc@chromium.org>
+
+        [Chromium/GTK/EFL] Flaky media/track/track-mode test.
+        https://bugs.webkit.org/show_bug.cgi?id=83878
+
+        Reviewed by Eric Seidel.
+
+        This test should only care that cuechange events are fired when the TextTrack
+        mode is set to HIDDEN or SHOWING.  Because the events are asynchronous, we
+        shouldn't test the order of them, just that they occur.
+
+        * media/track/track-mode-expected.txt:
+        * media/track/track-mode.html:
+
+2012-08-22  Leo Yang  <leoyang@rim.com>
+
+        Test cases under fast/filesystem/workers are flaky when using JSC
+        https://bugs.webkit.org/show_bug.cgi?id=94747
+
+        Reviewed by Yong Li.
+
+        These test cases sometimes can't complete because the worker object
+        created by startWorker() has been gc'ed before the worker thread complete.
+        We should reference the object to avoid it being gc'ed.
+
+        * fast/filesystem/workers/async-operations.html:
+        * fast/filesystem/workers/file-entry-to-uri-sync.html:
+        * fast/filesystem/workers/file-from-file-entry-sync.html:
+        * fast/filesystem/workers/file-from-file-entry.html:
+        * fast/filesystem/workers/file-writer-empty-blob.html:
+        * fast/filesystem/workers/file-writer-events.html:
+        * fast/filesystem/workers/file-writer-gc-blob.html:
+        * fast/filesystem/workers/file-writer-sync-truncate-extend.html:
+        * fast/filesystem/workers/file-writer-sync-write-overlapped.html:
+        * fast/filesystem/workers/file-writer-truncate-extend.html:
+        * fast/filesystem/workers/file-writer-write-overlapped.html:
+        * fast/filesystem/workers/simple-persistent-sync.html:
+        * fast/filesystem/workers/simple-persistent.html:
+        * fast/filesystem/workers/simple-temporary-sync.html:
+        * fast/filesystem/workers/simple-temporary.html:
+        * fast/filesystem/workers/sync-operations.html:
+
+2012-08-22  Anna Cavender  <annacc@chromium.org>
+
+        Update the TextTrackCue Constructor
+        https://bugs.webkit.org/show_bug.cgi?id=88583
+
+        Reviewed by Eric Carlson.
+
+        The TextTrackCue constructor has been changed to:
+        [Constructor(double startTime, double endTime, DOMString text)]
+        http://www.whatwg.org/specs/web-apps/current-work/multipage/the-video-element.html#texttrackcue
+
+        * media/track/track-add-remove-cue-expected.txt:
+        * media/track/track-add-remove-cue.html:
+
+2012-08-22  Erik Arvidsson  <arv@chromium.org>
+
+        Changing class attribute is not reflected in the classList property
+        https://bugs.webkit.org/show_bug.cgi?id=93665
+
+        Reviewed by Ojan Vafai.
+
+        Before this change classAttributeChanged was only called for StyledElement. With this refactoring
+        it gets called for all Elements when the class attribute changes.
+
+        * fast/dom/Element/class-list-update-expected.txt: Added.
+        * fast/dom/Element/class-list-update.html: Added.
+
+2012-08-22  Kenneth Russell  <kbr@google.com>
+
+        [Chromium] Need baselines for new paged-x and paged-y tests in fast/overflow after r126343
+        https://bugs.webkit.org/show_bug.cgi?id=94748
+
+        Unreviewed gardening; suppressing new failures until baselines are generated.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-22  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] Add touch link highlight animation layers.
+        https://bugs.webkit.org/show_bug.cgi?id=84487
+
+        Reviewed by James Robinson.
+
+        Adds support for creating composited touch link highlights in renderer thread. Clipping not yet
+        implemented for non-composited frames/overflow divs, but scrolling and layout changes are supported.
+        Transform support currently limited to translation.
+
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-clipped.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-composite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-noncomposite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-scrolled.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scroll-clip.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scrolled.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-2.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-composite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-noncomposite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-late-composite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-late-composite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-window-scroll.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple.html: Added.
+        * platform/chromium-linux/compositing/gestures/resources/1-frame-composited.html: Added.
+        * platform/chromium-linux/compositing/gestures/resources/1-frame-noncomposited.html: Added.
+        * platform/chromium-linux/compositing/gestures/resources/1-nested-frame-composited.html: Added.
+        * platform/chromium-linux/compositing/gestures/resources/1-nested-frame-noncomposited.html: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-clipped-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-clipped-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-composite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-composite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-noncomposite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-noncomposite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-scrolled-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-scrolled-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scroll-clip-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scroll-clip-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scrolled-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scrolled-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-2-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-2-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-composite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-composite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-noncomposite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-noncomposite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-late-composite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-late-composite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-late-composite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-late-composite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-window-scroll-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-window-scroll-expected.txt: Added.
+        * platform/chromium/TestExpectations:
+
+2012-08-22  Beth Dakin  <bdakin@apple.com>
+
+        https://bugs.webkit.org/show_bug.cgi?id=94401
+        Add support for making a web site become paginated using overflow: 
+        paged-x | paged-y
+        -and corresponding-
+        <rdar://problem/11831783> 
+
+        Reviewed by Dave Hyatt.
+
+        Test the parsing of the two new values.
+        * fast/css/overflow-property-expected.txt:
+        * fast/css/overflow-property.html:
+
+        New tests.
+        * fast/overflow/paged-x-div.html: Added.
+        * fast/overflow/paged-x-on-root.html: Added.
+        * fast/overflow/paged-y-div.html: Added.
+        * fast/overflow/paged-y-on-root.html: Added.
+        * platform/mac/fast/overflow/paged-x-div-expected.png: Added.
+        * platform/mac/fast/overflow/paged-x-div-expected.txt: Added.
+        * platform/mac/fast/overflow/paged-x-on-root-expected.png: Added.
+        * platform/mac/fast/overflow/paged-x-on-root-expected.txt: Added.
+        * platform/mac/fast/overflow/paged-y-div-expected.png: Added.
+        * platform/mac/fast/overflow/paged-y-div-expected.txt: Added.
+        * platform/mac/fast/overflow/paged-y-on-root-expected.png: Added.
+        * platform/mac/fast/overflow/paged-y-on-root-expected.txt: Added.
+
+2012-08-22  Mark Lam  <mark.lam@apple.com>
+
+        Skipping css3/flexbox/flexitem.html.
+        https://bugs.webkit.org/show_bug.cgi?id=94723.
+
+        Reviewed by Simon Fraser.
+
+        * platform/mac/Skipped:
+
+2012-08-22  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Introduce RTCSessionDescription
+        https://bugs.webkit.org/show_bug.cgi?id=93119
+
+        Reviewed by Adam Barth.
+
+        * fast/mediastream/RTCSessionDescription-expected.txt: Added.
+        * fast/mediastream/RTCSessionDescription.html: Added.
+
+2012-08-22  Victor Carbune  <victor@rosedu.org>
+
+        DOM manipulation crashes the browser
+
+        Creating a DOM track element by script and changing the mode crashes
+        results in a browser crash.
+        https://bugs.webkit.org/show_bug.cgi?id=94628
+
+        Reviewed by Eric Carlson.
+
+        * media/track/track-element-dom-change-crash-expected.txt: Added.
+        * media/track/track-element-dom-change-crash.html: Added.
+
+2012-08-22  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Adding platform-specific baseline for css3/flexbox/flexitem.html that's
+        required after r126257.
+
+        Removing failure expectation for fast/forms/range/range-hit-test-with-padding.html
+        after the test was refactored in r126252 and is now passing.
+
+        Skipping two more failing tests that take too long to fail.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/css3/flexbox: Added.
+        * platform/gtk/css3/flexbox/flexitem-expected.txt: Added.
+
+2012-08-22  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Introduce RTCIceCandidate
+        https://bugs.webkit.org/show_bug.cgi?id=93117
+
+        Reviewed by Adam Barth.
+
+        * fast/mediastream/RTCIceCandidate-expected.txt: Added.
+        * fast/mediastream/RTCIceCandidate.html: Added.
+
+2012-08-22  Kenneth Russell  <kbr@google.com>
+
+        Layout test fast/text/emphasis-overlap.html started failing differently after r126312
+        https://bugs.webkit.org/show_bug.cgi?id=94735
+
+        Unreviewed gardening. Suppressed failure.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-22  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed, rolling out r126319.
+        http://trac.webkit.org/changeset/126319
+        https://bugs.webkit.org/show_bug.cgi?id=84487
+
+        Broke Chromium Mac build
+
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-clipped.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-composite.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-noncomposite.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-scrolled.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scroll-clip.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scrolled.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-2.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-composite.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-noncomposite.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-inner.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-outer.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-late-composite.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-late-composite.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-inner.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-outer.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-inner.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-outer.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-inner.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-outer.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-window-scroll.html: Removed.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple.html: Removed.
+        * platform/chromium-linux/compositing/gestures/resources/1-frame-composited.html: Removed.
+        * platform/chromium-linux/compositing/gestures/resources/1-frame-noncomposited.html: Removed.
+        * platform/chromium-linux/compositing/gestures/resources/1-nested-frame-composited.html: Removed.
+        * platform/chromium-linux/compositing/gestures/resources/1-nested-frame-noncomposited.html: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-clipped-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-clipped-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-composite-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-composite-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-noncomposite-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-noncomposite-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-scrolled-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-scrolled-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scroll-clip-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scroll-clip-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scrolled-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scrolled-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-2-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-2-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-composite-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-composite-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-noncomposite-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-noncomposite-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-inner-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-inner-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-outer-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-outer-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-late-composite-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-late-composite-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-late-composite-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-late-composite-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-inner-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-inner-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-outer-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-outer-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-inner-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-inner-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-outer-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-outer-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-inner-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-inner-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-outer-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-outer-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-expected.txt: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-window-scroll-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-window-scroll-expected.txt: Removed.
+
+2012-08-22  Kenneth Russell  <kbr@google.com>
+
+        Layout Test fast/repaint/japanese-rl-selection-repaint-in-regions.html is failing after r126304
+        https://bugs.webkit.org/show_bug.cgi?id=94730
+
+        Unreviewed; suppressed failure for the moment.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-22  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] Add touch link highlight animation layers.
+        https://bugs.webkit.org/show_bug.cgi?id=84487
+
+        Reviewed by James Robinson.
+
+        Adds support for creating composited touch link highlights in renderer thread. Clipping not yet
+        implemented for non-composited frames/overflow divs, but scrolling and layout changes are supported.
+        Transform support currently limited to translation.
+
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-clipped.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-composite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-noncomposite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-scrolled.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scroll-clip.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scrolled.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-2.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-composite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-noncomposite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-late-composite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-late-composite.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-inner.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-outer.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-window-scroll.html: Added.
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple.html: Added.
+        * platform/chromium-linux/compositing/gestures/resources/1-frame-composited.html: Added.
+        * platform/chromium-linux/compositing/gestures/resources/1-frame-noncomposited.html: Added.
+        * platform/chromium-linux/compositing/gestures/resources/1-nested-frame-composited.html: Added.
+        * platform/chromium-linux/compositing/gestures/resources/1-nested-frame-noncomposited.html: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-clipped-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-clipped-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-composite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-composite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-noncomposite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-composited-scrolled-late-noncomposite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-scrolled-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-iframe-scrolled-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scroll-clip-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scroll-clip-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scrolled-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-composited-scrolled-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-2-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-2-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-layout-change-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-composite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-composite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-noncomposite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-1-overflow-div-scrolled-late-noncomposite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-composited-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-late-composite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-inner-late-composite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-late-composite-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-iframe-scrolled-outer-late-composite-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-inner-scroll-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-composited-outer-scroll-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-inner-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-inner-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-outer-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-2-overflow-div-scrolled-outer-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-expected.txt: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-window-scroll-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-window-scroll-expected.txt: Added.
+
+2012-08-22  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed Chromium gardening. Copy old Mac test expectations
+        (ignored anyway) for this Mac-specific test after r126219.
+
+        * platform/chromium/platform/mac/fast/text/vertical-surrogate-pair-expected.png: Added.
+        * platform/chromium/platform/mac/fast/text/vertical-surrogate-pair-expected.txt: Added.
+
+2012-08-22  Mark Lam  <mark.lam@apple.com>
+
+        Unskip http/tests/inspector/console-resource-errors.html.
+        https://bugs.webkit.org/show_bug.cgi?id=94640.
+
+        Reviewed by Jessie Berlin.
+
+        The test has been rebaseline'd in r126281 and no longer fails.
+
+        * platform/mac/Skipped:
+
+2012-08-22  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: make "sdk" component compile independently from the rest of the front-end.
+        https://bugs.webkit.org/show_bug.cgi?id=94705
+
+        Reviewed by Vsevolod Vlasov.
+
+        * http/tests/inspector-enabled/database-open.html:
+        * http/tests/inspector-enabled/dom-storage-open.html:
+
+2012-08-22  Koji Ishii  <kojiishi@gmail.com>
+
+        FontMetrics.unitsPerEm(), FontPlatformData.orientation(), SimpleFontData::platformBoundsForGlyph are not implemented on Chromium Windows
+        https://bugs.webkit.org/show_bug.cgi?id=83512
+
+        Reviewed by Tony Chang.
+
+        Chromium Windows does not implement following 3 functions that are required for bug 51450.
+        1. FontMetrics.unitsPerEm() always returns the default value (gDefaultUnitsPerEm = 1000).
+           This change requires rebaseline of fast/repaint/stacked-diacritics and fast/text/emphasis-overlap.
+        2. FontPlatformData.orientation() always returns Horizontal. This has no effect as of this patch.
+        3. SimpleFontData::platformBoundsForGlyph() always returns FloatRect().
+           This change improves rendering of text-emphasis and 3 existing tests pass now.
+        Tony suggested in bug 51450 review to split code that is not behind
+        #if ENABLE(OPENTYPE_VERTICAL) to a separate patch.
+
+        * platform/chromium-win/fast/repaint/stacked-diacritics-expected.png:
+        * platform/chromium-win/fast/text/emphasis-overlap-expected.txt: Added due to metrics change.
+        * platform/chromium/TestExpectations: Enabled 3 tests for Chromium Win.
+
+2012-08-22  Dominic Mazzoni  <dmazzoni@google.com>
+
+        REGRESSION (r125710): accessibility/accessibility-node-reparent.html, accessibility/accessibility-node-memory-management.html failing on GTK Linux
+        https://bugs.webkit.org/show_bug.cgi?id=94200
+
+        Reviewed by Chris Fleizach.
+
+        This patch fixes two tests and removes them from gtk expectations.
+
+        * platform/gtk/TestExpectations:
+
+2012-08-22  Raul Hudea  <rhudea@adobe.com>
+
+        Crash in WebCore::RenderBlock::removeChild
+        https://bugs.webkit.org/show_bug.cgi?id=93879
+
+        Reviewed by Abhishek Arya.
+
+        Test the region-flow_thread sibling case
+
+        * fast/regions/remove-flow-thread-crash-expected.txt: Added.
+        * fast/regions/remove-flow-thread-crash.html: Added.
+
+2012-08-22  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r126287.
+        http://trac.webkit.org/changeset/126287
+        https://bugs.webkit.org/show_bug.cgi?id=94708
+
+        It made WK1 layout testing 3.7x slower (>1hours) (Requested by
+        ossy on #webkit).
+
+        * platform/qt/Skipped:
+
+2012-08-22  KwangYong Choi  <ky0.choi@samsung.com>
+
+        [EFL] Support slider tick mark snapping
+        https://bugs.webkit.org/show_bug.cgi?id=94560
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        The expected result of fast/forms/datalist/range-snap-to-datalist.html
+        is updated because slider tick mark snapping threshold is changed.
+
+        * platform/efl/fast/forms/datalist/range-snap-to-datalist-expected.txt:
+
+2012-08-22  Dominik Röttsches  <dominik.rottsches@intel.com>
+
+        [EFL] Unreviewed gardening.
+
+        Gardening after r126025 & r126275.
+
+        * platform/efl/TestExpectations: Unskipping one, skipping another.
+
+2012-08-22  Shinya Kawanaka  <shinyak@chromium.org>
+
+        Test and test expectation of Shadow DOM for button should be fixed.
+        https://bugs.webkit.org/show_bug.cgi?id=94674
+
+        Reviewed by Hajime Morita.
+
+        Now that the HTMLButtonElement was AuthroShadowDOM-ready, it's time to update the previous
+        failing tests for AuthroShadowDOM for button elements.
+
+        I've updated the failing tests to follow the current implementation and updated the test expectations.
+
+        * fast/dom/shadow/shadowdom-for-button-complex-shadow-expected.html:
+        * fast/dom/shadow/shadowdom-for-button-complex-shadow.html:
+        * fast/dom/shadow/shadowdom-for-button-only-shadow-expected.html:
+        * fast/dom/shadow/shadowdom-for-button-only-shadow.html:
+        * fast/dom/shadow/shadowdom-for-button-without-shadow-expected.html:
+        * fast/dom/shadow/shadowdom-for-button-without-shadow.html:
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-08-22  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        [Qt] REGRESSION(r125428): fast/profiler/nested-start-and-stop-profiler.html fails
+        https://bugs.webkit.org/show_bug.cgi?id=93897
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        * platform/qt/Skipped: Unskip test that is now passing.
+
+2012-08-22  Christophe Dumez  <christophe.dumez@intel.com>
+
+        window.postMessage() / MessagePort.postMessage() throw wrong exception for invalid ports argument
+        https://bugs.webkit.org/show_bug.cgi?id=94581
+
+        Reviewed by Kentaro Hara.
+
+        Update several tests and their expected results now that an
+        INVALID_STATE_ERR is thrown instead of a DATA_CLONE_ERROR
+        when window.postMessage() / MessagePort.postMessage() are
+        called with invalid values in their 'ports' argument.
+
+        * fast/events/constructors/message-event-constructor-expected.txt:
+        * fast/events/constructors/message-event-constructor.html: Stop using duplicate
+        ports in the test since it throws an exception now.
+        * fast/events/message-port-clone-expected.txt:
+        * fast/events/message-port-multi-expected.txt:
+        * fast/events/resources/message-port-multi.js: Add check for duplicate port case.
+        * fast/workers/worker-context-multi-port-expected.txt:
+        * fast/workers/worker-multi-port-expected.txt:
+
+2012-08-22  Ulan Degenbaev  <ulan@chromium.org>
+
+        Remove chromium/fast/js/array-functions-non-arrays-expected.txt and add WebKit bug id to chromium/TestExpectation.
+        https://bugs.webkit.org/show_bug.cgi?id=94682
+
+        Reviewed by Kentaro Hara.
+
+        Only one failing test case remains in array-functions-non-arrays and it is being tracked by Bug 94681.
+
+        * platform/chromium/TestExpectations:
+        * platform/chromium/fast/js/array-functions-non-arrays-expected.txt: Removed.
+
+2012-08-22  Allan Sandfeld Jensen  <allan.jensen@nokia.com>
+
+        [TouchAdjustment] Adjust to word or selection
+        https://bugs.webkit.org/show_bug.cgi?id=94449
+
+        Reviewed by Antonio Gomes.
+
+        Tests that touch-adjustment can adjust to the right subtargets within text-nodes.
+
+        * touchadjustment/context-menu-select-text.html:
+        * touchadjustment/context-menu-text-subtargets-expected.txt: Added.
+        * touchadjustment/context-menu-text-subtargets.html: Added.
+        * touchadjustment/resources/touchadjustment.js:
+        (pointToString):
+        (shouldBeWithin):
+
+2012-08-22  Balazs Ankes  <bank@inf.u-szeged.hu>
+
+        [Qt][GTK] REGRESSION(r126194): http/tests/security/contentSecurityPolicy/register-bypassing-scheme.html fails
+        https://bugs.webkit.org/show_bug.cgi?id=94677
+
+        Unreviewed gardening.
+
+        * platform/qt/Skipped:
+
+2012-08-22  Zoltan Arvai  <zarvai@inf.u-szeged.hu>
+
+        [Qt] Unreviewed gardening.
+
+        * http/tests/inspector/console-resource-errors-expected.txt: Rebaseline after r126168.
+        * platform/qt/Skipped: Skip tests using disabled SHADOW_DOM feature.
+
+2012-08-22  Dominic Cooney   <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Rebaseline tests after http://trac.webkit.org/changeset/126219 .
+
+        These are the same results as platform/mac-lion, which until
+        r126219 were the results of platform/mac. So this is "reverting"
+        r126219 in terms of Chromium expectations.
+
+        * platform/chromium/fast/text/hyphenate-locale-expected.png: Added.
+        * platform/chromium/fast/text/hyphenate-locale-expected.txt: Added.
+        * platform/chromium/fast/text/justify-ideograph-vertical-expected.png: Added.
+        * platform/chromium/fast/text/justify-ideograph-vertical-expected.txt: Added.
+
+2012-08-22  Takashi Sakamoto  <tasak@google.com>
+
+        Dynamically styling ShadowDom content on a node distributed to another shadow insertion point fails.
+        https://bugs.webkit.org/show_bug.cgi?id=92899
+
+        Reviewed by Hajime Morita.
+
+        * fast/dom/shadow/shadowdom-dynamic-styling-expected.txt: Added.
+        * fast/dom/shadow/shadowdom-dynamic-styling.html: Added.
+        * editing/shadow/delete-characters-in-distributed-node-crash.html:
+        Made the layout test robust. This patch causes commit-queue- and the
+        failed test is delete-characters-in-distributed-node-crash.html.
+        However the layout test passes when locally running run_webkit_test
+        i.e. no difference between actual and expected texts. And looking at
+        the commit-queue's report, the actual text has "PASS" message (no
+        crash messages).
+
+2012-08-22  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Rebaseline tests after http://trac.webkit.org/changeset/126187 .
+        These are the same results as platform/mac-lion, which until
+        r126187 were the results of platform/mac. So this is "reverting"
+        r126187 in terms of Chromium expectations.
+        https://bugs.webkit.org/show_bug.cgi?id=94665 was filed
+        to track optimization of these baselines.
+
+        * platform/chromium-mac-snowleopard/fast/writing-mode/text-orientation-basic-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/fast/writing-mode/vertical-align-table-baseline-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/writing-mode/vertical-align-table-baseline-expected.txt: Added.
+        * platform/chromium-mac/fast/writing-mode/text-orientation-basic-expected.txt: Added.
+        * platform/chromium-mac/fast/writing-mode/vertical-align-table-baseline-expected.png:
+        * platform/chromium-mac/fast/writing-mode/vertical-align-table-baseline-expected.txt: Added.
+        * platform/chromium/TestExpectations:
+
+2012-08-22  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Update image expectations for these tests. The 'x' to clear out a
+        text field is slightly brighter on chromium-mac; this is not
+        material to the intent of the tests.
+
+        * platform/chromium-mac/fast/css/text-overflow-input-expected.png:
+        * platform/chromium-mac/fast/forms/box-shadow-override-expected.png:
+
+2012-08-22  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Add failure expectations for a regression in r126257. See
+        https://bugs.webkit.org/show_bug.cgi?id=94675
+
+        * platform/chromium/TestExpectations:
+
+2012-08-21  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: TabbedPane: measure tab widths in batches.
+        https://bugs.webkit.org/show_bug.cgi?id=94484
+
+        Reviewed by Vsevolod Vlasov.
+
+        * inspector/start-end-batch-update-expected.txt: Added.
+        * inspector/start-end-batch-update.html: Added.
+        * inspector/tabbed-pane-tabs-to-show.html:
+
+2012-08-21  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Restore expected results for Chromium after r126219. See
+        https://bugs.webkit.org/show_bug.cgi?id=94672 .
+
+        * platform/chromium/fast/text/emphasis-combined-text-expected.png: Added.
+        * platform/chromium/fast/text/emphasis-combined-text-expected.txt: Added.
+
+2012-08-21  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Rebaseline tests after http://trac.webkit.org/changeset/126183 .
+        These are the same results as platform/mac-lion, which until
+        r126183 where the results of platform/mac. So this is "reverting"
+        r126183 in terms of Chromium expectations.
+        https://bugs.webkit.org/show_bug.cgi?id=94665 was filed
+        to track optimization of these baselines.
+
+        * platform/chromium-mac-snowleopard/editing/selection/vertical-rl-ltr-extend-line-backward-wrap-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/editing/selection/vertical-rl-ltr-extend-line-forward-wrap-expected.txt: Added.
+        * platform/chromium-mac/editing/selection/vertical-rl-ltr-extend-line-backward-wrap-expected.txt: Added.
+        * platform/chromium-mac/editing/selection/vertical-rl-ltr-extend-line-forward-wrap-expected.txt: Added.
+
+2012-08-21  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Fix TestExpectations syntax error WIN WIN7 => WIN.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-21  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Rebaseline tests after http://trac.webkit.org/changeset/126225 .
+        These are the same results as platform/mac-lion, which until
+        r126225 where the results of platform/mac. So this is "reverting"
+        r126225 in terms of Chromium expectations.
+        https://bugs.webkit.org/show_bug.cgi?id=94665 was filed
+        to track optimization of these baselines.
+
+        * platform/chromium-mac-snowleopard/fast/text/international/text-combine-image-test-expected.txt: Added.
+        * platform/chromium-mac/css2.1/t1202-counter-04-b-expected.txt: Added.
+        * platform/chromium-mac/css2.1/t1202-counters-04-b-expected.txt: Added.
+        * platform/chromium-mac/fast/text/fallback-traits-fixup-expected.txt: Added.
+        * platform/chromium-mac/fast/text/international/text-combine-image-test-expected.txt: Added.
+
+2012-08-21  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed gardening. Added file somehow missed by garden-o-matic in last rebaseline.
+
+        * platform/chromium/fast/canvas/canvas-strokeRect-alpha-shadow-expected.txt: Added.
+
+2012-08-21  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Rebaseline tests after http://trac.webkit.org/changeset/126225 .
+        https://bugs.webkit.org/show_bug.cgi?id=94665 filed to track
+        optimization of these baselines.
+
+        * platform/chromium-linux-x86/http/tests/multipart/multipart-replace-non-html-content-expected.txt: Added.
+        * platform/chromium-linux/http/tests/multipart/multipart-replace-non-html-content-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/http/tests/multipart/multipart-replace-non-html-content-expected.txt: Added.
+        * platform/chromium-mac/http/tests/multipart/multipart-replace-non-html-content-expected.txt: Added.
+        * platform/chromium-win-xp/http/tests/multipart/multipart-replace-non-html-content-expected.txt: Added.
+        * platform/chromium-win/http/tests/multipart/multipart-replace-non-html-content-expected.txt: Added.
+
+2012-08-21  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Add test expectations for regression in r126250. See bug 94667.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-21  Sukolsak Sakshuwong  <sukolsak@google.com>
+
+        Implement UndoManager's automatic DOM transactions
+        https://bugs.webkit.org/show_bug.cgi?id=91812
+
+        Reviewed by Ryosuke Niwa.
+
+        * editing/undomanager/automatic-transaction-attribute-expected.txt: Added.
+        * editing/undomanager/automatic-transaction-attribute.html: Added.
+        * editing/undomanager/automatic-transaction-data-expected.txt: Added.
+        * editing/undomanager/automatic-transaction-data.html: Added.
+        * editing/undomanager/automatic-transaction-node-expected.txt: Added.
+        * editing/undomanager/automatic-transaction-node.html: Added.
+
+2012-08-21  Shezan Baig  <sbaig1@bloomberg.net>
+
+        Fix cross-direction stretch for replaced elements in row flexbox
+        https://bugs.webkit.org/show_bug.cgi?id=94237
+
+        Reviewed by Ojan Vafai.
+
+        Fix test cases for images stretching in the cross direction. Also,
+        added test cases for stretching/shrinking iframes, seamless iframes,
+        and also tests for vertically flowing flexboxes.
+
+        * css3/flexbox/flexitem-expected.txt:
+        * css3/flexbox/flexitem.html:
+
+2012-08-21  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed Chromium gardening. Rebaseline tests after http://trac.webkit.org/changeset/126225 .
+        https://bugs.webkit.org/show_bug.cgi?id=94665 filed to track optimization of these baselines.
+
+        * platform/chromium-linux-x86/fast/canvas/canvas-scale-shadowBlur-expected.txt: Added.
+        * platform/chromium-linux-x86/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Added.
+        * platform/chromium-linux-x86/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Added.
+        * platform/chromium-linux-x86/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Added.
+        * platform/chromium-linux/fast/canvas/canvas-scale-shadowBlur-expected.txt: Added.
+        * platform/chromium-linux/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Added.
+        * platform/chromium-linux/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Added.
+        * platform/chromium-linux/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/fast/canvas/canvas-scale-shadowBlur-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Added.
+        * platform/chromium-mac/fast/canvas/canvas-scale-shadowBlur-expected.txt: Added.
+        * platform/chromium-mac/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Added.
+        * platform/chromium-mac/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Added.
+        * platform/chromium-mac/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Added.
+        * platform/chromium-win-xp/fast/canvas/canvas-scale-shadowBlur-expected.txt: Added.
+        * platform/chromium-win-xp/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Added.
+        * platform/chromium-win-xp/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Added.
+        * platform/chromium-win-xp/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Added.
+        * platform/chromium-win/fast/canvas/canvas-scale-shadowBlur-expected.txt: Added.
+        * platform/chromium-win/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Added.
+        * platform/chromium-win/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Added.
+        * platform/chromium-win/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Added.
+        * platform/chromium/platform/chromium/virtual/gpu/fast/canvas/canvas-scale-shadowBlur-expected.txt: Added.
+        * platform/chromium/platform/chromium/virtual/gpu/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Added.
+        * platform/chromium/platform/chromium/virtual/gpu/fast/canvas/canvas-strokeRect-alpha-shadow-expected.txt: Added.
+        * platform/chromium/platform/chromium/virtual/gpu/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Added.
+
+2012-08-21  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: IDBRequest can be GCd during event dispatch
+        https://bugs.webkit.org/show_bug.cgi?id=94235
+
+        Reviewed by Ojan Vafai.
+
+        Release references to IDBRequest and IDBTransaction objects and force GC,
+        to ensure that pending events are still fired. (Doesn't exercise race
+        condition where GC is triggered by script during dispatch itself, though.)
+
+        * storage/indexeddb/pending-activity-expected.txt: Added.
+        * storage/indexeddb/pending-activity-workers-expected.txt: Added.
+        * storage/indexeddb/pending-activity-workers.html: Added.
+        * storage/indexeddb/pending-activity.html: Added.
+        * storage/indexeddb/resources/pending-activity.js: Added.
+        (test):
+        (prepareDatabase.request.onsuccess.request.onsuccess.request.onsuccess):
+        (prepareDatabase.request.onsuccess.request.onsuccess):
+        (prepareDatabase.request.onsuccess):
+        (prepareDatabase):
+        (testTransaction):
+        (transactionOnComplete):
+        (testRequest):
+        (requestOnSuccess):
+        (testCursorRequest):
+        (cursorRequestOnFirstSuccess):
+        (cursorRequestOnSecondSuccess):
+
+2012-08-21  Keishi Hattori  <keishi@webkit.org>
+
+        range-hit-test-with-padding.html fails unless subpixel layout is on
+        https://bugs.webkit.org/show_bug.cgi?id=94585
+
+        Reviewed by Kent Tamura.
+
+        Ports without subpixel layout didn't exactly match the result, because slider thumb width is an odd number and we are dividing it by two.
+
+        * fast/forms/range/range-hit-test-with-padding-expected.txt:
+        * fast/forms/range/range-hit-test-with-padding.html: Adjust the max so it snaps to the step in the middle.
+
+2012-08-21  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Crash in RenderTableSection::setCellLogicalWidths
+        https://bugs.webkit.org/show_bug.cgi?id=94291
+
+        Reviewed by Abhishek Arya.
+
+        * fast/table/crash-split-table-section-no-cell-recalc-expected.txt: Added.
+        * fast/table/crash-split-table-section-no-cell-recalc.html: Added.
+
+2012-08-21  Yoshifumi Inoue  <yosin@chromium.org>
+
+        [Forms] multiple fields time input UI should not have two focus ring.
+        https://bugs.webkit.org/show_bug.cgi?id=94579
+
+        Reviewed by Hajime Morita.
+
+        This patch adds a test case of focus appearance multiple fields time
+        input UI.
+
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.html: Added script to make focus appearance.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic.html: Added script to set focus to input element.
+
+2012-08-21  Adam Barth  <abarth@webkit.org>
+
+        V8 shouldn't have its own way of printing cross-origin error messages
+        https://bugs.webkit.org/show_bug.cgi?id=94641
+
+        Reviewed by Eric Seidel.
+
+        Update these results to reflect the new error messages. These error
+        messages are both more correct and more like JavaScriptCore.
+
+        * platform/chromium/http/tests/security/cross-frame-access-private-browsing-expected.txt: Added.
+            - We don't use the private browsing setting to implement private browsing.
+        * platform/chromium/http/tests/security/cross-frame-access-document-direct-expected.txt:
+        * platform/chromium/http/tests/security/inactive-document-with-empty-security-origin-expected.txt:
+        * platform/chromium/http/tests/security/listener/xss-inactive-closure-expected.txt:
+        * platform/chromium/http/tests/security/xss-eval-expected.txt:
+            - Previously, we were incorrectly using the first script rather
+              than the active script when printing the error message.
+        * platform/chromium/http/tests/security/listener/xss-JSTargetNode-onclick-addEventListener-expected.txt: Removed.
+        * platform/chromium/http/tests/security/listener/xss-JSTargetNode-onclick-shortcut-expected.txt: Removed.
+        * platform/chromium/http/tests/security/listener/xss-XMLHttpRequest-addEventListener-expected.txt: Removed.
+        * platform/chromium/http/tests/security/listener/xss-XMLHttpRequest-shortcut-expected.txt: Removed.
+        * platform/chromium/http/tests/security/listener/xss-window-onclick-addEventListener-expected.txt: Removed.
+        * platform/chromium/http/tests/security/listener/xss-window-onclick-shortcut-expected.txt: Removed.
+            - These results are now identical to JSC.
+
+2012-08-21  Shinya Kawanaka  <shinyak@chromium.org>
+
+        A shadow element in ShadowDOM of a button element does not work.
+        https://bugs.webkit.org/show_bug.cgi?id=91486
+
+        Reviewed by Dimitri Glazkov.
+
+        * fast/dom/shadow/shadowdom-for-button-expected.html: Added.
+        * fast/dom/shadow/shadowdom-for-button.html: Added.
+        * fast/dom/shadow/shadowdom-for-form-associated-element-useragent-expected.txt:
+        * fast/dom/shadow/shadowdom-for-form-associated-element-useragent.html: a button element
+        does not have user agent shadow dom anymore.
+
+2012-08-21  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed Chromium gardening. Suppress crashes of new test.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-21  Sukolsak Sakshuwong  <sukolsak@google.com>
+
+        Remove UndoManager's undoscope content attribute
+        https://bugs.webkit.org/show_bug.cgi?id=94637
+
+        Reviewed by Ryosuke Niwa.
+
+        * editing/undomanager/undomanager-reenter-expected.txt: Copied from LayoutTests/editing/undomanager/undomanager-use-after-free-expected.txt.
+        * editing/undomanager/undomanager-reenter.html: Copied from LayoutTests/editing/undomanager/undomanager-use-after-free.html.
+        * editing/undomanager/undomanager-use-after-free-expected.txt: Removed.
+        * editing/undomanager/undomanager-use-after-free.html: Removed.
+        * editing/undomanager/undoscope-attribute-expected.txt: Removed.
+        * editing/undomanager/undoscope-attribute.html: Removed.
+        * editing/undomanager/undoscopehost-use-after-free.html:
+
+2012-08-21  Mark Lam  <mark.lam@apple.com>
+
+        Skipping http/tests/inspector/console-resource-errors.html.
+        https://bugs.webkit.org/show_bug.cgi?id=94646.
+
+        Reviewed by Brady Eidson.
+
+        Need to revert after https://bugs.webkit.org/show_bug.cgi?id=94640 is fixed.
+
+        * platform/mac/Skipped:
+
+2012-08-21  Tony Chang  <tony@chromium.org>
+
+        Force XML comments to maintain whitespace
+        https://bugs.webkit.org/show_bug.cgi?id=94620
+
+        Reviewed by Pavel Feldman.
+
+        Update comments to include whitespace formatting.
+
+        * http/tests/xmlviewer/dumpAsText/xlink-expected.txt:
+        * http/tests/xmlviewer/dumpAsText/xmlviewer-expected.txt:
+        * http/tests/xmlviewer/dumpAsText/xul-expected.txt:
+        * platform/chromium/http/tests/xmlviewer/dumpAsText/mathml-expected.txt:
+
+2012-08-21  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: Fire error at request when abort is called in upgradeneeded
+        https://bugs.webkit.org/show_bug.cgi?id=94402
+
+        Reviewed by Tony Chang.
+
+        * storage/indexeddb/intversion-abort-in-initial-upgradeneeded-expected.txt:
+        Only remaining error in this test is versions not being reset in
+        memory.
+
+        * storage/indexeddb/resources/intversion-abort-in-initial-upgradeneeded.js:
+        (deleteSuccess):
+        (upgradeNeeded):
+        (onAbort):
+        (onError):
+
+2012-08-21  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r126233.
+        http://trac.webkit.org/changeset/126233
+        https://bugs.webkit.org/show_bug.cgi?id=94656
+
+        Broke Chromium Mac build (Requested by dominicc on #webkit).
+
+        * media/track/captions-webvtt/captions-snap-to-lines-set.vtt: Removed.
+        * media/track/track-cue-rendering-horizontal.html: Removed.
+        * media/track/track-cue-rendering-snap-to-lines-not-set-expected.txt:
+        * media/track/track-cue-rendering-vertical.html: Removed.
+        * media/video-test.js:
+        * platform/chromium-linux/media/track/track-cue-rendering-horizontal-expected.png: Removed.
+        * platform/chromium-linux/media/track/track-cue-rendering-horizontal-expected.txt: Removed.
+        * platform/chromium-linux/media/track/track-cue-rendering-vertical-expected.png: Removed.
+        * platform/chromium-linux/media/track/track-cue-rendering-vertical-expected.txt: Removed.
+        * platform/chromium/TestExpectations:
+        * platform/mac/media/track/track-cue-rendering-horizontal-expected.png: Removed.
+        * platform/mac/media/track/track-cue-rendering-horizontal-expected.txt: Removed.
+        * platform/mac/media/track/track-cue-rendering-vertical-expected.png: Removed.
+        * platform/mac/media/track/track-cue-rendering-vertical-expected.txt: Removed.
+
+2012-08-21  Victor Carbune  <victor@rosedu.org>
+
+        Display a TextTrackCue when snap-to-lines flag is set
+        https://bugs.webkit.org/show_bug.cgi?id=79751
+
+        Reviewed by Tony Chang.
+
+        Test cases covering snap-to-lines horizontal and vertical positioning of cues.
+
+        * media/track/captions-webvtt/captions-snap-to-lines-set.vtt: Added.
+        * media/track/track-cue-rendering-horizontal.html: Added.
+        * media/track/track-cue-rendering-snap-to-lines-not-set-expected.txt: Updated.
+        * media/track/track-cue-rendering-vertical.html: Added.
+        * media/video-test.js: Updated to support pixel test dumps.
+        * platform/chromium-linux/media/track/track-cue-rendering-horizontal-expected.png: Added.
+        * platform/chromium-linux/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/chromium-linux/media/track/track-cue-rendering-vertical-expected.png: Added.
+        * platform/chromium-linux/media/track/track-cue-rendering-vertical-expected.txt: Added.
+        * platform/chromium/TestExpectations: Marking these temporarily as IMAGE fail, as they will
+        anyway require new baselines.
+        * platform/mac/media/track/track-cue-rendering-horizontal-expected.png: Added.
+        * platform/mac/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/mac/media/track/track-cue-rendering-vertical-expected.png: Added.
+        * platform/mac/media/track/track-cue-rendering-vertical-expected.txt: Added.
+
+2012-08-21  Zan Dobersek  <zandobersek@gmail.com>
+
+        [GTK] fast/xmlhttprequest/xmlhttprequest-nonexistent-file.html is failing
+        https://bugs.webkit.org/show_bug.cgi?id=94617
+
+        Reviewed by Martin Robinson.
+
+        Remove failure expectation for fast/xmlhttprequest/xmlhttprequest-nonexistent-file.html
+        test as it now passes.
+
+        * platform/gtk/TestExpectations:
+
+2012-08-21  Brady Eidson  <beidson@apple.com>
+
+        Rebaseline various tests for Mountain Lion that differ from the generic results.
+
+        Unreviewed (Bot gardening).
+
+        * platform/mac-lion/fast/css/pseudo-any-expected.txt: Added.
+        * platform/mac-lion/http/tests/multipart/multipart-replace-non-html-content-expected.txt: Added.
+        * platform/mac-lion/platform/mac/fast/loader/file-url-mimetypes-2-expected.txt: Added.
+        * platform/mac-lion/sputnik/Unicode/Unicode_320/S7.6_A2.2_T2-expected.txt: Added.
+        * platform/mac-lion/sputnik/Unicode/Unicode_320/S7.6_A5.2_T8-expected.txt: Added.
+        * platform/mac/fast/css/pseudo-any-expected.txt: Added.
+        * platform/mac/http/tests/multipart/multipart-replace-non-html-content-expected.txt: Added.
+        * platform/mac/platform/mac/fast/loader/file-url-mimetypes-2-expected.txt: Added.
+        * platform/mac/sputnik/Unicode/Unicode_320/S7.6_A2.2_T2-expected.txt: Added.
+        * platform/mac/sputnik/Unicode/Unicode_320/S7.6_A5.2_T8-expected.txt: Added.
+
+2012-08-21  Bruno de Oliveira Abinader  <bruno.abinader@basyskom.com>
+
+        [css3-text] Add repaint tests for -webkit-text-decoration-line
+        https://bugs.webkit.org/show_bug.cgi?id=94480
+
+        Reviewed by Julien Chaffraix.
+
+        Changeset r125205 introduced new CSS3 property "-webkit-text-decoration-line".
+        This patch adds repaint layout tests for this property.
+
+        * fast/css3-text-decoration/repaint/repaint-text-decoration-line-expected.png: Added.
+        * fast/css3-text-decoration/repaint/repaint-text-decoration-line-expected.txt: Added.
+        * fast/css3-text-decoration/repaint/repaint-text-decoration-line.html: Added.
+        Expected results generated from Chromium Linux build.
+
+2012-08-21  Levi Weintraub  <leviw@chromium.org>
+
+        Unreviewed gardening. Further rebaselining following r126110.
+
+        * platform/chromium-linux-x86/editing/selection: Added.
+        * platform/chromium-linux-x86/editing/selection/select-from-textfield-outwards-expected.txt: Added.
+        * platform/chromium-linux/editing/selection/select-from-textfield-outwards-expected.txt:
+        * platform/chromium-linux/fast/forms/input-text-self-emptying-click-expected.png:
+        * platform/chromium-linux/tables/mozilla/bugs/bug4527-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/input-text-self-emptying-click-expected.png:
+        * platform/chromium-win-xp/editing/selection/select-from-textfield-outwards-expected.txt: Added.
+        * platform/chromium-win/editing/selection/select-from-textfield-outwards-expected.txt:
+        * platform/chromium-win/fast/forms/input-text-drag-down-expected.txt:
+        * platform/chromium-win/fast/forms/input-text-self-emptying-click-expected.png:
+
+2012-08-21  Filip Pizlo  <fpizlo@apple.com>
+
+        A patchable GetById right after a watchpoint should have the appropriate nop padding
+        https://bugs.webkit.org/show_bug.cgi?id=94635
+
+        Reviewed by Mark Hahnenberg.
+
+        * fast/js/dfg-patchable-get-by-id-after-watchpoint-expected.txt: Added.
+        * fast/js/dfg-patchable-get-by-id-after-watchpoint.html: Added.
+        * fast/js/script-tests/dfg-patchable-get-by-id-after-watchpoint.js: Added.
+        (foo):
+        (O):
+        (O.prototype.f):
+        (P1):
+        (P2):
+
+2012-08-21  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        WTF Threading leaks kernel objects on platforms that use pthreads
+        https://bugs.webkit.org/show_bug.cgi?id=94636
+
+        Reviewed by Geoffrey Garen.
+
+        Added a test that creates a bunch of workers that immediately return. This should stress 
+        the new WTF threading code on platforms that use pthreads, so any major regressions in correctness 
+        will probably cause this test to fail since it creates both joinable and detached threads.
+
+        * fast/js/create-lots-of-workers-expected.txt: Added.
+        * fast/js/create-lots-of-workers.html: Added.
+        * fast/js/resources/empty-worker.js: Added.
+
+2012-08-21  Florin Malita  <fmalita@chromium.org>
+
+        ASSERT triggered in SVGTRefTargetEventListener::handleEvent()
+        https://bugs.webkit.org/show_bug.cgi?id=94487
+
+        Reviewed by Nikolas Zimmermann.
+
+        * svg/custom/tref-stale-listener-crash-expected.txt: Added.
+        * svg/custom/tref-stale-listener-crash.html: Added.
+
+2012-08-21  Brady Eidson  <beidson@apple.com>
+
+        Rebaseline various tests for Mountain Lion where Mountain Lion specific results override current Lion specific results,
+        or in some cases match the generic results.
+
+        Unreviewed (Bot gardening).
+
+        * platform/mac-lion/canvas/philip/tests/2d.strokeRect.zero.5-expected.txt: Renamed from LayoutTests/platform/mac/canvas/philip/tests/2d.strokeRect.zero.5-expected.txt.
+        * platform/mac-lion/css2.1/t1202-counter-04-b-expected.png: Copied from LayoutTests/platform/mac/css2.1/t1202-counter-04-b-expected.png.
+        * platform/mac-lion/css2.1/t1202-counter-04-b-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t1202-counter-04-b-expected.txt.
+        * platform/mac-lion/css2.1/t1202-counters-04-b-expected.png: Copied from LayoutTests/platform/mac/css2.1/t1202-counters-04-b-expected.png.
+        * platform/mac-lion/css2.1/t1202-counters-04-b-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t1202-counters-04-b-expected.txt.
+        * platform/mac-lion/fast/text/emphasis-combined-text-expected.png: Renamed from LayoutTests/platform/mac/fast/text/emphasis-combined-text-expected.png.
+        * platform/mac-lion/fast/text/emphasis-combined-text-expected.txt: Copied from LayoutTests/platform/mac/fast/text/emphasis-combined-text-expected.txt.
+        * platform/mac-lion/fast/text/fallback-traits-fixup-expected.png: Copied from LayoutTests/platform/mac/fast/text/fallback-traits-fixup-expected.png.
+        * platform/mac-lion/fast/text/fallback-traits-fixup-expected.txt: Copied from LayoutTests/platform/mac/fast/text/fallback-traits-fixup-expected.txt.
+        * platform/mac-lion/fast/text/hyphenate-locale-expected.png: Renamed from LayoutTests/platform/mac/fast/text/hyphenate-locale-expected.png.
+        * platform/mac-lion/fast/text/hyphenate-locale-expected.txt: Copied from LayoutTests/platform/mac/fast/text/hyphenate-locale-expected.txt.
+        * platform/mac-lion/fast/text/international/hindi-spacing-expected.png: Copied from LayoutTests/platform/mac/fast/text/international/hindi-spacing-expected.png.
+        * platform/mac-lion/fast/text/international/hindi-spacing-expected.txt: Copied from LayoutTests/platform/mac/fast/text/international/hindi-spacing-expected.txt.
+        * platform/mac-lion/fast/text/international/text-combine-image-test-expected.png: Renamed from LayoutTests/platform/mac/fast/text/international/text-combine-image-test-expected.png.
+        * platform/mac-lion/fast/text/international/text-combine-image-test-expected.txt: Copied from LayoutTests/platform/mac/fast/text/international/text-combine-image-test-expected.txt.
+        * platform/mac-lion/fast/text/international/vertical-text-glyph-test-expected.png: Renamed from LayoutTests/platform/mac/fast/text/international/vertical-text-glyph-test-expected.png.
+        * platform/mac-lion/fast/text/international/vertical-text-glyph-test-expected.txt: Copied from LayoutTests/platform/mac/fast/text/international/vertical-text-glyph-test-expected.txt.
+        * platform/mac-lion/fast/text/justify-ideograph-vertical-expected.png: Renamed from LayoutTests/platform/mac/fast/text/justify-ideograph-vertical-expected.png.
+        * platform/mac-lion/fast/text/justify-ideograph-vertical-expected.txt: Copied from LayoutTests/platform/mac/fast/text/justify-ideograph-vertical-expected.txt.
+        * platform/mac-lion/http/tests/xmlhttprequest/web-apps/012-expected.txt: Renamed from LayoutTests/platform/mac/http/tests/xmlhttprequest/web-apps/012-expected.txt.
+        * platform/mac-lion/http/tests/xmlhttprequest/web-apps/013-expected.txt: Renamed from LayoutTests/platform/mac/http/tests/xmlhttprequest/web-apps/013-expected.txt.
+        * platform/mac-lion/media/audio-repaint-expected.png: Renamed from LayoutTests/platform/mac/media/audio-repaint-expected.png.
+        * platform/mac-lion/media/audio-repaint-expected.txt: Added.
+        * platform/mac-lion/media/video-size-intrinsic-scale-expected.txt: Renamed from LayoutTests/platform/mac/media/video-size-intrinsic-scale-expected.txt.
+        * platform/mac-lion/platform/mac/fast/text/vertical-surrogate-pair-expected.png: Renamed from LayoutTests/platform/mac/platform/mac/fast/text/vertical-surrogate-pair-expected.png.
+        * platform/mac-lion/platform/mac/fast/text/vertical-surrogate-pair-expected.txt: Copied from LayoutTests/platform/mac/platform/mac/fast/text/vertical-surrogate-pair-expected.txt.
+        * platform/mac/css2.1/t1202-counter-04-b-expected.png:
+        * platform/mac/css2.1/t1202-counter-04-b-expected.txt:
+        * platform/mac/css2.1/t1202-counters-04-b-expected.png:
+        * platform/mac/css2.1/t1202-counters-04-b-expected.txt:
+        * platform/mac/fast/text/emphasis-combined-text-expected.txt:
+        * platform/mac/fast/text/fallback-traits-fixup-expected.png:
+        * platform/mac/fast/text/fallback-traits-fixup-expected.txt:
+        * platform/mac/fast/text/hyphenate-locale-expected.txt:
+        * platform/mac/fast/text/international/hindi-spacing-expected.png:
+        * platform/mac/fast/text/international/hindi-spacing-expected.txt:
+        * platform/mac/fast/text/international/text-combine-image-test-expected.txt:
+        * platform/mac/fast/text/international/vertical-text-glyph-test-expected.txt:
+        * platform/mac/fast/text/justify-ideograph-vertical-expected.txt:
+        * platform/mac/platform/mac/fast/text/vertical-surrogate-pair-expected.txt:
+
+2012-08-21  Brady Eidson  <beidson@apple.com>
+
+        Rebaseline failing fast/canvas tests for Mountain Lion
+
+        Unreviewed (Bot gardening).
+
+        * platform/mac-lion/fast/canvas/canvas-scale-shadowBlur-expected.txt: Added.
+        * platform/mac-lion/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Added.
+        * platform/mac-lion/fast/canvas/canvas-strokePath-alpha-shadow-expected.txt: Added.
+        * platform/mac-lion/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Added.
+        * platform/mac-lion/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Added.
+        * platform/mac/fast/canvas/canvas-scale-shadowBlur-expected.txt: Added.
+        * platform/mac/fast/canvas/canvas-scale-strokePath-shadow-expected.txt: Added.
+        * platform/mac/fast/canvas/canvas-strokePath-gradient-shadow-expected.txt: Added.
+        * platform/mac/fast/canvas/canvas-strokeRect-alpha-shadow-expected.txt: Added.
+        * platform/mac/fast/canvas/canvas-strokeRect-gradient-shadow-expected.txt: Added.
+
+2012-08-21  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [EFL] Enable CSS Text Decoration by default
+        https://bugs.webkit.org/show_bug.cgi?id=94483
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Remove test that will now pass from the skip list.
+
+        * platform/efl/TestExpectations:
+
+2012-08-21  Taiju Tsuiki  <tzik@chromium.org>
+
+        Web Inspector: Completion events of InspectorFileSystemAgent should be fired asynchronously.
+        https://bugs.webkit.org/show_bug.cgi?id=93933
+
+        Reviewed by Yury Semikhatsky.
+
+        InspectorFileSystemAgent fires completion event too early in error case. It should wait
+        until JS code is ready.
+
+        * http/tests/inspector/filesystem/request-directory-content-expected.txt:
+        * http/tests/inspector/filesystem/request-directory-content.html: Add more error case test.
+        * http/tests/inspector/filesystem/request-file-content-expected.txt:
+        * http/tests/inspector/filesystem/request-file-content.html: Add more error case test.
+        * http/tests/inspector/filesystem/request-filesystem-root-expected.txt:
+        * http/tests/inspector/filesystem/request-metadata-expected.txt:
+        * http/tests/inspector/filesystem/request-metadata.html: Add more error case test.
+
+2012-08-21  Mike West  <mkwst@chromium.org>
+
+        Blocking a resource via Content Security Policy should trigger an Error event.
+        https://bugs.webkit.org/show_bug.cgi?id=89440
+
+        Reviewed by Jochen Eisinger.
+
+        * http/tests/security/contentSecurityPolicy/image-blocked-expected.txt:
+        * http/tests/security/contentSecurityPolicy/image-blocked.html:
+        * http/tests/security/contentSecurityPolicy/register-bypassing-scheme-expected.txt:
+        * http/tests/security/contentSecurityPolicy/register-bypassing-scheme.html:
+            Adjusting existing tests to use the error event, as opposed to
+            hacking around the fact that it wasn't triggered.
+        * platform/chromium/permissionclient/image-permissions-expected.txt:
+        * platform/chromium/permissionclient/image-permissions.html:
+            Error events are now also generated for images blocked by Chromium's
+            content settings.
+
+2012-08-21  Sudarsana Nagineni  <sudarsana.nagineni@linux.intel.com>
+
+        canvas/philip/tests/2d.fillStyle.parse.invalid.rgba-6.html fails
+        https://bugs.webkit.org/show_bug.cgi?id=50797
+
+        Reviewed by Andreas Kling.
+
+        Unskipped tests that are now passing after this fix and removed
+        wrong expectations.
+
+        * platform/chromium/TestExpectations:
+        * platform/chromium/canvas/philip/tests/2d.fillStyle.parse.invalid.rgba-6-expected.txt: Removed.
+        * platform/efl/Skipped:
+        * platform/gtk/TestExpectations:
+        * platform/mac/canvas/philip/tests/2d.fillStyle.parse.invalid.rgba-6-expected.txt: Removed.
+        * platform/qt/Skipped:
+
+2012-08-21  Levi Weintraub  <leviw@chromium.org>
+
+        Unreviewed gardening. Rebaselines following r126110.
+
+        * platform/chromium-linux/editing/selection/select-from-textfield-outwards-expected.png:
+        * platform/chromium-linux/fast/forms/input-text-drag-down-expected.png:
+        * platform/chromium-linux/fast/forms/input-text-self-emptying-click-expected.png:
+        * platform/chromium-linux/fast/forms/placeholder-position-expected.png:
+        * platform/chromium-linux/tables/mozilla/bugs/bug4527-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/input-text-self-emptying-click-expected.png:
+        * platform/chromium-mac/editing/input/caret-at-the-edge-of-input-expected.png:
+        * platform/chromium-mac/editing/inserting/before-after-input-element-expected.png:
+        * platform/chromium-mac/editing/pasteboard/4806874-expected.png:
+        * platform/chromium-mac/editing/pasteboard/drop-text-without-selection-expected.png:
+        * platform/chromium-mac/editing/pasteboard/input-field-1-expected.png:
+        * platform/chromium-mac/editing/selection/3690703-2-expected.png:
+        * platform/chromium-mac/editing/selection/3690703-expected.png:
+        * platform/chromium-mac/editing/selection/3690719-expected.png:
+        * platform/chromium-mac/editing/selection/4895428-3-expected.png:
+        * platform/chromium-mac/editing/selection/4975120-expected.png:
+        * platform/chromium-mac/editing/selection/drag-select-1-expected.png:
+        * platform/chromium-mac/editing/selection/select-across-readonly-input-1-expected.png:
+        * platform/chromium-mac/editing/selection/select-across-readonly-input-2-expected.png:
+        * platform/chromium-mac/editing/selection/select-across-readonly-input-3-expected.png:
+        * platform/chromium-mac/editing/selection/select-across-readonly-input-4-expected.png:
+        * platform/chromium-mac/editing/selection/select-across-readonly-input-5-expected.png:
+        * platform/chromium-mac/editing/selection/select-from-textfield-outwards-expected.png:
+        * platform/chromium-mac/fast/block/margin-collapse/103-expected.png:
+        * platform/chromium-mac/fast/css/input-search-padding-expected.png:
+        * platform/chromium-mac/fast/css/line-height-determined-by-primary-font-expected.png:
+        * platform/chromium-mac/fast/css/line-height-expected.png:
+        * platform/chromium-mac/fast/css/square-button-appearance-expected.png:
+        * platform/chromium-mac/fast/css/text-overflow-input-expected.png:
+        * platform/chromium-mac/fast/dom/isindex-001-expected.png:
+        * platform/chromium-mac/fast/dom/isindex-002-expected.png:
+        * platform/chromium-mac/fast/events/autoscroll-expected.png:
+        * platform/chromium-mac/fast/events/context-no-deselect-expected.png:
+        * platform/chromium-mac/fast/forms/basic-buttons-expected.png:
+        * platform/chromium-mac/fast/forms/basic-inputs-expected.png:
+        * platform/chromium-mac/fast/forms/box-shadow-override-expected.png:
+        * platform/chromium-mac/fast/forms/button-sizes-expected.png:
+        * platform/chromium-mac/fast/forms/color/input-appearance-color-expected.png:
+        * platform/chromium-mac/fast/forms/date/date-appearance-expected.png:
+        * platform/chromium-mac/fast/forms/encoding-test-expected.png:
+        * platform/chromium-mac/fast/forms/fieldset-align-expected.png:
+        * platform/chromium-mac/fast/forms/floating-textfield-relayout-expected.png:
+        * platform/chromium-mac/fast/forms/form-element-geometry-expected.png:
+        * platform/chromium-mac/fast/forms/input-align-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-default-bkcolor-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-disabled-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-focus-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-height-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-preventDefault-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-readonly-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-selection-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-visibility-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-width-expected.png:
+        * platform/chromium-mac/fast/forms/input-baseline-expected.png:
+        * platform/chromium-mac/fast/forms/input-disabled-color-expected.png:
+        * platform/chromium-mac/fast/forms/input-double-click-selection-gap-bug-expected.png:
+        * platform/chromium-mac/fast/forms/input-field-text-truncated-expected.png:
+        * platform/chromium-mac/fast/forms/input-placeholder-paint-order-expected.png:
+        * platform/chromium-mac/fast/forms/input-placeholder-visibility-1-expected.png:
+        * platform/chromium-mac/fast/forms/input-placeholder-visibility-3-expected.png:
+        * platform/chromium-mac/fast/forms/input-readonly-autoscroll-expected.png:
+        * platform/chromium-mac/fast/forms/input-readonly-dimmed-expected.png:
+        * platform/chromium-mac/fast/forms/input-readonly-empty-expected.png:
+        * platform/chromium-mac/fast/forms/input-spaces-expected.png:
+        * platform/chromium-mac/fast/forms/input-table-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-click-inside-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-click-outside-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-double-click-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-drag-down-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-option-delete-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-scroll-left-on-blur-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-self-emptying-click-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-word-wrap-expected.png:
+        * platform/chromium-mac/fast/forms/input-type-text-min-width-expected.png:
+        * platform/chromium-mac/fast/forms/input-value-expected.png:
+        * platform/chromium-mac/fast/forms/input-width-expected.png:
+        * platform/chromium-mac/fast/forms/minWidthPercent-expected.png:
+        * platform/chromium-mac/fast/forms/number/number-appearance-rtl-expected.png:
+        * platform/chromium-mac/fast/forms/number/number-appearance-spinbutton-disabled-readonly-expected.png:
+        * platform/chromium-mac/fast/forms/number/number-appearance-spinbutton-layer-expected.png:
+        * platform/chromium-mac/fast/forms/placeholder-position-expected.png:
+        * platform/chromium-mac/fast/forms/placeholder-pseudo-style-expected.png:
+        * platform/chromium-mac/fast/forms/plaintext-mode-2-expected.png:
+        * platform/chromium-mac/fast/forms/tabbing-input-iframe-expected.png:
+        * platform/chromium-mac/fast/forms/text-style-color-expected.png:
+        * platform/chromium-mac/fast/forms/textfield-focus-ring-expected.png:
+        * platform/chromium-mac/fast/forms/textfield-overflow-expected.png:
+        * platform/chromium-mac/fast/forms/validation-message-appearance-expected.png:
+        * platform/chromium-mac/fast/forms/visual-hebrew-text-field-expected.png:
+        * platform/chromium-mac/fast/frames/take-focus-from-iframe-expected.png:
+        * platform/chromium-mac/fast/html/details-no-summary4-expected.png:
+        * platform/chromium-mac/fast/html/details-open-javascript-expected.png:
+        * platform/chromium-mac/fast/html/details-open2-expected.png:
+        * platform/chromium-mac/fast/html/details-open4-expected.png:
+        * platform/chromium-mac/fast/lists/dynamic-marker-crash-expected.png:
+        * platform/chromium-mac/fast/repaint/renderer-destruction-by-invalidateSelection-crash-expected.png:
+        * platform/chromium-mac/fast/repaint/subtree-root-skipped-expected.png:
+        * platform/chromium-mac/fast/replaced/replaced-breaking-expected.png:
+        * platform/chromium-mac/fast/replaced/replaced-breaking-mixture-expected.png:
+        * platform/chromium-mac/fast/replaced/width100percent-textfield-expected.png:
+        * platform/chromium-mac/fast/speech/input-appearance-numberandspeech-expected.png:
+        * platform/chromium-mac/fast/speech/input-appearance-speechbutton-expected.png:
+        * platform/chromium-mac/fast/speech/speech-bidi-rendering-expected.png:
+        * platform/chromium-mac/fast/table/003-expected.png:
+        * platform/chromium-mac/fast/table/colspanMinWidth-expected.png:
+        * platform/chromium-mac/fast/table/spanOverlapRepaint-expected.png:
+        * platform/chromium-mac/fast/table/text-field-baseline-expected.png:
+        * platform/chromium-mac/fast/text/textIteratorNilRenderer-expected.png:
+        * platform/chromium-mac/fast/transforms/transformed-focused-text-input-expected.png:
+        * platform/chromium-mac/plugins/mouse-click-plugin-clears-selection-expected.png:
+        * platform/chromium-mac/svg/custom/inline-svg-in-xhtml-expected.png:
+        * platform/chromium-mac/svg/hixie/mixed/003-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/45621-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug1188-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug12384-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug18359-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug24200-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug2479-2-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug2479-3-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug28928-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug4382-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug4527-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug46368-1-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug46368-2-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug51037-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug55545-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug59354-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug7342-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug96334-expected.png:
+        * platform/chromium-mac/tables/mozilla/dom/tableDom-expected.png:
+        * platform/chromium-mac/tables/mozilla/other/move_row-expected.png:
+        * platform/chromium-mac/tables/mozilla_expected_failures/bugs/bug92647-1-expected.png:
+        * platform/chromium-win/editing/selection/select-from-textfield-outwards-expected.png:
+        * platform/chromium-win/fast/forms/input-text-drag-down-expected.png:
+        * platform/chromium-win/fast/forms/input-text-self-emptying-click-expected.png:
+        * platform/chromium/TestExpectations:
+        * platform/qt-4.8/TestExpectations:
+        * platform/qt-mac/TestExpectations:
+
+2012-08-21  Brady Eidson  <beidson@apple.com>
+
+        Rebaseline failing fast/writing-mode tests for Mountain Lion
+
+        Unreviewed (Bot gardening).
+
+        * platform/mac-lion/fast/writing-mode/japanese-ruby-vertical-lr-expected.png: Copied from LayoutTests/platform/mac/fast/writing-mode/japanese-ruby-vertical-lr-expected.png.
+        * platform/mac-lion/fast/writing-mode/japanese-ruby-vertical-lr-expected.txt: Copied from LayoutTests/platform/mac/fast/writing-mode/japanese-ruby-vertical-lr-expected.txt.
+        * platform/mac-lion/fast/writing-mode/japanese-ruby-vertical-rl-expected.png: Copied from LayoutTests/platform/mac/fast/writing-mode/japanese-ruby-vertical-rl-expected.png.
+        * platform/mac-lion/fast/writing-mode/japanese-ruby-vertical-rl-expected.txt: Copied from LayoutTests/platform/mac/fast/writing-mode/japanese-ruby-vertical-rl-expected.txt.
+        * platform/mac-lion/fast/writing-mode/text-orientation-basic-expected.png: Copied from LayoutTests/platform/mac/fast/writing-mode/text-orientation-basic-expected.png.
+        * platform/mac-lion/fast/writing-mode/text-orientation-basic-expected.txt: Copied from LayoutTests/platform/mac/fast/writing-mode/text-orientation-basic-expected.txt.
+        * platform/mac-lion/fast/writing-mode/vertical-align-table-baseline-expected.png: Copied from LayoutTests/platform/mac/fast/writing-mode/vertical-align-table-baseline-expected.png.
+        * platform/mac-lion/fast/writing-mode/vertical-align-table-baseline-expected.txt: Copied from LayoutTests/platform/mac/fast/writing-mode/vertical-align-table-baseline-expected.txt.
+        * platform/mac-lion/fast/writing-mode/vertical-baseline-alignment-expected.png: Copied from LayoutTests/platform/mac/fast/writing-mode/vertical-baseline-alignment-expected.png.
+        * platform/mac-lion/fast/writing-mode/vertical-baseline-alignment-expected.txt: Copied from LayoutTests/platform/mac/fast/writing-mode/vertical-baseline-alignment-expected.txt.
+        * platform/mac-lion/fast/writing-mode/vertical-font-fallback-expected.png: Copied from LayoutTests/platform/mac/fast/writing-mode/vertical-font-fallback-expected.png.
+        * platform/mac-lion/fast/writing-mode/vertical-font-fallback-expected.txt: Copied from LayoutTests/platform/mac/fast/writing-mode/vertical-font-fallback-expected.txt.
+        * platform/mac/fast/writing-mode/japanese-ruby-vertical-lr-expected.png:
+        * platform/mac/fast/writing-mode/japanese-ruby-vertical-lr-expected.txt:
+        * platform/mac/fast/writing-mode/japanese-ruby-vertical-rl-expected.png:
+        * platform/mac/fast/writing-mode/japanese-ruby-vertical-rl-expected.txt:
+        * platform/mac/fast/writing-mode/text-orientation-basic-expected.png:
+        * platform/mac/fast/writing-mode/text-orientation-basic-expected.txt:
+        * platform/mac/fast/writing-mode/vertical-align-table-baseline-expected.png:
+        * platform/mac/fast/writing-mode/vertical-align-table-baseline-expected.txt:
+        * platform/mac/fast/writing-mode/vertical-baseline-alignment-expected.png:
+        * platform/mac/fast/writing-mode/vertical-baseline-alignment-expected.txt:
+        * platform/mac/fast/writing-mode/vertical-font-fallback-expected.png:
+        * platform/mac/fast/writing-mode/vertical-font-fallback-expected.txt:
+
+2012-08-21  Brady Eidson  <beidson@apple.com>
+
+        Rebaseline failing editing/selection tests for mountain lion
+        https://bugs.webkit.org/show_bug.cgi?id=94629
+
+        Reviewed by Simon Fraser.
+
+        Move current Mac-specific results to platform/mac-lion and add Mountain Lion results to platform/mac
+
+        * platform/mac-lion/editing/selection/vertical-lr-ltr-extend-line-backward-br-expected.png: Renamed from LayoutTests/platform/mac/editing/selection/vertical-lr-ltr-extend-line-backward-br-expected.png.
+        * platform/mac-lion/editing/selection/vertical-lr-ltr-extend-line-backward-br-expected.txt: Copied from LayoutTests/platform/mac/editing/selection/vertical-lr-ltr-extend-line-backward-br-expected.txt.
+        * platform/mac-lion/editing/selection/vertical-lr-ltr-extend-line-forward-br-expected.png: Renamed from LayoutTests/platform/mac/editing/selection/vertical-lr-ltr-extend-line-forward-br-expected.png.
+        * platform/mac-lion/editing/selection/vertical-lr-ltr-extend-line-forward-br-expected.txt: Copied from LayoutTests/platform/mac/editing/selection/vertical-lr-ltr-extend-line-forward-br-expected.txt.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-backward-br-expected.png: Renamed from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-backward-br-expected.png.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-backward-br-expected.txt: Copied from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-backward-br-expected.txt.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-backward-p-expected.png: Renamed from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-backward-p-expected.png.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-backward-p-expected.txt: Copied from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-backward-p-expected.txt.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-backward-wrap-expected.png: Renamed from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-backward-wrap-expected.png.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-backward-wrap-expected.txt: Copied from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-backward-wrap-expected.txt.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.png: Renamed from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.png.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.txt: Copied from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.txt.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-forward-p-expected.png: Renamed from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-forward-p-expected.png.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-forward-p-expected.txt: Copied from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-forward-p-expected.txt.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-forward-wrap-expected.png: Renamed from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-forward-wrap-expected.png.
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-forward-wrap-expected.txt: Copied from LayoutTests/platform/mac/editing/selection/vertical-rl-ltr-extend-line-forward-wrap-expected.txt.
+        * platform/mac/editing/selection/vertical-lr-ltr-extend-line-backward-br-expected.txt:
+        * platform/mac/editing/selection/vertical-lr-ltr-extend-line-forward-br-expected.txt:
+        * platform/mac/editing/selection/vertical-rl-ltr-extend-line-backward-br-expected.txt:
+        * platform/mac/editing/selection/vertical-rl-ltr-extend-line-backward-p-expected.txt:
+        * platform/mac/editing/selection/vertical-rl-ltr-extend-line-backward-wrap-expected.txt:
+        * platform/mac/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.txt:
+        * platform/mac/editing/selection/vertical-rl-ltr-extend-line-forward-p-expected.txt:
+        * platform/mac/editing/selection/vertical-rl-ltr-extend-line-forward-wrap-expected.txt:
+
+2012-08-21  Kenneth Russell  <kbr@google.com>
+
+        [Chromium] context-creation-and-destruction layout tests are slow
+        https://bugs.webkit.org/show_bug.cgi?id=92287
+
+        Unreviewed; marked test slow on Linux as well.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-21  Brady Eidson  <beidson@apple.com>
+
+        fast/multicol/shrink-to-column-height-for-pagination.html fails on Mac WK2 bots
+        https://bugs.webkit.org/show_bug.cgi?id=94624
+
+        Unreviewed (Bot gardening).
+
+        * platform/mac-wk2/Skipped: Skip until we fix it.
+
+2012-08-21  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [EFL] Layout tests gardening
+        https://bugs.webkit.org/show_bug.cgi?id=94594
+
+        Unreviewed gardening.
+
+        * platform/efl-wk2/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-08-21  Vincent Scheib  <scheib@chromium.org>
+
+        Add parsing logic for allow-pointer-lock to iframe sandbox attribute.
+        https://bugs.webkit.org/show_bug.cgi?id=94513
+
+        Reviewed by Adam Barth.
+
+        Pointer lock was previously blocked from all sandboxed iframes.
+        Parsing the sandbox="allow-pointer-lock" attribute allows pages
+        to control the feature and enable it in sandboxed iframes.
+
+        * http/tests/pointer-lock/iframe-sandboxed-allow-pointer-lock-expected.txt: Added.
+        * http/tests/pointer-lock/iframe-sandboxed-allow-pointer-lock.html: Copied from LayoutTests/http/tests/pointer-lock/iframe-sandboxed.html.
+        * http/tests/pointer-lock/iframe-sandboxed-nested-allow-pointer-lock-expected.txt: Added.
+        * http/tests/pointer-lock/iframe-sandboxed-nested-allow-pointer-lock.html: Copied from LayoutTests/http/tests/pointer-lock/iframe-sandboxed.html.
+        * http/tests/pointer-lock/iframe-sandboxed-nested-disallow-then-allow-pointer-lock-expected.txt: Added.
+        * http/tests/pointer-lock/iframe-sandboxed-nested-disallow-then-allow-pointer-lock.html: Copied from LayoutTests/http/tests/pointer-lock/iframe-sandboxed.html.
+        * http/tests/pointer-lock/iframe-sandboxed.html:
+        * http/tests/resources/pointer-lock/iframe-allows-inner-iframe.html: Added.
+        * http/tests/resources/pointer-lock/iframe-common.js:
+        (window.onmessage):
+
+2012-08-21  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: do not use window's eval in InjectedScript
+        https://bugs.webkit.org/show_bug.cgi?id=94610
+
+        Reviewed by Yury Semikhatsky.
+
+        * inspector/console/console-eval-fake-expected.txt: Added.
+        * inspector/console/console-eval-fake.html: Added.
+
+2012-08-21  Adam Barth  <abarth@webkit.org>
+
+        Implement JSDOMWindow*::allowsAccessFrom* in terms of BindingSecurity
+        https://bugs.webkit.org/show_bug.cgi?id=93407
+
+        Reviewed by Eric Seidel.
+
+        These test results are now more similar (although not identical) to the
+        results for the V8 bindings.
+
+        * http/tests/security/listener/xss-JSTargetNode-onclick-addEventListener-expected.txt:
+        * http/tests/security/listener/xss-JSTargetNode-onclick-shortcut-expected.txt:
+        * http/tests/security/listener/xss-XMLHttpRequest-addEventListener-expected.txt:
+        * http/tests/security/listener/xss-XMLHttpRequest-shortcut-expected.txt:
+        * http/tests/security/listener/xss-window-onclick-addEventListener-expected.txt:
+        * http/tests/security/listener/xss-window-onclick-shortcut-expected.txt:
+
+2012-08-21  Brady Eidson  <beidson@apple.com>
+
+        WKTR doesn't implement dumpWillCacheResponse().
+        https://bugs.webkit.org/show_bug.cgi?id=94607
+
+        Unreviewed (Bot gardening)
+
+        * platform/wk2/Skipped: Skip http/tests/misc/willCacheResponse-delegate-callback.html
+
+2012-08-21  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r126146.
+        http://trac.webkit.org/changeset/126146
+        https://bugs.webkit.org/show_bug.cgi?id=94606
+
+        It made all tests assert (Requested by Ossy on #webkit).
+
+        * platform/qt/Skipped:
+
+2012-08-21  Brady Eidson  <beidson@apple.com>
+
+        MathML tests need rebaselining on Mac.
+        https://bugs.webkit.org/show_bug.cgi?id=94393
+
+        Reviewed by Dan Bernstein and Dave Barton.
+
+        * platform/mac/mathml/presentation/attributes-expected.txt:
+        * platform/mac/mathml/presentation/fenced-mi-expected.txt:
+        * platform/mac/mathml/presentation/fractions-expected.txt:
+        * platform/mac/mathml/presentation/mo-expected.txt:
+        * platform/mac/mathml/presentation/over-expected.txt:
+        * platform/mac/mathml/presentation/roots-expected.txt:
+        * platform/mac/mathml/presentation/row-expected.txt:
+        * platform/mac/mathml/presentation/sub-expected.txt:
+        * platform/mac/mathml/presentation/tokenElements-expected.txt:
+        * platform/mac/mathml/presentation/underover-expected.txt:
+
+2012-08-20  Philippe Normand  <pnormand@igalia.com>
+
+        media/media-document-audio-repaint.html is racy
+        https://bugs.webkit.org/show_bug.cgi?id=94454
+
+        Reviewed by Eric Carlson.
+
+        * media/media-document-audio-repaint.html: Don't rely on the play
+        event. Trigger the display and seek upon receipt of the pause event.
+
+2012-08-21  Keishi Hattori  <keishi@webkit.org>
+
+        Fix range-hit-test-with-padding.html by removing unnecessary part.
+
+        Unreviewed.
+
+        * fast/forms/range/range-hit-test-with-padding.html:
+
 2012-08-21  János Badics  <jbadics@inf.u-szeged.hu>
 
         [Qt] Gardening. Skip new failing tests.

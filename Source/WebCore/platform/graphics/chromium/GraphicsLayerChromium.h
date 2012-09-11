@@ -46,13 +46,24 @@
 namespace WebCore {
 
 class LayerChromium;
-class LinkHighlight;
 class Path;
+
+class LinkHighlightClient {
+public:
+    virtual void invalidate() = 0;
+    virtual void clearCurrentGraphicsLayer() = 0;
+    virtual WebKit::WebLayer* layer() = 0;
+
+protected:
+    virtual ~LinkHighlightClient() { }
+};
 
 class GraphicsLayerChromium : public GraphicsLayer, public GraphicsContextPainter, public WebKit::WebAnimationDelegate {
 public:
     GraphicsLayerChromium(GraphicsLayerClient*);
     virtual ~GraphicsLayerChromium();
+
+    virtual void willBeDestroyed() OVERRIDE;
 
     virtual void setName(const String&);
 
@@ -110,8 +121,9 @@ public:
     virtual void suspendAnimations(double wallClockTime);
     virtual void resumeAnimations();
 
-    virtual void addLinkHighlight(const Path&);
-    virtual void didFinishLinkHighlight();
+    void setLinkHighlight(LinkHighlightClient*);
+    // Next function for testing purposes.
+    LinkHighlightClient* linkHighlight() { return m_linkHighlight; }
 
     virtual PlatformLayer* platformLayer() const;
 
@@ -173,6 +185,8 @@ private:
     // we stash an ID away when we know m_contentsLayer is alive and use that for comparisons from that point
     // on.
     int m_contentsLayerId;
+
+    LinkHighlightClient* m_linkHighlight;
 
     OwnPtr<OpaqueRectTrackingContentLayerDelegate> m_opaqueRectTrackingContentLayerDelegate;
 

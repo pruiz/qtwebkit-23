@@ -83,6 +83,7 @@
 #include "KeyboardCodes.h"
 #include "KeyboardEvent.h"
 #include "LayerPainterChromium.h"
+#include "LinkHighlight.h"
 #include "MIMETypeRegistry.h"
 #include "NodeRenderStyle.h"
 #include "NonCompositedContentHost.h"
@@ -729,10 +730,17 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
         m_contextMenuAllowed = false;
         return handled;
     }
+    case WebInputEvent::GestureTapDown: {
+        // Queue a highlight animation, then hand off to regular handler.
+#if OS(LINUX)
+        enableTouchHighlight(IntPoint(event.x, event.y));
+#endif
+        PlatformGestureEventBuilder platformEvent(mainFrameImpl()->frameView(), event);
+        return mainFrameImpl()->frame()->eventHandler()->handleGestureEvent(platformEvent);
+    }
     case WebInputEvent::GestureScrollBegin:
     case WebInputEvent::GestureScrollEnd:
     case WebInputEvent::GestureScrollUpdate:
-    case WebInputEvent::GestureTapDown:
     case WebInputEvent::GestureDoubleTap:
     case WebInputEvent::GesturePinchBegin:
     case WebInputEvent::GesturePinchEnd:
@@ -1117,6 +1125,53 @@ void WebViewImpl::computeScaleAndScrollForHitRect(const WebRect& hitRect, AutoZo
     scroll.x = rect.x;
     scroll.y = rect.y;
 }
+
+static bool highlightConditions(Node* node)
+{
+    return node->isLink()
+           || node->supportsFocus()
+           || node->hasEventListeners(eventNames().clickEvent)
+           || node->hasEventListeners(eventNames().mousedownEvent)
+           || node->hasEventListeners(eventNames().mouseupEvent);
+}
+
+Node* WebViewImpl::bestTouchLinkNode(IntPoint touchEventLocation)
+{
+    if (!m_page || !m_page->mainFrame())
+        return 0;
+
+    Node* bestTouchNode = 0;
+
+    // FIXME: Should accept a search region from the caller instead of hard-coding the size.
+    IntSize touchEventSearchRegionSize(4, 2);
+    m_page->mainFrame()->eventHandler()->bestClickableNodeForTouchPoint(touchEventLocation, touchEventSearchRegionSize, touchEventLocation, bestTouchNode);
+    // bestClickableNodeForTouchPoint() doesn't always return a node that is a link, so let's try and find
+    // a link to highlight.
+    while (bestTouchNode && !highlightConditions(bestTouchNode))
+        bestTouchNode = bestTouchNode->parentNode();
+
+    return bestTouchNode;
+}
+
+void WebViewImpl::enableTouchHighlight(IntPoint touchEventLocation)
+{
+    Node* touchNode = bestTouchLinkNode(touchEventLocation);
+
+    if (!touchNode || !touchNode->renderer() || !touchNode->renderer()->enclosingLayer())
+        return;
+
+    Color highlightColor = touchNode->renderer()->style()->tapHighlightColor();
+    // Safari documentation for -webkit-tap-highlight-color says if the specified color has 0 alpha,
+    // then tap highlighting is disabled.
+    // http://developer.apple.com/library/safari/#documentation/appleapplications/reference/safaricssref/articles/standardcssproperties.html
+    if (!highlightColor.alpha())
+        return;
+
+    // This will clear any highlight currently being displayed.
+    m_linkHighlight = LinkHighlight::create(touchNode, this);
+    m_linkHighlight->startHighlightAnimation();
+}
+
 #endif
 
 void WebViewImpl::animateZoomAroundPoint(const IntPoint& point, AutoZoomType zoomType)
@@ -1654,6 +1709,9 @@ void WebViewImpl::layout()
 {
     TRACE_EVENT0("webkit", "WebViewImpl::layout");
     PageWidgetDelegate::layout(m_page.get());
+
+    if (m_linkHighlight)
+        m_linkHighlight->updateGeometry();
 }
 
 #if USE(ACCELERATED_COMPOSITING)
@@ -1686,9 +1744,15 @@ void WebViewImpl::doPixelReadbackToCanvas(WebCanvas* canvas, const IntRect& rect
 }
 #endif
 
-void WebViewImpl::paint(WebCanvas* canvas, const WebRect& rect)
+void WebViewImpl::paint(WebCanvas* canvas, const WebRect& rect, PaintOptions option)
 {
-    if (isAcceleratedCompositingActive()) {
+#if !OS(ANDROID)
+    // ReadbackFromCompositorIfAvailable is the only option available on non-Android.
+    // Ideally, Android would always use ReadbackFromCompositorIfAvailable as well.
+    ASSERT(option == ReadbackFromCompositorIfAvailable);
+#endif
+
+    if (option == ReadbackFromCompositorIfAvailable && isAcceleratedCompositingActive()) {
 #if USE(ACCELERATED_COMPOSITING)
         // If a canvas was passed in, we use it to grab a copy of the
         // freshly-rendered pixels.
@@ -1700,12 +1764,24 @@ void WebViewImpl::paint(WebCanvas* canvas, const WebRect& rect)
         }
 #endif
     } else {
+        FrameView* view = page()->mainFrame()->view();
+        PaintBehavior oldPaintBehavior = view->paintBehavior();
+        if (isAcceleratedCompositingActive()) {
+            ASSERT(option == ForceSoftwareRenderingAndIgnoreGPUResidentContent);            
+            view->setPaintBehavior(oldPaintBehavior | PaintBehaviorFlattenCompositingLayers);
+        }
+
         double paintStart = currentTime();
         PageWidgetDelegate::paint(m_page.get(), pageOverlays(), canvas, rect, isTransparent() ? PageWidgetDelegate::Translucent : PageWidgetDelegate::Opaque);
         double paintEnd = currentTime();
         double pixelsPerSec = (rect.width * rect.height) / (paintEnd - paintStart);
         WebKit::Platform::current()->histogramCustomCounts("Renderer4.SoftwarePaintDurationMS", (paintEnd - paintStart) * 1000, 0, 120, 30);
         WebKit::Platform::current()->histogramCustomCounts("Renderer4.SoftwarePaintMegapixPerSecond", pixelsPerSec / 1000000, 10, 210, 30);
+
+        if (isAcceleratedCompositingActive()) {
+            ASSERT(option == ForceSoftwareRenderingAndIgnoreGPUResidentContent);            
+            view->setPaintBehavior(oldPaintBehavior);
+        }
     }
 }
 
@@ -2213,6 +2289,58 @@ bool WebViewImpl::setEditableSelectionOffsets(int start, int end)
         return false;
 
     return editor->setSelectionOffsets(start, end);
+}
+
+bool WebViewImpl::setCompositionFromExistingText(int compositionStart, int compositionEnd, const WebVector<WebCompositionUnderline>& underlines)
+{
+    const Frame* focused = focusedWebCoreFrame();
+    if (!focused)
+        return false;
+
+    Editor* editor = focused->editor();
+    if (!editor || !editor->canEdit())
+        return false;
+
+    editor->cancelComposition();
+
+    if (compositionStart == compositionEnd)
+        return true;
+
+    size_t location;
+    size_t length;
+    caretOrSelectionRange(&location, &length);
+    editor->setIgnoreCompositionSelectionChange(true);
+    editor->setSelectionOffsets(compositionStart, compositionEnd);
+    String text = editor->selectedText();
+    focused->document()->execCommand("delete", true);
+    editor->setComposition(text, CompositionUnderlineVectorBuilder(underlines), 0, 0);
+    editor->setSelectionOffsets(location, location + length);
+    editor->setIgnoreCompositionSelectionChange(false);
+
+    return true;
+}
+
+void WebViewImpl::extendSelectionAndDelete(int before, int after)
+{
+    const Frame* focused = focusedWebCoreFrame();
+    if (!focused)
+        return;
+
+    Editor* editor = focused->editor();
+    if (!editor || !editor->canEdit())
+        return;
+
+    FrameSelection* selection = focused->selection();
+    if (!selection)
+        return;
+
+    size_t location;
+    size_t length;
+    RefPtr<Range> range = selection->selection().firstRange();
+    if (range && TextIterator::getLocationAndLengthFromRange(selection->rootEditableElement(), range.get(), location, length)) {
+        editor->setSelectionOffsets(max(static_cast<int>(location) - before, 0), location + length + after);
+        focused->document()->execCommand("delete", true);
+    }
 }
 
 bool WebViewImpl::isSelectionEditable() const

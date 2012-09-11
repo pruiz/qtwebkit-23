@@ -150,7 +150,7 @@ public:
     bool scrollBy(int deltaX, int deltaY, bool scrollMainFrame = true);
 
     void enqueueRenderingOfClippedContentOfScrollableNodeAfterInRegionScrolling(WebCore::Node*);
-    void notifyInRegionScrollStatusChanged(bool status);
+    void notifyInRegionScrollStopped();
     void setScrollOriginPoint(const Platform::IntPoint&);
     void setHasInRegionScrollableAreas(bool);
 
@@ -462,6 +462,8 @@ public:
     void applySizeOverride(int overrideWidth, int overrideHeight);
     void setTextZoomFactor(float);
 
+    WebCore::IntSize screenSize() const;
+
     WebPage* m_webPage;
     WebPageClient* m_client;
     WebCore::InspectorClientBlackBerry* m_inspectorClient;
@@ -614,6 +616,8 @@ public:
     WebString m_cachedColorInput;
     WebCore::KURL m_cachedManualScript;
     bool m_cachedFocused;
+
+    bool m_enableQnxJavaScriptObject;
 
     class DeferredTaskBase {
     public:

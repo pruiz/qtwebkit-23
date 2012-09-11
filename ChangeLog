@@ -1,3 +1,69 @@
+2012-08-22  Beth Dakin  <bdakin@apple.com>
+
+        https://bugs.webkit.org/show_bug.cgi?id=94401
+        Add support for making a web site become paginated using overflow: 
+        paged-x | paged-y
+        -and corresponding-
+        <rdar://problem/11831783> 
+
+        Reviewed by Dave Hyatt.
+
+        * Source/autotools/symbols.filter:
+
+2012-08-22  Gustavo Noronha Silva  <gns@gnome.org>
+
+        [GTK] Split WebCore/platform into a separate library
+        https://bugs.webkit.org/show_bug.cgi?id=94435
+
+        Reviewed by Martin Robinson.
+
+        More people have been reporting problems when linking WebCore because
+        the command line limit is being exceeded. Splitting WebCore a bit more
+        is in order.
+
+        * GNUmakefile.am: add variable that will hold the list of source files
+        for libWebCorePlatform .
+
+2012-08-21  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [EFL] Enable CSS Text Decoration by default
+        https://bugs.webkit.org/show_bug.cgi?id=94483
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        By enabling this feature by default, it will get tested by the bots
+        and we can make sure no regressions will happen.
+
+        * Source/cmake/OptionsEfl.cmake:
+
+2012-08-21  Ulan Degenbaev  <ulan@chromium.org>
+
+        Call AdjustAmountOfExternalAllocatedMemory when V8ArrayBuffer constructed and destructed
+        https://bugs.webkit.org/show_bug.cgi?id=92993
+
+        Reviewed by Kenneth Russell.
+
+        Call AdjustAmountOfExternalAllocatedMemory when V8ArrayBuffer
+        is constructed and destructed so that V8's garbage collection
+        heuristics can account for the memory held by these objects.
+
+        * ManualTests/typed-array-memory.html: Added.
+
+2012-08-21  Martin Robinson  <mrobinson@igalia.com>
+
+        [GTK] Using a native window for the WebView breaks GtkOverlay
+        https://bugs.webkit.org/show_bug.cgi?id=90085
+
+        Reviewed by Alejandro G. Castro.
+
+        * configure.ac: Parse xcomposite pkg-config file during configuration.
+
+2012-08-21  Patrick Gansterer  <paroga@webkit.org>
+
+        Build fix for WinCE after r115348.
+
+        * Source/cmake/OptionsWindows.cmake: Removed duplicated WEBKIT_OPTION_DEFAULT_PORT_VALUE().
+
 2012-08-20  George Staikos  <staikos@webkit.org>
 
         [BlackBerry] Enable XHR Response BLOB

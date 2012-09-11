@@ -27,6 +27,7 @@
 
 #if ENABLE(UNDO_MANAGER)
 
+#include "DOMTransactionStep.h"
 #include "UndoStep.h"
 #include "WorldContextHandle.h"
 #include <wtf/RefPtr.h>
@@ -46,8 +47,13 @@ public:
     virtual EditAction editingAction() const OVERRIDE { return EditActionUnspecified; }
     virtual bool isDOMTransaction() const OVERRIDE { return true; }
 
+    v8::Handle<v8::Value> data();
+    void setData(v8::Handle<v8::Value>);
+
     UndoManager* undoManager() const { return m_undoManager; }
     void setUndoManager(UndoManager* undoManager) { m_undoManager = undoManager; }
+
+    void addTransactionStep(PassRefPtr<DOMTransactionStep> step) { m_transactionSteps.append(step); }
 
 private:
     DOMTransaction(const WorldContextHandle&);
@@ -57,6 +63,7 @@ private:
     WorldContextHandle m_worldContext;
     UndoManager* m_undoManager;
     bool m_isAutomatic;
+    Vector<RefPtr<DOMTransactionStep> > m_transactionSteps;
 };
 
 }

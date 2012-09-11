@@ -23,6 +23,7 @@
 
 #include "BindingState.h"
 #include "ContextFeatures.h"
+#include "Frame.h"
 #include "RuntimeEnabledFeatures.h"
 #include "V8Binding.h"
 #include "V8DOMWrapper.h"
@@ -64,7 +65,7 @@ static v8::Persistent<v8::FunctionTemplate> ConfigureV8TestExceptionTemplate(v8:
     
 
     // Custom toString template
-    desc->Set(getToStringName(), getToStringTemplate());
+    desc->Set(v8::String::NewSymbol("toString"), V8PerIsolateData::current()->toStringTemplate());
     return desc;
 }
 
@@ -104,8 +105,8 @@ bool V8TestException::HasInstance(v8::Handle<v8::Value> value)
 v8::Handle<v8::Object> V8TestException::wrapSlow(PassRefPtr<TestException> impl, v8::Isolate* isolate)
 {
     v8::Handle<v8::Object> wrapper;
-    V8Proxy* proxy = 0;
-    wrapper = V8DOMWrapper::instantiateV8Object(proxy, &info, impl.get());
+    Frame* frame = 0;
+    wrapper = V8DOMWrapper::instantiateV8Object(frame, &info, impl.get());
     if (UNLIKELY(wrapper.IsEmpty()))
         return wrapper;
     v8::Persistent<v8::Object> wrapperHandle = V8DOMWrapper::setJSWrapperForDOMObject(impl, wrapper, isolate);

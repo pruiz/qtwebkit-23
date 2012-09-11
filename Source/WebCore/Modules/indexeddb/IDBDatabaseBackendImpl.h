@@ -72,7 +72,8 @@ public:
     IDBTransactionCoordinator* transactionCoordinator() const { return m_transactionCoordinator.get(); }
     void transactionStarted(PassRefPtr<IDBTransactionBackendImpl>);
     void transactionFinished(PassRefPtr<IDBTransactionBackendImpl>);
-    void transactionFinishedAndEventsFired(PassRefPtr<IDBTransactionBackendImpl>);
+    void transactionFinishedAndCompleteFired(PassRefPtr<IDBTransactionBackendImpl>);
+    void transactionFinishedAndAbortFired(PassRefPtr<IDBTransactionBackendImpl>);
 
 private:
     IDBDatabaseBackendImpl(const String& name, IDBBackingStore* database, IDBTransactionCoordinator*, IDBFactoryBackendImpl*, const String& uniqueIdentifier);
@@ -92,6 +93,7 @@ private:
     static void removeObjectStoreFromMap(ScriptExecutionContext*, PassRefPtr<IDBDatabaseBackendImpl>, PassRefPtr<IDBObjectStoreBackendImpl>);
     static void addObjectStoreToMap(ScriptExecutionContext*, PassRefPtr<IDBDatabaseBackendImpl>, PassRefPtr<IDBObjectStoreBackendImpl>);
     static void resetVersion(ScriptExecutionContext*, PassRefPtr<IDBDatabaseBackendImpl>, const String& version);
+    static void resetIntVersion(ScriptExecutionContext*, PassRefPtr<IDBDatabaseBackendImpl>, int64_t intVersion);
 
     RefPtr<IDBBackingStore> m_backingStore;
     int64_t m_id;

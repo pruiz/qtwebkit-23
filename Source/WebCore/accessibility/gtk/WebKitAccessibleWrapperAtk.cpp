@@ -430,6 +430,8 @@ static AtkRole atkRole(AccessibilityRole role)
         return ATK_ROLE_UNKNOWN;
     case ButtonRole:
         return ATK_ROLE_PUSH_BUTTON;
+    case ToggleButtonRole:
+        return ATK_ROLE_TOGGLE_BUTTON;
     case RadioButtonRole:
         return ATK_ROLE_RADIO_BUTTON;
     case CheckBoxRole:
@@ -815,6 +817,11 @@ static GType GetAtkInterfaceTypeFromWAIType(WAIType type)
     return G_TYPE_INVALID;
 }
 
+static bool roleIsTextType(AccessibilityRole role)
+{
+    return role == ParagraphRole || role == HeadingRole || role == DivRole || role == CellRole;
+}
+
 static guint16 getInterfaceMaskFromObject(AccessibilityObject* coreObject)
 {
     guint16 interfaceMask = 0;
@@ -856,7 +863,7 @@ static guint16 getInterfaceMaskFromObject(AccessibilityObject* coreObject)
         } else {
             if (role != TableRole) {
                 interfaceMask |= 1 << WAI_HYPERTEXT;
-                if (renderer && renderer->childrenInline())
+                if ((renderer && renderer->childrenInline()) || roleIsTextType(role))
                     interfaceMask |= 1 << WAI_TEXT;
             }
 

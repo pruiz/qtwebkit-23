@@ -35,6 +35,19 @@
 
 namespace WebCore {
 
+class DOMTransactionScope {
+public:
+    DOMTransactionScope(DOMTransaction* transaction)
+    {
+        UndoManager::setRecordingDOMTransaction(transaction);
+    }
+    
+    ~DOMTransactionScope()
+    {
+        UndoManager::setRecordingDOMTransaction(0);
+    }
+};
+
 DOMTransaction::DOMTransaction(const WorldContextHandle& worldContext)
     : m_worldContext(worldContext)
     , m_undoManager(0)
@@ -51,12 +64,20 @@ void DOMTransaction::apply()
     m_isAutomatic = !getFunction("executeAutomatic").IsEmpty();
     if (!m_isAutomatic)
         callFunction("execute");
+    else {
+        DOMTransactionScope scope(this);
+        callFunction("executeAutomatic");
+    }
 }
 
 void DOMTransaction::unapply()
 {
     if (!m_isAutomatic)
         callFunction("undo");
+    else {
+        for (size_t i = m_transactionSteps.size(); i > 0; --i)
+            m_transactionSteps[i - 1]->unapply();
+    }
 
     if (m_undoManager)
         m_undoManager->registerRedoStep(this);
@@ -66,22 +87,38 @@ void DOMTransaction::reapply()
 {
     if (!m_isAutomatic)
         callFunction("redo");
+    else {
+        for (size_t i = 0; i < m_transactionSteps.size(); ++i)
+            m_transactionSteps[i]->reapply();
+    }
 
     if (m_undoManager)
         m_undoManager->registerUndoStep(this);
 }
 
-v8::Handle<v8::Function> DOMTransaction::getFunction(const char* propertyName)
+v8::Handle<v8::Value> DOMTransaction::data()
 {
     v8::Handle<v8::Object> wrapper = v8::Handle<v8::Object>::Cast(toV8(this));
     if (wrapper.IsEmpty())
-        return v8::Handle<v8::Function>();
+        return v8::Handle<v8::Value>();
+    return wrapper->GetHiddenValue(V8HiddenPropertyName::domTransactionData());
+}
 
-    v8::Local<v8::Value> data = wrapper->GetHiddenValue(V8HiddenPropertyName::domTransactionData());
-    if (data.IsEmpty() || !data->IsObject())
-        return v8::Handle<v8::Function>();
+void DOMTransaction::setData(v8::Handle<v8::Value> newData)
+{
+    v8::Handle<v8::Object> wrapper = v8::Handle<v8::Object>::Cast(toV8(this));
+    if (wrapper.IsEmpty())
+        return;
+    wrapper->SetHiddenValue(V8HiddenPropertyName::domTransactionData(), newData);
+}
 
-    v8::Local<v8::Value> function = v8::Local<v8::Object>::Cast(data)->Get(v8::String::NewSymbol(propertyName));
+v8::Handle<v8::Function> DOMTransaction::getFunction(const char* propertyName)
+{
+    v8::Handle<v8::Value> dictionary = data();
+    if (dictionary.IsEmpty() || !dictionary->IsObject())
+        return v8::Handle<v8::Function>();
+    
+    v8::Local<v8::Value> function = v8::Handle<v8::Object>::Cast(dictionary)->Get(v8::String::NewSymbol(propertyName));
     if (function.IsEmpty() || !function->IsFunction())
         return v8::Handle<v8::Function>();
 
@@ -90,14 +127,10 @@ v8::Handle<v8::Function> DOMTransaction::getFunction(const char* propertyName)
 
 void DOMTransaction::callFunction(const char* propertyName)
 {
-    if (!m_undoManager || !m_undoManager->undoScopeHost())
+    if (!m_undoManager || !m_undoManager->document())
         return;
 
-    Document* document = m_undoManager->undoScopeHost()->document();
-    if (!document)
-        return;
-
-    Frame* frame = document->frame();
+    Frame* frame = m_undoManager->document()->frame();
     if (!frame || !frame->script()->canExecuteScripts(AboutToExecuteScript))
         return;
 

@@ -56,7 +56,7 @@ var WebInspector = {
             return panelDescriptors;
         }
         var allDescriptors = [elements, resources, network, scripts, timeline, profiles, audits, console];
-        var hiddenPanels = (InspectorFrontendHost.hiddenPanels() || "").split(',');
+        var hiddenPanels = InspectorFrontendHost.hiddenPanels();
         for (var i = 0; i < allDescriptors.length; ++i) {
             if (hiddenPanels.indexOf(allDescriptors[i].name) === -1)
                 panelDescriptors.push(allDescriptors[i]);
@@ -433,7 +433,14 @@ WebInspector.loaded = function()
         }
         return;
     }
+
     WebInspector.doLoadedDone();
+
+    // In case of loading as a web page with no bindings / harness, kick off initialization manually.
+    if (InspectorFrontendHost.isStub) {
+        InspectorFrontendAPI.dispatchQueryParameters();
+        WebInspector._doLoadedDoneWithCapabilities();
+    }
 }
 
 WebInspector.doLoadedDone = function()
@@ -458,8 +465,6 @@ WebInspector.doLoadedDone = function()
     PageAgent.canOverrideDeviceMetrics(WebInspector._initializeCapability.bind(WebInspector, "canOverrideDeviceMetrics", null));
     PageAgent.canOverrideGeolocation(WebInspector._initializeCapability.bind(WebInspector, "canOverrideGeolocation", null));
     PageAgent.canOverrideDeviceOrientation(WebInspector._initializeCapability.bind(WebInspector, "canOverrideDeviceOrientation", WebInspector._doLoadedDoneWithCapabilities.bind(WebInspector)));
-    if ("debugLoad" in WebInspector.queryParamsObject)
-        WebInspector._doLoadedDoneWithCapabilities();
 }
 
 WebInspector._doLoadedDoneWithCapabilities = function()
@@ -496,8 +501,6 @@ WebInspector._doLoadedDoneWithCapabilities = function()
     this.cssModel = new WebInspector.CSSStyleModel();
     this.timelineManager = new WebInspector.TimelineManager();
     this.userAgentSupport = new WebInspector.UserAgentSupport();
-    InspectorBackend.registerDatabaseDispatcher(new WebInspector.DatabaseDispatcher());
-    InspectorBackend.registerDOMStorageDispatcher(new WebInspector.DOMStorageDispatcher());
 
     this.searchController = new WebInspector.SearchController();
     this.advancedSearchController = new WebInspector.AdvancedSearchController();
@@ -522,11 +525,11 @@ WebInspector._doLoadedDoneWithCapabilities = function()
     WebInspector._installDockToRight();
 
     this.toolbar = new WebInspector.Toolbar();
-    this.toolbar.setCoalescingUpdate(true);
+    WebInspector.startBatchUpdate();
     var panelDescriptors = this._panelDescriptors();
     for (var i = 0; i < panelDescriptors.length; ++i)
         WebInspector.inspectorView.addPanel(panelDescriptors[i]);
-    this.toolbar.setCoalescingUpdate(false);
+    WebInspector.endBatchUpdate();
 
     this.addMainEventListeners(document);
     WebInspector.registerLinkifierPlugin(this._profilesLinkifier.bind(this));
@@ -548,8 +551,8 @@ WebInspector._doLoadedDoneWithCapabilities = function()
     }
 
     InspectorAgent.enable(showInitialPanel);
-    DatabaseAgent.enable();
-    DOMStorageAgent.enable();
+    this.databaseModel = new WebInspector.DatabaseModel();
+    this.domStorageModel = new WebInspector.DOMStorageModel();
 
     if (!Capabilities.profilerCausesRecompilation || WebInspector.settings.profilerEnabled.get())
         ProfilerAgent.enable();
@@ -993,6 +996,11 @@ WebInspector.log = function(message, messageLevel, showConsole)
     logMessage(message);
 }
 
+WebInspector.showErrorMessage = function(error)
+{
+    WebInspector.log(error, WebInspector.ConsoleMessage.MessageLevel.Error, true);
+}
+
 WebInspector.inspect = function(payload, hints)
 {
     var object = WebInspector.RemoteObject.fromPayload(payload);
@@ -1007,9 +1015,9 @@ WebInspector.inspect = function(payload, hints)
     }
 
     if (hints.databaseId)
-        WebInspector.showPanel("resources").selectDatabase(hints.databaseId);
+        WebInspector.showPanel("resources").selectDatabase(WebInspector.databaseModel.databaseForId(hints.databaseId));
     else if (hints.domStorageId)
-        WebInspector.showPanel("resources").selectDOMStorage(hints.domStorageId);
+        WebInspector.showPanel("resources").selectDOMStorage(WebInspector.domStorageModel.storageForId(hints.domStorageId));
 
     object.release();
 }
@@ -1050,15 +1058,9 @@ WebInspector._showAnchorLocationInPanel = function(anchor, panel)
         anchor.addStyleClass("webkit-html-resource-link");
     }
 
-    this.showPanelForAnchorNavigation(panel);
+    WebInspector.inspectorView.showPanelForAnchorNavigation(panel);
     panel.showAnchorLocation(anchor);
     return true;
-}
-
-WebInspector.showPanelForAnchorNavigation = function(panel)
-{
-    WebInspector.searchController.disableSearchUntilExplicitAction();
-    WebInspector.inspectorView.setCurrentPanel(panel);
 }
 
 WebInspector.showProfileForURL = function(url)

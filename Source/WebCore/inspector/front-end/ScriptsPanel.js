@@ -28,6 +28,8 @@ importScript("BreakpointsSidebarPane.js");
 importScript("CallStackSidebarPane.js");
 importScript("FilteredItemSelectionDialog.js");
 importScript("JavaScriptSourceFrame.js");
+importScript("NavigatorOverlayController.js");
+importScript("NavigatorView.js");
 importScript("RevisionHistoryView.js");
 importScript("ScopeChainSidebarPane.js");
 importScript("ScriptsNavigator.js");
@@ -185,9 +187,11 @@ WebInspector.ScriptsPanel = function(workspaceForTest)
     WebInspector.debuggerModel.addEventListener(WebInspector.DebuggerModel.Events.ExecutionLineChanged, this._executionLineChanged, this);
     WebInspector.debuggerModel.addEventListener(WebInspector.DebuggerModel.Events.BreakpointsActiveStateChanged, this._breakpointsActiveStateChanged, this);
 
+    WebInspector.startBatchUpdate();
     var uiSourceCodes = this._workspace.uiSourceCodes();
     for (var i = 0; i < uiSourceCodes.length; ++i)
         this._addUISourceCode(uiSourceCodes[i]);
+    WebInspector.endBatchUpdate();
 
     this._workspace.addEventListener(WebInspector.UISourceCodeProvider.Events.UISourceCodeAdded, this._uiSourceCodeAdded, this);
     this._workspace.addEventListener(WebInspector.UISourceCodeProvider.Events.UISourceCodeReplaced, this._uiSourceCodeReplaced, this);
@@ -388,7 +392,7 @@ WebInspector.ScriptsPanel.prototype = {
 
     showFunctionDefinition: function(functionLocation)
     {
-        WebInspector.showPanelForAnchorNavigation(this);
+        WebInspector.inspectorView.showPanelForAnchorNavigation(this);
         var uiLocation = WebInspector.debuggerModel.rawLocationToUILocation(functionLocation);
         this._showSourceLine(uiLocation.uiSourceCode, uiLocation.lineNumber);
     },
@@ -569,7 +573,8 @@ WebInspector.ScriptsPanel.prototype = {
 
     _pauseOnExceptionStateChanged: function()
     {
-        switch (WebInspector.settings.pauseOnExceptionStateString.get()) {
+        var pauseOnExceptionsState = WebInspector.settings.pauseOnExceptionStateString.get();
+        switch (pauseOnExceptionsState) {
         case WebInspector.DebuggerModel.PauseOnExceptionsState.DontPauseOnExceptions:
             this._pauseOnExceptionButton.title = WebInspector.UIString("Don't pause on exceptions.\nClick to Pause on all exceptions.");
             break;
@@ -580,6 +585,7 @@ WebInspector.ScriptsPanel.prototype = {
             this._pauseOnExceptionButton.title = WebInspector.UIString("Pause on uncaught exceptions.\nClick to Not pause on exceptions.");
             break;
         }
+        this._pauseOnExceptionButton.state = pauseOnExceptionsState;
     },
 
     _updateDebuggerButtons: function()

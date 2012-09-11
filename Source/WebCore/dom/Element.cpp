@@ -70,6 +70,7 @@
 #include "StyleResolver.h"
 #include "Text.h"
 #include "TextIterator.h"
+#include "UndoManager.h"
 #include "VoidCallback.h"
 #include "WebKitAnimationList.h"
 #include "XMLNSNames.h"
@@ -146,13 +147,6 @@ Element::~Element()
         ASSERT(m_attributeData);
         m_attributeData->detachAttrObjectsFromElement(this);
     }
-
-#if ENABLE(UNDO_MANAGER)
-    if (hasRareData() && elementRareData()->m_undoManager) {
-        elementRareData()->m_undoManager->disconnect();
-        elementRareData()->m_undoManager.clear();
-    }
-#endif
 }
 
 inline ElementRareData* Element::elementRareData() const
@@ -702,6 +696,8 @@ inline void Element::setAttributeInternal(size_t index, const QualifiedName& nam
 
 void Element::attributeChanged(const Attribute& attribute)
 {
+    parseAttribute(attribute);
+
     document()->incDOMTreeVersion();
 
     if (isIdAttributeName(attribute.name())) {
@@ -751,6 +747,34 @@ void Element::attributeChanged(const Attribute& attribute)
         document()->axObjectCache()->childrenChanged(this);
     else if (attrName == aria_invalidAttr)
         document()->axObjectCache()->postNotification(this, AXObjectCache::AXInvalidStatusChanged, true);
+}
+
+void Element::parseAttribute(const Attribute& attribute)
+{
+    if (attribute.name() == classAttr)
+        classAttributeChanged(attribute.value());
+}
+
+void Element::classAttributeChanged(const AtomicString& newClassString)
+{
+    const UChar* characters = newClassString.characters();
+    unsigned length = newClassString.length();
+    unsigned i;
+    for (i = 0; i < length; ++i) {
+        if (isNotHTMLSpace(characters[i]))
+            break;
+    }
+    bool hasClass = i < length;
+    if (hasClass) {
+        const bool shouldFoldCase = document()->inQuirksMode();
+        ensureAttributeData()->setClass(newClassString, shouldFoldCase);
+    } else if (attributeData())
+        mutableAttributeData()->clearClass();
+
+    if (DOMTokenList* classList = optionalClassList())
+        static_cast<ClassList*>(classList)->reset(newClassString);
+
+    setNeedsStyleRecalc();
 }
 
 // Returns true is the given attribute is an event handler.
@@ -1005,9 +1029,8 @@ void Element::detach()
     if (ElementShadow* shadow = this->shadow()) {
         detachChildrenIfNeeded();
         shadow->detach();
-        detachAsNode();
-    } else
-        ContainerNode::detach();
+    }
+    ContainerNode::detach();
 
     RenderWidget::resumeWidgetHierarchyUpdates();
 }
@@ -2055,6 +2078,11 @@ void Element::willModifyAttribute(const QualifiedName& name, const AtomicString&
         recipients->enqueueMutationRecord(MutationRecord::createAttributes(this, name, oldValue));
 #endif
 
+#if ENABLE(UNDO_MANAGER)
+    if (UndoManager::isRecordingAutomaticTransaction(this))
+        UndoManager::addTransactionStep(AttrChangingDOMTransactionStep::create(this, name, oldValue, newValue));
+#endif
+
 #if ENABLE(INSPECTOR)
     InspectorInstrumentation::willModifyDOMAttr(document(), this, oldValue, newValue);
 #endif
@@ -2221,62 +2249,5 @@ void Element::createMutableAttributeData()
     else
         m_attributeData = m_attributeData->makeMutable();
 }
-
-#if ENABLE(UNDO_MANAGER)
-bool Element::undoScope() const
-{
-    return hasRareData() && elementRareData()->m_undoScope;
-}
-
-void Element::setUndoScope(bool undoScope)
-{
-    ElementRareData* data = ensureElementRareData();
-    data->m_undoScope = undoScope;
-    if (!undoScope)
-        disconnectUndoManager();
-}
-
-PassRefPtr<UndoManager> Element::undoManager()
-{
-    if (!undoScope() || (isContentEditable() && !isRootEditableElement())) {
-        disconnectUndoManager();
-        return 0;
-    }
-    ElementRareData* data = ensureElementRareData();
-    if (!data->m_undoManager)
-        data->m_undoManager = UndoManager::create(document(), this);
-    return data->m_undoManager;
-}
-
-void Element::disconnectUndoManager()
-{
-    if (!hasRareData())
-        return;
-    ElementRareData* data = elementRareData();
-    UndoManager* undoManager = data->m_undoManager.get();
-    if (!undoManager)
-        return;
-    undoManager->disconnect();
-    data->m_undoManager.clear();
-}
-
-void Element::disconnectUndoManagersInSubtree()
-{
-    Node* node = firstChild();
-    while (node) {
-        if (node->isElementNode()) {
-            Element* element = toElement(node);
-            if (element->hasRareData() && element->elementRareData()->m_undoManager) {
-                if (!node->isContentEditable()) {
-                    node = node->traverseNextSibling(this);
-                    continue;
-                }
-                element->disconnectUndoManager();
-            }
-        }
-        node = node->traverseNextNode(this);
-    }
-}
-#endif
 
 } // namespace WebCore

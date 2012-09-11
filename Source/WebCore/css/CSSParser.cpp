@@ -62,6 +62,7 @@
 #include "FontValue.h"
 #include "HTMLParserIdioms.h"
 #include "HashTools.h"
+#include "HistogramSupport.h"
 #include "MediaList.h"
 #include "MediaQueryExp.h"
 #include "Page.h"
@@ -595,9 +596,12 @@ static inline bool isValidKeywordPropertyAndValue(CSSPropertyID propertyId, int 
         if (valueID == CSSValueAuto || valueID == CSSValueNone || (valueID >= CSSValueInset && valueID <= CSSValueDouble))
             return true;
         break;
-    case CSSPropertyOverflowX:
-    case CSSPropertyOverflowY: // visible | hidden | scroll | auto | marquee | overlay | inherit
+    case CSSPropertyOverflowX: // visible | hidden | scroll | auto | marquee | overlay | inherit
         if (valueID == CSSValueVisible || valueID == CSSValueHidden || valueID == CSSValueScroll || valueID == CSSValueAuto || valueID == CSSValueOverlay || valueID == CSSValueWebkitMarquee)
+            return true;
+        break;
+    case CSSPropertyOverflowY: // visible | hidden | scroll | auto | marquee | overlay | inherit | -webkit-paged-x | -webkit-paged-y
+        if (valueID == CSSValueVisible || valueID == CSSValueHidden || valueID == CSSValueScroll || valueID == CSSValueAuto || valueID == CSSValueOverlay || valueID == CSSValueWebkitMarquee || valueID == CSSValueWebkitPagedX || valueID == CSSValueWebkitPagedY)
             return true;
         break;
     case CSSPropertyPageBreakAfter: // auto | always | avoid | left | right | inherit
@@ -1757,10 +1761,20 @@ bool CSSParser::parseValue(CSSPropertyID propId, bool important)
      */
     case CSSPropertyOverflow: {
         ShorthandScope scope(this, propId);
-        if (num != 1 || !parseValue(CSSPropertyOverflowX, important))
+        if (num != 1 || !parseValue(CSSPropertyOverflowY, important))
             return false;
-        CSSValue* value = m_parsedProperties->last().value();
-        addProperty(CSSPropertyOverflowY, value, important);
+
+        RefPtr<CSSValue> overflowXValue;
+
+        // FIXME: -webkit-paged-x or -webkit-paged-y only apply to overflow-y. If this value has been
+        // set using the shorthand, then for now overflow-x will default to auto, but once we implement
+        // pagination controls, it should default to hidden. If the overflow-y value is anything but
+        // paged-x or paged-y, then overflow-x and overflow-y should have the same value.
+        if (id == CSSValueWebkitPagedX || id == CSSValueWebkitPagedY)
+            overflowXValue = cssValuePool().createIdentifierValue(CSSValueAuto);
+        else
+            overflowXValue = m_parsedProperties->last().value();
+        addProperty(CSSPropertyOverflowX, overflowXValue.release(), important);
         return true;
     }
 
@@ -5335,7 +5349,7 @@ static inline bool parseAlphaValue(const UChar*& string, const UChar* end, const
     if (length < 2)
         return false;
 
-    if (string[length - 1] != terminator)
+    if (string[length - 1] != terminator || !isASCIIDigit(string[length - 2]))
         return false;
 
     if (string[0] != '0' && string[0] != '1' && string[0] != '.') {
@@ -10124,7 +10138,16 @@ static CSSPropertyID cssPropertyID(const UChar* propertyName, unsigned length)
     }
 
     const Property* hashTableEntry = findProperty(name, length);
-    return hashTableEntry ? static_cast<CSSPropertyID>(hashTableEntry->id) : CSSPropertyInvalid;
+    const CSSPropertyID propertyID = hashTableEntry ? static_cast<CSSPropertyID>(hashTableEntry->id) : CSSPropertyInvalid;
+
+    // 600 is comfortably larger than numCSSProperties to allow for growth
+    static const int CSSPropertyHistogramSize = 600;
+    COMPILE_ASSERT(CSSPropertyHistogramSize > numCSSProperties, number_of_css_properties_exceed_CSSPropertyHistogramSize);
+
+    if (hasPrefix(buffer, length, "-webkit-") && propertyID != CSSPropertyInvalid)
+        HistogramSupport::histogramEnumeration("CSS.PrefixUsage", max(1, propertyID - firstCSSProperty), CSSPropertyHistogramSize);
+
+    return propertyID;
 }
 
 CSSPropertyID cssPropertyID(const String& string)

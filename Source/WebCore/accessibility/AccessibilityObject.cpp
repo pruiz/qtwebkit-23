@@ -1294,6 +1294,19 @@ const AtomicString& AccessibilityObject::invalidStatus() const
     return ariaInvalid;
 }
  
+bool AccessibilityObject::hasAttribute(const QualifiedName& attribute) const
+{
+    Node* elementNode = node();
+    if (!elementNode)
+        return false;
+    
+    if (!elementNode->isElementNode())
+        return false;
+    
+    Element* element = static_cast<Element*>(elementNode);
+    return element->fastHasAttribute(attribute);
+}
+    
 const AtomicString& AccessibilityObject::getAttribute(const QualifiedName& attribute) const
 {
     Node* elementNode = node();
@@ -1734,5 +1747,24 @@ void AccessibilityObject::scrollToGlobalPoint(const IntPoint& globalPoint) const
         }
     }
 }
-    
+
+bool AccessibilityObject::ariaPressedIsPresent() const
+{
+    return !getAttribute(aria_pressedAttr).isEmpty();
+}
+
+AccessibilityRole AccessibilityObject::buttonRoleType() const
+{
+    // If aria-pressed is present, then it should be exposed as a toggle button.
+    // http://www.w3.org/TR/wai-aria/states_and_properties#aria-pressed
+    if (ariaPressedIsPresent())
+        return ToggleButtonRole;
+    if (ariaHasPopup())
+        return PopUpButtonRole;
+    // We don't contemplate RadioButtonRole, as it depends on the input
+    // type.
+
+    return ButtonRole;
+}
+
 } // namespace WebCore

@@ -206,6 +206,8 @@ webcore_built_sources += \
 	DerivedSources/WebCore/JSDOMStringMap.h \
 	DerivedSources/WebCore/JSDOMTokenList.cpp \
 	DerivedSources/WebCore/JSDOMTokenList.h \
+	DerivedSources/WebCore/JSDOMTransaction.cpp \
+	DerivedSources/WebCore/JSDOMTransaction.h \
 	DerivedSources/WebCore/JSDOMURL.cpp \
 	DerivedSources/WebCore/JSDOMURL.h \
 	DerivedSources/WebCore/JSDOMWindow.cpp \
@@ -1365,6 +1367,7 @@ dom_binding_idls += \
 	$(WebCore)/dom/WebKitNamedFlow.idl \
 	$(WebCore)/dom/WebKitTransitionEvent.idl \
 	$(WebCore)/dom/WheelEvent.idl \
+	$(WebCore)/editing/DOMTransaction.idl \
 	$(WebCore)/editing/UndoManager.idl \
 	$(WebCore)/fileapi/Blob.idl \
 	$(WebCore)/fileapi/File.idl \
@@ -1751,6 +1754,7 @@ webcore_modules_sources += \
 	Source/WebCore/Modules/filesystem/FileSystemCallback.h \
 	Source/WebCore/Modules/filesystem/FileSystemCallbacks.cpp \
 	Source/WebCore/Modules/filesystem/FileSystemCallbacks.h \
+	Source/WebCore/Modules/filesystem/FileSystemFlags.h \
 	Source/WebCore/Modules/filesystem/FileSystemType.h \
 	Source/WebCore/Modules/filesystem/FileWriter.cpp \
 	Source/WebCore/Modules/filesystem/FileWriter.h \
@@ -1764,7 +1768,6 @@ webcore_modules_sources += \
 	Source/WebCore/Modules/filesystem/LocalFileSystem.h \
 	Source/WebCore/Modules/filesystem/MetadataCallback.h \
 	Source/WebCore/Modules/filesystem/Metadata.h \
-	Source/WebCore/Modules/filesystem/WebKitFlags.h \
 	Source/WebCore/Modules/filesystem/WorkerContextFileSystem.cpp \
 	Source/WebCore/Modules/filesystem/WorkerContextFileSystem.h \
 	Source/WebCore/Modules/gamepad/Gamepad.cpp \
@@ -2163,6 +2166,8 @@ webcore_sources += \
 	Source/WebCore/bindings/js/CallbackFunction.h \
 	Source/WebCore/bindings/js/DOMObjectHashTableMap.cpp \
 	Source/WebCore/bindings/js/DOMObjectHashTableMap.h \
+	Source/WebCore/bindings/js/DOMTransaction.cpp \
+	Source/WebCore/bindings/js/DOMTransaction.h \
 	Source/WebCore/bindings/js/DOMWrapperWorld.cpp \
 	Source/WebCore/bindings/js/DOMWrapperWorld.h \
 	Source/WebCore/bindings/js/GCController.cpp \
@@ -2193,8 +2198,6 @@ webcore_sources += \
 	Source/WebCore/bindings/js/JSConsoleCustom.cpp \
 	Source/WebCore/bindings/js/JSCoordinatesCustom.cpp \
 	Source/WebCore/bindings/js/JSCustomSQLStatementErrorCallback.cpp \
-	Source/WebCore/bindings/js/JSCustomVoidCallback.cpp \
-	Source/WebCore/bindings/js/JSCustomVoidCallback.h \
 	Source/WebCore/bindings/js/JSCustomXPathNSResolver.cpp \
 	Source/WebCore/bindings/js/JSCustomXPathNSResolver.h \
 	Source/WebCore/bindings/js/JSDictionary.cpp \
@@ -2226,8 +2229,6 @@ webcore_sources += \
 	Source/WebCore/bindings/js/JSDedicatedWorkerContextCustom.cpp \
 	Source/WebCore/bindings/js/JSDeviceMotionEventCustom.cpp \
 	Source/WebCore/bindings/js/JSDeviceOrientationEventCustom.cpp \
-	Source/WebCore/bindings/js/JSDirectoryEntryCustom.cpp \
-	Source/WebCore/bindings/js/JSDirectoryEntrySyncCustom.cpp \
 	Source/WebCore/bindings/js/JSDocumentCustom.cpp \
 	Source/WebCore/bindings/js/JSElementCustom.cpp \
 	Source/WebCore/bindings/js/JSEntryCustom.cpp \
@@ -2329,6 +2330,7 @@ webcore_sources += \
 	Source/WebCore/bindings/js/JSTrackCustom.h \
 	Source/WebCore/bindings/js/JSTrackEventCustom.cpp \
 	Source/WebCore/bindings/js/JSTreeWalkerCustom.cpp \
+	Source/WebCore/bindings/js/JSUndoManagerCustom.cpp \
 	Source/WebCore/bindings/js/JSWebKitAnimationCustom.cpp \
 	Source/WebCore/bindings/js/JSWebKitAnimationListCustom.cpp \
 	Source/WebCore/bindings/js/JSWebKitCSSKeyframeRuleCustom.cpp \
@@ -3478,6 +3480,8 @@ webcore_sources += \
 	Source/WebCore/html/shadow/ProgressShadowElement.h \
 	Source/WebCore/html/shadow/SliderThumbElement.cpp \
 	Source/WebCore/html/shadow/SliderThumbElement.h \
+	Source/WebCore/html/shadow/SpinButtonElement.cpp \
+	Source/WebCore/html/shadow/SpinButtonElement.h \
 	Source/WebCore/html/shadow/TextControlInnerElements.cpp \
 	Source/WebCore/html/shadow/TextControlInnerElements.h \
 	Source/WebCore/html/PasswordInputType.cpp \
@@ -4141,6 +4145,8 @@ webcore_sources += \
 	Source/WebCore/platform/EventLoop.h \
 	Source/WebCore/platform/EventTracer.cpp \
 	Source/WebCore/platform/EventTracer.h \
+	Source/WebCore/platform/PlatformInstrumentation.cpp \
+	Source/WebCore/platform/PlatformInstrumentation.h \
 	Source/WebCore/platform/FileChooser.cpp \
 	Source/WebCore/platform/FileChooser.h \
 	Source/WebCore/platform/FileIconLoader.cpp \

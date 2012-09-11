@@ -91,7 +91,7 @@ class WebPagePrivate : public PageClientBlackBerry
 #endif
                      , public Platform::GuardedPointerBase {
 public:
-    enum ViewMode { Mobile, Desktop, FixedDesktop };
+    enum ViewMode { Desktop, FixedDesktop };
     enum LoadState { None /* on instantiation of page */, Provisional, Committed, Finished, Failed };
 
     WebPagePrivate(WebPage*, WebPageClient*, const WebCore::IntRect&);
@@ -419,7 +419,8 @@ public:
     bool createCompositor();
     void destroyCompositor();
     void syncDestroyCompositorOnCompositingThread();
-    void destroyLayerResources();
+    void releaseLayerResources();
+    void releaseLayerResourcesCompositingThread();
     void suspendRootLayerCommit();
     void resumeRootLayerCommit();
     void blitVisibleContents();

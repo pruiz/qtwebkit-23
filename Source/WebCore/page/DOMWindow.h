@@ -109,14 +109,11 @@ namespace WebCore {
         void registerProperty(DOMWindowProperty*);
         void unregisterProperty(DOMWindowProperty*);
 
-        void clear();
+        void resetUnlessSuspendedForPageCache();
         void suspendForPageCache();
         void resumeFromPageCache();
 
         PassRefPtr<MediaQueryList> matchMedia(const String&);
-
-        // FIXME: Callers should use document()->securityOrigin() directly.
-        SecurityOrigin* securityOrigin() const;
 
         unsigned pendingUnloadEventListeners() const;
 
@@ -425,7 +422,7 @@ namespace WebCore {
             PrepareDialogFunction = 0, void* functionContext = 0);
         bool isInsecureScriptAccess(DOMWindow* activeWindow, const String& urlString);
 
-        void clearDOMWindowProperties();
+        void resetDOMWindowProperties();
         void disconnectDOMWindowProperties();
         void reconnectDOMWindowProperties();
         void willDestroyDocumentInFrame();

@@ -1,3 +1,544 @@
+2012-08-18  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: make profiles panel a lazily loaded module.
+        https://bugs.webkit.org/show_bug.cgi?id=94351
+
+        Reviewed by Yury Semikhatsky.
+
+        * WebKit.gyp:
+
+2012-08-18  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: load panels code on demand
+        https://bugs.webkit.org/show_bug.cgi?id=94326
+
+        Reviewed by Vsevolod Vlasov.
+
+        * WebKit.gyp:
+        * scripts/concatenate_js_files.py:
+        (OrderedJSFilesExtractor.handle_starttag):
+        * scripts/inline_js_imports.py:
+        (main):
+
+2012-08-17  Dirk Pranke  <dpranke@chromium.org>
+
+        Unreviewed, rolling out r125897.
+        http://trac.webkit.org/changeset/125897
+        https://bugs.webkit.org/show_bug.cgi?id=94326
+
+        this patch seems to have broken the inspector on the apple mac bots.
+
+        * WebKit.gyp:
+        * scripts/concatenate_js_files.py:
+        (OrderedJSFilesExtractor.handle_starttag):
+        * scripts/inline_js_imports.py:
+        (main):
+
+2012-08-17  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r125922.
+        http://trac.webkit.org/changeset/125922
+        https://bugs.webkit.org/show_bug.cgi?id=94389
+
+        "Causing failing/crashing tests on Mac bots" (Requested by
+        bradee-oh on #webkit).
+
+        * WebKit.gyp:
+
+2012-08-16  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Add Source/WebCore/platform/graphics/chromium/cc/ to include path and remove cc/ prefix from includes
+        https://bugs.webkit.org/show_bug.cgi?id=94279
+
+        Reviewed by Adam Barth.
+
+        * src/WebAnimationCurveCommon.cpp:
+        * src/WebAnimationImpl.cpp:
+        * src/WebCompositorInputHandlerImpl.cpp:
+        * src/WebCompositorInputHandlerImpl.h:
+        * src/WebExternalTextureLayer.cpp:
+        * src/WebFloatAnimationCurve.cpp:
+        * src/WebLayerTreeView.cpp:
+        * src/WebLayerTreeViewImpl.cpp:
+        * src/WebTransformAnimationCurve.cpp:
+        * tests/CCActiveAnimationTest.cpp:
+        * tests/CCAnimationTestCommon.cpp:
+        * tests/CCAnimationTestCommon.h:
+        * tests/CCDamageTrackerTest.cpp:
+        * tests/CCDelayBasedTimeSourceTest.cpp:
+        * tests/CCFrameRateControllerTest.cpp:
+        * tests/CCKeyframedAnimationCurveTest.cpp:
+        * tests/CCLayerAnimationControllerTest.cpp:
+        * tests/CCLayerImplTest.cpp:
+        * tests/CCLayerIteratorTest.cpp:
+        * tests/CCLayerQuadTest.cpp:
+        * tests/CCLayerSorterTest.cpp:
+        * tests/CCLayerTestCommon.cpp:
+        * tests/CCLayerTestCommon.h:
+        * tests/CCLayerTreeHostCommonTest.cpp:
+        * tests/CCLayerTreeHostImplTest.cpp:
+        * tests/CCLayerTreeHostTest.cpp:
+        * tests/CCMathUtilTest.cpp:
+        * tests/CCOcclusionTrackerTest.cpp:
+        * tests/CCOcclusionTrackerTestCommon.h:
+        * tests/CCPrioritizedTextureTest.cpp:
+        * tests/CCQuadCullerTest.cpp:
+        * tests/CCRenderSurfaceFiltersTest.cpp:
+        * tests/CCRenderSurfaceTest.cpp:
+        * tests/CCResourceProviderTest.cpp:
+        * tests/CCSchedulerStateMachineTest.cpp:
+        * tests/CCSchedulerTest.cpp:
+        * tests/CCSchedulerTestCommon.h:
+        * tests/CCScopedTextureTest.cpp:
+        * tests/CCScrollbarAnimationControllerLinearFadeTest.cpp:
+        * tests/CCSolidColorLayerImplTest.cpp:
+        * tests/CCTestCommon.h:
+        * tests/CCTextureUpdateControllerTest.cpp:
+        * tests/CCThreadTaskTest.cpp:
+        * tests/CCThreadedTest.cpp:
+        * tests/CCThreadedTest.h:
+        * tests/CCTiledLayerImplTest.cpp:
+        * tests/CCTiledLayerTestCommon.h:
+        * tests/CCTimerTest.cpp:
+        * tests/ContentLayerChromiumTest.cpp:
+        * tests/FakeCCGraphicsContext.h:
+        * tests/FakeCCLayerTreeHostClient.h:
+        * tests/FloatQuadTest.cpp:
+        * tests/GraphicsLayerChromiumTest.cpp:
+        * tests/LayerChromiumTest.cpp:
+        * tests/LayerRendererChromiumTest.cpp:
+        * tests/MockCCQuadCuller.h:
+        * tests/PlatformGestureCurveTest.cpp:
+        * tests/ScrollbarLayerChromiumTest.cpp:
+        * tests/TextureLayerChromiumTest.cpp:
+        * tests/TiledLayerChromiumTest.cpp:
+        * tests/TreeSynchronizerTest.cpp:
+        * tests/WebCompositorInputHandlerImplTest.cpp:
+        * tests/WebFloatAnimationCurveTest.cpp:
+        * tests/WebTransformAnimationCurveTest.cpp:
+
+2012-08-17  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: make profiles panel a lazily loaded module.
+        https://bugs.webkit.org/show_bug.cgi?id=94351
+
+        Reviewed by Yury Semikhatsky.
+
+        * WebKit.gyp:
+
+2012-08-17  Keishi Hattori  <keishi@webkit.org>
+
+        [Chromium] Turn off ENABLE_DATALIST_ELEMENT for Android
+        https://bugs.webkit.org/show_bug.cgi?id=94337
+
+        Reviewed by Kent Tamura.
+
+        We shouldn't have turned ENABLE_DATALIST_ELEMENT on for Android.
+
+        * features.gypi:
+
+2012-08-17  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r125892.
+        http://trac.webkit.org/changeset/125892
+        https://bugs.webkit.org/show_bug.cgi?id=94350
+
+        Broke windows build (Requested by vollick on #webkit).
+
+        * src/WebAnimationImpl.cpp:
+        (WebKit::WebAnimationImpl::cloneToCCAnimation):
+
+2012-08-17  Peter Beverloo  <peter@chromium.org>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-08-17  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: load panels code on demand
+        https://bugs.webkit.org/show_bug.cgi?id=94326
+
+        Reviewed by Vsevolod Vlasov.
+
+        * WebKit.gyp:
+        * scripts/concatenate_js_files.py:
+        (OrderedJSFilesExtractor.handle_starttag):
+        * scripts/inline_js_imports.py:
+        (main):
+
+2012-08-17  Ian Vollick  <vollick@chromium.org>
+
+        [chromium] Add tracing for active composited animations
+        https://bugs.webkit.org/show_bug.cgi?id=84210
+
+        Reviewed by James Robinson.
+
+        This patch issues the trace events from the animations. Animations will
+        report when they start and finish on the main and impl threads (via
+        TRACE_EVENT_ASYNC*), and also issues instant trace events whenever they
+        change state.
+
+        * src/WebAnimationImpl.cpp:
+        (WebKit::WebAnimationImpl::cloneToCCAnimation):
+
+2012-08-16  Antoine Labour  <piman@chromium.org>
+
+        [chromium] Add resource transfer functions to CCResourceProvider
+        https://bugs.webkit.org/show_bug.cgi?id=93524
+
+        Reviewed by James Robinson.
+
+        This adds methods to CCResourceProvider to be able to transport
+        resources from a child to a parent.
+
+        Added test to CCResourceProviderTest.
+
+        * tests/CCResourceProviderTest.cpp:
+        (WebKit::textureSize):
+        (WebKit):
+        (WebKit::Texture::Texture):
+        (Texture):
+        (ContextSharedData):
+        (WebKit::ContextSharedData::create):
+        (WebKit::ContextSharedData::insertSyncPoint):
+        (WebKit::ContextSharedData::genMailbox):
+        (WebKit::ContextSharedData::produceTexture):
+        (WebKit::ContextSharedData::consumeTexture):
+        (WebKit::ContextSharedData::ContextSharedData):
+        (WebKit::ResourceProviderContext::create):
+        (ResourceProviderContext):
+        (WebKit::ResourceProviderContext::insertSyncPoint):
+        (WebKit::ResourceProviderContext::waitSyncPoint):
+        (WebKit::ResourceProviderContext::genMailboxCHROMIUM):
+        (WebKit::ResourceProviderContext::produceTextureCHROMIUM):
+        (WebKit::ResourceProviderContext::consumeTextureCHROMIUM):
+        (WebKit::ResourceProviderContext::ResourceProviderContext):
+        (PendingProduceTexture):
+        (WebKit::CCResourceProviderTest::CCResourceProviderTest):
+        (CCResourceProviderTest):
+        (WebKit::TEST_F):
+
+2012-08-16  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: Frontend and plumbing for integer versions
+        https://bugs.webkit.org/show_bug.cgi?id=92897
+
+        Reviewed by Tony Chang.
+
+        * src/IDBCallbacksProxy.cpp:
+        (WebKit::IDBCallbacksProxy::onBlocked):
+        (WebKit):
+        (WebKit::IDBCallbacksProxy::onUpgradeNeeded):
+        * src/IDBCallbacksProxy.h:
+        (IDBCallbacksProxy):
+        * src/IDBDatabaseBackendProxy.cpp:
+        (WebKit::IDBDatabaseBackendProxy::setVersion):
+        * src/IDBDatabaseCallbacksProxy.cpp:
+        (WebKit::IDBDatabaseCallbacksProxy::onVersionChange):
+        (WebKit):
+        * src/IDBDatabaseCallbacksProxy.h:
+        (IDBDatabaseCallbacksProxy):
+        * src/IDBFactoryBackendProxy.cpp:
+        (WebKit::IDBFactoryBackendProxy::open):
+        * src/IDBFactoryBackendProxy.h:
+        (IDBFactoryBackendProxy):
+        * src/IDBTransactionCallbacksProxy.cpp:
+        (WebKit::IDBTransactionCallbacksProxy::onComplete):
+        * src/WebIDBCallbacksImpl.cpp:
+        (WebKit::WebIDBCallbacksImpl::WebIDBCallbacksImpl):
+        (WebKit::WebIDBCallbacksImpl::onSuccess):
+        We don't want to create IDBDatabaseBackendProxy again if we've already
+        created it during upgradeNeeded.  This makes
+        IDBRequest::onSuccess(IDBDatabaseBackend) reuse its previous
+        IDBDatabaseBackendInterface if it has one.
+
+        (WebKit::WebIDBCallbacksImpl::onBlocked):
+        (WebKit):
+        (WebKit::WebIDBCallbacksImpl::onUpgradeNeeded):
+        * src/WebIDBCallbacksImpl.h:
+        (WebIDBCallbacksImpl):
+        * src/WebIDBDatabaseCallbacksImpl.cpp:
+        (WebKit::WebIDBDatabaseCallbacksImpl::onVersionChange):
+        (WebKit):
+        * src/WebIDBDatabaseCallbacksImpl.h:
+        (WebIDBDatabaseCallbacksImpl):
+        * src/WebIDBDatabaseImpl.cpp:
+        (WebKit::WebIDBDatabaseImpl::WebIDBDatabaseImpl):
+        (WebKit::WebIDBDatabaseImpl::close):
+        (WebKit::WebIDBDatabaseImpl::open):
+        * src/WebIDBDatabaseImpl.h:
+        (WebIDBDatabaseImpl):
+        * src/WebIDBFactoryImpl.cpp:
+        (WebKit::WebIDBFactoryImpl::open):
+        * src/WebIDBFactoryImpl.h:
+        (WebIDBFactoryImpl):
+        * src/WebIDBTransactionCallbacksImpl.cpp:
+        (WebKit::WebIDBTransactionCallbacksImpl::onComplete):
+        * tests/IDBAbortOnCorruptTest.cpp:
+        (WebCore::TEST):
+        * tests/IDBDatabaseBackendTest.cpp:
+
+2012-08-16  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r125838.
+        http://trac.webkit.org/changeset/125838
+        https://bugs.webkit.org/show_bug.cgi?id=94283
+
+        Breaks Mac compile due to bug 74625 (Requested by enne on
+        #webkit).
+
+        * tests/CCResourceProviderTest.cpp:
+        (WebKit::ResourceProviderContext::create):
+        (WebKit::ResourceProviderContext::textureSize):
+        (ResourceProviderContext):
+        (WebKit::ResourceProviderContext::ResourceProviderContext):
+        (WebKit::ResourceProviderContext::Texture::Texture):
+        (Texture):
+        (WebKit::CCResourceProviderTest::CCResourceProviderTest):
+        (CCResourceProviderTest):
+        (WebKit::TEST_F):
+
+2012-08-16  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed, rolling out r125800.
+        http://trac.webkit.org/changeset/125800
+        https://bugs.webkit.org/show_bug.cgi?id=84281
+
+        Hypothesis that this change caused gpu_throughput_tests to
+        start timing out on all platforms on the Chromium GPU
+        canaries.
+
+        * tests/CCSchedulerTest.cpp:
+        (WebKitTests::TEST):
+        * tests/CCSchedulerTestCommon.h:
+        (WebKitTests::FakeCCTimeSource::FakeCCTimeSource):
+        (FakeCCTimeSource):
+        * tests/CCTextureUpdateControllerTest.cpp:
+
+2012-08-16  Antoine Labour  <piman@chromium.org>
+
+        [chromium] Add resource transfer functions to CCResourceProvider
+        https://bugs.webkit.org/show_bug.cgi?id=93524
+
+        Reviewed by James Robinson.
+
+        This adds methods to CCResourceProvider to be able to transport
+        resources from a child to a parent.
+
+        Added test to CCResourceProviderTest.
+
+        * tests/CCResourceProviderTest.cpp:
+        (WebKit::textureSize):
+        (WebKit):
+        (WebKit::Texture::Texture):
+        (Texture):
+        (ContextSharedData):
+        (WebKit::ContextSharedData::create):
+        (WebKit::ContextSharedData::insertSyncPoint):
+        (WebKit::ContextSharedData::genMailbox):
+        (WebKit::ContextSharedData::produceTexture):
+        (WebKit::ContextSharedData::consumeTexture):
+        (WebKit::ContextSharedData::ContextSharedData):
+        (WebKit::ResourceProviderContext::create):
+        (ResourceProviderContext):
+        (WebKit::ResourceProviderContext::insertSyncPoint):
+        (WebKit::ResourceProviderContext::waitSyncPoint):
+        (WebKit::ResourceProviderContext::genMailboxCHROMIUM):
+        (WebKit::ResourceProviderContext::produceTextureCHROMIUM):
+        (WebKit::ResourceProviderContext::consumeTextureCHROMIUM):
+        (WebKit::ResourceProviderContext::ResourceProviderContext):
+        (PendingProduceTexture):
+        (WebKit::CCResourceProviderTest::CCResourceProviderTest):
+        (CCResourceProviderTest):
+        (WebKit::TEST_F):
+
+2012-08-16  Alexandre Elias  <aelias@google.com>
+
+        [chromium] Replace destRect with destOffset in texture upload
+        https://bugs.webkit.org/show_bug.cgi?id=94154
+
+        Reviewed by James Robinson.
+
+        Previously, texture upload code implicitly assumed that sourceRect and
+        destRect have the same size. The behavior is undefined if they are
+        different, since they are used interchangeably and there's no support
+        for scaling from one rect to the other. This patch enforces that
+        constraint at the interface level by replacing all instances of
+        "IntRect destRect" by "IntSize destOffset".
+
+        * tests/CCResourceProviderTest.cpp:
+        (WebKit::TEST_F):
+        * tests/CCTextureUpdateControllerTest.cpp:
+        * tests/CCTiledLayerTestCommon.cpp:
+        (WebKitTests::FakeLayerTextureUpdater::Texture::updateRect):
+        * tests/CCTiledLayerTestCommon.h:
+        (Texture):
+        (WebKitTests::FakeTextureUploader::uploadTexture):
+
+2012-08-16  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Remove unnecessary tree hierarchy inspection APIs from WebLayer
+        https://bugs.webkit.org/show_bug.cgi?id=94229
+
+        Reviewed by Adrienne Walker.
+
+        Remove dead WebLayer function implementations and tests of same.
+
+        * src/WebLayer.cpp:
+        * tests/WebLayerTest.cpp:
+
+2012-08-16  David Reveman  <reveman@chromium.org>
+
+        [Chromium] Avoid aliasing global symbol monotonicallyIncreasingTime().
+        https://bugs.webkit.org/show_bug.cgi?id=94233
+
+        Reviewed by James Robinson.
+
+        * tests/CCDelayBasedTimeSourceTest.cpp:
+        (WebKitTests::TEST):
+        * tests/CCFrameRateControllerTest.cpp:
+        (WebKitTests::TEST):
+        * tests/CCSchedulerTestCommon.h:
+        (WebKitTests::FakeCCDelayBasedTimeSource::setMonotonicTimeNow):
+        (WebKitTests::FakeCCDelayBasedTimeSource::FakeCCDelayBasedTimeSource):
+        (FakeCCDelayBasedTimeSource):
+
+2012-08-16  David Reveman  <reveman@chromium.org>
+
+        [Chromium] Schedule texture uploads based on hard-coded timer and vsync.
+        https://bugs.webkit.org/show_bug.cgi?id=84281
+
+        Reviewed by James Robinson.
+
+        * tests/CCSchedulerTest.cpp:
+        (WebKitTests::TEST):
+        * tests/CCSchedulerTestCommon.h:
+        (WebKitTests::FakeCCTimeSource::FakeCCTimeSource):
+        (WebKitTests::FakeCCTimeSource::setNextTickTime):
+        (FakeCCTimeSource):
+        * tests/CCTextureUpdateControllerTest.cpp:
+
+2012-08-16  Dana Jansens  <danakj@chromium.org>
+
+        [chromium] Impl scrolling crashes when the renderer's initialization failed
+        https://bugs.webkit.org/show_bug.cgi?id=94232
+
+        Reviewed by James Robinson.
+
+        Also updated the finishAllRenderingAfterContextLost to properly fail
+        renderer initialization.
+
+        * tests/CCLayerTreeHostImplTest.cpp:
+
+2012-08-16  Peter Beverloo  <peter@chromium.org>
+
+        [Chromium] Pass the --strip-binary argument to the apk test generator
+        https://bugs.webkit.org/show_bug.cgi?id=94224
+
+        Reviewed by Adam Barth.
+
+        The native test generator currently relies on the $STRIP environment
+        variable to be available, which it shouldn't do. Instead, pass it as an
+        argument to the script. The $STRIP variable is being deprecated.
+
+        * WebKitUnitTests.gyp:
+
+2012-08-16  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Remove alwaysReserveTextures code - it doesn't do anything
+        https://bugs.webkit.org/show_bug.cgi?id=94183
+
+        Reviewed by Dimitri Glazkov.
+
+        Stops attempting to find the scrollbar layers and call setAlwaysReserveTextures() on them since the call doesn't
+        do anything.
+
+        * src/NonCompositedContentHost.cpp:
+        (WebKit::NonCompositedContentHost::setViewport):
+        * src/WebLayer.cpp:
+
+2012-08-16  Peter Beverloo  <peter@chromium.org>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-08-16  Keishi Hattori  <keishi@webkit.org>
+
+        DOMWindowPagePopup needs to be installed before loading the html inside the page popup
+        https://bugs.webkit.org/show_bug.cgi?id=94193
+
+        Reviewed by Kent Tamura.
+
+        We are using window.pagePopupController.localizeNumberString while loading so we need to install DOMWindowPagePopup before loading the html.
+
+        * src/WebPagePopupImpl.cpp:
+        (WebKit::WebPagePopupImpl::initPage):
+
+2012-08-16  Marja Hölttä  <marja@chromium.org>
+
+        WebHistoryItem: Enable reading selected file names from document state
+        https://bugs.webkit.org/show_bug.cgi?id=91231
+
+        Reviewed by Jochen Eisinger.
+
+        This change enables Chromium to set up file permissions properly when
+        the session restore feature restores a page with selected files.
+
+        * public/WebHistoryItem.h:
+        (WebHistoryItem): Added getReferencedFilePaths.
+        * src/WebHistoryItem.cpp:
+        (WebKit::WebHistoryItem::getReferencedFilePaths): Extracts selected and posted file paths from a document state.
+        (WebKit):
+
+2012-08-15  Shawn Singh  <shawnsingh@chromium.org>
+
+        [chromium] set scissorRect per quad so that quads are correctly clipped
+        https://bugs.webkit.org/show_bug.cgi?id=94050
+
+        Reviewed by Adrienne Walker.
+
+        Updated two unit tests to reflect that we need to always scissor,
+        until we refactor so that quads do not depend on scissoring.
+
+        * tests/CCLayerTreeHostImplTest.cpp:
+
+2012-08-16  Hironori Bono  <hbono@chromium.org>
+
+        Prevent showing suggestions when right-clicking a selection range.
+        https://bugs.webkit.org/show_bug.cgi?id=94189
+
+        Reviewed by Hajime Morita.
+
+        To emulate Safari, my r120810 changes selection when right-clicking a misspelled
+        word. Unfortunately, this change somehow uses VisibleSelection::isCaretOrRange
+        and it changes the existing selection when right-clicking a selection which
+        includes a misspelled word. This change uses VisibleSelection::isCaret to
+        prevent showing suggestions when right-clicking a selection range. (Neither does
+        Safari show suggestions when there is a selection range.)
+
+        * src/ContextMenuClientImpl.cpp:
+        (WebKit::ContextMenuClientImpl::getCustomMenuFromDefaultItems):
+
+2012-08-15  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-08-15  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Update manual tests and comments to refer to TestRunner instead of LayoutTestController
+        https://bugs.webkit.org/show_bug.cgi?id=94168
+
+        Reviewed by Kent Tamura.
+
+        * public/WebDevToolsAgent.h:
+        (WebDevToolsAgent):
+        * public/WebView.h:
+        (WebView):
+
 2012-08-15  Alec Flett  <alecflett@chromium.org>
 
         IndexedDB: generate index keys for existing data in createIndex in front end

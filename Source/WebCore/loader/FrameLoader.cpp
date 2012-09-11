@@ -303,6 +303,8 @@ void FrameLoader::submitForm(PassRefPtr<FormSubmission> submission)
         return;
 
     if (protocolIsJavaScript(submission->action())) {
+        if (!m_frame->document()->contentSecurityPolicy()->allowFormAction(KURL(submission->action())))
+            return;
         m_isExecutingJavaScriptFormAction = true;
         m_frame->script()->executeIfJavaScriptURL(submission->action(), DoNotReplaceDocumentIfJavaScriptURL);
         m_isExecutingJavaScriptFormAction = false;
@@ -357,7 +359,7 @@ void FrameLoader::stopLoading(UnloadEventPolicy unloadEventPolicy)
                 Node* currentFocusedNode = m_frame->document()->focusedNode();
                 if (currentFocusedNode)
                     currentFocusedNode->aboutToUnload();
-                if (m_frame->document()->domWindow() && m_pageDismissalEventBeingDispatched == NoDismissal) {
+                if (m_pageDismissalEventBeingDispatched == NoDismissal) {
                     if (unloadEventPolicy == UnloadEventPolicyUnloadAndPageHide) {
                         m_pageDismissalEventBeingDispatched = PageHideDismissal;
                         m_frame->document()->domWindow()->dispatchEvent(PageTransitionEvent::create(eventNames().pagehideEvent, m_frame->document()->inPageCache()), m_frame->document());
@@ -464,10 +466,9 @@ bool FrameLoader::didOpenURL()
     // its frame is not in a consistent state for rendering, so avoid setJSStatusBarText
     // since it may cause clients to attempt to render the frame.
     if (!m_stateMachine.creatingInitialEmptyDocument()) {
-        if (DOMWindow* window = m_frame->document()->domWindow()) {
-            window->setStatus(String());
-            window->setDefaultStatus(String());
-        }
+        DOMWindow* window = m_frame->document()->domWindow();
+        window->setStatus(String());
+        window->setDefaultStatus(String());
     }
 
     started();
@@ -523,7 +524,7 @@ void FrameLoader::clear(Document* newDocument, bool clearWindowProperties, bool 
     // Do this after detaching the document so that the unload event works.
     if (clearWindowProperties) {
         InspectorInstrumentation::frameWindowDiscarded(m_frame, m_frame->document()->domWindow());
-        m_frame->document()->domWindow()->clear();
+        m_frame->document()->domWindow()->resetUnlessSuspendedForPageCache();
         m_frame->script()->clearWindowShell(newDocument->domWindow(), m_frame->document()->inPageCache());
     }
 
@@ -910,6 +911,14 @@ bool FrameLoader::checkIfRunInsecureContent(SecurityOrigin* context, const KURL&
         m_client->didRunInsecureContent(context, url);
 
     return allowed;
+}
+
+bool FrameLoader::checkIfFormActionAllowedByCSP(const KURL& url) const
+{
+    if (m_submittedFormURL.isEmpty())
+        return true;
+
+    return m_frame->document()->contentSecurityPolicy()->allowFormAction(url);
 }
 
 Frame* FrameLoader::opener()
@@ -1902,10 +1911,9 @@ void FrameLoader::prepareForCachedPageRestore()
     
     // Delete old status bar messages (if it _was_ activated on last URL).
     if (m_frame->script()->canExecuteScripts(NotAboutToExecuteScript)) {
-        if (DOMWindow* window = m_frame->document()->domWindow()) {
-            window->setStatus(String());
-            window->setDefaultStatus(String());
-        }
+        DOMWindow* window = m_frame->document()->domWindow();
+        window->setStatus(String());
+        window->setDefaultStatus(String());
     }
 }
 

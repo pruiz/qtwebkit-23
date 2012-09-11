@@ -78,6 +78,7 @@ SOURCES += \
      bindings/js/BindingState.cpp \
      bindings/js/CallbackFunction.cpp \
      bindings/js/DOMObjectHashTableMap.cpp \
+     bindings/js/DOMTransaction.cpp \
      bindings/js/DOMWrapperWorld.cpp \
      bindings/js/Dictionary.cpp \
      bindings/js/GCController.cpp \
@@ -100,7 +101,6 @@ SOURCES += \
      bindings/js/JSClipboardCustom.cpp \
      bindings/js/JSConsoleCustom.cpp \
      bindings/js/JSCoordinatesCustom.cpp \
-     bindings/js/JSCustomVoidCallback.cpp \
      bindings/js/JSCustomXPathNSResolver.cpp \
      bindings/js/JSDictionary.cpp \
      bindings/js/JSDOMBinding.cpp \
@@ -187,6 +187,7 @@ SOURCES += \
      bindings/js/JSTouchCustom.cpp \
      bindings/js/JSTouchListCustom.cpp \
      bindings/js/JSTreeWalkerCustom.cpp \
+     bindings/js/JSUndoManagerCustom.cpp \
      bindings/js/JSWebKitAnimationCustom.cpp \
      bindings/js/JSWebKitAnimationListCustom.cpp \
      bindings/js/JSWebKitCSSKeyframeRuleCustom.cpp \
@@ -728,6 +729,7 @@ SOURCES += \
     html/shadow/MeterShadowElement.cpp \
     html/shadow/ProgressShadowElement.cpp \
     html/shadow/SliderThumbElement.cpp \
+    html/shadow/SpinButtonElement.cpp \
     html/shadow/TextControlInnerElements.cpp \
     inspector/ConsoleMessage.cpp \
     inspector/ContentSearchUtils.cpp \
@@ -1040,6 +1042,7 @@ SOURCES += \
     platform/network/ResourceResponseBase.cpp \
     platform/text/RegularExpression.cpp \
     platform/PlatformEvent.cpp \
+    platform/PlatformInstrumentation.cpp \
     platform/RuntimeApplicationChecks.cpp \
     platform/RunLoop.cpp \
     platform/SchemeRegistry.cpp \
@@ -1287,12 +1290,12 @@ HEADERS += \
     bindings/js/JSArrayBufferViewHelper.h \
     bindings/js/JSCSSStyleDeclarationCustom.h \
     bindings/js/JSCallbackData.h \
-    bindings/js/JSCustomVoidCallback.h \
     bindings/js/JSCustomXPathNSResolver.h \
     bindings/js/JSDictionary.h \
     bindings/js/JSDOMBinding.h \
     bindings/js/JSDOMGlobalObject.h \
     bindings/js/JSDOMStringMapCustom.h \
+    bindings/js/DOMTransaction.h \
     bindings/js/JSDOMWindowBase.h \
     bindings/js/JSDOMWindowCustom.h \
     bindings/js/JSDOMWindowShell.h \
@@ -2998,13 +3001,13 @@ contains(DEFINES, ENABLE_FILE_SYSTEM=1) {
         Modules/filesystem/FileEntrySync.h \
         Modules/filesystem/FileSystemCallback.h \
         Modules/filesystem/FileSystemCallbacks.h \
+        Modules/filesystem/FileSystemFlags.h \
         Modules/filesystem/FileWriter.h \
         Modules/filesystem/FileWriterBase.h \
         Modules/filesystem/FileWriterBaseCallback.h \
         Modules/filesystem/FileWriterCallback.h \
         Modules/filesystem/FileWriterClient.h \
         Modules/filesystem/FileWriterSync.h \
-        Modules/filesystem/WebKitFlags.h \
         Modules/filesystem/LocalFileSystem.h \
         Modules/filesystem/Metadata.h \
         Modules/filesystem/MetadataCallback.h \
@@ -3013,8 +3016,6 @@ contains(DEFINES, ENABLE_FILE_SYSTEM=1) {
         platform/FileMetadata.h
 
     SOURCES += \
-        bindings/js/JSDirectoryEntryCustom.cpp \
-        bindings/js/JSDirectoryEntrySyncCustom.cpp \
         bindings/js/JSEntryCustom.cpp \
         bindings/js/JSEntrySyncCustom.cpp \
         platform/AsyncFileSystem.cpp

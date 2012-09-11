@@ -33,3 +33,8 @@ win32-* {
     LIBS += -lwinmm
     LIBS += -lgdi32
 }
+
+qnx {
+    # required for timegm
+    LIBS += -lnbutil
+}

@@ -1041,11 +1041,9 @@ void WebPagePrivate::setLoadState(LoadState state)
 #endif
 
 #if USE(ACCELERATED_COMPOSITING)
-            if (isAcceleratedCompositingActive()) {
-                Platform::userInterfaceThreadMessageClient()->dispatchSyncMessage(
-                    Platform::createMethodCallMessage(&WebPagePrivate::destroyLayerResources, this));
-            }
+            releaseLayerResources();
 #endif
+
             // Suspend screen update to avoid ui thread blitting while resetting backingstore.
             m_backingStore->d->suspendScreenAndBackingStoreUpdates();
 
@@ -1068,15 +1066,11 @@ void WebPagePrivate::setLoadState(LoadState state)
             // Check if we have already process the meta viewport tag, this only happens on history navigation.
             // For back/forward history navigation, we should only keep these previous values if the document
             // has the meta viewport tag when the state is Committed in setLoadState.
-            // Refreshing should keep these previous values as well.
             static ViewportArguments defaultViewportArguments;
             bool documentHasViewportArguments = false;
-            FrameLoadType frameLoadType = FrameLoadTypeStandard;
             if (m_mainFrame && m_mainFrame->document() && m_mainFrame->document()->viewportArguments() != defaultViewportArguments)
                 documentHasViewportArguments = true;
-            if (m_mainFrame && m_mainFrame->loader())
-                frameLoadType = m_mainFrame->loader()->loadType();
-            if (!((m_didRestoreFromPageCache && documentHasViewportArguments) || (frameLoadType == FrameLoadTypeReload || frameLoadType == FrameLoadTypeReloadFromOrigin))) {
+            if (!(m_didRestoreFromPageCache && documentHasViewportArguments)) {
                 m_viewportArguments = ViewportArguments();
                 m_userScalable = m_webSettings->isUserScalable();
                 resetScales();
@@ -1094,16 +1088,6 @@ void WebPagePrivate::setLoadState(LoadState state)
             didReceiveCursorEventMode(ProcessedCursorEvents);
             didReceiveTouchEventMode(ProcessedTouchEvents);
 #endif
-
-            // If it's a outmost SVG document, we use FixedDesktop mode, otherwise
-            // we default to Mobile mode. For example, using FixedDesktop mode to
-            // render http://www.croczilla.com/bits_and_pieces/svg/samples/tiger/tiger.svg
-            // is user-experience friendly.
-            if (m_page->mainFrame()->document()->isSVGDocument()) {
-                setShouldUseFixedDesktopMode(true);
-                setViewMode(FixedDesktop);
-            } else
-                setViewMode(Mobile);
 
             // Reset block zoom and reflow.
             resetBlockZoom();
@@ -1588,6 +1572,10 @@ bool WebPagePrivate::hasVirtualViewport() const
 
 void WebPagePrivate::updateViewportSize(bool setFixedReportedSize, bool sendResizeEvent)
 {
+    // This checks to make sure we're not calling updateViewportSize
+    // during WebPagePrivate::init().
+    if (!m_backingStore)
+        return;
     ASSERT(m_mainFrame->view());
     if (setFixedReportedSize)
         m_mainFrame->view()->setFixedReportedSize(actualVisibleSize());
@@ -1765,9 +1753,9 @@ void WebPagePrivate::zoomToInitialScaleOnLoad()
     bool performedZoom = false;
     bool shouldZoom = !m_userPerformedManualZoom;
 
-    // If this load should restore view state, don't zoom to initial scale
+    // If this is a back/forward type navigation, don't zoom to initial scale
     // but instead let the HistoryItem's saved viewport reign supreme.
-    if (m_mainFrame && m_mainFrame->loader() && m_mainFrame->loader()->shouldRestoreScrollPositionAndViewState())
+    if (m_mainFrame && m_mainFrame->loader() && isBackForwardLoadType(m_mainFrame->loader()->loadType()))
         shouldZoom = false;
 
     if (shouldZoom && shouldZoomToInitialScaleOnLoad()) {
@@ -2538,32 +2526,8 @@ IntSize WebPagePrivate::fixedLayoutSize(bool snapToIncrement) const
         return IntSize(width, height);
     }
 
-    if (m_webSettings->isZoomToFitOnLoad()) {
-        // We need to clamp the layout width to the minimum of the layout
-        // width or the content width. This is important under rotation for mobile
-        // websites. We want the page to remain layouted at the same width which
-        // it was loaded with, and instead change the zoom level to fit to screen.
-        // The height is welcome to adapt to the height used in the new orientation,
-        // otherwise we will get a grey bar below the web page.
-        if (m_mainFrame->view() && !contentsSize().isEmpty())
-            minWidth = contentsSize().width();
-        else {
-            // If there is no contents width, use the minimum of screen width
-            // and layout width to shape the first layout to a contents width
-            // that we could reasonably zoom to fit, in a manner that takes
-            // orientation into account and still respects a small default
-            // layout width.
-#if ENABLE(ORIENTATION_EVENTS)
-            minWidth = m_mainFrame->orientation() % 180
-                ? Platform::Graphics::Screen::primaryScreen()->height()
-                : Platform::Graphics::Screen::primaryScreen()->width();
-#else
-            minWidth = Platform::Graphics::Screen::primaryScreen()->width();
-#endif
-        }
-    }
-
-    return IntSize(std::min(minWidth, defaultLayoutWidth), defaultLayoutHeight);
+    ASSERT_NOT_REACHED();
+    return IntSize(defaultLayoutWidth, defaultLayoutHeight);
 }
 
 BackingStoreClient* WebPagePrivate::backingStoreClientForFrame(const Frame* frame) const
@@ -5912,7 +5876,19 @@ void WebPagePrivate::syncDestroyCompositorOnCompositingThread()
             &WebPagePrivate::destroyCompositor, this));
 }
 
-void WebPagePrivate::destroyLayerResources()
+void WebPagePrivate::releaseLayerResources()
+{
+    if (!isAcceleratedCompositingActive())
+        return;
+
+    if (m_frameLayers)
+        m_frameLayers->releaseLayerResources();
+
+    Platform::userInterfaceThreadMessageClient()->dispatchSyncMessage(
+        Platform::createMethodCallMessage(&WebPagePrivate::releaseLayerResourcesCompositingThread, this));
+}
+
+void WebPagePrivate::releaseLayerResourcesCompositingThread()
 {
      m_compositor->releaseLayerResources();
 }
@@ -5927,8 +5903,7 @@ void WebPagePrivate::suspendRootLayerCommit()
     if (!m_compositor)
         return;
 
-    Platform::userInterfaceThreadMessageClient()->dispatchSyncMessage(
-        Platform::createMethodCallMessage(&WebPagePrivate::destroyLayerResources, this));
+    releaseLayerResources();
 }
 
 void WebPagePrivate::resumeRootLayerCommit()

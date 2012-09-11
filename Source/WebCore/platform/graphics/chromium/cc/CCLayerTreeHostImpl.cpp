@@ -24,29 +24,29 @@
 
 #include "config.h"
 
-#include "cc/CCLayerTreeHostImpl.h"
+#include "CCLayerTreeHostImpl.h"
 
+#include "CCActiveGestureAnimation.h"
+#include "CCDamageTracker.h"
+#include "CCDebugRectHistory.h"
+#include "CCDelayBasedTimeSource.h"
+#include "CCFontAtlas.h"
+#include "CCFrameRateCounter.h"
+#include "CCLayerIterator.h"
+#include "CCLayerTreeHost.h"
+#include "CCLayerTreeHostCommon.h"
+#include "CCOverdrawMetrics.h"
+#include "CCPageScaleAnimation.h"
+#include "CCPrioritizedTextureManager.h"
+#include "CCRenderPassDrawQuad.h"
+#include "CCRenderingStats.h"
+#include "CCScrollbarAnimationController.h"
+#include "CCScrollbarLayerImpl.h"
+#include "CCSettings.h"
+#include "CCSingleThreadProxy.h"
 #include "LayerRendererChromium.h"
 #include "TextStream.h"
 #include "TraceEvent.h"
-#include "cc/CCActiveGestureAnimation.h"
-#include "cc/CCDamageTracker.h"
-#include "cc/CCDebugRectHistory.h"
-#include "cc/CCDelayBasedTimeSource.h"
-#include "cc/CCFontAtlas.h"
-#include "cc/CCFrameRateCounter.h"
-#include "cc/CCLayerIterator.h"
-#include "cc/CCLayerTreeHost.h"
-#include "cc/CCLayerTreeHostCommon.h"
-#include "cc/CCOverdrawMetrics.h"
-#include "cc/CCPageScaleAnimation.h"
-#include "cc/CCPrioritizedTextureManager.h"
-#include "cc/CCRenderPassDrawQuad.h"
-#include "cc/CCRenderingStats.h"
-#include "cc/CCScrollbarAnimationController.h"
-#include "cc/CCScrollbarLayerImpl.h"
-#include "cc/CCSettings.h"
-#include "cc/CCSingleThreadProxy.h"
 #include <wtf/CurrentTime.h>
 
 using WebKit::WebTransformationMatrix;
@@ -251,6 +251,7 @@ void CCLayerTreeHostImpl::calculateRenderSurfaceLayerList(CCLayerList& renderSur
 {
     ASSERT(renderSurfaceLayerList.isEmpty());
     ASSERT(m_rootLayerImpl);
+    ASSERT(m_layerRenderer); // For maxTextureSize.
 
     {
         TRACE_EVENT0("cc", "CCLayerTreeHostImpl::calcDrawEtc");
@@ -829,6 +830,8 @@ void CCLayerTreeHostImpl::setNeedsRedraw()
 bool CCLayerTreeHostImpl::ensureRenderSurfaceLayerList()
 {
     if (!m_rootLayerImpl)
+        return false;
+    if (!m_layerRenderer)
         return false;
 
     // We need both a non-empty render surface layer list and a root render

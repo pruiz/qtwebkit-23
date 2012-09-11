@@ -260,6 +260,7 @@ BUGWK84333 : fast/forms/file/input-file-entries.html = TEXT
 BUGWK84333 : fast/forms/file/input-file-re-render.html = MISSING
 BUGWK84333 : fast/forms/file/input-file-write-files.html = TEXT
 BUGWK84333 : fast/forms/file/recover-file-input-in-unposted-form.html = TEXT
+BUGWK84333 : fast/forms/file/selected-files-from-history-state.html = TEXT
 BUGWK84333 : http/tests/local/blob/send-hybrid-blob.html = TEXT
 BUGWK84333 : http/tests/local/fileapi/file-last-modified.html = TEXT
 BUGWK84333 : http/tests/local/fileapi/send-dragged-file.html = TEXT
@@ -854,6 +855,9 @@ BUGWK50485 SKIP : inspector/profiler/heap-snapshot-summary-sorting-fields.html =
 BUGWK50485 SKIP : inspector/profiler/heap-snapshot-summary-sorting.html = TEXT
 BUGWK50485 SKIP : inspector/profiler/heap-snapshot-summary-sorting-instances.html = TEXT
 
+// ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS) is disabled
+BUGWK94186 SKIP : fast/forms/time-multiple-fields = PASS
+
 // Require rebaseline after bug 93148
 BUGWK93148 : tables/mozilla_expected_failures/bugs/bug106966.html = TEXT
 BUGWK93148 : tables/mozilla_expected_failures/marvin/table_overflow_hidden_tbody.html = TEXT
@@ -877,3 +881,21 @@ BUGWK94003 : fast/css/word-spacing-characters-complex-text.html = IMAGE
 BUGWK94009 : css2.1/20110323/c541-word-sp-000.htm = IMAGE
 
 BUGWK94150 : fast/events/autoscroll-in-textarea.html = TEXT
+
+// Fails also on GTK
+BUGWK94080 : fast/overflow/line-clamp-and-columns.html = IMAGE
+
+// Failing after 125592
+BUGWK94194 : http/tests/security/frameNavigation/inactive-function-in-popup-navigate-child.html = TEXT
+
+// Alt text should be displayed if src attribute is not set.
+BUGWK94198 : fast/dom/HTMLImageElement/image-alt-text.html = IMAGE
+BUGWK94198 : fast/dom/HTMLInputElement/input-image-alt-text.html = IMAGE
+
+BUGWK84037 : fast/text/international/spaces-combined-in-vertical-text.html = TEXT
+
+// Fails also on GTK and QT
+BUGWK59706 : http/tests/inspector/resource-tree/resource-tree-frame-navigate.html = TEXT
+
+// New test introduced in r125790 fails
+BUGWK94341 : inspector/timeline/timeline-decode-resize.html = TEXT

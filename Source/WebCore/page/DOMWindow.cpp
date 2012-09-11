@@ -437,9 +437,9 @@ DOMWindow::~DOMWindow()
     else
         willDestroyDocumentInFrame();
 
-    // As the ASSERTs above indicate, this clear should only be necesary if this DOMWindow is suspended for the page cache.
+    // As the ASSERTs above indicate, this reset should only be necessary if this DOMWindow is suspended for the page cache.
     // But we don't want to risk any of these objects hanging around after we've been destroyed.
-    clearDOMWindowProperties();
+    resetDOMWindowProperties();
 
     removeAllUnloadEventListeners(this);
     removeAllBeforeUnloadEventListeners(this);
@@ -474,7 +474,7 @@ void DOMWindow::frameDestroyed()
 {
     willDestroyDocumentInFrame();
     FrameDestructionObserver::frameDestroyed();
-    clearDOMWindowProperties();
+    resetDOMWindowProperties();
 }
 
 void DOMWindow::willDetachPage()
@@ -522,16 +522,12 @@ void DOMWindow::unregisterProperty(DOMWindowProperty* property)
     m_properties.remove(property);
 }
 
-void DOMWindow::clear()
+void DOMWindow::resetUnlessSuspendedForPageCache()
 {
-    // The main frame will always try to clear its DOMWindow when a new load is committed, even if that
-    // DOMWindow is suspended in the page cache.
-    // In those cases we need to make sure we don't actually clear it.
     if (m_suspendedForPageCache)
         return;
-    
     willDestroyDocumentInFrame();
-    clearDOMWindowProperties();
+    resetDOMWindowProperties();
 }
 
 void DOMWindow::suspendForPageCache()
@@ -567,7 +563,7 @@ void DOMWindow::reconnectDOMWindowProperties()
         properties[i]->reconnectFrameFromPageCache(m_frame);
 }
 
-void DOMWindow::clearDOMWindowProperties()
+void DOMWindow::resetDOMWindowProperties()
 {
     m_properties.clear();
 
@@ -1306,11 +1302,6 @@ Document* DOMWindow::document() const
     return static_cast<Document*>(context);
 }
 
-SecurityOrigin* DOMWindow::securityOrigin() const
-{
-    return document() ? document()->securityOrigin() : 0;
-}
-
 PassRefPtr<StyleMedia> DOMWindow::styleMedia() const
 {
     if (!isCurrentlyDisplayedInFrame())
@@ -1786,7 +1777,7 @@ bool DOMWindow::isInsecureScriptAccess(DOMWindow* activeWindow, const String& ur
 
         // FIXME: The name canAccess seems to be a roundabout way to ask "can execute script".
         // Can we name the SecurityOrigin function better to make this more clear?
-        if (activeWindow->securityOrigin()->canAccess(securityOrigin()))
+        if (activeWindow->document()->securityOrigin()->canAccess(document()->securityOrigin()))
             return false;
     }
 
@@ -1811,7 +1802,7 @@ Frame* DOMWindow::createWindow(const String& urlString, const AtomicString& fram
 
     ResourceRequest request(completedURL, referrer);
     FrameLoader::addHTTPOriginIfNeeded(request, firstFrame->loader()->outgoingOrigin());
-    FrameLoadRequest frameRequest(activeWindow->securityOrigin(), request, frameName);
+    FrameLoadRequest frameRequest(activeWindow->document()->securityOrigin(), request, frameName);
 
     // We pass the opener frame for the lookupFrame in case the active frame is different from
     // the opener frame, and the name references a frame relative to the opener frame.
@@ -1830,10 +1821,10 @@ Frame* DOMWindow::createWindow(const String& urlString, const AtomicString& fram
         function(newFrame->document()->domWindow(), functionContext);
 
     if (created)
-        newFrame->loader()->changeLocation(activeWindow->securityOrigin(), completedURL, referrer, false, false);
+        newFrame->loader()->changeLocation(activeWindow->document()->securityOrigin(), completedURL, referrer, false, false);
     else if (!urlString.isEmpty()) {
         bool lockHistory = !ScriptController::processingUserGesture();
-        newFrame->navigationScheduler()->scheduleLocationChange(activeWindow->securityOrigin(), completedURL.string(), referrer, lockHistory, false);
+        newFrame->navigationScheduler()->scheduleLocationChange(activeWindow->document()->securityOrigin(), completedURL.string(), referrer, lockHistory, false);
     }
 
     return newFrame;

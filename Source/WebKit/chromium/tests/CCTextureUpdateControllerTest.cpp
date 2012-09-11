@@ -24,17 +24,16 @@
 
 #include "config.h"
 
-#include "cc/CCTextureUpdateController.h"
+#include "CCTextureUpdateController.h"
 
 #include "CCSchedulerTestCommon.h"
+#include "CCSingleThreadProxy.h" // For DebugScopedSetImplThread
 #include "CCTiledLayerTestCommon.h"
 #include "FakeWebCompositorOutputSurface.h"
 #include "FakeWebGraphicsContext3D.h"
-#include "cc/CCSingleThreadProxy.h" // For DebugScopedSetImplThread
+#include <gtest/gtest.h>
 #include <public/WebCompositor.h>
 #include <public/WebThread.h>
-
-#include <gtest/gtest.h>
 #include <wtf/RefPtr.h>
 
 using namespace WebCore;
@@ -89,7 +88,7 @@ private:
 class TextureForUploadTest : public LayerTextureUpdater::Texture {
 public:
     TextureForUploadTest() : LayerTextureUpdater::Texture(adoptPtr<CCPrioritizedTexture>(0)) { }
-    virtual void updateRect(CCResourceProvider*, const IntRect& sourceRect, const IntRect& destRect) { }
+    virtual void updateRect(CCResourceProvider*, const IntRect& sourceRect, const IntSize& destOffset) { }
 };
 
 
@@ -190,7 +189,7 @@ protected:
         m_totalUploadCountExpected += count;
 
         const IntRect rect(0, 0, 300, 150);
-        const TextureUploader::Parameters upload = { &m_texture, rect, rect };
+        const TextureUploader::Parameters upload = { &m_texture, rect, IntSize() };
         for (int i = 0; i < count; i++)
             m_queue->appendFullUpload(upload);
     }
@@ -201,7 +200,7 @@ protected:
         m_totalUploadCountExpected += count;
 
         const IntRect rect(0, 0, 100, 100);
-        const TextureUploader::Parameters upload = { &m_texture, rect, rect };
+        const TextureUploader::Parameters upload = { &m_texture, rect, IntSize() };
         for (int i = 0; i < count; i++)
             m_queue->appendPartialUpload(upload);
     }

@@ -710,12 +710,21 @@ static LayoutRect sizingBox(RenderObject* renderer)
     return box->style()->boxSizing() == BORDER_BOX ? box->borderBoxRect() : box->computedCSSContentBoxRect();
 }
 
+static IntRect pixelSnappedSizingBox(RenderObject* renderer)
+{
+    if (!renderer->isBox())
+        return IntRect();
+
+    RenderBox* box = toRenderBox(renderer);
+    return box->style()->boxSizing() == BORDER_BOX ? box->pixelSnappedBorderBoxRect() : pixelSnappedIntRect(box->computedCSSContentBoxRect());
+}
+
 static PassRefPtr<CSSValue> computedTransform(RenderObject* renderer, const RenderStyle* style)
 {
     if (!renderer || style->transform().operations().isEmpty())
         return cssValuePool().createIdentifierValue(CSSValueNone);
 
-    LayoutRect box = sizingBox(renderer);
+    IntRect box = pixelSnappedSizingBox(renderer);
 
     TransformationMatrix transform;
     style->applyTransform(transform, box.size(), RenderStyle::ExcludeTransformOrigin);
@@ -2346,7 +2355,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(CSSPropert
                     else if (animation->animationMode() == Animation::AnimateAll)
                         propertyValue = cssValuePool().createIdentifierValue(CSSValueAll);
                     else
-                        propertyValue = cssValuePool().createValue(getPropertyName(animation->property()), CSSPrimitiveValue::CSS_STRING);
+                        propertyValue = cssValuePool().createValue(getPropertyNameString(animation->property()), CSSPrimitiveValue::CSS_STRING);
                     list->append(propertyValue);
                 }
             } else
@@ -2622,7 +2631,7 @@ String CSSComputedStyleDeclaration::item(unsigned i) const
     if (i >= length())
         return "";
 
-    return getPropertyName(computedProperties[i]);
+    return getPropertyNameString(computedProperties[i]);
 }
 
 bool CSSComputedStyleDeclaration::cssPropertyMatches(const CSSProperty* property) const

@@ -612,9 +612,9 @@ Document::~Document()
     ASSERT(!m_parentTreeScope);
     ASSERT(!m_guardRefCount);
 
-    // FIXME: Should we clear m_domWindow when we detach from the Frame?
+    // FIXME: Should we reset m_domWindow when we detach from the Frame?
     if (m_domWindow)
-        m_domWindow->clear();
+        m_domWindow->resetUnlessSuspendedForPageCache();
 
     m_scriptRunner.clear();
 
@@ -665,11 +665,6 @@ Document::~Document()
 
     clearStyleResolver(); // We need to destory CSSFontSelector before destroying m_cachedResourceLoader.
     m_cachedResourceLoader.clear();
-
-#if ENABLE(UNDO_MANAGER)
-    if (m_undoManager)
-        m_undoManager->disconnect();
-#endif
 
     // We must call clearRareData() here since a Document class inherits TreeScope
     // as well as Node. See a comment on TreeScope.h for the reason.
@@ -6144,7 +6139,7 @@ void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 PassRefPtr<UndoManager> Document::undoManager()
 {
     if (!m_undoManager)
-        m_undoManager = UndoManager::create(this);
+        m_undoManager = UndoManager::create(this, this);
     return m_undoManager;
 }
 #endif

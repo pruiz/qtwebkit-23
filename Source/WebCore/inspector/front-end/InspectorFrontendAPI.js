@@ -47,32 +47,31 @@ InspectorFrontendAPI = {
 
     isTimelineProfilingEnabled: function()
     {
-        return WebInspector.panels.timeline.timelineProfilingEnabled;
+        return WebInspector.panels.timeline && WebInspector.panels.timeline.timelineProfilingEnabled;
     },
 
     setTimelineProfilingEnabled: function(enabled)
     {
-        WebInspector.panels.timeline.setTimelineProfilingEnabled(enabled);
+        WebInspector.panel("timeline").setTimelineProfilingEnabled(enabled);
     },
 
     isProfilingJavaScript: function()
     {
-        return WebInspector.CPUProfileType.instance && WebInspector.CPUProfileType.instance.isRecordingProfile();
+        return WebInspector.panels.profiles && WebInspector.CPUProfileType.instance && WebInspector.CPUProfileType.instance.isRecordingProfile();
     },
 
     startProfilingJavaScript: function()
     {
-        WebInspector.panels.profiles.enableProfiler();
-        WebInspector.inspectorView.setCurrentPanel(WebInspector.panels.profiles);
+        WebInspector.showPanel("profiles").enableProfiler();
         if (WebInspector.CPUProfileType.instance)
             WebInspector.CPUProfileType.instance.startRecordingProfile();
     },
 
     stopProfilingJavaScript: function()
     {
+        WebInspector.showPanel("profiles");
         if (WebInspector.CPUProfileType.instance)
             WebInspector.CPUProfileType.instance.stopRecordingProfile();
-        WebInspector.inspectorView.setCurrentPanel(WebInspector.panels.profiles);
     },
 
     setAttachedWindow: function(attached)
@@ -82,7 +81,7 @@ InspectorFrontendAPI = {
 
     showConsole: function()
     {
-        WebInspector.inspectorView.setCurrentPanel(WebInspector.panels.console);
+        WebInspector.showPanel("console");
     },
 
     showMainResourceForFrame: function(frameId)
@@ -92,7 +91,7 @@ InspectorFrontendAPI = {
 
     showResources: function()
     {
-        WebInspector.inspectorView.setCurrentPanel(WebInspector.panels.resources);
+        WebInspector.showPanel("resources");
     },
 
     setDockingUnavailable: function(unavailable)
@@ -102,7 +101,7 @@ InspectorFrontendAPI = {
 
     enterInspectElementMode: function()
     {
-        WebInspector.toggleSearchingForNode();
+        WebInspector.panel("elements").toggleSearchingForNode();
     },
 
     savedURL: function(url)

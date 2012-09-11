@@ -1,3 +1,217 @@
+2012-08-17  Antonio Gomes  <agomes@rim.com>
+
+        [BlackBerry] Allow in-region accelerated scrolling take advantage of defer_blits
+        https://bugs.webkit.org/show_bug.cgi?id=94379
+        PR #194595
+
+        Reviewed by Yong Li.
+
+        Client does the blitting now.
+
+        * Api/InRegionScroller.cpp:
+        (BlackBerry::WebKit::InRegionScrollerPrivate::setScrollPositionCompositingThread):
+
+2012-08-17  Jacky Jiang  <zhajiang@rim.com>
+
+        [BlackBerry] On reload, www.sohu.com renders part white background, part overscroll pattern
+        https://bugs.webkit.org/show_bug.cgi?id=94348
+
+        Reviewed by Yong Li.
+        Jacky Jiang  <zhajiang@rim.com>
+
+        PR: 179200
+        This can fix the reload issues of sohu.com, yahoo.com and
+        thestar.com/iphone(PR158041). And it is also related with PR178305.
+
+        Internally reviewed by George Staikos.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::setLoadState):  Keeping scales for
+        reload was doing more harm than good. Two reasons to remove this:
+        (1) During reload, contents rect is changing due to layout updates,
+        it is possible that the contents or the white background can't cover
+        the whole screen if we are using the previous scales.
+        (2) Before reload, the source of the web page can be changed, therefore
+        previous scales won't be valid anymore.
+        Remove shouldRestoreViewState() as this check here is useless now.
+        (BlackBerry::WebKit::WebPagePrivate::zoomToInitialScaleOnLoad):  During
+        reload, we should give it a chance to zoom to fit the screen,
+        otherwise, it happens that the contents can't cover the whole screen
+        until we restore the view state, see PR158041.
+        Remove shouldRestoreViewState() as the error page issue PR178305 can be
+        covered by reload now.
+        * WebCoreSupport/FrameLoaderClientBlackBerry.h: Remove unused shouldRestoreViewState().
+
+2012-08-16  Mike Fenton  <mifenton@rim.com>
+
+        [BlackBerry] Use form state to determine the VKB enter key.
+        https://bugs.webkit.org/show_bug.cgi?id=94239
+
+        Reviewed by Rob Buis.
+
+        PR 188234.
+
+        If the enter key for the VKB is not explicitly set, use
+        submit if we are in a single line input and a default
+        button exists for the form.
+
+        Reviewed Internally by Gen Mak.
+
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::setElementFocused):
+
+2012-08-16  Konrad Piascik  <kpiascik@rim.com>
+
+        [BlackBerry] Reload valid page from Error Page keeps history ViewState and zoom.
+        https://bugs.webkit.org/show_bug.cgi?id=94123
+
+        Reviewed by Antonio Gomes.
+
+        Reviewed internally by Leo Yang, Jacky Jiang.
+        PR 178305
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::setLoadState):Reset the scales and
+        the user scalable flag if we're reloading from an error page.
+        (BlackBerry::WebKit::WebPagePrivate::updateViewportSize): Don't update the
+        viewport size if we're still in the WebPagePrivate::init method.
+        (BlackBerry::WebKit::WebPagePrivate::zoomToInitialScaleOnLoad):
+        Properly set the shouldZoom flag if we're not going to restore the
+        view state.
+        * WebCoreSupport/FrameLoaderClientBlackBerry.cpp:
+        (WebCore::FrameLoaderClientBlackBerry::FrameLoaderClientBlackBerry):
+        (WebCore::FrameLoaderClientBlackBerry::dispatchDidCommitLoad): Set the
+        ViewState's shouldSaveViewState flag if we're coming from an error page.
+        (WebCore::FrameLoaderClientBlackBerry::saveViewStateToItem): Set the
+        new member variable m_shouldRestoreViewState based on the ViewState's
+        shouldSaveViewState flag.
+        (WebCore::FrameLoaderClientBlackBerry::restoreViewState): Added early
+        return if m_shouldRestoreViewState is false.
+        * WebCoreSupport/FrameLoaderClientBlackBerry.h: Add new method to have
+        the client track whether we should restore the view state.
+        (WebCore::FrameLoaderClientBlackBerry::shouldRestoreViewState):
+        (FrameLoaderClientBlackBerry):
+
+2012-08-16  Leo Yang  <leoyang@rim.com>
+
+        [BlackBerry] Remove Mobile mode from WebPage.cpp and WebPage_p.h
+        https://bugs.webkit.org/show_bug.cgi?id=94223
+        PR #192773
+
+        Reviewed by Rob Buis.
+        Reviewed internally by Arvid Nilsson.
+
+        Remove Mobile mode as it's not been used. Also remove code that
+        handle top-level SVG document because now we can handle it in Desktop mode.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::setLoadState):
+        (BlackBerry::WebKit::WebPagePrivate::fixedLayoutSize):
+        * Api/WebPage_p.h:
+
+2012-08-16  Arvid Nilsson  <anilsson@rim.com>
+
+        [BlackBerry] SurfacePool::waitForBuffer() sometimes waits for deleted EGLSyncKHR object
+        https://bugs.webkit.org/show_bug.cgi?id=94208
+
+        Reviewed by Rob Buis.
+
+        SurfacePool::notifyBuffersComposited() adds a tile's previous
+        sync object to the garbage list before replacing it with a new one.
+        However, it failed to thoroughly clear all tiles that were referencing
+        the old sync object.
+
+        Thus it could happen that if a set of tiles A was composited, then
+        another set of tiles B was composited, only the intersection of A and B
+        was cleared of the soon-to-be-deleted sync object, and the subtraction
+        A - B would reference an invalid sync object in case the BackingStore
+        decided to render to one of the tiles in A - B before they were
+        composited again.
+
+        Fixed by storing each individual sync object in only one place so we
+        don't have to rummage through all tiles and remove stale references to
+        sync objects that are about to be destroyed.
+
+        A new reference counted Fence class is added for this purpose, to store
+        a sync object. Tiles refer to Fence instances instead of holding a sync
+        object directly. Since Fence is reference counted, several tiles can
+        refer to the same Fence instance, and clearing its sync object will
+        instantly remove it from the grasp of all tiles that depend on that
+        Fence.
+
+        Since there's no point in waiting for the same Fence twice, the only
+        operation provided on Fence is takePlatformSync() which returns the
+        sync object and clears the Fence of its sync object.
+
+        Reviewed internally by Filip Spacek.
+
+        PR 193610
+
+        * WebKitSupport/BackingStoreTile.cpp:
+        (BlackBerry::WebKit::TileBuffer::TileBuffer):
+        * WebKitSupport/BackingStoreTile.h:
+        (BlackBerry):
+        (Fence):
+        (BlackBerry::Fence::create):
+        (BlackBerry::Fence::takePlatformSync):
+        (BlackBerry::Fence::Fence):
+        (BlackBerry::WebKit::TileBuffer::fence):
+        (BlackBerry::WebKit::TileBuffer::setFence):
+        (TileBuffer):
+        * WebKitSupport/SurfacePool.cpp:
+        (BlackBerry::WebKit::SurfacePool::waitForBuffer):
+        (BlackBerry::WebKit::SurfacePool::notifyBuffersComposited):
+        * WebKitSupport/SurfacePool.h:
+        (SurfacePool):
+
+2012-08-16  Rob Buis  <rbuis@rim.com>
+
+        [BlackBerry] Suppress non DRT JS Console output.
+        https://bugs.webkit.org/show_bug.cgi?id=94058
+
+        Reviewed by Yong Li.
+        Reviewed internally by Ming Xie.
+
+        Some actual test results show JS Console showing up twice, for
+        instance traversal/moz-bug559526.html. Only print the DRT specific
+        Console message.
+
+        * WebCoreSupport/ChromeClientBlackBerry.cpp:
+        (WebCore::ChromeClientBlackBerry::addMessageToConsole):
+
+2012-08-16  Arvid Nilsson  <anilsson@rim.com>
+
+        [BlackBerry] WebGL and Canvas fail to display after being restored from page cache
+        https://bugs.webkit.org/show_bug.cgi?id=94105
+
+        Reviewed by George Staikos.
+
+        The EGLImage was being destroyed when releasing layer resources on the
+        compositing thread, but the WebKit thread layer never found out and
+        failed to create a new image.
+
+        Fixed by extending the release layer resources mechanism to also make a
+        pass on the WebKit thread so that thread's layers have a chance to
+        delete their textures and related resources.
+
+        Reviewed internally by Filip Spacek.
+
+        PR 192899
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::setLoadState):
+        (BlackBerry::WebKit::WebPagePrivate::releaseLayerResources):
+        (WebKit):
+        (BlackBerry::WebKit::WebPagePrivate::releaseLayerResourcesCompositingThread):
+        (BlackBerry::WebKit::WebPagePrivate::suspendRootLayerCommit):
+        * Api/WebPage_p.h:
+        (WebPagePrivate):
+        * WebKitSupport/FrameLayers.cpp:
+        (BlackBerry::WebKit::FrameLayers::releaseLayerResources):
+        (WebKit):
+        * WebKitSupport/FrameLayers.h:
+        (FrameLayers):
+
 2012-08-15  Benjamin C Meyer  <bmeyer@rim.com>
 
         [BlackBerry] When there is an exception we want to check if the ref is 0, not the

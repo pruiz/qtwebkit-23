@@ -170,6 +170,15 @@ BUGWK60830 SKIP : editing/pasteboard/smart-paste-in-text-control.html = PASS
 // Chromium needs larger media files to test buffering this way.
 BUGWK88172 SKIP : http/tests/media/video-buffered.html = PASS
 
+// BUG94287: We need to rebaseline for MAC and WIN for multiple fields time input UI
+BUGWK94287 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly.html = MISSING TEXT IMAGE IMAGE+TEXT PASS
+BUGWK94287 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes.html = MISSING TEXT IMAGE IMAGE+TEXT PASS
+BUGWK94287 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-style.html = MISSING TEXT IMAGE IMAGE+TEXT PASS
+
+// Temporary disabled
+BUGWK94297 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic.html = IMAGE PASS
+BUGWK94297 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements.html = IMAGE PASS
+
 // Proximity Events is not supported.
 BUGWK92942 SKIP : fast/dom/Proximity = PASS
 BUGWK92942 SKIP : fast/events/constructors/device-proximity-event-constructor.html = PASS
@@ -860,6 +869,12 @@ WONTFIX SKIP : plugins/npruntime/overrides-all-properties.html = TEXT
 
 // Chromium doesn't use fullscreen-specific media controls
 WONTFIX SKIP : media/video-controls-fullscreen-volume.html = TEXT
+
+// ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS) isn't enabled for Android (WK94186).
+WONTFIX SKIP ANDROID : fast/forms/time-multiple-fields = PASS
+
+// Test fails because it's trying to load a plugin we don't have. We probably don't need to fix this.
+WONTFIX : platform/gtk/plugins/invalidate-rect-with-null-npp-argument.html = TEXT
 
 // -----------------------------------------------------------------
 // TESTS TO FIX
@@ -1799,7 +1814,7 @@ BUGCR40680 SKIP : fast/media/media-query-list-06.html = PASS
 BUGCR40680 SKIP : fast/media/media-query-list-07.html = PASS
 
 // Caused by http://trac.webkit.org/changeset/56394.
-BUG_JAPHET WIN : http/tests/xmlhttprequest/xmlhttprequest-50ms-download-dispatch.html = TIMEOUT TEXT PASS
+BUGCR143475 WIN : http/tests/xmlhttprequest/xmlhttprequest-50ms-download-dispatch.html = TIMEOUT TEXT PASS
 
 // Due to the differences in handling text encodings in KURL and googleurl.
 BUGWK20559 : http/tests/navigation/anchor-frames-gbk.html = TEXT
@@ -2067,10 +2082,10 @@ BUGJAMESR LINUX ANDROID WIN : fast/text/international/vertical-text-metrics-test
 
 // Added in Webkit r69707 without expected results.
 // Expected result file added in r83450. Still no match.
-BUGJAPHET : platform/gtk/accessibility/aria-table-hierarchy.html = TEXT
+BUGCR143479 : platform/gtk/accessibility/aria-table-hierarchy.html = TEXT
 
 // r69833, JSC/V8 Date parsing differences
-BUGJAPHET : fast/js/date-parse-test.html = TEXT
+BUGCR143476 : fast/js/date-parse-test.html = TEXT
 
 // Vertical text needs to be implemented in platforms other than OS X.
 BUGCR65877 LINUX ANDROID WIN : fast/writing-mode/border-vertical-lr.html = IMAGE+TEXT
@@ -2546,9 +2561,6 @@ BUGWK63115 : fast/css/font-face-in-shadow-DOM.html = PASS IMAGE+TEXT
 
 BUGCR87732 : fast/regex/toString.html = TEXT
 
-// Test fails because it's trying to load a plugin we don't have. We probably don't need to fix this.
-BUGJAPHET : platform/gtk/plugins/invalidate-rect-with-null-npp-argument.html = TEXT
-
 // Started around WebKit r90233:r90242
 BUGWK64000 DEBUG : fast/events/click-focus-anchor.html = PASS TEXT
 
@@ -2728,7 +2740,6 @@ BUGWK91944 : platform/chromium/virtual/gpu/fast/canvas/canvas-transforms-fillRec
 BUGWK73865 : media/track/text-track-cue-is-reachable.html = TEXT
 BUGWK73865 : media/track/text-track-is-reachable.html = TEXT
 
-BUGWK81402 WIN : media/track/track-active-cues.html = PASS TIMEOUT
 BUGWK83882 : media/track/track-mode.html = PASS TEXT TIMEOUT
 
 BUGWK72271 SNOWLEOPARD DEBUG : fast/dom/node-iterator-reference-node-moved-crash.html = PASS CRASH
@@ -3284,8 +3295,6 @@ BUGWK88124 DEBUG : fast/css/absolute-child-with-percent-height-inside-relative-p
 
 BUGWK88131 DEBUG : fast/dom/HTMLMeterElement/meter-element-crash.html = PASS TEXT
 
-BUGWK67116 DEBUG : compositing/layer-creation/overflow-scroll-overlap.html = PASS TEXT
-
 BUGWK88593 : fast/table/multiple-captions-display.xhtml = PASS IMAGE IMAGE+TEXT
 
 BUGWK88900 MAC : http/tests/misc/embed-image-load-outlives-gc-without-crashing.html = TEXT
@@ -3405,7 +3414,7 @@ BUGWK92570 WIN DEBUG : inspector/debugger/dom-breakpoints.html = PASS TIMEOUT
 BUGWK92570 WIN DEBUG : inspector/timeline/timeline-network-received-data.html = TEXT PASS TIMEOUT
 BUGWK92570 WIN DEBUG : inspector/timeline/timeline-start-time.html = TEXT PASS TIMEOUT
 
-BUGCR139493 DEBUG : media/track/track-cues-sorted-before-dispatch.html = PASS CRASH
+BUGWK94242 DEBUG : media/track/track-cues-sorted-before-dispatch.html = PASS TIMEOUT
 
 // Supposedly started failing between CR r140760 and CR r141216.  The failures
 // look like they involve antialiasing; the fact that the test clearly expects
@@ -3494,5 +3503,8 @@ BUGWK94063 LION : fast/css/nested-rounded-corners.html = IMAGE+TEXT
 
 BUGWK94078 WIN RELEASE : http/tests/inspector/web-socket-frame-error.html = PASS TEXT
 
-BUGWK94156 DEBUG : accessibility/canvas-fallback-content.html = PASS CRASH
-BUGWK94156 DEBUG : platform/chromium/virtual/gpu/fast/canvas/fallback-content.html = PASS CRASH
+BUGWK94256 DEBUG : fast/block/inline-children-root-linebox-crash.html = PASS CRASH
+
+BUGWK94261 DEBUG : http/tests/inspector/indexeddb/resources-panel.html = PASS CRASH TIMEOUT
+
+BUGWK94376 MAC : touchadjustment/context-menu.html = PASS TEXT

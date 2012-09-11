@@ -97,6 +97,14 @@ function getLanguage() {
     return result[1];
 }
 
+/**
+ * @param {!number} number
+ * @return {!string}
+ */
+function localizeNumber(number) {
+    return window.pagePopupController.localizeNumberString(number);
+}
+
 /*
  * @const
  * @type {number}
@@ -114,17 +122,17 @@ function formatJapaneseImperialEra(year, month) {
     if (year > ImperialEraLimit)
         return "";
     if (year > 1989)
-        return "(平成" + (year - 1988) + "年)";
+        return "(平成" + localizeNumber(year - 1988) + "年)";
     if (year == 1989)
         return "(平成元年)";
     if (year >= 1927)
-        return "(昭和" + (year - 1925) + "年)";
+        return "(昭和" + localizeNumber(year - 1925) + "年)";
     if (year > 1912)
-        return "(大正" + (year - 1911) + "年)";
+        return "(大正" + localizeNumber(year - 1911) + "年)";
     if (year == 1912 && month >= 7)
         return "(大正元年)";
     if (year > 1868)
-        return "(明治" + (year - 1867) + "年)";
+        return "(明治" + localizeNumber(year - 1867) + "年)";
     if (year == 1868)
         return "(明治元年)";
     return "";
@@ -136,8 +144,7 @@ function formatJapaneseImperialEra(year, month) {
  * @return {!string}
  */
 function formatYearMonth(year, month) {
-    // FIXME: Need localized number?
-    var yearString = String(year);
+    var yearString = localizeNumber(year);
     var monthString = global.params.monthLabels[month];
     switch (getLanguage()) {
     case "eu":
@@ -167,6 +174,13 @@ function formatYearMonth(year, month) {
     }
 }
 
+function createUTCDate(year, month, date) {
+    var newDate = new Date(Date.UTC(year, month, date));
+    if (year < 100)
+        newDate.setUTCFullYear(year);
+    return newDate;
+};
+
 /**
  * @param {string=} opt_current
  * @return {!Date}
@@ -175,11 +189,11 @@ function parseDateString(opt_current) {
     if (opt_current) {
         var result = opt_current.match(/(\d+)-(\d+)-(\d+)/);
         if (result)
-            return new Date(Date.UTC(Number(result[1]), Number(result[2]) - 1, Number(result[3])));
+            return createUTCDate(Number(result[1]), Number(result[2]) - 1, Number(result[3]));
     }
     var now = new Date();
     // Create UTC date with same numbers as local date.
-    return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+    return createUTCDate(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
 /**
@@ -843,8 +857,7 @@ function isValidDate(time) {
 DaysTable.prototype._renderMonth = function(year, month) {
     this._currentYear = year;
     this._currentMonth = month;
-    var dayIterator = new Date(Date.UTC(year, month, 1));
-    dayIterator.setUTCFullYear(year);
+    var dayIterator = createUTCDate(year, month, 1);
     var monthStartDay = dayIterator.getUTCDay();
     var weekStartDay = global.params.weekStartDay || 0;
     var startOffset = weekStartDay - monthStartDay;
@@ -857,8 +870,7 @@ DaysTable.prototype._renderMonth = function(year, month) {
             var iterMonth = dayIterator.getUTCMonth();
             var time = dayIterator.getTime();
             var element = this._days[w][d];
-            // FIXME: Need localized number?
-            element.innerText = String(dayIterator.getUTCDate());
+            element.innerText = localizeNumber(dayIterator.getUTCDate());
             element.className = ClassNames.Day;
             element.dataset.submitValue = serializeDate(iterYear, iterMonth, dayIterator.getUTCDate());
             if (outOfRange(time))
@@ -962,7 +974,7 @@ DaysTable.prototype.selectDate = function(date) {
 DaysTable.prototype._maybeSetPreviousMonth = function() {
     var year = global.yearMonthController.year();
     var month = global.yearMonthController.month();
-    var thisMonthStartTime = Date.UTC(year, month, 1);
+    var thisMonthStartTime = createUTCDate(year, month, 1).getTime();
     if (global.minimumDate.getTime() >= thisMonthStartTime)
         return false;
     if (month == 0) {
@@ -985,7 +997,7 @@ DaysTable.prototype._maybeSetNextMonth = function() {
         month = 0;
     } else
         month++;
-    var nextMonthStartTime = Date.UTC(year, month, 1);
+    var nextMonthStartTime = createUTCDate(year, month, 1).getTime();
     if (global.maximumDate.getTime() < nextMonthStartTime)
         return false;
     this._navigateToMonthWithAnimation(year, month);

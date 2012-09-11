@@ -24,16 +24,16 @@
 
 #include "config.h"
 
-#include "cc/CCLayerTreeHost.h"
+#include "CCLayerTreeHost.h"
 
+#include "CCGraphicsContext.h"
+#include "CCLayerTreeHostImpl.h"
 #include "CCOcclusionTrackerTestCommon.h"
+#include "CCSettings.h"
+#include "CCTextureUpdateQueue.h"
 #include "CCThreadedTest.h"
+#include "CCTimingFunction.h"
 #include "ContentLayerChromium.h"
-#include "cc/CCGraphicsContext.h"
-#include "cc/CCLayerTreeHostImpl.h"
-#include "cc/CCSettings.h"
-#include "cc/CCTextureUpdateQueue.h"
-#include "cc/CCTimingFunction.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <public/Platform.h>
@@ -2353,7 +2353,7 @@ public:
     static PassOwnPtr<EvictionTrackingTexture> create(PassOwnPtr<CCPrioritizedTexture> texture) { return adoptPtr(new EvictionTrackingTexture(texture)); }
     virtual ~EvictionTrackingTexture() { }
 
-    virtual void updateRect(CCResourceProvider* resourceProvider, const IntRect&, const IntRect&) OVERRIDE
+    virtual void updateRect(CCResourceProvider* resourceProvider, const IntRect&, const IntSize&) OVERRIDE
     {
         ASSERT_TRUE(!texture()->haveBackingTexture() || resourceProvider->numResources() > 0);
         texture()->acquireBackingTexture(resourceProvider);
@@ -2438,7 +2438,7 @@ void EvictionTestLayer::update(CCTextureUpdateQueue& queue, const CCOcclusionTra
     if (!m_texture.get())
         return;
     IntRect fullRect(0, 0, 10, 10);
-    TextureUploader::Parameters parameters = { m_texture.get(), fullRect, fullRect };
+    TextureUploader::Parameters parameters = { m_texture.get(), fullRect, IntSize() };
     queue.appendFullUpload(parameters);
 }
 

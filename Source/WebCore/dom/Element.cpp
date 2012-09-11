@@ -146,6 +146,13 @@ Element::~Element()
         ASSERT(m_attributeData);
         m_attributeData->detachAttrObjectsFromElement(this);
     }
+
+#if ENABLE(UNDO_MANAGER)
+    if (hasRareData() && elementRareData()->m_undoManager) {
+        elementRareData()->m_undoManager->disconnect();
+        elementRareData()->m_undoManager.clear();
+    }
+#endif
 }
 
 inline ElementRareData* Element::elementRareData() const
@@ -2237,7 +2244,7 @@ PassRefPtr<UndoManager> Element::undoManager()
     }
     ElementRareData* data = ensureElementRareData();
     if (!data->m_undoManager)
-        data->m_undoManager = UndoManager::create(this);
+        data->m_undoManager = UndoManager::create(document(), this);
     return data->m_undoManager;
 }
 
@@ -2249,7 +2256,6 @@ void Element::disconnectUndoManager()
     UndoManager* undoManager = data->m_undoManager.get();
     if (!undoManager)
         return;
-    undoManager->clearUndoRedo();
     undoManager->disconnect();
     data->m_undoManager.clear();
 }

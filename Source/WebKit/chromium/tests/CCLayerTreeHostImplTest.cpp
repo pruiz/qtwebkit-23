@@ -24,30 +24,30 @@
 
 #include "config.h"
 
-#include "cc/CCLayerTreeHostImpl.h"
+#include "CCLayerTreeHostImpl.h"
 
 #include "CCAnimationTestCommon.h"
+#include "CCHeadsUpDisplayLayerImpl.h"
+#include "CCIOSurfaceLayerImpl.h"
+#include "CCLayerImpl.h"
 #include "CCLayerTestCommon.h"
+#include "CCLayerTilingData.h"
 #include "CCLayerTreeTestCommon.h"
+#include "CCQuadCuller.h"
+#include "CCRenderPassDrawQuad.h"
+#include "CCScrollbarLayerImpl.h"
+#include "CCSettings.h"
+#include "CCSingleThreadProxy.h"
+#include "CCSolidColorDrawQuad.h"
 #include "CCTestCommon.h"
+#include "CCTextureLayerImpl.h"
+#include "CCTileDrawQuad.h"
+#include "CCTiledLayerImpl.h"
+#include "CCVideoLayerImpl.h"
 #include "FakeWebCompositorOutputSurface.h"
 #include "FakeWebGraphicsContext3D.h"
 #include "FakeWebScrollbarThemeGeometry.h"
 #include "LayerRendererChromium.h"
-#include "cc/CCHeadsUpDisplayLayerImpl.h"
-#include "cc/CCIOSurfaceLayerImpl.h"
-#include "cc/CCLayerImpl.h"
-#include "cc/CCLayerTilingData.h"
-#include "cc/CCQuadCuller.h"
-#include "cc/CCRenderPassDrawQuad.h"
-#include "cc/CCScrollbarLayerImpl.h"
-#include "cc/CCSettings.h"
-#include "cc/CCSingleThreadProxy.h"
-#include "cc/CCSolidColorDrawQuad.h"
-#include "cc/CCTextureLayerImpl.h"
-#include "cc/CCTileDrawQuad.h"
-#include "cc/CCTiledLayerImpl.h"
-#include "cc/CCVideoLayerImpl.h"
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <public/WebVideoFrame.h>
@@ -190,6 +190,11 @@ protected:
     CCScopedSettings m_scopedSettings;
 };
 
+class FakeWebGraphicsContext3DMakeCurrentFails : public FakeWebGraphicsContext3D {
+public:
+    virtual bool makeContextCurrent() { return false; }
+};
+
 TEST_F(CCLayerTreeHostImplTest, scrollDeltaNoLayers)
 {
     ASSERT_FALSE(m_hostImpl->rootLayer());
@@ -273,6 +278,21 @@ TEST_F(CCLayerTreeHostImplTest, scrollRootCallsCommitAndRedraw)
 TEST_F(CCLayerTreeHostImplTest, scrollWithoutRootLayer)
 {
     // We should not crash when trying to scroll an empty layer tree.
+    EXPECT_EQ(m_hostImpl->scrollBegin(IntPoint(0, 0), CCInputHandlerClient::Wheel), CCInputHandlerClient::ScrollIgnored);
+}
+
+TEST_F(CCLayerTreeHostImplTest, scrollWithoutRenderer)
+{
+    CCLayerTreeSettings settings;
+    m_hostImpl = CCLayerTreeHostImpl::create(settings, this);
+
+    // Initialization will fail here.
+    m_hostImpl->initializeLayerRenderer(FakeWebCompositorOutputSurface::create(adoptPtr(new FakeWebGraphicsContext3DMakeCurrentFails)), UnthrottledUploader);
+    m_hostImpl->setViewportSize(IntSize(10, 10), IntSize(10, 10));
+
+    setupScrollAndContentsLayers(IntSize(100, 100));
+
+    // We should not crash when trying to scroll after the renderer initialization fails.
     EXPECT_EQ(m_hostImpl->scrollBegin(IntPoint(0, 0), CCInputHandlerClient::Wheel), CCInputHandlerClient::ScrollIgnored);
 }
 
@@ -1840,7 +1860,7 @@ TEST_F(CCLayerTreeHostImplTest, noPartialSwap)
     MockContextHarness harness(mockContext);
 
     harness.mustDrawSolidQuad();
-    harness.mustSetNoScissor();
+    harness.mustSetScissor(0, 0, 10, 10);
 
     // Run test case
     OwnPtr<CCLayerTreeHostImpl> myHostImpl = createLayerTreeHost(false, context.release(), FakeLayerWithQuads::create(1));
@@ -1861,7 +1881,7 @@ TEST_F(CCLayerTreeHostImplTest, partialSwap)
     OwnPtr<CCLayerTreeHostImpl> myHostImpl = createLayerTreeHost(true, context.release(), FakeLayerWithQuads::create(1));
 
     // The first frame is not a partially-swapped one.
-    harness.mustSetNoScissor();
+    harness.mustSetScissor(0, 0, 10, 10);
     harness.mustDrawSolidQuad();
     {
         CCLayerTreeHostImpl::FrameData frame;
@@ -2062,13 +2082,11 @@ TEST_F(CCLayerTreeHostImplTest, contextLostAndRestoredNotificationSentToAllLayer
     EXPECT_TRUE(layer2->didLoseContextCalled());
 }
 
-class FakeWebGraphicsContext3DMakeCurrentFails : public FakeWebGraphicsContext3D {
-public:
-    virtual bool makeContextCurrent() { return false; }
-};
-
 TEST_F(CCLayerTreeHostImplTest, finishAllRenderingAfterContextLost)
 {
+    CCLayerTreeSettings settings;
+    m_hostImpl = CCLayerTreeHostImpl::create(settings, this);
+
     // The context initialization will fail, but we should still be able to call finishAllRendering() without any ill effects.
     m_hostImpl->initializeLayerRenderer(FakeWebCompositorOutputSurface::create(adoptPtr(new FakeWebGraphicsContext3DMakeCurrentFails)), UnthrottledUploader);
     m_hostImpl->finishAllRendering();

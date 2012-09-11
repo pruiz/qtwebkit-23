@@ -34,8 +34,10 @@
 #include "QtWebPagePolicyClient.h"
 #include "UtilsQt.h"
 #include "WebBackForwardList.h"
+#if ENABLE(INSPECTOR_SERVER)
 #include "WebInspectorProxy.h"
 #include "WebInspectorServer.h"
+#endif
 #if ENABLE(FULLSCREEN_API)
 #include "WebFullScreenManagerProxy.h"
 #endif
@@ -1332,7 +1334,11 @@ void QQuickWebViewExperimental::setUserScripts(const QList<QUrl>& userScripts)
 
 QUrl QQuickWebViewExperimental::remoteInspectorUrl() const
 {
+#if ENABLE(INSPECTOR_SERVER)
     return QUrl(WebInspectorServer::shared().inspectorUrlForPageID(d_ptr->webPageProxy->inspector()->remoteInspectionPageID()));
+#else
+    return QUrl();
+#endif
 }
 
 QQuickUrlSchemeDelegate* QQuickWebViewExperimental::schemeDelegates_At(QQmlListProperty<QQuickUrlSchemeDelegate>* property, int index)

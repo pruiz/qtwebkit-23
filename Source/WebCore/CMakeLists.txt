@@ -392,6 +392,7 @@ SET(WebCore_IDL_FILES
     dom/WebKitTransitionEvent.idl
     dom/WheelEvent.idl
 
+    editing/DOMTransaction.idl
     editing/UndoManager.idl
 
     fileapi/Blob.idl
@@ -1503,6 +1504,7 @@ SET(WebCore_SOURCES
     html/shadow/MeterShadowElement.cpp
     html/shadow/ProgressShadowElement.cpp
     html/shadow/SliderThumbElement.cpp
+    html/shadow/SpinButtonElement.cpp
     html/shadow/TextControlInnerElements.cpp
 
     html/track/LoadableTextTrack.cpp
@@ -1750,6 +1752,7 @@ SET(WebCore_SOURCES
     platform/MIMETypeRegistry.cpp
     platform/MemoryPressureHandler.cpp
     platform/PlatformEvent.cpp
+    platform/PlatformInstrumentation.cpp
     platform/RunLoop.cpp
     platform/RuntimeApplicationChecks.cpp
     platform/ScrollAnimator.cpp

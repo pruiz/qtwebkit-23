@@ -54,8 +54,8 @@ public:
     DOMDataStore* domDataStore() const { return m_domDataStore.getStore(); }
 
 private:
-
-    DOMWrapperWorld(int worldId): m_worldId(worldId)
+    DOMWrapperWorld(int worldId)
+        : m_worldId(worldId)
     {
         if (m_worldId != mainWorldId)
             isolatedWorldCount++;

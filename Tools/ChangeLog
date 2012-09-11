@@ -1,3 +1,300 @@
+2012-08-17  Kiran Muppala  <cmuppala@apple.com>
+
+        Add self to webkit contributors list
+        https://bugs.webkit.org/show_bug.cgi?id=94409
+
+        Reviewed by Dirk Pranke.
+
+        Add name, email and irc handle to webkit contributors list.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-08-17  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Perfalizer should differentiate results with and without the patch
+        https://bugs.webkit.org/show_bug.cgi?id=94399
+
+        Reviewed by Dirk Pranke.
+
+        Add "with 12345" and "without 12345" descriptions in results JSON so that graphs in
+        the results page are labled accordingly.
+
+        Also use _build_without_patch when building without a patch so that we get the right error message.
+
+        * Scripts/webkitpy/tool/commands/perfalizer.py:
+        (PerfalizerTask.run):
+        (PerfalizerTask._run_perf_test):
+        * Scripts/webkitpy/tool/commands/perfalizer_unittest.py:
+        (PerfalizerTaskTest._create_and_run_perfalizer.run_perf_test):
+
+2012-08-17  Dirk Pranke  <dpranke@chromium.org>
+
+        nrwt: don't fail tests if ImageDiff fails on the wk2 ports
+        https://bugs.webkit.org/show_bug.cgi?id=94396
+
+        Reviewed by Ryosuke Niwa.
+
+        It appears that WTR is generating PNGs that ImageDiff doesn't
+        like, and so we're getting lots of "can not get ImageDiff"
+        errors (see bug 81962). The change in r124581 made this a test
+        failure, and this is causing the WK2 bots to frequently abort
+        with 500+ failures. 
+
+        This change makes ImageDiff errors not be test failures just for
+        WK2 for now until we can better triage what's going on.
+
+        * Scripts/webkitpy/layout_tests/controllers/single_test_runner.py:
+        (SingleTestRunner._compare_image):
+
+2012-08-17  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Add a style check for #include "cc/..." in chromium files
+        https://bugs.webkit.org/show_bug.cgi?id=94382
+
+        Reviewed by Adam Barth.
+
+        Adds a style check to make sure new chromium code follows the correct convention for including cc files.
+
+        * Scripts/webkitpy/style/checkers/cpp.py:
+        (check_include_line):
+        * Scripts/webkitpy/style/checkers/cpp_unittest.py:
+        (OrderOfIncludesTest.test_check_cc_includes):
+
+2012-08-17  Ojan Vafai  <ojan@chromium.org>
+
+        Delete some dead code from the flakiness dashboard
+        https://bugs.webkit.org/show_bug.cgi?id=94380
+
+        Reviewed by Dirk Pranke.
+
+        This code became dead in one of the refactors of how we handle BuilderGroups.
+        There's no bug here, it's just dead code.
+        * TestResultServer/static-dashboards/builders.js:
+        (requestBuilderList):
+        (loadBuildersList):
+
+2012-08-17  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] Add content shell bots to the flakiness dashboard
+        https://bugs.webkit.org/show_bug.cgi?id=94369
+
+        Reviewed by Ojan Vafai.
+
+        The bots are named $OS (Content Shell).
+
+        * TestResultServer/static-dashboards/builders.js:
+        (isChromiumWebkitTipOfTreeTestRunner):
+        * TestResultServer/static-dashboards/flakiness_dashboard_unittests.js:
+
+2012-08-17  Shadi Khalek  <shadi@chromium.org>
+
+        Add AV perf layout tests to webkit flakiness dashboard
+        https://bugs.webkit.org/show_bug.cgi?id=94255
+
+        Reviewed by Ojan Vafai.
+
+        Added missing mappings to LEGACY_BUILDER_MASTERS_TO_GROUPS.
+        The isChromiumDepsAVTestRunner() filter does not work on current builder names. 
+        It assumes the new names they are getting renamed to (AV Linux, AV Win7).
+
+        * TestResultServer/static-dashboards/builders.js:
+        (isChromiumTipOfTreeAVTestRunner):
+        (loadBuildersList):
+
+2012-08-17  Milian Wolff  <milian.wolff@kdab.com>
+
+        [Qt] QtWebKit fails to build with OpenGL support on QNX
+        https://bugs.webkit.org/show_bug.cgi?id=93278
+
+        Reviewed by Noam Rosenthal.
+
+        Change the order in which we define WTF_USE_3D_GRAPHICS and ENABLE_WEBGL.
+        First, we now defined WTF_USE_3D_GRAPHICS=1, but only if QT_CONFIG
+        contains opengl. Furthermore, we disable this feature on win32-* as usual,
+        but now also disable it on QNX.
+
+        Then, we set ENABLE_WEBGL=1 but only if we previously set WTF_USE_3D_GRAPHICS=1.
+
+        * qmake/mkspecs/features/features.prf:
+
+2012-08-16  Gustavo Noronha Silva  <gns@gnome.org>
+
+        [jhbuild] EFL now runs jhbuild update for every build
+        https://bugs.webkit.org/show_bug.cgi?id=94267
+
+        Reviewed by Dirk Pranke.
+
+        This change makes EFL's approach to jhbuild more in line with the one
+        used by WebKitGTK+. update-webkitefl-libs will only be called by build-
+        webkit if --update-efl is given explicitly. The EWS bot will do that
+        from now on.
+
+        * Scripts/webkitdirs.pm:
+        (jhbuildWrapperPrefixIfNeeded): return jhbuild wrapper only if the
+        Dependencies directory exists also for EFL
+        (generateBuildSystemFromCMakeProject): no longer run update-webkitefl-libs
+        (buildCMakeProjectOrExit): build update-webkitefl-libs if --update-efl is
+        given
+        * Scripts/webkitpy/common/config/ports.py:
+        (EflPort.build_webkit_command): make EWS bots pass --update-efl to build-webkit
+        * Scripts/webkitpy/common/config/ports_unittest.py:
+        (DeprecatedPortTest.test_efl_port): add unit testing for EFL port
+
+2012-08-16  Kent Tamura  <tkent@chromium.org>
+
+        Add forms-bugs@chromium.org as a contributor.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-08-16  Gustavo Noronha Silva  <gns@gnome.org>
+
+        Unreviewed warning fix, sys.argv is a python construct.
+
+        * Scripts/update-webkitefl-libs:
+
+2012-08-16  Dirk Pranke  <dpranke@chromium.org>
+
+        NRWT cutting off the output from LayoutTest run under Valgrind
+        https://bugs.webkit.org/show_bug.cgi?id=94011
+
+        Reviewed by Ojan Vafai.
+
+        Make NRWT work with valgrind again ... I needed to rework the
+        driver infrastructure so that we could get the stderr written
+        between a test completing and a process being stopped and
+        associate it with the DriverOutput for the test; this meant that
+        run_test() needed to stop the driver at the end of the test
+        directly if/when appropriate. This also entailed reworking
+        run_test() so that we would gather stderr and stdout
+        consistently regardless of whether this was a normal test, or
+        stop_when_done, or a crash or timeout.
+
+        Also, I had to rework the process_stop_time() (and renamed it to
+        driver_stop_timeout) so that it would be longer if --time-out-ms
+        was long as well (so that valgrind would get enough time to
+        run), and I reworked driver.stop(kill_directly=True) to just
+        driver.stop(timeout=0.0).
+
+        Lastly, adding the new stop_when_done parameter entailed
+        touching a lot of test mock functions :(.
+
+        This change appeared to be well-covered by existing tests.
+
+        * Scripts/webkitpy/layout_tests/controllers/layout_test_runner.py:
+        (Worker._run_test):
+        (Worker._run_test_with_timeout):
+        (Worker._run_test_in_another_thread):
+        (Worker._run_test_in_another_thread.SingleTestThread.run):
+        (Worker._run_test_in_this_thread):
+        (Worker._run_single_test):
+        * Scripts/webkitpy/layout_tests/controllers/single_test_runner.py:
+        (run_single_test):
+        (SingleTestRunner.__init__):
+        (SingleTestRunner._run_compare_test):
+        (SingleTestRunner._run_rebaseline):
+        (SingleTestRunner._run_reftest):
+        * Scripts/webkitpy/layout_tests/port/base.py:
+        (Port.driver_stop_timeout):
+        (Port.variable.default_configuration):
+        * Scripts/webkitpy/layout_tests/port/chromium_android.py:
+        (ChromiumAndroidPort.driver_stop_timeout):
+        (ChromiumAndroidDriver.stop):
+        * Scripts/webkitpy/layout_tests/port/driver.py:
+        (Driver.run_test):
+        (Driver.stop):
+        (DriverProxy.run_test):
+        * Scripts/webkitpy/layout_tests/port/driver_unittest.py:
+        (DriverTest.test_check_for_driver_crash.FakeServerProcess.stop):
+        * Scripts/webkitpy/layout_tests/port/server_process.py:
+        (ServerProcess.write):
+        (ServerProcess._wait_for_data_and_update_buffers_using_select):
+        (ServerProcess.stop):
+        (ServerProcess.kill):
+        (ServerProcess):
+        (ServerProcess._kill):
+        * Scripts/webkitpy/layout_tests/port/server_process_unittest.py:
+        (TrivialMockPort.__init__):
+        (MockProc.wait):
+        (TestServerProcess.test_basic):
+        * Scripts/webkitpy/layout_tests/port/test.py:
+        (TestDriver.run_test):
+        * Scripts/webkitpy/layout_tests/run_webkit_tests_integrationtest.py:
+        (get_tests_run.RecordingTestDriver.run_test):
+        * Scripts/webkitpy/performance_tests/perftest.py:
+        (PerfTest.run_single):
+        * Scripts/webkitpy/performance_tests/perftest_unittest.py:
+        (TestPageLoadingPerfTest.MockDriver.run_test):
+        (TestReplayPerfTest.ReplayTestPort.__init__.ReplayTestDriver.run_test):
+        (TestReplayPerfTest.test_run_single.run_test):
+        (TestReplayPerfTest.test_run_single_fails_when_output_has_error.run_test):
+        (TestReplayPerfTest.test_prepare.run_test):
+        * Scripts/webkitpy/performance_tests/perftestsrunner_unittest.py:
+        (MainTest.TestDriver.run_test):
+
+2012-08-16  Roger Fong  <roger_fong@apple.com>
+
+        Typo in old-run-webkit-tests script from https://bugs.webkit.org/show_bug.cgi?id=93904.
+        https://bugs.webkit.org/show_bug.cgi?id=94228
+
+        Reviewed by Tim Horton.
+
+        I previously made the change but made a typo that causes the script not ignore mismatch ref tests.
+
+        * Scripts/old-run-webkit-tests:
+        (isUsedInReftest):
+
+2012-08-16  Peter Beverloo  <peter@chromium.org>
+
+        [Chromium] Pass the --strip-binary argument to the apk test generator
+        https://bugs.webkit.org/show_bug.cgi?id=94224
+
+        Reviewed by Adam Barth.
+
+        The native test generator currently relies on the $STRIP environment
+        variable to be available, which it shouldn't do. Instead, pass it as an
+        argument to the script. The $STRIP variable is being deprecated.
+
+        * DumpRenderTree/DumpRenderTree.gyp/DumpRenderTree.gyp:
+        * TestWebKitAPI/TestWebKitAPI.gyp/TestWebKitAPI.gyp:
+
+2012-08-16  Xiaobo Wang  <xbwang@torchmobile.com.cn>
+
+        [BlackBerry] Update format of JS console message to keep consistent with other ports.
+        https://bugs.webkit.org/show_bug.cgi?id=94058
+
+        Reviewed by Yong Li.
+        Reviewed internally by George Staikos.
+
+        1. Remove line number if it's zero.
+        2. Print only file name for "file://" URL.
+
+        * DumpRenderTree/blackberry/DumpRenderTree.cpp:
+        (BlackBerry::WebKit::DumpRenderTree::addMessageToConsole):
+
+2012-08-16  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        [Qt] Make DRT results more reliable on X11
+
+        Reviewed by Jocelyn Turcotte.
+
+        Disable desktop setting awareness, to prevent QApplication on X11 from reading palette settings from
+        the running desktop environment.
+
+        * DumpRenderTree/qt/main.cpp:
+        (main):
+
+2012-08-16  Taiju Tsuiki  <tzik@chromium.org>
+
+        Add deleteFileSystem support to DumpRenderTree for chromium
+        https://bugs.webkit.org/show_bug.cgi?id=94071
+
+        Reviewed by Kent Tamura.
+
+        * DumpRenderTree/chromium/WebViewHost.cpp:
+        (WebViewHost::deleteFileSystem): Added
+        * DumpRenderTree/chromium/WebViewHost.h:
+        (WebViewHost):
+
 2012-08-15  Ryosuke Niwa  <rniwa@webkit.org>
 
         Rename LayoutTestController to TestRunner in WebKitTestRunner

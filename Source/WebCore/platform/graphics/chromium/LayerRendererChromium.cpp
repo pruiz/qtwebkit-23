@@ -34,6 +34,16 @@
 #if USE(ACCELERATED_COMPOSITING)
 #include "LayerRendererChromium.h"
 
+#include "CCDamageTracker.h"
+#include "CCLayerQuad.h"
+#include "CCMathUtil.h"
+#include "CCProxy.h"
+#include "CCRenderPass.h"
+#include "CCRenderSurfaceFilters.h"
+#include "CCScopedTexture.h"
+#include "CCSettings.h"
+#include "CCSingleThreadProxy.h"
+#include "CCVideoLayerImpl.h"
 #include "Extensions3D.h"
 #include "FloatQuad.h"
 #include "GeometryBinding.h"
@@ -44,16 +54,6 @@
 #include "SkColor.h"
 #include "ThrottledTextureUploader.h"
 #include "TraceEvent.h"
-#include "cc/CCDamageTracker.h"
-#include "cc/CCLayerQuad.h"
-#include "cc/CCMathUtil.h"
-#include "cc/CCProxy.h"
-#include "cc/CCRenderPass.h"
-#include "cc/CCRenderSurfaceFilters.h"
-#include "cc/CCScopedTexture.h"
-#include "cc/CCSettings.h"
-#include "cc/CCSingleThreadProxy.h"
-#include "cc/CCVideoLayerImpl.h"
 #include <public/WebGraphicsContext3D.h>
 #include <public/WebSharedGraphicsContext3D.h>
 #include <public/WebVideoFrame.h>
@@ -126,7 +126,7 @@ public:
     virtual bool isBusy() OVERRIDE { return false; }
     virtual void beginUploads() OVERRIDE { }
     virtual void endUploads() OVERRIDE { }
-    virtual void uploadTexture(CCResourceProvider* resourceProvider, Parameters upload) OVERRIDE { upload.texture->updateRect(resourceProvider, upload.sourceRect, upload.destRect); }
+    virtual void uploadTexture(CCResourceProvider* resourceProvider, Parameters upload) OVERRIDE { upload.texture->updateRect(resourceProvider, upload.sourceRect, upload.destOffset); }
 
 protected:
     UnthrottledTextureUploader() { }
@@ -420,11 +420,7 @@ void LayerRendererChromium::drawRenderPass(DrawingFrame& frame, const CCRenderPa
         scissorRect.intersect(CCMathUtil::projectClippedRect(inverseTransformToRoot, frame.rootDamageRect));
     }
 
-    if (scissorRect != renderPass->outputRect())
-        setScissorToRect(frame, enclosingIntRect(scissorRect));
-    else
-        GLC(m_context, m_context->disable(GraphicsContext3D::SCISSOR_TEST));
-
+    setScissorToRect(frame, enclosingIntRect(scissorRect));
     clearFramebuffer(frame);
 
     const CCQuadList& quadList = renderPass->quadList();
@@ -441,6 +437,10 @@ void LayerRendererChromium::drawQuad(DrawingFrame& frame, const CCDrawQuad* quad
     scissorRect.intersect(quad->clippedRectInTarget());
     if (scissorRect.isEmpty())
         return;
+
+    // For now, we always do per-quad scissoring because some quad types draw their
+    // un-clipped bounds, relying on scissoring for correct clipping.
+    setScissorToRect(frame, enclosingIntRect(scissorRect));
 
     if (quad->needsBlending())
         GLC(m_context, m_context->enable(GraphicsContext3D::BLEND));

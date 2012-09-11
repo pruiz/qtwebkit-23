@@ -86,7 +86,6 @@ LIST(APPEND WebCore_SOURCES
     bindings/v8/custom/V8ConsoleCustom.cpp
     bindings/v8/custom/V8CoordinatesCustom.cpp
     bindings/v8/custom/V8CustomSQLStatementErrorCallback.cpp
-    bindings/v8/custom/V8CustomVoidCallback.cpp
     bindings/v8/custom/V8CustomXPathNSResolver.cpp
     bindings/v8/custom/V8DOMFormDataCustom.cpp
     bindings/v8/custom/V8DOMStringMapCustom.cpp
@@ -95,8 +94,6 @@ LIST(APPEND WebCore_SOURCES
     bindings/v8/custom/V8DedicatedWorkerContextCustom.cpp
     bindings/v8/custom/V8DeviceMotionEventCustom.cpp
     bindings/v8/custom/V8DeviceOrientationEventCustom.cpp
-    bindings/v8/custom/V8DirectoryEntryCustom.cpp
-    bindings/v8/custom/V8DirectoryEntrySyncCustom.cpp
     bindings/v8/custom/V8DocumentCustom.cpp
     bindings/v8/custom/V8DocumentLocationCustom.cpp
     bindings/v8/custom/V8EntrySyncCustom.cpp
@@ -206,6 +203,15 @@ IF (ENABLE_SVG)
         bindings/v8/custom/V8SVGElementCustom.cpp
         bindings/v8/custom/V8SVGLengthCustom.cpp
         bindings/v8/custom/V8SVGPathSegCustom.cpp
+    )
+ENDIF ()
+
+IF (ENABLE_UNDO_MANAGER)
+    LIST(APPEND WebCore_SOURCES
+        bindings/v8/DOMTransaction.cpp
+
+        bindings/v8/custom/V8DOMTransactionCustom.cpp
+        bindings/v8/custom/V8UndoManagerCustom.cpp
     )
 ENDIF ()
 

@@ -142,6 +142,8 @@ public:
 #if ENABLE(TOUCH_ADJUSTMENT)
     PassRefPtr<WebKitPoint> touchPositionAdjustedToBestClickableNode(long x, long y, long width, long height, Document*, ExceptionCode&);
     Node* touchNodeAdjustedToBestClickableNode(long x, long y, long width, long height, Document*, ExceptionCode&);
+    PassRefPtr<WebKitPoint> touchPositionAdjustedToBestContextMenuNode(long x, long y, long width, long height, Document*, ExceptionCode&);
+    Node* touchNodeAdjustedToBestContextMenuNode(long x, long y, long width, long height, Document*, ExceptionCode&);
     PassRefPtr<ClientRect> bestZoomableAreaForTouchPoint(long x, long y, long width, long height, Document*, ExceptionCode&);
 #endif
 
@@ -209,6 +211,8 @@ public:
     void removeURLSchemeRegisteredAsBypassingContentSecurityPolicy(const String& scheme);
 
     PassRefPtr<MallocStatistics> mallocStatistics() const;
+
+    PassRefPtr<DOMStringList> getReferencedFilePaths() const;
 
 private:
     explicit Internals(Document*);

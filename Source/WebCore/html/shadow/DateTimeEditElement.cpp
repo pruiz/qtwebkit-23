@@ -202,7 +202,7 @@ DateTimeEditElement::~DateTimeEditElement()
         m_fields[fieldIndex]->removeEventHandler();
 
     if (m_spinButton)
-        m_spinButton->removeStepActionHandler();
+        m_spinButton->removeSpinButtonOwner();
 }
 
 void DateTimeEditElement::addField(PassRefPtr<DateTimeFieldElement> field)
@@ -417,6 +417,12 @@ void DateTimeEditElement::defaultEventHandler(Event* event)
     DateTimeFieldElement* const focusField = fieldAt(m_focusFieldIndex);
     if (!focusField)
         return;
+
+    if (m_spinButton) {
+        m_spinButton->forwardEvent(event);
+        if (event->defaultHandled())
+            return;
+    }
 
     focusField->defaultEventHandler(event);
 }

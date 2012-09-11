@@ -26,6 +26,7 @@
 #include "config.h"
 #include "Internals.h"
 
+#include "BackForwardController.h"
 #include "CachedResourceLoader.h"
 #include "ClientRect.h"
 #include "ClientRectList.h"
@@ -37,6 +38,7 @@
 #include "Element.h"
 #include "ElementShadow.h"
 #include "ExceptionCode.h"
+#include "FormController.h"
 #include "Frame.h"
 #include "FrameView.h"
 #include "HTMLContentElement.h"
@@ -842,6 +844,42 @@ Node* Internals::touchNodeAdjustedToBestClickableNode(long x, long y, long width
     return targetNode;
 }
 
+PassRefPtr<WebKitPoint> Internals::touchPositionAdjustedToBestContextMenuNode(long x, long y, long width, long height, Document* document, ExceptionCode& ec)
+{
+    if (!document || !document->frame()) {
+        ec = INVALID_ACCESS_ERR;
+        return 0;
+    }
+
+    IntSize radius(width / 2, height / 2);
+    IntPoint point(x + radius.width(), y + radius.height());
+
+    Node* targetNode = 0;
+    IntPoint adjustedPoint;
+
+    bool foundNode = document->frame()->eventHandler()->bestContextMenuNodeForTouchPoint(point, radius, adjustedPoint, targetNode);
+    if (foundNode)
+        return WebKitPoint::create(adjustedPoint.x(), adjustedPoint.y());
+
+    return WebKitPoint::create(x, y);
+}
+
+Node* Internals::touchNodeAdjustedToBestContextMenuNode(long x, long y, long width, long height, Document* document, ExceptionCode& ec)
+{
+    if (!document || !document->frame()) {
+        ec = INVALID_ACCESS_ERR;
+        return 0;
+    }
+
+    IntSize radius(width / 2, height / 2);
+    IntPoint point(x + radius.width(), y + radius.height());
+
+    Node* targetNode = 0;
+    IntPoint adjustedPoint;
+    document->frame()->eventHandler()->bestContextMenuNodeForTouchPoint(point, radius, adjustedPoint, targetNode);
+    return targetNode;
+}
+
 PassRefPtr<ClientRect> Internals::bestZoomableAreaForTouchPoint(long x, long y, long width, long height, Document* document, ExceptionCode& ec)
 {
     if (!document || !document->frame()) {
@@ -1186,6 +1224,16 @@ void Internals::removeURLSchemeRegisteredAsBypassingContentSecurityPolicy(const 
 PassRefPtr<MallocStatistics> Internals::mallocStatistics() const
 {
     return MallocStatistics::create();
+}
+
+PassRefPtr<DOMStringList> Internals::getReferencedFilePaths() const
+{
+    RefPtr<DOMStringList> stringList = DOMStringList::create();
+    frame()->loader()->history()->saveDocumentAndScrollState();
+    const Vector<String>& filePaths = FormController::getReferencedFilePaths(frame()->loader()->history()->currentItem()->documentState());
+    for (size_t i = 0; i < filePaths.size(); ++i)
+        stringList->append(filePaths[i]);
+    return stringList.release();
 }
 
 }

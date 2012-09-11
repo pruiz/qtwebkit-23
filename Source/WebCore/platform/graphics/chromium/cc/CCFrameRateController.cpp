@@ -24,11 +24,12 @@
 
 #include "config.h"
 
-#include "cc/CCFrameRateController.h"
+#include "CCFrameRateController.h"
 
+#include "CCDelayBasedTimeSource.h"
+#include "CCTimeSource.h"
 #include "TraceEvent.h"
-#include "cc/CCDelayBasedTimeSource.h"
-#include "cc/CCTimeSource.h"
+#include <wtf/CurrentTime.h>
 
 namespace WebCore {
 
@@ -100,7 +101,8 @@ void CCFrameRateController::setMaxFramesPending(int maxFramesPending)
 
 void CCFrameRateController::setTimebaseAndInterval(double timebase, double intervalSeconds)
 {
-    m_timeSource->setTimebaseAndInterval(timebase, intervalSeconds);
+    if (m_isTimeSourceThrottling)
+        m_timeSource->setTimebaseAndInterval(timebase, intervalSeconds);
 }
 
 void CCFrameRateController::onTimerTick()
@@ -115,6 +117,10 @@ void CCFrameRateController::onTimerTick()
 
     if (m_client)
         m_client->vsyncTick();
+
+    if (!m_isTimeSourceThrottling
+        && (!m_maxFramesPending || m_numFramesPending < m_maxFramesPending))
+        postManualTick();
 }
 
 void CCFrameRateController::postManualTick()
@@ -131,8 +137,6 @@ void CCFrameRateController::onTimerFired()
 void CCFrameRateController::didBeginFrame()
 {
     m_numFramesPending++;
-    if (!m_isTimeSourceThrottling)
-        postManualTick();
 }
 
 void CCFrameRateController::didFinishFrame()

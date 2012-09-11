@@ -82,4 +82,6 @@ QtWebKit.file = Source/QtWebKit.pro
 QtWebKit.makefile = Makefile.QtWebKit
 SUBDIRS += QtWebKit
 
+Tools.file = Tools/Tools.pro
+Tools.makefile = Makefile.Tools
 SUBDIRS += Tools

@@ -569,6 +569,9 @@ bool CSSProperty::isInheritedProperty(CSSPropertyID propertyID)
 #if ENABLE(CSS_FILTERS)
     case CSSPropertyWebkitFilter:
 #endif
+#if ENABLE(CSS_COMPOSITING)
+    case CSSPropertyWebkitBlendMode:
+#endif
 #if ENABLE(CSS3_FLEXBOX)
     case CSSPropertyWebkitAlignContent:
     case CSSPropertyWebkitAlignItems:
@@ -637,6 +640,9 @@ bool CSSProperty::isInheritedProperty(CSSPropertyID propertyID)
     case CSSPropertyWebkitPerspectiveOrigin:
     case CSSPropertyWebkitPerspectiveOriginX:
     case CSSPropertyWebkitPerspectiveOriginY:
+#if ENABLE(CSS3_TEXT_DECORATION)
+    case CSSPropertyWebkitTextDecorationStyle:
+#endif // CSS3_TEXT_DECORATION
     case CSSPropertyWebkitTransform:
     case CSSPropertyWebkitTransformOrigin:
     case CSSPropertyWebkitTransformOriginX:

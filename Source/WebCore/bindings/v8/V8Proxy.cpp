@@ -69,7 +69,6 @@
 #include <wtf/StdLibExtras.h>
 #include <wtf/StringExtras.h>
 #include <wtf/UnusedParam.h>
-#include <wtf/text/StringBuilder.h>
 #include <wtf/text/WTFString.h>
 
 #if PLATFORM(CHROMIUM)
@@ -105,13 +104,7 @@ void V8Proxy::reportUnsafeAccessTo(Document* targetDocument)
     sourceDocument->addConsoleMessage(JSMessageSource, LogMessageType, ErrorMessageLevel, str, stackTrace.release());
 }
 
-static void handleFatalErrorInV8()
-{
-    // FIXME: We temporarily deal with V8 internal error situations
-    // such as out-of-memory by crashing the renderer.
-    CRASH();
-}
-
+// FIXME: This will be soon removed when we move runScript() to ScriptController.
 static v8::Local<v8::Value> handleMaxRecursionDepthExceeded()
 {
     throwError(RangeError, "Maximum call stack size exceeded.");
@@ -120,13 +113,11 @@ static v8::Local<v8::Value> handleMaxRecursionDepthExceeded()
 
 V8Proxy::V8Proxy(Frame* frame)
     : m_frame(frame)
-    , m_windowShell(V8DOMWindowShell::create(frame))
 {
 }
 
 V8Proxy::~V8Proxy()
 {
-    clearForClose();
     windowShell()->destroyGlobal();
 }
 
@@ -139,31 +130,6 @@ v8::Handle<v8::Script> V8Proxy::compileScript(v8::Handle<v8::String> code, const
     v8::ScriptOrigin origin(name, line, column);
     v8::Handle<v8::Script> script = v8::Script::Compile(code, &origin, scriptData);
     return script;
-}
-
-bool V8Proxy::handleOutOfMemory()
-{
-    v8::Local<v8::Context> context = v8::Context::GetCurrent();
-
-    if (!context->HasOutOfMemoryException())
-        return false;
-
-    // Warning, error, disable JS for this frame?
-    Frame* frame = V8Proxy::retrieveFrame(context);
-    if (!frame)
-        return true;
-
-    frame->script()->proxy()->clearForClose();
-    frame->script()->windowShell()->destroyGlobal();
-
-#if PLATFORM(CHROMIUM)
-    PlatformSupport::notifyJSOutOfMemory(frame);
-#endif
-
-    if (Settings* settings = frame->settings())
-        settings->setScriptEnabled(false);
-
-    return true;
 }
 
 PassOwnPtr<v8::ScriptData> V8Proxy::precompileScript(v8::Handle<v8::String> code, CachedScript* cachedScript)
@@ -263,159 +229,24 @@ v8::Local<v8::Value> V8Proxy::runScript(v8::Handle<v8::Script> script)
     if (result.IsEmpty())
         return v8::Local<v8::Value>();
 
-    if (v8::V8::IsDead())
-        handleFatalErrorInV8();
-
+    crashIfV8IsDead();
     return result;
 }
 
-v8::Local<v8::Value> V8Proxy::callFunction(v8::Handle<v8::Function> function, v8::Handle<v8::Object> receiver, int argc, v8::Handle<v8::Value> args[])
+V8DOMWindowShell* V8Proxy::windowShell() const
 {
-    // Keep Frame (and therefore ScriptController and V8Proxy) alive.
-    RefPtr<Frame> protect(frame());
-    return V8Proxy::instrumentedCallFunction(frame(), function, receiver, argc, args);
-}
-
-static inline void resourceInfo(const v8::Handle<v8::Function> function, String& resourceName, int& lineNumber)
-{
-    v8::ScriptOrigin origin = function->GetScriptOrigin();
-    if (origin.ResourceName().IsEmpty()) {
-        resourceName = "undefined";
-        lineNumber = 1;
-    } else {
-        resourceName = toWebCoreString(origin.ResourceName());
-        lineNumber = function->GetScriptLineNumber() + 1;
-    }
-}
-
-static inline String resourceString(const v8::Handle<v8::Function> function)
-{
-    String resourceName;
-    int lineNumber;
-    resourceInfo(function, resourceName, lineNumber);
-
-    StringBuilder builder;
-    builder.append(resourceName);
-    builder.append(':');
-    builder.append(String::number(lineNumber));
-    return builder.toString();
-}
-
-v8::Local<v8::Value> V8Proxy::instrumentedCallFunction(Frame* frame, v8::Handle<v8::Function> function, v8::Handle<v8::Object> receiver, int argc, v8::Handle<v8::Value> args[])
-{
-    V8GCController::checkMemoryUsage();
-
-    if (V8RecursionScope::recursionLevel() >= kMaxRecursionDepth)
-        return handleMaxRecursionDepthExceeded();
-
-    ScriptExecutionContext* context = frame ? frame->document() : 0;
-
-    InspectorInstrumentationCookie cookie;
-    if (InspectorInstrumentation::hasFrontends() && context) {
-        String resourceName;
-        int lineNumber;
-        resourceInfo(function, resourceName, lineNumber);
-        cookie = InspectorInstrumentation::willCallFunction(context, resourceName, lineNumber);
-    }
-
-    v8::Local<v8::Value> result;
-    {
-#if PLATFORM(CHROMIUM)
-        TRACE_EVENT1("v8", "v8.callFunction", "callsite", resourceString(function).utf8());
-#endif
-        V8RecursionScope recursionScope(context);
-        result = function->Call(receiver, argc, args);
-    }
-
-    InspectorInstrumentation::didCallFunction(cookie);
-
-    if (v8::V8::IsDead())
-        handleFatalErrorInV8();
-
-    return result;
-}
-
-v8::Local<v8::Value> V8Proxy::newInstance(v8::Handle<v8::Function> constructor, int argc, v8::Handle<v8::Value> args[])
-{
-#if PLATFORM(CHROMIUM)
-    TRACE_EVENT0("v8", "v8.newInstance");
-#endif
-
-    // No artificial limitations on the depth of recursion, see comment in
-    // V8Proxy::callFunction.
-    v8::Local<v8::Value> result;
-    {
-        V8RecursionScope recursionScope(frame() ? frame()->document() : 0);
-        result = constructor->NewInstance(argc, args);
-    }
-
-    if (v8::V8::IsDead())
-        handleFatalErrorInV8();
-
-    return result;
-}
-
-DOMWindow* V8Proxy::retrieveWindow(v8::Handle<v8::Context> context)
-{
-    v8::Handle<v8::Object> global = context->Global();
-    ASSERT(!global.IsEmpty());
-    global = V8DOMWrapper::lookupDOMWrapper(V8DOMWindow::GetTemplate(), global);
-    ASSERT(!global.IsEmpty());
-    return V8DOMWindow::toNative(global);
-}
-
-Frame* V8Proxy::retrieveFrame(v8::Handle<v8::Context> context)
-{
-    DOMWindow* window = retrieveWindow(context);
-    if (window->isCurrentlyDisplayedInFrame())
-        return window->frame();
-    // We return 0 here because |context| is detached from the Frame.  If we
-    // did return |frame| we could get in trouble because the frame could be
-    // navigated to another security origin.
-    return 0;
-}
-
-V8PerContextData* V8Proxy::retrievePerContextData(Frame* frame)
-{
-    V8IsolatedContext* isolatedContext;
-    if (UNLIKELY(!!(isolatedContext = V8IsolatedContext::getEntered())))
-        return isolatedContext->perContextData();
-    return frame->script()->windowShell()->perContextData();
-}
-
-void V8Proxy::resetIsolatedWorlds()
-{
-    for (IsolatedWorldMap::iterator iter = m_isolatedWorlds.begin();
-         iter != m_isolatedWorlds.end(); ++iter) {
-        iter->second->destroy();
-    }
-    m_isolatedWorlds.clear();
-    m_isolatedWorldSecurityOrigins.clear();
-}
-
-void V8Proxy::clearForClose()
-{
-    resetIsolatedWorlds();
-    V8GCController::collectGarbageIfNecessary();
-    windowShell()->clearForClose();
-}
-
-void V8Proxy::clearForNavigation()
-{
-    resetIsolatedWorlds();
-    V8GCController::collectGarbageIfNecessary();
-    windowShell()->clearForNavigation();
+    return frame()->script()->windowShell();
 }
 
 v8::Local<v8::Context> V8Proxy::context(Frame* frame)
 {
-    v8::Local<v8::Context> context = V8Proxy::mainWorldContext(frame);
+    v8::Local<v8::Context> context = ScriptController::mainWorldContext(frame);
     if (context.IsEmpty())
         return v8::Local<v8::Context>();
 
     if (V8IsolatedContext* isolatedContext = V8IsolatedContext::getEntered()) {
         context = v8::Local<v8::Context>::New(isolatedContext->context());
-        if (frame != V8Proxy::retrieveFrame(context))
+        if (frame != toFrameIfNotDetached(context))
             return v8::Local<v8::Context>();
     }
 
@@ -426,17 +257,11 @@ v8::Local<v8::Context> V8Proxy::context()
 {
     if (V8IsolatedContext* isolatedContext = V8IsolatedContext::getEntered()) {
         RefPtr<SharedPersistent<v8::Context> > context = isolatedContext->sharedContext();
-        if (m_frame != V8Proxy::retrieveFrame(context->get()))
+        if (m_frame != toFrameIfNotDetached(context->get()))
             return v8::Local<v8::Context>();
         return v8::Local<v8::Context>::New(context->get());
     }
-    return mainWorldContext();
-}
-
-v8::Local<v8::Context> V8Proxy::mainWorldContext()
-{
-    windowShell()->initContextIfNeeded();
-    return v8::Local<v8::Context>::New(windowShell()->context());
+    return frame()->script()->mainWorldContext();
 }
 
 v8::Local<v8::Context> V8Proxy::isolatedWorldContext(int worldId)
@@ -452,7 +277,7 @@ bool V8Proxy::matchesCurrentContext()
     v8::Handle<v8::Context> context;
     if (V8IsolatedContext* isolatedContext = V8IsolatedContext::getEntered()) {
         context = isolatedContext->sharedContext()->get();
-        if (m_frame != V8Proxy::retrieveFrame(context))
+        if (m_frame != toFrameIfNotDetached(context))
             return false;
     } else {
         windowShell()->initContextIfNeeded();
@@ -461,67 +286,11 @@ bool V8Proxy::matchesCurrentContext()
     return context == context->GetCurrent();
 }
 
-v8::Local<v8::Context> V8Proxy::mainWorldContext(Frame* frame)
-{
-    if (!frame)
-        return v8::Local<v8::Context>();
-
-    return frame->script()->proxy()->mainWorldContext();
-}
-
-V8Extensions& V8Proxy::extensions()
-{
-    DEFINE_STATIC_LOCAL(V8Extensions, extensions, ());
-    return extensions;
-}
-
-void V8Proxy::registerExtensionIfNeeded(v8::Extension* extension)
-{
-    const V8Extensions& registeredExtensions = extensions();
-    for (size_t i = 0; i < registeredExtensions.size(); ++i) {
-        if (registeredExtensions[i] == extension)
-            return;
-    }
-    v8::RegisterExtension(extension);
-    extensions().append(extension);
-}
-
-bool V8Proxy::setContextDebugId(int debugId)
-{
-    ASSERT(debugId > 0);
-    v8::HandleScope scope;
-    v8::Handle<v8::Context> context = windowShell()->context();
-    if (context.IsEmpty())
-        return false;
-    if (!context->GetData()->IsUndefined())
-        return false;
-
-    v8::Context::Scope contextScope(context);
-
-    char buffer[32];
-    snprintf(buffer, sizeof(buffer), "page,%d", debugId);
-    context->SetData(v8::String::New(buffer));
-
-    return true;
-}
-
-int V8Proxy::contextDebugId(v8::Handle<v8::Context> context)
-{
-    v8::HandleScope scope;
-    if (!context->GetData()->IsString())
-        return -1;
-    v8::String::AsciiValue ascii(context->GetData());
-    char* comma = strnstr(*ascii, ",", ascii.length());
-    if (!comma)
-        return -1;
-    return atoi(comma + 1);
-}
-
 v8::Local<v8::Context> toV8Context(ScriptExecutionContext* context, const WorldContextHandle& worldContext)
 {
     if (context->isDocument()) {
         if (Frame* frame = static_cast<Document*>(context)->frame())
-            return worldContext.adjustedContext(frame->script()->proxy());
+            return worldContext.adjustedContext(frame->script());
 #if ENABLE(WORKERS)
     } else if (context->isWorkerContext()) {
         if (WorkerContextExecutionProxy* proxy = static_cast<WorkerContext*>(context)->script()->proxy())

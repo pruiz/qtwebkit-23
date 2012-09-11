@@ -1204,6 +1204,24 @@ void RenderObject::absoluteFocusRingQuads(Vector<FloatQuad>& quads)
     }
 }
 
+FloatRect RenderObject::absoluteBoundingBoxRectForRange(const Range* range)
+{
+    if (!range || !range->startContainer())
+        return FloatRect();
+
+    if (range->ownerDocument())
+        range->ownerDocument()->updateLayout();
+
+    Vector<FloatQuad> quads;
+    range->textQuads(quads);
+
+    FloatRect result;
+    for (size_t i = 0; i < quads.size(); ++i)
+        result.unite(quads[i].boundingBox());
+
+    return result;
+}
+
 void RenderObject::addAbsoluteRectForLayer(LayoutRect& result)
 {
     if (hasLayer())
@@ -2393,6 +2411,42 @@ void RenderObject::insertedIntoTree()
 
     if (RenderNamedFlowThread* containerFlowThread = parent()->enclosingRenderNamedFlowThread())
         containerFlowThread->addFlowChild(this);
+}
+
+void RenderObject::willBeRemovedFromTree()
+{
+    // FIXME: We should ASSERT(isRooted()) but we have some out-of-order removals which would need to be fixed first.
+
+    // If we remove a visible child from an invisible parent, we don't know the layer visibility any more.
+    RenderLayer* layer = 0;
+    if (parent()->style()->visibility() != VISIBLE && style()->visibility() == VISIBLE && !hasLayer()) {
+        if ((layer = parent()->enclosingLayer()))
+            layer->dirtyVisibleContentStatus();
+    }
+
+    // Keep our layer hierarchy updated.
+    if (firstChild() || hasLayer()) {
+        if (!layer)
+            layer = parent()->enclosingLayer();
+        removeLayers(layer);
+    }
+
+    if (isOutOfFlowPositioned() && parent()->childrenInline())
+        parent()->dirtyLinesFromChangedChild(this);
+
+    if (inRenderFlowThread()) {
+        if (isBox())
+            enclosingRenderFlowThread()->removeRenderBoxRegionInfo(toRenderBox(this));
+        enclosingRenderFlowThread()->clearRenderObjectCustomStyle(this);
+    }
+
+    if (RenderNamedFlowThread* containerFlowThread = parent()->enclosingRenderNamedFlowThread())
+        containerFlowThread->removeFlowChild(this);
+
+#if ENABLE(SVG)
+    // Update cached boundaries in SVG renderers, if a child is removed.
+    parent()->setNeedsBoundariesUpdate();
+#endif
 }
 
 void RenderObject::destroyAndCleanupAnonymousWrappers()

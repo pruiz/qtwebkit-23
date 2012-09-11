@@ -711,6 +711,8 @@ public:
 
     void absoluteFocusRingQuads(Vector<FloatQuad>&);
 
+    static FloatRect absoluteBoundingBoxRectForRange(const Range*);
+
     // the rect that will be painted if this object is passed as the paintingRoot
     LayoutRect paintingRootRect(LayoutRect& topLevelRect);
 
@@ -939,6 +941,7 @@ protected:
     virtual bool canBeReplacedWithInlineRunIn() const;
 
     virtual void insertedIntoTree();
+    virtual void willBeRemovedFromTree();
 
 private:
     RenderStyle* firstLineStyleSlowCase() const;

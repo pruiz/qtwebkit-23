@@ -1,3 +1,646 @@
+2012-08-21  Peter Beverloo  <peter@chromium.org>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-08-20  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium-win] Use native digits in parsing/formatting dates in the textfield part of input[type=date]
+        https://bugs.webkit.org/show_bug.cgi?id=94281
+
+        Reviewed by Hajime Morita.
+
+        * tests/LocaleWinTest.cpp:
+        (TEST_F): Added formatting and parsing tests for Persian locale to check
+        native digit behavior.
+
+2012-08-20  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Make the popup positioning code testable
+        https://bugs.webkit.org/show_bug.cgi?id=94086
+
+        Reviewed by Hajime Morita.
+
+        * WebKit.gypi: Add PopupContainerTest.cpp.
+        * tests/PopupContainerTest.cpp: Added.
+        (MockPopupContent):
+        (calculatePosition):
+        (TEST):
+
+2012-08-20  Scott Graham  <scottmg@chromium.org>
+
+        [Chromium] Fix warnings on Windows builds
+        https://bugs.webkit.org/show_bug.cgi?id=94543
+
+        Reviewed by Adrienne Walker.
+
+        * tests/CCMathUtilTest.cpp:
+
+2012-08-20  Adam Klein  <adamk@chromium.org>
+
+        Allow MutationEvents to be enabled/disabled per context
+        https://bugs.webkit.org/show_bug.cgi?id=94016
+
+        Reviewed by Ojan Vafai.
+
+        Add Chromium/WebKit API for enabling/disabling MutationEvents via
+        WebPermissionClient.
+
+        * public/WebPermissionClient.h:
+        (WebPermissionClient):
+        (WebKit::WebPermissionClient::allowMutationEvents):
+        * src/ContextFeaturesClientImpl.cpp:
+        (WebKit::ContextFeaturesClientImpl::askIfIsEnabled):
+
+2012-08-20  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r126095.
+        http://trac.webkit.org/changeset/126095
+        https://bugs.webkit.org/show_bug.cgi?id=94555
+
+        Breaks compilation of downstream WebWidget::paint
+        implementations (Requested by jamesr on #webkit).
+
+        * public/WebWidget.h:
+        (WebKit::WebWidget::paint):
+        * src/WebPagePopupImpl.cpp:
+        (WebKit::WebPagePopupImpl::paint):
+        * src/WebPagePopupImpl.h:
+        (WebPagePopupImpl):
+        * src/WebPopupMenuImpl.cpp:
+        (WebKit::WebPopupMenuImpl::paint):
+        * src/WebPopupMenuImpl.h:
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::paint):
+        * src/WebViewImpl.h:
+        (WebViewImpl):
+
+2012-08-20  Kentaro Hara  <haraken@chromium.org>
+
+        [V8] Move instrumentedCallFunction() from V8Proxy to ScriptController
+        https://bugs.webkit.org/show_bug.cgi?id=94456
+
+        Reviewed by Adam Barth.
+
+        To kill V8Proxy, this patch moves instrumentedCallFunction() from V8Proxy
+        to ScriptController. Also this patch renames instrumentedCallFunction()
+        to callFunctionWithInstrumentation(), for consistency with callFunction().
+
+        No tests. No change in behavior.
+
+        * src/WebDevToolsFrontendImpl.cpp:
+        (WebKit::WebDevToolsFrontendImpl::dispatchOnInspectorFrontend):
+
+2012-08-20  Kentaro Hara  <haraken@chromium.org>
+
+        [V8] Move retrieve{Window,Frame,PerContextData}() from V8Proxy to V8Binding
+        https://bugs.webkit.org/show_bug.cgi?id=94460
+
+        Reviewed by Adam Barth.
+
+        To kill V8Proxy, we move retrieve{Window,Frame,PerContextData}()
+        from V8Proxy to V8Binding. Also, this patch renames these methods as follows:
+
+        - retrieveWindow() -> toDOMWindow()
+        - retrieveFrame() -> toFrameIfNotDetached()
+        - retrievePerContextData() -> perContextDataForCurrentWorld()
+
+        No tests. No change in behavior.
+
+        * src/WebBindings.cpp:
+        (WebKit::makeIntArrayImpl):
+        (WebKit::makeStringArrayImpl):
+        * src/WebFrameImpl.cpp:
+        (WebKit::WebFrame::frameForContext):
+
+2012-08-20  James Robinson  <jamesr@chromium.org>
+
+        [chromium] REGRESSION(126076) Should not touch old GraphicsLayerChromium::m_contentsLayer when setting up a new contents layer
+        https://bugs.webkit.org/show_bug.cgi?id=94544
+
+        Reviewed by Adrienne Walker.
+
+        * src/WebLayerImpl.cpp:
+        (WebKit::WebLayerImpl::id):
+        (WebKit):
+        * src/WebLayerImpl.h:
+        (WebLayerImpl):
+
+2012-08-20  Kentaro Hara  <haraken@chromium.org>
+
+        [V8] Move collectGarbage() from ScriptController to V8GCController
+        https://bugs.webkit.org/show_bug.cgi?id=94455
+
+        Reviewed by Adam Barth.
+
+        - This patch moves collectGarbage() from ScriptController to V8GCController.
+        - This patch makes collectGarbage() a static method.
+        - This patch removes ScriptController::lowMemoryNotification()
+        since it is not used at all.
+
+        No tests. No change in behavior.
+
+        * src/WebFrameImpl.cpp:
+        (WebKit::WebFrameImpl::collectGarbage):
+
+2012-08-20  Adam Barth  <abarth@webkit.org>
+
+        WebWidget should be able to paint into a zoomed canvas without aliasing
+        https://bugs.webkit.org/show_bug.cgi?id=92043
+
+        Reviewed by James Robinson.
+
+        If accelerated compositing is enabled, WebWidget::paint reads back from
+        the compositor rather than re-painting the widget. That approach works
+        well if the canvas we're rendering into is at a similar resolution to
+        the pixels in the compositor, but if the canvas has been scaled (e.g.,
+        to help the user disambiguate links), then reading back from the
+        compositor will cause aliasing artifacts.
+
+        This patch adds an option to paint to let the embedder request a
+        software re-rendering of the widget to avoid these aliasing artifacts.
+
+        * public/WebWidget.h:
+        (WebKit::WebWidget::paint):
+        * src/WebPagePopupImpl.cpp:
+        (WebKit::WebPagePopupImpl::paint):
+        * src/WebPagePopupImpl.h:
+        (WebPagePopupImpl):
+        * src/WebPopupMenuImpl.cpp:
+        (WebKit::WebPopupMenuImpl::paint):
+        * src/WebPopupMenuImpl.h:
+        * src/WebViewImpl.cpp:
+        (WebKit::canvasBackgroundForTransparencey):
+        (WebKit):
+        (WebKit::WebViewImpl::paint):
+        * src/WebViewImpl.h:
+        (WebViewImpl):
+
+2012-08-20  James Robinson  <jamesr@chromium.org>
+
+        Unreviewed. Roll WebKit chromium DEPS forward.
+
+        * DEPS:
+
+2012-08-20  Kentaro Hara  <haraken@chromium.org>
+
+        [V8] Move clearForClose() and clearForNavigation() from V8Proxy to ScriptController
+        https://bugs.webkit.org/show_bug.cgi?id=94459
+
+        Reviewed by Adam Barth.
+
+        To kill V8Proxy, we can move clearForClose() and
+        clearForNavigation() from V8Proxy to ScriptController.
+
+        No tests. No change in behavior.
+
+        * src/FrameLoaderClientImpl.cpp:
+        (WebKit::FrameLoaderClientImpl::detachedFromParent3):
+
+2012-08-20  Kentaro Hara  <haraken@chromium.org>
+
+        [V8] Move mainWorldContext() from V8Proxy to ScriptController
+        https://bugs.webkit.org/show_bug.cgi?id=94453
+
+        Reviewed by Adam Barth.
+
+        This patch moves mainWorldContext() from V8Proxy to ScriptController.
+        In addition, this patch removes dependency on V8Proxy from WorldContextHandle.
+
+        No tests. No change in behavior.
+
+        * src/WebFrameImpl.cpp:
+        (WebKit::WebFrameImpl::mainWorldScriptContext):
+
+2012-08-20  Adam Klein  <adamk@chromium.org>
+
+        Remove redundant TOUCH_LISTENER event type
+        https://bugs.webkit.org/show_bug.cgi?id=94524
+
+        Reviewed by Ryosuke Niwa.
+
+        * src/WebPluginContainerImpl.cpp:
+        (WebKit::WebPluginContainerImpl::setIsAcceptingTouchEvents): Remove
+        bookkeeping for TOUCH_LISTENER.
+
+2012-08-16  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Change WebLayer from a concrete type to a pure virtual interface
+        https://bugs.webkit.org/show_bug.cgi?id=94174
+
+        Reviewed by Adrienne Walker.
+
+        This updates the implementation of the Web*Layer family to the new design and updates callers in WebViewImpl /
+        NonCompositedContentHost.
+
+        * WebKit.gyp:
+        * src/NonCompositedContentHost.cpp:
+        (WebKit::NonCompositedContentHost::NonCompositedContentHost):
+        (WebKit::NonCompositedContentHost::setScrollLayer):
+        (WebKit::NonCompositedContentHost::setViewport):
+        (WebKit::NonCompositedContentHost::scrollLayer):
+        * src/NonCompositedContentHost.h:
+        * src/WebContentLayerImpl.cpp:
+        (WebKit::WebContentLayer::create):
+        (WebKit::WebContentLayerImpl::WebContentLayerImpl):
+        (WebKit::WebContentLayerImpl::~WebContentLayerImpl):
+        (WebKit::WebContentLayerImpl::layer):
+        (WebKit):
+        (WebKit::WebContentLayerImpl::clearClient):
+        (WebKit::WebContentLayerImpl::setDoubleSided):
+        (WebKit::WebContentLayerImpl::setContentsScale):
+        (WebKit::WebContentLayerImpl::setUseLCDText):
+        (WebKit::WebContentLayerImpl::setDrawCheckerboardForMissingTiles):
+        (WebKit::WebContentLayerImpl::paintContents):
+        * src/WebContentLayerImpl.h:
+        (WebContentLayerImpl):
+        * src/WebExternalTextureLayer.cpp: Removed.
+        * src/WebExternalTextureLayerImpl.cpp: Added.
+        (WebKit):
+        (WebKit::WebExternalTextureLayer::create):
+        (WebKit::WebExternalTextureLayerImpl::WebExternalTextureLayerImpl):
+        (WebKit::WebExternalTextureLayerImpl::~WebExternalTextureLayerImpl):
+        (WebKit::WebExternalTextureLayerImpl::layer):
+        (WebKit::WebExternalTextureLayerImpl::clearClient):
+        (WebKit::WebExternalTextureLayerImpl::setTextureId):
+        (WebKit::WebExternalTextureLayerImpl::setFlipped):
+        (WebKit::WebExternalTextureLayerImpl::setUVRect):
+        (WebKit::WebExternalTextureLayerImpl::setOpaque):
+        (WebKit::WebExternalTextureLayerImpl::setPremultipliedAlpha):
+        (WebKit::WebExternalTextureLayerImpl::willModifyTexture):
+        (WebKit::WebExternalTextureLayerImpl::setRateLimitContext):
+        (WebTextureUpdaterImpl):
+        (WebKit::WebTextureUpdaterImpl::WebTextureUpdaterImpl):
+        (WebKit::WebExternalTextureLayerImpl::prepareTexture):
+        (WebKit::WebExternalTextureLayerImpl::context):
+        * src/WebExternalTextureLayerImpl.h: Renamed from Source/WebKit/chromium/src/WebContentLayer.cpp.
+        (WebKit):
+        (WebExternalTextureLayerImpl):
+        * src/WebIOSurfaceLayerImpl.cpp: Renamed from Source/WebKit/chromium/src/WebIOSurfaceLayer.cpp.
+        (WebKit):
+        (WebKit::WebIOSurfaceLayer::create):
+        (WebKit::WebIOSurfaceLayerImpl::WebIOSurfaceLayerImpl):
+        (WebKit::WebIOSurfaceLayerImpl::~WebIOSurfaceLayerImpl):
+        (WebKit::WebIOSurfaceLayerImpl::setIOSurfaceProperties):
+        (WebKit::WebIOSurfaceLayerImpl::layer):
+        * src/WebIOSurfaceLayerImpl.h: Copied from Source/Platform/chromium/public/WebImageLayer.h.
+        (WebCore):
+        (WebKit):
+        (WebIOSurfaceLayerImpl):
+        * src/WebImageLayerImpl.cpp: Renamed from Source/WebKit/chromium/src/WebSolidColorLayer.cpp.
+        (WebKit):
+        (WebKit::WebImageLayer::create):
+        (WebKit::WebImageLayerImpl::WebImageLayerImpl):
+        (WebKit::WebImageLayerImpl::~WebImageLayerImpl):
+        (WebKit::WebImageLayerImpl::layer):
+        (WebKit::WebImageLayerImpl::setBitmap):
+        * src/WebImageLayerImpl.h: Renamed from Source/WebKit/chromium/src/WebImageLayer.cpp.
+        (WebCore):
+        (WebKit):
+        (WebImageLayerImpl):
+        * src/WebLayer.cpp: Removed.
+        * src/WebLayerImpl.cpp:
+        (WebKit::WebLayer::create):
+        (WebKit::WebLayerImpl::WebLayerImpl):
+        (WebKit::WebLayerImpl::~WebLayerImpl):
+        (WebKit):
+        (WebKit::WebLayerImpl::invalidateRect):
+        (WebKit::WebLayerImpl::invalidate):
+        (WebKit::WebLayerImpl::addChild):
+        (WebKit::WebLayerImpl::insertChild):
+        (WebKit::WebLayerImpl::replaceChild):
+        (WebKit::WebLayerImpl::setChildren):
+        (WebKit::WebLayerImpl::removeFromParent):
+        (WebKit::WebLayerImpl::removeAllChildren):
+        (WebKit::WebLayerImpl::setAnchorPoint):
+        (WebKit::WebLayerImpl::anchorPoint):
+        (WebKit::WebLayerImpl::setAnchorPointZ):
+        (WebKit::WebLayerImpl::anchorPointZ):
+        (WebKit::WebLayerImpl::setBounds):
+        (WebKit::WebLayerImpl::bounds):
+        (WebKit::WebLayerImpl::setMasksToBounds):
+        (WebKit::WebLayerImpl::masksToBounds):
+        (WebKit::WebLayerImpl::setMaskLayer):
+        (WebKit::WebLayerImpl::setReplicaLayer):
+        (WebKit::WebLayerImpl::setOpacity):
+        (WebKit::WebLayerImpl::opacity):
+        (WebKit::WebLayerImpl::setOpaque):
+        (WebKit::WebLayerImpl::opaque):
+        (WebKit::WebLayerImpl::setPosition):
+        (WebKit::WebLayerImpl::position):
+        (WebKit::WebLayerImpl::setSublayerTransform):
+        (WebKit::WebLayerImpl::sublayerTransform):
+        (WebKit::WebLayerImpl::setTransform):
+        (WebKit::WebLayerImpl::transform):
+        (WebKit::WebLayerImpl::setDrawsContent):
+        (WebKit::WebLayerImpl::drawsContent):
+        (WebKit::WebLayerImpl::setPreserves3D):
+        (WebKit::WebLayerImpl::setUseParentBackfaceVisibility):
+        (WebKit::WebLayerImpl::setBackgroundColor):
+        (WebKit::WebLayerImpl::setFilters):
+        (WebKit::WebLayerImpl::setBackgroundFilters):
+        (WebKit::WebLayerImpl::setDebugBorderColor):
+        (WebKit::WebLayerImpl::setDebugBorderWidth):
+        (WebKit::WebLayerImpl::setDebugName):
+        (WebKit::WebLayerImpl::setAnimationDelegate):
+        (WebKit::WebLayerImpl::addAnimation):
+        (WebKit::WebLayerImpl::removeAnimation):
+        (WebKit::WebLayerImpl::pauseAnimation):
+        (WebKit::WebLayerImpl::suspendAnimations):
+        (WebKit::WebLayerImpl::resumeAnimations):
+        (WebKit::WebLayerImpl::hasActiveAnimation):
+        (WebKit::WebLayerImpl::transferAnimationsTo):
+        (WebKit::WebLayerImpl::setForceRenderSurface):
+        (WebKit::WebLayerImpl::clearRenderSurface):
+        (WebKit::WebLayerImpl::setScrollPosition):
+        (WebKit::WebLayerImpl::setScrollable):
+        (WebKit::WebLayerImpl::setHaveWheelEventHandlers):
+        (WebKit::WebLayerImpl::setShouldScrollOnMainThread):
+        (WebKit::WebLayerImpl::setNonFastScrollableRegion):
+        (WebKit::WebLayerImpl::setIsContainerForFixedPositionLayers):
+        (WebKit::WebLayerImpl::setFixedToContainerLayer):
+        (WebKit::WebLayerImpl::layer):
+        * src/WebLayerImpl.h:
+        (WebCore):
+        (WebLayerImpl):
+        * src/WebLayerTreeView.cpp:
+        (WebKit::WebLayerTreeView::setRootLayer):
+        * src/WebLayerTreeViewImpl.cpp:
+        (WebKit::WebLayerTreeViewImpl::create):
+        * src/WebMediaPlayerClientImpl.cpp:
+        (WebKit::WebMediaPlayerClientImpl::readyStateChanged):
+        (WebKit::WebMediaPlayerClientImpl::repaint):
+        (WebKit::WebMediaPlayerClientImpl::setOpaque):
+        (WebKit::WebMediaPlayerClientImpl::platformLayer):
+        (WebKit::WebMediaPlayerClientImpl::acceleratedRenderingInUse):
+        * src/WebMediaPlayerClientImpl.h:
+        (WebMediaPlayerClientImpl):
+        * src/WebPluginContainerImpl.cpp:
+        (WebKit::WebPluginContainerImpl::setBackingTextureId):
+        (WebKit::WebPluginContainerImpl::setBackingIOSurfaceId):
+        (WebKit::WebPluginContainerImpl::commitBackingTexture):
+        (WebKit::WebPluginContainerImpl::setOpaque):
+        (WebKit::WebPluginContainerImpl::platformLayer):
+        * src/WebPluginContainerImpl.h:
+        (WebPluginContainerImpl):
+        * src/WebScrollableLayerImpl.cpp: Renamed from Source/WebKit/chromium/src/WebScrollableLayer.cpp.
+        (WebKit):
+        (WebKit::WebScrollableLayer::setScrollPosition):
+        (WebKit::WebScrollableLayer::setScrollable):
+        (WebKit::WebScrollableLayer::setHaveWheelEventHandlers):
+        (WebKit::WebScrollableLayer::setShouldScrollOnMainThread):
+        (WebKit::WebScrollableLayer::setNonFastScrollableRegion):
+        (WebKit::WebScrollableLayer::setIsContainerForFixedPositionLayers):
+        (WebKit::WebScrollableLayer::setFixedToContainerLayer):
+        * src/WebScrollbarLayerImpl.cpp: Renamed from Source/WebKit/chromium/src/WebScrollbarLayer.cpp.
+        (WebKit):
+        (WebKit::WebScrollbarLayer::create):
+        (WebKit::WebScrollbarLayerImpl::WebScrollbarLayerImpl):
+        (WebKit::WebScrollbarLayerImpl::~WebScrollbarLayerImpl):
+        (WebKit::WebScrollbarLayerImpl::layer):
+        (WebKit::WebScrollbarLayerImpl::setScrollLayer):
+        * src/WebScrollbarLayerImpl.h: Copied from Source/WebKit/chromium/src/WebSolidColorLayerImpl.h.
+        (WebCore):
+        (WebKit):
+        (WebScrollbarLayerImpl):
+        * src/WebSolidColorLayerImpl.cpp:
+        (WebKit::WebSolidColorLayer::create):
+        (WebKit::WebSolidColorLayerImpl::WebSolidColorLayerImpl):
+        (WebKit::WebSolidColorLayerImpl::layer):
+        (WebKit):
+        (WebKit::WebSolidColorLayerImpl::setBackgroundColor):
+        * src/WebSolidColorLayerImpl.h:
+        (WebCore):
+        (WebKit):
+        (WebSolidColorLayerImpl):
+        * src/WebVideoLayerImpl.cpp: Copied from Source/WebKit/chromium/src/WebVideoLayer.cpp.
+        (WebKit):
+        (WebKit::WebVideoLayer::create):
+        (WebKit::WebVideoLayerImpl::WebVideoLayerImpl):
+        (WebKit::WebVideoLayerImpl::~WebVideoLayerImpl):
+        (WebKit::WebVideoLayerImpl::layer):
+        (WebKit::WebVideoLayerImpl::active):
+        * src/WebVideoLayerImpl.h: Renamed from Source/WebKit/chromium/src/WebVideoLayer.cpp.
+        (WebCore):
+        (WebKit):
+        (WebVideoLayerImpl):
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::WebViewImpl):
+        (WebKit::WebViewImpl::setRootGraphicsLayer):
+        (WebKit::WebViewImpl::setIsAcceleratedCompositingActive):
+        (WebKit):
+        * src/WebViewImpl.h:
+        * tests/ImageLayerChromiumTest.cpp:
+        (WebCore::TEST):
+        * tests/WebLayerTest.cpp:
+        * tests/WebLayerTreeViewTest.cpp:
+
+2012-08-20  Shawn Singh  <shawnsingh@chromium.org>
+
+        [chromium] CCMathUtilTest.smallestAngleBetweenVectors unit test failing
+        https://bugs.webkit.org/show_bug.cgi?id=94502
+
+        Reviewed by Kenneth Russell.
+
+        The test needed to use EXPECT_FLOAT_EQ instead of EXPECT_EQ. In
+        this patch, the test is also re-enabled.
+
+        * tests/CCMathUtilTest.cpp:
+
+2012-08-20  Leandro Gracia Gil  <leandrogracia@chromium.org>
+
+        Move transformFriendlyBoundingBox out of Range
+        https://bugs.webkit.org/show_bug.cgi?id=94366
+
+        Reviewed by Ryosuke Niwa.
+
+        Update the WebKit code that makes use of transformFriendlyBoundingBox.
+
+        * src/FindInPageCoordinates.cpp:
+        (WebKit::findInPageRectFromRange):
+        * src/WebFrameImpl.cpp:
+        (WebKit::WebFrameImpl::find):
+        (WebKit::WebFrameImpl::selectFindMatch):
+
+2012-08-20  Leandro Gracia Gil  <leandrogracia@chromium.org>
+
+        [Chromium] detectContentIntentAround has a misleading name
+        https://bugs.webkit.org/show_bug.cgi?id=94349
+
+        Reviewed by Adam Barth.
+
+        The current WebViewClient API exposes a method named detectContentIntentAround.
+        However, this is not designed to detect any "content intent", but to allow the embedder
+        to detect content around a position and fire Android intents if appropriate.
+
+        This patch also disables content detection if the touched node listens to events
+        that consume the tap action like clicks, touch events or mouse events.
+
+        * public/WebViewClient.h:
+        (WebViewClient):
+        (WebKit::WebViewClient::detectContentAround):
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::detectContentOnTouch):
+        * src/WebViewImpl.h:
+        (WebViewImpl):
+
+2012-08-20  Hans Wennborg  <hans@chromium.org>
+
+        Respect runtime flags for Device Orientation and Device Motion
+        https://bugs.webkit.org/show_bug.cgi?id=94479
+
+        Reviewed by Adam Barth.
+
+        WebRuntimeFeatures::enableDeviceMotion should not be hard-coded to
+        false.
+
+        * src/WebViewImpl.cpp:
+        (WebKit::WebView::create):
+
+2012-08-20  David Reveman  <reveman@chromium.org>
+
+        [Chromium] Schedule texture uploads based on hard-coded timer and vsync.
+        https://bugs.webkit.org/show_bug.cgi?id=84281
+
+        Reviewed by James Robinson.
+
+        * tests/CCSchedulerTest.cpp:
+        (WebKitTests::TEST):
+        * tests/CCSchedulerTestCommon.h:
+        (WebKitTests::FakeCCTimeSource::FakeCCTimeSource):
+        (WebKitTests::FakeCCTimeSource::setNextTickTime):
+        (FakeCCTimeSource):
+        * tests/CCTextureUpdateControllerTest.cpp:
+
+2012-08-20  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed Chromium rebaselining and test failure suppressions.
+
+        https://bugs.webkit.org/show_bug.cgi?id=94502
+
+        * tests/CCMathUtilTest.cpp:
+
+2012-08-20  Ian Vollick  <vollick@chromium.org>
+
+        [chromium] Add tracing for active composited animations
+        https://bugs.webkit.org/show_bug.cgi?id=84210
+
+        Reviewed by James Robinson.
+
+        This patch issues the trace events from the animations. Animations will
+        report when they start and finish on the main and impl threads (via
+        TRACE_EVENT_ASYNC*), and also issues instant trace events whenever they
+        change state.
+
+        * src/WebAnimationImpl.cpp:
+        (WebKit::WebAnimationImpl::cloneToCCAnimation):
+        * tests/CCAnimationTestCommon.h:
+
+2012-08-20  Sami Kyostila  <skyostil@chromium.org>
+
+        [chromium] Convert screen space scroll gestures to layer space
+        https://bugs.webkit.org/show_bug.cgi?id=92499
+
+        Reviewed by James Robinson.
+
+        Added new tests for verifying transformed layer scrolling:
+
+            CCLayerTreeHostImplTest.scrollAxisAlignedRotatedLayer
+            CCLayerTreeHostImplTest.scrollNonAxisAlignedRotatedLayer
+            CCLayerTreeHostImplTest.scrollScaledLayer
+
+        Also some tests for the introduced math utilities:
+
+            CCMathUtilTest.smallestAngleBetweenVectors
+            CCMathUtilTest.vectorProjection
+
+        * src/WebCompositorInputHandlerImpl.cpp:
+        (WebKit::WebCompositorInputHandlerImpl::handleInputEventInternal):
+        (WebKit::WebCompositorInputHandlerImpl::handleGestureFling):
+        * tests/CCLayerTreeHostImplTest.cpp: Adjusted scroll delta in scrollChildBeyondLimit to avoid triggering the 45 degree rule.
+        * tests/CCLayerTreeHostTest.cpp:
+        * tests/CCMathUtilTest.cpp:
+        * tests/WebCompositorInputHandlerImplTest.cpp:
+        (MockCCInputHandlerClient):
+        (WebKit::TEST_F):
+
+2012-08-20  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: load scripts panel lazily
+        https://bugs.webkit.org/show_bug.cgi?id=94416
+
+        Reviewed by Vsevolod Vlasov.
+
+        * WebKit.gyp:
+
+2012-08-19  Kentaro Hara  <haraken@chromium.org>
+
+        [V8] Move contextDebugId() and setContextDebugId() from V8Proxy to ScriptController
+        https://bugs.webkit.org/show_bug.cgi?id=94446
+
+        Reviewed by Adam Barth.
+
+        To kill V8Proxy, we can move contextDebugId() and setContextDebugId()
+        from V8Proxy to ScriptController.
+
+        No tests. No change in behavior.
+
+        * src/WebDevToolsAgentImpl.cpp:
+        (WebKit::WebDevToolsAgentImpl::didCreateScriptContext):
+
+2012-08-20  Kentaro Hara  <haraken@chromium.org>
+
+        [V8] Move V8Proxy::m_extensions to ScriptController
+        https://bugs.webkit.org/show_bug.cgi?id=94444
+
+        Reviewed by Adam Barth.
+
+        To kill V8Proxy, this patch moves V8Proxy::m_extensions to ScriptController.
+
+        No tests. No change in behavior.
+
+        * src/WebScriptController.cpp:
+        (WebKit::WebScriptController::registerExtension):
+
+2012-08-19  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Put webkit compositor binding files in separate conditionally included gyp section
+        https://bugs.webkit.org/show_bug.cgi?id=94392
+
+        Reviewed by Dirk Pranke.
+
+        This allows the use_libcc_for_compositor gyp variable to control whether the webkit bindings are pulled from the
+        WebKit repository or an external target.
+
+        * WebKit.gyp:
+        * WebKit.gypi:
+
+2012-08-19  Rick Byers  <rbyers@chromium.org>
+
+        [chromium] Add additional fields to WebGestureEvent
+        https://bugs.webkit.org/show_bug.cgi?id=94238
+
+        Reviewed by James Robinson.
+
+        Add a union to WebGestureEvent with per-event-type data, as a first
+        step to eliminating the overloaded delta fields.
+
+        * public/WebInputEvent.h:
+        (WebGestureEvent):
+        (WebKit::WebGestureEvent::WebGestureEvent):
+        * src/WebInputEvent.cpp:
+        (SameSizeAsWebGestureEvent):
+
+2012-08-19  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: load network panel lazily
+        https://bugs.webkit.org/show_bug.cgi?id=94414
+
+        Reviewed by Vsevolod Vlasov.
+
+        * WebKit.gyp:
+
 2012-08-18  Pavel Feldman  <pfeldman@chromium.org>
 
         Web Inspector: make profiles panel a lazily loaded module.

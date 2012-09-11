@@ -199,9 +199,7 @@ WebInspector.ScriptSnippetModel.prototype = {
                 var consoleMessage = WebInspector.ConsoleMessage.create(
                         WebInspector.ConsoleMessage.MessageSource.JS,
                         WebInspector.ConsoleMessage.MessageLevel.Error,
-                        syntaxErrorMessage || "",
-                        WebInspector.ConsoleMessage.MessageType.Log,
-                        "", 0, 1, null, null, null);
+                        syntaxErrorMessage || "");
                 WebInspector.console.addMessage(consoleMessage);
                 return;
             }
@@ -549,35 +547,3 @@ WebInspector.SnippetContentProvider.prototype.__proto__ = WebInspector.StaticCon
  * @type {?WebInspector.ScriptSnippetModel}
  */
 WebInspector.scriptSnippetModel = null;
-
-/**
- * @constructor
- * @extends {WebInspector.JavaScriptSourceFrame}
- * @param {WebInspector.ScriptsPanel} scriptsPanel
- * @param {WebInspector.SnippetJavaScriptSource} snippetJavaScriptSource
- */
-WebInspector.SnippetJavaScriptSourceFrame = function(scriptsPanel, snippetJavaScriptSource)
-{
-    WebInspector.JavaScriptSourceFrame.call(this, scriptsPanel, snippetJavaScriptSource);
-    
-    this._snippetJavaScriptSource = snippetJavaScriptSource;
-    this._runButton = new WebInspector.StatusBarButton(WebInspector.UIString("Run"), "evaluate-snippet-status-bar-item");
-    this._runButton.addEventListener("click", this._runButtonClicked, this);
-}
-
-WebInspector.SnippetJavaScriptSourceFrame.prototype = {
-    /**
-     * @return {Array.<Element>}
-     */
-    statusBarItems: function()
-    {
-        return [this._runButton.element];
-    },
-
-    _runButtonClicked: function()
-    {
-        this._snippetJavaScriptSource.evaluate();
-    }
-}
-
-WebInspector.SnippetJavaScriptSourceFrame.prototype.__proto__ = WebInspector.JavaScriptSourceFrame.prototype;

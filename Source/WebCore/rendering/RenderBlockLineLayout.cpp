@@ -997,7 +997,7 @@ static inline void constructBidiRuns(InlineBidiResolver& topResolver, BidiRunLis
         if (unicodeBidi == Plaintext)
             determineDirectionality(direction, InlineIterator(isolatedInline, isolatedRun->object(), 0));
         else {
-            ASSERT(unicodeBidi == Isolate || unicodeBidi == OverrideIsolate);
+            ASSERT(unicodeBidi == Isolate || unicodeBidi == IsolateOverride);
             direction = isolatedInline->style()->direction();
         }
         isolatedResolver.setStatus(statusWithDirection(direction, isOverride(unicodeBidi)));
@@ -1539,10 +1539,8 @@ void RenderBlock::layoutInlineChildren(bool relayoutChildren, LayoutUnit& repain
             }
         }
 
-        if (replacedChildren.size()) {
-            for (size_t i = 0; i < replacedChildren.size(); i++)
-                 replacedChildren[i]->layoutIfNeeded();
-        }
+        for (size_t i = 0; i < replacedChildren.size(); i++)
+             replacedChildren[i]->layoutIfNeeded();
 
         layoutRunsAndFloats(layoutState, hasInlineChild);
     }

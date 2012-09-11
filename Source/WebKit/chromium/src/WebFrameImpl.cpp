@@ -194,6 +194,7 @@
 #include "V8DirectoryEntry.h"
 #include "V8DOMFileSystem.h"
 #include "V8FileEntry.h"
+#include "V8GCController.h"
 #include <public/WebFileSystem.h>
 #endif
 
@@ -582,8 +583,8 @@ WebFrame* WebFrame::frameForCurrentContext()
 
 #if WEBKIT_USING_V8
 WebFrame* WebFrame::frameForContext(v8::Handle<v8::Context> context)
-{
-    return WebFrameImpl::fromFrame(V8Proxy::retrieveFrame(context));
+{ 
+   return WebFrameImpl::fromFrame(toFrameIfNotDetached(context));
 }
 #endif
 
@@ -898,7 +899,7 @@ void WebFrameImpl::collectGarbage()
         return;
     // FIXME: Move this to the ScriptController and make it JS neutral.
 #if USE(V8)
-    m_frame->script()->collectGarbage();
+    V8GCController::collectGarbage();
 #else
     notImplemented();
 #endif
@@ -960,7 +961,7 @@ v8::Local<v8::Context> WebFrameImpl::mainWorldScriptContext() const
     if (!m_frame)
         return v8::Local<v8::Context>();
 
-    return V8Proxy::mainWorldContext(m_frame);
+    return ScriptController::mainWorldContext(m_frame);
 }
 
 v8::Handle<v8::Value> WebFrameImpl::createFileSystem(WebFileSystem::Type type,
@@ -1671,7 +1672,7 @@ bool WebFrameImpl::find(int identifier,
     }
 
 #if OS(ANDROID)
-    viewImpl()->zoomToFindInPageRect(frameView()->contentsToWindow(enclosingIntRect(m_activeMatch->transformFriendlyBoundingBox())));
+    viewImpl()->zoomToFindInPageRect(frameView()->contentsToWindow(enclosingIntRect(RenderObject::absoluteBoundingBoxRectForRange(m_activeMatch.get()))));
 #endif
 
     setMarkerActive(m_activeMatch.get(), true);
@@ -2149,7 +2150,7 @@ int WebFrameImpl::selectFindMatch(unsigned index, WebRect* selectionRect)
     }
 
     IntRect activeMatchRect;
-    IntRect activeMatchBoundingBox = enclosingIntRect(m_activeMatch->transformFriendlyBoundingBox());
+    IntRect activeMatchBoundingBox = enclosingIntRect(RenderObject::absoluteBoundingBoxRectForRange(m_activeMatch.get()));
 
     if (!activeMatchBoundingBox.isEmpty()) {
         if (m_activeMatch->firstNode() && m_activeMatch->firstNode()->renderer())

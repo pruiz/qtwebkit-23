@@ -76,7 +76,8 @@ namespace WebCore {
         static void gcEpilogue();
 
         static void checkMemoryUsage();
-        static void collectGarbageIfNecessary();
+        static void hintForCollectGarbage();
+        static void collectGarbage();
 
     private:
         // Estimate of current working set.

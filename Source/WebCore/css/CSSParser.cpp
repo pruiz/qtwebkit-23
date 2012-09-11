@@ -674,6 +674,15 @@ static inline bool isValidKeywordPropertyAndValue(CSSPropertyID propertyId, int 
         if (valueID == CSSValueVisible || valueID == CSSValueHidden)
             return true;
         break;
+#if ENABLE(CSS_COMPOSITING)
+    case CSSPropertyWebkitBlendMode:
+        if (valueID == CSSValueNormal || valueID == CSSValueMultiply || valueID == CSSValueScreen || valueID == CSSValueOverlay 
+            || valueID == CSSValueDarken || valueID == CSSValueLighten ||  valueID == CSSValueColorDodge || valueID == CSSValueColorBurn 
+            || valueID == CSSValueHardLight || valueID == CSSValueSoftLight || valueID == CSSValueDifference || valueID == CSSValueExclusion 
+            || valueID == CSSValueHue || valueID == CSSValueSaturation || valueID == CSSValueColor || valueID == CSSValueLuminosity)
+            return true;
+        break;
+#endif
     case CSSPropertyWebkitBorderFit:
         if (valueID == CSSValueBorder || valueID == CSSValueLines)
             return true;
@@ -918,6 +927,9 @@ static inline bool isKeywordPropertyID(CSSPropertyID propertyId)
     case CSSPropertyTextUnderlineStyle:
     case CSSPropertyVisibility:
     case CSSPropertyWebkitAppearance:
+#if ENABLE(CSS_COMPOSITING)
+    case CSSPropertyWebkitBlendMode:
+#endif
     case CSSPropertyWebkitBackfaceVisibility:
     case CSSPropertyWebkitBorderAfterStyle:
     case CSSPropertyWebkitBorderBeforeStyle:
@@ -1719,30 +1731,14 @@ bool CSSParser::parseValue(CSSPropertyID propId, bool important)
         else
             return parseQuotes(propId, important);
         break;
-    case CSSPropertyUnicodeBidi: // normal | embed | (bidi-override || isolate) | plaintext | inherit
+    case CSSPropertyUnicodeBidi: // normal | embed | bidi-override | isolate | isolate-override | plaintext | inherit
         if (id == CSSValueNormal
             || id == CSSValueEmbed
+            || id == CSSValueBidiOverride
+            || id == CSSValueWebkitIsolate
+            || id == CSSValueWebkitIsolateOverride
             || id == CSSValueWebkitPlaintext)
             validPrimitive = true;
-        else {
-            RefPtr<CSSValueList> list = CSSValueList::createSpaceSeparated();
-            bool isValid = true;
-            while (isValid && value) {
-                switch (value->id) {
-                case CSSValueBidiOverride:
-                case CSSValueWebkitIsolate:
-                    list->append(cssValuePool().createIdentifierValue(value->id));
-                    break;
-                default:
-                    isValid = false;
-                }
-                value = m_valueList->next();
-            }
-            if (list->length() && isValid) {
-                parsedValue = list.release();
-                m_valueList->next();
-            }
-        }
         break;
 
     case CSSPropertyContent:              // [ <string> | <uri> | <counter> | attr(X) | open-quote |
@@ -2108,6 +2104,12 @@ bool CSSParser::parseValue(CSSPropertyID propId, bool important)
     case CSSPropertyWebkitTextDecorationLine:
         // none | [ underline || overline || line-through ] | inherit
         return parseTextDecoration(propId, important);
+
+    case CSSPropertyWebkitTextDecorationStyle:
+        // solid | double | dotted | dashed | wavy
+        if (id == CSSValueSolid || id == CSSValueDouble || id == CSSValueDotted || id == CSSValueDashed || id == CSSValueWavy)
+            validPrimitive = true;
+        break;
 #endif // CSS3_TEXT_DECORATION
 
     case CSSPropertyZoom:          // normal | reset | document | <number> | <percentage> | inherit
@@ -2255,6 +2257,11 @@ bool CSSParser::parseValue(CSSPropertyID propId, bool important)
             }
             return false;
         }
+        break;
+#endif
+#if ENABLE(CSS_COMPOSITING)
+    case CSSPropertyWebkitBlendMode:
+            validPrimitive = true;
         break;
 #endif
 #if ENABLE(CSS3_FLEXBOX)

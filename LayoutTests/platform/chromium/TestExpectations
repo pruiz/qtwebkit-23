@@ -152,9 +152,6 @@ BUGWK73528 SKIP : networkinformation = PASS
 // The intent tag is not yet enabled.
 BUGGBILLOCK SKIP : webintents/intent-tag.html = PASS
 
-// CSS Variables are not yet enabled.
-BUGWK85580 SKIP : inspector/styles/variables = PASS
-
 // CSS image-resolution is not yet enabled.
 BUGWK85262 SKIP : fast/css/image-resolution = PASS
 
@@ -176,8 +173,8 @@ BUGWK94287 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appear
 BUGWK94287 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-style.html = MISSING TEXT IMAGE IMAGE+TEXT PASS
 
 // Temporary disabled
-BUGWK94297 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic.html = IMAGE PASS
-BUGWK94297 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements.html = IMAGE PASS
+BUGWK94439 MAC : fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic.html = IMAGE PASS
+BUGWK94439 MAC : fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements.html = IMAGE PASS
 
 // Proximity Events is not supported.
 BUGWK92942 SKIP : fast/dom/Proximity = PASS
@@ -764,6 +761,7 @@ WONTFIX SKIP : fast/fast-mobile-scrolling/no-fixed-position-elements.html = IMAG
 
 // Tests for frameset flattening. Relevant only on mobile browsers.
 WONTFIX SKIP : fast/frames/flattening = TIMEOUT
+WONTFIX SKIP : fast/text-autosizing/narrow-iframe-flattened.html = IMAGE
 WONTFIX SKIP : http/tests/misc/iframe-flattening-3level-nesting-with-blocking-resource.html = TIMEOUT
 
 // This should be tested differently (see discussion on https://bugs.webkit.org/show_bug.cgi?id=35063).
@@ -1062,7 +1060,7 @@ BUGWK71792 : editing/spelling/markers.html = TEXT
 BUGCR79854 : editing/execCommand/delete-empty-container.html = PASS TEXT
 
 // pulled in from downstream during webkit roll 84350:84431
-BUGCASEQ LINUX ANDROID WIN : editing/selection/select-from-textfield-outwards.html = IMAGE+TEXT
+BUGCASEQ ANDROID : editing/selection/select-from-textfield-outwards.html = IMAGE+TEXT
 
 BUGWK60120 DEBUG : editing/execCommand/append-node-under-document.html = PASS TEXT
 
@@ -1865,17 +1863,10 @@ BUGCR43890 WIN : http/tests/loading/basic.html = PASS TEXT
 BUGWK45991 : canvas/philip/tests/2d.drawImage.broken.html = TEXT
 BUGWK45991 : platform/chromium/virtual/gpu/canvas/philip/tests/2d.drawImage.broken.html = TEXT
 
-BUGWK39212 : canvas/philip/tests/2d.imageData.create1.type.html = TEXT
-BUGWK39212 : canvas/philip/tests/2d.imageData.create2.type.html = TEXT
-BUGWK39212 : canvas/philip/tests/2d.imageData.get.type.html = TEXT
-BUGWK39212 : platform/chromium/virtual/gpu/canvas/philip/tests/2d.imageData.create1.type.html = TEXT
-BUGWK39212 : platform/chromium/virtual/gpu/canvas/philip/tests/2d.imageData.create2.type.html = TEXT
-BUGWK39212 : platform/chromium/virtual/gpu/canvas/philip/tests/2d.imageData.get.type.html = TEXT
-
-BUGWK40272 : canvas/philip/tests/2d.imageData.object.round.html = TEXT
-BUGWK40272 : canvas/philip/tests/2d.imageData.object.wrap.html = TEXT
-BUGWK40272 : platform/chromium/virtual/gpu/canvas/philip/tests/2d.imageData.object.round.html = TEXT
-BUGWK40272 : platform/chromium/virtual/gpu/canvas/philip/tests/2d.imageData.object.wrap.html = TEXT
+BUGWK94246 : canvas/philip/tests/2d.imageData.object.round.html = TEXT
+BUGWK94246 : platform/chromium/virtual/gpu/canvas/philip/tests/2d.imageData.object.round.html = TEXT
+BUGWK94246 : fast/canvas/canvas-ImageData-behaviour.html = TEXT
+BUGWK94246 : platform/chromium/virtual/gpu/fast/canvas/canvas-ImageData-behaviour.html = TEXT
 
 BUGWK45991 : canvas/philip/tests/2d.pattern.image.broken.html = TEXT
 BUGWK45991 : platform/chromium/virtual/gpu/canvas/philip/tests/2d.pattern.image.broken.html = TEXT
@@ -2430,7 +2421,7 @@ BUGWK60103 MAC : fast/replaced/border-radius-clip.html = IMAGE+TEXT
 BUGWK60131 SLOW : fast/css/visited-link-hang.html = PASS
 
 // pulled in from downstream during webkit roll 84350:84431
-BUGCASEQ LINUX ANDROID WIN : fast/forms/input-text-drag-down.html = IMAGE+TEXT
+BUGCASEQ ANDROID : fast/forms/input-text-drag-down.html = IMAGE+TEXT
 
 // Introduced in r84443
 BUGWK59063 : fast/images/animated-gif-restored-from-bfcache.html = TEXT
@@ -3205,6 +3196,134 @@ BUGWK86592 LINUX ANDROID : http/tests/xmlhttprequest/xmlhttprequest-unsafe-redir
 BUGWK86592 LINUX ANDROID : fast/loader/unload-form-about-blank.html = TIMEOUT PASS
 BUGWK86592 LINUX ANDROID : http/tests/xmlhttprequest/zero-length-response-sync.html = TIMEOUT PASS
 
+// Need updated baselines after the bots cycle
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/css/text-overflow-input.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/input/caret-at-the-edge-of-input.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/inserting/before-after-input-element.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/pasteboard/4806874.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/pasteboard/drop-text-without-selection.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/pasteboard/input-field-1.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/3690703-2.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/3690703.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/3690719.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/4895428-3.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/4975120.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/drag-select-1.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/select-across-readonly-input-1.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/select-across-readonly-input-2.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/select-across-readonly-input-3.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/select-across-readonly-input-4.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/select-across-readonly-input-5.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : editing/selection/select-from-textfield-outwards.html = IMAGE IMAGE+TEXT PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/block/margin-collapse/103.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/css/input-search-padding.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/css/line-height-determined-by-primary-font.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/css/line-height.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/css/square-button-appearance.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/dom/isindex-001.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/dom/isindex-002.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/events/autoscroll.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/events/context-no-deselect.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/basic-buttons.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/basic-inputs.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/box-shadow-override.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/button-sizes.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/color/input-appearance-color.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/date/date-appearance.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/encoding-test.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/fieldset-align.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/floating-textfield-relayout.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/form-element-geometry.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-align.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-appearance-default-bkcolor.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-appearance-disabled.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-appearance-focus.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-appearance-height.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-appearance-preventDefault.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-appearance-readonly.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-appearance-selection.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-appearance-visibility.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-appearance-width.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-baseline.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-disabled-color.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-double-click-selection-gap-bug.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-field-text-truncated.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-placeholder-paint-order.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-placeholder-visibility-1.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-placeholder-visibility-3.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-readonly-autoscroll.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-readonly-dimmed.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-readonly-empty.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-spaces.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-table.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-text-click-inside.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-text-click-outside.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-text-double-click.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-text-drag-down.html = IMAGE IMAGE+TEXT PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-text-option-delete.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-text-scroll-left-on-blur.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-text-self-emptying-click.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-text-word-wrap.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-type-text-min-width.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-value.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/input-width.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/minWidthPercent.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/number/number-appearance-rtl.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/number/number-appearance-spinbutton-disabled-readonly.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/number/number-appearance-spinbutton-layer.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/placeholder-position.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/placeholder-pseudo-style.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/plaintext-mode-2.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/tabbing-input-iframe.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/text-style-color.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/textfield-focus-ring.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/textfield-overflow.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/validation-message-appearance.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/forms/visual-hebrew-text-field.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/frames/take-focus-from-iframe.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/html/details-no-summary4.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/html/details-open-javascript.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/html/details-open2.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/html/details-open4.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/lists/dynamic-marker-crash.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/repaint/renderer-destruction-by-invalidateSelection-crash.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/repaint/subtree-root-skipped.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/replaced/replaced-breaking-mixture.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/replaced/replaced-breaking.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/replaced/width100percent-textfield.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/speech/input-appearance-numberandspeech.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/speech/input-appearance-speechbutton.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/speech/speech-bidi-rendering.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/table/003.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/table/colspanMinWidth.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/table/spanOverlapRepaint.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/table/text-field-baseline.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/text/textIteratorNilRenderer.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : fast/transforms/transformed-focused-text-input.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : plugins/mouse-click-plugin-clears-selection.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : svg/custom/inline-svg-in-xhtml.xml = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : svg/hixie/mixed/003.xml = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/45621.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug1188.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug12384.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug18359.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug24200.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug2479-2.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug2479-3.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug28928.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug4382.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug4527.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug46368-1.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug46368-2.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug51037.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug55545.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug59354.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug7342.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/bugs/bug96334.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/dom/tableDom.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla/other/move_row.html = IMAGE PASS
+BUGLEVIW LINUX SNOWLEOPARD WIN : tables/mozilla_expected_failures/bugs/bug92647-1.html = IMAGE PASS
+
 // strange "Unexpected no expected results found" on cr-linux ews
 BUGWK86600 LINUX ANDROID : http/tests/cache/loaded-from-cache-after-reload-within-iframe.html = MISSING PASS
 BUGWK86600 LINUX ANDROID : http/tests/cache/loaded-from-cache-after-reload.html = MISSING PASS
@@ -3242,7 +3361,7 @@ BUGWK89238 SKIP : fast/repaint/reflection-repaint-test.html = PASS
 BUGWK89238 SKIP : fast/repaint/transform-layout-repaint.html = PASS
 BUGWK87282 WIN : fast/sub-pixel/layout-boxes-with-zoom.html = IMAGE
 
-BUGWK87273 : webaudio/audioparam-connect-audioratesignal.html = TIMEOUT PASS
+BUGWK87273 RELEASE : webaudio/audioparam-connect-audioratesignal.html = TIMEOUT PASS
 
 BUGWK87321 XP : fast/history/history-subframe-with-name.html = TEXT PASS
 BUGWK87321 XP : fast/history/history-traversal-is-asynchronous.html = TEXT PASS
@@ -3338,7 +3457,7 @@ BUGWK89813 LINUX ANDROID DEBUG : fast/js/large-expressions.html = PASS TIMEOUT
 
 BUGWK89820 : fast/text/hyphen-min-preferred-width.html = IMAGE
 
-BUGWK91433 LINUX ANDROID : fast/forms/placeholder-position.html = PASS IMAGE
+BUGWK91433 ANDROID : fast/forms/placeholder-position.html = PASS IMAGE
 
 // Kerning seems disabled for some reason.
 BUGWK89936 XP : fast/text/atsui-kerning-and-ligatures.html = IMAGE
@@ -3507,4 +3626,16 @@ BUGWK94256 DEBUG : fast/block/inline-children-root-linebox-crash.html = PASS CRA
 
 BUGWK94261 DEBUG : http/tests/inspector/indexeddb/resources-panel.html = PASS CRASH TIMEOUT
 
-BUGWK94376 MAC : touchadjustment/context-menu.html = PASS TEXT
+// Needs a rebaseline.
+BUGWK40272 : svg/css/circle-in-mask-with-shadow.svg = IMAGE
+
+BUGWK90488 SLOW WIN : http/tests/inspector/network-preflight-options.html = PASS
+
+BUGWK94501 WIN : http/tests/inspector/resource-tree/resource-tree-invalid-mime-type-css-content.html = PASS TEXT
+BUGWK94501 WIN LINUX : http/tests/inspector/resource-tree/resource-tree-frame-navigate.html = PASS TEXT
+
+BUGWK94521 LINUX : fast/loader/loadInProgress.html = PASS CRASH
+
+BUGWK94528 MAC : fast/text-autosizing/nested-em-line-height.html = PASS IMAGE
+
+BUGWK94532 LINUX : fast/forms/formmethod-attribute-button-html.html = PASS MISSING

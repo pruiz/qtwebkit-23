@@ -1,3 +1,244 @@
+2012-08-20  Mark Lam  <mark.lam@apple.com>
+
+        Fix broken non-JIT build.
+        https://bugs.webkit.org/show_bug.cgi?id=94564.
+
+        Reviewed by Filip Pizlo.
+
+        Added some UNUSED_PARAM() macros to make the compiler happy.
+
+        * runtime/Executable.cpp:
+        (JSC::EvalExecutable::compileInternal):
+        (JSC::ProgramExecutable::compileInternal):
+        (JSC::FunctionExecutable::compileForCallInternal):
+        (JSC::FunctionExecutable::compileForConstructInternal):
+
+2012-08-20  Mark Lam  <mark.lam@apple.com>
+
+        Fixed erroneous line number for LLint frame when throwing exceptions.
+        https://bugs.webkit.org/show_bug.cgi?id=94051.
+
+        Reviewed by Filip Pizlo.
+
+        For LLInt frames, before throwing an exception, adjust the PC from the
+        return PC back to the call PC if we are indeed at a call site.
+
+        * bytecode/CodeBlock.cpp:
+        (JSC::CodeBlock::adjustPCIfAtCallSite):
+        (JSC):
+        (JSC::CodeBlock::bytecodeOffset):
+        * bytecode/CodeBlock.h:
+        (CodeBlock):
+        * llint/LLIntExceptions.cpp:
+        (JSC::LLInt::fixupPCforExceptionIfNeeded):
+        (LLInt):
+        (JSC::LLInt::interpreterThrowInCaller):
+        (JSC::LLInt::returnToThrow):
+        (JSC::LLInt::callToThrow):
+
+2012-08-20  Filip Pizlo  <fpizlo@apple.com>
+
+        fast/js/dfg-peephole-compare-final-object-to-final-object-or-other-when-both-proven-final-object.html on 32-bit
+        https://bugs.webkit.org/show_bug.cgi?id=94538
+
+        Reviewed by Mark Hahnenberg.
+
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compilePeepHoleObjectToObjectOrOtherEquality):
+
+2012-08-20  Filip Pizlo  <fpizlo@apple.com>
+
+        fast/js/dfg-compare-final-object-to-final-object-or-other-when-both-proven-final-object.html crashes on 32-bit
+        https://bugs.webkit.org/show_bug.cgi?id=94026
+
+        Reviewed by Mark Hahnenberg.
+
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compileObjectToObjectOrOtherEquality):
+
+2012-08-19  Filip Pizlo  <fpizlo@apple.com>
+
+        The relationship between abstract values and structure transition watchpoints should be rationalized
+        https://bugs.webkit.org/show_bug.cgi?id=94205
+
+        Reviewed by Geoffrey Garen.
+
+        This patch does a number of things related to the handling of the abstract values
+        arrising from values with structures known to be watchpointable:
+        
+        - This rationalizes the relationship between the structure that we know an object
+          to have *right now* based on having executed a check against that structure, and
+          the structure that we know the object could have *in the future* based on a type
+          check executed in the past over a structure that was watchpointable.
+        
+        - We use the above to assert that structure transition watchpoints are being used
+          soundly.
+        
+        - We use the above to strength reduce CheckStructure into StructureTransitionWatchpoint
+          whenever possible.
+        
+        - This rationalizes the handling of CFA over constants that appeared in the bytecode.
+          If at compile-time the constant has a watchpointable structure, then we can prove
+          what structures it may have in the future. The analysis uses this to both assert
+          that structure transition watchpoints are being used correctly, and to find
+          opportunities for using them more aggressively.
+        
+        The net effect of all of these changes is that OSR entry should work more smoothly.
+        It may also be a slight win due to strength reductions, though most of those strength
+        reductions would have already been done by the parser and the structure check hoister.
+
+        * GNUmakefile.list.am:
+        * JavaScriptCore.xcodeproj/project.pbxproj:
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::beginBasicBlock):
+        (JSC::DFG::AbstractState::execute):
+        * dfg/DFGAbstractValue.h:
+        (DFG):
+        (JSC::DFG::AbstractValue::clear):
+        (JSC::DFG::AbstractValue::isClear):
+        (JSC::DFG::AbstractValue::makeTop):
+        (JSC::DFG::AbstractValue::clobberStructures):
+        (JSC::DFG::AbstractValue::isTop):
+        (JSC::DFG::AbstractValue::setFuturePossibleStructure):
+        (AbstractValue):
+        (JSC::DFG::AbstractValue::filterFuturePossibleStructure):
+        (JSC::DFG::AbstractValue::setMostSpecific):
+        (JSC::DFG::AbstractValue::set):
+        (JSC::DFG::AbstractValue::operator==):
+        (JSC::DFG::AbstractValue::merge):
+        (JSC::DFG::AbstractValue::filter):
+        (JSC::DFG::AbstractValue::filterValueByType):
+        (JSC::DFG::AbstractValue::validateType):
+        (JSC::DFG::AbstractValue::validate):
+        (JSC::DFG::AbstractValue::checkConsistency):
+        (JSC::DFG::AbstractValue::dump):
+        * dfg/DFGArgumentsSimplificationPhase.cpp:
+        (JSC::DFG::ArgumentsSimplificationPhase::run):
+        * dfg/DFGCSEPhase.cpp:
+        (JSC::DFG::CSEPhase::checkStructureLoadElimination):
+        (JSC::DFG::CSEPhase::structureTransitionWatchpointElimination):
+        (JSC::DFG::CSEPhase::performNodeCSE):
+        * dfg/DFGConstantFoldingPhase.cpp:
+        (JSC::DFG::ConstantFoldingPhase::foldConstants):
+        * dfg/DFGNode.h:
+        (JSC::DFG::Node::convertToStructureTransitionWatchpoint):
+        (Node):
+        (JSC::DFG::Node::hasStructure):
+        * dfg/DFGNodeType.h:
+        (DFG):
+        * dfg/DFGOSREntry.cpp:
+        (JSC::DFG::prepareOSREntry):
+        * dfg/DFGPredictionPropagationPhase.cpp:
+        (JSC::DFG::PredictionPropagationPhase::propagate):
+        * dfg/DFGSpeculativeJIT.cpp:
+        (JSC::DFG::SpeculativeJIT::convertLastOSRExitToForward):
+        (JSC::DFG::SpeculativeJIT::forwardSpeculationWatchpoint):
+        (DFG):
+        (JSC::DFG::SpeculativeJIT::speculationWatchpointWithConditionalDirection):
+        (JSC::DFG::SpeculativeJIT::forwardSpeculationCheck):
+        (JSC::DFG::SpeculativeJIT::speculateArray):
+        * dfg/DFGSpeculativeJIT.h:
+        (SpeculativeJIT):
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGSpeculativeJIT64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGStructureAbstractValue.h: Added.
+        (DFG):
+        (StructureAbstractValue):
+        (JSC::DFG::StructureAbstractValue::StructureAbstractValue):
+        (JSC::DFG::StructureAbstractValue::clear):
+        (JSC::DFG::StructureAbstractValue::makeTop):
+        (JSC::DFG::StructureAbstractValue::top):
+        (JSC::DFG::StructureAbstractValue::add):
+        (JSC::DFG::StructureAbstractValue::addAll):
+        (JSC::DFG::StructureAbstractValue::contains):
+        (JSC::DFG::StructureAbstractValue::isSubsetOf):
+        (JSC::DFG::StructureAbstractValue::doesNotContainAnyOtherThan):
+        (JSC::DFG::StructureAbstractValue::isSupersetOf):
+        (JSC::DFG::StructureAbstractValue::filter):
+        (JSC::DFG::StructureAbstractValue::isClear):
+        (JSC::DFG::StructureAbstractValue::isTop):
+        (JSC::DFG::StructureAbstractValue::isClearOrTop):
+        (JSC::DFG::StructureAbstractValue::isNeitherClearNorTop):
+        (JSC::DFG::StructureAbstractValue::size):
+        (JSC::DFG::StructureAbstractValue::at):
+        (JSC::DFG::StructureAbstractValue::operator[]):
+        (JSC::DFG::StructureAbstractValue::last):
+        (JSC::DFG::StructureAbstractValue::speculationFromStructures):
+        (JSC::DFG::StructureAbstractValue::hasSingleton):
+        (JSC::DFG::StructureAbstractValue::singleton):
+        (JSC::DFG::StructureAbstractValue::operator==):
+        (JSC::DFG::StructureAbstractValue::dump):
+        (JSC::DFG::StructureAbstractValue::topValue):
+        * dfg/DFGStructureCheckHoistingPhase.cpp:
+        (JSC::DFG::StructureCheckHoistingPhase::run):
+
+2012-08-17  Filip Pizlo  <fpizlo@apple.com>
+
+        The current state of the call frame should be taken into account in the DFG for both predictions and proofs
+        https://bugs.webkit.org/show_bug.cgi?id=94412
+
+        Reviewed by Geoffrey Garen.
+
+        This ensures that no matter how smart the DFG gets, it'll always know through
+        which entrypoint OSR will try to enter, and with which values it will attempt
+        to do so. For prologue OSR, this has no effect other than adding the current
+        arguments to the argument predictions. For loop OSR, this makes our treatment
+        of the loop slightly more conservative - just conservative enough to ensure
+        that OSR succeeds.
+
+        * bytecode/CodeBlock.cpp:
+        (JSC::ProgramCodeBlock::compileOptimized):
+        (JSC::EvalCodeBlock::compileOptimized):
+        (JSC::FunctionCodeBlock::compileOptimized):
+        * bytecode/CodeBlock.h:
+        (CodeBlock):
+        (ProgramCodeBlock):
+        (EvalCodeBlock):
+        (FunctionCodeBlock):
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::initialize):
+        * dfg/DFGAbstractValue.h:
+        (JSC::DFG::AbstractValue::setMostSpecific):
+        (AbstractValue):
+        * dfg/DFGByteCodeParser.cpp:
+        (JSC::DFG::ByteCodeParser::fixVariableAccessPredictions):
+        (JSC::DFG::ByteCodeParser::parse):
+        * dfg/DFGDriver.cpp:
+        (JSC::DFG::compile):
+        (JSC::DFG::tryCompile):
+        (JSC::DFG::tryCompileFunction):
+        * dfg/DFGDriver.h:
+        (DFG):
+        (JSC::DFG::tryCompile):
+        (JSC::DFG::tryCompileFunction):
+        * dfg/DFGGraph.h:
+        (JSC::DFG::Graph::Graph):
+        (Graph):
+        * jit/JITDriver.h:
+        (JSC::jitCompileIfAppropriate):
+        (JSC::jitCompileFunctionIfAppropriate):
+        * jit/JITStubs.cpp:
+        (JSC::DEFINE_STUB_FUNCTION):
+        * runtime/Executable.cpp:
+        (JSC::EvalExecutable::compileOptimized):
+        (JSC::EvalExecutable::compileInternal):
+        (JSC::ProgramExecutable::compileOptimized):
+        (JSC::ProgramExecutable::compileInternal):
+        (JSC::FunctionExecutable::compileOptimizedForCall):
+        (JSC::FunctionExecutable::compileOptimizedForConstruct):
+        (JSC::FunctionExecutable::compileForCallInternal):
+        (JSC::FunctionExecutable::compileForConstructInternal):
+        * runtime/Executable.h:
+        (EvalExecutable):
+        (ProgramExecutable):
+        (FunctionExecutable):
+        (JSC::FunctionExecutable::compileOptimizedFor):
+        * runtime/ExecutionHarness.h:
+        (JSC::prepareForExecution):
+        (JSC::prepareFunctionForExecution):
+
 2012-08-17  Filip Pizlo  <fpizlo@apple.com>
 
         DFG CSE should be more honest about when it changed the IR

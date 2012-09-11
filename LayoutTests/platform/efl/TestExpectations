@@ -171,10 +171,16 @@ BUGWK86082 : security/block-test.html = TEXT PASS
 BUGWK86084 : svg/dom/SVGScriptElement/script-onerror-bubbling.svg = TEXT PASS
 BUGWK60103 : fast/replaced/border-radius-clip.html = TEXT PASS
 BUGWK91366 : fast/forms/number/number-spinbutton-gets-disabled-or-readonly.html = TEXT PASS
-BUGWK91958 : http/tests/inspector-enabled/injected-script-discard.html = TEXT PASS
 BUGWK92112 : fast/overflow/overflow-height-float-not-removed-crash2.html = CRASH PASS
+BUGWK93589 : svg/dom/SVGScriptElement/script-change-externalResourcesRequired-while-loading.svg = TEXT PASS
+
+// Flaky inspector tests
+BUGWK91958 : http/tests/inspector-enabled/injected-script-discard.html = TEXT PASS
 BUGWK85615 : http/tests/inspector/resource-har-pages.html = TEXT PASS
+BUGWKEFL : http/tests/inspector/search/resources-search-match-index.html = TEXT PASS
 BUGWK93820 : inspector/console/console-format-collections.html = TEXT PASS
+BUGWKEFL : inspector/profiler/heap-snapshot.html = TEXT PASS
+BUGWKEFL : inspector/timeline/timeline-enum-stability.html = TEXT PASS
 
 // Aborting application cache downloads is flaky.
 BUGWK87633 : http/tests/appcache/abort-cache-onchecking-manifest-404.html = TEXT PASS
@@ -882,6 +888,9 @@ BUGWK94009 : css2.1/20110323/c541-word-sp-000.htm = IMAGE
 
 BUGWK94150 : fast/events/autoscroll-in-textarea.html = TEXT
 
+// Requires CSS_COMPOSITING to be turned on
+BUGWK94024 SKIP : css3/compositing = TEXT
+
 // Fails also on GTK
 BUGWK94080 : fast/overflow/line-clamp-and-columns.html = IMAGE
 
@@ -899,3 +908,6 @@ BUGWK59706 : http/tests/inspector/resource-tree/resource-tree-frame-navigate.htm
 
 // New test introduced in r125790 fails
 BUGWK94341 : inspector/timeline/timeline-decode-resize.html = TEXT
+
+// Slider thumb can not be displayed without parent slider.
+BUGWK94334 : fast/forms/range/thumbslider-no-parent-slider.html = MISSING

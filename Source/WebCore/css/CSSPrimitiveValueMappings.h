@@ -2198,6 +2198,27 @@ template<> inline CSSPrimitiveValue::operator ETextDecoration() const
     return TDNONE;
 }
 
+#if ENABLE(CSS3_TEXT_DECORATION)
+template<> inline CSSPrimitiveValue::operator TextDecorationStyle() const
+{
+    switch (m_value.ident) {
+    case CSSValueSolid:
+        return TextDecorationStyleSolid;
+    case CSSValueDouble:
+        return TextDecorationStyleDouble;
+    case CSSValueDotted:
+        return TextDecorationStyleDotted;
+    case CSSValueDashed:
+        return TextDecorationStyleDashed;
+    case CSSValueWavy:
+        return TextDecorationStyleWavy;
+    }
+
+    ASSERT_NOT_REACHED();
+    return TextDecorationStyleSolid;
+}
+#endif // CSS3_TEXT_DECORATION
+
 template<> inline CSSPrimitiveValue::CSSPrimitiveValue(ETextSecurity e)
     : CSSValue(PrimitiveClass)
 {
@@ -2272,6 +2293,32 @@ template<> inline CSSPrimitiveValue::operator ETextTransform() const
     return TTNONE;
 }
 
+template<> inline CSSPrimitiveValue::CSSPrimitiveValue(EUnicodeBidi e)
+    : CSSValue(PrimitiveClass)
+{
+    m_primitiveUnitType = CSS_IDENT;
+    switch (e) {
+    case UBNormal:
+        m_value.ident = CSSValueNormal;
+        break;
+    case Embed:
+        m_value.ident = CSSValueEmbed;
+        break;
+    case Override:
+        m_value.ident = CSSValueBidiOverride;
+        break;
+    case Isolate:
+        m_value.ident = CSSValueWebkitIsolate;
+        break;
+    case IsolateOverride:
+        m_value.ident = CSSValueWebkitIsolateOverride;
+        break;
+    case Plaintext:
+        m_value.ident = CSSValueWebkitPlaintext;
+        break;
+    }
+}
+
 template<> inline CSSPrimitiveValue::operator EUnicodeBidi() const
 {
     switch (m_value.ident) {
@@ -2283,6 +2330,8 @@ template<> inline CSSPrimitiveValue::operator EUnicodeBidi() const
         return Override;
     case CSSValueWebkitIsolate:
         return Isolate;
+    case CSSValueWebkitIsolateOverride:
+        return IsolateOverride;
     case CSSValueWebkitPlaintext:
         return Plaintext;
     }

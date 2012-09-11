@@ -610,6 +610,9 @@ public:
     ETextTransform textTransform() const { return static_cast<ETextTransform>(inherited_flags._text_transform); }
     ETextDecoration textDecorationsInEffect() const { return static_cast<ETextDecoration>(inherited_flags._text_decorations); }
     ETextDecoration textDecoration() const { return static_cast<ETextDecoration>(visual->textDecoration); }
+#if ENABLE(CSS3_TEXT_DECORATION)
+    TextDecorationStyle textDecorationStyle() const { return static_cast<TextDecorationStyle>(rareNonInheritedData->m_textDecorationStyle); }
+#endif // CSS3_TEXT_DECORATION
     int wordSpacing() const;
     int letterSpacing() const;
 
@@ -713,9 +716,6 @@ public:
     short verticalBorderSpacing() const;
     EEmptyCell emptyCells() const { return static_cast<EEmptyCell>(inherited_flags._empty_cells); }
     ECaptionSide captionSide() const { return static_cast<ECaptionSide>(inherited_flags._caption_side); }
-
-    short counterIncrement() const { return rareNonInheritedData->m_counterIncrement; }
-    short counterReset() const { return rareNonInheritedData->m_counterReset; }
 
     EListStyleType listStyleType() const { return static_cast<EListStyleType>(inherited_flags._list_style_type); }
     StyleImage* listStyleImage() const;
@@ -978,6 +978,14 @@ public:
     bool hasFilter() const { return false; }
 #endif
 
+#if ENABLE(CSS_COMPOSITING)
+    BlendMode blendMode() const { return static_cast<BlendMode>(rareNonInheritedData->m_effectiveBlendMode); }
+    void setBlendMode(BlendMode v) { rareNonInheritedData.access()->m_effectiveBlendMode = v; }
+    bool hasBlendMode() const { return static_cast<BlendMode>(rareNonInheritedData->m_effectiveBlendMode) == BlendModeNormal; }
+#else
+    bool hasBlendMode() const { return false; }
+#endif
+ 
 #if USE(RTL_SCROLLBAR)
     bool shouldPlaceBlockDirectionScrollbarOnLogicalLeft() const { return !isLeftToRightDirection() && isHorizontalWritingMode(); }
 #else
@@ -1127,6 +1135,9 @@ public:
     void addToTextDecorationsInEffect(ETextDecoration v) { inherited_flags._text_decorations |= v; }
     void setTextDecorationsInEffect(ETextDecoration v) { inherited_flags._text_decorations = v; }
     void setTextDecoration(ETextDecoration v) { SET_VAR(visual, textDecoration, v); }
+#if ENABLE(CSS3_TEXT_DECORATION)
+    void setTextDecorationStyle(TextDecorationStyle v) { SET_VAR(rareNonInheritedData, m_textDecorationStyle, v); }
+#endif // CSS3_TEXT_DECORATION
     void setDirection(TextDirection v) { inherited_flags._direction = v; }
     void setLineHeight(Length specifiedLineHeight);
     bool setZoom(float);
@@ -1189,8 +1200,6 @@ public:
     void setHasAspectRatio(bool b) { SET_VAR(rareNonInheritedData, m_hasAspectRatio, b); }
     void setAspectRatioDenominator(float v) { SET_VAR(rareNonInheritedData, m_aspectRatioDenominator, v); }
     void setAspectRatioNumerator(float v) { SET_VAR(rareNonInheritedData, m_aspectRatioNumerator, v); }
-    void setCounterIncrement(short v) { SET_VAR(rareNonInheritedData, m_counterIncrement, v) }
-    void setCounterReset(short v) { SET_VAR(rareNonInheritedData, m_counterReset, v) }
 
     void setListStyleType(EListStyleType v) { inherited_flags._list_style_type = v; }
     void setListStyleImage(PassRefPtr<StyleImage>);
@@ -1575,6 +1584,9 @@ public:
     static Length initialLineHeight() { return Length(-100.0, Percent); }
     static ETextAlign initialTextAlign() { return TASTART; }
     static ETextDecoration initialTextDecoration() { return TDNONE; }
+#if ENABLE(CSS3_TEXT_DECORATION)
+    static TextDecorationStyle initialTextDecorationStyle() { return TextDecorationStyleSolid; }
+#endif // CSS3_TEXT_DECORATION
     static float initialZoom() { return 1.0f; }
     static int initialOutlineOffset() { return 0; }
     static float initialOpacity() { return 1.0f; }
@@ -1703,6 +1715,9 @@ public:
 #endif
 #if ENABLE(CSS_FILTERS)
     static const FilterOperations& initialFilter() { DEFINE_STATIC_LOCAL(FilterOperations, ops, ()); return ops; }
+#endif
+#if ENABLE(CSS_COMPOSITING)
+    static BlendMode initialBlendMode() { return BlendModeNormal; }
 #endif
 private:
     void setVisitedLinkColor(const Color&);

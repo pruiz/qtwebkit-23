@@ -33,11 +33,12 @@
 
 #include "BindingSecurity.h"
 #include "Document.h"
-#include "SafeAllocation.h"
 #include "V8BindingMacros.h"
 #include "V8DOMConfiguration.h"
+#include "V8DOMWindowShell.h"
 #include "V8DOMWrapper.h"
 #include "V8HiddenPropertyName.h"
+#include "V8ObjectConstructor.h"
 #include "V8PerIsolateData.h"
 #include "V8Proxy.h"
 #include "V8ThrowException.h"
@@ -366,6 +367,22 @@ namespace WebCore {
     String int32ToWebCoreString(int value);
 
     PassRefPtr<DOMStringList> toDOMStringList(v8::Handle<v8::Value>);
+
+    // Returns the window object associated with a context.
+    DOMWindow* toDOMWindow(v8::Handle<v8::Context>);
+
+    // Returns the frame object of the window object associated with
+    // a context, if the window is currently being displayed in the Frame.
+    Frame* toFrameIfNotDetached(v8::Handle<v8::Context>);
+
+    // Returns the PerContextData associated with a frame for the current isolated world.
+    V8PerContextData* perContextDataForCurrentWorld(Frame*);
+
+    // If the current context causes out of memory, JavaScript setting
+    // is disabled and it returns true.
+    bool handleOutOfMemory();
+
+    void crashIfV8IsDead();
 
     class V8ParameterBase {
     public:

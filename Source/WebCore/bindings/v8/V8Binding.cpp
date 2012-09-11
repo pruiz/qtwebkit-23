@@ -34,13 +34,15 @@
 #include "BindingVisitors.h"
 #include "DOMStringList.h"
 #include "Element.h"
+#include "Frame.h"
 #include "MemoryInstrumentation.h"
 #include "PlatformString.h"
 #include "QualifiedName.h"
-#include "SafeAllocation.h"
+#include "Settings.h"
 #include "V8DOMStringList.h"
+#include "V8DOMWindow.h"
 #include "V8Element.h"
-#include "V8Proxy.h"
+#include "V8ObjectConstructor.h"
 
 #include <wtf/MathExtras.h>
 #include <wtf/MainThread.h>
@@ -317,7 +319,7 @@ String int32ToWebCoreString(int value)
 v8::Persistent<v8::FunctionTemplate> createRawTemplate()
 {
     v8::HandleScope scope;
-    v8::Local<v8::FunctionTemplate> result = v8::FunctionTemplate::New(SafeAllocation::isValidConstructorMode);
+    v8::Local<v8::FunctionTemplate> result = v8::FunctionTemplate::New(V8ObjectConstructor::isValidConstructorMode);
     return v8::Persistent<v8::FunctionTemplate>::New(result);
 }        
 
@@ -379,6 +381,68 @@ PassRefPtr<DOMStringList> toDOMStringList(v8::Handle<v8::Value> value)
         ret->append(toWebCoreString(indexedValue));
     }
     return ret.release();
+}
+
+DOMWindow* toDOMWindow(v8::Handle<v8::Context> context)
+{
+    v8::Handle<v8::Object> global = context->Global();
+    ASSERT(!global.IsEmpty());
+    global = V8DOMWrapper::lookupDOMWrapper(V8DOMWindow::GetTemplate(), global);
+    ASSERT(!global.IsEmpty());
+    return V8DOMWindow::toNative(global);
+}
+
+Frame* toFrameIfNotDetached(v8::Handle<v8::Context> context)
+{
+    DOMWindow* window = toDOMWindow(context);
+    if (window->isCurrentlyDisplayedInFrame())
+        return window->frame();
+    // We return 0 here because |context| is detached from the Frame. If we
+    // did return |frame| we could get in trouble because the frame could be
+    // navigated to another security origin.
+    return 0;
+}
+
+V8PerContextData* perContextDataForCurrentWorld(Frame* frame)
+{
+    V8IsolatedContext* isolatedContext;
+    if (UNLIKELY(!!(isolatedContext = V8IsolatedContext::getEntered())))
+        return isolatedContext->perContextData();
+    return frame->script()->windowShell()->perContextData();
+}
+
+bool handleOutOfMemory()
+{
+    v8::Local<v8::Context> context = v8::Context::GetCurrent();
+
+    if (!context->HasOutOfMemoryException())
+        return false;
+
+    // Warning, error, disable JS for this frame?
+    Frame* frame = toFrameIfNotDetached(context);
+    if (!frame)
+        return true;
+
+    frame->script()->clearForClose();
+    frame->script()->windowShell()->destroyGlobal();
+
+#if PLATFORM(CHROMIUM)
+    PlatformSupport::notifyJSOutOfMemory(frame);
+#endif
+
+    if (Settings* settings = frame->settings())
+        settings->setScriptEnabled(false);
+
+    return true;
+}
+
+void crashIfV8IsDead()
+{
+    if (v8::V8::IsDead()) {
+        // FIXME: We temporarily deal with V8 internal error situations
+        // such as out-of-memory by crashing the renderer.
+        CRASH();
+    }
 }
 
 } // namespace WebCore

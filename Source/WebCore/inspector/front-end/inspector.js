@@ -39,8 +39,8 @@ var WebInspector = {
 
         var elements = new WebInspector.PanelDescriptor("elements", WebInspector.UIString("Elements"), "ElementsPanel", "ElementsPanel.js");
         var resources = new WebInspector.PanelDescriptor("resources", WebInspector.UIString("Resources"), "ResourcesPanel", "ResourcesPanel.js");
-        var network = new WebInspector.PanelDescriptor("network", WebInspector.UIString("Network"), undefined, undefined, new WebInspector.NetworkPanel());
-        var scripts = new WebInspector.PanelDescriptor("scripts", WebInspector.UIString("Sources"), undefined, undefined, new WebInspector.ScriptsPanel());
+        var network = new WebInspector.PanelDescriptor("network", WebInspector.UIString("Network"), "NetworkPanel", "NetworkPanel.js");
+        var scripts = new WebInspector.PanelDescriptor("scripts", WebInspector.UIString("Sources"), "ScriptsPanel", "ScriptsPanel.js");
         var timeline = new WebInspector.PanelDescriptor("timeline", WebInspector.UIString("Timeline"), "TimelinePanel", "TimelinePanel.js");
         var profiles = new WebInspector.PanelDescriptor("profiles", WebInspector.UIString("Profiles"), "ProfilesPanel", "ProfilesPanel.js");
         var audits = new WebInspector.PanelDescriptor("audits", WebInspector.UIString("Audits"), "AuditsPanel", "AuditsPanel.js");
@@ -256,14 +256,7 @@ var WebInspector = {
             body.addStyleClass("compact");
         else
             body.removeStyleClass("compact");
-
-        // This may be called before doLoadedDone, hence the bulk of inspector objects may
-        // not be created yet.
-        if (WebInspector.toolbar)
-            WebInspector.toolbar.compact = x;
-
-        if (WebInspector.drawer)
-            WebInspector.drawer.resize();
+        WebInspector.windowResize();
     },
 
     _updateErrorAndWarningCounts: function()
@@ -326,15 +319,6 @@ var WebInspector = {
             errorWarningElement.title = null;
     },
 
-    /**
-     * @param {NetworkAgent.RequestId} requestId
-     * @return {?WebInspector.NetworkRequest}
-     */
-    networkRequestById: function(requestId)
-    {
-        return this.panels.network.requestById(requestId);
-    },
-
     get inspectedPageDomain()
     {
         var parsedURL = WebInspector.inspectedPageURL && WebInspector.inspectedPageURL.asParsedURL();
@@ -394,6 +378,12 @@ var WebInspector = {
             title = WebInspector.ProfilesPanel._instance.displayTitleForProfileLink(profileStringMatches[2], profileStringMatches[1]);
         }
         return title;
+    },
+
+    _debuggerPaused: function()
+    {
+        // Create scripts panel upon demand.
+        WebInspector.panel("scripts");
     }
 }
 
@@ -486,8 +476,6 @@ WebInspector._doLoadedDoneWithCapabilities = function()
     this.console.addEventListener(WebInspector.ConsoleModel.Events.MessageAdded, this._updateErrorAndWarningCounts, this);
     this.console.addEventListener(WebInspector.ConsoleModel.Events.RepeatCountUpdated, this._updateErrorAndWarningCounts, this);
 
-    this.debuggerModel = new WebInspector.DebuggerModel();
-
     WebInspector.CSSCompletions.requestCSSNameCompletions();
 
     this.drawer = new WebInspector.Drawer();
@@ -495,6 +483,8 @@ WebInspector._doLoadedDoneWithCapabilities = function()
 
     this.networkManager = new WebInspector.NetworkManager();
     this.resourceTreeModel = new WebInspector.ResourceTreeModel(this.networkManager);
+    this.debuggerModel = new WebInspector.DebuggerModel();
+    this.debuggerModel.addEventListener(WebInspector.DebuggerModel.Events.DebuggerPaused, this._debuggerPaused, this);
     this.networkLog = new WebInspector.NetworkLog();
     this.domAgent = new WebInspector.DOMAgent();
     this.javaScriptContextManager = new WebInspector.JavaScriptContextManager(this.resourceTreeModel, this.consoleView);
@@ -529,12 +519,14 @@ WebInspector._doLoadedDoneWithCapabilities = function()
 
     this._createGlobalStatusBarItems();
 
-    this.toolbar = new WebInspector.Toolbar();
     WebInspector._installDockToRight();
 
+    this.toolbar = new WebInspector.Toolbar();
+    this.toolbar.setCoalescingUpdate(true);
     var panelDescriptors = this._panelDescriptors();
     for (var i = 0; i < panelDescriptors.length; ++i)
         WebInspector.inspectorView.addPanel(panelDescriptors[i]);
+    this.toolbar.setCoalescingUpdate(false);
 
     this.addMainEventListeners(document);
     WebInspector.registerLinkifierPlugin(this._profilesLinkifier.bind(this));
@@ -558,6 +550,7 @@ WebInspector._doLoadedDoneWithCapabilities = function()
     InspectorAgent.enable(showInitialPanel);
     DatabaseAgent.enable();
     DOMStorageAgent.enable();
+
     if (!Capabilities.profilerCausesRecompilation || WebInspector.settings.profilerEnabled.get())
         ProfilerAgent.enable();
 
@@ -649,10 +642,14 @@ WebInspector.dispatchMessageFromBackend = function(messageObject)
 
 WebInspector.windowResize = function(event)
 {
-    WebInspector.inspectorView.doResize();
-    WebInspector.drawer.resize();
-    WebInspector.toolbar.resize();
-    WebInspector.settingsController.resize();
+    if (WebInspector.inspectorView)
+        WebInspector.inspectorView.doResize();
+    if (WebInspector.drawer)
+        WebInspector.drawer.resize();
+    if (WebInspector.toolbar)
+        WebInspector.toolbar.resize();
+    if (WebInspector.settingsController)
+        WebInspector.settingsController.resize();
 }
 
 WebInspector.setDockingUnavailable = function(unavailable)
@@ -748,7 +745,7 @@ WebInspector._registerShortcuts = function()
     var advancedSearchShortcut = WebInspector.AdvancedSearchController.createShortcut();
     section.addKey(advancedSearchShortcut.name, WebInspector.UIString("Search across all sources"));
 
-    var openResourceShortcut = WebInspector.OpenResourceDialog.createShortcut();
+    var openResourceShortcut = WebInspector.KeyboardShortcut.makeDescriptor("o", WebInspector.KeyboardShortcut.Modifiers.CtrlOrMeta);
     section.addKey(openResourceShortcut.name, WebInspector.UIString("Go to source"));
 
     if (WebInspector.isMac()) {
@@ -798,7 +795,7 @@ WebInspector.documentKeyDown = function(event)
     switch (event.keyIdentifier) {
         case "U+004F": // O key
             if (!event.shiftKey && !event.altKey && WebInspector.KeyboardShortcut.eventHasCtrlOrMeta(event)) {
-                WebInspector.panels.scripts.showGoToSourceDialog();
+                WebInspector.showPanel("scripts").showGoToSourceDialog();
                 event.consume(true);
             }
             break;
@@ -1033,11 +1030,11 @@ WebInspector._showAnchorLocation = function(anchor)
     var preferredPanel = this.panels[anchor.preferredPanel];
     if (preferredPanel && WebInspector._showAnchorLocationInPanel(anchor, preferredPanel))
         return true;
-    if (WebInspector._showAnchorLocationInPanel(anchor, this.panels.scripts))
+    if (WebInspector._showAnchorLocationInPanel(anchor, this.panel("scripts")))
         return true;
     if (WebInspector._showAnchorLocationInPanel(anchor, this.panel("resources")))
         return true;
-    if (WebInspector._showAnchorLocationInPanel(anchor, this.panels.network))
+    if (WebInspector._showAnchorLocationInPanel(anchor, this.panel("network")))
         return true;
     return false;
 }

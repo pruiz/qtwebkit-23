@@ -1530,7 +1530,7 @@ void SpeculativeJIT::compileObjectToObjectOrOtherEquality(
     
     // We know that within this branch, rightChild must not be a cell. Check if that is enough to
     // prove that it is either null or undefined.
-    if (!isOtherSpeculation(m_state.forNode(rightChild).m_type & ~SpecCell)) {
+    if (!isOtherOrEmptySpeculation(m_state.forNode(rightChild).m_type & ~SpecCell)) {
         m_jit.move(op2TagGPR, resultGPR);
         m_jit.or32(TrustedImm32(1), resultGPR);
         
@@ -1602,7 +1602,7 @@ void SpeculativeJIT::compilePeepHoleObjectToObjectOrOtherEquality(
     
     // We know that within this branch, rightChild must not be a cell. Check if that is enough to
     // prove that it is either null or undefined.
-    if (isOtherSpeculation(m_state.forNode(rightChild).m_type & ~SpecCell))
+    if (isOtherOrEmptySpeculation(m_state.forNode(rightChild).m_type & ~SpecCell))
         rightNotCell.link(&m_jit);
     else {
         jump(notTaken, ForceJump);
@@ -3459,7 +3459,7 @@ void SpeculativeJIT::compile(Node& node)
     case CheckStructure:
     case ForwardCheckStructure: {
         AbstractValue& value = m_state.forNode(node.child1());
-        if (value.m_structure.isSubsetOf(node.structureSet())
+        if (value.m_currentKnownStructure.isSubsetOf(node.structureSet())
             && isCellSpeculation(value.m_type)) {
             noResult(m_compileIndex);
             break;
@@ -3500,9 +3500,12 @@ void SpeculativeJIT::compile(Node& node)
         break;
     }
         
-    case StructureTransitionWatchpoint: {
+    case StructureTransitionWatchpoint:
+    case ForwardStructureTransitionWatchpoint: {
         m_jit.addWeakReference(node.structure());
-        node.structure()->addTransitionWatchpoint(speculationWatchpoint(BadCache));
+        node.structure()->addTransitionWatchpoint(
+            speculationWatchpointWithConditionalDirection(
+                BadCache, node.op() == ForwardStructureTransitionWatchpoint));
         
 #if !ASSERT_DISABLED
         SpeculateCellOperand op1(this, node.child1());

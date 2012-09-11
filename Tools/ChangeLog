@@ -1,3 +1,212 @@
+2012-08-21  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        Unreviewed build fix for newer Qt 5: The meaning of private_includes changed to be fully
+        self-contained. The module name is not appended automatically anymore.
+
+        * qmake/qt_webkit.pri:
+
+2012-08-20  Xianzhu Wang  <wangxianzhu@chromium.org>
+
+        [Chromium-Android] Add stop_when_done parameter to ChromiumAndroidDriver.run_test()
+        https://bugs.webkit.org/show_bug.cgi?id=94558
+
+        Reviewed by Dirk Pranke.
+
+        * Scripts/webkitpy/layout_tests/port/chromium_android.py:
+        (ChromiumAndroidDriver.run_test):
+
+2012-08-20  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Cleanup TestExpectationParser.parse
+        https://bugs.webkit.org/show_bug.cgi?id=94545
+
+        Reviewed by Dirk Pranke.
+
+        Refactor TestExpectations to simplify the code.
+
+        * Scripts/webkitpy/layout_tests/models/test_expectations.py:
+        (TestExpectationParser.parse): Merged _tokenize_list.
+        (TestExpectationParser._parse_line): Removed the call to _check_modifiers_against_expectations
+        since the check is now done in _parser_modifiers.
+        (TestExpectationParser._parse_modifiers): Merged _check_modifiers_against_expectations.
+        (TestExpectationParser._tokenize_line): Renamed from _tokenize.
+        (TestExpectationParser._split_space_separated): No longer calls lower() on all modifiers.
+        This is done on a local variable in _parse_modifiers, preserving the original case.
+        (TestExpectations.remove_rebaselined_tests.without_rebaseline_modifier): Check the existence
+        of 'rebaseline' against parsed modifiers.
+        * Scripts/webkitpy/layout_tests/models/test_expectations_unittest.py:
+        (TestExpectationParserTests._tokenize):
+        (TestExpectationParserTests.test_tokenize_valid_with_comment): Preserves case.
+        (TestExpectationParserTests.test_tokenize_valid_with_multiple_modifiers): Ditto.
+        (TestExpectationSerializerTests._tokenize):
+        (TestExpectationSerializerTests.assert_list_round_trip): Call parse since _tokenize_list has
+        been merged into parse.
+        * Scripts/webkitpy/tool/commands/queries_unittest.py:
+        (PrintExpectationsTest.test_csv): Preserves the case.
+
+2012-08-20  Gustavo Noronha Silva  <gns@gnome.org>
+
+        [jhbuild] EFL now runs jhbuild update for every build
+        https://bugs.webkit.org/show_bug.cgi?id=94267
+
+        Reviewed by Martin Robinson.
+
+        Try to fix WinCE build by returning the empty string instead of
+        env when no jhbuild infrastructure is found.
+
+        * Scripts/webkitdirs.pm:
+        (jhbuildWrapperPrefixIfNeeded):
+
+2012-08-20  Benjamin Poulain  <benjamin@webkit.org>
+
+        Add a watcher for WTF changes
+
+        Unreviewed.
+
+        Add myself as a watcher for changes in WTF.
+
+        * Scripts/webkitpy/common/config/watchlist:
+
+2012-08-20  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [EFL] Move jhbuild dependencies based on SVN to tarballs
+        https://bugs.webkit.org/show_bug.cgi?id=90374
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Moved all the dependencies based on SVN to tarballs taken from a
+        equivalent snapshot from the official git mirror. This will make
+        update-webkitefl not dependent on network connection after the first
+        run. The bots will not fail if EFL SVN server in unreachable.
+        The reason why git mirror is not used directly is to minimize the
+        total size of source code we need to download.
+
+        * efl/jhbuild.modules:
+
+2012-08-20  Simon Fraser  <simon.fraser@apple.com>
+
+        Lots of "error, test and reference image have different properties" in pixel test output
+        https://bugs.webkit.org/show_bug.cgi?id=92578
+
+        Reviewed by Dirk Pranke.
+
+        Improve ImageDiff's error reporting when test result image and expected image
+        differ in their properties.
+
+        * DumpRenderTree/cg/ImageDiffCG.cpp:
+
+2012-08-20  Nate Chapin  <japhet@chromium.org>
+
+        Unsafe vsprintf usage in TestNetscapePlugin
+        https://bugs.webkit.org/show_bug.cgi?id=94522
+
+        Reviewed by Adam Barth.
+
+        * DumpRenderTree/TestNetscapePlugIn/PluginObject.cpp:
+        (pluginLogWithArguments): Using vsnprintf instead of vsprintf to ensure we don't overflow
+            the message buffer.
+        (testDocumentOpen):
+        (testWindowOpen):
+
+2012-08-20  George Staikos  <staikos@webkit.org>
+
+        [BlackBerry] Enable XHR Response BLOB
+        https://bugs.webkit.org/show_bug.cgi?id=94525
+
+        Reviewed by Rob Buis.
+
+        Turn on the XHR response blob feature for the BlackBerry port.
+
+        * Scripts/webkitperl/FeatureList.pm: Add the feature and enable it.
+
+2012-08-20  Dirk Pranke  <dpranke@chromium.org>
+
+        temporarily disable ImageDiff on WK2 ports for ref tests
+        https://bugs.webkit.org/show_bug.cgi?id=94517
+
+        Reviewed by Brady Eidson.
+
+        ImageDiff appears to be unable to handle the pngs returned from
+        WebKitTestRunner, so we disable checking images by default
+        for ref tests on wk2 ports (unless pixel tests is explicitly enabled).
+
+        * Scripts/webkitpy/layout_tests/controllers/single_test_runner.py:
+        (SingleTestRunner._compare_output_with_reference):
+
+2012-08-20  Dirk Pranke  <dpranke@chromium.org>
+
+        Add missing FIXME: to previous change.
+        https://bugs.webkit.org/show_bug.cgi?id=94505
+
+        Reviewed by Ojan Vafai.
+
+        * Scripts/webkitpy/layout_tests/port/driver.py:
+        (Driver.run_test):
+
+2012-08-20  Dirk Pranke  <dpranke@chromium.org>
+
+        Intermittenly, many WebKit2 tests have results from the wrong test compared to the test just run, giving false failures.
+        https://bugs.webkit.org/show_bug.cgi?id=94505
+
+        Reviewed by Ojan Vafai.
+
+        It looks like if the webprocess times out, WTR may tell NRWT
+        that the test completed, but not properly reset its internal
+        state, and then return stale output for subsequent tests.
+
+        This patch modifies NRWT temporarily to check for
+        "Timed out waiting for final message from web process" in stdout
+        and treat that as a timeout (and thus kill WTR); this seems
+        to solve the cascade of failures, but of course there's probably
+        still a bug in WTR that needs to be fixed.
+
+        * Scripts/webkitpy/layout_tests/port/driver.py:
+        (Driver.run_test):
+
+2012-08-20  Dirk Pranke  <dpranke@chromium.org>
+
+        NRWT reports unexpected EOF
+        https://bugs.webkit.org/show_bug.cgi?id=94387
+
+        Reviewed by Adam Barth.
+
+        Stop logging "Unexpected EOF" when we are reading the last few
+        bytes from stdout/stderr after stopping the subprocess.
+
+        * Scripts/webkitpy/layout_tests/port/server_process.py:
+        (ServerProcess._wait_for_data_and_update_buffers_using_select):
+        (ServerProcess.stop):
+
+2012-08-20  Brady Eidson  <beidson@apple.com>
+
+        Temporarily disable the 20+ crash and 500+ failure options on WK2 bots.
+        https://bugs.webkit.org/show_bug.cgi?id=94506
+
+        Reviewed by Dirk Pranke.
+
+        When running WK2 tests, don't add the "abort early" command line options.
+
+        * BuildSlaveSupport/build.webkit.org-config/master.cfg:
+        (ConfigureBuild.start):
+        (RunWebKitTests):
+        (RunWebKitTests.start):
+        (RunWebKit2Tests.start):
+
+2012-08-19  Stephanie Lewis  <slewis@apple.com>
+
+        Add mountain lion to build config.
+        https://bugs.webkit.org/show_bug.cgi?id=94441
+
+        Reviewed by Adam Barth.
+
+        Add Mountain Lion to the build trigger configurations.
+
+        * Scripts/webkitpy/common/config/build.py:
+        (_should_file_trigger_build):
+        * Scripts/webkitpy/common/config/build_unittest.py:
+        (ShouldBuildTest):
+        (ShouldBuildTest.test_should_build):
+
 2012-08-17  Kiran Muppala  <cmuppala@apple.com>
 
         Add self to webkit contributors list

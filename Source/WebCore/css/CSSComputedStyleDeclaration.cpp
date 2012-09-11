@@ -179,6 +179,7 @@ static const CSSPropertyID computedProperties[] = {
     CSSPropertyTextDecoration,
 #if ENABLE(CSS3_TEXT_DECORATION)
     CSSPropertyWebkitTextDecorationLine,
+    CSSPropertyWebkitTextDecorationStyle,
 #endif // CSS3_TEXT_DECORATION
     CSSPropertyTextIndent,
     CSSPropertyTextRendering,
@@ -212,6 +213,9 @@ static const CSSPropertyID computedProperties[] = {
     CSSPropertyWebkitBackgroundComposite,
     CSSPropertyWebkitBackgroundOrigin,
     CSSPropertyWebkitBackgroundSize,
+#if ENABLE(CSS_COMPOSITING)
+    CSSPropertyWebkitBlendMode,
+#endif
     CSSPropertyWebkitBorderFit,
     CSSPropertyWebkitBorderHorizontalSpacing,
     CSSPropertyWebkitBorderImage,
@@ -1176,31 +1180,6 @@ static PassRefPtr<CSSPrimitiveValue> valueForFamily(const AtomicString& family)
     return cssValuePool().createValue(family.string(), CSSPrimitiveValue::CSS_STRING);
 }
 
-static PassRefPtr<CSSValue> renderUnicodeBidiFlagsToCSSValue(EUnicodeBidi unicodeBidi)
-{
-    switch (unicodeBidi) {
-    case UBNormal:
-        return cssValuePool().createIdentifierValue(CSSValueNormal);
-    case Embed:
-        return cssValuePool().createIdentifierValue(CSSValueEmbed);
-    case Plaintext:
-        return cssValuePool().createIdentifierValue(CSSValueWebkitPlaintext);
-    case Override:
-        return cssValuePool().createIdentifierValue(CSSValueBidiOverride);
-    case Isolate:
-        return cssValuePool().createIdentifierValue(CSSValueWebkitIsolate);
-    case OverrideIsolate:
-    {
-        RefPtr<CSSValueList> list = CSSValueList::createSpaceSeparated();
-        list->append(cssValuePool().createIdentifierValue(CSSValueBidiOverride));
-        list->append(cssValuePool().createIdentifierValue(CSSValueWebkitIsolate));
-        return list;
-    }
-    }
-    ASSERT_NOT_REACHED();
-    return 0;
-}
-
 static PassRefPtr<CSSValue> renderTextDecorationFlagsToCSSValue(int textDecoration)
 {
     // Blink value is ignored.
@@ -1216,6 +1195,27 @@ static PassRefPtr<CSSValue> renderTextDecorationFlagsToCSSValue(int textDecorati
         return cssValuePool().createIdentifierValue(CSSValueNone);
     return list;
 }
+
+#if ENABLE(CSS3_TEXT_DECORATION)
+static PassRefPtr<CSSValue> renderTextDecorationStyleFlagsToCSSValue(TextDecorationStyle textDecorationStyle)
+{
+    switch (textDecorationStyle) {
+    case TextDecorationStyleSolid:
+        return cssValuePool().createIdentifierValue(CSSValueSolid);
+    case TextDecorationStyleDouble:
+        return cssValuePool().createIdentifierValue(CSSValueDouble);
+    case TextDecorationStyleDotted:
+        return cssValuePool().createIdentifierValue(CSSValueDotted);
+    case TextDecorationStyleDashed:
+        return cssValuePool().createIdentifierValue(CSSValueDashed);
+    case TextDecorationStyleWavy:
+        return cssValuePool().createIdentifierValue(CSSValueWavy);
+    }
+
+    ASSERT_NOT_REACHED();
+    return cssValuePool().createExplicitInitialValue();
+}
+#endif // CSS3_TEXT_DECORATION
 
 static PassRefPtr<CSSValue> fillRepeatToCSSValue(EFillRepeat xRepeat, EFillRepeat yRepeat)
 {
@@ -1960,10 +1960,13 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(CSSPropert
         case CSSPropertyTextAlign:
             return cssValuePool().createValue(style->textAlign());
         case CSSPropertyTextDecoration:
+            return renderTextDecorationFlagsToCSSValue(style->textDecoration());
 #if ENABLE(CSS3_TEXT_DECORATION)
         case CSSPropertyWebkitTextDecorationLine:
-#endif // CSS3_TEXT_DECORATION
             return renderTextDecorationFlagsToCSSValue(style->textDecoration());
+        case CSSPropertyWebkitTextDecorationStyle:
+            return renderTextDecorationStyleFlagsToCSSValue(style->textDecorationStyle());
+#endif // CSS3_TEXT_DECORATION
         case CSSPropertyWebkitTextDecorationsInEffect:
             return renderTextDecorationFlagsToCSSValue(style->textDecorationsInEffect());
         case CSSPropertyWebkitTextFillColor:
@@ -2017,7 +2020,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(CSSPropert
         case CSSPropertyTop:
             return getPositionOffsetValue(style.get(), CSSPropertyTop, m_node->document()->renderView());
         case CSSPropertyUnicodeBidi:
-            return renderUnicodeBidiFlagsToCSSValue(style->unicodeBidi());
+            return cssValuePool().createValue(style->unicodeBidi());
         case CSSPropertyVerticalAlign:
             switch (style->verticalAlign()) {
                 case BASELINE:
@@ -2423,6 +2426,10 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(CSSPropert
 #if ENABLE(CSS_FILTERS)
         case CSSPropertyWebkitFilter:
             return valueForFilter(style.get());
+#endif
+#if ENABLE(CSS_COMPOSITING)
+        case CSSPropertyWebkitBlendMode:
+            return cssValuePool().createValue(style->blendMode());
 #endif
         case CSSPropertyBackground:
             return getBackgroundShorthandValue();

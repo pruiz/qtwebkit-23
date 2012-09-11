@@ -567,9 +567,6 @@ StyleDifference RenderStyle::diff(const RenderStyle* other, unsigned& changedCon
     const CounterDirectiveMap* mapB = other->rareNonInheritedData->m_counterDirectives.get();
     if (!(mapA == mapB || (mapA && mapB && *mapA == *mapB)))
         return StyleDifferenceLayout;
-    if (rareNonInheritedData->m_counterIncrement != other->rareNonInheritedData->m_counterIncrement
-        || rareNonInheritedData->m_counterReset != other->rareNonInheritedData->m_counterReset)
-        return StyleDifferenceLayout;
 
     if ((visibility() == COLLAPSE) != (other->visibility() == COLLAPSE))
         return StyleDifferenceLayout;
@@ -612,6 +609,11 @@ StyleDifference RenderStyle::diff(const RenderStyle* other, unsigned& changedCon
                  || visual->clip != other->visual->clip || visual->hasClip != other->visual->hasClip)
             return StyleDifferenceRepaintLayer;
     }
+    
+#if ENABLE(CSS_COMPOSITING)
+    if (rareNonInheritedData->m_effectiveBlendMode != other->rareNonInheritedData->m_effectiveBlendMode)
+        return StyleDifferenceRepaintLayer;
+#endif
 
     if (rareNonInheritedData->opacity != other->rareNonInheritedData->opacity) {
 #if USE(ACCELERATED_COMPOSITING)
@@ -650,6 +652,9 @@ StyleDifference RenderStyle::diff(const RenderStyle* other, unsigned& changedCon
         || rareInheritedData->userSelect != other->rareInheritedData->userSelect
         || rareNonInheritedData->userDrag != other->rareNonInheritedData->userDrag
         || rareNonInheritedData->m_borderFit != other->rareNonInheritedData->m_borderFit
+#if ENABLE(CSS3_TEXT_DECORATION)
+        || rareNonInheritedData->m_textDecorationStyle != other->rareNonInheritedData->m_textDecorationStyle
+#endif // CSS3_TEXT_DECORATION
         || rareInheritedData->textFillColor != other->rareInheritedData->textFillColor
         || rareInheritedData->textStrokeColor != other->rareInheritedData->textStrokeColor
         || rareInheritedData->textEmphasisColor != other->rareInheritedData->textEmphasisColor

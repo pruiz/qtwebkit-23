@@ -1,3 +1,903 @@
+2012-08-21  János Badics  <jbadics@inf.u-szeged.hu>
+
+        [Qt] Gardening. Skip new failing tests.
+
+        Reviewed Csaba Osztrogonác.
+
+        * platform/qt/Skipped:
+
+2012-08-17  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        [Qt] REGRESSION(r125428): fast/profiler/nested-start-and-stop-profiler.html fails
+        https://bugs.webkit.org/show_bug.cgi?id=93897
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        * platform/qt/Skipped: Unskip test that is now passing.
+
+2012-08-21  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        fast/js/random-array-gc-stress.html has started to flakily crash in
+        release builds as well, so expanding the expectation.
+
+        The fast/forms/range/range-hit-test-with-padding.html test has been
+        failing since introduced in 126132. Adding a text expectation.
+
+        Marking one more frame flattening test as flaky.
+
+        Skipping two calendar picker tests. The feature is currently unsupported
+        and the tests take half a minute to run, so it's not really worth it.
+
+        * platform/gtk/TestExpectations:
+
+2012-08-21  Chris Evans  <cevans@google.com>
+
+        Add another interesting test that used to fire a different ASSERT before we fixed https://bugs.webkit.org/show_bug.cgi?id=36427:
+        ASSERT(parents.size() >= depth + 1)
+        https://bugs.webkit.org/show_bug.cgi?id=84793
+
+        Reviewed by Abhishek Arya.
+
+        * fast/xpath/xpath-detached-import-assert-expected.txt: Added.
+        * fast/xpath/xpath-detached-import-assert.html: Added.
+
+2012-08-20  Keishi Hattori  <keishi@webkit.org>
+
+        Clicking input type=range with padding or border sets wrong value
+        https://bugs.webkit.org/show_bug.cgi?id=94473
+
+        Reviewed by Kent Tamura.
+
+        * fast/forms/range/range-hit-test-with-padding-expected.txt: Added.
+        * fast/forms/range/range-hit-test-with-padding.html: Added.
+
+2012-08-20  MORITA Hajime  <morrita@google.com>
+
+        load event shouldn't fired during node insertion traversals.
+        https://bugs.webkit.org/show_bug.cgi?id=94447
+
+        Reviewed by Ryosuke Niwa.
+
+        * fast/frames/iframe-onload-and-domnodeinserted-expected.txt: Added.
+        * fast/frames/iframe-onload-and-domnodeinserted.html: Added.
+
+2012-08-20  Shinya Kawanaka  <shinyak@chromium.org>
+
+        ShadowRoot.cloneNode() must always throw a DATA_CLONE_ERR exception.
+        https://bugs.webkit.org/show_bug.cgi?id=91704
+
+        Reviewed by Dimitri Glazkov.
+
+        * fast/dom/shadow/shadowroot-clonenode-expected.txt: Added.
+        * fast/dom/shadow/shadowroot-clonenode.html: Added.
+
+2012-08-20  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed Chromium gardening. Improved how a few test
+        expectations were merged together in r126117.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-20  Tom Sepez  <tsepez@chromium.org>
+
+        XSSAuditor too tolerant of injected data: URLs from other "hostless" schemes.
+        https://bugs.webkit.org/show_bug.cgi?id=94547
+
+        Reviewed by Adam Barth.
+
+        * fast/frames/resources/static-xss-vector.html: Added.
+        * fast/frames/xss-auditor-handles-file-urls-expected.txt: Added.
+        * fast/frames/xss-auditor-handles-file-urls.html: Added.
+
+2012-08-20  Luke Macpherson   <macpherson@chromium.org>
+
+        Fix inspector with variables enabled and enable inspector variables tests by default.
+        https://bugs.webkit.org/show_bug.cgi?id=94296
+
+        Reviewed by Hajime Morita.
+
+        Fix paths to included javascript and enable tests by default on Chromium port.
+
+        * inspector/styles/variables/css-variables.html:
+        * platform/chromium/TestExpectations:
+
+2012-08-20  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed. Fixed lint errors in TestExpectations after r126110.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-20  Levi Weintraub  <leviw@chromium.org>
+
+        [Sub-pixel Layout] Block selection gap repainting can leave one pixel gaps
+        https://bugs.webkit.org/show_bug.cgi?id=94526
+
+        Reviewed by Eric Seidel.
+
+        Correcting pixel gap repainting reverts a bunch of chromium expectations to their pre-sub-pixel layout
+        versions. This largely triggers 1-pixel image diffs in input fields.
+
+        * platform/chromium-mac/editing/input/caret-at-the-edge-of-input-expected.png:
+        * platform/chromium-mac/editing/inserting/before-after-input-element-expected.png:
+        * platform/chromium-mac/editing/pasteboard/4806874-expected.png:
+        * platform/chromium-mac/editing/pasteboard/drop-text-without-selection-expected.png:
+        * platform/chromium-mac/editing/pasteboard/input-field-1-expected.png:
+        * platform/chromium-mac/editing/selection/3690703-2-expected.png:
+        * platform/chromium-mac/editing/selection/3690703-expected.png:
+        * platform/chromium-mac/editing/selection/3690719-expected.png:
+        * platform/chromium-mac/editing/selection/4895428-3-expected.png:
+        * platform/chromium-mac/editing/selection/4975120-expected.png:
+        * platform/chromium-mac/editing/selection/drag-select-1-expected.png:
+        * platform/chromium-mac/editing/selection/select-across-readonly-input-1-expected.png:
+        * platform/chromium-mac/editing/selection/select-across-readonly-input-2-expected.png:
+        * platform/chromium-mac/editing/selection/select-across-readonly-input-3-expected.png:
+        * platform/chromium-mac/editing/selection/select-across-readonly-input-4-expected.png:
+        * platform/chromium-mac/editing/selection/select-across-readonly-input-5-expected.png:
+        * platform/chromium-mac/editing/selection/select-from-textfield-outwards-expected.png:
+        * platform/chromium-mac/fast/block/margin-collapse/103-expected.png:
+        * platform/chromium-mac/fast/css/input-search-padding-expected.png:
+        * platform/chromium-mac/fast/css/line-height-determined-by-primary-font-expected.png:
+        * platform/chromium-mac/fast/css/line-height-expected.png:
+        * platform/chromium-mac/fast/css/square-button-appearance-expected.png:
+        * platform/chromium-mac/fast/css/text-overflow-input-expected.png:
+        * platform/chromium-mac/fast/dom/isindex-001-expected.png:
+        * platform/chromium-mac/fast/dom/isindex-002-expected.png:
+        * platform/chromium-mac/fast/events/autoscroll-expected.png:
+        * platform/chromium-mac/fast/events/context-no-deselect-expected.png:
+        * platform/chromium-mac/fast/forms/basic-buttons-expected.png:
+        * platform/chromium-mac/fast/forms/basic-inputs-expected.png:
+        * platform/chromium-mac/fast/forms/box-shadow-override-expected.png:
+        * platform/chromium-mac/fast/forms/button-sizes-expected.png:
+        * platform/chromium-mac/fast/forms/color/input-appearance-color-expected.png:
+        * platform/chromium-mac/fast/forms/date/date-appearance-expected.png:
+        * platform/chromium-mac/fast/forms/encoding-test-expected.png:
+        * platform/chromium-mac/fast/forms/fieldset-align-expected.png:
+        * platform/chromium-mac/fast/forms/floating-textfield-relayout-expected.png:
+        * platform/chromium-mac/fast/forms/form-element-geometry-expected.png:
+        * platform/chromium-mac/fast/forms/input-align-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-default-bkcolor-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-disabled-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-focus-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-height-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-preventDefault-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-readonly-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-selection-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-visibility-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-width-expected.png:
+        * platform/chromium-mac/fast/forms/input-baseline-expected.png:
+        * platform/chromium-mac/fast/forms/input-disabled-color-expected.png:
+        * platform/chromium-mac/fast/forms/input-double-click-selection-gap-bug-expected.png:
+        * platform/chromium-mac/fast/forms/input-field-text-truncated-expected.png:
+        * platform/chromium-mac/fast/forms/input-placeholder-paint-order-expected.png:
+        * platform/chromium-mac/fast/forms/input-placeholder-visibility-1-expected.png:
+        * platform/chromium-mac/fast/forms/input-placeholder-visibility-3-expected.png:
+        * platform/chromium-mac/fast/forms/input-readonly-autoscroll-expected.png:
+        * platform/chromium-mac/fast/forms/input-readonly-dimmed-expected.png:
+        * platform/chromium-mac/fast/forms/input-readonly-empty-expected.png:
+        * platform/chromium-mac/fast/forms/input-spaces-expected.png:
+        * platform/chromium-mac/fast/forms/input-table-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-click-inside-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-click-outside-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-double-click-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-drag-down-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-option-delete-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-scroll-left-on-blur-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-self-emptying-click-expected.png:
+        * platform/chromium-mac/fast/forms/input-text-word-wrap-expected.png:
+        * platform/chromium-mac/fast/forms/input-type-text-min-width-expected.png:
+        * platform/chromium-mac/fast/forms/input-value-expected.png:
+        * platform/chromium-mac/fast/forms/input-width-expected.png:
+        * platform/chromium-mac/fast/forms/minWidthPercent-expected.png:
+        * platform/chromium-mac/fast/forms/number/number-appearance-rtl-expected.png:
+        * platform/chromium-mac/fast/forms/number/number-appearance-spinbutton-disabled-readonly-expected.png:
+        * platform/chromium-mac/fast/forms/number/number-appearance-spinbutton-layer-expected.png:
+        * platform/chromium-mac/fast/forms/placeholder-position-expected.png:
+        * platform/chromium-mac/fast/forms/placeholder-pseudo-style-expected.png:
+        * platform/chromium-mac/fast/forms/plaintext-mode-2-expected.png:
+        * platform/chromium-mac/fast/forms/tabbing-input-iframe-expected.png:
+        * platform/chromium-mac/fast/forms/text-style-color-expected.png:
+        * platform/chromium-mac/fast/forms/textfield-focus-ring-expected.png:
+        * platform/chromium-mac/fast/forms/textfield-overflow-expected.png:
+        * platform/chromium-mac/fast/forms/validation-message-appearance-expected.png:
+        * platform/chromium-mac/fast/forms/visual-hebrew-text-field-expected.png:
+        * platform/chromium-mac/fast/frames/take-focus-from-iframe-expected.png:
+        * platform/chromium-mac/fast/html/details-no-summary4-expected.png:
+        * platform/chromium-mac/fast/html/details-open-javascript-expected.png:
+        * platform/chromium-mac/fast/html/details-open2-expected.png:
+        * platform/chromium-mac/fast/html/details-open4-expected.png:
+        * platform/chromium-mac/fast/lists/dynamic-marker-crash-expected.png:
+        * platform/chromium-mac/fast/repaint/renderer-destruction-by-invalidateSelection-crash-expected.png:
+        * platform/chromium-mac/fast/repaint/subtree-root-skipped-expected.png:
+        * platform/chromium-mac/fast/replaced/replaced-breaking-expected.png:
+        * platform/chromium-mac/fast/replaced/replaced-breaking-mixture-expected.png:
+        * platform/chromium-mac/fast/replaced/width100percent-textfield-expected.png:
+        * platform/chromium-mac/fast/speech/input-appearance-numberandspeech-expected.png:
+        * platform/chromium-mac/fast/speech/input-appearance-speechbutton-expected.png:
+        * platform/chromium-mac/fast/speech/speech-bidi-rendering-expected.png:
+        * platform/chromium-mac/fast/table/003-expected.png:
+        * platform/chromium-mac/fast/table/colspanMinWidth-expected.png:
+        * platform/chromium-mac/fast/table/spanOverlapRepaint-expected.png:
+        * platform/chromium-mac/fast/table/text-field-baseline-expected.png:
+        * platform/chromium-mac/fast/text/textIteratorNilRenderer-expected.png:
+        * platform/chromium-mac/fast/transforms/transformed-focused-text-input-expected.png:
+        * platform/chromium-mac/plugins/mouse-click-plugin-clears-selection-expected.png:
+        * platform/chromium-mac/svg/custom/inline-svg-in-xhtml-expected.png:
+        * platform/chromium-mac/svg/hixie/mixed/003-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/45621-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug1188-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug12384-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug18359-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug24200-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug2479-2-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug2479-3-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug28928-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug4382-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug4527-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug46368-1-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug46368-2-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug51037-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug55545-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug59354-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug7342-expected.png:
+        * platform/chromium-mac/tables/mozilla/bugs/bug96334-expected.png:
+        * platform/chromium-mac/tables/mozilla/dom/tableDom-expected.png:
+        * platform/chromium-mac/tables/mozilla/other/move_row-expected.png:
+        * platform/chromium-mac/tables/mozilla_expected_failures/bugs/bug92647-1-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-08-20  Brady Eidson  <beidson@apple.com>
+
+        setMockGeolocationPosition not defined in WKTR
+        https://bugs.webkit.org/show_bug.cgi?id=94554
+
+        Unreviewed (bot gardening)
+
+        * platform/wk2/Skipped:
+
+2012-08-20  Rik Cabanier  <cabanier@adobe.com>
+
+        parse CSS attribute -webkit-blend-mode
+        https://bugs.webkit.org/show_bug.cgi?id=94024
+
+        Reviewed by Dirk Schulze.
+
+        Added parsing and general CSS handling of -webkit-blend-mode per http://www.w3.org/TR/2012/WD-compositing-20120816/
+
+        * css3/compositing: Added.
+        * css3/compositing/blend-mode-property-expected.txt: Added.
+        * css3/compositing/blend-mode-property-parsing-expected.txt: Added.
+        * css3/compositing/blend-mode-property-parsing-invalid-expected.txt: Added.
+        * css3/compositing/blend-mode-property-parsing-invalid.html: Added.
+        * css3/compositing/blend-mode-property-parsing.html: Added.
+        * css3/compositing/blend-mode-property.html: Added.
+        * css3/compositing/script-tests: Added.
+        * css3/compositing/script-tests/blend-mode-property-parsing-invalid.js: Added.
+        (testInvalidFilterRule):
+        * css3/compositing/script-tests/blend-mode-property-parsing.js: Added.
+        (jsWrapperClass):
+        (shouldBeType):
+        (testFilterRule):
+        * css3/compositing/script-tests/blend-mode-property.js: Added.
+        * platform/chromium/css3/compositing/blend-mode-property-expected.txt : Added.
+        * platform/chromium/css3/compositing/blend-mode-property-parsing-expected.txt : Added.
+
+2012-08-20  Brady Eidson  <beidson@apple.com>
+
+        REGRESSION (125759) fast/forms/file/selected-files-from-history-state.html fails on Mac
+        https://bugs.webkit.org/show_bug.cgi?id=94549
+
+        Unreviewed (Bot gardening)
+
+        * platform/mac-wk2/Skipped:
+
+2012-08-20  Philip Rogers  <pdr@google.com>
+
+        Canvas drawImage() should draw SVG at the correct scale.
+        https://bugs.webkit.org/show_bug.cgi?id=94377
+
+        Reviewed by Tim Horton.
+
+        * svg/as-image/resources/100px-green-rect.svg: Added.
+        * svg/as-image/svg-as-image-canvas-expected.html: Added.
+        * svg/as-image/svg-as-image-canvas.html: Added.
+
+2012-08-20  Chris Rogers  <crogers@google.com>
+
+        Update TestExpectations now that stray ASSERT is fixed in AudioParamTimeline
+        https://bugs.webkit.org/show_bug.cgi?id=94548
+
+        Unreviewed.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-20  Dominik Röttsches  <dominik.rottsches@intel.com>
+
+        2d.imageData.object.wrap.html has wrong expectations
+        https://bugs.webkit.org/show_bug.cgi?id=94089
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Updating and renaming the test to match new version in W3C approved tests.
+
+        * canvas/philip/tests/2d.imageData.object.clamp-expected.txt: Renamed from LayoutTests/canvas/philip/tests/2d.imageData.object.wrap-expected.txt.
+        * canvas/philip/tests/2d.imageData.object.clamp.html: Renamed from LayoutTests/canvas/philip/tests/2d.imageData.object.wrap.html.
+        * platform/chromium/TestExpectations: Unskipping.
+        * platform/efl/Skipped: Unskipping.
+        * platform/gtk/TestExpectations: Unskipping.
+        * platform/mac/Skipped: Unskipping.
+        * platform/qt/Skipped: Unskipping.
+
+2012-08-20  Dirk Schulze  <krit@webkit.org>
+
+        CSS Masking and CSS Filters applied in wrong order
+        https://bugs.webkit.org/show_bug.cgi?id=94354
+
+        Reviewed by Dean Jackson.
+
+        The test checks the correct order on applying CSS Masking, Filter Effects and CSS Clipping.
+        According to the Filter Effects spec, the order should be first filters, then masking and clipping.
+
+        * css3/filters/filter-mask-clip-order-expected.html: Added.
+        * css3/filters/filter-mask-clip-order.html: Added.
+        * css3/filters/resources/mask.png: Added.
+
+2012-08-20  Adam Klein  <adamk@chromium.org>
+
+        Remove redundant TOUCH_LISTENER event type
+        https://bugs.webkit.org/show_bug.cgi?id=94524
+
+        Reviewed by Ryosuke Niwa.
+
+        Removed tests for hasTouchEventListener as they're redundant
+        with tests for touchEventHandlerCount.
+
+        * fast/events/touch/touch-handler-count-expected.txt:
+        * fast/events/touch/touch-handler-count.html:
+
+2012-08-20  Kenneth Russell  <kbr@google.com>
+
+        Reftest fast/text-autosizing/nested-em-line-height.html needs updating after r126058
+        https://bugs.webkit.org/show_bug.cgi?id=94528
+
+        Unreviewed Chromium gardening. Narrow test expectation.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-20  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed Chromium gardening. Adding suppressions for failing tests.
+
+        https://bugs.webkit.org/show_bug.cgi?id=94521
+        https://bugs.webkit.org/show_bug.cgi?id=94528
+        https://bugs.webkit.org/show_bug.cgi?id=94532
+
+        * platform/chromium/TestExpectations:
+
+2012-08-20  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Replace isolate || bidi-override by isolate-override
+        https://bugs.webkit.org/show_bug.cgi?id=89746
+
+        Reviewed by Levi Weintraub.
+
+        Rebaseline test expectations. These tests test the new behavior and new property value -webkit-isolate-override.
+
+        * fast/css/unicode-bidi-computed-value-expected.txt:
+        * fast/css/unicode-bidi-computed-value.html:
+        * fast/text/bidi-override-isolate.html:
+
+2012-08-20  Tony Chang  <tony@chromium.org>
+
+        RenderGrid children should always be RenderBoxes
+        https://bugs.webkit.org/show_bug.cgi?id=94305
+
+        Reviewed by Abhishek Arya.
+
+        Add test case from fuzzer.
+
+        * fast/css-grid-layout/should-not-collapse-anonymous-blocks-expected.txt: Added.
+        * fast/css-grid-layout/should-not-collapse-anonymous-blocks.html: Added.
+
+2012-08-20  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed, rolling out r126026.
+        http://trac.webkit.org/changeset/126026
+        https://bugs.webkit.org/show_bug.cgi?id=94449
+
+        Caused assertion failure in layout test touchadjustment/context-menu.html
+
+        * touchadjustment/context-menu-select-text.html:
+        * touchadjustment/context-menu-text-subtargets-expected.txt: Removed.
+        * touchadjustment/context-menu-text-subtargets.html: Removed.
+        * touchadjustment/resources/touchadjustment.js:
+
+2012-08-20  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [JSC] SerializedScriptValue::create() should throw a DataCloneError if input is an unsupported object
+        https://bugs.webkit.org/show_bug.cgi?id=94493
+
+        Reviewed by Oliver Hunt.
+
+        Add checks for Function, Error and host objects arguments to
+        MessagePort.postMessage() in fast/events/message-port-multi.html.
+
+        According to the structured clone specification, we should throw
+        a DataCloneError for such input types.
+
+        * fast/dom/Window/anonymous-slot-with-changes-expected.txt:
+        * fast/dom/Window/anonymous-slot-with-changes.html: Update test to expect
+        an exception when passing a function to postMessage().
+        * fast/events/message-port-multi-expected.txt: Update expected result
+        accordingly.
+        * fast/events/resources/message-port-multi.js:
+        (testTransfers.try.f1):
+        * platform/chromium/fast/events/message-port-multi-expected.txt: Removed.
+        Now identical to global expectation.
+
+2012-08-20  Ken Buchanan  <kenrb@chromium.org>
+        Line boxes not being dirtied correctly during inline removal
+        https://bugs.webkit.org/show_bug.cgi?id=93156
+
+        Reviewed by David Hyatt.
+
+        Test exercising crashing condition for bug 93156.
+
+        * fast/block/line-layout/double-line-break-obj-removal-crash.html: Added
+        * fast/block/line-layout/double-line-break-obj-removal-crash-expected.txt: Added
+
+2012-08-20  Bruno de Oliveira Abinader  <bruno.abinader@basyskom.com>
+
+        [css3-text] Add getComputedStyle tests for -webkit-text-decoration-line
+        https://bugs.webkit.org/show_bug.cgi?id=94108
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Changeset r125205 introduced new CSS3 property "-webkit-text-decoration-line",
+        with included basic getComputedStyle* layout tests for parsing check. This
+        patch adds a new, more robust getComputedStyle-based layout test for this
+        property.
+
+        * fast/css3-text-decoration/getComputedStyle/getComputedStyle-text-decoration-line-expected.txt: Added.
+        * fast/css3-text-decoration/getComputedStyle/getComputedStyle-text-decoration-line.html: Added.
+        * fast/css3-text-decoration/getComputedStyle/script-tests/getComputedStyle-text-decoration-line.js: Added.
+
+2012-08-20  John Mellor  <johnme@chromium.org>
+
+        Text Autosizing: Only take into account block width <= document layout width.
+        https://bugs.webkit.org/show_bug.cgi?id=93862
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added 4 tests: a block wider than the main frame, iframes both narrower
+        than and wider than the main frame, both also containing wide blocks,
+        and a narrow iframe expanded by frame flattening.
+
+        I verified experimentally that narrow-iframe-flattened.html passes, by
+        enabling frame flattening in Settings.cpp, but unfortunately it won't
+        get run by any bots since the only platform which currently enables
+        Text Autosizing (Chromium), doesn't enable frame flattening (or have
+        the DRT methods required to test it).
+
+        * fast/text-autosizing/font-scale-factor-expected.html:
+        * fast/text-autosizing/font-scale-factor.html:
+        * fast/text-autosizing/narrow-iframe-expected.html: Added.
+        * fast/text-autosizing/narrow-iframe-flattened-expected.html: Added.
+        * fast/text-autosizing/narrow-iframe-flattened.html: Added.
+        * fast/text-autosizing/narrow-iframe.html: Added.
+        * fast/text-autosizing/wide-block-expected.html: Added.
+        * fast/text-autosizing/wide-block.html: Added.
+        * fast/text-autosizing/wide-iframe-expected.html: Added.
+        * fast/text-autosizing/wide-iframe.html: Added.
+        * platform/chromium/TestExpectations:
+        * platform/win/Skipped:
+        * platform/wincairo/Skipped:
+
+2012-08-20  Bruno de Oliveira Abinader  <bruno.abinader@basyskom.com>
+
+        [css3-text] Add parsing support for -webkit-text-decoration-style
+        https://bugs.webkit.org/show_bug.cgi?id=94093
+
+        Reviewed by Julien Chaffraix.
+
+        This patch implements the "text-decoration-style" property parsing as specified
+        in CSS3 working draft, with "-webkit-" prefix. The specification can be found
+        here: http://dev.w3.org/csswg/css3-text/#text-decoration-style
+
+        Additionally, Mozilla implementation details can be found here:
+        https://developer.mozilla.org/en-US/docs/CSS/text-decoration-style
+
+        This is an individual task for bug 90958. Rendering support will be handled on a
+        different bug.
+
+        * fast/css3-text-decoration/getComputedStyle/getComputedStyle-text-decoration-style-expected.txt: Added.
+        * fast/css3-text-decoration/getComputedStyle/getComputedStyle-text-decoration-style.html: Added.
+        * fast/css3-text-decoration/getComputedStyle/script-tests/getComputedStyle-text-decoration-style.js: Added.
+
+2012-08-20  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed Chromium gardening. Fixed invalid test expectation.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-20  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed Chromium rebaselining and test failure suppressions.
+
+        https://bugs.webkit.org/show_bug.cgi?id=94494
+        https://bugs.webkit.org/show_bug.cgi?id=94501
+        https://bugs.webkit.org/show_bug.cgi?id=94502
+
+        * platform/chromium-mac-snowleopard/fast/forms/input-double-click-selection-gap-bug-expected.png:
+        * platform/chromium-mac/fast/css/text-overflow-input-expected.png:
+        * platform/chromium-mac/fast/forms/box-shadow-override-expected.png:
+        * platform/chromium-mac/fast/forms/input-double-click-selection-gap-bug-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-08-20  Mike West  <mkwst@chromium.org>
+
+        CSP 1.1: The 'plugin-types' warning should include details about explicit type declaration when relevant.
+        https://bugs.webkit.org/show_bug.cgi?id=94432
+
+        Reviewed by Adam Barth.
+
+        * http/tests/security/contentSecurityPolicy/1.1/plugintypes-notype-data-expected.txt:
+        * http/tests/security/contentSecurityPolicy/1.1/plugintypes-notype-url-expected.txt:
+
+2012-08-20  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r125989.
+        http://trac.webkit.org/changeset/125989
+        https://bugs.webkit.org/show_bug.cgi?id=94485
+
+        "Two of the new tests always failed on Mac bots" (Requested by
+        bradee-oh on #webkit).
+
+        * css3/compositing/blend-mode-property-expected.txt: Removed.
+        * css3/compositing/blend-mode-property-parsing-expected.txt: Removed.
+        * css3/compositing/blend-mode-property-parsing-invalid-expected.txt: Removed.
+        * css3/compositing/blend-mode-property-parsing-invalid.html: Removed.
+        * css3/compositing/blend-mode-property-parsing.html: Removed.
+        * css3/compositing/blend-mode-property.html: Removed.
+        * css3/compositing/script-tests/blend-mode-property-parsing-invalid.js: Removed.
+        * css3/compositing/script-tests/blend-mode-property-parsing.js: Removed.
+        * css3/compositing/script-tests/blend-mode-property.js: Removed.
+
+2012-08-20  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        Update canvas tests that are using CanvasPixelArray
+        https://bugs.webkit.org/show_bug.cgi?id=94474
+
+        Reviewed by Andreas Kling.
+
+        CanvasPixelArray is deprecated. W3C already updated these tests on the
+        approved tests repository. Using Uint8ClampedArray, they now pass on
+        WebKit.
+
+        * canvas/philip/tests/2d.imageData.create1.type.html:
+        * canvas/philip/tests/2d.imageData.create2.type.html:
+        * canvas/philip/tests/2d.imageData.get.type.html:
+        * platform/chromium/TestExpectations:
+        * platform/efl/Skipped:
+        * platform/gtk/TestExpectations:
+        * platform/mac/canvas/philip/tests/2d.imageData.create1.type-expected.txt: Removed.
+        * platform/mac/canvas/philip/tests/2d.imageData.create2.type-expected.txt: Removed.
+        * platform/mac/canvas/philip/tests/2d.imageData.get.type-expected.txt: Removed.
+        * platform/qt/Skipped:
+
+2012-08-20  Allan Sandfeld Jensen  <allan.jensen@nokia.com>
+
+        [TouchAdjustment] Adjust to word or selection
+        https://bugs.webkit.org/show_bug.cgi?id=94449
+
+        Reviewed by Antonio Gomes.
+
+        Tests that touch-adjustment can adjust to the right subtargets within text-nodes.
+
+        * touchadjustment/context-menu-select-text.html:
+        * touchadjustment/context-menu-text-subtargets-expected.txt: Added.
+        * touchadjustment/context-menu-text-subtargets.html: Added.
+        * touchadjustment/resources/touchadjustment.js:
+        (pointToString):
+        (shouldBeWithin):
+
+2012-08-20  'Pavel Feldman'  <pfeldman@chromium.org>
+
+        Not reviewed: fixing flaky inspector test.
+
+        * http/tests/inspector/resource-tree/resource-tree-frame-navigate.html:
+        * http/tests/inspector/resource-tree/resource-tree-test.js:
+        (initialize_ResourceTreeTest.InspectorTest.dumpResourcesTree):
+
+2012-08-20  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Fixing the failure expectations for a flaky crasher XFrameOptions test
+        in debug builds. When it doesn't crash it fails due to text diff.
+
+        * platform/gtk/TestExpectations:
+
+2012-08-20  Dominik Röttsches  <dominik.rottsches@intel.com>
+
+        The 2d.imageData.object.round canvas test is failing
+        https://bugs.webkit.org/show_bug.cgi?id=40272
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Fixing expectations for the imageData rounding test, unskipping the tests on all ports.
+
+        * canvas/philip/tests/2d.imageData.object.round.html: Fixing expected results according to "round to even in halfway case".
+        * fast/canvas/canvas-ImageData-behaviour-expected.txt: Fixing expected results according to "round to even in halfway case".
+        * fast/canvas/canvas-ImageData-behaviour.js: Fixing expected results according to "round to even in halfway case".
+        * platform/chromium/TestExpectations: Updating bug id for 2d.imageData.object.round.html and for wrap case, adding SVG case for rebaselining.
+        * platform/efl/Skipped: 2d.imageData.object.round.html
+        * platform/efl/TestExpectations: Moving 2d.imageData.object.wrap.html case here with new bug id.
+        * platform/gtk/TestExpectations: Unskippng 2d.imageData.object.round.html, updating bug id for wrap case.
+        * platform/mac/Skipped: Unskipping 2d.imageData.object.round.html.
+        * platform/qt/Skipped: Unskipping 2d.imageData.object.round.html.
+
+2012-08-20  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Update flaky tests to make the bots green
+        https://bugs.webkit.org/show_bug.cgi?id=94467
+
+        Unreviewed EFL gardening. Mark several tests as
+        flaky in order to make the bots green.
+
+        * platform/efl/TestExpectations:
+
+2012-08-20  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Mark several inspector tests as flaky
+        https://bugs.webkit.org/show_bug.cgi?id=94452
+
+        Unreviewed EFL gardening. Mark several inspector
+        tests as flaky to make the bots green.
+
+        * platform/efl/TestExpectations:
+
+2012-08-20  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Moving a couple of WONTFIX accessibility tests into the appropriate
+        section.
+
+        Removing crash expectations for a few accessibility tests that were fixed
+        in r125920.
+
+        Adding a flaky crash expectation for a XFrameOptions http test.
+
+        Adding platform-specific baselines for a few css3 compositing tests that fail
+        differently because of using JavaScriptCore instead of V8.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/css3/compositing: Added.
+        * platform/gtk/css3/compositing/blend-mode-property-expected.txt: Added.
+        * platform/gtk/css3/compositing/blend-mode-property-parsing-expected.txt: Added.
+
+2012-08-20  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: load scripts panel lazily
+        https://bugs.webkit.org/show_bug.cgi?id=94416
+
+        Reviewed by Vsevolod Vlasov.
+
+        This change removes access to WebInspector.panels.scripts and loads it lazily.
+
+        * http/tests/inspector/debugger-test.js:
+        (initialize_DebuggerTest):
+        * inspector/debugger/scripts-panel.html:
+        * inspector/debugger/scripts-sorting.html:
+        * inspector/filtered-item-selection-dialog-filtering.html:
+        * inspector/styles/edit-inspector-stylesheet.html:
+        * inspector/tabbed-editors-history.html:
+
+2012-08-20  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Move CSS 3 compositing tests to TestExpectations
+        https://bugs.webkit.org/show_bug.cgi?id=94451
+
+        Unreviewed EFL gardening. Skip css3/compositing test
+        cases for EFL port until we turn on CSS_COMPOSITING
+        compile flag.
+
+        * platform/efl/TestExpectations:
+
+2012-08-20  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: prepare scripts panel to be lazily loaded
+        https://bugs.webkit.org/show_bug.cgi?id=94423
+
+        Reviewed by Vsevolod Vlasov.
+
+        * http/tests/inspector/debugger-test.js:
+        (initialize_DebuggerTest.InspectorTest.finishDebuggerTest.disableDebugger):
+        * inspector/debugger/debugger-autocontinue-on-syntax-error.html:
+        * inspector/debugger/debugger-pause-in-internal.html:
+        * inspector/debugger/debugger-pause-on-exception.html:
+        * inspector/debugger/scripts-panel-expected.txt:
+
+2012-08-20  Allan Sandfeld Jensen  <allan.jensen@nokia.com>
+
+        Unreviewed gardening, remove FAIL expectation fixed by r126006
+
+        * platform/chromium/TestExpectations:
+
+2012-08-20  Allan Sandfeld Jensen  <allan.jensen@nokia.com>
+
+        [chromium] context-menu.html fails on Chromium Mac
+        https://bugs.webkit.org/show_bug.cgi?id=94367
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Set editing behaviour explicitly so the test behaves the same independent of host OS.
+
+        * touchadjustment/context-menu.html:
+
+2012-08-20  Yoshifumi Inoue  <yosin@chromium.org>
+
+        [Tests] time-multiple-fields-appearance-basic.html and time-multiple-fields-appearance-pseudo-elements.html are failed on Chromium Mac
+        https://bugs.webkit.org/show_bug.cgi?id=94439
+
+        Unreviewed. Temporary disabled these tests.
+
+        * platform/chromium/TestExpectations: Add entries for these tests.
+
+2012-08-19  Yoshifumi Inoue  <yosin@chromium.org>
+
+        [Tests] time-multiple-fields-appearance-basic.html and time-multiple-fields-appearance-pseudo-elements.html are failed on Chromium Mac
+        https://bugs.webkit.org/show_bug.cgi?id=94439
+
+        Reviewed by Kent Tamura.
+
+        This patch updates expected images of multiple fields time input UI for
+        Chromium-Linux and CSS selectors for expected HTML file for changing
+        of Source/WebCore/css/themeWin.css.
+
+        * fast/forms/time-multiple-fields/resources/time-multiple-fields-appearance.css:
+        (.host): Changed padding property.
+        (.ampmField): Remove wrong property.
+        (.hourField): ditto
+        (.millisecondField): ditto
+        (.minuteField): ditto
+        (.secondField): ditto
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png:
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.txt:
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.txt:
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.txt:
+        * platform/chromium/TestExpectations: Remove Chromium-Mac disabled entries.
+
+2012-08-19  Rik Cabanier  <cabanier@adobe.com>
+
+        parse CSS attribute -webkit-blend-mode
+        https://bugs.webkit.org/show_bug.cgi?id=94024
+
+        Reviewed by Dirk Schulze.
+
+        Added parsing and general CSS handling of -webkit-blend-mode per http://www.w3.org/TR/2012/WD-compositing-20120816/
+
+        * css3/compositing: Added.
+        * css3/compositing/blend-mode-property-expected.txt: Added.
+        * css3/compositing/blend-mode-property-parsing-expected.txt: Added.
+        * css3/compositing/blend-mode-property-parsing-invalid-expected.txt: Added.
+        * css3/compositing/blend-mode-property-parsing-invalid.html: Added.
+        * css3/compositing/blend-mode-property-parsing.html: Added.
+        * css3/compositing/blend-mode-property.html: Added.
+        * css3/compositing/script-tests: Added.
+        * css3/compositing/script-tests/blend-mode-property-parsing-invalid.js: Added.
+        (testInvalidFilterRule):
+        * css3/compositing/script-tests/blend-mode-property-parsing.js: Added.
+        (jsWrapperClass):
+        (shouldBeType):
+        (testFilterRule):
+        * css3/compositing/script-tests/blend-mode-property.js: Added.
+
+2012-08-19  MORITA Hajime  <morrita@google.com>
+
+        DOM mutation against including <link> shouldn't trigger pending HTML parser.
+        https://bugs.webkit.org/show_bug.cgi?id=93641
+
+        Reviewed by Ryosuke Niwa.
+
+        Note that the test content need to be such cryptic because HTML parser is involving the
+        captured bug and adding explanations can affect the behavior then mask the bug.
+
+        * http/tests/loading/remove-child-triggers-parser-expected.txt: Added.
+        * http/tests/loading/remove-child-triggers-parser.html: Added.
+
+2012-08-19  KwangYong Choi  <ky0.choi@samsung.com>
+
+        [EFL] Gardening for fast/forms/range/thumbslider-no-parent-slider.html
+        https://bugs.webkit.org/show_bug.cgi?id=94334
+
+        Unreviewed gardening.
+
+        Slider thumb can not be displayed without parent slider because
+        current theme of EFL does not display slider thumb separately.
+
+        * platform/efl/TestExpectations:
+        * platform/efl/fast/forms/range/thumbslider-no-parent-slider-expected.png: Removed.
+        * platform/efl/fast/forms/range/thumbslider-no-parent-slider-expected.txt: Removed.
+
+2012-08-19  Yoshifumi Inoue  <yosin@chromium.org>
+
+        [Tests] time-multiple-fields-appearance-basic.html and time-multiple-fields-appearance-pseudo-elements.html are failed on Chromium Windows
+        https://bugs.webkit.org/show_bug.cgi?id=94297
+
+        Reviewed by Kent Tamura.
+
+        This patch updates a logic for detcting multiple fields time input UI
+        has second field or not.
+
+        * fast/forms/time-multiple-fields/resources/time-multiple-fields-appearance.js:
+        (checkHasShortFormat): Added "<br>" between input elements to avoid rounding error
+        on calculating rendering width of input elements. When input elements are rendered on
+        same baseline, width of first one is 126px and second is 125px.
+        * platform/chromium/TestExpectations: Changed bug id of entries Chromium-Mac specific bug entry, bug 94339.
+
+2012-08-19  Mike West  <mkwst@chromium.org>
+
+        CSP 1.1: Add 'plugin-types' and 'form-action' DOM API.
+        https://bugs.webkit.org/show_bug.cgi?id=94415
+
+        Reviewed by Adam Barth.
+
+        * http/tests/security/contentSecurityPolicy/1.1/securitypolicy-allowformaction-expected.txt: Added.
+        * http/tests/security/contentSecurityPolicy/1.1/securitypolicy-allowformaction.html: Added.
+        * http/tests/security/contentSecurityPolicy/1.1/securitypolicy-allowplugintype-expected.txt: Added.
+        * http/tests/security/contentSecurityPolicy/1.1/securitypolicy-allowplugintype.html: Added.
+
+2012-08-19  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: load network panel lazily
+        https://bugs.webkit.org/show_bug.cgi?id=94414
+
+        Reviewed by Vsevolod Vlasov.
+
+        * http/tests/inspector/inspector-test.js:
+        (initialize_InspectorTest.InspectorTest.navigate):
+        (initialize_InspectorTest.InspectorTest._innerReloadPage):
+        * http/tests/inspector/network-test.js:
+        * http/tests/inspector/network/async-xhr-json-mime-type.html:
+        * http/tests/inspector/network/cached-resource-destroyed-moved-to-storage.html:
+        * http/tests/inspector/network/cached-resource-destroyed-too-big-discarded.html:
+        * http/tests/inspector/network/download.html:
+        * http/tests/inspector/network/network-cachedresources-with-same-urls.html:
+        * http/tests/inspector/network/network-clear-cache.html-disabled:
+        * http/tests/inspector/network/network-clear-cookies.html-disabled:
+        * http/tests/inspector/network/network-content-replacement-embed.html:
+        * http/tests/inspector/network/network-content-replacement-xhr.html:
+        * http/tests/inspector/network/network-cyrillic-xhr.html:
+        * http/tests/inspector/network/network-disable-cache-memory.html:
+        * http/tests/inspector/network/network-disable-cache-xhrs.html:
+        * http/tests/inspector/network/network-disabling-check-no-memory-leak.html:
+        * http/tests/inspector/network/network-embed.html:
+        * http/tests/inspector/network/network-empty-xhr.html:
+        * http/tests/inspector/network/network-iframe-load-and-delete.html:
+        * http/tests/inspector/network/network-image-404.html:
+        * http/tests/inspector/network/network-initiator-from-console.html:
+        * http/tests/inspector/network/network-preview-json.html:
+        * http/tests/inspector/network/network-request-revision-content.html:
+        * http/tests/inspector/network/network-shared-worker.html:
+        * http/tests/inspector/network/network-sidebar-width.html:
+        * http/tests/inspector/network/network-size-chunked.html:
+        * http/tests/inspector/network/network-size-sync.html:
+        * http/tests/inspector/network/network-size.html:
+        * http/tests/inspector/network/network-worker.html:
+        * http/tests/inspector/network/network-xhr-async-double.html:
+        * http/tests/inspector/network/network-xhr-async.html:
+        * http/tests/inspector/network/network-xhr-same-url-as-main-resource.html:
+        * http/tests/inspector/network/network-xhr-sync.html:
+        * http/tests/inspector/network/request-parameters-decoding.html:
+        * http/tests/inspector/network/x-frame-options-deny.html:
+        * http/tests/inspector/resource-har-pages.html:
+        * http/tests/inspector/resource-tree/resource-tree-mimetype.html:
+
 2012-08-19  Pavel Feldman  <pfeldman@chromium.org>
 
         REGRESSION (r125280-r125284): inspector/console/console-format-collections.html failing on Apple Lion Debug WK1 (Tests)

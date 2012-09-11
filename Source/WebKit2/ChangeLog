@@ -1,3 +1,137 @@
+2012-08-21  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        Unreviewed build fix for newer Qt 5: QT += qmltest does not imply QT += testlib anymore, but
+        the code here needs QSignalSpy from QTestLib
+
+        * UIProcess/API/qt/tests/qmltests/DesktopBehavior.pro:
+        * UIProcess/API/qt/tests/qmltests/WebView.pro:
+
+2012-08-18  John Sullivan  <sullivan@apple.com>
+
+        <https://bugs.webkit.org/show_bug.cgi?id=94486>
+        <rdar://problem/12128557>
+        REGRESSION (r121482, Lion-only): Closing a popover containing a WKView can crash
+        
+        Reviewed by Darin Adler.
+
+        * UIProcess/API/mac/WKView.mm:
+        (-[WKView viewWillMoveToWindow:]):
+        Avoid calling the code added in 121482 that ensures that the undo stack is cleaned up
+        before the WKView is moved from one window to another when the WKView is being moved
+        out of a popover window. This avoids a bug in OS X 10.7 that was fixed in 10.8.
+        While this technically reopens a potentially crashing code path that 121482 closed,
+        it only reopens it for WKViews that are used for text editing and that are removed
+        from an NSPopover at some time earlier than tear-down of the NSPopover.
+
+2012-08-20  Allan Sandfeld Jensen  <allan.jensen@nokia.com>
+
+        [Qt] Custom tap-highlight-color renders fully opaque
+        https://bugs.webkit.org/show_bug.cgi?id=94468
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Draw tap-highlight-color at 50% transparency, to better match how
+        existing WebKit browsers act on custom tap-highlight colors.
+
+        * WebProcess/WebPage/TapHighlightController.cpp:
+        (WebKit::TapHighlightController::drawRect):
+
+2012-08-20  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        [GTK] Replace webkit_web_view_replace_content with webkit_web_view_load_alternate_html
+        https://bugs.webkit.org/show_bug.cgi?id=94471
+
+        Reviewed by Martin Robinson.
+
+        In WebKit1 there's code to prevent that load signals are emitted
+        when loading internal custom error pages. We added
+        webkit_web_view_replace_content() with the same idea, but it has
+        ended up being problematic, because it allows to add any HTML
+        content (in WebKit1 we assumed internal error pages never failed
+        and always loaded) and it's impossible to know when the load has
+        finished. It also required a lot of logic to handle
+        replace_content as an especial case, in order to hide the fact
+        that it loads content. This patch renames
+        webkit_web_view_replace_content() as
+        webkit_web_view_load_alternate_html() and emit load events
+        normally.
+
+        * UIProcess/API/gtk/WebKitWebView.cpp:
+        (_WebKitWebViewPrivate):
+        (webkitWebViewLoadChanged):
+        (webkitWebViewLoadFailed):
+        (webkitWebViewSetEstimatedLoadProgress):
+        (webkitWebViewResourceLoadStarted):
+        (webkitWebViewGetLoadingWebResource):
+        (webkitWebViewRemoveLoadingWebResource):
+        (webkitWebViewResourceLoadFinished):
+        (webkit_web_view_load_alternate_html):
+        * UIProcess/API/gtk/WebKitWebView.h:
+        * UIProcess/API/gtk/docs/webkit2gtk-sections.txt:
+        * UIProcess/API/gtk/tests/TestLoaderClient.cpp:
+        (testLoadAlternateHTML):
+        (beforeAll):
+        * UIProcess/API/gtk/tests/TestResources.cpp:
+        (beforeAll):
+        * UIProcess/API/gtk/tests/TestWebKitWebView.cpp:
+        (beforeAll):
+        * UIProcess/API/gtk/tests/WebViewTest.cpp:
+        (WebViewTest::loadAlternateHTML):
+        * UIProcess/API/gtk/tests/WebViewTest.h:
+
+2012-08-20  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL][WK2] Add unit tests for WKEinaSharedString
+        https://bugs.webkit.org/show_bug.cgi?id=94104
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added unit tests for WKEinaSharedString class.
+
+        * PlatformEfl.cmake:
+        * UIProcess/API/efl/tests/test_ewk2_eina_shared_string.cpp: Added.
+        (checkString):
+        (TEST_F):
+
+2012-08-20  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        [GTK] Add API to set preferred languages to WebKit2 GTK+
+        https://bugs.webkit.org/show_bug.cgi?id=90878
+
+        Reviewed by Martin Robinson.
+
+        * UIProcess/API/gtk/WebKitWebContext.cpp:
+        (webkit_web_context_set_preferred_languages): Public API to set a
+        list of preferred languages sorted from most desirable to least
+        desirable.
+        * UIProcess/API/gtk/WebKitWebContext.h:
+        * UIProcess/API/gtk/docs/webkit2gtk-sections.txt: Add new symbol.
+        * UIProcess/API/gtk/tests/TestWebKitWebContext.cpp:
+        (testWebContextLanguages):
+        (serverCallback):
+        (beforeAll):
+        (afterAll):
+        * UIProcess/API/gtk/tests/WebViewTest.cpp:
+        (resourceGetDataCallback):
+        (WebViewTest::mainResourceData): Moved from TestWebKitWebContext
+        to make it available to all WebViewTests.
+        * UIProcess/API/gtk/tests/WebViewTest.h:
+        * WebProcess/WebProcess.cpp:
+        (WebKit::WebProcess::userPreferredLanguagesChanged): Notify our
+        observer that the languages have been overriden.
+        * WebProcess/gtk/WebProcessGtk.cpp:
+        (WebKit::buildAcceptLanguages): Helper function to build the
+        accept languages as specified in RFC 2616.
+        (WebKit::setSoupSessionAcceptLanguage): Set the accept-language
+        property of the default SoupSession.
+        (WebKit::languageChanged): Update the preferred languages in
+        SoupSession.
+        (WebKit::WebProcess::platformInitializeWebProcess): Add an
+        observer to be notified when the list of preferred languages is
+        updated.
+        (WebKit::WebProcess::platformTerminate): Remove the observer added
+        in platformInitializeWebProcess().
+
 2012-08-19  Dan Bernstein  <mitz@apple.com>
 
         WebPageProxy::setCursor does not check that the view is still in an active window

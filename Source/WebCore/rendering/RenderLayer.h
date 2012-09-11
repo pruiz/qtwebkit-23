@@ -397,6 +397,10 @@ public:
     bool isPaginated() const { return m_isPaginated; }
 
     void updateTransform();
+    
+#if ENABLE(CSS_COMPOSITING)
+    void updateBlendMode();
+#endif
 
     const LayoutSize& relativePositionOffset() const { return m_relativeOffset; }
 
@@ -931,6 +935,10 @@ protected:
     bool m_hasFilterInfo : 1;
 #endif
 
+#if ENABLE(CSS_COMPOSITING)
+    BlendMode m_blendMode;
+#endif
+
     RenderBoxModelObject* m_renderer;
 
     RenderLayer* m_parent;
@@ -992,7 +1000,7 @@ protected:
     RenderScrollbarPart* m_resizer;
 
 private:
-    LayoutRect m_blockSelectionGapsBounds;
+    IntRect m_blockSelectionGapsBounds;
 
 #if USE(ACCELERATED_COMPOSITING)
     OwnPtr<RenderLayerBacking> m_backing;

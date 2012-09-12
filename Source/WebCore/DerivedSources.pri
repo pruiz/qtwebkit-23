@@ -725,16 +725,10 @@ preprocessIdls.add_output_to_sources = false
 preprocessIdls.depends = $$PWD/bindings/scripts/IDLParser.pm $$IDL_BINDINGS
 GENERATORS += preprocessIdls
 
-win32 {
-    env_export = set
-} else {
-    env_export = export
-}
-
 # GENERATOR 1: Generate .h and .cpp from IDLs
 generateBindings.input = IDL_BINDINGS
 generateBindings.script = $$PWD/bindings/scripts/generate-bindings.pl
-generateBindings.commands = $$env_export \"SOURCE_ROOT=$$toSystemPath($$PWD)\" && perl -I$$PWD/bindings/scripts $$generateBindings.script \
+generateBindings.commands = $$setEnvironmentVariable(SOURCE_ROOT, $$toSystemPath($$PWD)) && perl -I$$PWD/bindings/scripts $$generateBindings.script \
                             --defines \"$${FEATURE_DEFINES_JAVASCRIPT}\" \
                             --generator JS \
                             --include Modules/filesystem \

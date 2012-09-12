@@ -383,6 +383,7 @@ SOURCES += \
     dom/DOMCoreException.cpp \
     dom/DOMError.cpp \
     dom/DOMImplementation.cpp \
+    dom/DOMNamedFlowCollection.cpp \
     dom/DOMStringList.cpp \
     dom/DOMStringMap.cpp \
     dom/DatasetDOMStringMap.cpp \
@@ -422,6 +423,8 @@ SOURCES += \
     dom/MutationObserverInterestGroup.cpp \
     dom/MutationObserverRegistration.cpp \
     dom/MutationRecord.cpp \
+    dom/WebKitNamedFlow.cpp \
+    dom/NamedFlowCollection.cpp \
     dom/NamedNodeMap.cpp \
     dom/NameNodeList.cpp \
     dom/Node.cpp \
@@ -474,8 +477,6 @@ SOURCES += \
     dom/UserTypingGestureIndicator.cpp \
     dom/ViewportArguments.cpp \
     dom/WebKitAnimationEvent.cpp \
-    dom/WebKitNamedFlow.cpp \
-    dom/WebKitNamedFlowCollection.cpp \
     dom/WebKitTransitionEvent.cpp \
     dom/WheelEvent.cpp \
     dom/WindowEventContext.cpp \
@@ -1185,6 +1186,7 @@ SOURCES += \
     rendering/RenderWordBreak.cpp \
     rendering/RootInlineBox.cpp \
     rendering/ScrollBehavior.cpp \
+    rendering/WrapShapeInfo.cpp \
     rendering/style/ContentData.cpp \
     rendering/style/CounterDirectives.cpp \
     rendering/style/FillLayer.cpp \
@@ -1560,6 +1562,7 @@ HEADERS += \
     dom/MutationObserver.h \
     dom/MutationObserverRegistration.h \
     dom/MutationRecord.h \
+    dom/NamedFlowCollection.h \
     dom/NamedNodeMap.h \
     dom/NameNodeList.h \
     dom/NodeFilterCondition.h \
@@ -1608,7 +1611,6 @@ HEADERS += \
     dom/ViewportArguments.h \
     dom/WebKitAnimationEvent.h \
     dom/WebKitNamedFlow.h \
-    dom/WebKitNamedFlowCollection.h \
     dom/WebKitTransitionEvent.h \
     dom/WheelEvent.h \
     editing/AlternativeTextController.h \
@@ -2365,6 +2367,7 @@ HEADERS += \
     rendering/RenderWordBreak.h \
     rendering/RootInlineBox.h \
     rendering/ScrollBehavior.h \
+    rendering/WrapShapeInfo.h \
     rendering/style/ContentData.h \
     rendering/style/CounterDirectives.h \
     rendering/style/CursorData.h \

@@ -33,7 +33,6 @@
 
 #include "DOMDataStore.h"
 #include "Event.h"
-#include "IsolatedWorld.h"
 #include "Node.h"
 #include "NodeFilter.h"
 #include "PlatformString.h"
@@ -53,9 +52,7 @@ namespace WebCore {
     class Frame;
     class Node;
     class V8PerContextData;
-    class V8Proxy;
     class WorkerContext;
-    class XPathResolver;
 
     enum ListenerLookupType {
         ListenerFindOnly,
@@ -127,7 +124,7 @@ namespace WebCore {
         static v8::Handle<v8::Object> getCachedWrapper(Node* node)
         {
             ASSERT(isMainThread());
-            if (LIKELY(!IsolatedWorld::count())) {
+            if (LIKELY(!DOMWrapperWorld::isolatedWorldsExist())) {
                 v8::Persistent<v8::Object>* wrapper = node->wrapper();
                 if (LIKELY(!!wrapper))
                     return *wrapper;

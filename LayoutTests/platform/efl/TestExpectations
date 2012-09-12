@@ -121,8 +121,8 @@ BUGWK87088 : fast/js/names.html = TEXT
 BUGWKEFL SKIP : fast/events/option-tab.html = PASS
 
 // These tests are valid for ports where RenderTheme::shouldShowPlaceholderWhenFocused() returns true.
-BUGWKEFL SKIP : fast/forms/input-placeholder-paint-order.html = MISSING
-BUGWKEFL SKIP : fast/forms/textarea/textarea-placeholder-paint-order.html = MISSING
+BUGWKEFL : fast/forms/input-placeholder-paint-order.html = MISSING
+BUGWKEFL : fast/forms/textarea/textarea-placeholder-paint-order.html = MISSING
 
 // Implementing copy{En,De}codedHostName only to test them does not make sense
 BUGWK86080 SKIP : fast/encoding/idn-security.html = TEXT
@@ -339,7 +339,7 @@ BUGWK84338 : editing/style/apply-through-end-of-document.html = TEXT
 BUGWK84338 : editing/style/non-inheritable-styles.html = TEXT
 BUGWK84338 : editing/style/smoosh-styles-003.html = TEXT
 BUGWK84338 : fast/events/clipboard-dataTransferItemList.html = TEXT
-BUGWK84338 SKIP : fast/forms/plaintext-mode-2.html = MISSING
+BUGWK84338 : fast/forms/plaintext-mode-2.html = MISSING
 BUGWK84338 : fast/forms/textarea-paste-newline.html = TEXT
 
 // Missing showModalDialog implementation
@@ -543,8 +543,11 @@ BUGWK29359 : fast/css/pseudo-in-range.html = TEXT
 BUGWK29359 : fast/css/pseudo-out-of-range.html = TEXT
 BUGWK29359 : fast/css/pseudo-in-range-invalid-value.html = TEXT
 
+// Tracking corner not being painted for TextArea.
 BUGWK85484 : fast/css/resize-corner-tracking-transformed.html = TEXT
 BUGWK85484 : fast/css/resize-corner-tracking.html = TEXT
+BUGWK85484 : fast/forms/textarea-scroll-height.html = MISSING
+BUGWK85484 : fast/forms/textarea-scrolled-type.html = MISSING
 
 BUGWK85493 : fast/css/square-button-appearance.html = TEXT
 
@@ -692,8 +695,6 @@ BUGWK91487 : fast/dom/shadow/shadowdom-for-select-without-shadow.html = IMAGE
 BUGWK91488 : fast/dom/shadow/shadowdom-for-output-only-shadow.html = IMAGE
 BUGWK91489 : fast/dom/shadow/shadowdom-for-fieldset-complex-shadow.html = IMAGE
 BUGWK91489 : fast/dom/shadow/shadowdom-for-fieldset-only-shadow.html = IMAGE
-BUGWK91491 : fast/dom/shadow/shadowdom-for-keygen-complex-shadow.html = IMAGE
-BUGWK91491 : fast/dom/shadow/shadowdom-for-keygen-without-shadow.html = IMAGE
 
 // This test is specific to QuickTime media engine.
 BUGWKEFL SKIP : media/video-does-not-loop.html = PASS
@@ -903,9 +904,25 @@ BUGWK84037 : fast/text/international/spaces-combined-in-vertical-text.html = TEX
 BUGWK94341 : inspector/timeline/timeline-decode-resize.html = TEXT
 
 // Slider thumb can not be displayed without parent slider.
-BUGWK94334 SKIP : fast/forms/range/thumbslider-no-parent-slider.html = MISSING
+BUGWK94334 : fast/forms/range/thumbslider-no-parent-slider.html = MISSING
 
 BUGWK94690 : fast/dom/shadow/shadowdom-dynamic-styling.html = TEXT
 
 // Fails after r126350
 BUGWK94788 : media/track/track-cue-rendering-snap-to-lines-not-set.html = TEXT
+
+// Intrusive theming overrides collide with style-related LayoutTests.
+BUGWK85877 : fast/forms/menulist-narrow-width.html = MISSING
+BUGWK85877 : fast/forms/select-baseline.html = MISSING
+BUGWK85877 : fast/forms/menulist-style-color.html = MISSING
+BUGWK85877 : fast/forms/select-style.html = MISSING
+
+// Test 2 in below test is failing.
+BUGWK94877 : fast/forms/listbox-hit-test-zoomed.html = MISSING
+
+// The text in the popup button is clipped.
+BUGWK94878 : fast/forms/menulist-restrict-line-height.html = MISSING
+
+// Cancel mark in search field is not working.
+BUGWK94880 : fast/forms/search-cancel-button-style-sharing.html = MISSING
+BUGWK94880 : fast/forms/search-rtl.html = MISSING

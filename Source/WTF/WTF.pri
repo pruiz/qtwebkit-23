@@ -19,7 +19,7 @@ haveQt(5) {
             win32: LIBS += -licuin -licuuc -licudt
             else: LIBS += -licui18n -licuuc -licudata
         } else {
-            error("To build QtWebKit with Qt 5 you need ICU")
+            error("To build QtWebKit with Qt 5 you need to build Qt 5 with libICU support. Check for ICU support being mentioned in qtbase/config.summary.")
         }
     }
 }

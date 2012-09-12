@@ -336,8 +336,7 @@ WebInspector.ElementsPanel.prototype = {
 
         var contextMenu = new WebInspector.ContextMenu();
         var populated = this.treeOutline.populateContextMenu(contextMenu, event);
-        if (populated)
-            contextMenu.appendSeparator();
+        contextMenu.appendSeparator();
         contextMenu.appendCheckboxItem(WebInspector.UIString(WebInspector.useLowerCaseMenuTitles() ? "Word wrap" : "Word Wrap"), toggleWordWrap.bind(this), WebInspector.settings.domWordWrap.get());
 
         contextMenu.show(event);
@@ -433,9 +432,9 @@ WebInspector.ElementsPanel.prototype = {
     {
         var listItem = anchor.enclosingNodeOrSelfWithNodeName("li");
         if (listItem && listItem.treeElement)
-            this._loadDimensionsForNode(listItem.treeElement, WebInspector.buildImagePreviewContents.bind(WebInspector, anchor.href, true, showPopover));
+            this._loadDimensionsForNode(listItem.treeElement, WebInspector.DOMPresentationUtils.buildImagePreviewContents.bind(WebInspector.DOMPresentationUtils, anchor.href, true, showPopover));
         else
-            WebInspector.buildImagePreviewContents(anchor.href, true, showPopover);
+            WebInspector.DOMPresentationUtils.buildImagePreviewContents(anchor.href, true, showPopover);
 
         /**
          * @param {Element=} contents

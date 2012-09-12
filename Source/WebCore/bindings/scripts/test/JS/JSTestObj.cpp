@@ -1048,7 +1048,7 @@ void setJSTestObjCreate(ExecState* exec, JSObject* thisObject, JSValue value)
     UNUSED_PARAM(exec);
     JSTestObj* castedThis = jsCast<JSTestObj*>(thisObject);
     TestObj* impl = static_cast<TestObj*>(castedThis->impl());
-    impl->setCreate(value.toBoolean());
+    impl->setCreate(value.toBoolean(exec));
 }
 
 
@@ -1084,7 +1084,7 @@ void setJSTestObjReflectedBooleanAttr(ExecState* exec, JSObject* thisObject, JSV
     UNUSED_PARAM(exec);
     JSTestObj* castedThis = jsCast<JSTestObj*>(thisObject);
     TestObj* impl = static_cast<TestObj*>(castedThis->impl());
-    impl->setBooleanAttribute(WebCore::HTMLNames::reflectedbooleanattrAttr, value.toBoolean());
+    impl->setBooleanAttribute(WebCore::HTMLNames::reflectedbooleanattrAttr, value.toBoolean(exec));
 }
 
 
@@ -1120,7 +1120,7 @@ void setJSTestObjReflectedCustomBooleanAttr(ExecState* exec, JSObject* thisObjec
     UNUSED_PARAM(exec);
     JSTestObj* castedThis = jsCast<JSTestObj*>(thisObject);
     TestObj* impl = static_cast<TestObj*>(castedThis->impl());
-    impl->setBooleanAttribute(WebCore::HTMLNames::customContentBooleanAttrAttr, value.toBoolean());
+    impl->setBooleanAttribute(WebCore::HTMLNames::customContentBooleanAttrAttr, value.toBoolean(exec));
 }
 
 
@@ -1681,7 +1681,7 @@ EncodedJSValue JSC_HOST_CALL jsTestObjPrototypeFunctionAddEventListener(ExecStat
     JSValue listener = exec->argument(1);
     if (!listener.isObject())
         return JSValue::encode(jsUndefined());
-    impl->addEventListener(ustringToAtomicString(exec->argument(0).toString(exec)->value(exec)), JSEventListener::create(asObject(listener), castedThis, false, currentWorld(exec)), exec->argument(2).toBoolean());
+    impl->addEventListener(ustringToAtomicString(exec->argument(0).toString(exec)->value(exec)), JSEventListener::create(asObject(listener), castedThis, false, currentWorld(exec)), exec->argument(2).toBoolean(exec));
     return JSValue::encode(jsUndefined());
 }
 
@@ -1696,7 +1696,7 @@ EncodedJSValue JSC_HOST_CALL jsTestObjPrototypeFunctionRemoveEventListener(ExecS
     JSValue listener = exec->argument(1);
     if (!listener.isObject())
         return JSValue::encode(jsUndefined());
-    impl->removeEventListener(ustringToAtomicString(exec->argument(0).toString(exec)->value(exec)), JSEventListener::create(asObject(listener), castedThis, false, currentWorld(exec)).get(), exec->argument(2).toBoolean());
+    impl->removeEventListener(ustringToAtomicString(exec->argument(0).toString(exec)->value(exec)), JSEventListener::create(asObject(listener), castedThis, false, currentWorld(exec)).get(), exec->argument(2).toBoolean(exec));
     return JSValue::encode(jsUndefined());
 }
 
@@ -2293,6 +2293,8 @@ EncodedJSValue JSC_HOST_CALL jsTestObjPrototypeFunctionOverloadedMethod(ExecStat
         return jsTestObjPrototypeFunctionOverloadedMethod9(exec);
     if ((argsCount == 1 && (arg0.isObject() && isJSArray(arg0))))
         return jsTestObjPrototypeFunctionOverloadedMethod10(exec);
+    if (argsCount < 1)
+        return throwVMError(exec, createNotEnoughArgumentsError(exec));
     return throwVMTypeError(exec);
 }
 
@@ -2361,6 +2363,8 @@ EncodedJSValue JSC_HOST_CALL jsTestObjConstructorFunctionOverloadedMethod1(ExecS
     JSValue arg0(exec->argument(0));
     if ((argsCount == 1 && (arg0.isUndefinedOrNull() || arg0.isString() || arg0.isObject())))
         return jsTestObjConstructorFunctionOverloadedMethod12(exec);
+    if (argsCount < 1)
+        return throwVMError(exec, createNotEnoughArgumentsError(exec));
     return throwVMTypeError(exec);
 }
 

@@ -120,6 +120,7 @@ HEADERS += \
     RefPtrHashMap.h \
     RetainPtr.h \
     SHA1.h \
+    SaturatedArithmetic.h \
     Spectrum.h \
     StackBounds.h \
     StaticConstructors.h \

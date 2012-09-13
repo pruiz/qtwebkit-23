@@ -123,13 +123,10 @@ haveQt(5) {
 # QStyle detection
 haveQt(4)|haveQtModule(widgets): DEFINES += HAVE_QSTYLE=1
 
-# Enable the USE(3D_GRAPHICS) flag for Qt5 or when QtOpenGL is enabled.
+# Enable the USE(3D_GRAPHICS) when QtOpenGL is enabled.
 !contains(DEFINES, WTF_USE_3D_GRAPHICS=.):contains(QT_CONFIG, opengl) {
-    # Disable USE(3D_GRAPHICS) on Windows temporarily, see https://bugs.webkit.org/show_bug.cgi?id=90850 for details.
-    # Also disable on QNX, see https://bugs.webkit.org/show_bug.cgi?id=93278
-    !win32-*:!qnx {
-        haveQt(5)|contains(QT_CONFIG, opengl): DEFINES += WTF_USE_3D_GRAPHICS=1
-    }
+    # On Windows we require GLES2/EGL through ANGLE.
+    !win32|contains(QT_CONFIG, opengles2): DEFINES += WTF_USE_3D_GRAPHICS=1
 }
 
 # WebGL support - only enabled if we can use 3D graphics

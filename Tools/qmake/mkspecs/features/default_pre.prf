@@ -137,3 +137,8 @@ for(define, DEFINES) {
 # what features.prf introduced and what was already there.
 BASE_CONFIG = $$CONFIG
 BASE_DEFINES = $$DEFINES
+
+# A newer version of flex is required on Windows. At the moment the only
+# one that appears to provide binaries and is not cygwin is winflex.
+FLEX = flex
+win32: FLEX = win_flex

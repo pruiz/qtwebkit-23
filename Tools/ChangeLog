@@ -1,3 +1,313 @@
+2012-09-14  Allan Sandfeld Jensen  <allan.jensen@nokia.com>
+
+        [Qt4] QOpenGLContext used in GraphicsContext3DQt.cpp (regression r126635)
+        https://bugs.webkit.org/show_bug.cgi?id=96490
+
+        Reenables USE(3D_GRAPHICS) on Qt 4.
+
+        * qmake/mkspecs/features/features.prf:
+
+2012-08-27  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        Rename RegisterProtocolHandler API to NavigatorContentUtils
+        https://bugs.webkit.org/show_bug.cgi?id=94920
+
+        Reviewed by Adam Barth.
+
+        Renamed 'register-protocol-handler' feature to 'navigator-content-utils'.
+
+        * Scripts/webkitperl/FeatureList.pm:
+        * qmake/mkspecs/features/features.pri:
+
+2012-08-24  Benjamin Poulain  <bpoulain@apple.com>
+
+        Unify Number to StringImpl conversion
+        https://bugs.webkit.org/show_bug.cgi?id=94879
+
+        Reviewed by Geoffrey Garen.
+
+        Add testing for the new IntegerToStringConversion.
+
+        * TestWebKitAPI/CMakeLists.txt:
+        * TestWebKitAPI/GNUmakefile.am:
+        * TestWebKitAPI/TestWebKitAPI.xcodeproj/project.pbxproj:
+        * TestWebKitAPI/Tests/WTF/IntegerToStringConversion.cpp: Added.
+
+2012-08-23  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Convert WebLayerTreeView interface into pure virtual
+        https://bugs.webkit.org/show_bug.cgi?id=94866
+
+        Reviewed by Adrienne Walker.
+
+        Updates DumpRenderTree's WebViewHost to vend a WebCompositorOutputSurface so DumpRenderTree can run compositing
+        tests.
+
+        * DumpRenderTree/DumpRenderTree.gypi:
+        * DumpRenderTree/chromium/WebViewHost.cpp:
+        (WebViewHost::createOutputSurface):
+        * DumpRenderTree/chromium/WebViewHost.h:
+        (WebViewHost):
+        * DumpRenderTree/chromium/WebViewHostOutputSurface.cpp: Copied from Source/WebKit/chromium/src/WebLayerTreeViewImpl.h.
+        (WebKit):
+        (WebKit::WebViewHostOutputSurface::WebViewHostOutputSurface):
+        (WebKit::WebViewHostOutputSurface::~WebViewHostOutputSurface):
+        (WebKit::WebViewHostOutputSurface::bindToClient):
+        (WebKit::WebViewHostOutputSurface::capabilities):
+        (WebKit::WebViewHostOutputSurface::context3D):
+        (WebKit::WebViewHostOutputSurface::sendFrameToParentCompositor):
+        * DumpRenderTree/chromium/WebViewHostOutputSurface.h: Copied from Source/WebKit/chromium/src/WebLayerTreeViewImpl.h.
+        (WebKit):
+        (WebViewHostOutputSurface):
+
+2012-08-24  Xianzhu Wang  <wangxianzhu@chromium.org>
+
+        [Chromium-Android] Many 'Unexpected EOF ...' when a test crashes
+        https://bugs.webkit.org/show_bug.cgi?id=94865
+
+        Reviewed by Dirk Pranke.
+
+        Android detects crash of test by checking if the return value of read() is None.
+        Added a parameter 'treat_no_data_as_crash' to let ServerProcess know the special requirement of Android.
+        If set, ServerProcess will set _crashed unconditionaly when there is no data.
+
+        * Scripts/webkitpy/layout_tests/port/chromium_android.py:
+        (ChromiumAndroidPort.__init__):
+        (ChromiumAndroidPort):
+        (ChromiumAndroidPort._android_server_process_constructor):
+        (ChromiumAndroidDriver._start_once):
+        * Scripts/webkitpy/layout_tests/port/server_process.py:
+        (ServerProcess.__init__):
+        (ServerProcess._wait_for_data_and_update_buffers_using_select):
+
+2012-08-24  Arnaud Renevier  <a.renevier@sisa.samsung.com>
+
+        build-webkit --gtk fails with Can't exec ""
+        https://bugs.webkit.org/show_bug.cgi?id=94944
+
+        Reviewed by Martin Robinson.
+
+        When jhbuild wrapper is not needed, do unshift a blank string to build
+        arguments.
+
+        * Scripts/webkitdirs.pm:
+        (runAutogenForAutotoolsProjectIfNecessary):
+
+2012-08-24  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Add readyState functionality to RTCPeerConnection
+        https://bugs.webkit.org/show_bug.cgi?id=94813
+
+        Reviewed by Adam Barth.
+
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.cpp:
+        (MockWebRTCPeerConnectionHandler::MockWebRTCPeerConnectionHandler):
+        (MockWebRTCPeerConnectionHandler::stop):
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.h:
+        (MockWebRTCPeerConnectionHandler):
+
+2012-08-24  Michael Brüning  <michaelbruening@gmail.com>
+
+        Unreviewed. Adding myself to committers list.
+
+        Also updated email information.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-08-24  Michael Brüning  <michaelbruening@gmail.com>
+
+        [Qt][WK2] Make viewport related experimental.test properties encapsulated.
+        https://bugs.webkit.org/show_bug.cgi?id=88320
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Changed the access to the viewport attributes to use the viewport object that is introduced by this change.
+
+        * MiniBrowser/qt/qml/ViewportInfoItem.qml:
+
+2012-08-23  Dirk Pranke  <dpranke@chromium.org>
+
+        leak detection broken after r126247 on mac
+        https://bugs.webkit.org/show_bug.cgi?id=94893
+
+        Unreviewed, build fix.
+
+        Adds is_snowleopard(), is_lion back() in for the mac port. We'll
+        probably need an is_mountainlion() or equivalent at some point,
+        I'm guessing (but I've deleted the leopard code).
+
+        * Scripts/webkitpy/layout_tests/port/leakdetector.py:
+        (LeakDetector._callstacks_to_exclude_from_leaks):
+        * Scripts/webkitpy/layout_tests/port/mac.py:
+        (MacPort):
+        (MacPort.is_snowleopard):
+        (MacPort.is_lion):
+
+2012-08-23  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        [Chromium] Enable AtomicString && CString && WTFString && StringImpl unit tests
+        https://bugs.webkit.org/show_bug.cgi?id=94871
+
+        Reviewed by Benjamin Poulain.
+
+        * TestWebKitAPI/TestWebKitAPI.gypi:
+        Added the missing files to Chromium's build system.
+
+2012-08-23  Raphael Kubo da Costa  <rakuco@webkit.org>
+
+        [watchlist] Unreviewed, subscribe to WebKit2-EFL bugs.
+
+        * Scripts/webkitpy/common/config/watchlist:
+
+2012-08-23  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Replay tests take forever to load
+        https://bugs.webkit.org/show_bug.cgi?id=94764
+
+        Reviewed by Adam Barth.
+
+        Don't load about:blank at the beginning. This appears to clog the DRT.
+
+        * Scripts/webkitpy/performance_tests/perftest.py:
+        (ReplayPerfTest.run_single):
+        * Scripts/webkitpy/performance_tests/perftest_unittest.py:
+        (TestReplayPerfTest.test_run_single):
+        (TestReplayPerfTest.test_run_single_fails_when_output_has_error):
+
+2012-08-23  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed, rolling out r126497.
+        http://trac.webkit.org/changeset/126497
+        https://bugs.webkit.org/show_bug.cgi?id=94764
+
+        Caused webkitpy-test step to start failing.
+
+        * Scripts/webkitpy/performance_tests/perftest.py:
+        (ReplayPerfTest.run_single):
+
+2012-08-23  Emil A Eklund  <eae@chromium.org>
+
+        Add saturation arithmetic support to FractionalLayoutUnit
+        https://bugs.webkit.org/show_bug.cgi?id=94364
+
+        Reviewed by Benjamin Poulain.
+
+        Add test for new saturatedArithmetic functions.
+
+        * TestWebKitAPI/CMakeLists.txt:
+        * TestWebKitAPI/GNUmakefile.am:
+        * TestWebKitAPI/TestWebKitAPI.gypi:
+        * TestWebKitAPI/TestWebKitAPI.xcodeproj/project.pbxproj:
+        * TestWebKitAPI/Tests/WTF/SaturatedArithmeticOperations.cpp: Added.
+        (TestWebKitAPI):
+        (TestWebKitAPI::TEST):
+        * TestWebKitAPI/win/TestWebKitAPI.vcproj:
+
+2012-08-23  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Replay tests take forever to load
+        https://bugs.webkit.org/show_bug.cgi?id=94764
+
+        Reviewed by Adam Barth.
+
+        Don't load about:blank at the beginning. This appears to clog the DRT.
+
+        * Scripts/webkitpy/performance_tests/perftest.py:
+        (ReplayPerfTest.run_single):
+
+2012-08-23  Wei Jia  <wjia@chromium.org>
+
+        create different WebKit::WebMediaPlayer based on URL
+        https://bugs.webkit.org/show_bug.cgi?id=91301
+
+        Reviewed by Adam Barth.
+
+        Pass URL to createMediaPlayer. This corresponds to change in base
+        class WebKit::WebFrameClient.
+
+        * DumpRenderTree/chromium/WebViewHost.cpp:
+        (WebViewHost::createMediaPlayer): add URL as additional argument.
+        * DumpRenderTree/chromium/WebViewHost.h:
+        (WebViewHost):
+
+2012-08-23  Gyuyoung Kim  <gyuyoung.kim@samsung.com>
+
+        Unreviewed, upgrade gyuyoung to reviewer.
+        http://lists.webkit.org/pipermail/webkit-dev/2012-August/022004.html
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-08-23  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        REGRESSION(r126306): it broke the plugin process
+        https://bugs.webkit.org/show_bug.cgi?id=94797
+
+        Reviewed by Xan Lopez.
+
+        * GNUmakefile.am:
+
+2012-08-23  Ryuan Choi  <ryuan.choi@samsung.com>
+
+        [EFL] Add url bar to EWebLauncher and MiniBrowser/Efl.
+        https://bugs.webkit.org/show_bug.cgi?id=63966
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        EWebLauncher and MiniBrowser/Efl did not have functionality that users
+        navigates the site which they want.
+        This patch adds the urlbar and functionality to load url which users want.
+
+        * CMakeLists.txt:
+        Added to share urlbar theme for both EWebLauncher and MiniBrowser/Efl.
+        * EWebLauncher/CMakeLists.txt:
+        Added urlbar.c and dependency of urlbar theme.
+        In addition, changed macro name to THEME_DIR to share the code easily.
+        * EWebLauncher/ControlTheme/CMakeLists.txt: Added for urlbar theme.
+        * EWebLauncher/ControlTheme/entry.edc: Implemented urlbar theme.
+        * EWebLauncher/main.c:
+        Implemented to use the urlbar.
+        In addition, remove unnecessary border of webview to control webview and urlbar easily.
+        (_ELauncher):
+        (on_url_changed):
+        (browserCreate):
+        (closeWindow):
+        (findThemePath):
+        * EWebLauncher/url_bar.c: Implemented functionality of the urlbar.
+        (_url_bar_url_get_with_protocol):
+        (on_urlbar_key_down):
+        (on_urlbar_mouse_down):
+        (on_urlbar_focus_out):
+        (url_bar_add):
+        (url_bar_del):
+        (url_bar_url_set):
+        * EWebLauncher/url_bar.h: Added.
+        * MiniBrowser/efl/CMakeLists.txt:
+        * MiniBrowser/efl/main.c: Implemented to use the urlbar.
+        (_MiniBrowser):
+        (on_url_changed):
+        (browserCreate):
+
+2012-08-23  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [nrwt, WTR] Remove workaround for timeout handing from r126062
+        https://bugs.webkit.org/show_bug.cgi?id=94609
+
+        Reviewed by Dirk Pranke.
+
+        Don't try to reset state if a timeout occured but inform
+        the harness that the web process is no longer reliable.
+
+        * Scripts/webkitpy/layout_tests/port/driver.py:
+        (Driver.run_test): Remove the workaround. Furthermore, handle the case when
+        the pid is unknown.
+        * WebKitTestRunner/TestController.cpp:
+        (WTR::TestController::run):
+        * WebKitTestRunner/TestInvocation.cpp:
+        (WTR::TestInvocation::invoke):
+        (WTR::TestInvocation::dumpWebProcessUnresponsiveness):
+        * WebKitTestRunner/TestInvocation.h:
+        (TestInvocation):
+
 2012-08-23  Ádám Kallai  <kadam@inf.u-szeged.hu>
 
         Unreviewed. Adding myself to committers list.

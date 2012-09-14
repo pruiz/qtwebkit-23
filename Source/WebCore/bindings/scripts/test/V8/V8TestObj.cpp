@@ -44,7 +44,6 @@
 #include "V8Document.h"
 #include "V8Float32Array.h"
 #include "V8IsolatedContext.h"
-#include "V8Proxy.h"
 #include "V8SVGDocument.h"
 #include "V8SVGPoint.h"
 #include "V8ScriptProfile.h"
@@ -1677,6 +1676,8 @@ static v8::Handle<v8::Value> overloadedMethodCallback(const v8::Arguments& args)
         return overloadedMethod9Callback(args);
     if ((args.Length() == 1 && (args[0]->IsArray())))
         return overloadedMethod10Callback(args);
+    if (args.Length() < 1)
+        return throwNotEnoughArgumentsError(args.GetIsolate());
     return throwTypeError(0, args.GetIsolate());
 }
 
@@ -1734,6 +1735,8 @@ static v8::Handle<v8::Value> overloadedMethod1Callback(const v8::Arguments& args
         return overloadedMethod11Callback(args);
     if ((args.Length() == 1 && (args[0]->IsNull() || args[0]->IsUndefined() || args[0]->IsString() || args[0]->IsObject())))
         return overloadedMethod12Callback(args);
+    if (args.Length() < 1)
+        return throwNotEnoughArgumentsError(args.GetIsolate());
     return throwTypeError(0, args.GetIsolate());
 }
 

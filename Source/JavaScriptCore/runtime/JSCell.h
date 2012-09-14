@@ -65,6 +65,8 @@ namespace JSC {
         template<typename T> friend void* allocateCell(Heap&);
 
     public:
+        static const unsigned StructureFlags = 0;
+
         enum CreatingEarlyCellTag { CreatingEarlyCell };
         JSCell(CreatingEarlyCellTag);
 
@@ -98,7 +100,7 @@ namespace JSC {
         // Basic conversions.
         JS_EXPORT_PRIVATE JSValue toPrimitive(ExecState*, PreferredPrimitiveType) const;
         bool getPrimitiveNumber(ExecState*, double& number, JSValue&) const;
-        bool toBoolean() const;
+        bool toBoolean(ExecState*) const;
         JS_EXPORT_PRIVATE double toNumber(ExecState*) const;
         JS_EXPORT_PRIVATE JSObject* toObject(ExecState*, JSGlobalObject*) const;
 

@@ -26,27 +26,52 @@
 
 #include "WebAnimationImpl.h"
 
-#include "AnimationIdVendor.h"
 #include "CCActiveAnimation.h"
 #include "CCAnimationCurve.h"
+#include "WebFloatAnimationCurveImpl.h"
+#include "WebTransformAnimationCurveImpl.h"
 #include <public/WebAnimation.h>
 #include <public/WebAnimationCurve.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/PassOwnPtr.h>
 
-using WebCore::AnimationIdVendor;
 using WebCore::CCActiveAnimation;
 
 namespace WebKit {
 
-WebAnimation* WebAnimation::create(const WebAnimationCurve& curve, TargetProperty targetProperty)
+WebAnimation* WebAnimation::create(const WebAnimationCurve& curve, TargetProperty targetProperty, int animationId)
 {
-    return WebAnimation::create(curve, AnimationIdVendor::getNextAnimationId(), AnimationIdVendor::getNextGroupId(), targetProperty);
+    static int nextGroupId = 1;
+    static int nextAnimationId = 1;
+    return new WebAnimationImpl(curve, targetProperty, animationId ? animationId : nextAnimationId++, nextGroupId++);
 }
 
-WebAnimation* WebAnimation::create(const WebAnimationCurve& curve, int animationId, int groupId, TargetProperty targetProperty)
+WebAnimationImpl::WebAnimationImpl(const WebAnimationCurve& webCurve, TargetProperty targetProperty, int animationId, int groupId)
 {
-    return new WebAnimationImpl(CCActiveAnimation::create(curve, animationId, groupId, static_cast<WebCore::CCActiveAnimation::TargetProperty>(targetProperty)));
+    WebAnimationCurve::AnimationCurveType curveType = webCurve.type();
+    OwnPtr<WebCore::CCAnimationCurve> curve;
+    switch (curveType) {
+    case WebAnimationCurve::AnimationCurveTypeFloat: {
+        const WebFloatAnimationCurveImpl* floatCurveImpl = static_cast<const WebFloatAnimationCurveImpl*>(&webCurve);
+        curve = floatCurveImpl->cloneToCCAnimationCurve();
+        break;
+    }
+    case WebAnimationCurve::AnimationCurveTypeTransform: {
+        const WebTransformAnimationCurveImpl* transformCurveImpl = static_cast<const WebTransformAnimationCurveImpl*>(&webCurve);
+        curve = transformCurveImpl->cloneToCCAnimationCurve();
+        break;
+    }
+    }
+    m_animation = CCActiveAnimation::create(curve.release(), animationId, groupId, static_cast<WebCore::CCActiveAnimation::TargetProperty>(targetProperty));
+}
+
+WebAnimationImpl::~WebAnimationImpl()
+{
+}
+
+int WebAnimationImpl::id()
+{
+    return m_animation->id();
 }
 
 WebAnimation::TargetProperty WebAnimationImpl::targetProperty() const

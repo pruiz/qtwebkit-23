@@ -37,10 +37,10 @@ var WebInspector = {
         WebInspector.inspectorView.show(parentElement);
         WebInspector.inspectorView.addEventListener(WebInspector.InspectorView.Events.PanelSelected, this._panelSelected, this);
 
-        var elements = new WebInspector.PanelDescriptor("elements", WebInspector.UIString("Elements"), "ElementsPanel", "ElementsPanel.js");
+        var elements = new WebInspector.ElementsPanelDescriptor();
         var resources = new WebInspector.PanelDescriptor("resources", WebInspector.UIString("Resources"), "ResourcesPanel", "ResourcesPanel.js");
-        var network = new WebInspector.PanelDescriptor("network", WebInspector.UIString("Network"), "NetworkPanel", "NetworkPanel.js");
-        var scripts = new WebInspector.PanelDescriptor("scripts", WebInspector.UIString("Sources"), "ScriptsPanel", "ScriptsPanel.js");
+        var network = new WebInspector.NetworkPanelDescriptor();
+        var scripts = new WebInspector.ScriptsPanelDescriptor();
         var timeline = new WebInspector.PanelDescriptor("timeline", WebInspector.UIString("Timeline"), "TimelinePanel", "TimelinePanel.js");
         var profiles = new WebInspector.PanelDescriptor("profiles", WebInspector.UIString("Profiles"), "ProfilesPanel", "ProfilesPanel.js");
         var audits = new WebInspector.PanelDescriptor("audits", WebInspector.UIString("Audits"), "AuditsPanel", "AuditsPanel.js");
@@ -484,7 +484,6 @@ WebInspector._doLoadedDoneWithCapabilities = function()
     WebInspector.CSSCompletions.requestCSSNameCompletions();
 
     this.drawer = new WebInspector.Drawer();
-    this.consoleView = new WebInspector.ConsoleView(WebInspector.WorkerManager.isWorkerFrontend());
 
     this.networkManager = new WebInspector.NetworkManager();
     this.resourceTreeModel = new WebInspector.ResourceTreeModel(this.networkManager);
@@ -492,9 +491,10 @@ WebInspector._doLoadedDoneWithCapabilities = function()
     this.debuggerModel.addEventListener(WebInspector.DebuggerModel.Events.DebuggerPaused, this._debuggerPaused, this);
     this.networkLog = new WebInspector.NetworkLog();
     this.domAgent = new WebInspector.DOMAgent();
-    this.javaScriptContextManager = new WebInspector.JavaScriptContextManager(this.resourceTreeModel, this.consoleView);
-
+    this.javaScriptContextManager = new WebInspector.JavaScriptContextManager(this.resourceTreeModel);
     this.scriptSnippetModel = new WebInspector.ScriptSnippetModel();
+
+    this.consoleView = new WebInspector.ConsoleView(WebInspector.WorkerManager.isWorkerFrontend());
 
     InspectorBackend.registerInspectorDispatcher(this);
 
@@ -1082,11 +1082,6 @@ WebInspector.addMainEventListeners = function(doc)
     doc.addEventListener("copy", this.documentCopy.bind(this), true);
     doc.addEventListener("contextmenu", this.contextMenuEventFired.bind(this), true);
     doc.addEventListener("click", this.documentClick.bind(this), true);
-}
-
-WebInspector.frontendReused = function()
-{
-    this.resourceTreeModel.frontendReused();
 }
 
 WebInspector.ProfileURLRegExp = /webkit-profile:\/\/(.+)\/(.+)#([0-9]+)/;

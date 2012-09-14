@@ -1,3 +1,45 @@
+2012-08-27  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        Rename RegisterProtocolHandler API to NavigatorContentUtils
+        https://bugs.webkit.org/show_bug.cgi?id=94920
+
+        Reviewed by Adam Barth.
+
+        ENABLE_REGISTER_PROTOCOL_HANDLER is renamed to ENABLE_NAVIGATOR_CONTENT_UTILS.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-08-24  Pratik Solanki  <psolanki@apple.com>
+
+        Don't create a new ResourceRequest if delegate returns the same NSURLRequest we passed it
+        https://bugs.webkit.org/show_bug.cgi?id=94962
+
+        Reviewed by Geoffrey Garen.
+
+        If the NSURLRequest returned from the delegate callback is the same as the one we passed to
+        it, then avoid creating a new ResourceRequest object. This reduces the number of calls to
+        ResourceRequest::doUpdateResourceRequest().
+
+        * WebCoreSupport/WebFrameLoaderClient.mm:
+        (WebFrameLoaderClient::dispatchWillSendRequest):
+
+2012-08-23  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        Change behavior of MasqueradesAsUndefined to better accommodate DFG changes
+        https://bugs.webkit.org/show_bug.cgi?id=93884
+
+        Reviewed by Filip Pizlo.
+
+        With some upcoming changes to the DFG to remove uses of ClassInfo, we will be changing the behavior of  
+        MasqueradesAsUndefined. In order to make this change consistent across all of our execution engines,  
+        we will make this change to MasqueradesAsUndefined as a separate patch. After this patch, MasqueradesAsUndefined  
+        objects will only masquerade as undefined in their original context (i.e. their original JSGlobalObject).  
+        For example, if an object that masquerades as undefined in frame A is passed to frame B, it will not  
+        masquerade as undefined within frame B, but it will continue to masquerade in frame A. 
+
+        * Plugins/Hosted/NetscapePluginInstanceProxy.mm:
+        (WebKit::NetscapePluginInstanceProxy::addValueToArray): Passing ExecState to toBoolean call.
+
 2012-08-22  Beth Dakin  <bdakin@apple.com>
 
         https://bugs.webkit.org/show_bug.cgi?id=94401

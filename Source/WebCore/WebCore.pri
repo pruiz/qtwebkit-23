@@ -17,8 +17,8 @@ INCLUDEPATH += \
     $$SOURCE_DIR/Modules/filesystem \
     $$SOURCE_DIR/Modules/geolocation \
     $$SOURCE_DIR/Modules/indexeddb \
+    $$SOURCE_DIR/Modules/navigatorcontentutils \
     $$SOURCE_DIR/Modules/notifications \
-    $$SOURCE_DIR/Modules/protocolhandler \
     $$SOURCE_DIR/Modules/quota \
     $$SOURCE_DIR/Modules/webaudio \
     $$SOURCE_DIR/Modules/webdatabase \
@@ -236,13 +236,6 @@ haveQt(5) {
     }
 }
 
-win32-*|wince* {
-    DLLDESTDIR = $${ROOT_BUILD_DIR}/bin
-
-    dlltarget.commands = $(COPY_FILE) $(DESTDIR_TARGET) $$[QT_INSTALL_BINS]
-    dlltarget.CONFIG = no_path
-    INSTALLS += dlltarget
-}
 mac {
     LIBS += -framework Carbon -framework AppKit
 }

@@ -1,3 +1,2145 @@
+2012-08-24  Alexander Pavlov  <apavlov@chromium.org>
+
+        Web Inspector: Incorrect property override computation when !important is involved
+        https://bugs.webkit.org/show_bug.cgi?id=94923
+
+        Reviewed by Vsevolod Vlasov.
+
+        * inspector/elements/elements-panel-styles-expected.txt:
+        * inspector/elements/resources/elements-panel-styles.css:
+        (.foo, .foo::before):
+
+2012-08-27  Yoshifumi Inoue  <yosin@chromium.org>
+
+        [Tests] Using ref image instead ref HTML for fast/forms/time-multiple-fields/time-multiple-fields-appearance-{basic,pseudo-element}.html
+        https://bugs.webkit.org/show_bug.cgi?id=95055
+
+        Reviewed by Kent Tamura.
+
+        This patch changes test expectations of time-multiple-fields-appearance-basic.html
+        and time-multiple-fields-appearance-pseudo-elements.html to images
+        rather than HTML for ease of maintenance. There were unexpected image
+        differences between actual images and HTML reference images. It seems
+        rebaseline is easier than updating JavaScript code and CSS style sheet
+        of reference HTML.
+
+        Note: This patch contains Chromium-Linux images only. We need to do
+        rebaseline for Chromium-Mac and Chromium-Win later.
+
+        * fast/forms/time-multiple-fields/resources/time-multiple-fields-appearance.css: Removed.
+        * fast/forms/time-multiple-fields/resources/time-multiple-fields-appearance.js: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.html: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.html: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements.html: Changed not to use external style sheet.
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png: Added.
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.txt: Added.
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.txt: Added.
+        * platform/chromium/TestExpectations: Updates entries for rebaseline
+
+2012-08-27  Balazs Ankes  <bank@inf.u-szeged.hu>
+
+        [Qt] New test introduced in r126611 fails: fast/css/image-set-setting.html.
+        https://bugs.webkit.org/show_bug.cgi?id=95054
+
+        Unreviewed gardeing.
+
+        * platform/qt/Skipped:
+
+2012-08-27  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Skip several compositing/overflow test cases
+        https://bugs.webkit.org/show_bug.cgi?id=95047
+
+        Unreviewed EFL gardening. Skip several compositing/overflow
+        test cases which are failing due to incomplete support
+        for accelerated compositing or missing support for
+        layerTreeAsText().
+
+        * platform/efl/TestExpectations:
+
+2012-08-27  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Add missing baselines and rebaseline some minor font rendering
+        differences.
+
+        * platform/chromium-linux/compositing/overflow/nested-scrolling-expected.png:
+        * platform/chromium-linux/compositing/overflow/nested-scrolling-expected.txt:
+        * platform/chromium-mac/compositing/overflow/nested-scrolling-expected.png: Added.
+        * platform/chromium-mac/compositing/overflow/nested-scrolling-expected.txt: Added.
+        * platform/chromium-mac/compositing/overflow/remove-overflow-crash2-expected.png: Added.
+        * platform/chromium-mac/compositing/overflow/remove-overflow-crash2-expected.txt: Added.
+        * platform/chromium-win/compositing/overflow/nested-scrolling-expected.png: Added.
+        * platform/chromium-win/compositing/overflow/nested-scrolling-expected.txt: Added.
+        * platform/chromium-win/compositing/overflow/remove-overflow-crash2-expected.png: Added.
+        * platform/chromium-win/compositing/overflow/remove-overflow-crash2-expected.txt: Added.
+        * platform/chromium/TestExpectations:
+        * platform/chromium/compositing/overflow/clipping-ancestor-with-accelerated-scrolling-ancestor-expected.png: Renamed from LayoutTests/platform/chromium-linux/compositing/overflow/clipping-ancestor-with-accelerated-scrolling-ancestor-expected.png.
+        * platform/chromium/compositing/overflow/clipping-ancestor-with-accelerated-scrolling-ancestor-expected.txt: Renamed from LayoutTests/platform/chromium-linux/compositing/overflow/clipping-ancestor-with-accelerated-scrolling-ancestor-expected.txt.
+        * platform/chromium/compositing/overflow/overflow-clip-with-accelerated-scrolling-ancestor-expected.png: Renamed from LayoutTests/platform/chromium-linux/compositing/overflow/overflow-clip-with-accelerated-scrolling-ancestor-expected.png.
+        * platform/chromium/compositing/overflow/overflow-clip-with-accelerated-scrolling-ancestor-expected.txt: Renamed from LayoutTests/platform/chromium-linux/compositing/overflow/overflow-clip-with-accelerated-scrolling-ancestor-expected.txt.
+
+2012-08-27  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Update expectations for
+        fast/writing-mode/broken-ideographic-font.html after r126683.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-26  Yoshifumi Inoue  <yosin@chromium.org>
+
+        [Forms] Focus style of millisecond field in multiple fields time input UI is different from other fields
+        https://bugs.webkit.org/show_bug.cgi?id=95046
+
+        Reviewed by Kent Tamura.
+
+        This patch adds a new test for checking focus style of all fields in
+        multiple fields time input UI.
+
+        We check appearance of focus field in fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic.html
+
+        * fast/forms/time-multiple-fields/time-multiple-fields-focus-style-expected.txt: Added.
+        * fast/forms/time-multiple-fields/time-multiple-fields-focus-style.html: Added.
+
+2012-08-26  Mark Lam  <mark.lam@apple.com>
+
+        Skipping http/tests/security/local-user-CSS-from-remote.html to green mac WK2 bots.
+        https://bugs.webkit.org/show_bug.cgi?id=95043.
+
+        Reviewed by Kentaro Hara.
+
+        * platform/mac-wk2/Skipped:
+
+2012-08-26  Mark Lam  <mark.lam@apple.com>
+
+        Skipping fast/forms/validation-message-user-modify.html to green mac WK2 bots.
+        https://bugs.webkit.org/show_bug.cgi?id=95042.
+
+        Reviewed by Kentaro Hara.
+
+        * platform/mac-wk2/Skipped:
+
+2012-08-26  Filip Pizlo  <fpizlo@apple.com>
+
+        Finally inlining should correctly track the catch context
+        https://bugs.webkit.org/show_bug.cgi?id=94986
+        <rdar://problem/11753784>
+
+        Reviewed by Sam Weinig.
+
+        * fast/js/jsc-test-list:
+        * fast/js/script-tests/throw-from-finally.js: Added.
+        * fast/js/throw-from-finally.html: Added.
+        * fast/js/throw-from-finally-expected.txt: Added.
+
+2012-08-26  Robert Hogan  <robert@webkit.org>
+
+        Suppress Mac test requiring rebaseline after r126683.
+
+        Unreviewed gardening.
+
+        fast/repaint/control-clip.html was suppressed and failing already so remove it from
+        the tests requiring rebaseline after r126683.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-26  Robert Hogan  <robert@webkit.org>
+
+        Suppress test requiring rebaseline after r126683
+
+        Unreviewed, gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-26  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: make ConsoleView listen to the JavaScriptContextManager
+        https://bugs.webkit.org/show_bug.cgi?id=94940
+
+        Reviewed by Vsevolod Vlasov.
+
+        * inspector/elements/elements-panel-rewrite-href-expected.txt:
+        * inspector/styles/styles-url-linkify-expected.txt:
+
+2012-08-26  Filip Pizlo  <fpizlo@apple.com>
+
+        Don't allocate space for arguments and call frame if arguments aren't captured
+        https://bugs.webkit.org/show_bug.cgi?id=95024
+
+        Reviewed by Geoffrey Garen.
+
+        Test coverage for the case where an argument was legitimately captured.
+
+        * fast/js/jsc-test-list:
+        * fast/js/legitimately-captured-argument-expected.txt: Added.
+        * fast/js/legitimately-captured-argument.html: Added.
+        * fast/js/script-tests/legitimately-captured-argument.js: Added.
+
+2012-08-26  Robert Hogan  <robert@webkit.org>
+
+        Suppress 6 failing tests on Qt.
+
+        Unreviewed gardening.
+
+        * platform/qt/TestExpectations:
+
+2012-08-26  Robert Hogan  <robert@webkit.org>
+
+        Rebaseline Mac test results after r126683.
+
+        Unreviewed gardening.
+
+        * platform/mac-lion/animations/cross-fade-border-image-source-expected.txt: Copied from LayoutTests/platform/mac/animations/cross-fade-border-image-source-expected.txt.
+        * platform/mac-lion/css1/box_properties/border_bottom-expected.txt: Copied from LayoutTests/platform/mac/css1/box_properties/border_bottom-expected.txt.
+        * platform/mac-lion/css1/box_properties/border_bottom_inline-expected.txt: Copied from LayoutTests/platform/mac/css1/box_properties/border_bottom_inline-expected.txt.
+        * platform/mac-lion/css1/box_properties/border_left-expected.txt: Copied from LayoutTests/platform/mac/css1/box_properties/border_left-expected.txt.
+        * platform/mac-lion/css1/box_properties/border_left_inline-expected.txt: Copied from LayoutTests/platform/mac/css1/box_properties/border_left_inline-expected.txt.
+        * platform/mac-lion/css1/box_properties/border_right-expected.txt: Copied from LayoutTests/platform/mac/css1/box_properties/border_right-expected.txt.
+        * platform/mac-lion/css1/box_properties/border_right_inline-expected.txt: Copied from LayoutTests/platform/mac/css1/box_properties/border_right_inline-expected.txt.
+        * platform/mac-lion/css1/units/length_units-expected.txt: Copied from LayoutTests/platform/mac/css1/units/length_units-expected.txt.
+        * platform/mac-lion/css2.1/20110323/absolute-replaced-height-036-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/absolute-replaced-height-036-expected.txt.
+        * platform/mac-lion/css2.1/20110323/abspos-non-replaced-width-margin-000-expected.txt: Added.
+        * platform/mac-lion/css2.1/20110323/abspos-replaced-width-margin-000-expected.txt: Added.
+        * platform/mac-lion/css2.1/20110323/block-non-replaced-height-007-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/block-non-replaced-height-007-expected.txt.
+        * platform/mac-lion/css2.1/20110323/block-non-replaced-height-008-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/block-non-replaced-height-008-expected.txt.
+        * platform/mac-lion/css2.1/20110323/block-non-replaced-height-009-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/block-non-replaced-height-009-expected.txt.
+        * platform/mac-lion/css2.1/20110323/block-non-replaced-height-010-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/block-non-replaced-height-010-expected.txt.
+        * platform/mac-lion/css2.1/20110323/block-non-replaced-width-001-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/block-non-replaced-width-001-expected.txt.
+        * platform/mac-lion/css2.1/20110323/block-non-replaced-width-002-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/block-non-replaced-width-002-expected.txt.
+        * platform/mac-lion/css2.1/20110323/block-non-replaced-width-003-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/block-non-replaced-width-003-expected.txt.
+        * platform/mac-lion/css2.1/20110323/block-non-replaced-width-004-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/block-non-replaced-width-004-expected.txt.
+        * platform/mac-lion/css2.1/20110323/block-non-replaced-width-008-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/block-non-replaced-width-008-expected.txt.
+        * platform/mac-lion/css2.1/20110323/margin-applies-to-008-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/margin-applies-to-008-expected.txt.
+        * platform/mac-lion/css2.1/20110323/width-non-replaced-inline-001-expected.txt: Copied from LayoutTests/platform/mac/css2.1/20110323/width-non-replaced-inline-001-expected.txt.
+        * platform/mac-lion/css2.1/t040302-c61-phys-len-00-b-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t040302-c61-phys-len-00-b-expected.txt.
+        * platform/mac-lion/css2.1/t0804-c5507-padn-r-02-f-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0804-c5507-padn-r-02-f-expected.txt.
+        * platform/mac-lion/css2.1/t0804-c5508-ipadn-b-03-b-a-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0804-c5508-ipadn-b-03-b-a-expected.txt.
+        * platform/mac-lion/css2.1/t0804-c5509-padn-l-02-f-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0804-c5509-padn-l-02-f-expected.txt.
+        * platform/mac-lion/css2.1/t0805-c5519-brdr-r-00-a-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0805-c5519-brdr-r-00-a-expected.txt.
+        * platform/mac-lion/css2.1/t0805-c5519-brdr-r-01-e-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0805-c5519-brdr-r-01-e-expected.txt.
+        * platform/mac-lion/css2.1/t0805-c5519-brdr-r-02-e-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0805-c5519-brdr-r-02-e-expected.txt.
+        * platform/mac-lion/css2.1/t0805-c5519-ibrdr-r-00-a-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0805-c5519-ibrdr-r-00-a-expected.txt.
+        * platform/mac-lion/css2.1/t0805-c5520-brdr-b-00-a-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0805-c5520-brdr-b-00-a-expected.txt.
+        * platform/mac-lion/css2.1/t0805-c5520-brdr-b-01-e-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0805-c5520-brdr-b-01-e-expected.txt.
+        * platform/mac-lion/css2.1/t0805-c5520-ibrdr-b-00-a-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0805-c5520-ibrdr-b-00-a-expected.txt.
+        * platform/mac-lion/css2.1/t0805-c5521-brdr-l-00-a-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0805-c5521-brdr-l-00-a-expected.txt.
+        * platform/mac-lion/css2.1/t0805-c5521-brdr-l-01-e-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0805-c5521-brdr-l-01-e-expected.txt.
+        * platform/mac-lion/css2.1/t0805-c5521-brdr-l-02-e-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0805-c5521-brdr-l-02-e-expected.txt.
+        * platform/mac-lion/css2.1/t0805-c5521-ibrdr-l-00-a-expected.txt: Copied from LayoutTests/platform/mac/css2.1/t0805-c5521-ibrdr-l-00-a-expected.txt.
+        * platform/mac-lion/css3/selectors3/html/css3-modsel-19b-expected.txt: Copied from LayoutTests/platform/mac/css3/selectors3/html/css3-modsel-19b-expected.txt.
+        * platform/mac-lion/css3/selectors3/html/css3-modsel-64-expected.txt: Copied from LayoutTests/platform/mac/css3/selectors3/html/css3-modsel-64-expected.txt.
+        * platform/mac-lion/css3/selectors3/xhtml/css3-modsel-19b-expected.txt: Copied from LayoutTests/platform/mac/css3/selectors3/xhtml/css3-modsel-19b-expected.txt.
+        * platform/mac-lion/css3/selectors3/xhtml/css3-modsel-64-expected.txt: Copied from LayoutTests/platform/mac/css3/selectors3/xhtml/css3-modsel-64-expected.txt.
+        * platform/mac-lion/css3/selectors3/xml/css3-modsel-19b-expected.txt: Copied from LayoutTests/platform/mac/css3/selectors3/xml/css3-modsel-19b-expected.txt.
+        * platform/mac-lion/css3/selectors3/xml/css3-modsel-64-expected.txt: Copied from LayoutTests/platform/mac/css3/selectors3/xml/css3-modsel-64-expected.txt.
+        * platform/mac-lion/editing/deleting/type-delete-after-quote-expected.txt: Copied from LayoutTests/platform/mac/editing/deleting/type-delete-after-quote-expected.txt.
+        * platform/mac-lion/editing/execCommand/4580583-1-expected.txt: Copied from LayoutTests/platform/mac/editing/execCommand/4580583-1-expected.txt.
+        * platform/mac-lion/editing/execCommand/4580583-2-expected.txt: Copied from LayoutTests/platform/mac/editing/execCommand/4580583-2-expected.txt.
+        * platform/mac-lion/editing/inserting/5418891-expected.txt: Copied from LayoutTests/platform/mac/editing/inserting/5418891-expected.txt.
+        * platform/mac-lion/editing/inserting/5510537-expected.txt: Copied from LayoutTests/platform/mac/editing/inserting/5510537-expected.txt.
+        * platform/mac-lion/editing/inserting/6703873-expected.txt: Copied from LayoutTests/platform/mac/editing/inserting/6703873-expected.txt.
+        * platform/mac-lion/editing/inserting/break-blockquote-after-delete-expected.txt: Copied from LayoutTests/platform/mac/editing/inserting/break-blockquote-after-delete-expected.txt.
+        * platform/mac-lion/editing/pasteboard/5006779-expected.txt: Copied from LayoutTests/platform/mac/editing/pasteboard/5006779-expected.txt.
+        * platform/mac-lion/editing/pasteboard/paste-blockquote-after-blockquote-expected.txt: Copied from LayoutTests/platform/mac/editing/pasteboard/paste-blockquote-after-blockquote-expected.txt.
+        * platform/mac-lion/editing/pasteboard/paste-blockquote-into-blockquote-4-expected.txt: Copied from LayoutTests/platform/mac/editing/pasteboard/paste-blockquote-into-blockquote-4-expected.txt.
+        * platform/mac-lion/fast/block/float/012-expected.txt: Copied from LayoutTests/platform/mac/fast/block/float/012-expected.txt.
+        * platform/mac-lion/fast/block/float/013-expected.txt: Copied from LayoutTests/platform/mac/fast/block/float/013-expected.txt.
+        * platform/mac-lion/fast/block/float/avoidance-rtl-expected.txt: Added.
+        * platform/mac-lion/fast/block/margin-collapse/041-expected.txt: Copied from LayoutTests/platform/mac/fast/block/margin-collapse/041-expected.txt.
+        * platform/mac-lion/fast/block/margin-collapse/043-expected.txt: Copied from LayoutTests/platform/mac/fast/block/margin-collapse/043-expected.txt.
+        * platform/mac-lion/fast/block/margin-collapse/057-expected.txt: Copied from LayoutTests/platform/mac/fast/block/margin-collapse/057-expected.txt.
+        * platform/mac-lion/fast/block/positioning/inline-block-relposition-expected.txt: Copied from LayoutTests/platform/mac/fast/block/positioning/inline-block-relposition-expected.txt.
+        * platform/mac-lion/fast/borders/border-radius-wide-border-01-expected.txt: Added.
+        * platform/mac-lion/fast/borders/only-one-border-with-width-expected.txt: Added.
+        * platform/mac-lion/fast/css/acid2-expected.txt: Copied from LayoutTests/platform/mac/http/tests/misc/acid2-expected.txt.
+        * platform/mac-lion/fast/css/acid2-pixel-expected.txt: Copied from LayoutTests/platform/mac/fast/css/acid2-pixel-expected.txt.
+        * platform/mac-lion/fast/css/border-height-expected.txt: Copied from LayoutTests/platform/mac/fast/css/border-height-expected.txt.
+        * platform/mac-lion/fast/css/caption-width-absolute-position-expected.txt: Copied from LayoutTests/platform/mac/fast/css/caption-width-absolute-position-expected.txt.
+        * platform/mac-lion/fast/css/caption-width-absolute-position-offset-top-expected.txt: Copied from LayoutTests/platform/mac/fast/css/caption-width-absolute-position-offset-top-expected.txt.
+        * platform/mac-lion/fast/css/caption-width-fixed-position-expected.txt: Copied from LayoutTests/platform/mac/fast/css/caption-width-fixed-position-expected.txt.
+        * platform/mac-lion/fast/css/caption-width-fixed-position-offset-top-expected.txt: Copied from LayoutTests/platform/mac/fast/css/caption-width-fixed-position-offset-top-expected.txt.
+        * platform/mac-lion/fast/css/line-height-determined-by-primary-font-expected.txt: Copied from LayoutTests/platform/mac/fast/css/line-height-determined-by-primary-font-expected.txt.
+        * platform/mac-lion/fast/css/pseudo-first-line-border-width-expected.txt: Copied from LayoutTests/platform/mac/fast/css/pseudo-first-line-border-width-expected.txt.
+        * platform/mac-lion/fast/css/rtl-ordering-expected.txt: Copied from LayoutTests/platform/mac/fast/css/rtl-ordering-expected.txt.
+        * platform/mac-lion/fast/dom/HTMLTableColElement/resize-table-using-col-width-expected.txt: Copied from LayoutTests/platform/mac/fast/dom/HTMLTableColElement/resize-table-using-col-width-expected.txt.
+        * platform/mac-lion/fast/dynamic/positioned-movement-with-positioned-children-expected.txt: Copied from LayoutTests/platform/mac/fast/dynamic/positioned-movement-with-positioned-children-expected.txt.
+        * platform/mac-lion/fast/forms/basic-buttons-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/basic-buttons-expected.txt.
+        * platform/mac-lion/fast/forms/box-shadow-override-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/box-shadow-override-expected.txt.
+        * platform/mac-lion/fast/forms/button-align-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/button-align-expected.txt.
+        * platform/mac-lion/fast/forms/button-cannot-be-nested-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/button-cannot-be-nested-expected.txt.
+        * platform/mac-lion/fast/forms/button-generated-content-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/button-generated-content-expected.txt.
+        * platform/mac-lion/fast/forms/button-inner-block-reuse-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/button-inner-block-reuse-expected.txt.
+        * platform/mac-lion/fast/forms/button-positioned-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/button-positioned-expected.txt.
+        * platform/mac-lion/fast/forms/button-sizes-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/button-sizes-expected.txt.
+        * platform/mac-lion/fast/forms/button-style-color-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/button-style-color-expected.txt.
+        * platform/mac-lion/fast/forms/button-text-transform-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/button-text-transform-expected.txt.
+        * platform/mac-lion/fast/forms/button-white-space-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/button-white-space-expected.txt.
+        * platform/mac-lion/fast/forms/control-clip-overflow-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/control-clip-overflow-expected.txt.
+        * platform/mac-lion/fast/forms/select-baseline-expected.txt: Copied from LayoutTests/platform/mac/fast/forms/select-baseline-expected.txt.
+        * platform/mac-lion/fast/frames/viewsource-attribute-expected.txt: Copied from LayoutTests/platform/mac/fast/frames/viewsource-attribute-expected.txt.
+        * platform/mac-lion/fast/frames/viewsource-on-image-file-expected.txt: Copied from LayoutTests/platform/mac/fast/frames/viewsource-on-image-file-expected.txt.
+        * platform/mac-lion/fast/hidpi/image-set-border-image-comparison-expected.txt: Copied from LayoutTests/platform/mac/fast/hidpi/image-set-border-image-comparison-expected.txt.
+        * platform/mac-lion/fast/hidpi/image-set-border-image-dynamic-expected.txt: Copied from LayoutTests/platform/mac/fast/hidpi/image-set-border-image-dynamic-expected.txt.
+        * platform/mac-lion/fast/inline/inline-padding-disables-text-quirk-expected.txt: Copied from LayoutTests/platform/mac/fast/inline/inline-padding-disables-text-quirk-expected.txt.
+        * platform/mac-lion/fast/inline/inline-text-quirk-bpm-expected.txt: Copied from LayoutTests/platform/mac/fast/inline/inline-text-quirk-bpm-expected.txt.
+        * platform/mac-lion/fast/invalid/residual-style-expected.txt: Copied from LayoutTests/platform/mac/fast/invalid/residual-style-expected.txt.
+        * platform/mac-lion/fast/layers/scroll-rect-to-visible-expected.txt: Copied from LayoutTests/platform/mac/fast/layers/scroll-rect-to-visible-expected.txt.
+        * platform/mac-lion/fast/lists/007-expected.txt: Copied from LayoutTests/platform/mac/fast/lists/007-expected.txt.
+        * platform/mac-lion/fast/multicol/block-axis-horizontal-bt-expected.txt: Copied from LayoutTests/platform/mac/fast/multicol/block-axis-horizontal-bt-expected.txt.
+        * platform/mac-lion/fast/multicol/block-axis-vertical-lr-expected.txt: Copied from LayoutTests/platform/mac/fast/multicol/block-axis-vertical-lr-expected.txt.
+        * platform/mac-lion/fast/multicol/block-axis-vertical-rl-expected.txt: Copied from LayoutTests/platform/mac/fast/multicol/block-axis-vertical-rl-expected.txt.
+        * platform/mac-lion/fast/multicol/progression-reverse-expected.txt: Added.
+        * platform/mac-lion/fast/multicol/vertical-lr/rules-with-border-before-expected.txt: Added.
+        * platform/mac-lion/fast/multicol/vertical-rl/rules-with-border-before-expected.txt: Added.
+        * platform/mac-lion/fast/overflow/overflow-rtl-expected.txt: Copied from LayoutTests/platform/mac/fast/overflow/overflow-rtl-expected.txt.
+        * platform/mac-lion/fast/overflow/overflow-rtl-inline-scrollbar-expected.txt: Copied from LayoutTests/platform/mac/fast/overflow/overflow-rtl-inline-scrollbar-expected.txt.
+        * platform/mac-lion/fast/repaint/control-clip-expected.txt: Copied from LayoutTests/platform/mac/fast/repaint/control-clip-expected.txt.
+        * platform/mac-lion/fast/replaced/replaced-breaking-expected.txt: Copied from LayoutTests/platform/mac/fast/replaced/replaced-breaking-expected.txt.
+        * platform/mac-lion/fast/selectors/064-expected.txt: Copied from LayoutTests/platform/mac/fast/selectors/064-expected.txt.
+        * platform/mac-lion/fast/table/append-cells2-expected.txt: Copied from LayoutTests/platform/mac/fast/table/append-cells2-expected.txt.
+        * platform/mac-lion/fast/table/border-collapsing/003-expected.txt: Copied from LayoutTests/platform/mac/fast/table/border-collapsing/003-expected.txt.
+        * platform/mac-lion/fast/table/border-collapsing/003-vertical-expected.txt: Copied from LayoutTests/platform/mac/fast/table/border-collapsing/003-vertical-expected.txt.
+        * platform/mac-lion/fast/table/border-collapsing/equal-precedence-resolution-expected.txt: Copied from LayoutTests/platform/mac/fast/table/border-collapsing/equal-precedence-resolution-expected.txt.
+        * platform/mac-lion/fast/table/border-collapsing/equal-precedence-resolution-vertical-expected.txt: Copied from LayoutTests/platform/mac/fast/table/border-collapsing/equal-precedence-resolution-vertical-expected.txt.
+        * platform/mac-lion/fast/table/border-collapsing/rtl-border-collapsing-expected.txt: Copied from LayoutTests/platform/mac/fast/table/border-collapsing/rtl-border-collapsing-expected.txt.
+        * platform/mac-lion/fast/table/colgroup-spanning-groups-rules-expected.txt: Copied from LayoutTests/platform/mac/fast/table/colgroup-spanning-groups-rules-expected.txt.
+        * platform/mac-lion/fast/table/remove-td-display-none-expected.txt: Copied from LayoutTests/platform/mac/fast/table/remove-td-display-none-expected.txt.
+        * platform/mac-lion/fast/text/apply-start-width-after-skipped-text-expected.txt: Copied from LayoutTests/platform/mac/fast/text/apply-start-width-after-skipped-text-expected.txt.
+        * platform/mac-lion/fast/text/basic/015-expected.txt: Copied from LayoutTests/platform/mac/fast/text/basic/015-expected.txt.
+        * platform/mac-lion/fast/text/monospace-width-cache-expected.txt: Copied from LayoutTests/platform/mac/fast/text/monospace-width-cache-expected.txt.
+        * platform/mac-lion/fast/writing-mode/broken-ideographic-font-expected.txt: Copied from LayoutTests/platform/mac/fast/writing-mode/broken-ideographic-font-expected.txt.
+        * platform/mac-lion/fast/writing-mode/vertical-font-fallback-expected.txt:
+        * platform/mac-lion/http/tests/misc/acid2-expected.txt: Copied from LayoutTests/platform/mac/http/tests/misc/acid2-expected.txt.
+        * platform/mac-lion/http/tests/misc/acid2-pixel-expected.txt: Copied from LayoutTests/platform/mac/fast/css/acid2-pixel-expected.txt.
+        * platform/mac-lion/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-009-expected.txt: Copied from LayoutTests/platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-009-expected.txt.
+        * platform/mac-lion/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-012-expected.txt: Copied from LayoutTests/platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-012-expected.txt.
+        * platform/mac-lion/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-013-expected.txt: Copied from LayoutTests/platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-013-expected.txt.
+        * platform/mac-lion/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-014-expected.txt: Copied from LayoutTests/platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-014-expected.txt.
+        * platform/mac-lion/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-015-expected.txt: Copied from LayoutTests/platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-015-expected.txt.
+        * platform/mac-lion/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-016-expected.txt: Copied from LayoutTests/platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-016-expected.txt.
+        * platform/mac-lion/ietestcenter/css3/bordersbackgrounds/border-top-left-radius-values-001-expected.txt: Copied from LayoutTests/platform/mac/ietestcenter/css3/bordersbackgrounds/border-top-left-radius-values-001-expected.txt.
+        * platform/mac-lion/svg/custom/inline-svg-in-xhtml-expected.txt: Copied from LayoutTests/platform/mac/svg/custom/inline-svg-in-xhtml-expected.txt.
+        * platform/mac-lion/tables/mozilla/bugs/bug68912-expected.txt: Copied from LayoutTests/platform/mac/tables/mozilla/bugs/bug68912-expected.txt.
+        * platform/mac-lion/tables/mozilla/core/table_rules-expected.txt: Copied from LayoutTests/platform/mac/tables/mozilla/core/table_rules-expected.txt.
+        * platform/mac-lion/tables/mozilla/marvin/x_table_rules_groups-expected.txt: Copied from LayoutTests/platform/mac/tables/mozilla/marvin/x_table_rules_groups-expected.txt.
+        * platform/mac-lion/tables/mozilla_expected_failures/collapsing_borders/bug41262-1-expected.txt: Copied from LayoutTests/platform/mac/tables/mozilla_expected_failures/collapsing_borders/bug41262-1-expected.txt.
+        * platform/mac-lion/tables/mozilla_expected_failures/collapsing_borders/bug41262-6-expected.txt: Copied from LayoutTests/platform/mac/tables/mozilla_expected_failures/collapsing_borders/bug41262-6-expected.txt.
+        * platform/mac-lion/transforms/2d/transform-borderbox-expected.txt: Copied from LayoutTests/platform/mac/transforms/2d/transform-borderbox-expected.txt.
+        * platform/mac-lion/transforms/2d/transform-origin-borderbox-expected.txt: Copied from LayoutTests/platform/mac/transforms/2d/transform-origin-borderbox-expected.txt.
+        * platform/mac-lion/transitions/cross-fade-border-image-expected.txt: Added.
+        * platform/mac/TestExpectations:
+        * platform/mac/animations/cross-fade-border-image-source-expected.txt:
+        * platform/mac/css1/box_properties/border_bottom-expected.txt:
+        * platform/mac/css1/box_properties/border_bottom_inline-expected.txt:
+        * platform/mac/css1/box_properties/border_left-expected.txt:
+        * platform/mac/css1/box_properties/border_left_inline-expected.txt:
+        * platform/mac/css1/box_properties/border_right-expected.txt:
+        * platform/mac/css1/box_properties/border_right_inline-expected.txt:
+        * platform/mac/css1/units/length_units-expected.txt:
+        * platform/mac/css2.1/20110323/absolute-replaced-height-036-expected.txt:
+        * platform/mac/css2.1/20110323/abspos-non-replaced-width-margin-000-expected.txt:
+        * platform/mac/css2.1/20110323/abspos-replaced-width-margin-000-expected.txt:
+        * platform/mac/css2.1/20110323/block-non-replaced-height-007-expected.txt:
+        * platform/mac/css2.1/20110323/block-non-replaced-height-008-expected.txt:
+        * platform/mac/css2.1/20110323/block-non-replaced-height-009-expected.txt:
+        * platform/mac/css2.1/20110323/block-non-replaced-height-010-expected.txt:
+        * platform/mac/css2.1/20110323/block-non-replaced-width-001-expected.txt:
+        * platform/mac/css2.1/20110323/block-non-replaced-width-002-expected.txt:
+        * platform/mac/css2.1/20110323/block-non-replaced-width-003-expected.txt:
+        * platform/mac/css2.1/20110323/block-non-replaced-width-004-expected.txt:
+        * platform/mac/css2.1/20110323/block-non-replaced-width-008-expected.txt:
+        * platform/mac/css2.1/20110323/margin-applies-to-008-expected.txt:
+        * platform/mac/css2.1/20110323/width-non-replaced-inline-001-expected.txt:
+        * platform/mac/css2.1/t040302-c61-phys-len-00-b-expected.txt:
+        * platform/mac/css2.1/t0804-c5507-padn-r-02-f-expected.txt:
+        * platform/mac/css2.1/t0804-c5508-ipadn-b-03-b-a-expected.txt:
+        * platform/mac/css2.1/t0804-c5509-padn-l-02-f-expected.txt:
+        * platform/mac/css2.1/t0805-c5519-brdr-r-00-a-expected.txt:
+        * platform/mac/css2.1/t0805-c5519-brdr-r-01-e-expected.txt:
+        * platform/mac/css2.1/t0805-c5519-brdr-r-02-e-expected.txt:
+        * platform/mac/css2.1/t0805-c5519-ibrdr-r-00-a-expected.txt:
+        * platform/mac/css2.1/t0805-c5520-brdr-b-00-a-expected.txt:
+        * platform/mac/css2.1/t0805-c5520-brdr-b-01-e-expected.txt:
+        * platform/mac/css2.1/t0805-c5520-ibrdr-b-00-a-expected.txt:
+        * platform/mac/css2.1/t0805-c5521-brdr-l-00-a-expected.txt:
+        * platform/mac/css2.1/t0805-c5521-brdr-l-01-e-expected.txt:
+        * platform/mac/css2.1/t0805-c5521-brdr-l-02-e-expected.txt:
+        * platform/mac/css2.1/t0805-c5521-ibrdr-l-00-a-expected.txt:
+        * platform/mac/css3/selectors3/html/css3-modsel-19b-expected.txt:
+        * platform/mac/css3/selectors3/html/css3-modsel-64-expected.txt:
+        * platform/mac/css3/selectors3/xhtml/css3-modsel-19b-expected.txt:
+        * platform/mac/css3/selectors3/xhtml/css3-modsel-64-expected.txt:
+        * platform/mac/css3/selectors3/xml/css3-modsel-19b-expected.txt:
+        * platform/mac/css3/selectors3/xml/css3-modsel-64-expected.txt:
+        * platform/mac/editing/deleting/type-delete-after-quote-expected.txt:
+        * platform/mac/editing/execCommand/4580583-1-expected.txt:
+        * platform/mac/editing/execCommand/4580583-2-expected.txt:
+        * platform/mac/editing/inserting/5418891-expected.txt:
+        * platform/mac/editing/inserting/5510537-expected.txt:
+        * platform/mac/editing/inserting/6703873-expected.txt:
+        * platform/mac/editing/inserting/break-blockquote-after-delete-expected.txt:
+        * platform/mac/editing/pasteboard/5006779-expected.txt:
+        * platform/mac/editing/pasteboard/paste-blockquote-after-blockquote-expected.txt:
+        * platform/mac/editing/pasteboard/paste-blockquote-into-blockquote-4-expected.txt:
+        * platform/mac/fast/block/float/012-expected.txt:
+        * platform/mac/fast/block/float/013-expected.txt:
+        * platform/mac/fast/block/float/avoidance-rtl-expected.txt: Added.
+        * platform/mac/fast/block/margin-collapse/041-expected.txt:
+        * platform/mac/fast/block/margin-collapse/043-expected.txt:
+        * platform/mac/fast/block/margin-collapse/057-expected.txt:
+        * platform/mac/fast/block/positioning/inline-block-relposition-expected.txt:
+        * platform/mac/fast/borders/border-radius-wide-border-01-expected.txt: Added.
+        * platform/mac/fast/borders/only-one-border-with-width-expected.txt: Added.
+        * platform/mac/fast/css/acid2-expected.txt:
+        * platform/mac/fast/css/acid2-pixel-expected.txt:
+        * platform/mac/fast/css/border-height-expected.txt:
+        * platform/mac/fast/css/caption-width-absolute-position-expected.txt:
+        * platform/mac/fast/css/caption-width-absolute-position-offset-top-expected.txt:
+        * platform/mac/fast/css/caption-width-fixed-position-expected.txt:
+        * platform/mac/fast/css/caption-width-fixed-position-offset-top-expected.txt:
+        * platform/mac/fast/css/line-height-determined-by-primary-font-expected.txt:
+        * platform/mac/fast/css/pseudo-first-line-border-width-expected.txt:
+        * platform/mac/fast/css/rtl-ordering-expected.txt:
+        * platform/mac/fast/dom/HTMLTableColElement/resize-table-using-col-width-expected.txt:
+        * platform/mac/fast/dynamic/positioned-movement-with-positioned-children-expected.txt:
+        * platform/mac/fast/forms/basic-buttons-expected.txt:
+        * platform/mac/fast/forms/box-shadow-override-expected.txt:
+        * platform/mac/fast/forms/button-align-expected.txt:
+        * platform/mac/fast/forms/button-cannot-be-nested-expected.txt:
+        * platform/mac/fast/forms/button-generated-content-expected.txt:
+        * platform/mac/fast/forms/button-inner-block-reuse-expected.txt:
+        * platform/mac/fast/forms/button-positioned-expected.txt:
+        * platform/mac/fast/forms/button-sizes-expected.txt:
+        * platform/mac/fast/forms/button-style-color-expected.txt:
+        * platform/mac/fast/forms/button-text-transform-expected.txt:
+        * platform/mac/fast/forms/button-white-space-expected.txt:
+        * platform/mac/fast/forms/control-clip-overflow-expected.txt:
+        * platform/mac/fast/forms/select-baseline-expected.txt:
+        * platform/mac/fast/frames/viewsource-attribute-expected.txt:
+        * platform/mac/fast/frames/viewsource-on-image-file-expected.txt:
+        * platform/mac/fast/hidpi/image-set-border-image-comparison-expected.txt:
+        * platform/mac/fast/hidpi/image-set-border-image-dynamic-expected.txt:
+        * platform/mac/fast/inline/inline-padding-disables-text-quirk-expected.txt:
+        * platform/mac/fast/inline/inline-text-quirk-bpm-expected.txt:
+        * platform/mac/fast/invalid/residual-style-expected.txt:
+        * platform/mac/fast/layers/scroll-rect-to-visible-expected.txt:
+        * platform/mac/fast/lists/007-expected.txt:
+        * platform/mac/fast/multicol/block-axis-horizontal-bt-expected.txt:
+        * platform/mac/fast/multicol/block-axis-vertical-lr-expected.txt:
+        * platform/mac/fast/multicol/block-axis-vertical-rl-expected.txt:
+        * platform/mac/fast/multicol/progression-reverse-expected.txt: Added.
+        * platform/mac/fast/multicol/vertical-lr/rules-with-border-before-expected.txt: Added.
+        * platform/mac/fast/multicol/vertical-rl/rules-with-border-before-expected.txt: Added.
+        * platform/mac/fast/overflow/overflow-rtl-expected.txt:
+        * platform/mac/fast/overflow/overflow-rtl-inline-scrollbar-expected.txt:
+        * platform/mac/fast/repaint/control-clip-expected.txt:
+        * platform/mac/fast/replaced/replaced-breaking-expected.txt:
+        * platform/mac/fast/selectors/064-expected.txt:
+        * platform/mac/fast/table/append-cells2-expected.txt:
+        * platform/mac/fast/table/border-collapsing/003-expected.txt:
+        * platform/mac/fast/table/border-collapsing/003-vertical-expected.txt:
+        * platform/mac/fast/table/border-collapsing/equal-precedence-resolution-expected.txt:
+        * platform/mac/fast/table/border-collapsing/equal-precedence-resolution-vertical-expected.txt:
+        * platform/mac/fast/table/border-collapsing/rtl-border-collapsing-expected.txt:
+        * platform/mac/fast/table/colgroup-spanning-groups-rules-expected.txt:
+        * platform/mac/fast/table/remove-td-display-none-expected.txt:
+        * platform/mac/fast/text/apply-start-width-after-skipped-text-expected.txt:
+        * platform/mac/fast/text/basic/015-expected.txt:
+        * platform/mac/fast/text/monospace-width-cache-expected.txt:
+        * platform/mac/fast/writing-mode/broken-ideographic-font-expected.txt:
+        * platform/mac/fast/writing-mode/vertical-font-fallback-expected.txt:
+        * platform/mac/http/tests/misc/acid2-expected.txt:
+        * platform/mac/http/tests/misc/acid2-pixel-expected.txt:
+        * platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-009-expected.txt:
+        * platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-012-expected.txt:
+        * platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-013-expected.txt:
+        * platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-014-expected.txt:
+        * platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-015-expected.txt:
+        * platform/mac/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-016-expected.txt:
+        * platform/mac/ietestcenter/css3/bordersbackgrounds/border-top-left-radius-values-001-expected.txt:
+        * platform/mac/svg/custom/inline-svg-in-xhtml-expected.txt:
+        * platform/mac/tables/mozilla/bugs/bug68912-expected.txt:
+        * platform/mac/tables/mozilla/core/table_rules-expected.txt:
+        * platform/mac/tables/mozilla/marvin/x_table_rules_groups-expected.txt:
+        * platform/mac/tables/mozilla_expected_failures/collapsing_borders/bug41262-1-expected.txt:
+        * platform/mac/tables/mozilla_expected_failures/collapsing_borders/bug41262-6-expected.txt:
+        * platform/mac/transforms/2d/transform-borderbox-expected.txt:
+        * platform/mac/transforms/2d/transform-origin-borderbox-expected.txt:
+        * platform/mac/transitions/cross-fade-border-image-expected.txt: Added.
+
+2012-08-26  Robert Hogan  <robert@webkit.org>
+
+        Rebaseline Qt test results after r126683.
+
+        Unreviewed gardening.
+
+        * platform/qt-4.8/TestExpectations:
+        * platform/qt-linux/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/qt/animations/cross-fade-border-image-source-expected.txt:
+        * platform/qt/css1/box_properties/border_bottom-expected.txt:
+        * platform/qt/css1/box_properties/border_bottom_inline-expected.txt:
+        * platform/qt/css1/box_properties/border_left-expected.txt:
+        * platform/qt/css1/box_properties/border_left_inline-expected.txt:
+        * platform/qt/css1/box_properties/border_right-expected.txt:
+        * platform/qt/css1/box_properties/border_right_inline-expected.txt:
+        * platform/qt/css1/units/length_units-expected.txt:
+        * platform/qt/css2.1/20110323/absolute-replaced-height-036-expected.txt:
+        * platform/qt/css2.1/20110323/abspos-non-replaced-width-margin-000-expected.txt: Added.
+        * platform/qt/css2.1/20110323/abspos-replaced-width-margin-000-expected.txt: Added.
+        * platform/qt/css2.1/20110323/block-non-replaced-height-007-expected.txt:
+        * platform/qt/css2.1/20110323/block-non-replaced-height-008-expected.txt:
+        * platform/qt/css2.1/20110323/block-non-replaced-height-009-expected.txt:
+        * platform/qt/css2.1/20110323/block-non-replaced-height-010-expected.txt:
+        * platform/qt/css2.1/20110323/block-non-replaced-width-001-expected.txt:
+        * platform/qt/css2.1/20110323/block-non-replaced-width-002-expected.txt:
+        * platform/qt/css2.1/20110323/block-non-replaced-width-003-expected.txt:
+        * platform/qt/css2.1/20110323/block-non-replaced-width-004-expected.txt:
+        * platform/qt/css2.1/20110323/block-non-replaced-width-008-expected.txt:
+        * platform/qt/css2.1/20110323/margin-applies-to-008-expected.txt:
+        * platform/qt/css2.1/20110323/width-non-replaced-inline-001-expected.txt:
+        * platform/qt/css2.1/t040302-c61-phys-len-00-b-expected.txt:
+        * platform/qt/css2.1/t0804-c5507-padn-r-02-f-expected.txt:
+        * platform/qt/css2.1/t0804-c5508-ipadn-b-03-b-a-expected.txt:
+        * platform/qt/css2.1/t0804-c5509-padn-l-02-f-expected.txt:
+        * platform/qt/css2.1/t0805-c5519-brdr-r-02-e-expected.txt:
+        * platform/qt/css2.1/t0805-c5519-ibrdr-r-00-a-expected.txt:
+        * platform/qt/css2.1/t0805-c5520-brdr-b-00-a-expected.txt:
+        * platform/qt/css2.1/t0805-c5520-ibrdr-b-00-a-expected.txt:
+        * platform/qt/css2.1/t0805-c5521-brdr-l-02-e-expected.txt:
+        * platform/qt/editing/deleting/type-delete-after-quote-expected.txt:
+        * platform/qt/editing/execCommand/4580583-1-expected.txt:
+        * platform/qt/editing/execCommand/4580583-2-expected.txt:
+        * platform/qt/editing/inserting/5418891-expected.txt:
+        * platform/qt/editing/inserting/5510537-expected.txt:
+        * platform/qt/editing/inserting/6703873-expected.txt:
+        * platform/qt/editing/inserting/break-blockquote-after-delete-expected.txt:
+        * platform/qt/editing/pasteboard/5006779-expected.txt:
+        * platform/qt/editing/pasteboard/paste-blockquote-after-blockquote-expected.txt:
+        * platform/qt/editing/pasteboard/paste-blockquote-into-blockquote-4-expected.txt:
+        * platform/qt/fast/block/float/012-expected.txt:
+        * platform/qt/fast/block/float/013-expected.txt:
+        * platform/qt/fast/block/float/016-expected.txt:
+        * platform/qt/fast/block/float/avoidance-rtl-expected.txt: Added.
+        * platform/qt/fast/block/margin-collapse/041-expected.txt:
+        * platform/qt/fast/block/margin-collapse/043-expected.txt:
+        * platform/qt/fast/block/margin-collapse/057-expected.txt:
+        * platform/qt/fast/borders/border-radius-wide-border-01-expected.txt: Added.
+        * platform/qt/fast/borders/only-one-border-with-width-expected.txt: Added.
+        * platform/qt/fast/css/acid2-expected.txt:
+        * platform/qt/fast/css/acid2-pixel-expected.txt:
+        * platform/qt/fast/css/border-height-expected.txt:
+        * platform/qt/fast/css/caption-width-absolute-position-expected.txt:
+        * platform/qt/fast/css/caption-width-absolute-position-offset-top-expected.txt:
+        * platform/qt/fast/css/caption-width-fixed-position-expected.txt:
+        * platform/qt/fast/css/caption-width-fixed-position-offset-top-expected.txt:
+        * platform/qt/fast/css/pseudo-first-line-border-width-expected.txt: Added.
+        * platform/qt/fast/frames/viewsource-attribute-expected.txt:
+        * platform/qt/fast/frames/viewsource-on-image-file-expected.txt:
+        * platform/qt/fast/inline/inline-padding-disables-text-quirk-expected.txt:
+        * platform/qt/fast/inline/inline-text-quirk-bpm-expected.txt:
+        * platform/qt/fast/layers/scroll-rect-to-visible-expected.txt:
+        * platform/qt/fast/lists/007-expected.txt:
+        * platform/qt/fast/multicol/block-axis-horizontal-bt-expected.txt:
+        * platform/qt/fast/multicol/block-axis-vertical-lr-expected.txt:
+        * platform/qt/fast/multicol/block-axis-vertical-rl-expected.txt:
+        * platform/qt/fast/multicol/progression-reverse-expected.txt:
+        * platform/qt/fast/multicol/vertical-lr/rules-with-border-before-expected.txt: Added.
+        * platform/qt/fast/multicol/vertical-rl/rules-with-border-before-expected.txt: Added.
+        * platform/qt/fast/overflow/overflow-rtl-inline-scrollbar-expected.txt:
+        * platform/qt/fast/table/border-collapsing/003-expected.txt:
+        * platform/qt/fast/table/border-collapsing/003-vertical-expected.txt:
+        * platform/qt/fast/table/border-collapsing/equal-precedence-resolution-expected.txt:
+        * platform/qt/fast/table/border-collapsing/equal-precedence-resolution-vertical-expected.txt: Added.
+        * platform/qt/fast/table/border-collapsing/rtl-border-collapsing-expected.txt:
+        * platform/qt/fast/table/colgroup-spanning-groups-rules-expected.txt:
+        * platform/qt/fast/text/apply-start-width-after-skipped-text-expected.txt:
+        * platform/qt/http/tests/misc/acid2-expected.txt:
+        * platform/qt/http/tests/misc/acid2-pixel-expected.txt:
+        * platform/qt/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-009-expected.txt:
+        * platform/qt/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-012-expected.txt:
+        * platform/qt/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-013-expected.txt:
+        * platform/qt/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-014-expected.txt:
+        * platform/qt/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-015-expected.txt:
+        * platform/qt/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-016-expected.txt:
+        * platform/qt/ietestcenter/css3/bordersbackgrounds/border-top-left-radius-values-001-expected.txt:
+        * platform/qt/tables/mozilla/core/table_rules-expected.txt:
+        * platform/qt/tables/mozilla/marvin/x_table_rules_groups-expected.txt:
+        * platform/qt/tables/mozilla_expected_failures/collapsing_borders/bug41262-1-expected.txt:
+        * platform/qt/tables/mozilla_expected_failures/other/test4-expected.txt:
+        * platform/qt/transforms/2d/transform-borderbox-expected.txt:
+        * platform/qt/transforms/2d/transform-origin-borderbox-expected.txt:
+        * platform/qt/transitions/cross-fade-border-image-expected.txt:
+
+2012-08-26  Robert Hogan  <robert@webkit.org>
+
+        Rebaseline EFL test results after r126683.
+
+        Unreviewed gardening.
+
+        * platform/efl/TestExpectations:
+        * platform/efl/animations/cross-fade-border-image-source-expected.txt:
+        * platform/efl/css1/box_properties/border_bottom-expected.txt:
+        * platform/efl/css1/box_properties/border_bottom_inline-expected.txt:
+        * platform/efl/css1/box_properties/border_left-expected.txt:
+        * platform/efl/css1/box_properties/border_left_inline-expected.txt:
+        * platform/efl/css1/box_properties/border_right-expected.txt:
+        * platform/efl/css1/box_properties/border_right_inline-expected.txt:
+        * platform/efl/css1/units/length_units-expected.txt:
+        * platform/efl/css2.1/20110323/absolute-replaced-height-036-expected.txt:
+        * platform/efl/css2.1/20110323/abspos-non-replaced-width-margin-000-expected.txt:
+        * platform/efl/css2.1/20110323/abspos-replaced-width-margin-000-expected.txt:
+        * platform/efl/css2.1/20110323/block-non-replaced-height-007-expected.txt:
+        * platform/efl/css2.1/20110323/block-non-replaced-height-008-expected.txt:
+        * platform/efl/css2.1/20110323/block-non-replaced-height-009-expected.txt:
+        * platform/efl/css2.1/20110323/block-non-replaced-height-010-expected.txt:
+        * platform/efl/css2.1/20110323/block-non-replaced-width-001-expected.txt:
+        * platform/efl/css2.1/20110323/block-non-replaced-width-002-expected.txt:
+        * platform/efl/css2.1/20110323/block-non-replaced-width-003-expected.txt:
+        * platform/efl/css2.1/20110323/block-non-replaced-width-004-expected.txt:
+        * platform/efl/css2.1/20110323/block-non-replaced-width-008-expected.txt:
+        * platform/efl/css2.1/20110323/margin-applies-to-008-expected.txt:
+        * platform/efl/css2.1/20110323/width-non-replaced-inline-001-expected.txt:
+        * platform/efl/css2.1/t040302-c61-phys-len-00-b-expected.txt:
+        * platform/efl/css2.1/t0804-c5507-padn-r-02-f-expected.txt:
+        * platform/efl/css2.1/t0804-c5508-ipadn-b-03-b-a-expected.txt:
+        * platform/efl/css2.1/t0804-c5509-padn-l-02-f-expected.txt:
+        * platform/efl/css2.1/t0805-c5519-brdr-r-00-a-expected.txt:
+        * platform/efl/css2.1/t0805-c5519-brdr-r-01-e-expected.txt:
+        * platform/efl/css2.1/t0805-c5519-brdr-r-02-e-expected.txt:
+        * platform/efl/css2.1/t0805-c5519-ibrdr-r-00-a-expected.txt:
+        * platform/efl/css2.1/t0805-c5520-brdr-b-00-a-expected.txt:
+        * platform/efl/css2.1/t0805-c5520-brdr-b-01-e-expected.txt:
+        * platform/efl/css2.1/t0805-c5520-ibrdr-b-00-a-expected.txt:
+        * platform/efl/css2.1/t0805-c5521-brdr-l-00-a-expected.txt:
+        * platform/efl/css2.1/t0805-c5521-brdr-l-01-e-expected.txt:
+        * platform/efl/css2.1/t0805-c5521-brdr-l-02-e-expected.txt:
+        * platform/efl/css2.1/t0805-c5521-ibrdr-l-00-a-expected.txt:
+        * platform/efl/editing/execCommand/4580583-1-expected.txt:
+        * platform/efl/editing/execCommand/4580583-2-expected.txt:
+        * platform/efl/fast/block/float/012-expected.txt:
+        * platform/efl/fast/block/float/013-expected.txt:
+        * platform/efl/fast/block/float/016-expected.txt: Added.
+        * platform/efl/fast/block/float/avoidance-rtl-expected.txt: Added.
+        * platform/efl/fast/block/margin-collapse/041-expected.txt:
+        * platform/efl/fast/block/margin-collapse/043-expected.txt:
+        * platform/efl/fast/block/margin-collapse/057-expected.txt:
+        * platform/efl/fast/borders/border-radius-wide-border-01-expected.txt: Added.
+        * platform/efl/fast/borders/only-one-border-with-width-expected.txt: Added.
+        * platform/efl/fast/css/acid2-expected.txt: Copied from LayoutTests/platform/efl/http/tests/misc/acid2-expected.txt.
+        * platform/efl/fast/css/acid2-pixel-expected.txt: Copied from LayoutTests/platform/efl/http/tests/misc/acid2-expected.txt.
+        * platform/efl/fast/css/border-height-expected.txt:
+        * platform/efl/fast/css/caption-width-absolute-position-expected.txt:
+        * platform/efl/fast/css/caption-width-absolute-position-offset-top-expected.txt:
+        * platform/efl/fast/css/caption-width-fixed-position-expected.txt:
+        * platform/efl/fast/css/caption-width-fixed-position-offset-top-expected.txt:
+        * platform/efl/fast/css/line-height-determined-by-primary-font-expected.txt:
+        * platform/efl/fast/css/pseudo-first-line-border-width-expected.txt:
+        * platform/efl/fast/frames/viewsource-attribute-expected.txt:
+        * platform/efl/fast/frames/viewsource-on-image-file-expected.txt:
+        * platform/efl/fast/inline/inline-padding-disables-text-quirk-expected.txt:
+        * platform/efl/fast/inline/inline-text-quirk-bpm-expected.txt:
+        * platform/efl/fast/layers/scroll-rect-to-visible-expected.txt:
+        * platform/efl/fast/lists/007-expected.txt:
+        * platform/efl/fast/multicol/block-axis-horizontal-bt-expected.txt:
+        * platform/efl/fast/multicol/block-axis-vertical-lr-expected.txt:
+        * platform/efl/fast/multicol/block-axis-vertical-rl-expected.txt:
+        * platform/efl/fast/multicol/progression-reverse-expected.txt: Added.
+        * platform/efl/fast/multicol/vertical-lr/rules-with-border-before-expected.txt: Added.
+        * platform/efl/fast/multicol/vertical-rl/rules-with-border-before-expected.txt: Added.
+        * platform/efl/fast/overflow/overflow-rtl-expected.txt: Added.
+        * platform/efl/fast/overflow/overflow-rtl-inline-scrollbar-expected.txt:
+        * platform/efl/fast/repaint/repaint-across-writing-mode-boundary-expected.txt:
+        * platform/efl/fast/table/border-collapsing/003-expected.txt:
+        * platform/efl/fast/table/border-collapsing/003-vertical-expected.txt:
+        * platform/efl/fast/table/border-collapsing/equal-precedence-resolution-expected.txt:
+        * platform/efl/fast/table/border-collapsing/equal-precedence-resolution-vertical-expected.txt:
+        * platform/efl/fast/table/border-collapsing/rtl-border-collapsing-expected.txt:
+        * platform/efl/fast/table/colgroup-spanning-groups-rules-expected.txt:
+        * platform/efl/fast/text/apply-start-width-after-skipped-text-expected.txt:
+        * platform/efl/fast/text/basic/015-expected.txt:
+        * platform/efl/fast/text/monospace-width-cache-expected.txt:
+        * platform/efl/fast/writing-mode/broken-ideograph-small-caps-expected.txt:
+        * platform/efl/fast/writing-mode/broken-ideographic-font-expected.txt:
+        * platform/efl/fast/writing-mode/vertical-font-fallback-expected.txt:
+        * platform/efl/http/tests/misc/acid2-expected.txt:
+        * platform/efl/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-009-expected.txt:
+        * platform/efl/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-012-expected.txt:
+        * platform/efl/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-013-expected.txt:
+        * platform/efl/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-014-expected.txt:
+        * platform/efl/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-015-expected.txt:
+        * platform/efl/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-016-expected.txt:
+        * platform/efl/ietestcenter/css3/bordersbackgrounds/border-top-left-radius-values-001-expected.txt:
+        * platform/efl/transforms/2d/transform-borderbox-expected.txt:
+        * platform/efl/transforms/2d/transform-origin-borderbox-expected.txt:
+        * platform/efl/transitions/cross-fade-border-image-expected.txt:
+
+2012-08-26  Mark Lam  <mark.lam@apple.com>
+
+        Skipping fast/block/float/016.html to green the platform mac bots.
+        https://bugs.webkit.org/show_bug.cgi?id=95028.
+
+        Reviewed by Filip Pizlo.
+
+        * platform/mac/Skipped:
+
+2012-08-26  Mark Lam  <mark.lam@apple.com>
+
+        Added test-generated expected results file for a few compositing
+        overflow tests.
+        https://bugs.webkit.org/show_bug.cgi?id=95023.
+
+        Reviewed by Filip Pizlo.
+
+        * platform/mac/compositing/overflow/clipping-ancestor-with-accelerated-scrolling-ancestor-expected.txt: Added.
+        * platform/mac/compositing/overflow/nested-scrolling-expected.txt: Added.
+        * platform/mac/compositing/overflow/overflow-clip-with-accelerated-scrolling-ancestor-expected.txt: Added.
+        * platform/mac/compositing/overflow/remove-overflow-crash2-expected.txt: Added.
+
+2012-08-25  David Barton  <dbarton@mathscribe.com>
+
+        Remove { vertical-align: baseline } declarations from mathml.css
+        https://bugs.webkit.org/show_bug.cgi?id=95015
+
+        Reviewed by Eric Seidel.
+
+        Added 1 test to mathml/presentation/subsup.xhtml.
+
+        * mathml/presentation/subsup.xhtml:
+        * platform/mac/mathml/presentation/subsup-expected.png:
+        * platform/mac/mathml/presentation/subsup-expected.txt:
+
+2012-08-25  Philip Rogers  <pdr@google.com>
+
+        Roll out r126056 and r126626
+        https://bugs.webkit.org/show_bug.cgi?id=95017
+
+        Reviewed by Dirk Schulze.
+
+        Removing skipped test.
+
+        * platform/mac/Skipped:
+
+2012-08-25  Mark Lam  <mark.lam@apple.com>
+
+        Skipping 4 compositing/overflow tests for gardening.
+        https://bugs.webkit.org/show_bug.cgi?id=95011.
+
+        Reviewed by Sam Weinig.
+
+        compositing/overflow/overflow-auto-with-touch.html
+        compositing/overflow/overflow-overlay-with-touch.html
+        compositing/overflow/scrolling-content-clip-to-viewport.html
+        compositing/overflow/textarea-scroll-touch.html
+
+        * platform/mac/Skipped:
+
+2012-08-25  David Barton  <dbarton@mathscribe.com>
+
+        Re-unskip 2 previously fixed tests that were accidentally re-skipped in r119192.
+
+        Unreviewed, gardening.
+
+        * platform/mac/Skipped:
+
+2012-08-25  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Rebaselining after the changes made in r126683.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/animations/cross-fade-border-image-source-expected.txt:
+        * platform/gtk/css1/box_properties/border_bottom-expected.txt:
+        * platform/gtk/css1/box_properties/border_bottom_inline-expected.txt:
+        * platform/gtk/css1/box_properties/border_left-expected.txt:
+        * platform/gtk/css1/box_properties/border_left_inline-expected.txt:
+        * platform/gtk/css1/box_properties/border_right-expected.txt:
+        * platform/gtk/css1/box_properties/border_right_inline-expected.txt:
+        * platform/gtk/css1/units/length_units-expected.txt:
+        * platform/gtk/css2.1/20110323/absolute-replaced-height-036-expected.txt:
+        * platform/gtk/css2.1/20110323/abspos-non-replaced-width-margin-000-expected.txt:
+        * platform/gtk/css2.1/20110323/abspos-replaced-width-margin-000-expected.txt:
+        * platform/gtk/css2.1/20110323/block-non-replaced-height-007-expected.txt:
+        * platform/gtk/css2.1/20110323/block-non-replaced-height-008-expected.txt:
+        * platform/gtk/css2.1/20110323/block-non-replaced-height-009-expected.txt:
+        * platform/gtk/css2.1/20110323/block-non-replaced-height-010-expected.txt:
+        * platform/gtk/css2.1/20110323/block-non-replaced-width-001-expected.txt:
+        * platform/gtk/css2.1/20110323/block-non-replaced-width-002-expected.txt:
+        * platform/gtk/css2.1/20110323/block-non-replaced-width-003-expected.txt:
+        * platform/gtk/css2.1/20110323/block-non-replaced-width-004-expected.txt:
+        * platform/gtk/css2.1/20110323/block-non-replaced-width-008-expected.txt:
+        * platform/gtk/css2.1/20110323/margin-applies-to-008-expected.txt:
+        * platform/gtk/css2.1/20110323/width-non-replaced-inline-001-expected.txt:
+        * platform/gtk/css2.1/t040302-c61-phys-len-00-b-expected.txt:
+        * platform/gtk/css2.1/t0804-c5507-padn-r-02-f-expected.txt:
+        * platform/gtk/css2.1/t0804-c5508-ipadn-b-03-b-a-expected.txt:
+        * platform/gtk/css2.1/t0804-c5509-padn-l-02-f-expected.txt:
+        * platform/gtk/css2.1/t0805-c5519-brdr-r-00-a-expected.txt:
+        * platform/gtk/css2.1/t0805-c5519-brdr-r-01-e-expected.txt:
+        * platform/gtk/css2.1/t0805-c5519-brdr-r-02-e-expected.txt:
+        * platform/gtk/css2.1/t0805-c5519-ibrdr-r-00-a-expected.txt:
+        * platform/gtk/css2.1/t0805-c5520-brdr-b-00-a-expected.txt:
+        * platform/gtk/css2.1/t0805-c5520-brdr-b-01-e-expected.txt:
+        * platform/gtk/css2.1/t0805-c5520-ibrdr-b-00-a-expected.txt:
+        * platform/gtk/css2.1/t0805-c5521-brdr-l-00-a-expected.txt:
+        * platform/gtk/css2.1/t0805-c5521-brdr-l-01-e-expected.txt:
+        * platform/gtk/css2.1/t0805-c5521-brdr-l-02-e-expected.txt:
+        * platform/gtk/css2.1/t0805-c5521-ibrdr-l-00-a-expected.txt:
+        * platform/gtk/editing/deleting/type-delete-after-quote-expected.txt:
+        * platform/gtk/editing/execCommand/4580583-1-expected.txt:
+        * platform/gtk/editing/execCommand/4580583-2-expected.txt:
+        * platform/gtk/editing/inserting/5418891-expected.txt:
+        * platform/gtk/editing/inserting/5510537-expected.txt:
+        * platform/gtk/editing/inserting/6703873-expected.txt:
+        * platform/gtk/editing/inserting/break-blockquote-after-delete-expected.txt:
+        * platform/gtk/editing/pasteboard/5006779-expected.txt:
+        * platform/gtk/editing/pasteboard/paste-blockquote-after-blockquote-expected.txt:
+        * platform/gtk/editing/pasteboard/paste-blockquote-into-blockquote-4-expected.txt:
+        * platform/gtk/fast/block/float/012-expected.txt:
+        * platform/gtk/fast/block/float/013-expected.txt:
+        * platform/gtk/fast/block/float/016-expected.txt: Added.
+        * platform/gtk/fast/block/float/avoidance-rtl-expected.txt: Added.
+        * platform/gtk/fast/block/margin-collapse/041-expected.txt:
+        * platform/gtk/fast/block/margin-collapse/043-expected.txt:
+        * platform/gtk/fast/block/margin-collapse/057-expected.txt:
+        * platform/gtk/fast/borders/border-radius-wide-border-01-expected.txt: Added.
+        * platform/gtk/fast/borders/only-one-border-with-width-expected.txt: Added.
+        * platform/gtk/fast/css/acid2-expected.txt: Added.
+        * platform/gtk/fast/css/acid2-pixel-expected.txt: Added.
+        * platform/gtk/fast/css/border-height-expected.txt:
+        * platform/gtk/fast/css/caption-width-absolute-position-expected.txt:
+        * platform/gtk/fast/css/caption-width-absolute-position-offset-top-expected.txt:
+        * platform/gtk/fast/css/caption-width-fixed-position-expected.txt:
+        * platform/gtk/fast/css/caption-width-fixed-position-offset-top-expected.txt:
+        * platform/gtk/fast/css/line-height-determined-by-primary-font-expected.txt:
+        * platform/gtk/fast/css/pseudo-first-line-border-width-expected.txt:
+        * platform/gtk/fast/frames/viewsource-attribute-expected.txt:
+        * platform/gtk/fast/frames/viewsource-on-image-file-expected.txt:
+        * platform/gtk/fast/hidpi/image-set-border-image-comparison-expected.txt:
+        * platform/gtk/fast/hidpi/video-controls-in-hidpi-expected.txt:
+        * platform/gtk/fast/inline/inline-padding-disables-text-quirk-expected.txt:
+        * platform/gtk/fast/inline/inline-text-quirk-bpm-expected.txt:
+        * platform/gtk/fast/layers/scroll-rect-to-visible-expected.txt:
+        * platform/gtk/fast/layers/video-layer-expected.txt:
+        * platform/gtk/fast/lists/007-expected.txt:
+        * platform/gtk/fast/multicol/block-axis-horizontal-bt-expected.txt:
+        * platform/gtk/fast/multicol/block-axis-vertical-lr-expected.txt:
+        * platform/gtk/fast/multicol/block-axis-vertical-rl-expected.txt:
+        * platform/gtk/fast/multicol/progression-reverse-expected.txt: Added.
+        * platform/gtk/fast/multicol/vertical-lr/rules-with-border-before-expected.txt: Added.
+        * platform/gtk/fast/multicol/vertical-rl/rules-with-border-before-expected.txt: Added.
+        * platform/gtk/fast/overflow/overflow-rtl-expected.txt: Added.
+        * platform/gtk/fast/overflow/overflow-rtl-inline-scrollbar-expected.txt:
+        * platform/gtk/fast/repaint/repaint-across-writing-mode-boundary-expected.txt:
+        * platform/gtk/fast/table/border-collapsing/003-expected.txt:
+        * platform/gtk/fast/table/border-collapsing/003-vertical-expected.txt:
+        * platform/gtk/fast/table/border-collapsing/equal-precedence-resolution-expected.txt:
+        * platform/gtk/fast/table/border-collapsing/equal-precedence-resolution-vertical-expected.txt:
+        * platform/gtk/fast/table/border-collapsing/rtl-border-collapsing-expected.txt:
+        * platform/gtk/fast/table/colgroup-spanning-groups-rules-expected.txt:
+        * platform/gtk/fast/text/apply-start-width-after-skipped-text-expected.txt:
+        * platform/gtk/fast/text/basic/015-expected.txt:
+        * platform/gtk/fast/text/monospace-width-cache-expected.txt:
+        * platform/gtk/fast/writing-mode/broken-ideograph-small-caps-expected.txt:
+        * platform/gtk/fast/writing-mode/broken-ideographic-font-expected.txt:
+        * platform/gtk/fast/writing-mode/vertical-font-fallback-expected.txt:
+        * platform/gtk/http/tests/misc/acid2-expected.txt:
+        * platform/gtk/http/tests/misc/acid2-pixel-expected.txt:
+        * platform/gtk/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-009-expected.txt:
+        * platform/gtk/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-012-expected.txt:
+        * platform/gtk/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-013-expected.txt:
+        * platform/gtk/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-014-expected.txt:
+        * platform/gtk/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-015-expected.txt:
+        * platform/gtk/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-016-expected.txt:
+        * platform/gtk/ietestcenter/css3/bordersbackgrounds/border-top-left-radius-values-001-expected.txt:
+        * platform/gtk/media/audio-controls-rendering-expected.txt:
+        * platform/gtk/media/audio-repaint-expected.txt:
+        * platform/gtk/media/controls-after-reload-expected.txt:
+        * platform/gtk/media/controls-strict-expected.txt:
+        * platform/gtk/media/controls-styling-expected.txt:
+        * platform/gtk/media/controls-styling-strict-expected.txt:
+        * platform/gtk/media/controls-without-preload-expected.txt:
+        * platform/gtk/media/media-controls-clone-expected.txt:
+        * platform/gtk/media/media-document-audio-repaint-expected.txt:
+        * platform/gtk/media/track/track-cue-rendering-horizontal-expected.txt:
+        * platform/gtk/media/track/track-cue-rendering-vertical-expected.txt:
+        * platform/gtk/media/video-controls-rendering-expected.txt:
+        * platform/gtk/media/video-display-toggle-expected.txt:
+        * platform/gtk/media/video-empty-source-expected.txt:
+        * platform/gtk/media/video-no-audio-expected.txt:
+        * platform/gtk/media/video-volume-slider-expected.txt:
+        * platform/gtk/media/video-zoom-controls-expected.txt:
+        * platform/gtk/tables/mozilla/core/table_rules-expected.txt:
+        * platform/gtk/tables/mozilla/marvin/x_table_rules_groups-expected.txt:
+        * platform/gtk/tables/mozilla_expected_failures/collapsing_borders/bug41262-1-expected.txt:
+        * platform/gtk/tables/mozilla_expected_failures/other/test4-expected.txt:
+        * platform/gtk/transforms/2d/transform-borderbox-expected.txt:
+        * platform/gtk/transforms/2d/transform-origin-borderbox-expected.txt:
+        * platform/gtk/transitions/cross-fade-border-image-expected.txt:
+
+2012-08-25  David Barton  <dbarton@mathscribe.com>
+
+        Remove custom mac-snowleopard mathml test baselines
+        https://bugs.webkit.org/show_bug.cgi?id=95004
+
+        Reviewed by Eric Seidel.
+
+        These custom baselines are no longer needed, since the mac lion bots were upgraded to
+        OS X 10.7.4 in the fix for https://bugs.webkit.org/show_bug.cgi?id=94393.
+
+        * platform/mac-snowleopard/mathml: Removed.
+        * platform/mac-snowleopard/mathml/presentation: Removed.
+        * platform/mac-snowleopard/mathml/presentation/attributes-expected.txt: Removed.
+        * platform/mac-snowleopard/mathml/presentation/fenced-mi-expected.txt: Removed.
+        * platform/mac-snowleopard/mathml/presentation/fractions-expected.txt: Removed.
+        * platform/mac-snowleopard/mathml/presentation/mo-expected.txt: Removed.
+        * platform/mac-snowleopard/mathml/presentation/over-expected.txt: Removed.
+        * platform/mac-snowleopard/mathml/presentation/roots-expected.txt: Removed.
+        * platform/mac-snowleopard/mathml/presentation/row-expected.txt: Removed.
+        * platform/mac-snowleopard/mathml/presentation/sub-expected.txt: Removed.
+        * platform/mac-snowleopard/mathml/presentation/tokenElements-expected.txt: Removed.
+        * platform/mac-snowleopard/mathml/presentation/underover-expected.txt: Removed.
+
+2012-08-25  Robert Hogan  <robert@webkit.org>
+
+        Update TestExpectations for Qt, EFL, GTK, Apple Win and Chromium after r126683.
+
+        Unreviewed, gardening.
+
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+
+2012-07-18  Robert Hogan  <robert@webkit.org>
+
+        Tables with just border-style set on the cells do not get a grid
+        https://bugs.webkit.org/show_bug.cgi?id=84286
+
+        Reviewed by Julien Chaffraix.
+
+        With the exception of the new test table-rules-attribute-none-with-cell-borders.html all
+        of these are rebaselines due to RenderTreeAsText now reporting the first border, even if it
+        is a default border.
+
+        * fast/block/float/avoidance-rtl-expected.txt:
+        * fast/borders/border-radius-wide-border-01-expected.txt:
+        * fast/borders/only-one-border-with-width-expected.txt:
+        * fast/css/table-rules-attribute-none-with-cell-borders-expected.html: Added.
+        * fast/css/table-rules-attribute-none-with-cell-borders.html: Added.
+        * fast/multicol/progression-reverse-expected.txt:
+        * fast/multicol/vertical-lr/rules-with-border-before-expected.txt:
+        * fast/multicol/vertical-rl/rules-with-border-before-expected.txt:
+        * platform/chromium-linux/css1/box_properties/border_bottom-expected.png:
+        * platform/chromium-linux/css2.1/t0805-c5519-brdr-r-00-a-expected.txt:
+        * platform/chromium-linux/css2.1/t0805-c5519-brdr-r-01-e-expected.txt:
+        * platform/chromium-linux/css2.1/t0805-c5520-brdr-b-01-e-expected.txt:
+        * platform/chromium-linux/css2.1/t0805-c5521-brdr-l-00-a-expected.txt:
+        * platform/chromium-linux/css2.1/t0805-c5521-brdr-l-01-e-expected.txt:
+        * platform/chromium-linux/css2.1/t0805-c5521-ibrdr-l-00-a-expected.txt:
+        * platform/chromium-linux/fast/css/line-height-determined-by-primary-font-expected.txt:
+        * platform/chromium-win/animations/cross-fade-border-image-source-expected.txt:
+        * platform/chromium-win/css1/box_properties/border_bottom-expected.txt:
+        * platform/chromium-win/css1/box_properties/border_bottom_inline-expected.txt:
+        * platform/chromium-win/css1/box_properties/border_left-expected.txt:
+        * platform/chromium-win/css1/box_properties/border_left_inline-expected.txt:
+        * platform/chromium-win/css1/box_properties/border_right-expected.txt:
+        * platform/chromium-win/css1/box_properties/border_right_inline-expected.txt:
+        * platform/chromium-win/css1/units/length_units-expected.txt:
+        * platform/chromium-win/css2.1/20110323/absolute-replaced-height-036-expected.txt:
+        * platform/chromium-win/css2.1/20110323/block-non-replaced-height-007-expected.txt:
+        * platform/chromium-win/css2.1/20110323/block-non-replaced-height-008-expected.txt:
+        * platform/chromium-win/css2.1/20110323/block-non-replaced-height-009-expected.txt:
+        * platform/chromium-win/css2.1/20110323/block-non-replaced-height-010-expected.txt:
+        * platform/chromium-win/css2.1/20110323/block-non-replaced-width-001-expected.txt:
+        * platform/chromium-win/css2.1/20110323/block-non-replaced-width-002-expected.txt:
+        * platform/chromium-win/css2.1/20110323/block-non-replaced-width-003-expected.txt:
+        * platform/chromium-win/css2.1/20110323/block-non-replaced-width-004-expected.txt:
+        * platform/chromium-win/css2.1/20110323/block-non-replaced-width-008-expected.txt:
+        * platform/chromium-win/css2.1/20110323/margin-applies-to-008-expected.txt:
+        * platform/chromium-win/css2.1/20110323/width-non-replaced-inline-001-expected.txt:
+        * platform/chromium-win/css2.1/t040302-c61-phys-len-00-b-expected.txt:
+        * platform/chromium-win/css2.1/t0804-c5507-padn-r-02-f-expected.txt:
+        * platform/chromium-win/css2.1/t0804-c5508-ipadn-b-03-b-a-expected.txt:
+        * platform/chromium-win/css2.1/t0804-c5509-padn-l-02-f-expected.txt:
+        * platform/chromium-win/css2.1/t0805-c5519-brdr-r-02-e-expected.txt:
+        * platform/chromium-win/css2.1/t0805-c5519-ibrdr-r-00-a-expected.txt:
+        * platform/chromium-win/css2.1/t0805-c5520-brdr-b-00-a-expected.txt:
+        * platform/chromium-win/css2.1/t0805-c5520-ibrdr-b-00-a-expected.txt:
+        * platform/chromium-win/css2.1/t0805-c5521-brdr-l-02-e-expected.txt:
+        * platform/chromium-win/editing/deleting/type-delete-after-quote-expected.txt:
+        * platform/chromium-win/editing/execCommand/4580583-1-expected.txt:
+        * platform/chromium-win/editing/execCommand/4580583-2-expected.txt:
+        * platform/chromium-win/editing/inserting/5418891-expected.txt:
+        * platform/chromium-win/editing/inserting/5510537-expected.txt:
+        * platform/chromium-win/editing/inserting/6703873-expected.txt:
+        * platform/chromium-win/editing/inserting/break-blockquote-after-delete-expected.txt:
+        * platform/chromium-win/editing/pasteboard/5006779-expected.txt:
+        * platform/chromium-win/editing/pasteboard/paste-blockquote-after-blockquote-expected.txt:
+        * platform/chromium-win/editing/pasteboard/paste-blockquote-into-blockquote-4-expected.txt:
+        * platform/chromium-win/fast/block/float/012-expected.txt:
+        * platform/chromium-win/fast/block/float/013-expected.txt:
+        * platform/chromium-win/fast/block/float/016-expected.txt:
+        * platform/chromium-win/fast/block/margin-collapse/041-expected.txt:
+        * platform/chromium-win/fast/block/margin-collapse/043-expected.txt:
+        * platform/chromium-win/fast/block/margin-collapse/057-expected.txt:
+        * platform/chromium-win/fast/css/acid2-expected.txt:
+        * platform/chromium-win/fast/css/acid2-pixel-expected.txt:
+        * platform/chromium-win/fast/css/border-height-expected.txt:
+        * platform/chromium-win/fast/frames/viewsource-attribute-expected.txt:
+        * platform/chromium-win/fast/frames/viewsource-on-image-file-expected.txt:
+        * platform/chromium-win/fast/inline/inline-padding-disables-text-quirk-expected.txt:
+        * platform/chromium-win/fast/inline/inline-text-quirk-bpm-expected.txt:
+        * platform/chromium-win/fast/layers/scroll-rect-to-visible-expected.txt:
+        * platform/chromium-win/fast/lists/007-expected.txt:
+        * platform/chromium-win/fast/multicol/block-axis-horizontal-bt-expected.txt:
+        * platform/chromium-win/fast/multicol/block-axis-vertical-lr-expected.txt:
+        * platform/chromium-win/fast/multicol/block-axis-vertical-rl-expected.txt:
+        * platform/chromium-win/fast/overflow/overflow-rtl-expected.txt:
+        * platform/chromium-win/fast/overflow/overflow-rtl-inline-scrollbar-expected.txt:
+        * platform/chromium-win/fast/repaint/repaint-across-writing-mode-boundary-expected.txt:
+        * platform/chromium-win/fast/table/border-collapsing/003-expected.txt:
+        * platform/chromium-win/fast/table/border-collapsing/003-vertical-expected.txt:
+        * platform/chromium-win/fast/table/border-collapsing/rtl-border-collapsing-expected.txt:
+        * platform/chromium-win/fast/table/colgroup-spanning-groups-rules-expected.txt:
+        * platform/chromium-win/fast/text/basic/015-expected.txt:
+        * platform/chromium-win/fast/text/monospace-width-cache-expected.txt:
+        * platform/chromium-win/http/tests/misc/acid2-expected.txt:
+        * platform/chromium-win/http/tests/misc/acid2-pixel-expected.txt:
+        * platform/chromium-win/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-009-expected.txt:
+        * platform/chromium-win/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-012-expected.txt:
+        * platform/chromium-win/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-013-expected.txt:
+        * platform/chromium-win/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-014-expected.txt:
+        * platform/chromium-win/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-015-expected.txt:
+        * platform/chromium-win/ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-016-expected.txt:
+        * platform/chromium-win/ietestcenter/css3/bordersbackgrounds/border-top-left-radius-values-001-expected.txt:
+        * platform/chromium-win/tables/mozilla/core/table_rules-expected.txt:
+        * platform/chromium-win/tables/mozilla/marvin/x_table_rules_groups-expected.txt:
+        * platform/chromium-win/tables/mozilla_expected_failures/collapsing_borders/bug41262-1-expected.txt:
+        * platform/chromium-win/tables/mozilla_expected_failures/other/test4-expected.txt:
+        * platform/chromium-win/transforms/2d/transform-borderbox-expected.txt:
+        * platform/chromium-win/transforms/2d/transform-origin-borderbox-expected.txt:
+        * platform/chromium-win/transitions/cross-fade-border-image-expected.txt:
+        * platform/chromium/fast/css/pseudo-first-line-border-width-expected.txt:
+        * platform/mac/css2.1/20110323/abspos-non-replaced-width-margin-000-expected.txt:
+        * platform/mac/css2.1/20110323/abspos-replaced-width-margin-000-expected.txt:
+        * platform/mac/fast/css/caption-width-absolute-position-expected.txt:
+        * platform/mac/fast/css/caption-width-absolute-position-offset-top-expected.txt:
+        * platform/mac/fast/css/caption-width-fixed-position-expected.txt:
+        * platform/mac/fast/css/caption-width-fixed-position-offset-top-expected.txt:
+        * platform/mac/fast/table/border-collapsing/equal-precedence-resolution-expected.txt:
+        * platform/mac/fast/table/border-collapsing/equal-precedence-resolution-vertical-expected.txt:
+        * platform/mac/fast/text/apply-start-width-after-skipped-text-expected.txt:
+
+2012-08-25  Michelangelo De Simone  <michelangelo@webkit.org>
+
+        [Crash] Null pointer in CSSParser::parseMixFunction()
+        https://bugs.webkit.org/show_bug.cgi?id=94998
+
+        Reviewed by Benjamin Poulain.
+
+        New test cases added to check invalid comma-terminated values within mix().
+
+        * css3/filters/custom/custom-filter-property-parsing-invalid-expected.txt:
+        * css3/filters/script-tests/custom-filter-property-parsing-invalid.js:
+
+2012-08-24  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Skipping a test added in r126611 that requires CSS image-set support.
+        That feature is not currently enabled on the GTK port.
+
+        * platform/gtk/TestExpectations:
+
+2012-08-24  Florin Malita  <fmalita@chromium.org>
+
+        ASSERTION FAILED: !attached() in WebCore::Node::attach()
+        https://bugs.webkit.org/show_bug.cgi?id=94650
+
+        Reviewed by Abhishek Arya.
+
+        * svg/custom/system-language-crash-expected.txt: Added.
+        * svg/custom/system-language-crash.html: Added.
+
+2012-08-24  Glenn Adams  <glenn@skynav.com>
+
+        CSSStyleDeclaration.cssText should not contain extraneous whitespace in final delimiter
+        https://bugs.webkit.org/show_bug.cgi?id=94633
+
+        Reviewed by Benjamin Poulain.
+
+        Ensure cssText final delimiter does not contain extraneous space character after semicolon.
+
+        * cssom/README.txt: Added.
+        * cssom/cssstyledeclaration-csstext-final-delimiter-expected.txt: Added.
+        * cssom/cssstyledeclaration-csstext-final-delimiter.html: Added.
+        * editing/deleting/delete-line-break-before-underlined-content-expected.txt: Remove extraneous space.
+        * editing/deleting/delete-line-break-between-paragraphs-with-same-style-expected.txt: ditto
+        * editing/deleting/deleting-line-break-preserves-underline-color-expected.txt: ditto
+        * editing/deleting/merge-paragraph-from-h6-with-style-2-expected.txt: ditto
+        * editing/deleting/merge-paragraph-from-h6-with-style-expected.txt: ditto
+        * editing/deleting/merge-paragraph-from-p-with-style-3-expected.txt: ditto
+        * editing/deleting/merge-paragraph-from-p-with-style-expected.txt: ditto
+        * editing/deleting/paste-with-transparent-background-color-expected.txt: ditto
+        * editing/execCommand/insert-list-with-noneditable-content-expected.txt: ditto
+        * editing/execCommand/script-tests/toggle-link.js: ditto
+        * editing/execCommand/script-tests/toggle-unlink.js: ditto
+        * editing/execCommand/toggle-link-expected.txt: ditto
+        * editing/execCommand/toggle-unlink-expected.txt: ditto
+        * editing/inserting/page-zoom-font-size-expected.txt: ditto
+        * editing/pasteboard/19644-2-expected.txt: ditto
+        * editing/pasteboard/5761530-1-expected.txt: ditto
+        * editing/pasteboard/5780697-2-expected.txt: ditto
+        * editing/pasteboard/copy-null-characters-expected.txt: ditto
+        * editing/pasteboard/copy-paste-bidi-expected.txt: ditto
+        * editing/pasteboard/copy-text-with-backgroundcolor-expected.txt: ditto
+        * editing/pasteboard/data-transfer-items-expected.txt: ditto
+        * editing/pasteboard/display-block-on-spans-expected.txt: ditto
+        * editing/pasteboard/do-not-copy-unnecessary-styles-2-expected.txt: ditto
+        * editing/pasteboard/do-not-copy-unnecessary-styles-expected.txt: ditto
+        * editing/pasteboard/drag-drop-url-with-style-expected.txt: ditto
+        * editing/pasteboard/onpaste-text-html-expected.txt: ditto
+        * editing/pasteboard/paste-4039777-fix-expected.txt: ditto
+        * editing/pasteboard/paste-and-sanitize-expected.txt: ditto
+        * editing/pasteboard/paste-and-sanitize.html: ditto
+        * editing/pasteboard/paste-list-003-expected.txt: ditto
+        * editing/pasteboard/paste-noscript-expected.txt: ditto
+        * editing/pasteboard/paste-noscript-xhtml-expected.txt: ditto
+        * editing/pasteboard/paste-table-002-expected.txt: ditto
+        * editing/pasteboard/paste-text-with-style-4-expected.txt: ditto
+        * editing/pasteboard/paste-text-with-style-5-expected.txt: ditto
+        * editing/pasteboard/paste-with-redundant-style-expected.txt: ditto
+        * editing/pasteboard/preserve-underline-color-expected.txt: ditto
+        * editing/pasteboard/style-from-rules-expected.txt: ditto
+        * editing/pasteboard/testcase-9507-expected.txt: ditto
+        * editing/style/non-inheritable-styles-expected.txt: ditto
+        * editing/style/push-down-font-styles-expected.txt: ditto
+        * editing/style/push-down-implicit-styles-around-list-expected.txt: ditto
+        * editing/style/push-down-implicit-styles-expected.txt: ditto
+        * editing/style/push-down-inline-styles-expected.txt: ditto
+        * editing/style/script-tests/push-down-font-styles.js: ditto
+        * editing/style/script-tests/push-down-implicit-styles-around-list.js: ditto
+        * editing/style/script-tests/push-down-implicit-styles.js: ditto
+        * editing/style/script-tests/push-down-inline-styles.js: ditto
+        * editing/undo/remove-css-property-and-remove-style-expected.txt: ditto
+        * editing/undo/replace-by-span-then-remove-expected.txt: ditto
+        * editing/undo/replace-by-span-then-remove.html: ditto
+        * fast/css/background-position-serialize.html: ditto
+        * fast/css/counters/counter-cssText-expected.txt: ditto
+        * fast/css/counters/counter-cssText.html: ditto
+        * fast/css/parse-border-image-repeat-null-crash-expected.txt: ditto
+        * fast/css/remove-shorthand.html: ditto
+        * fast/dom/Element/scrollWidth.html: ditto
+        * fast/dom/HTMLMeterElement/meter-element-markup-expected.txt: ditto
+        * fast/dom/HTMLProgressElement/progress-element-markup-expected.txt: ditto
+        * fast/dom/attr-style-too-lazy-expected.txt: ditto
+        * fast/dom/attr-style-too-lazy.html: ditto
+        * fast/dom/css-set-property-exception-expected.txt: ditto
+        * fast/fast/events/ondrop-text-html-expected.txt: ditto
+        * fast/mutation/observe-attributes-expected.txt: ditto
+        * fast/mutation/observe-attributes.html: ditto
+        * inspector/elements/insert-node-expected.txt: ditto
+        * inspector/styles/styles-update-from-js-expected.txt: ditto
+        * platform/chromium-win/editing/pasteboard/5780697-2-expected.txt: ditto
+        * platform/efl/fast/dom/HTMLMeterElement/meter-element-markup-expected.txt: ditto
+        * platform/mac/editing/pasteboard/5761530-1-expected.txt: ditto
+        * platform/qt/editing/pasteboard/5761530-1-expected.txt: ditto
+        * platform/qt/editing/pasteboard/5780697-2-expected.txt: ditto
+        * svg/webarchive/svg-script-subresouces-expected.webarchive: ditto
+        * webarchive/test-link-rel-icon-beforeload-expected.webarchive: ditto
+
+2012-08-24  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        More unreviewed Chromium rebaselining.
+
+        * fast/repaint/bugzilla-6473-expected.txt: Added.
+        * platform/chromium-linux/fast/repaint/bugzilla-6473-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/bugzilla-6473-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/bugzilla-6473-expected.png: Added.
+        * platform/chromium-win/fast/repaint/bugzilla-6473-expected.png: Added.
+        * platform/chromium-win/fast/repaint/bugzilla-6473-expected.txt: Added.
+        * platform/efl/fast/repaint/bugzilla-6473-expected.txt: Removed.
+        * platform/gtk/fast/repaint/bugzilla-6473-expected.txt: Removed.
+        Rebaseline this test as it was deflaked by Simon in r79661. The new baseline
+        matches Mac and Mitz's expectations (see bug 21536).
+
+        * platform/chromium/TestExpectations:
+        Removed fast/repaint/bugzilla-6473.html now that it's rebaselined.
+        Removed fast/table/frame-and-rules.html as it hasn't been failing for a week.
+
+2012-08-24  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] WebViewImpl::enableTouchHighlight() should always clear any existing highlight when invoked.
+        https://bugs.webkit.org/show_bug.cgi?id=94978
+
+        Reviewed by James Robinson.
+
+        Modified WebViewImpl::enableTouchHighlight() so it always clears any existing highlight, even if no new
+        highlight target is found.
+
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-cancel.html: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-cancel-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-cancel-expected.txt: Added.
+
+2012-08-24  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed rebaseline after r126622.
+
+        * platform/chromium-mac-snowleopard/fast/repaint/delete-into-nested-block-expected.png: Added.
+
+2012-08-24  Filip Pizlo  <fpizlo@apple.com>
+
+        We should have tests for the DFG CFA's handling of structure clobbering and basic blocks
+        https://bugs.webkit.org/show_bug.cgi?id=94977
+
+        Reviewed by Mark Hahnenberg.
+
+        * fast/js/dfg-multi-basic-block-structure-clobber-expected.txt: Added.
+        * fast/js/dfg-multi-basic-block-structure-clobber.html: Added.
+        * fast/js/script-tests/dfg-multi-basic-block-structure-clobber.js: Added.
+        (bar):
+        (foo):
+        * fast/js/jsc-test-list:
+
+2012-08-24  Xianzhu Wang  <wangxianzhu@chromium.org>
+
+        [Chromium-Android] Reapply "Upstream layout test expectations (Part 1)"
+        https://bugs.webkit.org/show_bug.cgi?id=94884
+
+        Reviewed by Adam Barth.
+
+        This part include:
+        - Removed ANDROID tag for passing tests and tests that should be covered by other Android specific rules
+        - Added android rules for fast/js and jquery/ tests
+        - crbug.com/144536
+        - Several other rules with public bugs
+
+        * platform/chromium/TestExpectations:
+
+2012-08-24  Andrei Onea  <onea@adobe.com>
+
+        [CSSRegions]Expose WebKitNamedFlowCollection interface through document.getNamedFlows()
+        https://bugs.webkit.org/show_bug.cgi?id=93368
+
+        Reviewed by Ryosuke Niwa.
+
+        Added test for WebKitNamedFlowCollection interface.
+
+        * fast/regions/webkit-named-flow-collection-expected.txt: Added.
+        * fast/regions/webkit-named-flow-collection.html: Added.
+
+2012-08-24  Mark Lam  <mark.lam@apple.com>
+
+        Skipping svg/custom/getBBox-path.svg on platform mac.
+        https://bugs.webkit.org/show_bug.cgi?id=94971.
+
+        Reviewed by Sam Weinig.
+
+        * platform/mac/Skipped:
+
+2012-08-24  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed Chromium gardening.
+
+        Rebaselined a bunch of repaint tests on Mac. The failures or differences fell in
+        the following categories:
+        - small alpha difference on the repaint tests' background. This issue has been known for
+        some time now but is not being worked on AFAICT.
+        - Chromium unions the invalidation rects when Mac doesn't.
+        - font difference.
+
+        * platform/chromium-mac-snowleopard/fast/repaint/box-shadow-dynamic-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/box-shadow-dynamic-expected.png: Added.
+        This test was using Mac's expectation which is wrong (they have some beige rectangles that
+        are not in the page). Those new baselines matches the other ports and the expected result.
+
+        * platform/chromium-mac-snowleopard/fast/repaint/4774354-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/4776765-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/border-fit-lines-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/border-repaint-glitch-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/bugzilla-3509-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/bugzilla-6388-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/bugzilla-7235-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/change-transform-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/containing-block-position-change-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/dynamic-table-vertical-alignment-change-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/fixed-child-move-after-scroll-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/fixed-child-of-fixed-move-after-scroll-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/fixed-child-of-transformed-move-after-scroll-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/fixed-move-after-scroll-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/float-move-during-layout-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/inline-color-change-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/layout-state-relative-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/outline-shrinking-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/4774354-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/4776765-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/block-selection-gap-in-table-cell-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/border-fit-lines-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/border-repaint-glitch-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/bugzilla-3509-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/bugzilla-6388-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/bugzilla-7235-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/button-spurious-layout-hint-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/change-transform-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/clip-with-layout-delta-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/containing-block-position-change-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/delete-into-nested-block-expected.png:
+        * platform/chromium-mac/fast/repaint/dynamic-table-vertical-alignment-change-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/erase-overflow-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/fixed-child-move-after-scroll-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/fixed-child-of-fixed-move-after-scroll-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/fixed-child-of-transformed-move-after-scroll-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/fixed-move-after-scroll-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/float-in-new-block-with-layout-delta-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/float-move-during-layout-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/inline-block-resize-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/inline-color-change-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/inline-overflow-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/layer-full-repaint-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/layer-hide-when-needs-layout-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/layer-visibility-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/layout-state-relative-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/outline-shrinking-expected.png: Added.
+        * platform/chromium/TestExpectations:
+
+2012-08-24  Chris Evans  <cevans@google.com>
+
+        Improve xpath-detached-nodes.html test.
+        https://bugs.webkit.org/show_bug.cgi?id=36427
+
+        Reviewed by Alexey Proskuryakov.
+
+        * fast/xpath/xpath-detached-nodes-expected.txt:
+        * fast/xpath/xpath-detached-nodes.html: Increase coverage and improve log messages.
+
+2012-08-24  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r126606.
+        http://trac.webkit.org/changeset/126606
+        https://bugs.webkit.org/show_bug.cgi?id=94970
+
+        The change broke TestExpectations.txt (Requested by jchaffraix
+        on #webkit).
+
+        * platform/chromium/TestExpectations:
+
+2012-08-24  Anish Bhayani  <anish.bhayani@gmail.com>
+
+        webkit-image-set() function not showing up when computing background property
+        https://bugs.webkit.org/show_bug.cgi?id=94536
+
+        Reviewed by Simon Fraser.
+
+        Used same tests from image-set-parsing to show consistency between CSS background
+        value and backgroundImage value when setting -webkit-image-set(...).
+
+        * fast/css/image-set-setting-expected.txt: Added.
+        * fast/css/image-set-setting.html: Added.
+        * fast/css/script-tests/image-set-setting.js: Added.
+        (testComputedStyle):
+        (testImageSetRule):
+
+2012-08-24  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] gestureTapDown should not select a RenderView node as target.
+        https://bugs.webkit.org/show_bug.cgi?id=94956
+
+        Reviewed by James Robinson.
+
+        Add check to prevent selecting a RenderView node as a highlight target.
+
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-background.html: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-background-expected.png: Added.
+        * platform/chromium-linux/platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-background-expected.txt: Added.
+
+2012-08-24  Xianzhu Wang  <wangxianzhu@chromium.org>
+
+        [Chromium-Android] Upstream layout test expectations (Part 1)
+        https://bugs.webkit.org/show_bug.cgi?id=94884
+
+        Reviewed by Adam Barth.
+
+        This part include:
+        - Removed ANDROID tag for passing tests and tests that should be covered by other Android specific rules
+        - Added android rules for fast/js and jquery/ tests
+        - crbug.com/144536
+        - Several other rules with public bugs
+
+        * platform/chromium/TestExpectations:
+
+2012-08-24  Bear Travis  <betravis@adobe.com>
+
+        [CSS Exclusions] Enable shape-inside for simple rectangles
+        https://bugs.webkit.org/show_bug.cgi?id=89259
+
+        Reviewed by Levi Weintraub.
+
+        Test that inline content correctly wraps for a simple rectangular
+        shape-inside. Text and inline content should wrap inside the
+        rectangular shape-inside, and overflow to its containing block.
+        Inline content inside a shape-inside should also avoid floats.
+
+        * fast/exclusions/shape-inside/shape-inside-floats-simple-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-floats-simple.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-inline-elements-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-inline-elements.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-overflow-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-overflow.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-percentage-auto-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-percentage-auto.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-text-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-text.html: Added.
+
+2012-08-24  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed Chromium rebaseline.
+
+        * platform/chromium-mac/fast/table/border-collapsing/cached-69296-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-cell-append-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-cell-remove-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-cell-border-color-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-cell-border-width-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-cell-sl-border-color-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-col-border-color-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-col-border-width-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-colgroup-border-color-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-colgroup-border-width-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-row-border-color-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-row-border-width-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-table-border-color-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-table-border-width-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-tbody-border-color-expected.png: Added.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-tbody-border-width-expected.png: Added.
+        * platform/chromium/TestExpectations:
+        Rebaselined the border-collapsing tests on Mac. They have required a different baseline for several months
+        now and the root cause (small alpha difference) doesn't seem to be worked on.
+
+2012-08-24  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Adding expectations for a few failing tests that popped up on the debug
+        builder after it was brought back into a working state.
+
+        Removing failure expectation for fast/dom/Window/window-postmessage-clone.html
+        after the test was fixed in r126464.
+
+        * platform/gtk/TestExpectations:
+
+2012-08-24  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed gardening.
+
+        * platform/chromium/TestExpectations:
+        Marked fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements.html as failing following r126534.
+
+2012-08-24  Sudarsana Nagineni  <sudarsana.nagineni@linux.intel.com>
+
+        [EFL] Add baselines for the tests which are missing expected results
+        https://bugs.webkit.org/show_bug.cgi?id=94942
+
+        Unreviewed EFL gardening. Add platform specific baselines required
+        after r126343 and r126372.
+
+        * platform/efl/fast/overflow/paged-x-div-expected.png: Added.
+        * platform/efl/fast/overflow/paged-x-div-expected.txt: Added.
+        * platform/efl/fast/overflow/paged-x-on-root-expected.png: Added.
+        * platform/efl/fast/overflow/paged-x-on-root-expected.txt: Added.
+        * platform/efl/fast/overflow/paged-y-div-expected.png: Added.
+        * platform/efl/fast/overflow/paged-y-div-expected.txt: Added.
+        * platform/efl/fast/overflow/paged-y-on-root-expected.png: Added.
+        * platform/efl/fast/overflow/paged-y-on-root-expected.txt: Added.
+        * platform/efl/media/track/track-cue-rendering-horizontal-expected.png: Added.
+        * platform/efl/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/efl/media/track/track-cue-rendering-vertical-expected.png: Added.
+        * platform/efl/media/track/track-cue-rendering-vertical-expected.txt: Added.
+
+2012-08-24  Sudarsana Nagineni  <sudarsana.nagineni@linux.intel.com>
+
+        [EFL] fast/dom/navigator-vibration.html is failing after r126562
+        https://bugs.webkit.org/show_bug.cgi?id=94939
+
+        Reviewed by Kentaro Hara.
+
+        Update expected results for fast/dom/navigator-vibration.html now that
+        NotEnoughArguments is thrown instead of TypeError if the actual argument
+        count is less than the least mandatory argument count.
+
+        * fast/dom/navigator-vibration-expected.txt:
+
+2012-08-24  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Crash in RenderTableCell::borderTop() due to custom scrollbars after r124168
+        https://bugs.webkit.org/show_bug.cgi?id=93903
+
+        Reviewed by Tony Chang.
+
+        * scrollbars/custom-scrollbar-table-cell-expected.png: Added.
+        * scrollbars/custom-scrollbar-table-cell-expected.txt: Added.
+        * scrollbars/custom-scrollbar-table-cell.html: Added.
+
+2012-08-24  Alexander Pavlov  <apavlov@chromium.org>
+
+        Web Inspector: Unreviewed, fix test flakiness due to the recently introduced lazy panel loading.
+
+        * inspector/debugger/scripts-file-selector.html:
+        * inspector/debugger/step-through-event-listeners.html:
+        * inspector/elements/edit-dom-actions.html:
+        * inspector/elements/edit-style-attribute.html:
+        * inspector/timeline/timeline-enum-stability.html:
+
+2012-08-24  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Add readyState functionality to RTCPeerConnection
+        https://bugs.webkit.org/show_bug.cgi?id=94813
+
+        Reviewed by Adam Barth.
+
+        * fast/mediastream/RTCPeerConnection-state-expected.txt: Added.
+        * fast/mediastream/RTCPeerConnection-state.html: Added.
+
+2012-08-24  Vsevolod Vlasov  <vsevik@chromium.org>
+
+        Web Inspector: Get rid of frontendReused logic on front-end.
+        https://bugs.webkit.org/show_bug.cgi?id=94929
+
+        Reviewed by Pavel Feldman.
+
+        * http/tests/inspector/resource-tree/resource-tree-events.html:
+
+2012-08-24  'Pavel Feldman'  <pfeldman@chromium.org>
+
+        Web Inspector: three layout tests crashing with assertion failure
+        https://bugs.webkit.org/show_bug.cgi?id=94829
+
+        Not reviewed: updating test expectations.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-24  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Updating baselines for css3/flexbox/flexitem.html after r126503.
+
+        * platform/gtk/css3/flexbox: Removed.
+        * platform/gtk/css3/flexbox/flexitem-expected.txt: Removed.
+
+2012-08-24  KwangYong Choi  <ky0.choi@samsung.com>
+
+        [EFL] Added missing SKIP keyword to platform/efl/TestExpectations
+        https://bugs.webkit.org/show_bug.cgi?id=94781
+
+        Unreviewed. Removed unnecessary SKIP keyword.
+
+        * platform/efl/TestExpectations:
+
+2012-08-24  Xiaobo Wang  <xbwang@torchmobile.com.cn>
+
+        Remove platform specific expected files after the change
+        https://bugs.webkit.org/show_bug.cgi?id=94790
+
+        Reviewed by Kentaro Hara.
+
+        1. Use the cross-platform expected files for the 2 tests in question.
+        2. Update other tests for overloaded functions and their expected files
+        affected by the change.
+
+        * fast/canvas/canvas-overloads-drawImage-expected.txt:
+        * fast/canvas/canvas-overloads-setFillColor-expected.txt:
+        * fast/canvas/canvas-overloads-setShadow-expected.txt:
+        * fast/canvas/canvas-overloads-setStrokeColor-expected.txt:
+        * fast/canvas/script-tests/canvas-overloads-drawImage.js:
+        * fast/canvas/script-tests/canvas-overloads-setFillColor.js:
+        * fast/canvas/script-tests/canvas-overloads-setShadow.js:
+        * fast/canvas/script-tests/canvas-overloads-setStrokeColor.js:
+        * fast/canvas/webgl/texImageTest-expected.txt:
+        * platform/chromium/fast/files/create-blob-url-crash-expected.txt: Removed.
+        * platform/chromium/fast/files/url-required-arguments-expected.txt: Removed.
+        * platform/gtk/fast/files/create-blob-url-crash-expected.txt: Removed.
+        * platform/gtk/fast/files/url-required-arguments-expected.txt: Removed.
+        * storage/indexeddb/index-get-key-argument-required-expected.txt:
+        * storage/indexeddb/objectStore-required-arguments-expected.txt:
+        * storage/indexeddb/transaction-and-objectstore-calls-expected.txt:
+        * storage/indexeddb/transaction-storeNames-required-expected.txt:
+
+2012-08-24  Yoshifumi Inoue  <yosin@chromium.org>
+
+        [Forms] Multiple fields time input UI should handle Delete key as Backspace key
+        https://bugs.webkit.org/show_bug.cgi?id=94902
+
+        Reviewed by Kent Tamura.
+
+        This patch adds a new test case for "Delete" key behavior for multiple
+        fields time input UI.
+
+        * fast/forms/time-multiple-fields/time-multiple-fields-keyboard-events-expected.txt: Updated expectation.
+        * fast/forms/time-multiple-fields/time-multiple-fields-keyboard-events.html: Added "Delete" key test case.
+
+2012-08-24  János Badics  <jbadics@inf.u-szeged.hu>
+
+        [Qt] Gardening after r126442. Skip a test because of missing shadow feature.
+
+        Reviewed by Csaba Osztrogonác.
+
+        * platform/qt/Skipped:
+
+2012-08-24  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Narrow expected failures to Linux.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-23  Yoshifumi Inoue <yosin@chromium.org>
+
+        [Chromium] REGRESSION(r126534) time-multiple-fields-appearance-pseudo-elements.html failing on Win7
+        https://bugs.webkit.org/show_bug.cgi?id=94898
+
+        This patch changes parameters to test expectation generator to make
+        actual result and test expectation to be matched.
+
+        Root cause of this regression is the test expectation generator for
+        Chromium-Win generates second field with value "56" instead of "00".
+
+        On Chromium-Linux and Chromium-Mac, the test expectation generator
+        doesn't generate second field.
+
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.html: Changes parameters to have hour and minute only.
+
+2012-08-23  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r126496.
+        http://trac.webkit.org/changeset/126496
+        https://bugs.webkit.org/show_bug.cgi?id=94895
+
+        Broke TestNotificationActiveDescendantChanged (Requested by
+        dominicc on #webkit).
+
+        * accessibility/editable-webarea-context-menu-point.html:
+        * accessibility/focusable-div-expected.txt: Removed.
+        * accessibility/focusable-div.html: Removed.
+        * accessibility/table-detection.html:
+        * platform/mac/accessibility/listbox-hit-test.html:
+
+2012-08-23  KwangYong Choi  <ky0.choi@samsung.com>
+
+        [EFL] Skip the tests which have wrong pixel expectations in fast/forms/
+        https://bugs.webkit.org/show_bug.cgi?id=94798
+
+        Unreviewed. Some tests in fast/forms seem to fail. Removed wrong expectations
+        and marked the tests MISSING.
+
+        fast/forms/listbox-hit-test-zoomed.html
+        Test 2 in this test seems to fail.
+
+        fast/forms/menulist-restrict-line-height.html
+        The text in the popup button is clipped.
+
+        fast/forms/search-cancel-button-style-sharing.html
+        fast/forms/search-rtl.html
+        Cancel mark in search field is not displayed.
+
+        fast/forms/menulist-narrow-width.html
+        fast/forms/select-baseline.html
+        fast/forms/menulist-style-color.html
+        fast/forms/select-style.html
+        These tests seem to have style error.
+
+        fast/forms/textarea-scroll-height.html
+        fast/forms/textarea-scrolled-type.html
+        Scroll bar isn't being fully rendered.
+
+        * platform/efl/TestExpectations:
+        * platform/efl/fast/forms/listbox-hit-test-zoomed-expected.png: Removed.
+        * platform/efl/fast/forms/listbox-hit-test-zoomed-expected.txt: Removed.
+        * platform/efl/fast/forms/menulist-narrow-width-expected.png: Removed.
+        * platform/efl/fast/forms/menulist-narrow-width-expected.txt: Removed.
+        * platform/efl/fast/forms/menulist-restrict-line-height-expected.png: Removed.
+        * platform/efl/fast/forms/menulist-restrict-line-height-expected.txt: Removed.
+        * platform/efl/fast/forms/menulist-style-color-expected.png: Removed.
+        * platform/efl/fast/forms/menulist-style-color-expected.txt: Removed.
+        * platform/efl/fast/forms/search-cancel-button-style-sharing-expected.png: Removed.
+        * platform/efl/fast/forms/search-cancel-button-style-sharing-expected.txt: Removed.
+        * platform/efl/fast/forms/search-rtl-expected.png: Removed.
+        * platform/efl/fast/forms/search-rtl-expected.txt: Removed.
+        * platform/efl/fast/forms/select-baseline-expected.png: Removed.
+        * platform/efl/fast/forms/select-baseline-expected.txt: Removed.
+        * platform/efl/fast/forms/select-style-expected.png: Removed.
+        * platform/efl/fast/forms/select-style-expected.txt: Removed.
+        * platform/efl/fast/forms/textarea-scroll-height-expected.png: Removed.
+        * platform/efl/fast/forms/textarea-scroll-height-expected.txt: Removed.
+        * platform/efl/fast/forms/textarea-scrolled-type-expected.png: Removed.
+        * platform/efl/fast/forms/textarea-scrolled-type-expected.txt: Removed.
+
+2012-08-23  Keishi Hattori  <keishi@webkit.org>
+
+        REGRESSION(r126132): thumb doesn't match click position for rtl input type=range
+        https://bugs.webkit.org/show_bug.cgi?id=94890
+
+        Reviewed by Kent Tamura.
+
+        * fast/forms/range/range-hit-test-with-padding-expected.txt:
+        * fast/forms/range/range-hit-test-with-padding.html:
+
+2012-08-23  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Rebaseline meter element tests on Mac. These grew a DIV in
+        r125659.
+        https://bugs.webkit.org/show_bug.cgi?id=94666
+
+        * platform/chromium-mac/fast/dom/HTMLMeterElement/meter-element-repaint-on-update-value-expected.txt:
+        * platform/chromium-mac/fast/dom/HTMLMeterElement/meter-styles-expected.txt:
+
+2012-08-23  Dominic Cooney  <dominicc@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        Revert a few test expectations tightened in r126529 to green
+        builders.
+
+        These differ by whether zero width blocks appear in the dumped
+        render tree.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-23  Yoshifumi Inoue  <yosin@chromium.org>
+
+        [Forms] Step mismatched value should be editable in multiple field time UI.
+        https://bugs.webkit.org/show_bug.cgi?id=94664
+
+        Reviewed by Kent Tamura.
+
+        This patch adds new test case for step mismatched value case and
+        updates test cases to avoid step mismatched value, and a test file
+        for dynamic layout change casued by input element's value change.
+
+        Note: We need to do rebaseline for Chromium-Mac and Chromium-Win.
+
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.html: Updated for new test case and behavior change.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic.html: ditto
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly.html: Updated for behavior change.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements.html: ditto
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-style.html: ditto
+        * fast/forms/time-multiple-fields/time-multiple-fields-change-layout-by-value-expected.txt: Added.
+        * fast/forms/time-multiple-fields/time-multiple-fields-change-layout-by-value.html: Added for dynamic layout change from value change.
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png: ditto
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.txt: ditto
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png: ditto
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.txt: ditto
+
+2012-08-23  Kenneth Russell  <kbr@google.com>
+
+        [Chromium] LayoutTests: css3/selector3/xml tests are flaky / have wrong expectations on Snow Leopard
+        https://bugs.webkit.org/show_bug.cgi?id=82122
+
+        Unreviewed Chromium gardening. Tightened majority of test
+        expectations to only expect failures on debug bots.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-23  Shinya Kawanaka  <shinyak@chromium.org>
+
+        Needs update tests of Shadow DOM for keygen
+        https://bugs.webkit.org/show_bug.cgi?id=94765
+
+        Reviewed by Dimitri Glazkov.
+
+        Now that the HTMLKeygenElement was AuthroShadowDOM-ready, it's time to update the previous
+        failing tests for AuthroShadowDOM for keygen elements.
+
+        I've updated the failing tests to follow the current implementation and updated the test expectations.
+
+        * fast/dom/shadow/shadowdom-for-keygen-complex-shadow-expected.html:
+        * fast/dom/shadow/shadowdom-for-keygen-complex-shadow.html:
+        * fast/dom/shadow/shadowdom-for-keygen-only-shadow-expected.html:
+        * fast/dom/shadow/shadowdom-for-keygen-only-shadow.html:
+        * fast/dom/shadow/shadowdom-for-keygen-without-shadow-expected.html:
+        * fast/dom/shadow/shadowdom-for-keygen-without-shadow.html:
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-08-23  Jon Honeycutt  <jhoneycutt@apple.com>
+
+        Update Skipped list and TestExpectations in preparation for making
+        Mountain Lion the default Mac builder.
+
+        Rubber-stamped by Jessie Berlin.
+
+        * platform/mac-lion/TestExpectations: Added.
+        Moved/added test expectations from platform/mac/TestExpectations to
+        here.
+
+        * platform/mac/Skipped:
+        Added some known failures from internal testers.
+
+        * platform/mac/TestExpectations:
+        Ditto.
+
+2012-08-23  Shezan Baig  <shezbaig.wk@gmail.com>
+
+        Remove FIXMEs from css3/flexbox/flexitem.html
+        https://bugs.webkit.org/show_bug.cgi?id=94872
+
+        Reviewed by Ojan Vafai.
+
+        Remove FIXMEs that were fixed in bug 94604.
+
+        * css3/flexbox/flexitem.html:
+
+2012-08-23  Shezan Baig  <shezbaig.wk@gmail.com>
+
+        Fix cross-direction stretch for replaced elements in column flexbox
+        https://bugs.webkit.org/show_bug.cgi?id=94604
+
+        Reviewed by Ojan Vafai.
+
+        Fixed failing test cases. Add tests for min/max width/height.
+
+        * css3/flexbox/flexitem-expected.txt:
+        * css3/flexbox/flexitem.html:
+
+2012-08-23  Kenneth Russell  <kbr@google.com>
+
+        Unreviewed Chromium gardening. Generalized a few Snow Leopard-only
+        expectations to Mac in order to get the new Lion bot green.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-23  Dominic Mazzoni  <dmazzoni@google.com>
+
+        AX: Focusable elements without a role should not be ignored
+        https://bugs.webkit.org/show_bug.cgi?id=94302
+
+        Reviewed by Chris Fleizach.
+
+        Adds a new test to make sure that a generic focusable element (like a div with tabindex=0)
+        can get focus and return an appropriate title, just like a form control or element with
+        an ARIA role.
+
+        Modifies three existing tests that were previously assuming that a focusable node
+        with no role would be ignored for accessibility ("accessibilityIsIgnored").
+
+        * accessibility/editable-webarea-context-menu-point.html:
+        * accessibility/focusable-div-expected.txt: Added.
+        * accessibility/focusable-div.html: Added.
+        * accessibility/table-detection.html:
+        * platform/mac/accessibility/listbox-hit-test.html:
+
+2012-08-23  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        Change behavior of MasqueradesAsUndefined to better accommodate DFG changes
+        https://bugs.webkit.org/show_bug.cgi?id=93884
+
+        Reviewed by Filip Pizlo.
+
+        Added a test that uses a variety of ways of checking whether something is correctly 
+        masquerading as undefined (or not) in a subframe.
+
+        * fast/js/document-all-between-frames-expected.txt: Added.
+        * fast/js/document-all-between-frames.html: Added.
+        * fast/js/resources/document-all-between-frames-subframe.html: Added.
+        * platform/chromium/TestExpectations: Chromium treats document.all differently, so skip our new test.
+
+2012-08-23  Ulan Degenbaev  <ulan@chromium.org>
+
+        Adjust test expectations for fast/js/toString-overrides.html and fast/js/eval-cross-window.html
+        https://bugs.webkit.org/show_bug.cgi?id=94824
+
+        Reviewed by Kentaro Hara.
+
+        Add a bug number for tracking failing cases in fast/js/toString-overrides.html.
+        Upload Chromium specific test expectations for fast/js/eval-cross-window.html.
+
+        Failing tests in eval-cross-window swap the eval() function in the main window and the frame.
+        This behaviour is not specified in ECMA-262 and is probably implementation dependent.
+        Both Firefox and Chromium produce the same result for this test.
+
+        * platform/chromium/TestExpectations:
+        * platform/chromium/fast/js/eval-cross-window-expected.txt: Added.
+
+2012-08-23  Mike West  <mkwst@chromium.org>
+
+        Trailing spaces in CSP source lists should not generate console warnings.
+        https://bugs.webkit.org/show_bug.cgi?id=94847
+
+        Reviewed by Adam Barth.
+
+        Trailing space after a valid source in a Content Security Policy source
+        list was accidentally generating console warnings about an invalid
+        (empty) source. This patch silently ignores trailing whitespace instead.
+
+        * http/tests/security/contentSecurityPolicy/source-list-parsing-02-expected.txt:
+        * http/tests/security/contentSecurityPolicy/source-list-parsing-02.html:
+
+2012-08-23  Kenneth Russell  <kbr@google.com>
+
+        [Chromium] LayoutTests: css3/selector3/xml tests are flaky / have wrong expectations on Snow Leopard
+        https://bugs.webkit.org/show_bug.cgi?id=82122
+
+        Unreviewed Chromium gardening. Expanded expectations from Snow Leopard to Mac.
+
+        * platform/chromium/TestExpectations:
+
+2012-05-25  Anna Cavender <annacc@chromium.org>
+
+        [Chromium] Removing media/track/track-mode.html - resolved.
+        [Chromium] Removing media/track/track-cues-cuechange.html - appears to be no longer failing.
+ 
+        Unreviewed gardening.
+
+        * platform/chromium/TestExpectations: 
+
+2012-08-23  KwangYong Choi  <ky0.choi@samsung.com>
+
+        [EFL] Update pixel test expectations for layout test fast/forms/
+        https://bugs.webkit.org/show_bug.cgi?id=94687
+
+        Unreviewed, rebaseline.
+
+        Some tests have wrong pixel test expectations. They should be replaced.
+
+        * platform/efl/fast/forms/003-expected.png:
+        * platform/efl/fast/forms/006-expected.png:
+        * platform/efl/fast/forms/007-expected.png:
+        * platform/efl/fast/forms/HTMLOptionElement_label01-expected.png:
+        * platform/efl/fast/forms/HTMLOptionElement_label02-expected.png:
+        * platform/efl/fast/forms/HTMLOptionElement_label03-expected.png:
+        * platform/efl/fast/forms/HTMLOptionElement_label04-expected.png:
+        * platform/efl/fast/forms/HTMLOptionElement_label05-expected.png:
+        * platform/efl/fast/forms/basic-buttons-expected.png:
+        * platform/efl/fast/forms/basic-inputs-expected.png:
+        * platform/efl/fast/forms/button-align-expected.png:
+        * platform/efl/fast/forms/button-cannot-be-nested-expected.png:
+        * platform/efl/fast/forms/button-default-title-expected.png:
+        * platform/efl/fast/forms/button-generated-content-expected.png:
+        * platform/efl/fast/forms/button-inner-block-reuse-expected.png:
+        * platform/efl/fast/forms/button-sizes-expected.png:
+        * platform/efl/fast/forms/button-style-color-expected.png:
+        * platform/efl/fast/forms/button-table-styles-expected.png:
+        * platform/efl/fast/forms/button-text-transform-expected.png:
+        * platform/efl/fast/forms/button-white-space-expected.png:
+        * platform/efl/fast/forms/control-clip-expected.png:
+        * platform/efl/fast/forms/control-clip-overflow-expected.png:
+        * platform/efl/fast/forms/control-restrict-line-height-expected.png:
+        * platform/efl/fast/forms/disabled-select-change-index-expected.png:
+        * platform/efl/fast/forms/encoding-test-expected.png:
+        * platform/efl/fast/forms/fieldset-align-expected.png:
+        * platform/efl/fast/forms/file/file-input-direction-expected.png:
+        * platform/efl/fast/forms/file/file-input-disabled-expected.png:
+        * platform/efl/fast/forms/floating-textfield-relayout-expected.png:
+        * platform/efl/fast/forms/form-hides-table-expected.png:
+        * platform/efl/fast/forms/image-border-expected.png:
+        * platform/efl/fast/forms/input-appearance-bkcolor-expected.png:
+        * platform/efl/fast/forms/input-appearance-default-bkcolor-expected.png:
+        * platform/efl/fast/forms/input-appearance-focus-expected.png:
+        * platform/efl/fast/forms/input-appearance-preventDefault-expected.png:
+        * platform/efl/fast/forms/input-appearance-selection-expected.png:
+        * platform/efl/fast/forms/input-appearance-visibility-expected.png:
+        * platform/efl/fast/forms/input-appearance-width-expected.png:
+        * platform/efl/fast/forms/input-button-sizes-expected.png:
+        * platform/efl/fast/forms/input-disabled-color-expected.png:
+        * platform/efl/fast/forms/input-double-click-selection-gap-bug-expected.png:
+        * platform/efl/fast/forms/input-field-text-truncated-expected.png:
+        * platform/efl/fast/forms/input-readonly-dimmed-expected.png:
+        * platform/efl/fast/forms/input-readonly-empty-expected.png:
+        * platform/efl/fast/forms/input-spaces-expected.png:
+        * platform/efl/fast/forms/input-table-expected.png:
+        * platform/efl/fast/forms/input-text-click-inside-expected.png:
+        * platform/efl/fast/forms/input-text-option-delete-expected.png:
+        * platform/efl/fast/forms/input-text-self-emptying-click-expected.png:
+        * platform/efl/fast/forms/input-text-word-wrap-expected.png:
+        * platform/efl/fast/forms/input-type-text-min-width-expected.png:
+        * platform/efl/fast/forms/input-value-expected.png:
+        * platform/efl/fast/forms/input-width-expected.png:
+        * platform/efl/fast/forms/listbox-bidi-align-expected.png:
+        * platform/efl/fast/forms/listbox-scrollbar-incremental-load-expected.png:
+        * platform/efl/fast/forms/listbox-width-change-expected.png:
+        * platform/efl/fast/forms/menulist-clip-expected.png:
+        * platform/efl/fast/forms/menulist-option-wrap-expected.png:
+        * platform/efl/fast/forms/menulist-width-change-expected.png:
+        * platform/efl/fast/forms/minWidthPercent-expected.png:
+        * platform/efl/fast/forms/negativeLineHeight-expected.png:
+        * platform/efl/fast/forms/option-index-expected.png:
+        * platform/efl/fast/forms/option-script-expected.png:
+        * platform/efl/fast/forms/option-strip-whitespace-expected.png:
+        * platform/efl/fast/forms/option-text-clip-expected.png:
+        * platform/efl/fast/forms/search-display-none-cancel-button-expected.png:
+        * platform/efl/fast/forms/search-vertical-alignment-expected.png:
+        * platform/efl/fast/forms/searchfield-heights-expected.png:
+        * platform/efl/fast/forms/select-align-expected.png:
+        * platform/efl/fast/forms/select-block-background-expected.png:
+        * platform/efl/fast/forms/select-change-listbox-size-expected.png:
+        * platform/efl/fast/forms/select-change-listbox-to-popup-expected.png:
+        * platform/efl/fast/forms/select-change-popup-to-listbox-expected.png:
+        * platform/efl/fast/forms/select-dirty-parent-pref-widths-expected.png:
+        * platform/efl/fast/forms/select-display-none-style-resolve-expected.png:
+        * platform/efl/fast/forms/select-initial-position-expected.png:
+        * platform/efl/fast/forms/select-item-background-clip-expected.png:
+        * platform/efl/fast/forms/select-list-box-with-height-expected.png:
+        * platform/efl/fast/forms/select-size-expected.png:
+        * platform/efl/fast/forms/select-visual-hebrew-expected.png:
+        * platform/efl/fast/forms/select/optgroup-rendering-expected.png:
+        * platform/efl/fast/forms/tabbing-input-iframe-expected.png:
+        * platform/efl/fast/forms/targeted-frame-submission-expected.png:
+        * platform/efl/fast/forms/text-style-color-expected.png:
+        * platform/efl/fast/forms/textAreaLineHeight-expected.png:
+        * platform/efl/fast/forms/textarea-align-expected.png:
+        * platform/efl/fast/forms/textarea-width-expected.png:
+        * platform/efl/fast/forms/textfield-focus-ring-expected.png:
+        * platform/efl/fast/forms/textfield-outline-expected.png:
+        * platform/efl/fast/forms/visual-hebrew-text-field-expected.png:
+
+2012-08-23  Christophe Dumez  <christophe.dumez@intel.com>
+
+        Serialization of JavaScript values does not appear to respect new HTML5 Structured Clone semantics
+        https://bugs.webkit.org/show_bug.cgi?id=65292
+
+        Reviewed by Oliver Hunt.
+
+        Update expected results for fast/dom/Window/window-postmessage-clone.html
+        now that String, Boolean and Number object are correctly serialized with
+        JSC.
+
+        * fast/dom/Window/window-postmessage-clone-expected.txt:
+        * platform/gtk/fast/dom/Window/window-postmessage-clone-expected.txt:
+
+2012-08-23  Kenneth Russell  <kbr@google.com>
+
+        Web Inspector: three layout tests crashing with assertion failure
+        https://bugs.webkit.org/show_bug.cgi?id=94829
+
+        Unreviewed. Expanded suppressions.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-23  Andrei Onea  <onea@adobe.com>
+
+        [CSSRegions]Crash when moving anonymous block children inside a named flow
+        https://bugs.webkit.org/show_bug.cgi?id=90865
+
+        Reviewed by Abhishek Arya.
+
+        Added test for crash which happens when the children of an anonymous block
+        inside a flow thread are moved.
+
+        * fast/regions/move-anonymous-block-inside-named-flow-crash-expected.txt:
+        * fast/regions/move-anonymous-block-inside-named-flow-crash.html:
+
+2012-08-23  Li Yin  <li.yin@intel.com>
+
+        Add test for decodeAudioData
+        https://bugs.webkit.org/show_bug.cgi?id=92620
+
+        Reviewed by Chris Rogers.
+
+        Spec: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html#AudioContext-section
+        This test checks if successCallback or errorCallback can be invoked correctly when
+        there is a correct or error decoding.
+
+        * webaudio/decode-audio-data-basic-expected.txt: Added.
+        * webaudio/decode-audio-data-basic.html: Added.
+        * webaudio/resources/media/invalid-audio-file.txt: Added.
+
+2012-08-23  Kenneth Russell  <kbr@google.com>
+
+        Web Inspector: three layout tests crashing with assertion failure
+        https://bugs.webkit.org/show_bug.cgi?id=94829
+
+        Unreviewed Chromium gardening. Suppressed failing tests.
+
+        * platform/chromium/TestExpectations:
+
+2012-08-23  Alexander Shalamov  <alexander.shalamov@intel.com>
+
+        getComputedStyle returns wrong value for CSS3 2D transformations
+        https://bugs.webkit.org/show_bug.cgi?id=94211
+
+        Reviewed by Simon Fraser.
+
+        This change fixes getComputedStyle-transform.html test.
+        Before this change, the test doesn't do anything.
+        When new transformation value is set, it immediately read
+        back as an old value, thus computed style is equal to
+        an old style. Moreover, expected result is never checked.
+        Added new test case to computed-style-origin.html layout test.
+
+        * fast/css/getComputedStyle/getComputedStyle-transform-expected.txt:
+        * fast/css/getComputedStyle/getComputedStyle-transform.html:
+        * transforms/2d/computed-style-origin-expected.txt:
+        * transforms/2d/computed-style-origin.html:
+
+2012-08-23  Takashi Sakamoto  <tasak@google.com>
+
+        Distributed nodes should not share styles.
+        https://bugs.webkit.org/show_bug.cgi?id=90661
+
+        Reviewed by Hajime Morita.
+
+        * fast/dom/shadow/style-of-distributed-node-expected.txt: Added.
+        * fast/dom/shadow/style-of-distributed-node.html: Added.
+        * fast/dom/shadow/user-modify-inheritance-expected.txt:
+        As this patch also change the user-modify-inheritance's test result,
+        updated the expected result.
+        * fast/dom/shadow/user-modify-inheritance.html:
+        Added FIXME comment.
+
+2012-08-23  John Mellor  <johnme@chromium.org>
+
+        Text Autosizing: Multiply large fonts less, as they are already more legible.
+        https://bugs.webkit.org/show_bug.cgi?id=94227
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added test demonstrating how various font sizes are affected.
+
+        * fast/text-autosizing/various-font-sizes-expected.html: Added.
+        * fast/text-autosizing/various-font-sizes.html: Added.
+
+2012-08-23  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Adding platform-specific baselines required after r126343 and r126372.
+
+        * platform/gtk/fast/overflow/paged-x-div-expected.png: Added.
+        * platform/gtk/fast/overflow/paged-x-div-expected.txt: Added.
+        * platform/gtk/fast/overflow/paged-x-on-root-expected.png: Added.
+        * platform/gtk/fast/overflow/paged-x-on-root-expected.txt: Added.
+        * platform/gtk/fast/overflow/paged-y-div-expected.png: Added.
+        * platform/gtk/fast/overflow/paged-y-div-expected.txt: Added.
+        * platform/gtk/fast/overflow/paged-y-on-root-expected.png: Added.
+        * platform/gtk/fast/overflow/paged-y-on-root-expected.txt: Added.
+        * platform/gtk/media/track: Added.
+        * platform/gtk/media/track/track-cue-rendering-horizontal-expected.png: Added.
+        * platform/gtk/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/gtk/media/track/track-cue-rendering-vertical-expected.png: Added.
+        * platform/gtk/media/track/track-cue-rendering-vertical-expected.txt: Added.
+
+2012-08-23  Dominic Cooney  <dominicc@chromium.org>
+
+        Unreviewed, rolling out r126391.
+        http://trac.webkit.org/changeset/126391
+        https://bugs.webkit.org/show_bug.cgi?id=94302
+
+        Breaks Chromium browser_tests AccessibilityFooter,
+        AccessibilityListMarkers, AccessibilityUI
+
+        * accessibility/editable-webarea-context-menu-point.html:
+        * accessibility/focusable-div-expected.txt: Removed.
+        * accessibility/focusable-div.html: Removed.
+        * accessibility/table-detection.html:
+        * platform/mac/accessibility/listbox-hit-test.html:
+
 2012-08-23  Hajime Morrita  <morrita@chromium.org>
 
         Unreviewed Chromium gardeing.

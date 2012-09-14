@@ -38,6 +38,7 @@ DEFINES += USE_SYSTEM_MALLOC=1
 contains(DEFINES, HAVE_FONTCONFIG=1): PKGCONFIG += fontconfig
 
 INCLUDEPATH += \
+    $$PWD \
     $${ROOT_WEBKIT_DIR}/Tools/DumpRenderTree/qt
 
 PREFIX_HEADER = WebKitTestRunnerPrefix.h

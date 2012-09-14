@@ -124,9 +124,15 @@ haveQt(5) {
 haveQt(4)|haveQtModule(widgets): DEFINES += HAVE_QSTYLE=1
 
 # Enable the USE(3D_GRAPHICS) when QtOpenGL is enabled.
-!contains(DEFINES, WTF_USE_3D_GRAPHICS=.):contains(QT_CONFIG, opengl) {
+# Disable on Windows CE for now, as ANGLE won't compile.
+!contains(DEFINES, WTF_USE_3D_GRAPHICS=.):!wince*:contains(QT_CONFIG, opengl) {
     # On Windows we require GLES2/EGL through ANGLE.
     !win32|contains(QT_CONFIG, opengles2): DEFINES += WTF_USE_3D_GRAPHICS=1
+}
+
+# Temporarily disable FTPDIR on Windows CE (missing functions from time.h)
+wince* {
+    DEFINES -= ENABLE_FTPDIR=1
 }
 
 # WebGL support - only enabled if we can use 3D graphics
@@ -137,7 +143,6 @@ haveQt(4)|haveQtModule(widgets): DEFINES += HAVE_QSTYLE=1
 haveQt(4):contains(DEFINES, ENABLE_WEBGL=1):contains(DEFINES, WTF_USE_3D_GRAPHICS=0) {
     error("WebGL requires Qt to be configured with OpenGL. Please reconfigure Qt with OpenGL, or build WebKit without WebGL.")
 }
-
 
 # CSS Shaders support
 !contains(DEFINES, ENABLE_CSS_SHADERS=.) {

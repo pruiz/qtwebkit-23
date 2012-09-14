@@ -1,3 +1,53 @@
+2012-08-27  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        Rename RegisterProtocolHandler API to NavigatorContentUtils
+        https://bugs.webkit.org/show_bug.cgi?id=94920
+
+        Reviewed by Adam Barth.
+
+        Renaming whatever RegisterProtocolHandler-prefixed to NavigatorContentUtils-prefixed.
+
+        * Configurations/FeatureDefines.xcconfig:
+        * WebProcess/WebCoreSupport/WebNavigatorContentUtilsClient.h: Renamed from Source/WebKit2/WebProcess/WebCoreSupport/WebRegisterProtocolHandlerClient.h.
+        (WebKit):
+        (WebNavigatorContentUtilsClient):
+        (WebKit::WebNavigatorContentUtilsClient::~WebNavigatorContentUtilsClient):
+        (WebKit::WebNavigatorContentUtilsClient::isProtocolHandlerRegistered):
+        (WebKit::WebNavigatorContentUtilsClient::unregisterProtocolHandler):
+
+2012-08-25  Vivek Galatage  <vivekgalatage@gmail.com>
+
+        WinCairo Build Broken due to missing export definitions
+        https://bugs.webkit.org/show_bug.cgi?id=95007
+
+        Reviewed by Ryosuke Niwa.
+
+        Export symbols were missing from the def file for WinCairo port. Added
+        these missing symbols to avoid build break
+
+        * win/WebKit2CFLite.def:
+
+2012-08-24  Alexey Proskuryakov  <ap@apple.com>
+
+        <rdar://problem/12157689> REGRESSION: WebProcessProxy destructor is sometimes called recursively
+        https://bugs.webkit.org/show_bug.cgi?id=94997
+
+        Reviewed by Dan Bernstein.
+
+        * UIProcess/WebContext.cpp: (WebKit::WebContext::disconnectProcess): Make sure that
+        we don't try to delete WebProcessProxy while the vector still contains it. Previously,
+        we used RefPtr::clear, which zeroes out the value before destructing, but doing that
+        in every RefPtr destructor would be bad for performance.
+
+2012-08-24  Benjamin Poulain  <bpoulain@apple.com>
+
+        Unify Number to StringImpl conversion
+        https://bugs.webkit.org/show_bug.cgi?id=94879
+
+        Reviewed by Geoffrey Garen.
+
+        * win/WebKit2.def: Update the exported symbols.
+
 2012-08-24  Andras Becsi  <andras.becsi@nokia.com>
 
         [Qt][WK2] Fix custom device pixel ratio propagation and add QML API tests

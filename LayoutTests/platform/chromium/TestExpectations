@@ -175,9 +175,9 @@ BUGWK94287 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appear
 BUGWK94287 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes.html = MISSING TEXT IMAGE IMAGE+TEXT PASS
 BUGWK94287 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-style.html = MISSING TEXT IMAGE IMAGE+TEXT PASS
 
-// Temporary disabled
-BUGWK94439 MAC : fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic.html = IMAGE PASS
-BUGWK94439 MAC : fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements.html = IMAGE PASS
+// BUG95055: We need to rebaseline for MAC and WIN for multiple fields time input UI
+BUGWK95055 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic.html = MISSING TEXT IMAGE IMAGE+TEXT PASS
+BUGWK95055 MAC WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements.html = MISSING TEXT IMAGE IMAGE+TEXT PASS
 
 // Proximity Events is not supported.
 BUGWK92942 SKIP : fast/dom/Proximity = PASS
@@ -923,13 +923,6 @@ BUGWK66377 : fast/dom/StyleSheet/gc-parent-rule.html = TEXT
 BUGWK66377 : fast/dom/StyleSheet/gc-parent-stylesheet.html = TEXT
 BUGWK66377 : fast/dom/StyleSheet/gc-rule-children-wrappers.html = TEXT
 
-// These tests don't work with fast timers due to setTimeout
-// races. See https://bugs.webkit.org/show_bug.cgi?id=21536
-// We currently match upstream except for font differences, but we should
-// probably rewrite the test as suggested in the webkit bug.
-BUGCR24195 LINUX ANDROID WIN : fast/repaint/bugzilla-6473.html = IMAGE+TEXT
-BUGCR24195 MAC : fast/repaint/bugzilla-6473.html = IMAGE
-
 // Implement testRunner.display()
 BUGCR8630 LINUX ANDROID WIN : fast/repaint/body-background-image.html = IMAGE IMAGE+TEXT
 
@@ -1519,7 +1512,7 @@ BUGCR23473 MAC : fast/repaint/body-background-image.html = IMAGE
 BUGCR23473 MAC : fast/repaint/bugzilla-5699.html = IMAGE
 BUGCR23473 MAC : fast/repaint/bugzilla-6278.html = IMAGE
 BUGCR23473 MAC : fast/repaint/content-into-overflow.html = IMAGE
-BUGCR23473 LION SNOWLEOPARD : fast/repaint/control-clip.html = IMAGE
+BUGCR23473 LION SNOWLEOPARD : fast/repaint/control-clip.html = IMAGE+TEXT
 BUGCR23473 MAC : fast/repaint/create-layer-repaint.html = IMAGE
 BUGCR23473 MAC : fast/repaint/intermediate-layout-position-clip.html = IMAGE
 BUGCR23473 MAC : fast/repaint/intermediate-layout-position.html = IMAGE
@@ -2063,6 +2056,8 @@ BUGCR65877 : fast/writing-mode/japanese-ruby-vertical-lr.html = PASS IMAGE+TEXT
 BUGCR65877 : fast/writing-mode/japanese-ruby-vertical-rl.html = PASS IMAGE+TEXT
 BUGCR65877 : fast/writing-mode/japanese-ruby-horizontal-bt.html = PASS IMAGE+TEXT
 BUGCR65877 LINUX : fast/writing-mode/broken-ideographic-font.html = IMAGE+TEXT
+BUGWK95052 WIN SNOWLEOPARD : fast/writing-mode/broken-ideographic-font.html = TEXT
+BUGWK95051 LION : fast/writing-mode/broken-ideographic-font.html = CRASH
 BUGCR65877 LINUX ANDROID WIN : fast/writing-mode/vertical-font-fallback.html = IMAGE+TEXT
 //BUGCR65877 LINUX ANDROID WIN : fast/writing-mode/broken-ideograph-small-caps.html = IMAGE
 BUGCR65877 LINUX ANDROID WIN : fast/writing-mode/Kusa-Makura-background-canvas.html = IMAGE+TEXT
@@ -2373,9 +2368,6 @@ BUGCR79241 : http/tests/misc/favicon-loads-with-icon-loading-override.html = TEX
 
 // Regression caused by r83669. Seems to be V8 related.
 BUGCR79259 : fast/js/array-proto-func-property-getter-except.html = PASS TEXT
-
-// Flaky, perhaps Skia related.
-BUGCR79851 LINUX ANDROID : fast/table/frame-and-rules.html = PASS TEXT
 
 BUGCR79857 DEBUG : fast/events/popup-blocking-timers.html = PASS TEXT
 
@@ -3449,6 +3441,14 @@ BUGWK94256 DEBUG : fast/block/inline-children-root-linebox-crash.html = PASS CRA
 
 BUGWK94261 DEBUG : http/tests/inspector/indexeddb/resources-panel.html = PASS CRASH TIMEOUT
 
+// ENABLE_OVERFLOW_SCROLLING is not currently enabled in Chromium.
+BUGWK94353 : compositing/overflow/scrolling-content-clip-to-viewport.html = TEXT
+BUGWK94353 : compositing/overflow/textarea-scroll-touch.html = TEXT
+// Failing on Linux (Content Shell) only now
+BUGWK94353 LINUX : compositing/overflow/nested-scrolling.html = IMAGE+TEXT PASS
+BUGWK94353 : compositing/overflow/overflow-auto-with-touch.html = TEXT
+BUGWK94353 : compositing/overflow/overflow-overlay-with-touch.html = TEXT
+
 // Needs a rebaseline.
 BUGWK40272 : svg/css/circle-in-mask-with-shadow.svg = IMAGE
 
@@ -3464,7 +3464,6 @@ BUGWK94528 MAC : fast/text-autosizing/nested-em-line-height.html = PASS IMAGE
 BUGWK94532 LINUX : fast/forms/formmethod-attribute-button-html.html = PASS MISSING
 
 BUGWK94660 : fast/js/create-lots-of-workers.html = PASS CRASH TIMEOUT
-BUGWK94667 WIN : fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic.html = IMAGE
 BUGWK94675 : css3/flexbox/flexitem.html = TEXT
 
 BUGWK94730 MAC : fast/repaint/japanese-rl-selection-repaint-in-regions.html = IMAGE
@@ -3497,3 +3496,151 @@ BUGCR144536 WONTFIX ANDROID : fast/forms/select/optgroup-clicking.html = TEXT
 BUGCR144536 WONTFIX ANDROID : fast/forms/select/optgroup-rendering.html = TEXT
 BUGCR144536 WONTFIX ANDROID : fast/repaint/select-option-background-color.html = TEXT
 BUGCR144536 WONTFIX ANDROID : scrollbars/listbox-scrollbar-combinations.html = TEXT
+
+// Require rebaseline after https://bugs.webkit.org/show_bug.cgi?id=84286
+BUGWK84286 : fast/block/float/avoidance-rtl.html = TEXT
+BUGWK84286 : fast/borders/border-radius-wide-border-01.html = TEXT
+BUGWK84286 : fast/borders/only-one-border-with-width.html = TEXT
+BUGWK84286 : fast/multicol/progression-reverse.html = TEXT
+BUGWK84286 : fast/multicol/vertical-lr/rules-with-border-before.html = TEXT
+BUGWK84286 : fast/multicol/vertical-rl/rules-with-border-before.html = TEXT
+BUGWK84286 : css1/box_properties/border_bottom-expected.png = TEXT
+BUGWK84286 : css2.1/t0805-c5519-brdr-r-00-a.html = TEXT
+BUGWK84286 : css2.1/t0805-c5519-brdr-r-01-e.html = TEXT
+BUGWK84286 : css2.1/t0805-c5520-brdr-b-01-e.html = TEXT
+BUGWK84286 : css2.1/t0805-c5521-brdr-l-00-a.html = TEXT
+BUGWK84286 : css2.1/t0805-c5521-brdr-l-01-e.html = TEXT
+BUGWK84286 : css2.1/t0805-c5521-ibrdr-l-00-a.html = TEXT
+BUGWK84286 : fast/css/line-height-determined-by-primary-font.html = TEXT
+BUGWK84286 : animations/cross-fade-border-image-source.html = TEXT
+BUGWK84286 : css1/box_properties/border_bottom.html = TEXT
+BUGWK84286 : css1/box_properties/border_bottom_inline.html = TEXT
+BUGWK84286 : css1/box_properties/border_left.html = TEXT
+BUGWK84286 : css1/box_properties/border_left_inline.html = TEXT
+BUGWK84286 : css1/box_properties/border_right.html = TEXT
+BUGWK84286 : css1/box_properties/border_right_inline.html = TEXT
+BUGWK84286 : css1/units/length_units.html = TEXT
+BUGWK84286 : css2.1/20110323/absolute-replaced-height-036.htm = TEXT
+BUGWK84286 : css2.1/20110323/block-non-replaced-height-007.htm = TEXT
+BUGWK84286 : css2.1/20110323/block-non-replaced-height-008.htm = TEXT
+BUGWK84286 : css2.1/20110323/block-non-replaced-height-009.htm = TEXT
+BUGWK84286 : css2.1/20110323/block-non-replaced-height-010.htm = TEXT
+BUGWK84286 : css2.1/20110323/block-non-replaced-width-001.htm = TEXT
+BUGWK84286 : css2.1/20110323/block-non-replaced-width-002.htm = TEXT
+BUGWK84286 : css2.1/20110323/block-non-replaced-width-003.htm = TEXT
+BUGWK84286 : css2.1/20110323/block-non-replaced-width-004.htm = TEXT
+BUGWK84286 : css2.1/20110323/block-non-replaced-width-008.htm = TEXT
+BUGWK84286 : css2.1/20110323/margin-applies-to-008.htm = TEXT
+BUGWK84286 : css2.1/20110323/width-non-replaced-inline-001.htm = TEXT
+BUGWK84286 : css2.1/t040302-c61-phys-len-00-b.html = TEXT
+BUGWK84286 : css2.1/t0804-c5507-padn-r-02-f.html = TEXT
+BUGWK84286 : css2.1/t0804-c5508-ipadn-b-03-b-a.html = TEXT
+BUGWK84286 : css2.1/t0804-c5509-padn-l-02-f.html = TEXT
+BUGWK84286 : css2.1/t0805-c5519-brdr-r-02-e.html = TEXT
+BUGWK84286 : css2.1/t0805-c5519-ibrdr-r-00-a.html = TEXT
+BUGWK84286 : css2.1/t0805-c5520-brdr-b-00-a.html = TEXT
+BUGWK84286 : css2.1/t0805-c5520-ibrdr-b-00-a.html = TEXT
+BUGWK84286 : css2.1/t0805-c5521-brdr-l-02-e.html = TEXT
+BUGWK84286 : editing/deleting/type-delete-after-quote.html = TEXT
+BUGWK84286 : editing/execCommand/4580583-1.html = TEXT
+BUGWK84286 : editing/execCommand/4580583-2.html = TEXT
+BUGWK84286 : editing/inserting/5418891.html = TEXT
+BUGWK84286 : editing/inserting/5510537.html = TEXT
+BUGWK84286 : editing/inserting/6703873.html = TEXT
+BUGWK84286 : editing/inserting/break-blockquote-after-delete.html = TEXT
+BUGWK84286 : editing/pasteboard/5006779.html = TEXT
+BUGWK84286 : editing/pasteboard/paste-blockquote-after-blockquote.html = TEXT
+BUGWK84286 : editing/pasteboard/paste-blockquote-into-blockquote-4.html = TEXT
+BUGWK84286 : fast/block/float/012.html = TEXT
+BUGWK84286 : fast/block/float/013.html = TEXT
+BUGWK84286 : fast/block/float/016.html = TEXT
+BUGWK84286 : fast/block/margin-collapse/041.html = TEXT
+BUGWK84286 : fast/block/margin-collapse/043.html = TEXT
+BUGWK84286 : fast/block/margin-collapse/057.html = TEXT
+BUGWK84286 : fast/css/acid2.html = TEXT
+BUGWK84286 : fast/css/acid2-pixel.html = TEXT
+BUGWK84286 : fast/css/border-height.html = TEXT
+BUGWK84286 : fast/frames/viewsource-attribute.html = TEXT
+BUGWK84286 : fast/frames/viewsource-on-image-file.html = TEXT
+BUGWK84286 : fast/inline/inline-padding-disables-text-quirk.html = TEXT
+BUGWK84286 : fast/inline/inline-text-quirk-bpm.html = TEXT
+BUGWK84286 : fast/layers/scroll-rect-to-visible.html = TEXT
+BUGWK84286 : fast/lists/007.html = TEXT
+BUGWK84286 : fast/multicol/block-axis-horizontal-bt.html = TEXT
+BUGWK84286 : fast/multicol/block-axis-vertical-lr.html = TEXT
+BUGWK84286 : fast/multicol/block-axis-vertical-rl.html = TEXT
+BUGWK84286 : fast/overflow/overflow-rtl.html = TEXT
+BUGWK84286 : fast/overflow/overflow-rtl-inline-scrollbar.html = TEXT
+BUGWK84286 : fast/repaint/repaint-across-writing-mode-boundary.html = TEXT
+BUGWK84286 : fast/table/border-collapsing/003.html = TEXT
+BUGWK84286 : fast/table/border-collapsing/003-vertical.html = TEXT
+BUGWK84286 : fast/table/border-collapsing/rtl-border-collapsing.html = TEXT
+BUGWK84286 : fast/table/colgroup-spanning-groups-rules.html = TEXT
+BUGWK84286 : fast/text/basic/015.html = TEXT
+BUGWK84286 : fast/text/monospace-width-cache.html = TEXT
+BUGWK84286 : http/tests/misc/acid2.html = TEXT
+BUGWK84286 : http/tests/misc/acid2-pixel.html = TEXT
+BUGWK84286 : ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-009.htm = TEXT
+BUGWK84286 : ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-012.htm = TEXT
+BUGWK84286 : ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-013.htm = TEXT
+BUGWK84286 : ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-014.htm = TEXT
+BUGWK84286 : ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-015.htm = TEXT
+BUGWK84286 : ietestcenter/css3/bordersbackgrounds/border-radius-applies-to-016.htm = TEXT
+BUGWK84286 : ietestcenter/css3/bordersbackgrounds/border-top-left-radius-values-001.htm = TEXT
+BUGWK84286 : tables/mozilla/core/table_rules.html = TEXT
+BUGWK84286 : tables/mozilla/marvin/x_table_rules_groups.xml = TEXT
+BUGWK84286 : tables/mozilla_expected_failures/collapsing_borders/bug41262-1.html = TEXT
+BUGWK84286 : tables/mozilla_expected_failures/other/test4.html = TEXT
+BUGWK84286 : transforms/2d/transform-borderbox.html = TEXT
+BUGWK84286 : transforms/2d/transform-origin-borderbox.html = TEXT
+BUGWK84286 : transitions/cross-fade-border-image.html = TEXT
+BUGWK84286 : fast/css/pseudo-first-line-border-width.html = TEXT
+BUGWK84286 : css2.1/20110323/abspos-non-replaced-width-margin-000.htm = TEXT
+BUGWK84286 : css2.1/20110323/abspos-replaced-width-margin-000.htm = TEXT
+BUGWK84286 : fast/css/caption-width-absolute-position.htm = TEXT
+BUGWK84286 : fast/css/caption-width-absolute-position-offset-top.htm = TEXT
+BUGWK84286 : fast/css/caption-width-fixed-position.htm = TEXT
+BUGWK84286 : fast/css/caption-width-fixed-position-offset-top.htm = TEXT
+BUGWK84286 : fast/table/border-collapsing/equal-precedence-resolution.html = TEXT
+BUGWK84286 : fast/table/border-collapsing/equal-precedence-resolution-vertical.html = TEXT
+BUGWK84286 : fast/text/apply-start-width-after-skipped-text.html = TEXT
+
+BUGWK84286 : fast/hidpi/image-set-border-image-comparison.html = TEXT
+BUGWK84286 : fast/hidpi/image-set-border-image-dynamic.html = TEXT
+
+BUGWK84286 MAC : css3/selectors3/html/css3-modsel-19b.html = TEXT
+BUGWK84286 MAC : css3/selectors3/html/css3-modsel-64.html = TEXT
+BUGWK84286 MAC : css3/selectors3/xhtml/css3-modsel-19b.xml = TEXT
+BUGWK84286 MAC : css3/selectors3/xhtml/css3-modsel-64.xml = TEXT
+BUGWK84286 MAC : css3/selectors3/xml/css3-modsel-19b.xml = TEXT
+BUGWK84286 MAC : css3/selectors3/xml/css3-modsel-64.xml = TEXT
+BUGWK84286 MAC : fast/block/positioning/inline-block-relposition.html = TEXT
+BUGWK84286 MAC : fast/css/rtl-ordering.html = TEXT
+BUGWK84286 MAC : fast/dom/HTMLTableColElement/resize-table-using-col-width.html = TEXT
+BUGWK84286 MAC : fast/dynamic/positioned-movement-with-positioned-children.html = TEXT
+BUGWK84286 MAC : fast/forms/basic-buttons.html = TEXT
+BUGWK84286 MAC : fast/forms/box-shadow-override.html = TEXT
+BUGWK84286 MAC : fast/forms/button-align.html = TEXT
+BUGWK84286 MAC : fast/forms/button-cannot-be-nested.html = TEXT
+BUGWK84286 MAC : fast/forms/button-generated-content.html = TEXT
+BUGWK84286 MAC : fast/forms/button-inner-block-reuse.html = TEXT
+BUGWK84286 MAC : fast/forms/button-positioned.html = TEXT
+BUGWK84286 MAC : fast/forms/button-sizes.html = TEXT
+BUGWK84286 MAC : fast/forms/button-style-color.html = TEXT
+BUGWK84286 MAC : fast/forms/button-text-transform.html = TEXT
+BUGWK84286 MAC : fast/forms/button-white-space.html = TEXT
+BUGWK84286 MAC : fast/forms/color/input-appearance-color.html = TEXT
+BUGWK84286 MAC : fast/forms/control-clip-overflow.html = TEXT
+BUGWK84286 MAC : fast/forms/select-baseline.html = TEXT
+BUGWK84286 MAC : fast/invalid/residual-style.html = TEXT
+BUGWK84286 MAC : fast/replaced/replaced-breaking.html = TEXT
+BUGWK84286 MAC : fast/selectors/064.html = TEXT
+BUGWK84286 MAC : fast/table/append-cells2.html = TEXT
+BUGWK84286 MAC : fast/table/remove-td-display-none.html = TEXT
+BUGWK84286 MAC : fast/writing-mode/broken-ideographic-font.html = TEXT
+BUGWK84286 MAC : fast/writing-mode/vertical-font-fallback.html = TEXT
+BUGWK84286 MAC : svg/custom/inline-svg-in-xhtml.xml = TEXT
+BUGWK84286 MAC : tables/mozilla/bugs/bug44505.html = TEXT
+BUGWK84286 MAC : tables/mozilla/bugs/bug68912.html = TEXT
+BUGWK84286 MAC : tables/mozilla_expected_failures/collapsing_borders/bug41262-5.html = TEXT
+BUGWK84286 MAC : tables/mozilla_expected_failures/collapsing_borders/bug41262-6.html = TEXT

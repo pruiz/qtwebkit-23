@@ -1,3 +1,477 @@
+2012-08-27  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        Rename RegisterProtocolHandler API to NavigatorContentUtils
+        https://bugs.webkit.org/show_bug.cgi?id=94920
+
+        Reviewed by Adam Barth.
+
+        ENABLE_REGISTER_PROTOCOL_HANDLER is renamed to ENABLE_NAVIGATOR_CONTENT_UTILS.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-08-26  Filip Pizlo  <fpizlo@apple.com>
+
+        Unreviewed, fix for builds without VALUE_PROFILING. I had forgotten that shouldEmitProfiling()
+        is designed to return true if DFG_JIT is disabled. I should be using canBeOptimized() instead.
+
+        * jit/JITCall.cpp:
+        (JSC::JIT::compileOpCall):
+        * jit/JITCall32_64.cpp:
+        (JSC::JIT::compileOpCall):
+
+2012-08-26  Geoffrey Garen  <ggaren@apple.com>
+
+        Don't allocate space for arguments and call frame if arguments aren't captured
+        https://bugs.webkit.org/show_bug.cgi?id=95024
+
+        Reviewed by Phil Pizlo.
+
+        27% on v8-real-earley.
+
+        * runtime/JSActivation.h:
+        (JSC::JSActivation::registerOffset): The offset is zero if we're skipping
+        the arguments and call frame because "offset" means space reserved for
+        those things.
+
+        (JSC::JSActivation::tearOff): Don't copy the scope chain and callee. We
+        don't need them for anything, and we're no longer guaranteed to have
+        space for them.
+
+2012-08-26  Geoffrey Garen  <ggaren@apple.com>
+
+        Removed the NULL checks from visitChildren functions
+        https://bugs.webkit.org/show_bug.cgi?id=95021
+
+        Reviewed by Oliver Hunt.
+
+        As of http://trac.webkit.org/changeset/126624, all values are NULL-checked
+        during GC, so explicit NULL checks aren't needed anymore.
+
+2011-08-26  Geoffrey Garen  <ggaren@apple.com>
+
+        Removed a JSC-specific hack from the web inspector
+        https://bugs.webkit.org/show_bug.cgi?id=95033
+
+        Reviewed by Filip Pizlo.
+
+        Added support for what the web inspector really wanted instead.
+
+        * runtime/JSActivation.cpp:
+        (JSC::JSActivation::symbolTableGet):
+        (JSC::JSActivation::symbolTablePut): Added some explanation for these
+        checks, which were non-obvious to me.
+
+        (JSC::JSActivation::getOwnPropertySlot): It's impossible to access the
+        arguments property of an activation after it's been torn off, since the
+        only way to tear off an activation is to instantiate a new function,
+        which has its own arguments property in scope. However, the inspector
+        get special access to activations, and may try to perform this access,
+        so we need a special guard to maintain coherence and avoid crashing in
+        case the activation optimized out the arguments property.
+
+        * runtime/JSActivation.cpp:
+        (JSC::JSActivation::symbolTableGet):
+        (JSC::JSActivation::symbolTablePut):
+        (JSC::JSActivation::getOwnPropertyNames):
+        (JSC::JSActivation::getOwnPropertyDescriptor): Provide getOwnPropertyNames
+        and getOwnPropertyDescriptor implementations, to meet the web inspector's
+        needs. (User code can never call these.)
+
+2012-08-24  Filip Pizlo  <fpizlo@apple.com>
+
+        Finally inlining should correctly track the catch context
+        https://bugs.webkit.org/show_bug.cgi?id=94986
+        <rdar://problem/11753784>
+
+        Reviewed by Sam Weinig.
+
+        This fixes two behaviors:
+        
+        1) Throwing from a finally block. Previously, we would seem to reenter the finally
+           block - though only once.
+        
+        2) Executing a finally block from some nested context, for example due to a
+           'continue', 'break', or 'return' in the try. This would execute the finally
+           block in the context of of the try block, which could lead to either scope depth
+           mismatches or reexecutions of the finally block on throw, similarly to (1) but
+           for different reasons.
+
+        * bytecompiler/BytecodeGenerator.cpp:
+        (JSC):
+        (JSC::BytecodeGenerator::pushFinallyContext):
+        (JSC::BytecodeGenerator::emitComplexJumpScopes):
+        (JSC::BytecodeGenerator::pushTry):
+        (JSC::BytecodeGenerator::popTryAndEmitCatch):
+        * bytecompiler/BytecodeGenerator.h:
+        (FinallyContext):
+        (TryData):
+        (JSC):
+        (TryContext):
+        (TryRange):
+        (BytecodeGenerator):
+        * bytecompiler/NodesCodegen.cpp:
+        (JSC::TryNode::emitBytecode):
+
+2012-08-26  Filip Pizlo  <fpizlo@apple.com>
+
+        Array type checks and storage accesses should be uniformly represented and available to CSE
+        https://bugs.webkit.org/show_bug.cgi?id=95013
+
+        Reviewed by Oliver Hunt.
+
+        This uniformly breaks up all array accesses into up to three parts:
+        
+        1) The type check, using a newly introduced CheckArray node, in addition to possibly
+           a CheckStructure node. We were already inserting the CheckStructure prior to this
+           patch. The CheckArray node will be automatically eliminated if the thing it was
+           checking for had already been checked for, either intentionally (a CheckStructure
+           inserted based on the array profile of this access) or accidentally (some checks,
+           typically a CheckStructure, inserted for some unrelated operations). The
+           CheckArray node may not be inserted if the array type is non-specific (Generic or
+           ForceExit).
+        
+        2) The storage load using GetIndexedPropertyStorage. Previously, this only worked for
+           GetByVal. Now it works for all array accesses. The storage load may not be
+           inserted if the mode of array access does not permit CSE of storage loads (like
+           non-specific modes or Arguments).
+        
+        3) The access itself: one of GetByVal, PutByVal, PutByValAlias, ArrayPush, ArrayPop,
+           GetArrayLength, StringCharAt, or StringCharCodeAt.
+        
+        This means that the type check can be subjected to CSE even if the CFA isn't smart
+        enough to reason about it (yet!). It also means that the storage load can always be
+        subjected to CSE; previously CSE on storage load only worked for array loads and not
+        other forms of access. Finally, it removes the bizarre behavior that
+        GetIndexedPropertyStorage previously had: previously, it was responsible for the type
+        check in some cases, but not others; this made reasoning about the CFA really
+        confusing.
+        
+        This change also disables late refinement of array mode, since I decided that
+        supporting that feature is both confusing and likely unprofitable. The array modes are
+        now locked in in the first fixup run after prediction propagation. Of course,
+        refinements from Generic to something else would not have been a problem; we could
+        reenable those if we thought we really needed to.
+
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::execute):
+        * dfg/DFGArgumentsSimplificationPhase.cpp:
+        (JSC::DFG::ArgumentsSimplificationPhase::run):
+        * dfg/DFGArrayMode.cpp:
+        (JSC::DFG::fromStructure):
+        (DFG):
+        (JSC::DFG::refineArrayMode):
+        * dfg/DFGArrayMode.h:
+        (DFG):
+        (JSC::DFG::modeIsJSArray):
+        (JSC::DFG::lengthNeedsStorage):
+        (JSC::DFG::modeIsSpecific):
+        (JSC::DFG::modeSupportsLength):
+        * dfg/DFGByteCodeParser.cpp:
+        (JSC::DFG::ByteCodeParser::ByteCodeParser):
+        (JSC::DFG::ByteCodeParser::getArrayMode):
+        (ByteCodeParser):
+        (JSC::DFG::ByteCodeParser::getArrayModeAndEmitChecks):
+        (JSC::DFG::ByteCodeParser::handleIntrinsic):
+        (JSC::DFG::ByteCodeParser::parseBlock):
+        * dfg/DFGCFGSimplificationPhase.cpp:
+        (JSC::DFG::CFGSimplificationPhase::mergeBlocks):
+        * dfg/DFGCSEPhase.cpp:
+        (JSC::DFG::CSEPhase::CSEPhase):
+        (JSC::DFG::CSEPhase::checkStructureElimination):
+        (CSEPhase):
+        (JSC::DFG::CSEPhase::checkArrayElimination):
+        (JSC::DFG::CSEPhase::getIndexedPropertyStorageLoadElimination):
+        (JSC::DFG::CSEPhase::performNodeCSE):
+        (JSC::DFG::performCSE):
+        * dfg/DFGCSEPhase.h:
+        (DFG):
+        * dfg/DFGCommon.h:
+        * dfg/DFGConstantFoldingPhase.cpp:
+        (JSC::DFG::ConstantFoldingPhase::foldConstants):
+        * dfg/DFGDriver.cpp:
+        (JSC::DFG::compile):
+        * dfg/DFGFixupPhase.cpp:
+        (JSC::DFG::FixupPhase::fixupNode):
+        (JSC::DFG::FixupPhase::checkArray):
+        (FixupPhase):
+        (JSC::DFG::FixupPhase::blessArrayOperation):
+        * dfg/DFGGraph.cpp:
+        (JSC::DFG::Graph::Graph):
+        (DFG):
+        (JSC::DFG::Graph::dump):
+        (JSC::DFG::Graph::collectGarbage):
+        * dfg/DFGGraph.h:
+        (Graph):
+        (JSC::DFG::Graph::vote):
+        (JSC::DFG::Graph::substitute):
+        * dfg/DFGNode.h:
+        (JSC::DFG::Node::hasArrayMode):
+        (JSC::DFG::Node::setArrayMode):
+        * dfg/DFGNodeType.h:
+        (DFG):
+        * dfg/DFGOperations.cpp:
+        * dfg/DFGPhase.h:
+        (DFG):
+        * dfg/DFGPredictionPropagationPhase.cpp:
+        (JSC::DFG::PredictionPropagationPhase::propagate):
+        (JSC::DFG::PredictionPropagationPhase::mergeDefaultFlags):
+        * dfg/DFGSpeculativeJIT.cpp:
+        (JSC::DFG::SpeculativeJIT::checkArray):
+        (JSC::DFG::SpeculativeJIT::useChildren):
+        (JSC::DFG::SpeculativeJIT::compilePutByValForIntTypedArray):
+        (JSC::DFG::SpeculativeJIT::compilePutByValForFloatTypedArray):
+        (JSC::DFG::SpeculativeJIT::compileGetIndexedPropertyStorage):
+        (JSC::DFG::SpeculativeJIT::compileGetArrayLength):
+        * dfg/DFGSpeculativeJIT.h:
+        (SpeculativeJIT):
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGSpeculativeJIT64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGStructureCheckHoistingPhase.cpp:
+        (JSC::DFG::StructureCheckHoistingPhase::run):
+
+2012-08-26  Filip Pizlo  <fpizlo@apple.com>
+
+        DFGGraph.h has a bogus comment about the nature of StorageAccessData
+        https://bugs.webkit.org/show_bug.cgi?id=95035
+
+        Reviewed by Oliver Hunt.
+
+        The comment is both wrong (storage access instructions don't reference CheckStructure)
+        and highly redundant: of course it's the case that two structures may have the same
+        identifier. Our interference analyses currently don't care about this and make the
+        conservative assumptions when necessary (same identifier, same object -> must be same
+        property; same identifier, may be same object -> may be the same property). Better to
+        remove the bogus comment since the code that operates over this data structure is
+        fairly self-explanatory already.
+
+        * dfg/DFGGraph.h:
+        (StorageAccessData):
+
+2012-08-25  Geoffrey Garen  <ggaren@apple.com>
+
+        Try a little harder to fix the Linux build.
+
+        * runtime/JSActivation.cpp:
+        * runtime/JSActivation.h:
+
+2012-08-25  Geoffrey Garen  <ggaren@apple.com>
+
+        Try to fix the Linux build.
+
+        * runtime/JSActivation.cpp:
+
+2012-08-25  Geoffrey Garen  <ggaren@apple.com>
+
+        Don't use malloc / destructors for activation objects
+        https://bugs.webkit.org/show_bug.cgi?id=94897
+
+        Reviewed by Oliver Hunt.
+
+        65% faster on v8-real-earley.
+
+        Lots of boilerplate here, but the jist is this:
+
+        (1) Use CopiedSpace instead of malloc to allocate the activation's
+        backing store.
+
+        (2) Use MarkedSpace instead of ref-counting to allocate the symbol table.
+
+        (3) ==> No more destructor.
+
+        * bytecode/CodeBlock.cpp:
+        (JSC::CodeBlock::CodeBlock):
+        (JSC::CodeBlock::stronglyVisitStrongReferences):
+        * bytecode/CodeBlock.h:
+        (JSC::CodeBlock::symbolTable):
+        (CodeBlock):
+        (JSC::GlobalCodeBlock::GlobalCodeBlock):
+        (JSC::FunctionCodeBlock::FunctionCodeBlock):
+        (FunctionCodeBlock): SymbolTable is a GC object now, so it gets a write
+        barrier and visit calls instead of ref-counting. I changed all CodeBlocks
+        to use shared symbol tables because the distinction between shared and
+        unshared hurt my head.
+
+        * bytecompiler/BytecodeGenerator.cpp:
+        (JSC::BytecodeGenerator::resolve):
+        (JSC::BytecodeGenerator::resolveConstDecl):
+        (JSC::BytecodeGenerator::emitPutStaticVar):
+        * dfg/DFGByteCodeParser.cpp:
+        (JSC::DFG::ByteCodeParser::parseBlock):
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGSpeculativeJIT64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile): Sometimes, a period just wants
+        to be an arrow. And then C++ is there to accommodate.
+
+        * jit/JITDriver.h:
+        (JSC::jitCompileFunctionIfAppropriate):
+        * runtime/Arguments.h:
+        (ArgumentsData):
+        (JSC::Arguments::setRegisters):
+        (Arguments):
+        (JSC::Arguments::argument):
+        (JSC::Arguments::finishCreation):
+        * runtime/Executable.cpp:
+        (JSC::FunctionExecutable::FunctionExecutable):
+        (JSC::ProgramExecutable::compileInternal):
+        (JSC::FunctionExecutable::compileForCallInternal):
+        (JSC::FunctionExecutable::compileForConstructInternal):
+        (JSC::FunctionExecutable::visitChildren):
+        * runtime/Executable.h:
+        (JSC::FunctionExecutable::symbolTable):
+        (FunctionExecutable):
+        * runtime/ExecutionHarness.h:
+        (JSC::prepareFunctionForExecution): I changed from WriteBarrier to
+        WriteBarrierBase so activations could reuse StorageBarrier and PropertyStorage.
+
+        * runtime/JSActivation.cpp:
+        (JSC::JSActivation::JSActivation):
+        (JSC::JSActivation::finishCreation): Allocate the symbol table here,
+        after we're fully constructed, to avoid GC during initialization.
+
+        (JSC::JSActivation::visitChildren):
+        (JSC::JSActivation::symbolTableGet):
+        (JSC::JSActivation::symbolTablePut):
+        (JSC::JSActivation::getOwnPropertyNames):
+        (JSC::JSActivation::symbolTablePutWithAttributes):
+        * runtime/JSActivation.h:
+        (JSC::JSActivation::create):
+        (JSActivation):
+        (JSC::JSActivation::registerOffset):
+        (JSC):
+        (JSC::JSActivation::registerArraySize):
+        (JSC::JSActivation::registerArraySizeInBytes):
+        (JSC::JSActivation::tearOff): Tear-off zero-initializes all uncopied
+        registers. This makes it safe to copyAndAppend the full buffer in
+        visitChildren, without any extra checks.
+
+        * runtime/JSCell.h:
+        (JSCell): Moved a shared default set of flags into this base class, so
+        I could use it in a few places.
+
+        * runtime/JSGlobalData.cpp:
+        (JSC::JSGlobalData::JSGlobalData):
+        * runtime/JSGlobalData.h:
+        (JSGlobalData): New structure for symbol tables.
+
+        * runtime/JSGlobalObject.cpp:
+        (JSC::JSGlobalObject::JSGlobalObject):
+        (JSC::JSGlobalObject::addStaticGlobals):
+        * runtime/JSGlobalObject.h:
+        (JSGlobalObject):
+        (JSC::JSGlobalObject::symbolTableHasProperty): We don't need an inline
+        symbol table -- JSSymbolTableObject will GC allocate one for us.
+
+        * runtime/JSObject.h:
+        (JSObject):
+        * runtime/JSSegmentedVariableObject.h:
+        (JSC::JSSegmentedVariableObject::JSSegmentedVariableObject):
+        * runtime/JSStaticScopeObject.cpp:
+        (JSC):
+        (JSC::JSStaticScopeObject::visitChildren): NULL check our register store
+        because finishCreation allocates an object now, so we may get marked
+        before we've assigned to our register store.
+
+        * runtime/JSStaticScopeObject.h:
+        (JSC::JSStaticScopeObject::finishCreation):
+        (JSC::JSStaticScopeObject::JSStaticScopeObject):
+        (JSStaticScopeObject): No more destructor for this object, either, since
+        it no longer embeds a hash table.
+
+        * runtime/JSSymbolTableObject.cpp:
+        (JSC::JSSymbolTableObject::visitChildren):
+        (JSC::JSSymbolTableObject::deleteProperty):
+        (JSC::JSSymbolTableObject::getOwnPropertyNames):
+        * runtime/JSSymbolTableObject.h:
+        (JSC::JSSymbolTableObject::symbolTable):
+        (JSSymbolTableObject):
+        (JSC::JSSymbolTableObject::JSSymbolTableObject):
+        (JSC::JSSymbolTableObject::finishCreation):
+        (JSC::symbolTableGet):
+        (JSC::symbolTablePut):
+        (JSC::symbolTablePutWithAttributes): SymbolTableObject allocates a symbol
+        table automatically if one isn't provided. (Activations provide their
+        own, which they get from compiled code.)
+
+        * runtime/JSVariableObject.cpp:
+        (JSC):
+        * runtime/JSVariableObject.h:
+        (JSC::JSVariableObject::registerAt):
+        (JSC::JSVariableObject::addressOfRegisters):
+        (JSVariableObject):
+        (JSC::JSVariableObject::JSVariableObject):
+        (JSC::JSVariableObject::finishCreation): Removed a bunch of obsolete code.
+        Activations manage their registers directly now.
+
+        * runtime/StorageBarrier.h:
+        (StorageBarrier):
+        (JSC::StorageBarrier::operator!):
+
+        * runtime/SymbolTable.cpp:
+        (JSC):
+        (JSC::SharedSymbolTable::destroy):
+        * runtime/SymbolTable.h:
+        (JSC::SharedSymbolTable::create):
+        (SharedSymbolTable):
+        (JSC::SharedSymbolTable::createStructure):
+        (JSC::SharedSymbolTable::SharedSymbolTable): Boilerplat code to
+        make shared symbol table GC-allocated.
+
+2012-08-25  Filip Pizlo  <fpizlo@apple.com>
+
+        op_call should have ArrayProfiling for the benefit of array intrinsics
+        https://bugs.webkit.org/show_bug.cgi?id=95014
+
+        Reviewed by Sam Weinig.
+
+        This is a performance-neutral change that just adds the profiling but does not
+        use it, yet. If in the future we wanted to make this kind of profiling cheaper
+        we could move it into specialized thunks for the relevant array intrinsics, but
+        I figure that if this much simpler change gives us what we need without any
+        discernable performance penalty then that's for the best.
+
+        * bytecompiler/BytecodeGenerator.cpp:
+        (JSC::BytecodeGenerator::emitCall):
+        * jit/JITCall.cpp:
+        (JSC::JIT::compileOpCall):
+        * jit/JITCall32_64.cpp:
+        (JSC::JIT::compileOpCall):
+        * llint/LowLevelInterpreter.asm:
+        * llint/LowLevelInterpreter32_64.asm:
+        * llint/LowLevelInterpreter64.asm:
+
+2012-08-25  Filip Pizlo  <fpizlo@apple.com>
+
+        The redundant phi elimination phase is not used and should be removed
+        https://bugs.webkit.org/show_bug.cgi?id=95006
+
+        Reviewed by Dan Bernstein.
+
+        Just removing dead code.
+
+        * CMakeLists.txt:
+        * GNUmakefile.list.am:
+        * JavaScriptCore.xcodeproj/project.pbxproj:
+        * Target.pri:
+        * dfg/DFGDriver.cpp:
+        * dfg/DFGRedundantPhiEliminationPhase.cpp: Removed.
+        * dfg/DFGRedundantPhiEliminationPhase.h: Removed.
+
+2012-08-24  Benjamin Poulain  <bpoulain@apple.com>
+
+        Unify Number to StringImpl conversion
+        https://bugs.webkit.org/show_bug.cgi?id=94879
+
+        Reviewed by Geoffrey Garen.
+
+        * JavaScriptCore.vcproj/JavaScriptCore/JavaScriptCore.def:
+        * runtime/UString.cpp:
+        * runtime/UString.h:
+        (JSC::UString::number):
+        Update UString to directly use the common NumberToString implementation.
+
 2012-08-24  Oliver Hunt  <oliver@apple.com>
 
         Always null check cells before marking

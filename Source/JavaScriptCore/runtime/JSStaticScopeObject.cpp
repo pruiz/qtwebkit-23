@@ -34,17 +34,13 @@ ASSERT_CLASS_FITS_IN_CELL(JSStaticScopeObject);
 
 const ClassInfo JSStaticScopeObject::s_info = { "Object", &Base::s_info, 0, 0, CREATE_METHOD_TABLE(JSStaticScopeObject) };
 
-void JSStaticScopeObject::destroy(JSCell* cell)
-{
-    static_cast<JSStaticScopeObject*>(cell)->JSStaticScopeObject::~JSStaticScopeObject();
-}
-
 void JSStaticScopeObject::visitChildren(JSCell* cell, SlotVisitor& visitor)
 {
     JSStaticScopeObject* thisObject = jsCast<JSStaticScopeObject*>(cell);
     ASSERT_GC_OBJECT_INHERITS(thisObject, &s_info);
     COMPILE_ASSERT(StructureFlags & OverridesVisitChildren, OverridesVisitChildrenWithoutSettingFlag);
     ASSERT(thisObject->structure()->typeInfo().overridesVisitChildren());
+
     JSVariableObject::visitChildren(thisObject, visitor);
     visitor.append(&thisObject->m_registerStore);
 }

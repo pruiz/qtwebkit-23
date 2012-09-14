@@ -255,6 +255,7 @@ public:
         ALPHA = 0x1906,
         RGB = 0x1907,
         RGBA = 0x1908,
+        BGRA = 0x80E1,
         LUMINANCE = 0x1909,
         LUMINANCE_ALPHA = 0x190A,
         UNSIGNED_SHORT_4_4_4_4 = 0x8033,
@@ -530,6 +531,9 @@ public:
     // With multisampling on, blit from multisampleFBO to regular FBO.
     void prepareTexture();
 #endif
+
+    // Equivalent to ::glTexImage2D(). Allows pixels==0 with no allocation.
+    void texImage2DDirect(GC3Denum target, GC3Dint level, GC3Denum internalformat, GC3Dsizei width, GC3Dsizei height, GC3Dint border, GC3Denum format, GC3Denum type, const void* pixels);
 
     // Helper to texImage2D with pixel==0 case: pixels are initialized to 0.
     // Return true if no GL error is synthesized.

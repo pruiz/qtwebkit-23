@@ -1,3 +1,31 @@
+2012-08-23  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Convert WebLayerTreeView interface into pure virtual
+        https://bugs.webkit.org/show_bug.cgi?id=94866
+
+        Reviewed by Adrienne Walker.
+
+        This makes the WebLayerTreeView interface pure virtual to provide better insulation from the implementation.
+
+        * chromium/public/WebLayerTreeView.h:
+        (WebKit):
+        (Settings):
+        (WebLayerTreeView):
+        (WebKit::WebLayerTreeView::~WebLayerTreeView):
+
+2012-08-24  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Clean up WebAnimation animationId/groupId generation
+        https://bugs.webkit.org/show_bug.cgi?id=94973
+
+        Reviewed by Adrienne Walker.
+
+        This removes the unused groupId from the public interface and makes the implicit animation id generation a bit
+        clearer.
+
+        * chromium/public/WebAnimation.h:
+        (WebAnimation):
+
 2012-08-24  Tommy Widenflycht  <tommyw@google.com>
 
         MediaStream API: Add readyState functionality to RTCPeerConnection

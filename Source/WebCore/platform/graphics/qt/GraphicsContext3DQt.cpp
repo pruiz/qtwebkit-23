@@ -126,8 +126,15 @@ GraphicsContext3DPrivate::GraphicsContext3DPrivate(GraphicsContext3D* context, H
     }
 
     if (renderStyle == GraphicsContext3D::RenderToCurrentGLContext) {
+#if HAVE(QT5)
         m_platformContext = QOpenGLContext::currentContext();
         m_surface = m_platformContext->surface();
+#else
+        QGLContext* platformContext = const_cast<QGLContext*>(QGLContext::currentContext());
+        m_surface = platformContext ? dynamic_cast<QGLWidget*>(platformContext->device()) : 0;
+        if (m_surface)
+            m_platformContext = platformContext;
+#endif
         return;
     }
 

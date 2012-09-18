@@ -59,6 +59,7 @@ haveQt(5) {
 
 !contains(DEFINES, HAVE_QTQUICK=.) {
     haveQtModule(quick): DEFINES += HAVE_QTQUICK=1
+    else: CONFIGURE_WARNINGS += "QtQuick module not found, QML APIs will not be built"
 }
 
 !contains(DEFINES, HAVE_QTPRINTSUPPORT=.) {

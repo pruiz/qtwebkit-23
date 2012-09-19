@@ -29,7 +29,6 @@
 #if ENABLE(BATTERY_STATUS)
 #include "BatteryClientBlackBerry.h"
 #endif
-#include "CString.h"
 #include "CachedImage.h"
 #include "Chrome.h"
 #include "ChromeClientBlackBerry.h"
@@ -76,6 +75,7 @@
 #include "InspectorBackendDispatcher.h"
 #include "InspectorClientBlackBerry.h"
 #include "InspectorController.h"
+#include "InspectorInstrumentation.h"
 #include "InspectorOverlay.h"
 #include "JavaScriptDebuggerBlackBerry.h"
 #include "JavaScriptVariant_p.h"
@@ -165,6 +165,8 @@
 #include <SharedPointer.h>
 #include <sys/keycodes.h>
 #include <unicode/ustring.h> // platform ICU
+
+#include <wtf/text/CString.h>
 
 #ifndef USER_PROCESSES
 #include <memalloc.h>
@@ -742,6 +744,7 @@ bool WebPagePrivate::executeJavaScript(const char* scriptUTF8, JavaScriptDataTyp
     JSC::ExecState* exec = m_mainFrame->script()->globalObject(mainThreadNormalWorld())->globalExec();
     JSGlobalContextRef context = toGlobalRef(exec);
 
+    JSC::JSLockHolder lock(exec);
     JSType type = JSValueGetType(context, toRef(exec, value));
 
     switch (type) {
@@ -1482,8 +1485,8 @@ void WebPage::scrollBy(const Platform::IntSize& delta)
 
 void WebPagePrivate::notifyInRegionScrollStopped()
 {
-    if (m_inRegionScroller->d->hasNode()) {
-        enqueueRenderingOfClippedContentOfScrollableNodeAfterInRegionScrolling(m_inRegionScroller->d->node());
+    if (m_inRegionScroller->d->isActive()) {
+        enqueueRenderingOfClippedContentOfScrollableAreaAfterInRegionScrolling();
         m_inRegionScroller->d->reset();
     }
 }
@@ -1493,9 +1496,16 @@ void WebPage::notifyInRegionScrollStopped()
     d->notifyInRegionScrollStopped();
 }
 
-void WebPagePrivate::enqueueRenderingOfClippedContentOfScrollableNodeAfterInRegionScrolling(Node* scrolledNode)
+void WebPagePrivate::enqueueRenderingOfClippedContentOfScrollableAreaAfterInRegionScrolling()
 {
-    ASSERT(scrolledNode);
+    // If no scrolling was even performed, bail out.
+    if (m_inRegionScroller->d->m_needsActiveScrollableAreaCalculation)
+        return;
+
+    InRegionScrollableArea* scrollableArea = static_cast<InRegionScrollableArea*>(m_inRegionScroller->d->activeInRegionScrollableAreas()[0]);
+    ASSERT(scrollableArea);
+    Node* scrolledNode = scrollableArea->layer()->enclosingElement();
+
     if (scrolledNode->isDocumentNode()) {
         Frame* frame = static_cast<const Document*>(scrolledNode)->frame();
         ASSERT(frame);
@@ -1560,10 +1570,11 @@ void WebPagePrivate::updateViewportSize(bool setFixedReportedSize, bool sendResi
     if (!m_backingStore)
         return;
     ASSERT(m_mainFrame->view());
+    IntSize visibleSize = actualVisibleSize();
     if (setFixedReportedSize)
-        m_mainFrame->view()->setFixedReportedSize(actualVisibleSize());
+        m_mainFrame->view()->setFixedReportedSize(visibleSize);
 
-    IntRect frameRect = IntRect(scrollPosition(), viewportSize());
+    IntRect frameRect = IntRect(scrollPosition(), visibleSize);
     if (frameRect != m_mainFrame->view()->frameRect()) {
         m_mainFrame->view()->setFrameRect(frameRect);
         m_mainFrame->view()->adjustViewSize();
@@ -2549,8 +2560,8 @@ void WebPagePrivate::clearDocumentData(const Document* documentGoingAway)
     if (m_currentBlockZoomAdjustedNode && m_currentBlockZoomAdjustedNode->document() == documentGoingAway)
         m_currentBlockZoomAdjustedNode = 0;
 
-    if (m_inRegionScroller->d->hasNode() && m_inRegionScroller->d->node()->document() == documentGoingAway)
-        m_inRegionScroller->d->reset();
+    if (m_inRegionScroller->d->isActive())
+        m_inRegionScroller->d->clearDocumentData(documentGoingAway);
 
     if (documentGoingAway->frame())
         m_inputHandler->frameUnloaded(documentGoingAway->frame());
@@ -4087,6 +4098,10 @@ bool WebPage::touchEvent(const Platform::TouchEvent& event)
     if (d->m_page->defersLoading())
         return false;
 
+    // FIXME: this checks if node search on inspector is enabled, though it might not be optimized.
+    if (InspectorInstrumentation::handleMousePress(d->m_mainFrame->page()))
+        return false;
+
     PluginView* pluginView = d->m_fullScreenPluginView.get();
     if (pluginView)
         return d->dispatchTouchEventToFullScreenPlugin(pluginView, event);
@@ -4097,7 +4112,6 @@ bool WebPage::touchEvent(const Platform::TouchEvent& event)
         tEvent.m_points[i].m_screenPos = d->mapFromTransformed(tEvent.m_points[i].m_screenPos);
     }
 
-    Platform::Gesture tapGesture;
     if (event.hasGesture(Platform::Gesture::SingleTap))
         d->m_pluginMayOpenNewTab = true;
     else if (tEvent.m_type == Platform::TouchEvent::TouchStart || tEvent.m_type == Platform::TouchEvent::TouchCancel)
@@ -5478,31 +5492,6 @@ void WebPagePrivate::setCompositorDrawsRootLayer(bool compositorDrawsRootLayer)
 }
 
 #if USE(ACCELERATED_COMPOSITING)
-void WebPagePrivate::drawLayersOnCommit()
-{
-    if (!Platform::userInterfaceThreadMessageClient()->isCurrentThread()) {
-        // This method will only be called when the layer appearance changed due to
-        // animations. And only if we don't need a one shot drawing sync.
-        ASSERT(!needsOneShotDrawingSynchronization());
-
-        if (!m_webPage->isVisible())
-            return;
-
-        m_backingStore->d->willDrawLayersOnCommit();
-
-        Platform::userInterfaceThreadMessageClient()->dispatchMessage(
-            Platform::createMethodCallMessage(&WebPagePrivate::drawLayersOnCommit, this));
-        return;
-    }
-
-#if DEBUG_AC_COMMIT
-    Platform::log(Platform::LogLevelCritical, "%s", WTF_PRETTY_FUNCTION);
-#endif
-
-    if (!m_backingStore->d->shouldDirectRenderingToWindow())
-        m_backingStore->d->blitVisibleContents();
-}
-
 void WebPagePrivate::scheduleRootLayerCommit()
 {
     if (!(m_frameLayers && m_frameLayers->hasLayer()) && !m_overlayLayer)
@@ -5653,7 +5642,9 @@ bool WebPagePrivate::commitRootLayerIfNeeded()
     if (!m_needsCommit)
         return false;
 
-    if (!(m_frameLayers && m_frameLayers->hasLayer()) && !m_overlayLayer)
+    // Don't bail if the layers were removed and we now need a one shot drawing sync as a consequence.
+    if (!(m_frameLayers && m_frameLayers->hasLayer()) && !m_overlayLayer
+     && !m_needsOneShotDrawingSynchronization)
         return false;
 
     FrameView* view = m_mainFrame->view();
@@ -5751,10 +5742,7 @@ void WebPagePrivate::rootLayerCommitTimerFired(Timer<WebPagePrivate>*)
         }
     }
 
-    // If the web page needs layout, the commit will fail.
-    // No need to draw the layers if nothing changed.
-    if (commitRootLayerIfNeeded())
-        drawLayersOnCommit();
+    commitRootLayerIfNeeded();
 }
 
 void WebPagePrivate::resetCompositingSurface()

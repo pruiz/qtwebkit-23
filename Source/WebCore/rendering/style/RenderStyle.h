@@ -38,6 +38,7 @@
 #include "FontBaseline.h"
 #include "FontDescription.h"
 #include "GraphicsTypes.h"
+#include "LayoutTypesInlineMethods.h"
 #include "Length.h"
 #include "LengthBox.h"
 #include "LengthFunctions.h"
@@ -511,6 +512,7 @@ public:
     EPosition position() const { return static_cast<EPosition>(noninherited_flags._position); }
     bool hasOutOfFlowPosition() const { return position() == AbsolutePosition || position() == FixedPosition; }
     bool hasInFlowPosition() const { return position() == RelativePosition || position() == StickyPosition; }
+    bool hasViewportConstrainedPosition() const { return position() == FixedPosition || position() == StickyPosition; }
     EFloat floating() const { return static_cast<EFloat>(noninherited_flags._floating); }
 
     Length width() const { return m_box->width(); }
@@ -988,7 +990,7 @@ public:
 #if ENABLE(CSS_COMPOSITING)
     BlendMode blendMode() const { return static_cast<BlendMode>(rareNonInheritedData->m_effectiveBlendMode); }
     void setBlendMode(BlendMode v) { rareNonInheritedData.access()->m_effectiveBlendMode = v; }
-    bool hasBlendMode() const { return static_cast<BlendMode>(rareNonInheritedData->m_effectiveBlendMode) == BlendModeNormal; }
+    bool hasBlendMode() const { return static_cast<BlendMode>(rareNonInheritedData->m_effectiveBlendMode) != BlendModeNormal; }
 #else
     bool hasBlendMode() const { return false; }
 #endif
@@ -1445,22 +1447,22 @@ public:
     void setKerning(SVGLength k) { accessSVGStyle()->setKerning(k); }
 #endif
 
-    void setWrapShapeInside(PassRefPtr<WrapShape> shape)
+    void setWrapShapeInside(PassRefPtr<BasicShape> shape)
     {
         if (rareNonInheritedData->m_wrapShapeInside != shape)
             rareNonInheritedData.access()->m_wrapShapeInside = shape;
     }
-    WrapShape* wrapShapeInside() const { return rareNonInheritedData->m_wrapShapeInside.get(); }
+    BasicShape* wrapShapeInside() const { return rareNonInheritedData->m_wrapShapeInside.get(); }
 
-    void setWrapShapeOutside(PassRefPtr<WrapShape> shape)
+    void setWrapShapeOutside(PassRefPtr<BasicShape> shape)
     {
         if (rareNonInheritedData->m_wrapShapeOutside != shape)
             rareNonInheritedData.access()->m_wrapShapeOutside = shape;
     }
-    WrapShape* wrapShapeOutside() const { return rareNonInheritedData->m_wrapShapeOutside.get(); }
+    BasicShape* wrapShapeOutside() const { return rareNonInheritedData->m_wrapShapeOutside.get(); }
 
-    static WrapShape* initialWrapShapeInside() { return 0; }
-    static WrapShape* initialWrapShapeOutside() { return 0; }
+    static BasicShape* initialWrapShapeInside() { return 0; }
+    static BasicShape* initialWrapShapeOutside() { return 0; }
 
     Length wrapPadding() const { return rareNonInheritedData->m_wrapPadding; }
     void setWrapPadding(Length wrapPadding) { SET_VAR(rareNonInheritedData, m_wrapPadding, wrapPadding); }

@@ -1,3 +1,134 @@
+2012-08-30  Benjamin Poulain  <bpoulain@apple.com>
+
+        Replace JSC::UString by WTF::String
+        https://bugs.webkit.org/show_bug.cgi?id=95271
+
+        Reviewed by Geoffrey Garen.
+
+        Replace UString by String.
+
+        * gdom/ConvertToGCharPrivate.h:
+        (copyAsGchar):
+
+2012-08-30  Gyuyoung Kim  <gyuyoung.kim@samsung.com>
+
+        Use ASCIILiteral for DEFINE_STATIC_LOCAL string
+        https://bugs.webkit.org/show_bug.cgi?id=95420
+
+        Reviewed by Benjamin Poulain.
+
+        As recommended by http://trac.webkit.org/wiki/EfficientStrings,
+        WebKit needs to use ASCIILiteral for the string of DEFINE_STATIC_LOCAL.
+
+        * webkit/webkitwebsettings.cpp:
+        (webkitPlatform):
+        (webkitOSVersion):
+
+2012-08-29  José Dapena Paz  <jdapena@igalia.com>
+
+        [Gtk] Process Gtk 3.4 smooth scroll events properly.
+        https://bugs.webkit.org/show_bug.cgi?id=88070
+
+        Gtk 3.3.18 added smooth scroll events, adding a new scroll direction that
+        provides detailed delta information.
+
+        Added GDK_SMOOTH_SCROLL_MASK to the events listened, and added
+        code to process properly the new direction GDK_SCROLL_SMOOTH and
+        its deltas.
+
+        Reviewed by Martin Robinson.
+
+        * webkit/webkitwebview.cpp:
+        (webkit_web_view_realize):
+
+2012-08-28  Martin Robinson  <mrobinson@igalia.com>
+
+        [GTK] Enable the edge distance anti-aliasing for accelerated compositing layers
+        https://bugs.webkit.org/show_bug.cgi?id=95272
+
+        Reviewed by No'am Rosenthal.
+
+        Turn on edge-distance anti-aliasing for GTK+ WebKit1. This
+        improves the quality of layer rendering.
+
+        * WebCoreSupport/AcceleratedCompositingContextGL.cpp:
+        (WebKit::AcceleratedCompositingContext::initialize):
+
+2012-08-28  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r126914.
+        http://trac.webkit.org/changeset/126914
+        https://bugs.webkit.org/show_bug.cgi?id=95239
+
+        it breaks everything and fixes nothing (Requested by pizlo on
+        #webkit).
+
+        * WebCoreSupport/PlatformStrategiesGtk.cpp:
+        (PlatformStrategiesGtk::getPluginInfo):
+        * webkit/webkitfavicondatabase.cpp:
+        (webkitFaviconDatabaseImportFinished):
+        * webkit/webkitwebplugin.cpp:
+        (webkit_web_plugin_get_mimetypes):
+
+2012-08-28  Caio Marcelo de Oliveira Filho  <caio.oliveira@openbossa.org>
+
+        Rename first/second to key/value in HashMap iterators
+        https://bugs.webkit.org/show_bug.cgi?id=82784
+
+        Reviewed by Eric Seidel.
+
+        * WebCoreSupport/PlatformStrategiesGtk.cpp:
+        (PlatformStrategiesGtk::getPluginInfo):
+        * webkit/webkitfavicondatabase.cpp:
+        (webkitFaviconDatabaseImportFinished):
+        * webkit/webkitwebplugin.cpp:
+        (webkit_web_plugin_get_mimetypes):
+
+2012-08-27  Zan Dobersek  <zandobersek@gmail.com>
+
+        [GTK] Memory cache should be cleared in between test runs
+        https://bugs.webkit.org/show_bug.cgi?id=95105
+
+        Reviewed by Martin Robinson.
+
+        Add a DumpRenderTreeSupportGtk helper method that clears the
+        memory cache when called.
+
+        * WebCoreSupport/DumpRenderTreeSupportGtk.cpp:
+        (DumpRenderTreeSupportGtk::clearMemoryCache):
+        * WebCoreSupport/DumpRenderTreeSupportGtk.h:
+        (DumpRenderTreeSupportGtk):
+
+2012-08-27  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r126836.
+        http://trac.webkit.org/changeset/126836
+        https://bugs.webkit.org/show_bug.cgi?id=95163
+
+        Broke all Apple ports, EFL, and Qt. (Requested by tkent on
+        #webkit).
+
+        * WebCoreSupport/PlatformStrategiesGtk.cpp:
+        (PlatformStrategiesGtk::getPluginInfo):
+        * webkit/webkitfavicondatabase.cpp:
+        (webkitFaviconDatabaseImportFinished):
+        * webkit/webkitwebplugin.cpp:
+        (webkit_web_plugin_get_mimetypes):
+
+2012-08-27  Caio Marcelo de Oliveira Filho  <caio.oliveira@openbossa.org>
+
+        Rename first/second to key/value in HashMap iterators
+        https://bugs.webkit.org/show_bug.cgi?id=82784
+
+        Reviewed by Eric Seidel.
+
+        * WebCoreSupport/PlatformStrategiesGtk.cpp:
+        (PlatformStrategiesGtk::getPluginInfo):
+        * webkit/webkitfavicondatabase.cpp:
+        (webkitFaviconDatabaseImportFinished):
+        * webkit/webkitwebplugin.cpp:
+        (webkit_web_plugin_get_mimetypes):
+
 2012-08-27  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
 
         Rename RegisterProtocolHandler API to NavigatorContentUtils

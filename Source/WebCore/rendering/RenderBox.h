@@ -44,7 +44,7 @@ public:
 
     // hasAutoZIndex only returns true if the element is positioned or a flex-item since
     // position:static elements that are not flex-items get their z-index coerced to auto.
-    virtual bool requiresLayer() const OVERRIDE { return isRoot() || isOutOfFlowPositioned() || isInFlowPositioned() || isTransparent() || hasOverflowClip() || hasTransform() || hasHiddenBackface() || hasMask() || hasReflection() || hasFilter() || style()->specifiesColumns() || !style()->hasAutoZIndex(); }
+    virtual bool requiresLayer() const OVERRIDE { return isRoot() || isPositioned() || createsGroup() || hasOverflowClip() || hasTransform() || hasHiddenBackface() || hasReflection() || style()->specifiesColumns() || !style()->hasAutoZIndex(); }
 
     // Use this with caution! No type checking is done!
     RenderBox* firstChildBox() const;
@@ -284,7 +284,7 @@ public:
 
     virtual void layout();
     virtual void paint(PaintInfo&, const LayoutPoint&);
-    virtual bool nodeAtPoint(const HitTestRequest&, HitTestResult&, const HitTestPoint& pointInContainer, const LayoutPoint& accumulatedOffset, HitTestAction) OVERRIDE;
+    virtual bool nodeAtPoint(const HitTestRequest&, HitTestResult&, const HitTestLocation& locationInContainer, const LayoutPoint& accumulatedOffset, HitTestAction) OVERRIDE;
 
     virtual LayoutUnit minPreferredLogicalWidth() const;
     virtual LayoutUnit maxPreferredLogicalWidth() const;
@@ -306,9 +306,33 @@ public:
 
     virtual void borderFitAdjust(LayoutRect&) const { } // Shrink the box in which the border paints if border-fit is set.
 
+    struct ComputedMarginValues {
+        ComputedMarginValues()
+            : m_before(0)
+            , m_after(0)
+            , m_start(0)
+            , m_end(0)
+        {
+        }
+        LayoutUnit m_before;
+        LayoutUnit m_after;
+        LayoutUnit m_start;
+        LayoutUnit m_end;
+    };
+    struct LogicalExtentComputedValues {
+        LogicalExtentComputedValues()
+            : m_extent(0)
+            , m_position(0)
+        {
+        }
+
+        LayoutUnit m_extent;
+        LayoutUnit m_position;
+        ComputedMarginValues m_margins;
+    };
     // Resolve auto margins in the inline direction of the containing block so that objects can be pushed to the start, middle or end
     // of the containing block.
-    void computeInlineDirectionMargins(RenderBlock* containingBlock, LayoutUnit containerWidth, LayoutUnit childWidth);
+    void computeInlineDirectionMargins(RenderBlock* containingBlock, LayoutUnit containerWidth, LayoutUnit childWidth, LayoutUnit& marginStart, LayoutUnit& marginEnd) const;
 
     // Used to resolve margins in the containing block's block-flow direction.
     void computeBlockDirectionMargins(const RenderBlock* containingBlock);
@@ -338,7 +362,7 @@ public:
     LayoutUnit containingBlockLogicalWidthForContentInRegion(RenderRegion*, LayoutUnit offsetFromLogicalTopOfFirstPage) const;
     LayoutUnit containingBlockAvailableLineWidthInRegion(RenderRegion*, LayoutUnit offsetFromLogicalTopOfFirstPage) const;
     LayoutUnit perpendicularContainingBlockLogicalHeight() const;
-    
+
     virtual void computeLogicalWidth();
     virtual void computeLogicalHeight();
 
@@ -561,7 +585,7 @@ private:
         LayoutUnit offsetFromLogicalTopOfFirstPage = 0, bool checkForPerpendicularWritingMode = true) const;
     LayoutUnit containingBlockLogicalHeightForPositioned(const RenderBoxModelObject* containingBlock, bool checkForPerpendicularWritingMode = true) const;
 
-    void computePositionedLogicalHeight();
+    void computePositionedLogicalHeight(LogicalExtentComputedValues&) const;
     void computePositionedLogicalWidthUsing(SizeType, Length logicalWidth, const RenderBoxModelObject* containerBlock, TextDirection containerDirection,
                                             LayoutUnit containerLogicalWidth, LayoutUnit bordersPlusPadding,
                                             Length logicalLeft, Length logicalRight, Length marginLogicalLeft, Length marginLogicalRight,
@@ -569,15 +593,17 @@ private:
     void computePositionedLogicalHeightUsing(SizeType, Length logicalHeight, const RenderBoxModelObject* containerBlock,
                                              LayoutUnit containerLogicalHeight, LayoutUnit bordersPlusPadding,
                                              Length logicalTop, Length logicalBottom, Length marginLogicalTop, Length marginLogicalBottom,
-                                             LayoutUnit& logicalHeightValue, LayoutUnit& marginLogicalTopValue, LayoutUnit& marginLogicalBottomValue, LayoutUnit& logicalTopPos);
+                                             LogicalExtentComputedValues&) const;
 
-    void computePositionedLogicalHeightReplaced();
+    void computePositionedLogicalHeightReplaced(LogicalExtentComputedValues&) const;
     void computePositionedLogicalWidthReplaced();
 
     // This function calculates the minimum and maximum preferred widths for an object.
     // These values are used in shrink-to-fit layout systems.
     // These include tables, positioned objects, floats and flexible boxes.
     virtual void computePreferredLogicalWidths() { setPreferredLogicalWidthsDirty(false); }
+
+    virtual LayoutRect frameRectForStickyPositioning() const OVERRIDE { return frameRect(); }
 
 private:
     // The width/height of the contents + borders + padding.  The x/y location is relative to our container (which is not always our parent).

@@ -36,6 +36,15 @@
 // Tests that require new results.
 //////////////////////////////////////////////////////////////////////////////////////////
 
+BUGWK77754 : fast/inline/left-right-center-inline-alignment-in-ltr-and-rtl-blocks.html = TEXT
+BUGWK77754 : fast/inline/absolute-positioned-inline-in-centred-block.html = TEXT
+BUGWK77754 : fast/css/absolute-child-with-percent-height-inside-relative-parent.html = TEXT
+
+//Require rebaseline after https://bugs.webkit.org/show_bug.cgi?id=80394
+BUGWK80394 : fast/block/margin-collapse/empty-clear-blocks.html = IMAGE+TEXT
+BUGWK80394 : fast/block/float/024.html = IMAGE+TEXT
+BUGWK80394 : fast/block/margin-collapse/025.html = TEXT
+BUGWK80394 : fast/block/margin-collapse/block-inside-inline/025.html = TEXT
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // Expected failures
@@ -208,6 +217,7 @@ BUGWKGTK SKIP : fast/events/constructors/speech-recognition-event-constructor.ht
 BUGWKGTK SKIP : fast/filesystem = TEXT
 BUGWKGTK SKIP : http/tests/filesystem = TEXT
 BUGWKGTK SKIP : http/tests/security/filesystem-iframe-from-remote.html = TEXT
+BUGWKGTK SKIP : http/tests/security/contentSecurityPolicy/filesystem-urls-match-self.html = TEXT
 BUGWKGTK SKIP : http/tests/security/mixedContent/filesystem-url-in-iframe.html = TEXT
 BUGWKGTK SKIP : http/tests/websocket/tests/hybi/send-file-blob.html = TEXT
 BUGWKGTK SKIP : http/tests/websocket/tests/hybi/send-file-blob-fail.html = TEXT
@@ -218,6 +228,8 @@ BUGWKGTK SKIP : fast/forms/file/input-file-entries.html = TEXT
 // Requires WebP support.
 BUGWKGTK SKIP : fast/canvas/canvas-toDataURL-webp.html = TEXT
 BUGWKGTK SKIP : fast/images/webp-image-decoding.html = TEXT
+BUGWKGTK SKIP : http/tests/images/webp-partial-load.html = TEXT
+BUGWKGTK SKIP : http/tests/images/webp-progressive-load.html = TEXT
 
 // DataTransferItems is not yet implemented.
 BUGWKGTK SKIP : editing/pasteboard/data-transfer-items.html = TEXT
@@ -303,6 +315,9 @@ BUGWKGTK SKIP : css3/filters = TEXT
 BUGWKGTK SKIP : fast/css/image-set-parsing.html = TEXT
 BUGWKGTK SKIP : fast/css/image-set-parsing-invalid.html = TEXT
 BUGWKGTK SKIP : fast/css/image-set-setting.html = TEXT
+
+// CSS Sticky Position is not yet enabled
+BUGWKGTK SKIP : fast/css/sticky = IMAGE TEXT PASS
 
 // For now, Web Audio API is disabled
 BUGWKGTK SKIP : webaudio = TEXT
@@ -553,6 +568,8 @@ BUGWK93727 RELEASE : fullscreen/exit-full-screen-iframe.html = TEXT PASS
 BUGWK93727 RELEASE : fullscreen/full-screen-iframe-zIndex.html = TEXT PASS
 BUGWK93727 RELEASE : svg/custom/use-instanceRoot-as-event-target.xhtml = TEXT PASS
 
+BUGWK95430 : fast/layers/scroll-no-visible-content-but-visible-descendant.html = IMAGE PASS
+
 //////////////////////////////////////////////////////////////////////////////////////////
 // End of Flaky tests
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -616,7 +633,7 @@ BUGWKGTK : accessibility/aria-scrollbar-role.html = TEXT
 BUGWKGTK : accessibility/aria-text-role.html = TEXT
 BUGWKGTK : accessibility/aria-used-on-image-maps.html = TEXT
 BUGWKGTK : accessibility/button-press-action.html = TEXT
-BUGWKGTK : accessibility/canvas.html = TEXT
+BUGWKGTK : accessibility/canvas-description-and-role.html = TEXT
 BUGWKGTK : accessibility/canvas-fallback-content.html = TEXT
 BUGWKGTK : accessibility/editable-webarea-context-menu-point.html = TEXT
 BUGWKGTK : accessibility/ellipsis-text.html = TEXT
@@ -787,24 +804,17 @@ BUGWKGTK : fast/loader/api-test-go-to-current-back-forward-item.html = TEXT
 BUGWK35300 : http/tests/loading/307-after-303-after-post.html = TEXT
 BUGWK35300 SKIP : http/tests/navigation/post-307-response.html = TEXT
 
-// mouseScrollBy() and continuousMouseScrollBy() are not yet implemented in the GTK EventSender API.
-BUGWK36003 : fast/events/continuous-platform-wheelevent-in-scrolling-div.html = TEXT
-BUGWK36003 : fast/events/platform-wheelevent-in-scrolling-div.html = TEXT
-BUGWK36003 : fast/events/platform-wheelevent-paging-x-in-non-scrolling-div.html = TEXT
-BUGWK36003 : fast/events/platform-wheelevent-paging-x-in-non-scrolling-page.html = TEXT
-BUGWK36003 : fast/events/platform-wheelevent-paging-x-in-scrolling-div.html = TEXT
-BUGWK36003 : fast/events/platform-wheelevent-paging-x-in-scrolling-page.html = TEXT
-BUGWK36003 : fast/events/platform-wheelevent-paging-xy-in-scrolling-div.html = TEXT
-BUGWK36003 : fast/events/platform-wheelevent-paging-xy-in-scrolling-page.html = TEXT
-BUGWK36003 : fast/events/platform-wheelevent-paging-y-in-non-scrolling-div.html = TEXT
-BUGWK36003 : fast/events/platform-wheelevent-paging-y-in-non-scrolling-page.html = TEXT
-BUGWK36003 : fast/events/platform-wheelevent-paging-y-in-scrolling-div.html = TEXT
-BUGWK36003 : fast/events/platform-wheelevent-paging-y-in-scrolling-page.html = TEXT
-BUGWK36003 SKIP : fast/events/remove-child-onscroll.html = TEXT
-BUGWK36003 : fast/events/scroll-in-scaled-page-with-overflow-hidden.html = TEXT
-BUGWK36003 : fast/events/wheelevent-direction-inverted-from-device.html = TEXT
-BUGWK36003 : fast/events/wheelevent-in-horizontal-scrollbar-in-rtl.html = TEXT
-BUGWK36003 : fast/events/wheelevent-in-vertical-scrollbar-in-rtl.html = TEXT
+// Paged continuousMouseScrollBy() events are not supported in GTK.
+BUGWKGTK : fast/events/platform-wheelevent-paging-x-in-non-scrolling-div.html = TEXT
+BUGWKGTK : fast/events/platform-wheelevent-paging-x-in-non-scrolling-page.html = TEXT
+BUGWKGTK : fast/events/platform-wheelevent-paging-x-in-scrolling-div.html = TEXT
+BUGWKGTK : fast/events/platform-wheelevent-paging-x-in-scrolling-page.html = TEXT
+BUGWKGTK : fast/events/platform-wheelevent-paging-xy-in-scrolling-div.html = TEXT
+BUGWKGTK : fast/events/platform-wheelevent-paging-xy-in-scrolling-page.html = TEXT
+BUGWKGTK : fast/events/platform-wheelevent-paging-y-in-non-scrolling-div.html = TEXT
+BUGWKGTK : fast/events/platform-wheelevent-paging-y-in-non-scrolling-page.html = TEXT
+BUGWKGTK : fast/events/platform-wheelevent-paging-y-in-scrolling-div.html = TEXT
+BUGWKGTK : fast/events/platform-wheelevent-paging-y-in-scrolling-page.html = TEXT
 
 // Misses setMediaType() implementation
 BUGWKGTK SKIP : fast/media/print-restores-previous-mediatype.html = TIMEOUT
@@ -1259,27 +1269,6 @@ BUGWK92100 : accessibility/canvas-accessibilitynodeobject.html = TEXT
 // These tests depend on subpixel layout.
 BUGWK92352 : css3/flexbox/flex-rounding.html = TEXT
 
-BUGWK93073 : mathml/presentation/attributes.xhtml = TEXT
-BUGWK93073 : mathml/presentation/fenced-mi.xhtml = TEXT
-BUGWK93073 : mathml/presentation/fenced.xhtml = TEXT
-BUGWK93073 : mathml/presentation/fractions-vertical-alignment.xhtml = TEXT
-BUGWK93073 : mathml/presentation/fractions.xhtml = TEXT
-BUGWK93073 : mathml/presentation/mo-stretch.html = TEXT
-BUGWK93073 : mathml/presentation/mo.xhtml = TEXT
-BUGWK93073 : mathml/presentation/mroot-pref-width.html = TEXT
-BUGWK93073 : mathml/presentation/over.xhtml = TEXT
-BUGWK93073 : mathml/presentation/roots.xhtml = TEXT
-BUGWK93073 : mathml/presentation/row-alignment.xhtml = TEXT
-BUGWK93073 : mathml/presentation/row.xhtml = TEXT
-BUGWK93073 : mathml/presentation/style.xhtml = TEXT
-BUGWK93073 : mathml/presentation/sub.xhtml = TEXT
-BUGWK93073 : mathml/presentation/subsup.xhtml = TEXT
-BUGWK93073 : mathml/presentation/sup.xhtml = TEXT
-BUGWK93073 : mathml/presentation/tables.xhtml = TEXT
-BUGWK93073 : mathml/presentation/tokenElements.xhtml = TEXT
-BUGWK93073 : mathml/presentation/under.xhtml = TEXT
-BUGWK93073 : mathml/presentation/underover.xhtml = TEXT
-
 BUGWK93976 : fast/css-generated-content/quotes-lang.html = IMAGE
 
 // Tests added by https://bugs.webkit.org/show_bug.cgi?id=89826
@@ -1305,6 +1294,16 @@ BUGWK88727 RELEASE : http/tests/xmlhttprequest/origin-exact-matching.html = TEXT
 
 BUGWK94952 DEBUG : platform/gtk/scrollbars/overflow-scrollbar-horizontal-wheel-scroll.html = TEXT
 BUGWK94952 DEBUG : scrollbars/scroll-rtl-or-bt-layer.html = TEXT
+
+BUGWK87355 : canvas/philip/tests/2d.text.draw.fontface.notinpage.html = TEXT
+
+BUGWK95428 : media/video-controls-captions.html = TEXT
+
+BUGWK95429 : svg/custom/clamped-masking-clipping.svg = IMAGE
+
+BUGWK94677 : http/tests/security/contentSecurityPolicy/register-bypassing-scheme = TEXT
+
+BUGWK95530 : http/tests/security/inactive-document-with-empty-security-origin.html = TEXT
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // End of Tests failing

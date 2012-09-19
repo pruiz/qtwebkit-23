@@ -27,6 +27,7 @@
 #include "CCLayerTreeHostImpl.h"
 
 #include "CCActiveGestureAnimation.h"
+#include "CCAppendQuadsData.h"
 #include "CCDamageTracker.h"
 #include "CCDebugRectHistory.h"
 #include "CCDelayBasedTimeSource.h"
@@ -266,6 +267,13 @@ void CCLayerTreeHostImpl::calculateRenderSurfaceLayerList(CCLayerList& renderSur
     }
 }
 
+void CCLayerTreeHostImpl::FrameData::appendRenderPass(PassOwnPtr<CCRenderPass> renderPass)
+{
+    CCRenderPass* pass = renderPass.get();
+    renderPasses.append(pass);
+    renderPassesById.set(pass->id(), renderPass);
+}
+
 bool CCLayerTreeHostImpl::calculateRenderPasses(FrameData& frame)
 {
     ASSERT(frame.renderPasses.isEmpty());
@@ -275,22 +283,9 @@ bool CCLayerTreeHostImpl::calculateRenderPasses(FrameData& frame)
     TRACE_EVENT1("cc", "CCLayerTreeHostImpl::calculateRenderPasses", "renderSurfaceLayerList.size()", static_cast<long long unsigned>(frame.renderSurfaceLayerList->size()));
 
     // Create the render passes in dependency order.
-    HashMap<CCRenderSurface*, CCRenderPass*> surfacePassMap;
     for (int surfaceIndex = frame.renderSurfaceLayerList->size() - 1; surfaceIndex >= 0 ; --surfaceIndex) {
         CCLayerImpl* renderSurfaceLayer = (*frame.renderSurfaceLayerList)[surfaceIndex];
-        CCRenderSurface* renderSurface = renderSurfaceLayer->renderSurface();
-
-        int renderPassId = renderSurfaceLayer->id();
-        IntRect outputRect = renderSurface->contentRect();
-        const WebTransformationMatrix& transformToRootTarget = renderSurface->screenSpaceTransform();
-        OwnPtr<CCRenderPass> pass = CCRenderPass::create(renderPassId, outputRect, transformToRootTarget);
-        pass->setDamageRect(renderSurface->damageTracker()->currentDamageRect());
-        pass->setFilters(renderSurfaceLayer->filters());
-        pass->setBackgroundFilters(renderSurfaceLayer->backgroundFilters());
-
-        surfacePassMap.add(renderSurface, pass.get());
-        frame.renderPasses.append(pass.get());
-        frame.renderPassesById.add(renderPassId, pass.release());
+        renderSurfaceLayer->renderSurface()->appendRenderPasses(frame);
     }
 
     bool recordMetricsForFrame = true; // FIXME: In the future, disable this when about:tracing is off.
@@ -310,28 +305,32 @@ bool CCLayerTreeHostImpl::calculateRenderPasses(FrameData& frame)
 
     CCLayerIteratorType end = CCLayerIteratorType::end(frame.renderSurfaceLayerList);
     for (CCLayerIteratorType it = CCLayerIteratorType::begin(frame.renderSurfaceLayerList); it != end; ++it) {
-        CCRenderSurface* renderSurface = it.targetRenderSurfaceLayer()->renderSurface();
-        CCRenderPass* pass = surfacePassMap.get(renderSurface);
-        bool hadMissingTiles = false;
+        int targetRenderPassId = it.targetRenderSurfaceLayer()->id();
+        CCRenderPass* targetRenderPass = frame.renderPassesById.get(targetRenderPassId);
 
         occlusionTracker.enterLayer(it);
 
+        CCAppendQuadsData appendQuadsData;
+
         if (it.representsContributingRenderSurface()) {
-            CCRenderPass* contributingRenderPass = surfacePassMap.get(it->renderSurface());
-            pass->appendQuadsForRenderSurfaceLayer(*it, contributingRenderPass, &occlusionTracker);
+            int contributingRenderPassId = it->id();
+            CCRenderPass* contributingRenderPass = frame.renderPassesById.get(contributingRenderPassId);
+            targetRenderPass->appendQuadsForRenderSurfaceLayer(*it, contributingRenderPass, &occlusionTracker, appendQuadsData);
         } else if (it.representsItself() && !it->visibleContentRect().isEmpty()) {
             bool hasOcclusionFromOutsideTargetSurface;
-            if (occlusionTracker.occluded(*it, it->visibleContentRect(), &hasOcclusionFromOutsideTargetSurface)) {
-                if (hasOcclusionFromOutsideTargetSurface)
-                    pass->setHasOcclusionFromOutsideTargetSurface(hasOcclusionFromOutsideTargetSurface);
-            } else {
+            if (occlusionTracker.occluded(*it, it->visibleContentRect(), &hasOcclusionFromOutsideTargetSurface))
+                appendQuadsData.hadOcclusionFromOutsideTargetSurface |= hasOcclusionFromOutsideTargetSurface;
+            else {
                 it->willDraw(m_resourceProvider.get());
                 frame.willDrawLayers.append(*it);
-                pass->appendQuadsForLayer(*it, &occlusionTracker, hadMissingTiles);
+                targetRenderPass->appendQuadsForLayer(*it, &occlusionTracker, appendQuadsData);
             }
         }
 
-        if (hadMissingTiles) {
+        if (appendQuadsData.hadOcclusionFromOutsideTargetSurface)
+            targetRenderPass->setHasOcclusionFromOutsideTargetSurface(true);
+
+        if (appendQuadsData.hadMissingTiles) {
             bool layerHasAnimatingTransform = it->screenSpaceTransformIsAnimating() || it->drawTransformIsAnimating();
             if (layerHasAnimatingTransform)
                 drawFrame = false;
@@ -344,6 +343,7 @@ bool CCLayerTreeHostImpl::calculateRenderPasses(FrameData& frame)
     for (size_t i = 0; i < frame.renderPasses.size(); ++i) {
         for (size_t j = 0; j < frame.renderPasses[i]->quadList().size(); ++j)
             ASSERT(frame.renderPasses[i]->quadList()[j]->sharedQuadStateId() >= 0);
+        ASSERT(frame.renderPassesById.contains(frame.renderPasses[i]->id()));
     }
 #endif
 
@@ -769,6 +769,8 @@ void CCLayerTreeHostImpl::setDeviceScaleFactor(float deviceScaleFactor)
     if (deviceScaleFactor == m_deviceScaleFactor)
         return;
     m_deviceScaleFactor = deviceScaleFactor;
+
+    updateMaxScrollPosition();
 }
 
 
@@ -976,7 +978,7 @@ void CCLayerTreeHostImpl::scrollBy(const IntPoint& viewportPoint, const IntSize&
             appliedDelta = scrollLayerWithLocalDelta(*layerImpl, pendingDelta);
 
         // If the layer wasn't able to move, try the next one in the hierarchy.
-        float moveThresholdSquared = 0.1 * 0.1;
+        float moveThresholdSquared = 0.1f * 0.1f;
         if (appliedDelta.diagonalLengthSquared() < moveThresholdSquared)
             continue;
 
@@ -1078,7 +1080,7 @@ void CCLayerTreeHostImpl::computePinchZoomDeltas(CCScrollAndScaleSet* scrollInfo
     // Only send fake scroll/zoom deltas if we're pinch zooming out by a
     // significant amount. This also ensures only one fake delta set will be
     // sent.
-    const float pinchZoomOutSensitivity = 0.95;
+    const float pinchZoomOutSensitivity = 0.95f;
     if (m_pageScaleDelta > pinchZoomOutSensitivity)
         return;
 

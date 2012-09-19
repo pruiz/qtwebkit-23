@@ -69,6 +69,7 @@
 #include <runtime/JSLock.h>
 #include <runtime/JSValue.h>
 #include <wtf/ASCIICType.h>
+#include <wtf/text/WTFString.h>
 
 #if !PLATFORM(WX)
 #include "BitmapInfo.h"
@@ -136,7 +137,6 @@ static inline HWND windowHandleForPageClient(PlatformPageClient client)
 using JSC::ExecState;
 using JSC::JSLock;
 using JSC::JSObject;
-using JSC::UString;
 
 using std::min;
 

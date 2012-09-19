@@ -36,8 +36,11 @@
 #include "Extensions3DChromium.h"
 #include "GraphicsContext3D.h"
 #include "GraphicsContext3DPrivate.h"
+#include "GraphicsLayerChromium.h"
 #include <algorithm>
+#include <public/Platform.h>
 #include <public/WebCompositor.h>
+#include <public/WebCompositorSupport.h>
 #include <public/WebExternalTextureLayer.h>
 #include <public/WebExternalTextureLayerClient.h>
 #include <public/WebGraphicsContext3D.h>
@@ -87,6 +90,7 @@ DrawingBuffer::DrawingBuffer(GraphicsContext3D* context,
     , m_stencilBuffer(0)
     , m_multisampleFBO(0)
     , m_multisampleColorBuffer(0)
+    , m_contentsChanged(true)
 {
     initialize(size);
 }
@@ -119,6 +123,9 @@ void DrawingBuffer::initialize(const IntSize& size)
 #if USE(ACCELERATED_COMPOSITING)
 void DrawingBuffer::prepareBackBuffer()
 {
+    if (!m_contentsChanged)
+        return;
+
     m_context->makeContextCurrent();
 
     if (multisample())
@@ -138,6 +145,8 @@ void DrawingBuffer::prepareBackBuffer()
         bind();
     else
         restoreFramebufferBinding();
+
+    m_contentsChanged = false;
 }
 
 bool DrawingBuffer::requiresCopyFromBackToFrontBuffer() const
@@ -156,15 +165,21 @@ class DrawingBufferPrivate : public WebKit::WebExternalTextureLayerClient {
 public:
     explicit DrawingBufferPrivate(DrawingBuffer* drawingBuffer)
         : m_drawingBuffer(drawingBuffer)
-        , m_layer(adoptPtr(WebKit::WebExternalTextureLayer::create(this)))
     {
+        if (WebKit::WebCompositorSupport* compositorSupport = WebKit::Platform::current()->compositorSupport())
+            m_layer = adoptPtr(compositorSupport->createExternalTextureLayer(this));
+        else
+            m_layer = adoptPtr(WebKit::WebExternalTextureLayer::create(this));
+
         GraphicsContext3D::Attributes attributes = m_drawingBuffer->graphicsContext3D()->getContextAttributes();
         m_layer->setOpaque(!attributes.alpha);
         m_layer->setPremultipliedAlpha(attributes.premultipliedAlpha);
+        GraphicsLayerChromium::registerContentsLayer(m_layer->layer());
     }
 
     virtual ~DrawingBufferPrivate()
     {
+        GraphicsLayerChromium::unregisterContentsLayer(m_layer->layer());
     }
 
     virtual unsigned prepareTexture(WebKit::WebTextureUpdater& updater) OVERRIDE

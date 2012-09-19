@@ -46,7 +46,7 @@ class AffineTransform;
 class AnimationController;
 class Cursor;
 class Document;
-class HitTestPoint;
+class HitTestLocation;
 class HitTestResult;
 class InlineBox;
 class InlineFlowBox;
@@ -369,7 +369,6 @@ public:
 #endif
 
     virtual bool isRenderFlowThread() const { return false; }
-    virtual bool isRenderFlowThreadContainer() const { return false; }
     virtual bool isRenderNamedFlowThread() const { return false; }
     
     virtual bool isRenderMultiColumnBlock() const { return false; }
@@ -513,8 +512,10 @@ public:
     bool isFloating() const { return m_bitfields.floating(); }
 
     bool isOutOfFlowPositioned() const { return m_bitfields.positioned(); } // absolute or fixed positioning
-    bool isInFlowPositioned() const { return m_bitfields.relPositioned(); } // relative positioning
+    bool isInFlowPositioned() const { return m_bitfields.relPositioned() || m_bitfields.stickyPositioned(); } // relative or sticky positioning
     bool isRelPositioned() const { return m_bitfields.relPositioned(); } // relative positioning
+    bool isStickyPositioned() const { return m_bitfields.stickyPositioned(); }
+    bool isPositioned() const { return m_bitfields.positioned() || m_bitfields.relPositioned() || m_bitfields.stickyPositioned(); }
 
     bool isText() const  { return m_bitfields.isText(); }
     bool isBox() const { return m_bitfields.isBox(); }
@@ -564,6 +565,12 @@ public:
     bool hasFilter() const { return style() && style()->hasFilter(); }
 #else
     bool hasFilter() const { return false; }
+#endif
+
+#if ENABLE(CSS_COMPOSITING)
+    bool hasBlendMode() const { return style() && style()->hasBlendMode(); }
+#else
+    bool hasBlendMode() const { return false; }
 #endif
 
     inline bool preservesNewline() const;
@@ -621,6 +628,7 @@ public:
 
     void setPositioned(bool b = true)  { m_bitfields.setPositioned(b);  }
     void setRelPositioned(bool b = true) { m_bitfields.setRelPositioned(b); }
+    void setStickyPositioned(bool b = true) { m_bitfields.setStickyPositioned(b); }
     void setFloating(bool b = true) { m_bitfields.setFloating(b); }
     void setInline(bool b = true) { m_bitfields.setIsInline(b); }
     void setHasBoxDecorations(bool b = true) { m_bitfields.setPaintBackground(b); }
@@ -657,9 +665,9 @@ public:
 
     bool isComposited() const;
 
-    bool hitTest(const HitTestRequest&, HitTestResult&, const HitTestPoint& pointInContainer, const LayoutPoint& accumulatedOffset, HitTestFilter = HitTestAll);
+    bool hitTest(const HitTestRequest&, HitTestResult&, const HitTestLocation& locationInContainer, const LayoutPoint& accumulatedOffset, HitTestFilter = HitTestAll);
     virtual void updateHitTestResult(HitTestResult&, const LayoutPoint&);
-    virtual bool nodeAtPoint(const HitTestRequest&, HitTestResult&, const HitTestPoint& pointInContainer, const LayoutPoint& accumulatedOffset, HitTestAction);
+    virtual bool nodeAtPoint(const HitTestRequest&, HitTestResult&, const HitTestLocation& locationInContainer, const LayoutPoint& accumulatedOffset, HitTestAction);
 
     virtual VisiblePosition positionForPoint(const LayoutPoint&);
     VisiblePosition createVisiblePosition(int offset, EAffinity);
@@ -903,6 +911,9 @@ public:
     bool shouldUseTransformFromContainer(const RenderObject* container) const;
     void getTransformFromContainer(const RenderObject* container, const LayoutSize& offsetInContainer, TransformationMatrix&) const;
     
+    // return true if this object requires a new stacking context
+    bool createsGroup() const { return isTransparent() || hasMask() || hasFilter() || hasBlendMode(); } 
+    
     virtual void addFocusRingRects(Vector<IntRect>&, const LayoutPoint&) { };
 
     LayoutRect absoluteOutlineBounds() const
@@ -930,7 +941,7 @@ protected:
     void paintFocusRing(GraphicsContext*, const LayoutPoint&, RenderStyle*);
     void paintOutline(GraphicsContext*, const LayoutRect&);
     void addPDFURLRect(GraphicsContext*, const LayoutRect&);
-
+    
     virtual LayoutRect viewRect() const;
 
     void adjustRectForOutlineAndShadow(LayoutRect&) const;
@@ -990,6 +1001,7 @@ private:
             , m_floating(false)
             , m_positioned(false)
             , m_relPositioned(false)
+            , m_stickyPositioned(false)
             , m_paintBackground(false)
             , m_isAnonymous(node == node->document())
             , m_isText(false)
@@ -1024,6 +1036,7 @@ private:
 
         ADD_BOOLEAN_BITFIELD(positioned, Positioned);
         ADD_BOOLEAN_BITFIELD(relPositioned, RelPositioned);
+        ADD_BOOLEAN_BITFIELD(stickyPositioned, StickyPositioned);
         ADD_BOOLEAN_BITFIELD(paintBackground, PaintBackground); // if the box has something to paint in the
         // background painting phase (background, border, etc)
 

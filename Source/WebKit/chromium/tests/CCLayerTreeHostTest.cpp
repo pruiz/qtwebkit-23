@@ -35,17 +35,16 @@
 #include "CCThreadedTest.h"
 #include "CCTimingFunction.h"
 #include "ContentLayerChromium.h"
+#include "Extensions3DChromium.h"
+#include "FakeWebCompositorOutputSurface.h"
 #include <gmock/gmock.h>
-#include <gtest/gtest.h>
 #include <public/Platform.h>
-#include <public/WebThread.h>
 #include <wtf/MainThread.h>
 #include <wtf/OwnArrayPtr.h>
 
 using namespace WebCore;
 using namespace WebKit;
 using namespace WebKitTests;
-using namespace WTF;
 
 #define EXPECT_EQ_RECT(a, b) \
     EXPECT_EQ(a.x(), b.x()); \
@@ -518,6 +517,63 @@ TEST_F(CCLayerTreeHostTestAbortFrameWhenInvisible, runMultiThread)
     runTest(true);
 }
 
+// Makes sure that setNedsAnimate does not cause the commitRequested() state to be set.
+class CCLayerTreeHostTestSetNeedsAnimateShouldNotSetCommitRequested : public CCLayerTreeHostTest {
+public:
+    CCLayerTreeHostTestSetNeedsAnimateShouldNotSetCommitRequested()
+        : m_numCommits(0)
+    {
+    }
+
+    virtual void beginTest() OVERRIDE
+    {
+        // The tests start up with a commit pending because we give them a root layer.
+        // We need to wait for the commit to happen before doing anything.
+        EXPECT_TRUE(m_layerTreeHost->commitRequested());
+    }
+
+    virtual void animate(double monotonicTime) OVERRIDE
+    {
+        // We skip the first commit becasue its the commit that populates the
+        // impl thread with a tree.
+        if (!m_numCommits)
+            return;
+
+        m_layerTreeHost->setNeedsAnimate();
+        // Right now, commitRequested is going to be true, because during
+        // beginFrame, we force commitRequested to true to prevent requests from
+        // hitting the impl thread. But, when the next didCommit happens, we should
+        // verify that commitRequested has gone back to false.
+    }
+    virtual void didCommit() OVERRIDE
+    {
+        if (!m_numCommits) {
+            EXPECT_FALSE(m_layerTreeHost->commitRequested());
+            m_layerTreeHost->setNeedsAnimate();
+            EXPECT_FALSE(m_layerTreeHost->commitRequested());
+            m_numCommits++;
+        }
+
+        // Verifies that the setNeedsAnimate we made in ::animate did not
+        // trigger commitRequested.
+        EXPECT_FALSE(m_layerTreeHost->commitRequested());
+        endTest();
+    }
+
+    virtual void afterTest() OVERRIDE
+    {
+    }
+
+private:
+    int m_numCommits;
+};
+
+TEST_F(CCLayerTreeHostTestSetNeedsAnimateShouldNotSetCommitRequested, runMultiThread)
+{
+    runTest(true);
+}
+
+
 
 // Trigger a frame with setNeedsCommit. Then, inside the resulting animate
 // callback, requet another frame using setNeedsAnimate. End the test when
@@ -912,7 +968,7 @@ private:
     int m_scrolls;
 };
 
-TEST_F(CCLayerTreeHostTestScrollSimple, DISABLED_runMultiThread)
+TEST_F(CCLayerTreeHostTestScrollSimple, runMultiThread)
 {
     runTest(true);
 }
@@ -2409,7 +2465,7 @@ public:
     }
     virtual ~EvictionTestLayerImpl() { }
 
-    virtual void appendQuads(CCQuadSink&, bool& hadMissingTiles) OVERRIDE
+    virtual void appendQuads(CCQuadSink& quadSink, CCAppendQuadsData&) OVERRIDE
     {
         ASSERT_TRUE(m_hasTexture);
         ASSERT_NE(0u, layerTreeHostImpl()->resourceProvider()->numResources());
@@ -2687,5 +2743,97 @@ private:
 };
 
 SINGLE_AND_MULTI_THREAD_TEST_F(CCLayerTreeHostTestLostContextAfterEvictTextures)
+
+class CompositorFakeWebGraphicsContext3DWithEndQueryCausingLostContext : public WebKit::CompositorFakeWebGraphicsContext3D {
+public:
+    static PassOwnPtr<CompositorFakeWebGraphicsContext3DWithEndQueryCausingLostContext> create(Attributes attrs)
+    {
+        return adoptPtr(new CompositorFakeWebGraphicsContext3DWithEndQueryCausingLostContext(attrs));
+    }
+
+    virtual void setContextLostCallback(WebGraphicsContextLostCallback* callback) { m_contextLostCallback = callback; }
+    virtual bool isContextLost() { return m_isContextLost; }
+
+    virtual void beginQueryEXT(GC3Denum, WebGLId) { }
+    virtual void endQueryEXT(GC3Denum)
+    {
+        // Lose context.
+        if (!m_isContextLost) {
+            m_contextLostCallback->onContextLost();
+            m_isContextLost = true;
+        }
+    }
+    virtual void getQueryObjectuivEXT(WebGLId, GC3Denum pname, GC3Duint* params)
+    {
+        // Context is lost. Result will never be available.
+        if (pname == Extensions3DChromium::QUERY_RESULT_AVAILABLE_EXT)
+            *params = 0;
+    }
+
+private:
+    explicit CompositorFakeWebGraphicsContext3DWithEndQueryCausingLostContext(Attributes attrs)
+        : CompositorFakeWebGraphicsContext3D(attrs)
+        , m_contextLostCallback(0)
+        , m_isContextLost(false) { }
+
+    WebGraphicsContextLostCallback* m_contextLostCallback;
+    bool m_isContextLost;
+};
+
+class CCLayerTreeHostTestLostContextWhileUpdatingResources : public CCLayerTreeHostTest {
+public:
+    CCLayerTreeHostTestLostContextWhileUpdatingResources()
+        : m_parent(ContentLayerChromiumWithUpdateTracking::create(&m_delegate))
+        , m_numChildren(50)
+    {
+        for (int i = 0; i < m_numChildren; i++)
+            m_children.append(ContentLayerChromiumWithUpdateTracking::create(&m_delegate));
+    }
+
+    virtual PassOwnPtr<WebKit::WebCompositorOutputSurface> createOutputSurface()
+    {
+        return FakeWebCompositorOutputSurface::create(CompositorFakeWebGraphicsContext3DWithEndQueryCausingLostContext::create(WebGraphicsContext3D::Attributes()));
+    }
+
+    virtual void beginTest()
+    {
+        m_layerTreeHost->setRootLayer(m_parent);
+        m_layerTreeHost->setViewportSize(IntSize(m_numChildren, 1), IntSize(m_numChildren, 1));
+
+        WebTransformationMatrix identityMatrix;
+        setLayerPropertiesForTesting(m_parent.get(), 0, identityMatrix, FloatPoint(0, 0), FloatPoint(0, 0), IntSize(m_numChildren, 1), true);
+        for (int i = 0; i < m_numChildren; i++)
+            setLayerPropertiesForTesting(m_children[i].get(), m_parent.get(), identityMatrix, FloatPoint(0, 0), FloatPoint(i, 0), IntSize(1, 1), false);
+
+        postSetNeedsCommitToMainThread();
+    }
+
+    virtual void commitCompleteOnCCThread(CCLayerTreeHostImpl* impl)
+    {
+        endTest();
+    }
+
+    virtual void layout()
+    {
+        m_parent->setNeedsDisplay();
+        for (int i = 0; i < m_numChildren; i++)
+            m_children[i]->setNeedsDisplay();
+    }
+
+    virtual void afterTest()
+    {
+    }
+
+private:
+    MockContentLayerDelegate m_delegate;
+    RefPtr<ContentLayerChromiumWithUpdateTracking> m_parent;
+    int m_numChildren;
+    Vector<RefPtr<ContentLayerChromiumWithUpdateTracking> > m_children;
+};
+
+TEST_F(CCLayerTreeHostTestLostContextWhileUpdatingResources, runMultiThread)
+{
+    runTest(true);
+}
 
 } // namespace

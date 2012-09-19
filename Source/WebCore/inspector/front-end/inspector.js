@@ -58,7 +58,7 @@ var WebInspector = {
         var allDescriptors = [elements, resources, network, scripts, timeline, profiles, audits, console];
         var hiddenPanels = InspectorFrontendHost.hiddenPanels();
         for (var i = 0; i < allDescriptors.length; ++i) {
-            if (hiddenPanels.indexOf(allDescriptors[i].name) === -1)
+            if (hiddenPanels.indexOf(allDescriptors[i].name()) === -1)
                 panelDescriptors.push(allDescriptors[i]);
         }
         return panelDescriptors;
@@ -492,7 +492,6 @@ WebInspector._doLoadedDoneWithCapabilities = function()
     this.networkLog = new WebInspector.NetworkLog();
     this.domAgent = new WebInspector.DOMAgent();
     this.javaScriptContextManager = new WebInspector.JavaScriptContextManager(this.resourceTreeModel);
-    this.scriptSnippetModel = new WebInspector.ScriptSnippetModel();
 
     this.consoleView = new WebInspector.ConsoleView(WebInspector.WorkerManager.isWorkerFrontend());
 
@@ -518,7 +517,17 @@ WebInspector._doLoadedDoneWithCapabilities = function()
     this.openAnchorLocationRegistry.registerHandler(autoselectPanel, function() { return false; });
 
     this.workspace = new WebInspector.Workspace();
+    this.workspaceController = new WebInspector.WorkspaceController(this.workspace);
+
     this.breakpointManager = new WebInspector.BreakpointManager(WebInspector.settings.breakpoints, this.debuggerModel, this.workspace);
+
+    this.scriptSnippetModel = new WebInspector.ScriptSnippetModel(this.workspace);
+    new WebInspector.DebuggerScriptMapping(this.workspace);
+    new WebInspector.StylesUISourceCodeProvider(this.workspace);
+    if (WebInspector.experimentsSettings.sass.isEnabled())
+        new WebInspector.SASSSourceMapping(this.workspace);
+
+    new WebInspector.PresentationConsoleMessageHelper(this.workspace);
 
     this._createGlobalStatusBarItems();
 

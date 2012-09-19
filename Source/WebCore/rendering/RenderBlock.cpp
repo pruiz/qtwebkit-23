@@ -1380,7 +1380,7 @@ void RenderBlock::layout()
 }
 
 #if ENABLE(CSS_EXCLUSIONS)
-void RenderBlock::updateWrapShapeInfoAfterStyleChange(const WrapShape* wrapShape, const WrapShape* oldWrapShape)
+void RenderBlock::updateWrapShapeInfoAfterStyleChange(const BasicShape* wrapShape, const BasicShape* oldWrapShape)
 {
     // FIXME: A future optimization would do a deep comparison for equality.
     if (wrapShape == oldWrapShape)
@@ -1450,6 +1450,9 @@ void RenderBlock::checkForPaginationLogicalHeightChange(LayoutUnit& pageLogicalH
             colInfo->clearForcedBreaks();
 
         colInfo->setPaginationUnit(paginationUnit());
+    } else if (isRenderFlowThread()) {
+        pageLogicalHeight = 1; // This is just a hack to always make sure we have a page logical height.
+        pageLogicalHeightChanged = toRenderFlowThread(this)->pageLogicalHeightChanged();
     }
 }
 
@@ -2082,28 +2085,28 @@ LayoutUnit RenderBlock::clearFloatsIfNeeded(RenderBox* child, MarginInfo& margin
         // For self-collapsing blocks that clear, they can still collapse their
         // margins with following siblings.  Reset the current margins to represent
         // the self-collapsing block's margins only.
-        // CSS2.1 states:
-        // "An element that has had clearance applied to it never collapses its top margin with its parent block's bottom margin.
-        // Therefore if we are at the bottom of the block, let's go ahead and reset margins to only include the
-        // self-collapsing block's bottom margin.
-        bool atBottomOfBlock = true;
-        for (RenderBox* curr = child->nextSiblingBox(); curr && atBottomOfBlock; curr = curr->nextSiblingBox()) {
-            if (!curr->isFloatingOrOutOfFlowPositioned())
-                atBottomOfBlock = false;
-        }
-        
         MarginValues childMargins = marginValuesForChild(child);
-        if (atBottomOfBlock) {
-            marginInfo.setPositiveMargin(childMargins.positiveMarginAfter());
-            marginInfo.setNegativeMargin(childMargins.negativeMarginAfter());
-        } else {
-            marginInfo.setPositiveMargin(max(childMargins.positiveMarginBefore(), childMargins.positiveMarginAfter()));
-            marginInfo.setNegativeMargin(max(childMargins.negativeMarginBefore(), childMargins.negativeMarginAfter()));
+        marginInfo.setPositiveMargin(max(childMargins.positiveMarginBefore(), childMargins.positiveMarginAfter()));
+        marginInfo.setNegativeMargin(max(childMargins.negativeMarginBefore(), childMargins.negativeMarginAfter()));
+
+        // CSS2.1 states:
+        // "If the top and bottom margins of an element with clearance are adjoining, its margins collapse with 
+        // the adjoining margins of following siblings but that resulting margin does not collapse with the bottom margin of the parent block."
+        // So the parent's bottom margin cannot collapse through this block or any subsequent self-collapsing blocks. Check subsequent siblings
+        // for a block with height - if none is found then don't allow the margins to collapse with the parent.
+        bool wouldCollapseMarginsWithParent = marginInfo.canCollapseMarginAfterWithChildren();
+        for (RenderBox* curr = child->nextSiblingBox(); curr && wouldCollapseMarginsWithParent; curr = curr->nextSiblingBox()) {
+            if (!curr->isFloatingOrOutOfFlowPositioned() && !curr->isSelfCollapsingBlock())
+                wouldCollapseMarginsWithParent = false;
         }
-        
-        // Adjust our height such that we are ready to be collapsed with subsequent siblings (or the bottom
-        // of the parent block).
-        setLogicalHeight(child->logicalTop() - max(ZERO_LAYOUT_UNIT, marginInfo.margin()));
+        if (wouldCollapseMarginsWithParent)
+            marginInfo.setCanCollapseMarginAfterWithChildren(false);
+
+        // CSS2.1: "the amount of clearance is set so that clearance + margin-top = [height of float], i.e., clearance = [height of float] - margin-top"
+        // Move the top of the child box to the bottom of the float ignoring the child's top margin.
+        LayoutUnit collapsedMargin = collapsedMarginBeforeForChild(child);
+        setLogicalHeight(child->logicalTop() - collapsedMargin);
+        heightIncrease -= collapsedMargin;
     } else
         // Increase our height by the amount we had to clear.
         setLogicalHeight(logicalHeight() + heightIncrease);
@@ -2117,8 +2120,14 @@ LayoutUnit RenderBlock::clearFloatsIfNeeded(RenderBox* child, MarginInfo& margin
         setMaxMarginBeforeValues(oldTopPosMargin, oldTopNegMargin);
         marginInfo.setAtBeforeSideOfBlock(false);
     }
-    
-    return yPos + heightIncrease;
+
+    LayoutUnit logicalTop = yPos + heightIncrease;
+    // After margin collapsing, one of our floats may now intrude into the child. If the child doesn't contain floats of its own it
+    // won't get picked up for relayout even though the logical top estimate was wrong - so add the newly intruding float now.
+    if (containsFloats() && child->isRenderBlock() && !toRenderBlock(child)->containsFloats() && lowestFloatLogicalBottom() > logicalTop)
+        toRenderBlock(child)->addIntrudingFloats(this, logicalLeftOffsetForContent(), logicalTop);
+
+    return logicalTop;
 }
 
 void RenderBlock::marginBeforeEstimateForChild(RenderBox* child, LayoutUnit& positiveMarginBefore, LayoutUnit& negativeMarginBefore) const
@@ -2279,7 +2288,10 @@ void RenderBlock::handleAfterSideOfBlock(LayoutUnit beforeSide, LayoutUnit after
     marginInfo.setAtAfterSideOfBlock(true);
 
     // If we can't collapse with children then go ahead and add in the bottom margin.
+    // Don't do this for ordinary anonymous blocks as only the enclosing box should add in
+    // its margin.
     if (!marginInfo.canCollapseWithMarginAfter() && !marginInfo.canCollapseWithMarginBefore()
+        && (!isAnonymousBlock() || isAnonymousColumnsBlock() || isAnonymousColumnSpanBlock())
         && (!document()->inQuirksMode() || !marginInfo.quirkContainer() || !marginInfo.marginAfterQuirk()))
         setLogicalHeight(logicalHeight() + marginInfo.margin());
         
@@ -2647,14 +2659,6 @@ void RenderBlock::layoutPositionedObjects(bool relayoutChildren)
         }
         
         r->layoutIfNeeded();
-
-        // Adjust the static position of a center-aligned inline positioned object with a block child now that the child's width has been computed.
-        if (!r->parent()->isRenderView() && r->parent()->isRenderBlock() && r->firstChild() && r->style()->position() == AbsolutePosition
-            && r->style()->isOriginalDisplayInlineType() && (r->style()->textAlign() == CENTER || r->style()->textAlign() == WEBKIT_CENTER)) {
-            RenderBlock* block = toRenderBlock(r->parent());
-            LayoutUnit blockHeight = block->logicalHeight();
-            block->setStaticInlinePositionForChild(r, blockHeight, block->startAlignedOffsetForLine(r, blockHeight, false));
-        }
 
         // Lay out again if our estimate was wrong.
         if (needsBlockDirectionLocationSetBeforeLayout && logicalTopForChild(r) != oldLogicalTop) {
@@ -3210,9 +3214,10 @@ bool RenderBlock::isSelectionRoot() const
         return false;
         
     if (isBody() || isRoot() || hasOverflowClip()
-        || isInFlowPositioned() || isFloatingOrOutOfFlowPositioned()
+        || isPositioned() || isFloating()
         || isTableCell() || isInlineBlockOrInlineTable()
-        || hasTransform() || hasReflection() || hasMask() || isWritingModeRoot())
+        || hasTransform() || hasReflection() || hasMask() || isWritingModeRoot()
+        || isRenderFlowThread())
         return true;
     
     if (view() && view()->selectionStart()) {
@@ -4674,15 +4679,15 @@ LayoutUnit RenderBlock::getClearDelta(RenderBox* child, LayoutUnit logicalTop)
     return result;
 }
 
-bool RenderBlock::isPointInOverflowControl(HitTestResult& result, const LayoutPoint& pointInContainer, const LayoutPoint& accumulatedOffset)
+bool RenderBlock::isPointInOverflowControl(HitTestResult& result, const LayoutPoint& locationInContainer, const LayoutPoint& accumulatedOffset)
 {
     if (!scrollsOverflow())
         return false;
 
-    return layer()->hitTestOverflowControls(result, roundedIntPoint(pointInContainer - toLayoutSize(accumulatedOffset)));
+    return layer()->hitTestOverflowControls(result, roundedIntPoint(locationInContainer - toLayoutSize(accumulatedOffset)));
 }
 
-bool RenderBlock::nodeAtPoint(const HitTestRequest& request, HitTestResult& result, const HitTestPoint& pointInContainer, const LayoutPoint& accumulatedOffset, HitTestAction hitTestAction)
+bool RenderBlock::nodeAtPoint(const HitTestRequest& request, HitTestResult& result, const HitTestLocation& locationInContainer, const LayoutPoint& accumulatedOffset, HitTestAction hitTestAction)
 {
     LayoutPoint adjustedLocation(accumulatedOffset + location());
     LayoutSize localOffset = toLayoutSize(adjustedLocation);
@@ -4692,21 +4697,21 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request, HitTestResult& resu
         LayoutRect overflowBox = visualOverflowRect();
         flipForWritingMode(overflowBox);
         overflowBox.moveBy(adjustedLocation);
-        if (!pointInContainer.intersects(overflowBox))
+        if (!locationInContainer.intersects(overflowBox))
             return false;
     }
 
-    if ((hitTestAction == HitTestBlockBackground || hitTestAction == HitTestChildBlockBackground) && isPointInOverflowControl(result, pointInContainer.point(), adjustedLocation)) {
-        updateHitTestResult(result, pointInContainer.point() - localOffset);
+    if ((hitTestAction == HitTestBlockBackground || hitTestAction == HitTestChildBlockBackground) && isPointInOverflowControl(result, locationInContainer.point(), adjustedLocation)) {
+        updateHitTestResult(result, locationInContainer.point() - localOffset);
         // FIXME: isPointInOverflowControl() doesn't handle rect-based tests yet.
-        if (!result.addNodeToRectBasedTestResult(node(), pointInContainer))
+        if (!result.addNodeToRectBasedTestResult(node(), locationInContainer))
            return true;
     }
 
     // If we have clipping, then we can't have any spillout.
     bool useOverflowClip = hasOverflowClip() && !hasSelfPaintingLayer();
     bool useClip = (hasControlClip() || useOverflowClip);
-    bool checkChildren = !useClip || (hasControlClip() ? pointInContainer.intersects(controlClipRect(adjustedLocation)) : pointInContainer.intersects(overflowClipRect(adjustedLocation, pointInContainer.region(), IncludeOverlayScrollbarSize)));
+    bool checkChildren = !useClip || (hasControlClip() ? locationInContainer.intersects(controlClipRect(adjustedLocation)) : locationInContainer.intersects(overflowClipRect(adjustedLocation, locationInContainer.region(), IncludeOverlayScrollbarSize)));
     if (checkChildren) {
         // Hit test descendants first.
         LayoutSize scrolledOffset(localOffset);
@@ -4715,14 +4720,14 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request, HitTestResult& resu
 
         // Hit test contents if we don't have columns.
         if (!hasColumns()) {
-            if (hitTestContents(request, result, pointInContainer, toLayoutPoint(scrolledOffset), hitTestAction)) {
-                updateHitTestResult(result, pointInContainer.point() - localOffset);
+            if (hitTestContents(request, result, locationInContainer, toLayoutPoint(scrolledOffset), hitTestAction)) {
+                updateHitTestResult(result, locationInContainer.point() - localOffset);
                 return true;
             }
-            if (hitTestAction == HitTestFloat && hitTestFloats(request, result, pointInContainer, toLayoutPoint(scrolledOffset)))
+            if (hitTestAction == HitTestFloat && hitTestFloats(request, result, locationInContainer, toLayoutPoint(scrolledOffset)))
                 return true;
-        } else if (hitTestColumns(request, result, pointInContainer, toLayoutPoint(scrolledOffset), hitTestAction)) {
-            updateHitTestResult(result, flipForWritingMode(pointInContainer.point() - localOffset));
+        } else if (hitTestColumns(request, result, locationInContainer, toLayoutPoint(scrolledOffset), hitTestAction)) {
+            updateHitTestResult(result, flipForWritingMode(locationInContainer.point() - localOffset));
             return true;
         }
     }
@@ -4730,9 +4735,9 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request, HitTestResult& resu
     // Now hit test our background
     if (hitTestAction == HitTestBlockBackground || hitTestAction == HitTestChildBlockBackground) {
         LayoutRect boundsRect(adjustedLocation, size());
-        if (visibleToHitTesting() && pointInContainer.intersects(boundsRect)) {
-            updateHitTestResult(result, flipForWritingMode(pointInContainer.point() - localOffset));
-            if (!result.addNodeToRectBasedTestResult(node(), pointInContainer, boundsRect))
+        if (visibleToHitTesting() && locationInContainer.intersects(boundsRect)) {
+            updateHitTestResult(result, flipForWritingMode(locationInContainer.point() - localOffset));
+            if (!result.addNodeToRectBasedTestResult(node(), locationInContainer, boundsRect))
                 return true;
         }
     }
@@ -4740,7 +4745,7 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request, HitTestResult& resu
     return false;
 }
 
-bool RenderBlock::hitTestFloats(const HitTestRequest& request, HitTestResult& result, const HitTestPoint& pointInContainer, const LayoutPoint& accumulatedOffset)
+bool RenderBlock::hitTestFloats(const HitTestRequest& request, HitTestResult& result, const HitTestLocation& locationInContainer, const LayoutPoint& accumulatedOffset)
 {
     if (!m_floatingObjects)
         return false;
@@ -4759,8 +4764,8 @@ bool RenderBlock::hitTestFloats(const HitTestRequest& request, HitTestResult& re
             LayoutUnit xOffset = xPositionForFloatIncludingMargin(floatingObject) - floatingObject->m_renderer->x();
             LayoutUnit yOffset = yPositionForFloatIncludingMargin(floatingObject) - floatingObject->m_renderer->y();
             LayoutPoint childPoint = flipFloatForWritingModeForChild(floatingObject, adjustedLocation + LayoutSize(xOffset, yOffset));
-            if (floatingObject->m_renderer->hitTest(request, result, pointInContainer, childPoint)) {
-                updateHitTestResult(result, pointInContainer.point() - toLayoutSize(childPoint));
+            if (floatingObject->m_renderer->hitTest(request, result, locationInContainer, childPoint)) {
+                updateHitTestResult(result, locationInContainer.point() - toLayoutSize(childPoint));
                 return true;
             }
         }
@@ -4828,48 +4833,48 @@ private:
     LayoutRect m_colRect;
 };
 
-bool RenderBlock::hitTestColumns(const HitTestRequest& request, HitTestResult& result, const HitTestPoint& pointInContainer, const LayoutPoint& accumulatedOffset, HitTestAction hitTestAction)
+bool RenderBlock::hitTestColumns(const HitTestRequest& request, HitTestResult& result, const HitTestLocation& locationInContainer, const LayoutPoint& accumulatedOffset, HitTestAction hitTestAction)
 {
     // We need to do multiple passes, breaking up our hit testing into strips.
     if (!hasColumns())
         return false;
 
     for (ColumnRectIterator it(*this); it.hasMore(); it.advance()) {
-        LayoutRect hitRect = pointInContainer.boundingBox();
+        LayoutRect hitRect = locationInContainer.boundingBox();
         LayoutRect colRect = it.columnRect();
         colRect.moveBy(accumulatedOffset);
-        if (pointInContainer.intersects(colRect)) {
+        if (locationInContainer.intersects(colRect)) {
             // The point is inside this column.
             // Adjust accumulatedOffset to change where we hit test.
             LayoutSize offset;
             it.adjust(offset);
             LayoutPoint finalLocation = accumulatedOffset + offset;
             if (!result.isRectBasedTest() || colRect.contains(hitRect))
-                return hitTestContents(request, result, pointInContainer, finalLocation, hitTestAction) || (hitTestAction == HitTestFloat && hitTestFloats(request, result, pointInContainer, finalLocation));
+                return hitTestContents(request, result, locationInContainer, finalLocation, hitTestAction) || (hitTestAction == HitTestFloat && hitTestFloats(request, result, locationInContainer, finalLocation));
 
-            hitTestContents(request, result, pointInContainer, finalLocation, hitTestAction);
+            hitTestContents(request, result, locationInContainer, finalLocation, hitTestAction);
         }
     }
 
     return false;
 }
 
-void RenderBlock::adjustForColumnRect(LayoutSize& offset, const LayoutPoint& pointInContainer) const
+void RenderBlock::adjustForColumnRect(LayoutSize& offset, const LayoutPoint& locationInContainer) const
 {
     for (ColumnRectIterator it(*this); it.hasMore(); it.advance()) {
         LayoutRect colRect = it.columnRect();
-        if (colRect.contains(pointInContainer)) {
+        if (colRect.contains(locationInContainer)) {
             it.adjust(offset);
             return;
         }
     }
 }
 
-bool RenderBlock::hitTestContents(const HitTestRequest& request, HitTestResult& result, const HitTestPoint& pointInContainer, const LayoutPoint& accumulatedOffset, HitTestAction hitTestAction)
+bool RenderBlock::hitTestContents(const HitTestRequest& request, HitTestResult& result, const HitTestLocation& locationInContainer, const LayoutPoint& accumulatedOffset, HitTestAction hitTestAction)
 {
     if (childrenInline() && !isTable()) {
         // We have to hit-test our line boxes.
-        if (m_lineBoxes.hitTest(this, request, result, pointInContainer, accumulatedOffset, hitTestAction))
+        if (m_lineBoxes.hitTest(this, request, result, locationInContainer, accumulatedOffset, hitTestAction))
             return true;
     } else {
         // Hit test our children.
@@ -4878,7 +4883,7 @@ bool RenderBlock::hitTestContents(const HitTestRequest& request, HitTestResult& 
             childHitTest = HitTestChildBlockBackground;
         for (RenderBox* child = lastChildBox(); child; child = child->previousSiblingBox()) {
             LayoutPoint childPoint = flipForWritingModeForChild(child, accumulatedOffset);
-            if (!child->hasSelfPaintingLayer() && !child->isFloating() && child->nodeAtPoint(request, result, pointInContainer, childPoint, childHitTest))
+            if (!child->hasSelfPaintingLayer() && !child->isFloating() && child->nodeAtPoint(request, result, locationInContainer, childPoint, childHitTest))
                 return true;
         }
     }
@@ -6884,11 +6889,11 @@ bool RenderBlock::hasNextPage(LayoutUnit logicalOffset, PageBoundaryRule pageBou
 
     // See if we're in the last region.
     LayoutUnit pageOffset = offsetFromLogicalTopOfFirstPage() + logicalOffset;
-    RenderRegion* region = enclosingRenderFlowThread()->renderRegionForLine(pageOffset, this);
+    RenderRegion* region = enclosingRenderFlowThread()->regionAtBlockOffset(pageOffset, this);
     if (!region)
         return false;
     if (region->isLastRegion())
-        return region->style()->regionOverflow() == BreakRegionOverflow
+        return region->isRenderRegionSet() || region->style()->regionOverflow() == BreakRegionOverflow
             || (pageBoundaryRule == IncludePageBoundary && pageOffset == region->offsetFromLogicalTopOfFirstPage());
     return true;
 }
@@ -6971,7 +6976,7 @@ LayoutUnit RenderBlock::pageLogicalTopForOffset(LayoutUnit offset) const
             return 0;
         return cumulativeOffset - roundToInt(cumulativeOffset - firstPageLogicalTop) % roundToInt(pageLogicalHeight);
     }
-    return enclosingRenderFlowThread()->regionLogicalTopForLine(cumulativeOffset);
+    return enclosingRenderFlowThread()->pageLogicalTopForOffset(cumulativeOffset);
 }
 
 LayoutUnit RenderBlock::pageLogicalHeightForOffset(LayoutUnit offset) const
@@ -6979,7 +6984,7 @@ LayoutUnit RenderBlock::pageLogicalHeightForOffset(LayoutUnit offset) const
     RenderView* renderView = view();
     if (!inRenderFlowThread())
         return renderView->layoutState()->m_pageLogicalHeight;
-    return enclosingRenderFlowThread()->regionLogicalHeightForLine(offset + offsetFromLogicalTopOfFirstPage());
+    return enclosingRenderFlowThread()->pageLogicalHeightForOffset(offset + offsetFromLogicalTopOfFirstPage());
 }
 
 LayoutUnit RenderBlock::pageRemainingLogicalHeightForOffset(LayoutUnit offset, PageBoundaryRule pageBoundaryRule) const
@@ -6998,7 +7003,7 @@ LayoutUnit RenderBlock::pageRemainingLogicalHeightForOffset(LayoutUnit offset, P
         return remainingHeight;
     }
     
-    return enclosingRenderFlowThread()->regionRemainingLogicalHeightForLine(offset, pageBoundaryRule);
+    return enclosingRenderFlowThread()->pageRemainingLogicalHeightForOffset(offset, pageBoundaryRule);
 }
 
 LayoutUnit RenderBlock::adjustForUnsplittableChild(RenderBox* child, LayoutUnit logicalOffset, bool includeMargins)
@@ -7205,7 +7210,7 @@ RenderRegion* RenderBlock::regionAtBlockOffset(LayoutUnit blockOffset) const
     if (!flowThread || !flowThread->hasValidRegionInfo())
         return 0;
 
-    return flowThread->renderRegionForLine(offsetFromLogicalTopOfFirstPage() + blockOffset, true);
+    return flowThread->regionAtBlockOffset(offsetFromLogicalTopOfFirstPage() + blockOffset, true);
 }
 
 void RenderBlock::setStaticInlinePositionForChild(RenderBox* child, LayoutUnit blockOffset, LayoutUnit inlinePosition)
@@ -7362,6 +7367,8 @@ const char* RenderBlock::renderName() const
         return "RenderBlock (generated)";
     if (isRelPositioned())
         return "RenderBlock (relative positioned)";
+    if (isStickyPositioned())
+        return "RenderBlock (sticky positioned)";
     if (isRunIn())
         return "RenderBlock (run-in)";
     return "RenderBlock";

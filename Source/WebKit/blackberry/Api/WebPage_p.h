@@ -152,7 +152,7 @@ public:
     void setScrollPosition(const WebCore::IntPoint&);
     void scrollBy(int deltaX, int deltaY);
 
-    void enqueueRenderingOfClippedContentOfScrollableNodeAfterInRegionScrolling(WebCore::Node*);
+    void enqueueRenderingOfClippedContentOfScrollableAreaAfterInRegionScrolling();
     void notifyInRegionScrollStopped();
     void setScrollOriginPoint(const Platform::IntPoint&);
     void setHasInRegionScrollableAreas(bool);
@@ -409,7 +409,6 @@ public:
 
     // Thread safe.
     void resetCompositingSurface();
-    void drawLayersOnCommit(); // Including backing store blit.
 
     // Compositing thread.
     void setRootLayerCompositingThread(WebCore::LayerCompositingThread*);

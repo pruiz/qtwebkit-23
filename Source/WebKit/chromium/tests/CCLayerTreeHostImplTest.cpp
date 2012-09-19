@@ -33,9 +33,10 @@
 #include "CCLayerTestCommon.h"
 #include "CCLayerTilingData.h"
 #include "CCLayerTreeTestCommon.h"
-#include "CCQuadCuller.h"
+#include "CCQuadSink.h"
 #include "CCRenderPassDrawQuad.h"
 #include "CCRendererGL.h"
+#include "CCScrollbarGeometryFixedThumb.h"
 #include "CCScrollbarLayerImpl.h"
 #include "CCSettings.h"
 #include "CCSingleThreadProxy.h"
@@ -397,6 +398,24 @@ TEST_F(CCLayerTreeHostImplTest, nonFastScrollableRegionWithOffset)
 
     // This point is still inside the non-fast region.
     EXPECT_EQ(m_hostImpl->scrollBegin(IntPoint(10, 10), CCInputHandlerClient::Wheel), CCInputHandlerClient::ScrollOnMainThread);
+}
+
+TEST_F(CCLayerTreeHostImplTest, maxScrollPositionChangedByDeviceScaleFactor)
+{
+    setupScrollAndContentsLayers(IntSize(100, 100));
+
+    float deviceScaleFactor = 2;
+    IntSize layoutViewport(25, 25);
+    IntSize deviceViewport(layoutViewport);
+    deviceViewport.scale(deviceScaleFactor);
+    m_hostImpl->setViewportSize(layoutViewport, deviceViewport);
+    m_hostImpl->setDeviceScaleFactor(deviceScaleFactor);
+    EXPECT_EQ(m_hostImpl->rootLayer()->maxScrollPosition(), IntSize(25, 25));
+
+    deviceScaleFactor = 1;
+    m_hostImpl->setViewportSize(layoutViewport, layoutViewport);
+    m_hostImpl->setDeviceScaleFactor(deviceScaleFactor);
+    EXPECT_EQ(m_hostImpl->rootLayer()->maxScrollPosition(), IntSize(75, 75));
 }
 
 TEST_F(CCLayerTreeHostImplTest, pinchGesture)
@@ -1345,7 +1364,7 @@ class BlendStateCheckLayer : public CCLayerImpl {
 public:
     static PassOwnPtr<BlendStateCheckLayer> create(int id, CCResourceProvider* resourceProvider) { return adoptPtr(new BlendStateCheckLayer(id, resourceProvider)); }
 
-    virtual void appendQuads(CCQuadSink& quadSink, bool&) OVERRIDE
+    virtual void appendQuads(CCQuadSink& quadSink, CCAppendQuadsData& appendQuadsData) OVERRIDE
     {
         m_quadsAppended = true;
 
@@ -1360,7 +1379,7 @@ public:
         testBlendingDrawQuad->setQuadVisibleRect(m_quadVisibleRect);
         EXPECT_EQ(m_blend, testBlendingDrawQuad->needsBlending());
         EXPECT_EQ(m_hasRenderSurface, !!renderSurface());
-        quadSink.append(testBlendingDrawQuad.release());
+        quadSink.append(testBlendingDrawQuad.release(), appendQuadsData);
     }
 
     void setExpectation(bool blend, bool hasRenderSurface)
@@ -1879,14 +1898,14 @@ class FakeLayerWithQuads : public CCLayerImpl {
 public:
     static PassOwnPtr<FakeLayerWithQuads> create(int id) { return adoptPtr(new FakeLayerWithQuads(id)); }
 
-    virtual void appendQuads(CCQuadSink& quadSink, bool&) OVERRIDE
+    virtual void appendQuads(CCQuadSink& quadSink, CCAppendQuadsData& appendQuadsData) OVERRIDE
     {
         CCSharedQuadState* sharedQuadState = quadSink.useSharedQuadState(createSharedQuadState());
 
         SkColor gray = SkColorSetRGB(100, 100, 100);
         IntRect quadRect(IntPoint(0, 0), contentBounds());
         OwnPtr<CCDrawQuad> myQuad = CCSolidColorDrawQuad::create(sharedQuadState, quadRect, gray);
-        quadSink.append(myQuad.release());
+        quadSink.append(myQuad.release(), appendQuadsData);
     }
 
 private:
@@ -2416,7 +2435,7 @@ public:
         IntSize size(10, 10);
         GC3Denum format = GraphicsContext3D::RGBA;
         CCResourceProvider::TextureUsageHint hint = CCResourceProvider::TextureUsageAny;
-        setScrollbarGeometry(FakeWebScrollbarThemeGeometryNonEmpty::create());
+        setScrollbarGeometry(CCScrollbarGeometryFixedThumb::create(FakeWebScrollbarThemeGeometryNonEmpty::create()));
 
         setBackTrackResourceId(provider->createResource(pool, size, format, hint));
         setForeTrackResourceId(provider->createResource(pool, size, format, hint));

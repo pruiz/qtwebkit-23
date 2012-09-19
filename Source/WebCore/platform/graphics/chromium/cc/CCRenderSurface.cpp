@@ -34,7 +34,9 @@
 #include "CCLayerImpl.h"
 #include "CCMathUtil.h"
 #include "CCQuadSink.h"
+#include "CCRenderPass.h"
 #include "CCRenderPassDrawQuad.h"
+#include "CCRenderPassSink.h"
 #include "CCSharedQuadState.h"
 #include "TextStream.h"
 #include <public/WebTransformationMatrix.h>
@@ -179,7 +181,16 @@ static inline IntRect computeClippedRectInTarget(const CCLayerImpl* owningLayer)
     return clippedRectInTarget;
 }
 
-void CCRenderSurface::appendQuads(CCQuadSink& quadSink, bool forReplica, int renderPassId)
+void CCRenderSurface::appendRenderPasses(CCRenderPassSink& passSink)
+{
+    OwnPtr<CCRenderPass> pass = CCRenderPass::create(m_owningLayer->id(), m_contentRect, m_screenSpaceTransform);
+    pass->setDamageRect(m_damageTracker->currentDamageRect());
+    pass->setFilters(m_owningLayer->filters());
+    pass->setBackgroundFilters(m_owningLayer->backgroundFilters());
+    passSink.appendRenderPass(pass.release());
+}
+
+void CCRenderSurface::appendQuads(CCQuadSink& quadSink, CCAppendQuadsData& appendQuadsData, bool forReplica, int renderPassId)
 {
     ASSERT(!forReplica || m_owningLayer->hasReplica());
 
@@ -193,7 +204,7 @@ void CCRenderSurface::appendQuads(CCQuadSink& quadSink, bool forReplica, int ren
         int green = forReplica ?  debugReplicaBorderColorGreen : debugSurfaceBorderColorGreen;
         int blue = forReplica ? debugReplicaBorderColorBlue : debugSurfaceBorderColorBlue;
         SkColor color = SkColorSetARGB(debugSurfaceBorderAlpha, red, green, blue);
-        quadSink.append(CCDebugBorderDrawQuad::create(sharedQuadState, contentRect(), color, debugSurfaceBorderWidth));
+        quadSink.append(CCDebugBorderDrawQuad::create(sharedQuadState, contentRect(), color, debugSurfaceBorderWidth), appendQuadsData);
     }
 
     // FIXME: By using the same RenderSurface for both the content and its reflection,
@@ -227,7 +238,7 @@ void CCRenderSurface::appendQuads(CCQuadSink& quadSink, bool forReplica, int ren
     IntRect contentsChangedSinceLastFrame = contentsChanged() ? m_contentRect : IntRect();
 
     quadSink.append(CCRenderPassDrawQuad::create(sharedQuadState, contentRect(), renderPassId, forReplica, maskResourceId, contentsChangedSinceLastFrame,
-                                                 maskTexCoordScaleX, maskTexCoordScaleY, maskTexCoordOffsetX, maskTexCoordOffsetY));
+                                                 maskTexCoordScaleX, maskTexCoordScaleY, maskTexCoordOffsetX, maskTexCoordOffsetY), appendQuadsData);
 }
 
 }

@@ -88,6 +88,7 @@ LIST(APPEND WebKit_SOURCES
     efl/WebCoreSupport/AssertMatchingEnums.cpp
     efl/WebCoreSupport/BatteryClientEfl.cpp
     efl/WebCoreSupport/ChromeClientEfl.cpp
+    efl/WebCoreSupport/ColorChooserEfl.cpp
     efl/WebCoreSupport/DeviceOrientationClientEfl.cpp
     efl/WebCoreSupport/DeviceMotionClientEfl.cpp
     efl/WebCoreSupport/DragClientEfl.cpp
@@ -103,6 +104,8 @@ LIST(APPEND WebKit_SOURCES
     efl/WebCoreSupport/NotificationPresenterClientEfl.cpp
     efl/WebCoreSupport/PageClientEfl.cpp
     efl/WebCoreSupport/PlatformStrategiesEfl.cpp 
+    efl/WebCoreSupport/PopupMenuEfl.cpp
+    efl/WebCoreSupport/SearchPopupMenuEfl.cpp
     efl/WebCoreSupport/StorageTrackerClientEfl.cpp
     efl/WebCoreSupport/VibrationClientEfl.cpp
 
@@ -166,15 +169,15 @@ ADD_CUSTOM_COMMAND(
   COMMAND ${EDJE_CC_EXECUTABLE} -v -id ${WEBKIT_DIR}/efl/DefaultTheme ${WebKit_THEME_DEFINITION} ${WEBKIT_DIR}/efl/DefaultTheme/default.edc ${WebKit_THEME}
   DEPENDS
     ${WEBKIT_DIR}/efl/DefaultTheme/default.edc
-    ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_knob_v.png
-    ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_knob_press_v.png
-    ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_v.png
     ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider.edc
-    ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_knob_press_h.png
-    ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_knob_h.png
     ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_fill_v.png
     ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_fill_h.png
     ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_h.png
+    ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_thumb_h.png
+    ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_thumb_press_h.png
+    ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_thumb_press_v.png
+    ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_thumb_v.png
+    ${WEBKIT_DIR}/efl/DefaultTheme/widget/slider/slider_v.png
     ${WEBKIT_DIR}/efl/DefaultTheme/widget/combo/combo_focus_button.png
     ${WEBKIT_DIR}/efl/DefaultTheme/widget/combo/combo_press.png
     ${WEBKIT_DIR}/efl/DefaultTheme/widget/combo/icon.png

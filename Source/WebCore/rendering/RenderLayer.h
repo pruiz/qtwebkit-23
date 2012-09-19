@@ -115,7 +115,7 @@ public:
 
     bool isEmpty() const { return m_rect.isEmpty(); }
     bool intersects(const LayoutRect& rect) { return m_rect.intersects(rect); }
-    bool intersects(const HitTestPoint&);
+    bool intersects(const HitTestLocation&);
 
 private:
     LayoutRect m_rect;
@@ -521,7 +521,7 @@ public:
     void paint(GraphicsContext*, const LayoutRect& damageRect, PaintBehavior = PaintBehaviorNormal, RenderObject* paintingRoot = 0,
         RenderRegion* = 0, PaintLayerFlags = 0);
     bool hitTest(const HitTestRequest&, HitTestResult&);
-    bool hitTest(const HitTestRequest&, const HitTestPoint&, HitTestResult&);
+    bool hitTest(const HitTestRequest&, const HitTestLocation&, HitTestResult&);
     void paintOverlayScrollbars(GraphicsContext*, const LayoutRect& damageRect, PaintBehavior, RenderObject* paintingRoot);
 
     enum ShouldRespectOverflowClip { IgnoreOverflowClip, RespectOverflowClip };
@@ -575,7 +575,7 @@ public:
 
     enum UpdateLayerPositionsAfterScrollFlag {
         NoFlag = 0,
-        HasSeenFixedPositionedAncestor = 1 << 0,
+        HasSeenViewportConstrainedAncestor = 1 << 0,
         HasSeenAncestorWithOverflowClip = 1 << 1
     };
 
@@ -611,6 +611,12 @@ public:
     bool hasFilter() const { return renderer()->hasFilter(); }
 #else
     bool hasFilter() const { return false; }
+#endif
+
+#if ENABLE(CSS_COMPOSITING)
+    bool hasBlendMode() const { return renderer()->hasBlendMode(); }
+#else
+    bool hasBlendMode() const { return false; }
 #endif
 
     // Overloaded new operator. Derived classes must override operator new
@@ -669,6 +675,8 @@ public:
     bool layerListMutationAllowed() const { return m_layerListMutationAllowed; }
     void setLayerListMutationAllowed(bool flag) { m_layerListMutationAllowed = flag; }
 #endif
+
+    Node* enclosingElement() const;
 
 private:
     void updateZOrderLists();
@@ -744,25 +752,25 @@ private:
                                     PaintLayerFlags, const Vector<RenderLayer*>& columnLayers, size_t columnIndex);
 
     RenderLayer* hitTestLayer(RenderLayer* rootLayer, RenderLayer* containerLayer, const HitTestRequest& request, HitTestResult& result,
-                              const LayoutRect& hitTestRect, const HitTestPoint&, bool appliedTransform,
+                              const LayoutRect& hitTestRect, const HitTestLocation&, bool appliedTransform,
                               const HitTestingTransformState* transformState = 0, double* zOffset = 0);
     RenderLayer* hitTestList(Vector<RenderLayer*>*, RenderLayer* rootLayer, const HitTestRequest& request, HitTestResult& result,
-                             const LayoutRect& hitTestRect, const HitTestPoint&,
+                             const LayoutRect& hitTestRect, const HitTestLocation&,
                              const HitTestingTransformState* transformState, double* zOffsetForDescendants, double* zOffset,
                              const HitTestingTransformState* unflattenedTransformState, bool depthSortDescendants);
     RenderLayer* hitTestPaginatedChildLayer(RenderLayer* childLayer, RenderLayer* rootLayer, const HitTestRequest& request, HitTestResult& result,
-                                            const LayoutRect& hitTestRect, const HitTestPoint&,
+                                            const LayoutRect& hitTestRect, const HitTestLocation&,
                                             const HitTestingTransformState* transformState, double* zOffset);
     RenderLayer* hitTestChildLayerColumns(RenderLayer* childLayer, RenderLayer* rootLayer, const HitTestRequest& request, HitTestResult& result,
-                                          const LayoutRect& hitTestRect, const HitTestPoint&,
+                                          const LayoutRect& hitTestRect, const HitTestLocation&,
                                           const HitTestingTransformState* transformState, double* zOffset,
                                           const Vector<RenderLayer*>& columnLayers, size_t columnIndex);
 
     PassRefPtr<HitTestingTransformState> createLocalTransformState(RenderLayer* rootLayer, RenderLayer* containerLayer,
-                            const LayoutRect& hitTestRect, const HitTestPoint&,
+                            const LayoutRect& hitTestRect, const HitTestLocation&,
                             const HitTestingTransformState* containerTransformState) const;
     
-    bool hitTestContents(const HitTestRequest&, HitTestResult&, const LayoutRect& layerBounds, const HitTestPoint&, HitTestFilter) const;
+    bool hitTestContents(const HitTestRequest&, HitTestResult&, const LayoutRect& layerBounds, const HitTestLocation&, HitTestFilter) const;
 
     void computeScrollDimensions();
     bool hasHorizontalOverflow() const;
@@ -822,8 +830,6 @@ private:
     void dirty3DTransformedDescendantStatus();
     // Both updates the status, and returns true if descendants of this have 3d.
     bool update3DTransformedDescendantStatus();
-
-    Node* enclosingElement() const;
 
     void createReflection();
     void removeReflection();

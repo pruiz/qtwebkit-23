@@ -90,6 +90,8 @@ modules = [
             "SnippetStorage.js",
             "SourceMapping.js",
             "StyleSource.js",
+            "StylesSourceMapping.js",
+            "StylesUISourceCodeProvider.js",
             "TimelineManager.js",
             "RawSourceCode.js",
             "RemoteObject.js",
@@ -329,6 +331,7 @@ modules = [
             "ProfilesPanel.js",
             "ProfileLauncherView.js",
             "TopDownProfileDataGridTree.js",
+            "WebGLProfileView.js",
         ]
     },
     {

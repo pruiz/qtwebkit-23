@@ -30,6 +30,8 @@
 #include "StringFunctions.h"
 #include "TestInvocation.h"
 #include <WebKit2/WKContextPrivate.h>
+#include <WebKit2/WKNotification.h>
+#include <WebKit2/WKNotificationManager.h>
 #include <WebKit2/WKNumber.h>
 #include <WebKit2/WKPageGroup.h>
 #include <WebKit2/WKPagePrivate.h>
@@ -333,6 +335,10 @@ void TestController::initialize(int argc, const char* argv[])
     };
     WKContextSetInjectedBundleClient(m_context.get(), &injectedBundleClient);
 
+    WKNotificationManagerRef notificationManager = WKContextGetNotificationManager(m_context.get());
+    WKNotificationProvider notificationKit = m_webNotificationProvider.provider();
+    WKNotificationManagerSetProvider(notificationManager, &notificationKit);
+
     if (testPluginDirectory())
         WKContextSetAdditionalPluginsDirectory(m_context.get(), testPluginDirectory());
 
@@ -500,6 +506,9 @@ bool TestController::resetStateToConsistentValues()
 
     // Re-set to the default backing scale factor by setting the custom scale factor to 0.
     WKPageSetCustomBackingScaleFactor(m_mainWebView->page(), 0);
+
+    // Reset notification permissions
+    m_webNotificationProvider.reset();
 
     // Reset main page back to about:blank
     m_doneResetting = false;
@@ -752,6 +761,23 @@ WKRetainPtr<WKTypeRef> TestController::didReceiveSynchronousMessageFromInjectedB
             return 0;
         }
 
+        if (WKStringIsEqualToUTF8CString(subMessageName, "ContinuousMouseScrollBy")) {
+            WKRetainPtr<WKStringRef> xKey = adoptWK(WKStringCreateWithUTF8CString("X"));
+            double x = WKDoubleGetValue(static_cast<WKDoubleRef>(WKDictionaryGetItemForKey(messageBodyDictionary, xKey.get())));
+
+            WKRetainPtr<WKStringRef> yKey = adoptWK(WKStringCreateWithUTF8CString("Y"));
+            double y = WKDoubleGetValue(static_cast<WKDoubleRef>(WKDictionaryGetItemForKey(messageBodyDictionary, yKey.get())));
+
+            WKRetainPtr<WKStringRef> pagedKey = adoptWK(WKStringCreateWithUTF8CString("Paged"));
+            bool paged = static_cast<bool>(WKUInt64GetValue(static_cast<WKUInt64Ref>(WKDictionaryGetItemForKey(messageBodyDictionary, pagedKey.get()))));
+
+            // Forward to WebProcess
+            WKPageSetShouldSendEventsSynchronously(mainWebView()->page(), true);
+            m_eventSenderProxy->continuousMouseScrollBy(x, y, paged);
+            WKPageSetShouldSendEventsSynchronously(mainWebView()->page(), false);
+            return 0;
+        }
+
         if (WKStringIsEqualToUTF8CString(subMessageName, "LeapForward")) {
             WKRetainPtr<WKStringRef> timeKey = adoptWK(WKStringCreateWithUTF8CString("TimeInMilliseconds"));
             unsigned time = static_cast<unsigned>(WKUInt64GetValue(static_cast<WKUInt64Ref>(WKDictionaryGetItemForKey(messageBodyDictionary, timeKey.get()))));
@@ -919,6 +945,11 @@ void TestController::processDidCrash()
 
     if (m_shouldExitWhenWebProcessCrashes)
         exit(1);
+}
+
+void TestController::simulateWebNotificationClick(uint64_t notificationID)
+{
+    m_webNotificationProvider.simulateWebNotificationClick(notificationID);
 }
 
 } // namespace WTR

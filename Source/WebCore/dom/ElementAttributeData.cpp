@@ -363,9 +363,7 @@ void ElementAttributeData::cloneDataFrom(const ElementAttributeData& sourceData,
     }
 
     if (targetElement.isStyledElement() && sourceData.m_inlineStyleDecl) {
-        StylePropertySet* inlineStyle = ensureMutableInlineStyle(static_cast<StyledElement*>(&targetElement));
-        inlineStyle->copyPropertiesFrom(*sourceData.m_inlineStyleDecl);
-        inlineStyle->setCSSParserMode(sourceData.m_inlineStyleDecl->cssParserMode());
+        m_inlineStyleDecl = sourceData.m_inlineStyleDecl->copy();
         targetElement.setIsStyleAttributeValid(sourceElement.isStyleAttributeValid());
     }
 }
@@ -379,17 +377,6 @@ void ElementAttributeData::clearAttributes(Element* element)
 
     clearClass();
     m_mutableAttributeVector->clear();
-}
-
-void ElementAttributeData::replaceAttribute(size_t index, const Attribute& attribute, Element* element)
-{
-    ASSERT(isMutable());
-    ASSERT(element);
-    ASSERT(index < length());
-
-    element->willModifyAttribute(attribute.name(), m_mutableAttributeVector->at(index).value(), attribute.value());
-    (*m_mutableAttributeVector)[index] = attribute;
-    element->didModifyAttribute(attribute);
 }
 
 PassRefPtr<Attr> ElementAttributeData::getAttributeNode(const String& name, bool shouldIgnoreAttributeCase, Element* element) const

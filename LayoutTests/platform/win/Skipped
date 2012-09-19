@@ -706,7 +706,6 @@ fast/text/international/bidi-linebreak-003.html
 fast/text/international/bidi-listbox-atsui.html
 fast/text/international/bidi-listbox.html
 fast/text/international/hindi-spacing.html
-http/tests/loading/gmail-assert-on-load.html
 http/tests/misc/window-dot-stop.html
 http/tests/security/dataTransfer-set-data-file-url.html
 http/tests/xmlhttprequest/abort-should-cancel-load.html
@@ -1300,6 +1299,7 @@ fast/parser/pre-html5-parser-quirks.html
 fast/filesystem
 http/tests/filesystem
 http/tests/inspector/filesystem
+http/tests/security/contentSecurityPolicy/filesystem-urls-match-self.html
 http/tests/security/filesystem-iframe-from-remote.html
 http/tests/websocket/tests/hybi/send-file-blob.html
 http/tests/websocket/tests/hybi/send-file-blob-fail.html
@@ -1312,6 +1312,8 @@ plugins/iframe-shims.html
 # Requires WebP support.
 fast/canvas/canvas-toDataURL-webp.html
 fast/images/webp-image-decoding.html
+http/tests/images/webp-partial-load.html
+http/tests/images/webp-progressive-load.html
 
 # Missing layoutTestController.findString() http://webkit.org/b/50234
 editing/text-iterator/findString.html
@@ -2132,3 +2134,36 @@ svg/custom/use-on-symbol-inside-pattern.svg
 tables/mozilla/bugs/bug68912.html 
 tables/mozilla_expected_failures/collapsing_borders/bug41262-6.html
 http/tests/security/referrer-policy-https-origin.html 
+
+# Rebaseline after bug 77754
+fast/inline/left-right-center-inline-alignment-in-ltr-and-rtl-blocks.html
+fast/inline/absolute-positioned-inline-in-centred-block.html
+fast/css/absolute-child-with-percent-height-inside-relative-parent.html
+
+# These tests have different results for NRWT and ORWT, skipping on OWRT for now
+editing/deleting/delete-br-004.html
+editing/deleting/delete-br-005.html
+editing/deleting/delete-br-006.html
+
+# https://bugs.webkit.org/show_bug.cgi?id=95405
+# Test times out
+platform/win/accessibility/single-select-children.html
+
+# Require rebaseline after https://bugs.webkit.org/show_bug.cgi?id=80394
+fast/block/float/024.html
+fast/block/margin-collapse/empty-clear-blocks.html
+fast/block/margin-collapse/025.html
+fast/block/margin-collapse/block-inside-inline/025.html
+
+# referrer tests failing, problems connecting to address provided to iframe
+http/tests/security/no-referrer.html
+http/tests/security/referrer-policy-https-always.html
+http/tests/security/referrer-policy-https-default.html
+http/tests/security/referrer-policy-https-never.html
+http/tests/security/referrer-policy-redirect.html
+http/tests/security/referrer-policy-rel-noreferrer.htm
+
+# As usual, DRT on Windows has problems knowing how to continue a test when focus moves to a popup window, in this case the file chooser
+# https://bugs.webkit.org/show_bug.cgi?id=87469
+fast/events/domactivate-sets-underlying-click-event-as-handled.html
+

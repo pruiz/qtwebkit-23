@@ -100,7 +100,6 @@ using JSC::Interpreter;
 #endif
 using JSC::JSLock;
 using JSC::JSObject;
-using JSC::UString;
 
 using std::min;
 

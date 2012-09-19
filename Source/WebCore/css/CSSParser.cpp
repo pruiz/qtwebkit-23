@@ -27,6 +27,7 @@
 #include "CSSParser.h"
 
 #include "CSSAspectRatioValue.h"
+#include "CSSBasicShapes.h"
 #include "CSSBorderImage.h"
 #include "CSSCanvasValue.h"
 #include "CSSCrossfadeValue.h"
@@ -56,7 +57,6 @@
 #if ENABLE(CSS_VARIABLES)
 #include "CSSVariableValue.h"
 #endif
-#include "CSSWrapShapes.h"
 #include "Counter.h"
 #include "Document.h"
 #include "FloatConversion.h"
@@ -1443,6 +1443,11 @@ bool CSSParser::validCalculationUnit(CSSParserValue* value, Units unitflags)
     case CalcPercentNumber:
         b = (unitflags & FPercent) && (unitflags & FNumber);
         break;
+#if ENABLE(CSS_VARIABLES)
+    case CalcVariable:
+        b = true;
+        break;
+#endif
     case CalcOther:
         break;
     }
@@ -2729,7 +2734,7 @@ bool CSSParser::parseValue(CSSPropertyID propId, bool important)
         if (id == CSSValueAuto)
             validPrimitive = true;
         else if (value->unit == CSSParserValue::Function)
-            return parseExclusionShape((propId == CSSPropertyWebkitShapeInside), important);
+            return parseBasicShape((propId == CSSPropertyWebkitShapeInside), important);
         break;
     case CSSPropertyWebkitWrapMargin:
     case CSSPropertyWebkitWrapPadding:
@@ -4517,7 +4522,7 @@ bool CSSParser::parseClipShape(CSSPropertyID propId, bool important)
 
 #if ENABLE(CSS_EXCLUSIONS)
 
-PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapeRectangle(CSSParserValueList* args)
+PassRefPtr<CSSBasicShape> CSSParser::parseBasicShapeRectangle(CSSParserValueList* args)
 {
     ASSERT(args);
 
@@ -4525,7 +4530,7 @@ PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapeRectangle(CSSParserValueL
     if (args->size() != 7 && args->size() != 9 && args->size() != 11)
         return 0;
 
-    RefPtr<CSSWrapShapeRectangle> shape = CSSWrapShapeRectangle::create();
+    RefPtr<CSSBasicShapeRectangle> shape = CSSBasicShapeRectangle::create();
 
     unsigned argumentNumber = 0;
     CSSParserValue* argument = args->current();
@@ -4575,7 +4580,7 @@ PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapeRectangle(CSSParserValueL
     return shape;
 }
 
-PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapeCircle(CSSParserValueList* args)
+PassRefPtr<CSSBasicShape> CSSParser::parseBasicShapeCircle(CSSParserValueList* args)
 {
     ASSERT(args);
 
@@ -4583,7 +4588,7 @@ PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapeCircle(CSSParserValueList
     if (args->size() != 5)
         return 0;
 
-    RefPtr<CSSWrapShapeCircle> shape = CSSWrapShapeCircle::create();
+    RefPtr<CSSBasicShapeCircle> shape = CSSBasicShapeCircle::create();
 
     unsigned argumentNumber = 0;
     CSSParserValue* argument = args->current();
@@ -4625,7 +4630,7 @@ PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapeCircle(CSSParserValueList
     return shape;
 }
 
-PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapeEllipse(CSSParserValueList* args)
+PassRefPtr<CSSBasicShape> CSSParser::parseBasicShapeEllipse(CSSParserValueList* args)
 {
     ASSERT(args);
 
@@ -4633,7 +4638,7 @@ PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapeEllipse(CSSParserValueLis
     if (args->size() != 7)
         return 0;
 
-    RefPtr<CSSWrapShapeEllipse> shape = CSSWrapShapeEllipse::create();
+    RefPtr<CSSBasicShapeEllipse> shape = CSSBasicShapeEllipse::create();
     unsigned argumentNumber = 0;
     CSSParserValue* argument = args->current();
     while (argument) {
@@ -4676,7 +4681,7 @@ PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapeEllipse(CSSParserValueLis
     return shape;
 }
 
-PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapePolygon(CSSParserValueList* args)
+PassRefPtr<CSSBasicShape> CSSParser::parseBasicShapePolygon(CSSParserValueList* args)
 {
     ASSERT(args);
 
@@ -4684,7 +4689,7 @@ PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapePolygon(CSSParserValueLis
     if (!size)
         return 0;
 
-    RefPtr<CSSWrapShapePolygon> shape = CSSWrapShapePolygon::create();
+    RefPtr<CSSBasicShapePolygon> shape = CSSBasicShapePolygon::create();
 
     CSSParserValue* argument = args->current();
     if (argument->id == CSSValueEvenodd || argument->id == CSSValueNonzero) {
@@ -4727,7 +4732,7 @@ PassRefPtr<CSSWrapShape> CSSParser::parseExclusionShapePolygon(CSSParserValueLis
     return shape;
 }
 
-bool CSSParser::parseExclusionShape(bool shapeInside, bool important)
+bool CSSParser::parseBasicShape(bool shapeInside, bool important)
 {
     CSSParserValue* value = m_valueList->current();
     CSSParserValueList* args = value->function->args.get();
@@ -4735,16 +4740,16 @@ bool CSSParser::parseExclusionShape(bool shapeInside, bool important)
     if (!args)
         return false;
 
-    RefPtr<CSSWrapShape> shape;
+    RefPtr<CSSBasicShape> shape;
 
     if (equalIgnoringCase(value->function->name, "rectangle("))
-        shape = parseExclusionShapeRectangle(args);
+        shape = parseBasicShapeRectangle(args);
     else if (equalIgnoringCase(value->function->name, "circle("))
-        shape = parseExclusionShapeCircle(args);
+        shape = parseBasicShapeCircle(args);
     else if (equalIgnoringCase(value->function->name, "ellipse("))
-        shape = parseExclusionShapeEllipse(args);
+        shape = parseBasicShapeEllipse(args);
     else if (equalIgnoringCase(value->function->name, "polygon("))
-        shape = parseExclusionShapePolygon(args);
+        shape = parseBasicShapePolygon(args);
 
     if (shape) {
         addProperty(shapeInside ? CSSPropertyWebkitShapeInside : CSSPropertyWebkitShapeOutside, cssValuePool().createValue(shape.release()), important);
@@ -9948,17 +9953,17 @@ void CSSParser::deleteFontFaceOnlyValues()
 StyleKeyframe* CSSParser::createKeyframe(CSSParserValueList* keys)
 {
     // Create a key string from the passed keys
-    String keyString;
+    StringBuilder keyString;
     for (unsigned i = 0; i < keys->size(); ++i) {
         float key = static_cast<float>(keys->valueAt(i)->fValue);
         if (i != 0)
-            keyString += ",";
-        keyString += String::number(key);
-        keyString += "%";
+            keyString.append(',');
+        keyString.append(String::number(key));
+        keyString.append('%');
     }
 
     RefPtr<StyleKeyframe> keyframe = StyleKeyframe::create();
-    keyframe->setKeyText(keyString);
+    keyframe->setKeyText(keyString.toString());
     keyframe->setProperties(createStylePropertySet());
 
     clearProperties();

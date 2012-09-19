@@ -146,7 +146,6 @@ class ChromiumAndroidPort(chromium.ChromiumPort):
         'chromium-linux',
         'chromium-win',
         'chromium',
-        'win',
         'mac',
     ]
 
@@ -234,12 +233,8 @@ class ChromiumAndroidPort(chromium.ChromiumPort):
     def skipped_layout_tests(self, test_list):
         # This method is more convenient to skip whole directories than SKIP in TestExpectations
         # because its higher priority.
-        # Still use TestExpectations to skip individual tests.
-        return self._real_tests([
-            # Only run these tests as virtual gpu tests.
-            'canvas/philip',
-            'fast/canvas',
-
+        # Still use TestExpectations to skip individual tests and small directories.
+        return set([
             # Skip tests of other platforms to save time.
             'platform/gtk',
             'platform/mac',
@@ -247,7 +242,7 @@ class ChromiumAndroidPort(chromium.ChromiumPort):
             'platform/qt',
             'platform/win',
 
-            # Features not supported.
+            # Features not supported: http://crbug.com/145338.
             'compositing/plugins',
             'plugins',
             'http/tests/plugins',
@@ -262,11 +257,12 @@ class ChromiumAndroidPort(chromium.ChromiumPort):
             'accessibility',
             'platform/chromium/accessibility',
 
-            'fast/dom/MediaStream',
-            'fast/mediastream',
-            'fast/notifications',
-            'fast/speech',
-            'webaudio',
+            # Skip webgl tests: http://crbug.com/135877.
+            'compositing/webgl',
+            'fast/canvas/webgl',
+            'http/tests/canvas/webgl',
+            'platform/chromium/virtual/gpu/fast/canvas/webgl',
+            'platform/chromium/virtual/threaded/compositing/webgl',
         ])
 
     def create_driver(self, worker_number, no_timeout=False):

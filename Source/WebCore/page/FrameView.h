@@ -197,6 +197,7 @@ public:
     void removeSlowRepaintObject();
     bool hasSlowRepaintObjects() const { return m_slowRepaintObjectCount; }
 
+    // This includes position:fixed and sticky objects.
     typedef HashSet<RenderObject*> FixedObjectSet;
     void addFixedObject(RenderObject*);
     void removeFixedObject(RenderObject*);
@@ -381,6 +382,7 @@ private:
     bool contentsInCompositedLayer() const;
 
     void applyOverflowToViewport(RenderObject*, ScrollbarMode& hMode, ScrollbarMode& vMode);
+    void applyPaginationToViewport();
 
     void updateOverflowStatus(bool horizontalOverflow, bool verticalOverflow);
 

@@ -277,7 +277,6 @@
                 'public/WebTextInputType.h',
                 'public/WebTextRun.h',
                 'public/WebTimeRange.h',
-                'public/WebTouchCandidatesInfo.h',
                 'public/WebURLLoaderOptions.h',
                 'public/WebUserMediaClient.h',
                 'public/WebUserMediaRequest.h',
@@ -605,8 +604,6 @@
                 'src/WebScopedMicrotaskSuppression.cpp',
                 'src/WebScopedUserGesture.cpp',
                 'src/WebScriptController.cpp',
-                'src/WebScrollbarImpl.cpp',
-                'src/WebScrollbarImpl.h',
                 'src/WebScrollbarThemeClientImpl.cpp',
                 'src/WebScrollbarThemeClientImpl.h',
                 'src/WebScrollbarThemePainter.cpp',
@@ -741,6 +738,11 @@
                                       'WARNING_CFLAGS!': ['-Wglobal-constructors'],
                                     },
                                 }],
+                                ['use_libcc_for_compositor==0', {
+                                    'sources': [
+                                        '<@(webkit_compositor_unittest_files)',
+                                    ],
+                                }],
                             ],
                             'msvs_settings': {
                               'VCLinkerTool': {
@@ -838,6 +840,12 @@
                 ['use_libcc_for_compositor==1', {
                     'dependencies': [
                         '<(chromium_src_dir)/webkit/compositor/compositor.gyp:webkit_compositor',
+                    ],
+                    'sources!': [
+                        '../../WebCore/platform/chromium/support/CCThreadImpl.cpp',
+                        '../../WebCore/platform/chromium/support/CCThreadImpl.h',
+                        '../../WebCore/platform/chromium/support/WebCompositorImpl.cpp',
+                        '../../WebCore/platform/chromium/support/WebCompositorImpl.h',
                     ],
                 }, { # else: use_libcc_for_compositor==0
                     'sources': [

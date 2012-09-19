@@ -41,8 +41,11 @@ namespace WebCore {
 class CCDamageTracker;
 class CCQuadSink;
 class CCRenderPass;
+class CCRenderPassSink;
 class CCLayerImpl;
 class TextStream;
+
+struct CCAppendQuadsData;
 
 class CCRenderSurface {
     WTF_MAKE_NONCOPYABLE(CCRenderSurface);
@@ -103,7 +106,8 @@ public:
 
     CCDamageTracker* damageTracker() const { return m_damageTracker.get(); }
 
-    void appendQuads(CCQuadSink&, bool forReplica, int renderPassId);
+    void appendRenderPasses(CCRenderPassSink&);
+    void appendQuads(CCQuadSink&, CCAppendQuadsData&, bool forReplica, int renderPassId);
 
 private:
     CCLayerImpl* m_owningLayer;

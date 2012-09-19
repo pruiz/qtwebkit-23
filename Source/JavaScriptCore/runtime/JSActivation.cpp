@@ -42,7 +42,14 @@ ASSERT_CLASS_FITS_IN_CELL(JSActivation);
 const ClassInfo JSActivation::s_info = { "JSActivation", &Base::s_info, 0, 0, CREATE_METHOD_TABLE(JSActivation) };
 
 JSActivation::JSActivation(CallFrame* callFrame, FunctionExecutable* functionExecutable)
-    : Base(callFrame->globalData(), callFrame->globalData().activationStructure.get(), callFrame->registers())
+    : Base(
+        callFrame->globalData(),
+        callFrame->globalData().activationStructure.get(),
+        callFrame->registers(),
+        callFrame->lexicalGlobalObject(),
+        callFrame->globalThisValue(),
+        callFrame->scope()
+    )
     , m_registerArray(callFrame->globalData(), this, 0)
     , m_numCapturedArgs(max(callFrame->argumentCount(), functionExecutable->parameterCount()))
     , m_numCapturedVars(functionExecutable->capturedVariableCount())
@@ -71,7 +78,7 @@ void JSActivation::visitChildren(JSCell* cell, SlotVisitor& visitor)
     if (!registerArray)
         return;
 
-    visitor.copyAndAppend(reinterpret_cast<void**>(&registerArray), thisObject->registerArraySizeInBytes(), reinterpret_cast<JSValue*>(registerArray), thisObject->registerArraySize());
+    visitor.copyAndAppend(bitwise_cast<void**>(&registerArray), thisObject->registerArraySizeInBytes(), reinterpret_cast<JSValue*>(registerArray), thisObject->registerArraySize());
     thisObject->m_registerArray.set(registerArray, StorageBarrier::Unchecked);
     thisObject->m_registers = registerArray + thisObject->registerOffset();
 

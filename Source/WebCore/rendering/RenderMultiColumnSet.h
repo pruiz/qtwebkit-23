@@ -66,10 +66,16 @@ private:
     virtual void computeLogicalHeight() OVERRIDE;
 
     virtual void paintReplaced(PaintInfo&, const LayoutPoint& paintOffset) OVERRIDE;
+    virtual bool nodeAtPoint(const HitTestRequest&, HitTestResult&, const HitTestLocation&, const LayoutPoint& accumulatedOffset, HitTestAction) OVERRIDE;
 
-    virtual LayoutUnit logicalWidthForFlowThreadContent() const OVERRIDE { return m_computedColumnWidth; }
-    virtual LayoutUnit logicalHeightForFlowThreadContent() const OVERRIDE { return m_computedColumnHeight; } // FIXME: Will be wrong once we have multiple sets.
+    virtual LayoutUnit pageLogicalWidth() const OVERRIDE { return m_computedColumnWidth; }
+    virtual LayoutUnit pageLogicalHeight() const OVERRIDE { return m_computedColumnHeight; }
 
+    virtual LayoutUnit pageLogicalTopForOffset(LayoutUnit offset) const OVERRIDE;
+    
+    // FIXME: This will change once we have column sets constrained by enclosing pages, etc.
+    virtual LayoutUnit logicalHeightOfAllFlowThreadContent() const OVERRIDE { return m_computedColumnHeight; }
+    
     virtual const char* renderName() const;
     
     void paintColumnRules(PaintInfo&, const LayoutPoint& paintOffset);
@@ -78,6 +84,9 @@ private:
     LayoutUnit columnGap() const;
     LayoutRect columnRectAt(unsigned index) const;
     unsigned columnCount() const;
+
+    LayoutRect flowThreadPortionRectAt(unsigned index) const;
+    LayoutRect flowThreadPortionOverflowRect(const LayoutRect& flowThreadPortion, unsigned index, unsigned colCount, int colGap) const;
 
     unsigned m_computedColumnCount;
     LayoutUnit m_computedColumnWidth;

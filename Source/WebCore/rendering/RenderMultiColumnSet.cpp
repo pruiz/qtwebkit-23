@@ -24,10 +24,15 @@
  */
 
 #include "config.h"
+#include "RenderMultiColumnSet.h"
+
+#include "HitTestResult.h"
 #include "PaintInfo.h"
 #include "RenderMultiColumnFlowThread.h"
-#include "RenderMultiColumnSet.h"
 #include "RenderMultiColumnBlock.h"
+
+using std::min;
+using std::max;
 
 namespace WebCore {
 
@@ -37,6 +42,13 @@ RenderMultiColumnSet::RenderMultiColumnSet(Node* node, RenderFlowThread* flowThr
     , m_computedColumnWidth(ZERO_LAYOUT_UNIT)
     , m_computedColumnHeight(ZERO_LAYOUT_UNIT)
 {
+}
+
+LayoutUnit RenderMultiColumnSet::pageLogicalTopForOffset(LayoutUnit offset) const
+{
+    LayoutUnit portionLogicalTop = (isHorizontalWritingMode() ? flowThreadPortionRect().y() : flowThreadPortionRect().x());
+    unsigned columnIndex = (offset - portionLogicalTop) / computedColumnHeight();
+    return portionLogicalTop + columnIndex * computedColumnHeight();
 }
 
 void RenderMultiColumnSet::computeLogicalWidth()
@@ -75,7 +87,7 @@ unsigned RenderMultiColumnSet::columnCount() const
         return 0;
     
     // Our region rect determines our column count. We have as many columns as needed to fit all the content.
-    LayoutUnit logicalHeightInColumns = flowThread()->isHorizontalWritingMode() ? regionRect().height() : regionRect().width();
+    LayoutUnit logicalHeightInColumns = flowThread()->isHorizontalWritingMode() ? flowThreadPortionRect().height() : flowThreadPortionRect().width();
     return ceil(static_cast<float>(logicalHeightInColumns) / computedColumnHeight());
 }
 
@@ -94,6 +106,65 @@ LayoutRect RenderMultiColumnSet::columnRectAt(unsigned index) const
     if (isHorizontalWritingMode())
         return LayoutRect(colLogicalLeft, colLogicalTop, colLogicalWidth, colLogicalHeight);
     return LayoutRect(colLogicalTop, colLogicalLeft, colLogicalHeight, colLogicalWidth);
+}
+
+LayoutRect RenderMultiColumnSet::flowThreadPortionRectAt(unsigned index) const
+{
+    LayoutRect portionRect = flowThreadPortionRect();
+    if (isHorizontalWritingMode())
+        portionRect = LayoutRect(portionRect.x(), portionRect.y() + index * computedColumnHeight(), portionRect.width(), computedColumnHeight());
+    else
+        portionRect = LayoutRect(portionRect.x() + index * computedColumnHeight(), portionRect.y(), computedColumnHeight(), portionRect.height());
+    return portionRect;
+}
+
+LayoutRect RenderMultiColumnSet::flowThreadPortionOverflowRect(const LayoutRect& portionRect, unsigned index, unsigned colCount, int colGap) const
+{
+    // This function determines the portion of the flow thread that paints for the column. Along the inline axis, columns are
+    // unclipped at outside edges (i.e., the first and last column in the set), and they clip to half the column
+    // gap along interior edges.
+    //
+    // In the block direction, we will not clip overflow out of the top of the first column, or out of the bottom of
+    // the last column. This applies only to the true first column and last column across all column sets.
+    //
+    // FIXME: Eventually we will know overflow on a per-column basis, but we can't do this until we have a painting
+    // mode that understands not to paint contents from a previous column in the overflow area of a following column.
+    // This problem applies to regions and pages as well and is not unique to columns.
+    bool isFirstColumn = !index;
+    bool isLastColumn = index == colCount - 1;
+    LayoutRect overflowRect(portionRect);
+    if (isHorizontalWritingMode()) {
+        if (isFirstColumn) {
+            // Shift to the logical left overflow of the flow thread to make sure it's all covered.
+            overflowRect.shiftXEdgeTo(min(flowThread()->visualOverflowRect().x(), portionRect.x()));
+        } else {
+            // Expand into half of the logical left column gap.
+            overflowRect.shiftXEdgeTo(portionRect.x() - colGap / 2);
+        }
+        if (isLastColumn) {
+            // Shift to the logical right overflow of the flow thread to ensure content can spill out of the column.
+            overflowRect.shiftMaxXEdgeTo(max(flowThread()->visualOverflowRect().maxX(), portionRect.maxX()));
+        } else {
+            // Expand into half of the logical right column gap.
+            overflowRect.shiftMaxXEdgeTo(portionRect.maxX() + colGap / 2);
+        }
+    } else {
+        if (isFirstColumn) {
+            // Shift to the logical left overflow of the flow thread to make sure it's all covered.
+            overflowRect.shiftYEdgeTo(min(flowThread()->visualOverflowRect().y(), portionRect.y()));
+        } else {
+            // Expand into half of the logical left column gap.
+            overflowRect.shiftYEdgeTo(portionRect.y() - colGap / 2);
+        }
+        if (isLastColumn) {
+            // Shift to the logical right overflow of the flow thread to ensure content can spill out of the column.
+            overflowRect.shiftMaxYEdgeTo(max(flowThread()->visualOverflowRect().maxY(), portionRect.maxY()));
+        } else {
+            // Expand into half of the logical right column gap.
+            overflowRect.shiftMaxYEdgeTo(portionRect.maxY() + colGap / 2);
+        }
+    }
+    return overflowRectForFlowThreadPortion(overflowRect, isFirstRegion() && isFirstColumn, isLastRegion() && isLastColumn);
 }
 
 void RenderMultiColumnSet::paintReplaced(PaintInfo& paintInfo, const LayoutPoint& paintOffset)
@@ -164,15 +235,74 @@ void RenderMultiColumnSet::paintColumnRules(PaintInfo& paintInfo, const LayoutPo
     }
 }
 
-void RenderMultiColumnSet::paintColumnContents(PaintInfo& /*paintInfo*/, const LayoutPoint& /*paintOffset*/)
+void RenderMultiColumnSet::paintColumnContents(PaintInfo& paintInfo, const LayoutPoint& paintOffset)
 {
     // For each rectangle, set it as the region rectangle and then let flow thread painting do the rest.
-    // We make multiple calls to paintIntoRegion, changing the rectangles each time.
+    // We make multiple calls to paintFlowThreadPortionInRegion, changing the rectangles each time.
     unsigned colCount = columnCount();
     if (!colCount)
         return;
 
-    // FIXME: Implement.
+    LayoutUnit colGap = columnGap();
+    for (unsigned i = 0; i < colCount; i++) {
+        // First we get the column rect, which is in our local coordinate space, and we make it physical and apply
+        // the paint offset to it. That gives us the physical location that we want to paint the column at.
+        LayoutRect colRect = columnRectAt(i);
+        flipForWritingMode(colRect);
+        colRect.moveBy(paintOffset);
+        
+        // Next we get the portion of the flow thread that corresponds to this column.
+        LayoutRect flowThreadPortion = flowThreadPortionRectAt(i);
+        
+        // Now get the overflow rect that corresponds to the column.
+        LayoutRect flowThreadOverflowPortion = flowThreadPortionOverflowRect(flowThreadPortion, i, colCount, colGap);
+
+        // Do the paint with the computed rects.
+        flowThread()->paintFlowThreadPortionInRegion(paintInfo, this, flowThreadPortion, flowThreadOverflowPortion, colRect.location());
+    }
+}
+
+bool RenderMultiColumnSet::nodeAtPoint(const HitTestRequest& request, HitTestResult& result, const HitTestLocation& locationInContainer, const LayoutPoint& accumulatedOffset, HitTestAction action)
+{
+    LayoutPoint adjustedLocation = accumulatedOffset + location();
+
+    // Check our bounds next. For this purpose always assume that we can only be hit in the
+    // foreground phase (which is true for replaced elements like images).
+    // FIXME: Once we support overflow, we need to intersect with that and not with the bounds rect.
+    LayoutRect boundsRect = borderBoxRectInRegion(locationInContainer.region());
+    boundsRect.moveBy(adjustedLocation);
+    if (!visibleToHitTesting() || action != HitTestForeground || !locationInContainer.intersects(boundsRect))
+        return false;
+    
+    // The point is in one specific column. Since columns can't overlap, we don't ever have to test
+    // multiple columns. Put the 
+    
+    // FIXME: It would be nice to jump right to the specific column by just doing math on the point. Since columns
+    // can't overlap, we shouldn't have to walk every column like this. The old column code walked all the columns, though,
+    // so this is no worse. We'd have to watch out for rect-based hit testing, though, which actually could overlap
+    // multiple columns.
+    LayoutUnit colGap = columnGap();
+    unsigned colCount = columnCount();
+    for (unsigned i = 0; i < colCount; i++) {
+        // First we get the column rect, which is in our local coordinate space, and we make it physical and apply
+        // the hit test offset to it. That gives us the physical location that we want to paint the column at.
+        LayoutRect colRect = columnRectAt(i);
+        flipForWritingMode(colRect);
+        colRect.moveBy(adjustedLocation);
+        
+        // Next we get the portion of the flow thread that corresponds to this column.
+        LayoutRect flowThreadPortion = flowThreadPortionRectAt(i);
+        
+        // Now get the overflow rect that corresponds to the column.
+        LayoutRect flowThreadOverflowPortion = flowThreadPortionOverflowRect(flowThreadPortion, i, colCount, colGap);
+
+        // Do the hit test with the computed rects.
+        if (flowThread()->hitTestFlowThreadPortionInRegion(this, flowThreadPortion, flowThreadOverflowPortion, request, result, locationInContainer, colRect.location()))
+            return true;
+    }
+    
+    updateHitTestResult(result, locationInContainer.point() - toLayoutSize(adjustedLocation));
+    return !result.addNodeToRectBasedTestResult(node(), locationInContainer, boundsRect);
 }
 
 const char* RenderMultiColumnSet::renderName() const

@@ -198,8 +198,13 @@ public:
         return m_impl->characters16();
     }
 
-    template <typename CharType>
-    inline const CharType* getCharacters() const;
+    // Return characters8() or characters16() depending on CharacterType.
+    template <typename CharacterType>
+    inline const CharacterType* getCharacters() const;
+
+    // Like getCharacters() and upconvert if CharacterType is UChar on a 8bit string.
+    template <typename CharacterType>
+    inline const CharacterType* getCharactersWithUpconvert() const;
 
     bool is8Bit() const { return m_impl->is8Bit(); }
 
@@ -230,6 +235,9 @@ public:
     static String number(unsigned long long number) { return numberToStringImpl(number); }
 
     WTF_EXPORT_STRING_API static String number(double, unsigned = ShouldRoundSignificantFigures | ShouldTruncateTrailingZeros, unsigned precision = 6);
+
+    // Number to String conversion following the ECMAScript definition.
+    WTF_EXPORT_STRING_API static String numberToStringECMAScript(double);
 
     // Find a single character or string, also with match function & latin1 forms.
     size_t find(UChar c, unsigned start = 0) const
@@ -312,7 +320,7 @@ public:
     WTF_EXPORT_STRING_API void remove(unsigned pos, int len = 1);
 
     WTF_EXPORT_STRING_API String substring(unsigned pos, unsigned len = UINT_MAX) const;
-    String substringSharingImpl(unsigned pos, unsigned len = UINT_MAX) const;
+    WTF_EXPORT_STRING_API String substringSharingImpl(unsigned pos, unsigned len = UINT_MAX) const;
     String left(unsigned len) const { return substring(0, len); }
     String right(unsigned len) const { return substring(length() - len, len); }
 
@@ -441,6 +449,14 @@ public:
     WTF_EXPORT_STRING_API void show() const;
 #endif
 
+    // Workaround for a compiler bug. Use operator[] instead.
+    UChar characterAt(unsigned index) const
+    {
+        if (!m_impl || index >= m_impl->length())
+            return 0;
+        return (*m_impl)[index];
+    }
+
 private:
     RefPtr<StringImpl> m_impl;
 };
@@ -513,6 +529,19 @@ inline const UChar* String::getCharacters<UChar>() const
 {
     ASSERT(!is8Bit());
     return characters16();
+}
+
+template<>
+inline const LChar* String::getCharactersWithUpconvert<LChar>() const
+{
+    ASSERT(is8Bit());
+    return characters8();
+}
+
+template<>
+inline const UChar* String::getCharactersWithUpconvert<UChar>() const
+{
+    return characters();
 }
 
 inline bool String::containsOnlyLatin1() const

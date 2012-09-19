@@ -145,7 +145,6 @@
 #include "WebRuntimeFeatures.h"
 #include "WebSettingsImpl.h"
 #include "WebTextInputInfo.h"
-#include "WebTouchCandidatesInfo.h"
 #include "WebViewClient.h"
 #include "WheelEvent.h"
 #include "painting/GraphicsContextBuilder.h"
@@ -170,6 +169,7 @@
 
 #if ENABLE(GESTURE_EVENTS)
 #include "PlatformGestureEvent.h"
+#include "TouchDisambiguation.h"
 #endif
 
 #if OS(WINDOWS)
@@ -688,6 +688,7 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
 {
     switch (event.type) {
     case WebInputEvent::GestureFlingStart: {
+        m_client->cancelScheduledContentIntents();
         m_lastWheelPosition = WebPoint(event.x, event.y);
         m_lastWheelGlobalPosition = WebPoint(event.globalX, event.globalY);
         m_flingModifier = event.modifiers;
@@ -703,12 +704,27 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
         }
         return false;
     case WebInputEvent::GestureTap: {
-        PlatformGestureEventBuilder platformEvent(mainFrameImpl()->frameView(), event);
+        m_client->cancelScheduledContentIntents();
+        if (detectContentOnTouch(WebPoint(event.x, event.y), event.type))
+            return true;
+
         RefPtr<WebCore::PopupContainer> selectPopup;
         selectPopup = m_selectPopup;
         hideSelectPopup();
         ASSERT(!m_selectPopup);
+
+        if (!event.boundingBox.isEmpty()) {
+            Vector<IntRect> goodTargets;
+            findGoodTouchTargets(event.boundingBox, mainFrameImpl()->frame(), pageScaleFactor(), goodTargets);
+            // FIXME: replace touch adjustment code when numberOfGoodTargets == 1?
+            // Single candidate case is currently handled by: https://bugs.webkit.org/show_bug.cgi?id=85101
+            if (goodTargets.size() >= 2 && m_client && m_client->handleDisambiguationPopup(event, goodTargets))
+                return true;
+        }
+
+        PlatformGestureEventBuilder platformEvent(mainFrameImpl()->frameView(), event);
         bool gestureHandled = mainFrameImpl()->frame()->eventHandler()->handleGestureEvent(platformEvent);
+
         if (m_selectPopup && m_selectPopup == selectPopup) {
             // That tap triggered a select popup which is the same as the one that
             // was showing before the tap. It means the user tapped the select
@@ -716,12 +732,17 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
             // immediately reopened the select popup. It needs to be closed.
             hideSelectPopup();
         }
+
         return gestureHandled;
     }
     case WebInputEvent::GestureTwoFingerTap:
     case WebInputEvent::GestureLongPress: {
         if (!mainFrameImpl() || !mainFrameImpl()->frameView())
             return false;
+
+        m_client->cancelScheduledContentIntents();
+        if (detectContentOnTouch(WebPoint(event.x, event.y), event.type))
+            return true;
 
         m_page->contextMenuController()->clearContextMenu();
         m_contextMenuAllowed = true;
@@ -731,18 +752,21 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
         return handled;
     }
     case WebInputEvent::GestureTapDown: {
+        m_client->cancelScheduledContentIntents();
         // Queue a highlight animation, then hand off to regular handler.
 #if OS(LINUX)
-        enableTouchHighlight(IntPoint(event.x, event.y));
+        if (settingsImpl()->gestureTapHighlightEnabled())
+            enableTouchHighlight(IntPoint(event.x, event.y));
 #endif
         PlatformGestureEventBuilder platformEvent(mainFrameImpl()->frameView(), event);
         return mainFrameImpl()->frame()->eventHandler()->handleGestureEvent(platformEvent);
     }
+    case WebInputEvent::GestureDoubleTap:
     case WebInputEvent::GestureScrollBegin:
+    case WebInputEvent::GesturePinchBegin:
+        m_client->cancelScheduledContentIntents();
     case WebInputEvent::GestureScrollEnd:
     case WebInputEvent::GestureScrollUpdate:
-    case WebInputEvent::GestureDoubleTap:
-    case WebInputEvent::GesturePinchBegin:
     case WebInputEvent::GesturePinchEnd:
     case WebInputEvent::GesturePinchUpdate: {
         PlatformGestureEventBuilder platformEvent(mainFrameImpl()->frameView(), event);
@@ -793,17 +817,6 @@ void WebViewImpl::startPageScaleAnimation(const IntPoint& targetPosition, bool u
 WebViewBenchmarkSupport* WebViewImpl::benchmarkSupport()
 {
     return &m_benchmarkSupport;
-}
-
-WebVector<WebFloatQuad> WebViewImpl::getTouchHighlightQuads(const WebPoint& point,
-                                                            int padding,
-                                                            WebTouchCandidatesInfo& outTouchInfo,
-                                                            WebColor& outTapHighlightColor)
-{
-    // FIXME: Upstream this function from the chromium-android branch.
-    notImplemented();
-
-    return WebVector<WebFloatQuad>();
 }
 
 bool WebViewImpl::handleKeyEvent(const WebKeyboardEvent& event)
@@ -3444,6 +3457,8 @@ void WebViewImpl::didCommitLoad(bool* isNewNavigation, bool isNavigationWithinPa
     if (*isNewNavigation && !isNavigationWithinPage)
         m_pageScaleFactorIsSet = false;
 
+    // Make sure link highlight from previous page is cleared.
+    m_linkHighlight.clear();
     m_gestureAnimation.clear();
     resetSavedScrollAndScaleState();
 }
@@ -3992,7 +4007,10 @@ void WebViewImpl::selectAutofillSuggestionAtIndex(unsigned listIndex)
 
 bool WebViewImpl::detectContentOnTouch(const WebPoint& position, WebInputEvent::Type touchType)
 {
-    ASSERT(touchType == WebInputEvent::GestureTap || touchType == WebInputEvent::GestureLongPress);
+    ASSERT(touchType == WebInputEvent::GestureTap
+           || touchType == WebInputEvent::GestureTwoFingerTap
+           || touchType == WebInputEvent::GestureLongPress);
+
     HitTestResult touchHit = hitTestResultForWindowPos(position);
 
     if (touchHit.isContentEditable())
@@ -4002,13 +4020,20 @@ bool WebViewImpl::detectContentOnTouch(const WebPoint& position, WebInputEvent::
     if (!node || !node->isTextNode())
         return false;
 
-    // FIXME: Should we not detect content intents in nodes that have event listeners?
+    // Ignore when tapping on links or nodes listening to click events, unless the click event is on the
+    // body element, in which case it's unlikely that the original node itself was intended to be clickable.
+    for (; node && !node->hasTagName(HTMLNames::bodyTag); node = node->parentNode()) {
+        if (node->isLink() || (touchType == WebInputEvent::GestureTap
+                && (node->willRespondToTouchEvents() || node->willRespondToMouseClickEvents()))) {
+            return false;
+        }
+    }
 
     WebContentDetectionResult content = m_client->detectContentAround(touchHit);
     if (!content.isValid())
         return false;
 
-    if (touchType == WebInputEvent::GestureLongPress) {
+    if (touchType != WebInputEvent::GestureTap) {
         // Select the detected content as a block.
         focusedFrame()->selectRange(content.range());
         return true;

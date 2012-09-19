@@ -76,7 +76,6 @@ namespace JSC {
     class RegExpCache;
     class Stringifier;
     class Structure;
-    class UString;
 #if ENABLE(REGEXP_TRACING)
     class RegExp;
 #endif
@@ -193,7 +192,15 @@ namespace JSC {
         JSLock m_apiLock;
 
     public:
-        Heap heap; // The heap is our first data member to ensure that it's destructed after all the objects that reference it.
+#if ENABLE(ASSEMBLER)
+        // executableAllocator should be destructed after the heap, as the heap can call executableAllocator
+        // in its destructor.
+        ExecutableAllocator executableAllocator;
+#endif
+
+        // The heap should be just after executableAllocator and before other members to ensure that it's
+        // destructed after all the objects that reference it.
+        Heap heap;
 
         GlobalDataType globalDataType;
         ClientData* clientData;
@@ -224,14 +231,14 @@ namespace JSC {
         Strong<Structure> activationStructure;
         Strong<Structure> interruptedExecutionErrorStructure;
         Strong<Structure> terminatedExecutionErrorStructure;
-        Strong<Structure> staticScopeStructure;
+        Strong<Structure> nameScopeStructure;
         Strong<Structure> strictEvalActivationStructure;
         Strong<Structure> stringStructure;
         Strong<Structure> notAnObjectStructure;
         Strong<Structure> propertyNameIteratorStructure;
         Strong<Structure> getterSetterStructure;
         Strong<Structure> apiWrapperStructure;
-        Strong<Structure> scopeChainNodeStructure;
+        Strong<Structure> JSScopeStructure;
         Strong<Structure> executableStructure;
         Strong<Structure> nativeExecutableStructure;
         Strong<Structure> evalExecutableStructure;
@@ -240,6 +247,7 @@ namespace JSC {
         Strong<Structure> regExpStructure;
         Strong<Structure> sharedSymbolTableStructure;
         Strong<Structure> structureChainStructure;
+        Strong<Structure> withScopeStructure;
 
         IdentifierTable* identifierTable;
         CommonIdentifiers* propertyNames;
@@ -274,10 +282,6 @@ namespace JSC {
         {
             return m_enabledProfiler;
         }
-
-#if ENABLE(ASSEMBLER)
-        ExecutableAllocator executableAllocator;
-#endif
 
 #if !ENABLE(JIT)
         bool canUseJIT() { return false; } // interpreter only
@@ -317,8 +321,6 @@ namespace JSC {
 
         const ClassInfo* const jsArrayClassInfo;
         const ClassInfo* const jsFinalObjectClassInfo;
-
-        LLInt::Data llintData;
 
         ReturnAddressPtr exceptionLocation;
         JSValue hostCallReturnValue;
@@ -363,7 +365,7 @@ namespace JSC {
         double cachedUTCOffset;
         DSTOffsetCache dstOffsetCache;
         
-        UString cachedDateString;
+        String cachedDateString;
         double cachedDateStringValue;
 
         int maxReentryDepth;
@@ -418,6 +420,7 @@ namespace JSC {
         { \
             ASSERT(!m_##type##ArrayDescriptor.m_classInfo || m_##type##ArrayDescriptor.m_classInfo == descriptor.m_classInfo); \
             m_##type##ArrayDescriptor = descriptor; \
+            ASSERT(m_##type##ArrayDescriptor.m_classInfo); \
         } \
         const TypedArrayDescriptor& type##ArrayDescriptor() const { ASSERT(m_##type##ArrayDescriptor.m_classInfo); return m_##type##ArrayDescriptor; }
 

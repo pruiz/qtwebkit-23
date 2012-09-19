@@ -339,6 +339,7 @@ http/tests/media/video-buffered.html
 fast/filesystem
 http/tests/filesystem
 http/tests/inspector/filesystem
+http/tests/security/contentSecurityPolicy/filesystem-urls-match-self.html
 http/tests/security/filesystem-iframe-from-remote.html
 http/tests/security/mixedContent/filesystem-url-in-iframe.html
 http/tests/websocket/tests/hybi/send-file-blob.html
@@ -356,6 +357,8 @@ plugins/plugin-initiate-popup-window.html
 # Requires WebP support.
 fast/canvas/canvas-toDataURL-webp.html
 fast/images/webp-image-decoding.html
+http/tests/images/webp-partial-load.html
+http/tests/images/webp-progressive-load.html
 
 # Times out because plugins aren't allowed to execute JS after NPP_Destroy has been called in WebKit1's OOP plugins implementation http://webkit.org/b/48929
 plugins/evaluate-js-after-removing-plugin-element.html
@@ -960,9 +963,6 @@ css3/flexbox/flex-rounding.html
 # ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS) is disabled
 fast/forms/time-multiple-fields
 
-# https://bugs.webkit.org/show_bug.cgi?id=94720
-css3/flexbox/flexitem.html
-
 # <rdar://problem/11224160> Focus not transferring properly in DumpRenderTree in Mountain Lion
 fast/events/show-modal-dialog-onblur-onfocus.html
 platform/mac/fast/forms/listbox-scrollbar-hit-test.html
@@ -1013,6 +1013,20 @@ compositing/overflow/textarea-scroll-touch.html
 
 # https://bugs.webkit.org/show_bug.cgi?id=95027
 fast/block/float/016.html
+
+# https://bugs.webkit.org/show_bug.cgi?id=93878
+# Due to JSC::Bindings::Instance::createRuntimeObject(JSC::ExecState*) crashes:
+editing/pasteboard/paste-TIFF.html
+platform/mac/editing/pasteboard/dataTransfer-set-data-file-url.html
+
+# https://bugs.webkit.org/show_bug.cgi?id=93878 (yes, same bug as the previous)
+# Due to WebCore::JSEventListener::jsFunction(WebCore::ScriptExecutionContext*) crashes:
+fast/events/keyevent-iframe-removed-crash.html
+fullscreen/full-screen-iframe-zIndex.html
+fullscreen/full-screen-restrictions.html
+http/tests/security/MessagePort/event-listener-context.html
+platform/mac/accessibility/search-with-frames.html
+svg/custom/use-instanceRoot-as-event-target.xhtml
 
 # Assorted failures that need investigation
 

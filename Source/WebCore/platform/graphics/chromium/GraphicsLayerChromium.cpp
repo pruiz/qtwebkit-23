@@ -56,8 +56,9 @@
 #include "PlatformString.h"
 #include "SkMatrix44.h"
 #include "SystemTime.h"
-
+#include <public/Platform.h>
 #include <public/WebAnimation.h>
+#include <public/WebCompositorSupport.h>
 #include <public/WebFilterOperation.h>
 #include <public/WebFilterOperations.h>
 #include <public/WebFloatPoint.h>
@@ -66,6 +67,7 @@
 #include <public/WebSize.h>
 #include <public/WebTransformationMatrix.h>
 #include <wtf/CurrentTime.h>
+#include <wtf/HashSet.h>
 #include <wtf/StringExtras.h>
 #include <wtf/text/CString.h>
 
@@ -90,7 +92,12 @@ GraphicsLayerChromium::GraphicsLayerChromium(GraphicsLayerClient* client)
     , m_pageScaleChanged(false)
 {
     m_opaqueRectTrackingContentLayerDelegate = adoptPtr(new OpaqueRectTrackingContentLayerDelegate(this));
-    m_layer = adoptPtr(WebContentLayer::create(m_opaqueRectTrackingContentLayerDelegate.get()));
+
+    if (WebCompositorSupport* compositorSupport = Platform::current()->compositorSupport())
+        m_layer = adoptPtr(compositorSupport->createContentLayer(m_opaqueRectTrackingContentLayerDelegate.get()));
+    else
+        m_layer = adoptPtr(WebContentLayer::create(m_opaqueRectTrackingContentLayerDelegate.get()));
+
     m_layer->layer()->setDrawsContent(m_drawsContent && m_contentsVisible);
     if (client)
         deviceOrPageScaleFactorChanged();
@@ -129,9 +136,9 @@ void GraphicsLayerChromium::updateNames()
         String debugName = "TransformLayer for " + m_nameBase;
         m_transformLayer->setDebugName(debugName);
     }
-    if (m_contentsLayer) {
+    if (WebLayer* contentsLayer = contentsLayerIfRegistered()) {
         String debugName = "ContentsLayer for " + m_nameBase;
-        m_contentsLayer->setDebugName(debugName);
+        contentsLayer->setDebugName(debugName);
     }
     if (m_linkHighlight) {
         String debugName = "LinkHighlight for " + m_nameBase;
@@ -289,7 +296,9 @@ void GraphicsLayerChromium::setBackgroundColor(const Color& color)
 void GraphicsLayerChromium::clearBackgroundColor()
 {
     GraphicsLayer::clearBackgroundColor();
-    m_contentsLayer->setBackgroundColor(static_cast<RGBA32>(0));
+
+    if (WebLayer* contentsLayer = contentsLayerIfRegistered())
+        contentsLayer->setBackgroundColor(static_cast<RGBA32>(0));
 }
 
 void GraphicsLayerChromium::setContentsOpaque(bool opaque)
@@ -431,8 +440,8 @@ void GraphicsLayerChromium::setReplicatedByLayer(GraphicsLayer* layer)
 
 void GraphicsLayerChromium::setContentsNeedsDisplay()
 {
-    if (m_contentsLayer)
-        m_contentsLayer->invalidate();
+    if (WebLayer* contentsLayer = contentsLayerIfRegistered())
+        contentsLayer->invalidate();
 }
 
 void GraphicsLayerChromium::setNeedsDisplay()
@@ -467,7 +476,12 @@ void GraphicsLayerChromium::setContentsToImage(Image* image)
     bool childrenChanged = false;
     if (image) {
         if (m_contentsLayerPurpose != ContentsLayerForImage) {
-            m_imageLayer = adoptPtr(WebImageLayer::create());
+            if (WebCompositorSupport* compositorSupport = Platform::current()->compositorSupport())
+                m_imageLayer = adoptPtr(compositorSupport->createImageLayer());
+            else
+                m_imageLayer = adoptPtr(WebImageLayer::create());
+            registerContentsLayer(m_imageLayer->layer());
+
             setupContentsLayer(m_imageLayer->layer());
             m_contentsLayerPurpose = ContentsLayerForImage;
             childrenChanged = true;
@@ -480,6 +494,7 @@ void GraphicsLayerChromium::setContentsToImage(Image* image)
         if (m_imageLayer) {
             childrenChanged = true;
 
+            unregisterContentsLayer(m_imageLayer->layer());
             m_imageLayer.clear();
         }
         // The old contents layer will be removed via updateChildList.
@@ -488,6 +503,40 @@ void GraphicsLayerChromium::setContentsToImage(Image* image)
 
     if (childrenChanged)
         updateChildList();
+}
+
+static HashSet<int>* s_registeredLayerSet;
+
+void GraphicsLayerChromium::registerContentsLayer(WebLayer* layer)
+{
+    if (!s_registeredLayerSet)
+        s_registeredLayerSet = new HashSet<int>;
+    if (s_registeredLayerSet->contains(layer->id()))
+        CRASH();
+    s_registeredLayerSet->add(layer->id());
+}
+
+void GraphicsLayerChromium::unregisterContentsLayer(WebLayer* layer)
+{
+    ASSERT(s_registeredLayerSet);
+    if (!s_registeredLayerSet->contains(layer->id()))
+        CRASH();
+    s_registeredLayerSet->remove(layer->id());
+}
+
+void GraphicsLayerChromium::clearContentsLayerIfUnregistered()
+{
+    if (!m_contentsLayerId || s_registeredLayerSet->contains(m_contentsLayerId))
+        return;
+
+    m_contentsLayer = 0;
+    m_contentsLayerId = 0;
+}
+
+WebLayer* GraphicsLayerChromium::contentsLayerIfRegistered()
+{
+    clearContentsLayerIfUnregistered();
+    return m_contentsLayer;
 }
 
 void GraphicsLayerChromium::setContentsToCanvas(PlatformLayer* layer)
@@ -500,10 +549,13 @@ void GraphicsLayerChromium::setContentsToMedia(PlatformLayer* layer)
     setContentsTo(ContentsLayerForVideo, layer);
 }
 
-void GraphicsLayerChromium::setContentsTo(ContentsLayerPurpose purpose, WebKit::WebLayer* layer)
+void GraphicsLayerChromium::setContentsTo(ContentsLayerPurpose purpose, WebLayer* layer)
 {
     bool childrenChanged = false;
     if (layer) {
+        ASSERT(s_registeredLayerSet);
+        if (!s_registeredLayerSet->contains(layer->id()))
+            CRASH();
         if (m_contentsLayerId != layer->id()) {
             setupContentsLayer(layer);
             m_contentsLayerPurpose = purpose;
@@ -532,7 +584,7 @@ bool GraphicsLayerChromium::addAnimation(const KeyframeValueList& values, const 
     if (m_animationIdMap.contains(animationName))
         animationId = m_animationIdMap.get(animationName);
 
-    OwnPtr<WebKit::WebAnimation> toAdd(createWebAnimation(values, animation, animationId, timeOffset, boxSize));
+    OwnPtr<WebAnimation> toAdd(createWebAnimation(values, animation, animationId, timeOffset, boxSize));
 
     if (toAdd) {
         animationId = toAdd->id();
@@ -606,6 +658,8 @@ void GraphicsLayerChromium::updateChildList()
     WebLayer* childHost = m_transformLayer ? m_transformLayer.get() : m_layer->layer();
     childHost->removeAllChildren();
 
+    clearContentsLayerIfUnregistered();
+
     if (m_transformLayer) {
         // Add the primary layer first. Even if we have negative z-order children, the primary layer always comes behind.
         childHost->addChild(m_layer->layer());
@@ -678,8 +732,11 @@ void GraphicsLayerChromium::updateMasksToBounds()
 void GraphicsLayerChromium::updateLayerPreserves3D()
 {
     if (m_preserves3D && !m_transformLayer) {
-        // Create the transform layer.
-        m_transformLayer = adoptPtr(WebLayer::create());
+        if (WebCompositorSupport* compositorSupport = Platform::current()->compositorSupport())
+            m_transformLayer = adoptPtr(compositorSupport->createLayer());
+        else
+            m_transformLayer = adoptPtr(WebLayer::create());
+
         m_transformLayer->setPreserves3D(true);
         m_transformLayer->setAnimationDelegate(this);
         m_layer->layer()->transferAnimationsTo(m_transformLayer.get());
@@ -742,9 +799,8 @@ void GraphicsLayerChromium::updateLayerIsDrawable()
     // so it is only given contentsVisible.
 
     m_layer->layer()->setDrawsContent(m_drawsContent && m_contentsVisible);
-
-    if (m_contentsLayer)
-        m_contentsLayer->setDrawsContent(m_contentsVisible);
+    if (WebLayer* contentsLayer = contentsLayerIfRegistered())
+        contentsLayer->setDrawsContent(m_contentsVisible);
 
     if (m_drawsContent) {
         m_layer->layer()->invalidate();
@@ -757,14 +813,15 @@ void GraphicsLayerChromium::updateLayerIsDrawable()
 
 void GraphicsLayerChromium::updateLayerBackgroundColor()
 {
-    if (!m_contentsLayer)
+    WebLayer* contentsLayer = contentsLayerIfRegistered();
+    if (!contentsLayer)
         return;
 
     // We never create the contents layer just for background color yet.
     if (m_backgroundColorSet)
-        m_contentsLayer->setBackgroundColor(m_backgroundColor.rgb());
+        contentsLayer->setBackgroundColor(m_backgroundColor.rgb());
     else
-        m_contentsLayer->setBackgroundColor(static_cast<RGBA32>(0));
+        contentsLayer->setBackgroundColor(static_cast<RGBA32>(0));
 }
 
 void GraphicsLayerChromium::updateContentsVideo()
@@ -774,11 +831,12 @@ void GraphicsLayerChromium::updateContentsVideo()
 
 void GraphicsLayerChromium::updateContentsRect()
 {
-    if (!m_contentsLayer)
+    WebLayer* contentsLayer = contentsLayerIfRegistered();
+    if (!contentsLayer)
         return;
 
-    m_contentsLayer->setPosition(FloatPoint(m_contentsRect.x(), m_contentsRect.y()));
-    m_contentsLayer->setBounds(IntSize(m_contentsRect.width(), m_contentsRect.height()));
+    contentsLayer->setPosition(FloatPoint(m_contentsRect.x(), m_contentsRect.y()));
+    contentsLayer->setBounds(IntSize(m_contentsRect.width(), m_contentsRect.height()));
 }
 
 void GraphicsLayerChromium::updateContentsScale()

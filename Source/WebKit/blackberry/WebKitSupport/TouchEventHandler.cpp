@@ -140,10 +140,11 @@ void TouchEventHandler::touchEventCancel()
         if (!elementUnderFatFinger || !elementUnderFatFinger->renderer())
             break;
 
-        if (!elementUnderFatFinger->renderer()->style()->affectedByHoverRules())
+        if (!elementUnderFatFinger->renderer()->style()->affectedByHoverRules()
+            && !elementUnderFatFinger->renderer()->style()->affectedByActiveRules())
             break;
 
-        HitTestRequest request(HitTestRequest::FingerUp);
+        HitTestRequest request(HitTestRequest::TouchEvent | HitTestRequest::Release);
         // The HitTestResult point is not actually needed.
         HitTestResult result(IntPoint::zero());
         result.setInnerNode(elementUnderFatFinger);
@@ -228,7 +229,9 @@ bool TouchEventHandler::handleTouchPoint(Platform::TouchPoint& point, bool useFa
             bool shouldRequestSpellCheckOptions = false;
 
             if (m_lastFatFingersResult.isTextInput())
-                shouldRequestSpellCheckOptions = m_webPage->m_inputHandler->shouldRequestSpellCheckingOptionsForPoint(point.m_pos, m_lastFatFingersResult.nodeAsElementIfApplicable(), spellCheckOptionRequest);
+                shouldRequestSpellCheckOptions = m_webPage->m_inputHandler->shouldRequestSpellCheckingOptionsForPoint(point.m_pos
+                                                                                                                      , m_lastFatFingersResult.nodeAsElementIfApplicable(FatFingersResult::ShadowContentNotAllowed)
+                                                                                                                      , spellCheckOptionRequest);
 
             // Apply any suppressed changes. This does not eliminate the need
             // for the show after the handling of fat finger pressed as it may
@@ -351,7 +354,7 @@ void TouchEventHandler::drawTapHighlight()
     // On the client side, this info is being used to hide the tap highlight window on scroll.
     RenderLayer* layer = m_webPage->enclosingFixedPositionedAncestorOrSelfIfFixedPositioned(renderer->enclosingLayer());
     bool shouldHideTapHighlightRightAfterScrolling = !layer->renderer()->isRenderView();
-    shouldHideTapHighlightRightAfterScrolling |= !!m_webPage->m_inRegionScroller->d->node();
+    shouldHideTapHighlightRightAfterScrolling |= !!m_webPage->m_inRegionScroller->d->isActive();
 
     IntPoint framePos(m_webPage->frameOffset(elementFrame));
 

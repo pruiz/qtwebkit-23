@@ -583,6 +583,9 @@ void PluginView::privateBrowsingStateChanged(bool privateBrowsingEnabled)
     if (!m_isInitialized || !m_plugin)
         return;
 
+    if (!privateBrowsingEnabled && !frame()->document()->securityOrigin()->canAccessPluginStorage(frame()->tree()->top()->document()->securityOrigin()))
+        return;
+
     m_plugin->privateBrowsingStateChanged(privateBrowsingEnabled);
 }
 
@@ -785,13 +788,19 @@ void PluginView::viewGeometryDidChange()
     transform.translate(scaledLocationInRootViewCoordinates.x(), scaledLocationInRootViewCoordinates.y());
     transform.scale(pageScaleFactor);
 
-    // FIXME: This clip rect isn't correct.
-    // But it is still important distinguish between empty and non-empty rects so we can notify the plug-in when it becomes invisible.
+    // FIXME: The way we calculate this clip rect isn't correct.
+    // But it is still important to distinguish between empty and non-empty rects so we can notify the plug-in when it becomes invisible.
     // Making the rect actually correct is covered by https://bugs.webkit.org/show_bug.cgi?id=95362
-    IntRect clipRect = clipRectInWindowCoordinates();
-    if (!clipRect.isEmpty())
-        clipRect = boundsRect();
-        
+    IntRect clipRect = boundsRect();
+    
+    // FIXME: We can only get a semi-reliable answer from clipRectInWindowCoordinates() when the page is not scaled.
+    // Fixing that is tracked in <rdar://problem/9026611> - Make the Widget hierarchy play nicely with transforms, for zoomed plug-ins and iframes
+    if (pageScaleFactor == 1) {
+        clipRect = clipRectInWindowCoordinates();
+        if (!clipRect.isEmpty())
+            clipRect = boundsRect();
+    }
+    
     m_plugin->geometryDidChange(size(), clipRect, transform);
 }
 
@@ -1265,6 +1274,9 @@ bool PluginView::isPrivateBrowsingEnabled()
 {
     // If we can't get the real setting, we'll assume that private browsing is enabled.
     if (!frame())
+        return true;
+
+    if (!frame()->document()->securityOrigin()->canAccessPluginStorage(frame()->tree()->top()->document()->securityOrigin()))
         return true;
 
     Settings* settings = frame()->settings();

@@ -173,7 +173,8 @@ void InjectedBundle::overrideBoolPreferenceForTestRunner(WebPageGroupProxy* page
     macro(WebKitWebAudioEnabled, WebAudioEnabled, webAudioEnabled) \
     macro(WebKitWebGLEnabled, WebGLEnabled, webGLEnabled) \
     macro(WebKitXSSAuditorEnabled, XSSAuditorEnabled, xssAuditorEnabled) \
-    macro(WebKitShouldRespectImageOrientation, ShouldRespectImageOrientation, shouldRespectImageOrientation)
+    macro(WebKitShouldRespectImageOrientation, ShouldRespectImageOrientation, shouldRespectImageOrientation) \
+    macro(WebKitEnableCaretBrowsing, CaretBrowsingEnabled, caretBrowsingEnabled)
 
     if (preference == "WebKitAcceleratedCompositingEnabled")
         enabled = enabled && LayerTreeHost::supportsAcceleratedCompositing();
@@ -539,7 +540,7 @@ void InjectedBundle::setUserStyleSheetLocation(WebPageGroupProxy* pageGroup, con
 void InjectedBundle::setWebNotificationPermission(WebPage* page, const String& originString, bool allowed)
 {
 #if ENABLE(NOTIFICATIONS) || ENABLE(LEGACY_NOTIFICATIONS)
-    page->notificationPermissionRequestManager()->setPermissionLevelForTesting(originString, allowed ? NotificationClient::PermissionAllowed : NotificationClient::PermissionDenied);
+    page->notificationPermissionRequestManager()->setPermissionLevelForTesting(originString, allowed);
 #else
     UNUSED_PARAM(page);
     UNUSED_PARAM(originString);

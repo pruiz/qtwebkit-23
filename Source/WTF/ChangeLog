@@ -1,3 +1,69 @@
+2012-09-05  Gabor Rapcsanyi  <rgabor@webkit.org>
+
+        DFG JIT doesn't work properly on ARM hardfp
+        https://bugs.webkit.org/show_bug.cgi?id=95684
+
+        Reviewed by Filip Pizlo.
+
+        Add hardfp support to DFG JIT. The patch is created with the
+        help of Zoltan Herczeg.
+
+        * wtf/Platform.h:
+
+2012-09-04  Zoltan Horvath  <zoltan@webkit.org>
+
+        Extend the coverage of the Custom Allocation Framework in WTF and in JavaScriptCore
+        https://bugs.webkit.org/show_bug.cgi?id=95737
+
+        Reviewed by Eric Seidel.
+
+        Add WTF_MAKE_FAST_ALLOCATED macro to the following class declarations because these are instantiated by operator new.
+
+        * wtf/CryptographicallyRandomNumber.cpp: CryptographicallyRandomNumber is instantiated at wtf/CryptographicallyRandomNumber.cpp:162.
+        * wtf/MediaTime.h: MediaTime is instantiated at wtf/MediaTime.cpp:288.
+        * wtf/MetaAllocator.h:
+        (MetaAllocatorTracker): MetaAllocatorTracker is instantiated at JavaScriptCore/tools/CodeProfiling.cpp:120.
+        * wtf/ThreadingPthreads.cpp:
+        (PthreadState): PthreadState is instantiated at wtf/ThreadingPthreads.cpp:165.
+        * wtf/text/AtomicString.cpp:
+        (AtomicStringTable): AtomicStringTable is instantiated at wtf/text/AtomicString.cpp:43.
+
+2012-09-01  Mark Lam  <mark.lam@apple.com>
+
+        LLInt C loop backend.
+        https://bugs.webkit.org/show_bug.cgi?id=91052.
+
+        Reviewed by Filip Pizlo.
+
+        Added configs for the llint C loop backend.
+
+        * wtf/Platform.h:
+
+2012-08-31  Pratik Solanki  <psolanki@apple.com>
+
+        objc_msgSend and IMP should be cast appropriately before using
+        https://bugs.webkit.org/show_bug.cgi?id=95242
+
+        Reviewed by Benjamin Poulain.
+
+        Fix for older compilers. Pass id as the return type to the template
+        instead of relying on default type.
+
+        * wtf/Functional.h:
+        (WTF::R):
+        * wtf/ObjcRuntimeExtras.h:
+
+2012-08-31  Michael Saboff  <msaboff@apple.com>
+
+        CSS Parser should directly parse 8 bit source strings
+        https://bugs.webkit.org/show_bug.cgi?id=95207
+
+        Reviewed by Geoffrey Garen.
+
+        * wtf/text/StringImpl.h:
+        (WTF::equalIgnoringCase): Added (const char*, const LChar*, unsigned) flavor to support
+        8 bit CSS parser work.
+
 2012-08-30  Benjamin Poulain  <bpoulain@apple.com>
 
         AtomicString(ASCIILiteral) should not compile

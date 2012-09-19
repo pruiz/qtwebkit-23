@@ -348,6 +348,15 @@ void RenderBoxModelObject::willBeDestroyed()
     // A continuation of this RenderObject should be destroyed at subclasses.
     ASSERT(!continuation());
 
+    if (isPositioned()) {
+        if (RenderView* view = this->view()) {
+            if (FrameView* frameView = view->frameView()) {
+                if (style()->hasViewportConstrainedPosition())
+                    frameView->removeFixedObject(this);
+            }
+        }
+    }
+
     // If this is a first-letter object with a remaining text fragment then the
     // entry needs to be cleared from the map.
     if (firstLetterRemainingText())
@@ -445,6 +454,17 @@ void RenderBoxModelObject::styleDidChange(StyleDifference diff, const RenderStyl
         layer()->styleChanged(diff, oldStyle);
         if (s_hadLayer && layer()->isSelfPaintingLayer() != s_layerWasSelfPainting)
             setChildNeedsLayout(true);
+    }
+
+    if (FrameView *frameView = view()->frameView()) {
+        bool newStyleIsViewportConstained = style()->hasViewportConstrainedPosition();
+        bool oldStyleIsViewportConstrained = oldStyle && oldStyle->hasViewportConstrainedPosition();
+        if (newStyleIsViewportConstained != oldStyleIsViewportConstrained) {
+            if (newStyleIsViewportConstained && layer())
+                frameView->addFixedObject(this);
+            else
+                frameView->removeFixedObject(this);
+        }
     }
 }
 

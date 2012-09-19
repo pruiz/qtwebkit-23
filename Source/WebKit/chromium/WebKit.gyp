@@ -358,6 +358,8 @@
                 'src/BatteryClientImpl.h',
                 'src/BlobRegistryProxy.cpp',
                 'src/BlobRegistryProxy.h',
+                'src/DateTimeChooserImpl.cpp',
+                'src/DateTimeChooserImpl.h',
                 'src/ChromeClientImpl.cpp',
                 'src/ChromeClientImpl.h',
                 'src/ChromiumCurrentTime.cpp',
@@ -839,7 +841,7 @@
                 }],
                 ['use_libcc_for_compositor==1', {
                     'dependencies': [
-                        '<(chromium_src_dir)/webkit/compositor/compositor.gyp:webkit_compositor',
+                        '<(chromium_src_dir)/webkit/compositor_bindings/compositor_bindings.gyp:webkit_compositor_bindings',
                     ],
                     'sources!': [
                         '../../WebCore/platform/chromium/support/CCThreadImpl.cpp',

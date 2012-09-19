@@ -192,7 +192,6 @@ BUGWK86072 : media/sources-fallback-codecs.html = TEXT PASS
 BUGWK86073 : ietestcenter/css3/flexbox/flexbox-layout-001.htm = IMAGE PASS
 BUGWK86073 : ietestcenter/css3/flexbox/flexbox-layout-003.htm = IMAGE PASS
 BUGWK86074 : media/svg-as-image-with-media-blocked.html = CRASH PASS
-BUGWK86075 : fast/events/message-port-close.html = CRASH PASS
 BUGWK86078 : http/tests/misc/favicon-loads-with-icon-loading-override.html = TEXT PASS
 BUGWK86079 : http/tests/misc/link-rel-icon-beforeload.html = TEXT PASS
 BUGWK86081 : loader/navigation-while-deferring-loads.html = TEXT PASS
@@ -235,6 +234,7 @@ BUGWKEFL : media/media-controls-clone.html = TEXT PASS
 
 BUGWK93213 : fast/text/international/text-spliced-font.html = TEXT PASS
 BUGWK93214 : http/tests/loading/307-after-303-after-post.html = TIMEOUT PASS
+BUGWK93212 : http/tests/incremental/slow-utf8-text.pl = TIMEOUT PASS
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // FAILING TESTS
@@ -542,7 +542,7 @@ BUGWK77219 SKIP : http/tests/canvas/webgl/origin-clean-conformance.html = TEXT
 BUGWK77219 SKIP : http/tests/security/webgl-remote-read-remote-image-allowed-with-credentials.html = TEXT
 BUGWK77219 SKIP : http/tests/security/webgl-remote-read-remote-image-allowed.html = TEXT
 BUGWK77219 SKIP : http/tests/security/webgl-remote-read-remote-image-blocked-no-crossorigin.html = TEXT
-BUGWK77219 : inspector/profiler/webgl/webgl-profiler-api-changes.html = TEXT
+BUGWK77219 SKIP : inspector/profiler/webgl = TEXT
 
 BUGWK84759 : ietestcenter/css3/multicolumn/column-containing-block-001.htm = IMAGE
 BUGWK84760 : ietestcenter/css3/multicolumn/column-containing-block-002.htm = IMAGE
@@ -598,6 +598,7 @@ BUGWK95302 SKIP : fast/events/constructors/speech-recognition-event-constructor.
 
 // Requires support for Web notifications
 BUGWK73544 SKIP : fast/notifications = TEXT
+BUGWK73544 SKIP : http/tests/notifications = TEXT
 
 // This tests fails by one on 32 bits machines due to rounding issues.
 BUGWKEFL : fast/css/percentage-non-integer.html = TEXT PASS
@@ -757,10 +758,6 @@ BUGWK86142 : ietestcenter/css3/namespaces/syntax-021.xml = IMAGE
 BUGWK86597 : fullscreen/video-controls-drag.html = TEXT
 BUGWK86187 : media/media-fullscreen-not-in-document.html = TEXT
 BUGWK86187 SKIP : media/media-fullscreen-inline.html = PASS
-
-// ecore_x library is not initialized and calls to it cause crashes
-BUGWK86961 : editing/execCommand/paste-and-match-style-event.html = CRASH
-BUGWK86961 : fast/dom/shadow/cppevent-in-shadow.html = CRASH
 
 // Selection problem in Shadow DOM test (passes on GTK)
 BUGWKEFL : fast/dom/shadow/selections-in-shadow.html = TEXT
@@ -1010,7 +1007,6 @@ BUGWK93148 : tables/mozilla_expected_failures/marvin/table_overflow_hidden_tr.ht
 BUGWK93148 : fast/css/nested-layers-with-hover.html = TEXT
 
 BUGWK92956 : http/tests/security/contentSecurityPolicy/object-src-url-blocked.html = TEXT
-BUGWK93212 : http/tests/incremental/slow-utf8-text.pl = TIMEOUT
 
 BUGWK93976 : fast/css-generated-content/quotes-lang.html = IMAGE
 
@@ -1075,8 +1071,8 @@ BUGWK77754 : fast/css/absolute-child-with-percent-height-inside-relative-parent.
 BUGWK95428 : media/video-controls-captions.html = TEXT
 
 //Require rebaseline after https://bugs.webkit.org/show_bug.cgi?id=80394
-BUGWK80394 : fast/block/margin-collapse/empty-clear-blocks.html = IMAGE+TEXT
-BUGWK80394 : fast/block/float/024.html = IMAGE+TEXT
+BUGWK80394 : fast/block/margin-collapse/empty-clear-blocks.html = TEXT IMAGE+TEXT
+BUGWK80394 : fast/block/float/024.html = TEXT IMAGE+TEXT
 BUGWK80394 : fast/block/margin-collapse/025.html = TEXT
 BUGWK80394 : fast/block/margin-collapse/block-inside-inline/025.html = TEXT
 

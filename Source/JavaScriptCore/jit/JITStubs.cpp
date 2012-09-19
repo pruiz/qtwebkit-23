@@ -3141,14 +3141,13 @@ DEFINE_STUB_FUNCTION(int, has_property)
     return result;
 }
 
-DEFINE_STUB_FUNCTION(JSObject*, op_push_scope)
+DEFINE_STUB_FUNCTION(void, op_push_with_scope)
 {
     STUB_INIT_STACK_FRAME(stackFrame);
 
     JSObject* o = stackFrame.args[0].jsValue().toObject(stackFrame.callFrame);
-    CHECK_FOR_EXCEPTION();
+    CHECK_FOR_EXCEPTION_VOID();
     stackFrame.callFrame->setScope(JSWithScope::create(stackFrame.callFrame, o));
-    return o;
 }
 
 DEFINE_STUB_FUNCTION(void, op_pop_scope)
@@ -3258,15 +3257,14 @@ DEFINE_STUB_FUNCTION(EncodedJSValue, op_in)
     return JSValue::encode(jsBoolean(baseObj->hasProperty(callFrame, property)));
 }
 
-DEFINE_STUB_FUNCTION(JSObject*, op_push_new_scope)
+DEFINE_STUB_FUNCTION(void, op_push_name_scope)
 {
     STUB_INIT_STACK_FRAME(stackFrame);
 
-    JSNameScope* scope = JSNameScope::create(stackFrame.callFrame, stackFrame.args[0].identifier(), stackFrame.args[1].jsValue(), DontDelete);
+    JSNameScope* scope = JSNameScope::create(stackFrame.callFrame, stackFrame.args[0].identifier(), stackFrame.args[1].jsValue(), stackFrame.args[2].int32());
 
     CallFrame* callFrame = stackFrame.callFrame;
     callFrame->setScope(scope);
-    return scope;
 }
 
 DEFINE_STUB_FUNCTION(void, op_jmp_scopes)
@@ -3291,7 +3289,7 @@ DEFINE_STUB_FUNCTION(void, op_put_by_index)
 
     JSValue arrayValue = stackFrame.args[0].jsValue();
     ASSERT(isJSArray(arrayValue));
-    asArray(arrayValue)->putDirectIndex(callFrame, property, stackFrame.args[2].jsValue(), false);
+    asArray(arrayValue)->putDirectIndex(callFrame, property, stackFrame.args[2].jsValue());
 }
 
 DEFINE_STUB_FUNCTION(void*, op_switch_imm)

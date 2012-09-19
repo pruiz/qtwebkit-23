@@ -35,12 +35,38 @@
 
 #include <public/WebMediaConstraints.h>
 #include <public/WebRTCPeerConnectionHandlerClient.h>
+#include <public/WebRTCSessionDescriptionDescriptor.h>
+#include <public/WebRTCSessionDescriptionRequest.h>
 #include <public/WebString.h>
 #include <public/WebVector.h>
 
 using namespace WebKit;
 
+MockWebRTCPeerConnectionHandler::SuccessCallbackTask::SuccessCallbackTask(MockWebRTCPeerConnectionHandler* object, const WebKit::WebRTCSessionDescriptionRequest& request, const WebRTCSessionDescriptionDescriptor& result)
+    : MethodTask<MockWebRTCPeerConnectionHandler>(object)
+    , m_request(request)
+    , m_result(result)
+{
+}
+
+void MockWebRTCPeerConnectionHandler::SuccessCallbackTask::runIfValid()
+{
+    m_request.requestSucceeded(m_result);
+}
+
+MockWebRTCPeerConnectionHandler::FailureCallbackTask::FailureCallbackTask(MockWebRTCPeerConnectionHandler* object, const WebKit::WebRTCSessionDescriptionRequest& request)
+    : MethodTask<MockWebRTCPeerConnectionHandler>(object)
+    , m_request(request)
+{
+}
+
+void MockWebRTCPeerConnectionHandler::FailureCallbackTask::runIfValid()
+{
+    m_request.requestFailed("TEST_ERROR");
+}
+
 MockWebRTCPeerConnectionHandler::MockWebRTCPeerConnectionHandler(WebRTCPeerConnectionHandlerClient* client)
+    : m_client(client)
 {
 }
 
@@ -83,6 +109,40 @@ bool MockWebRTCPeerConnectionHandler::initialize(const WebRTCConfiguration&, con
     }
 
     return true;
+}
+
+void MockWebRTCPeerConnectionHandler::createOffer(const WebRTCSessionDescriptionRequest& request, const WebMediaConstraints& constraints)
+{
+    WebString shouldSucceed;
+    if (constraints.getMandatoryConstraintValue("succeed", shouldSucceed) && shouldSucceed == "true") {
+        WebRTCSessionDescriptionDescriptor sessionDescription;
+        sessionDescription.initialize("offer", "Some SDP here");
+        postTask(new SuccessCallbackTask(this, request, sessionDescription));
+    } else
+        postTask(new FailureCallbackTask(this, request));
+}
+
+bool MockWebRTCPeerConnectionHandler::updateICE(const WebRTCConfiguration&, const WebMediaConstraints&)
+{
+    m_client->didChangeICEState(WebRTCPeerConnectionHandlerClient::ICEStateGathering);
+    return true;
+}
+
+bool MockWebRTCPeerConnectionHandler::addICECandidate(const WebRTCICECandidateDescriptor& iceCandidate)
+{
+    m_client->didGenerateICECandidate(iceCandidate);
+    return true;
+}
+
+bool MockWebRTCPeerConnectionHandler::addStream(const WebMediaStreamDescriptor& stream, const WebMediaConstraints&)
+{
+    m_client->didAddRemoteStream(stream);
+    return true;
+}
+
+void MockWebRTCPeerConnectionHandler::removeStream(const WebMediaStreamDescriptor& stream)
+{
+    m_client->didRemoveRemoteStream(stream);
 }
 
 void MockWebRTCPeerConnectionHandler::stop()

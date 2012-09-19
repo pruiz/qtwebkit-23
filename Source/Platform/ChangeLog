@@ -1,3 +1,94 @@
+2012-09-04  Kenichi Ishibashi  <bashi@chromium.org>
+
+        [Chromium] Attempt to fix build failure on Win
+
+        Remove chromium/public/WebOfferAnswerRequest.h from Platform.gypi,
+        which was added in r127501, but doesn't exist. Unreviewed.
+
+        * Platform.gypi:
+
+2012-09-04  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Add the async createOffer functionality to RTCPeerConnection
+        https://bugs.webkit.org/show_bug.cgi?id=95734
+
+        Reviewed by Adam Barth.
+
+        * Platform.gypi:
+        * chromium/public/WebRTCPeerConnectionHandler.h:
+        (WebKit):
+        (WebRTCPeerConnectionHandler):
+        * chromium/public/WebRTCSessionDescriptionDescriptor.h: Added.
+        (WebCore):
+        (WebKit):
+        (WebRTCSessionDescriptionDescriptor):
+        (WebKit::WebRTCSessionDescriptionDescriptor::WebRTCSessionDescriptionDescriptor):
+        (WebKit::WebRTCSessionDescriptionDescriptor::~WebRTCSessionDescriptionDescriptor):
+        (WebKit::WebRTCSessionDescriptionDescriptor::operator=):
+        (WebKit::WebRTCSessionDescriptionDescriptor::isNull):
+        * chromium/public/WebRTCSessionDescriptionRequest.h: Added.
+        (WebCore):
+        (WebKit):
+        (WebRTCSessionDescriptionRequest):
+        (ExtraData):
+        (WebKit::WebRTCSessionDescriptionRequest::ExtraData::~ExtraData):
+        (WebKit::WebRTCSessionDescriptionRequest::WebRTCSessionDescriptionRequest):
+        (WebKit::WebRTCSessionDescriptionRequest::~WebRTCSessionDescriptionRequest):
+        (WebKit::WebRTCSessionDescriptionRequest::operator=):
+        (WebKit::WebRTCSessionDescriptionRequest::isNull):
+
+2012-09-04  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Change the MediaStreamTrackList track added/removed signaling
+        https://bugs.webkit.org/show_bug.cgi?id=95721
+
+        Reviewed by Adam Barth.
+
+        Adding the signaling to the WebKit interface.
+
+        * chromium/public/WebMediaStreamCenter.h:
+        (WebKit::WebMediaStreamCenter::didAddMediaStreamTrack):
+        (WebKit::WebMediaStreamCenter::didRemoveMediaStreamTrack):
+
+2012-09-03  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Add Ice-related functionality to RTCPeerConnection
+        https://bugs.webkit.org/show_bug.cgi?id=95565
+
+        Reviewed by Adam Barth.
+
+        * Platform.gypi:
+        * chromium/public/WebRTCICECandidateDescriptor.h: Copied from Source/Platform/chromium/public/WebRTCPeerConnectionHandlerClient.h.
+        (WebCore):
+        (WebKit):
+        (WebRTCICECandidateDescriptor):
+        (WebKit::WebRTCICECandidateDescriptor::WebRTCICECandidateDescriptor):
+        (WebKit::WebRTCICECandidateDescriptor::~WebRTCICECandidateDescriptor):
+        (WebKit::WebRTCICECandidateDescriptor::operator=):
+        (WebKit::WebRTCICECandidateDescriptor::isNull):
+        * chromium/public/WebRTCPeerConnectionHandler.h:
+        (WebKit):
+        (WebRTCPeerConnectionHandler):
+        * chromium/public/WebRTCPeerConnectionHandlerClient.h:
+        (WebKit):
+        (WebRTCPeerConnectionHandlerClient):
+
+2012-09-01  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Add MediaStream management to RTCPeerConnection
+        https://bugs.webkit.org/show_bug.cgi?id=95543
+
+        Reviewed by Adam Barth.
+
+        * chromium/public/WebMediaStreamCenter.h:
+        (WebMediaStreamCenter):
+        * chromium/public/WebRTCPeerConnectionHandler.h:
+        (WebKit):
+        (WebRTCPeerConnectionHandler):
+        * chromium/public/WebRTCPeerConnectionHandlerClient.h:
+        (WebKit):
+        (WebRTCPeerConnectionHandlerClient):
+
 2012-08-30  James Robinson  <jamesr@chromium.org>
 
         [chromium] Revert WebCompositorSupport to raw ptrs, make dtor protected

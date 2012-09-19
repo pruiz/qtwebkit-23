@@ -25,6 +25,8 @@
 #include "config.h"
 #include "StyleBuilder.h"
 
+#include "BasicShapeFunctions.h"
+#include "BasicShapes.h"
 #include "CSSAspectRatioValue.h"
 #include "CSSCalculationValue.h"
 #include "CSSCursorImageValue.h"
@@ -43,11 +45,6 @@
 #include "StyleResolver.h"
 #include <wtf/StdLibExtras.h>
 #include <wtf/UnusedParam.h>
-
-#if ENABLE(CSS_EXCLUSIONS)
-#include "BasicShapeFunctions.h"
-#include "BasicShapes.h"
-#endif
 
 using namespace std;
 
@@ -1704,6 +1701,29 @@ public:
     }
 };
 
+template <BasicShape* (RenderStyle::*getterFunction)() const, void (RenderStyle::*setterFunction)(PassRefPtr<BasicShape>), BasicShape* (*initialFunction)()>
+class ApplyPropertyClipPath {
+public:
+    static void setValue(RenderStyle* style, PassRefPtr<BasicShape> value) { (style->*setterFunction)(value); }
+    static void applyValue(StyleResolver* styleResolver, CSSValue* value)
+    {
+        if (value->isPrimitiveValue()) {
+            CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
+            if (primitiveValue->getIdent() == CSSValueNone)
+                setValue(styleResolver->style(), 0);
+            else if (primitiveValue->isShape()) {
+                RefPtr<BasicShape> clipPathShape = basicShapeForValue(styleResolver, primitiveValue->getShapeValue());
+                setValue(styleResolver->style(), clipPathShape.release());
+            }
+        }
+    }
+    static PropertyHandler createHandler()
+    {
+        PropertyHandler handler = ApplyPropertyDefaultBase<BasicShape*, getterFunction, PassRefPtr<BasicShape>, setterFunction, BasicShape*, initialFunction>::createHandler();
+        return PropertyHandler(handler.inheritFunction(), handler.initialFunction(), &applyValue);
+    }
+};
+
 #if ENABLE(CSS_EXCLUSIONS)
 template <BasicShape* (RenderStyle::*getterFunction)() const, void (RenderStyle::*setterFunction)(PassRefPtr<BasicShape>), BasicShape* (*initialFunction)()>
 class ApplyPropertyWrapShape {
@@ -1962,7 +1982,6 @@ StyleBuilder::StyleBuilder()
     setPropertyHandler(CSSPropertyWebkitColumnSpan, ApplyPropertyDefault<ColumnSpan, &RenderStyle::columnSpan, ColumnSpan, &RenderStyle::setColumnSpan, ColumnSpan, &RenderStyle::initialColumnSpan>::createHandler());
     setPropertyHandler(CSSPropertyWebkitColumnRuleStyle, ApplyPropertyDefault<EBorderStyle, &RenderStyle::columnRuleStyle, EBorderStyle, &RenderStyle::setColumnRuleStyle, EBorderStyle, &RenderStyle::initialBorderStyle>::createHandler());
     setPropertyHandler(CSSPropertyWebkitColumnWidth, ApplyPropertyAuto<float, &RenderStyle::columnWidth, &RenderStyle::setColumnWidth, &RenderStyle::hasAutoColumnWidth, &RenderStyle::setHasAutoColumnWidth, ComputeLength>::createHandler());
-#if ENABLE(CSS3_FLEXBOX)
     setPropertyHandler(CSSPropertyWebkitAlignContent, ApplyPropertyDefault<EAlignContent, &RenderStyle::alignContent, EAlignContent, &RenderStyle::setAlignContent, EAlignContent, &RenderStyle::initialAlignContent>::createHandler());
     setPropertyHandler(CSSPropertyWebkitAlignItems, ApplyPropertyDefault<EAlignItems, &RenderStyle::alignItems, EAlignItems, &RenderStyle::setAlignItems, EAlignItems, &RenderStyle::initialAlignItems>::createHandler());
     setPropertyHandler(CSSPropertyWebkitAlignSelf, ApplyPropertyDefault<EAlignItems, &RenderStyle::alignSelf, EAlignItems, &RenderStyle::setAlignSelf, EAlignItems, &RenderStyle::initialAlignSelf>::createHandler());
@@ -1975,7 +1994,6 @@ StyleBuilder::StyleBuilder()
     setPropertyHandler(CSSPropertyWebkitFlexWrap, ApplyPropertyDefault<EFlexWrap, &RenderStyle::flexWrap, EFlexWrap, &RenderStyle::setFlexWrap, EFlexWrap, &RenderStyle::initialFlexWrap>::createHandler());
     setPropertyHandler(CSSPropertyWebkitJustifyContent, ApplyPropertyDefault<EJustifyContent, &RenderStyle::justifyContent, EJustifyContent, &RenderStyle::setJustifyContent, EJustifyContent, &RenderStyle::initialJustifyContent>::createHandler());
     setPropertyHandler(CSSPropertyWebkitOrder, ApplyPropertyDefault<int, &RenderStyle::order, int, &RenderStyle::setOrder, int, &RenderStyle::initialOrder>::createHandler());
-#endif
 #if ENABLE(CSS_REGIONS)
     setPropertyHandler(CSSPropertyWebkitFlowFrom, ApplyPropertyString<MapNoneToNull, &RenderStyle::regionThread, &RenderStyle::setRegionThread, &RenderStyle::initialRegionThread>::createHandler());
     setPropertyHandler(CSSPropertyWebkitFlowInto, ApplyPropertyString<MapNoneToNull, &RenderStyle::flowThread, &RenderStyle::setFlowThread, &RenderStyle::initialFlowThread>::createHandler());
@@ -2050,6 +2068,8 @@ StyleBuilder::StyleBuilder()
     setPropertyHandler(CSSPropertyWebkitUserDrag, ApplyPropertyDefault<EUserDrag, &RenderStyle::userDrag, EUserDrag, &RenderStyle::setUserDrag, EUserDrag, &RenderStyle::initialUserDrag>::createHandler());
     setPropertyHandler(CSSPropertyWebkitUserModify, ApplyPropertyDefault<EUserModify, &RenderStyle::userModify, EUserModify, &RenderStyle::setUserModify, EUserModify, &RenderStyle::initialUserModify>::createHandler());
     setPropertyHandler(CSSPropertyWebkitUserSelect, ApplyPropertyDefault<EUserSelect, &RenderStyle::userSelect, EUserSelect, &RenderStyle::setUserSelect, EUserSelect, &RenderStyle::initialUserSelect>::createHandler());
+    setPropertyHandler(CSSPropertyWebkitClipPath, ApplyPropertyClipPath<&RenderStyle::clipPath, &RenderStyle::setClipPath, &RenderStyle::initialClipPath>::createHandler());
+
 #if ENABLE(CSS_EXCLUSIONS)
     setPropertyHandler(CSSPropertyWebkitWrap, ApplyPropertyExpanding<SuppressValue, CSSPropertyWebkitWrapFlow, CSSPropertyWebkitWrapMargin, CSSPropertyWebkitWrapPadding>::createHandler());
     setPropertyHandler(CSSPropertyWebkitWrapFlow, ApplyPropertyDefault<WrapFlow, &RenderStyle::wrapFlow, WrapFlow, &RenderStyle::setWrapFlow, WrapFlow, &RenderStyle::initialWrapFlow>::createHandler());

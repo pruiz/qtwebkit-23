@@ -69,6 +69,7 @@ public:
     virtual void didLoseContextOnImplThread() OVERRIDE { }
     virtual void onSwapBuffersCompleteOnImplThread() OVERRIDE { ASSERT_NOT_REACHED(); }
     virtual void onVSyncParametersChanged(double monotonicTimebase, double intervalInSeconds) OVERRIDE { }
+    virtual void onCanDrawStateChanged(bool canDraw) OVERRIDE { }
     virtual void setNeedsRedrawOnImplThread() OVERRIDE { m_layerTreeHost->scheduleComposite(); }
     virtual void setNeedsCommitOnImplThread() OVERRIDE { m_layerTreeHost->scheduleComposite(); }
     virtual void postAnimationEventsToMainThreadOnImplThread(PassOwnPtr<CCAnimationEventsVector>, double wallClockTime) OVERRIDE;
@@ -102,7 +103,7 @@ private:
 };
 
 // For use in the single-threaded case. In debug builds, it pretends that the
-// code is running on the thread to satisfy assertion checks.
+// code is running on the impl thread to satisfy assertion checks.
 class DebugScopedSetImplThread {
 public:
     DebugScopedSetImplThread()
@@ -135,6 +136,15 @@ public:
         CCProxy::setCurrentThreadIsImplThread(true);
 #endif
     }
+};
+
+// For use in the single-threaded case. In debug builds, it pretends that the
+// code is running on the impl thread and that the main thread is blocked to
+// satisfy assertion checks
+class DebugScopedSetImplThreadAndMainThreadBlocked {
+private:
+    DebugScopedSetImplThread m_implThread;
+    DebugScopedSetMainThreadBlocked m_mainThreadBlocked;
 };
 
 } // namespace WebCore

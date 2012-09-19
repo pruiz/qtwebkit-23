@@ -50,6 +50,7 @@
 #include "JSPropertyNameIterator.h"
 #include "JSString.h"
 #include "JSWithScope.h"
+#include "LLIntCLoop.h"
 #include "LiteralParser.h"
 #include "NameInstance.h"
 #include "ObjectPrototype.h"
@@ -741,6 +742,8 @@ void Interpreter::addStackTraceIfNecessary(CallFrame* callFrame, JSObject* error
         globalObject = globalData->dynamicGlobalObject;
     else
         globalObject = error->globalObject();
+
+    // FIXME: JSStringJoiner could be more efficient than StringBuilder here.
     StringBuilder builder;
     for (unsigned i = 0; i < stackTrace.size(); i++) {
         builder.append(String(stackTrace[i].toString(globalObject->globalExec()).impl()));
@@ -983,12 +986,16 @@ failedJSONP:
         SamplingTool::CallRecord callRecord(m_sampler.get());
 
         m_reentryDepth++;  
+#if ENABLE(LLINT_C_LOOP)
+        result = LLInt::CLoop::execute(newCallFrame, llint_program_prologue);
+#else // !ENABLE(LLINT_C_LOOP)
 #if ENABLE(JIT)
         if (!classicEnabled())
             result = program->generatedJITCode().execute(&m_registerFile, newCallFrame, scope->globalData());
         else
 #endif // ENABLE(JIT)
             result = privateExecute(Normal, &m_registerFile, newCallFrame);
+#endif // !ENABLE(LLINT_C_LOOP)
 
         m_reentryDepth--;
     }
@@ -1055,12 +1062,17 @@ JSValue Interpreter::executeCall(CallFrame* callFrame, JSObject* function, CallT
             SamplingTool::CallRecord callRecord(m_sampler.get());
 
             m_reentryDepth++;  
+#if ENABLE(LLINT_C_LOOP)
+            result = LLInt::CLoop::execute(newCallFrame, llint_function_for_call_prologue);
+#else // ENABLE(LLINT_C_LOOP)
 #if ENABLE(JIT)
             if (!classicEnabled())
                 result = callData.js.functionExecutable->generatedJITCodeForCall().execute(&m_registerFile, newCallFrame, callDataScope->globalData());
             else
 #endif // ENABLE(JIT)
                 result = privateExecute(Normal, &m_registerFile, newCallFrame);
+#endif // !ENABLE(LLINT_C_LOOP)
+
             m_reentryDepth--;
         }
 
@@ -1149,12 +1161,16 @@ JSObject* Interpreter::executeConstruct(CallFrame* callFrame, JSObject* construc
             SamplingTool::CallRecord callRecord(m_sampler.get());
 
             m_reentryDepth++;  
+#if ENABLE(LLINT_C_LOOP)
+            result = LLInt::CLoop::execute(newCallFrame, llint_function_for_construct_prologue);
+#else // !ENABLE(LLINT_C_LOOP)
 #if ENABLE(JIT)
             if (!classicEnabled())
                 result = constructData.js.functionExecutable->generatedJITCodeForConstruct().execute(&m_registerFile, newCallFrame, constructDataScope->globalData());
             else
 #endif // ENABLE(JIT)
                 result = privateExecute(Normal, &m_registerFile, newCallFrame);
+#endif // !ENABLE(LLINT_C_LOOP)
             m_reentryDepth--;
         }
 
@@ -1252,6 +1268,9 @@ JSValue Interpreter::execute(CallFrameClosure& closure)
         SamplingTool::CallRecord callRecord(m_sampler.get());
         
         m_reentryDepth++;  
+#if ENABLE(LLINT_C_LOOP)
+        result = LLInt::CLoop::execute(closure.newCallFrame, llint_function_for_call_prologue);
+#else // !ENABLE(LLINT_C_LOOP)
 #if ENABLE(JIT)
 #if ENABLE(CLASSIC_INTERPRETER)
         if (closure.newCallFrame->globalData().canUseJIT())
@@ -1264,6 +1283,8 @@ JSValue Interpreter::execute(CallFrameClosure& closure)
 #if ENABLE(CLASSIC_INTERPRETER)
             result = privateExecute(Normal, &m_registerFile, closure.newCallFrame);
 #endif
+#endif // !ENABLE(LLINT_C_LOOP)
+
         m_reentryDepth--;
     }
 
@@ -1352,6 +1373,9 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSValue
 
         m_reentryDepth++;
         
+#if ENABLE(LLINT_C_LOOP)
+        result = LLInt::CLoop::execute(newCallFrame, llint_eval_prologue);
+#else // !ENABLE(LLINT_C_LOOP)
 #if ENABLE(JIT)
 #if ENABLE(CLASSIC_INTERPRETER)
         if (callFrame->globalData().canUseJIT())
@@ -1364,6 +1388,7 @@ JSValue Interpreter::execute(EvalExecutable* eval, CallFrame* callFrame, JSValue
 #if ENABLE(CLASSIC_INTERPRETER)
             result = privateExecute(Normal, &m_registerFile, newCallFrame);
 #endif
+#endif // !ENABLE(LLINT_C_LOOP)
         m_reentryDepth--;
     }
 
@@ -1403,14 +1428,13 @@ NEVER_INLINE void Interpreter::debug(CallFrame* callFrame, DebugHookID debugHook
 }
     
 #if ENABLE(CLASSIC_INTERPRETER)
-NEVER_INLINE JSScope* Interpreter::createExceptionScope(CallFrame* callFrame, const Instruction* vPC)
+NEVER_INLINE JSScope* Interpreter::createNameScope(CallFrame* callFrame, const Instruction* vPC)
 {
-    int dst = vPC[1].u.operand;
     CodeBlock* codeBlock = callFrame->codeBlock();
-    Identifier& property = codeBlock->identifier(vPC[2].u.operand);
-    JSValue value = callFrame->r(vPC[3].u.operand).jsValue();
-    JSNameScope* scope = JSNameScope::create(callFrame, property, value, DontDelete);
-    callFrame->uncheckedR(dst) = JSValue(scope);
+    Identifier& property = codeBlock->identifier(vPC[1].u.operand);
+    JSValue value = callFrame->r(vPC[2].u.operand).jsValue();
+    unsigned attributes = vPC[3].u.operand;
+    JSNameScope* scope = JSNameScope::create(callFrame, property, value, attributes);
     return scope;
 }
 
@@ -1635,6 +1659,8 @@ NEVER_INLINE void Interpreter::uncacheGetByID(CodeBlock*, Instruction* vPC)
 }
 
 #endif // ENABLE(CLASSIC_INTERPRETER)
+
+#if !ENABLE(LLINT_C_LOOP)
 
 JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFile, CallFrame* callFrame)
 {
@@ -3701,7 +3727,7 @@ skip_id_custom_self:
 
         JSValue arrayValue = callFrame->r(base).jsValue();
         ASSERT(isJSArray(arrayValue));
-        asArray(arrayValue)->putDirectIndex(callFrame, property, callFrame->r(value).jsValue(), false);
+        asArray(arrayValue)->putDirectIndex(callFrame, property, callFrame->r(value).jsValue());
 
         vPC += OPCODE_LENGTH(op_put_by_index);
         NEXT_INSTRUCTION();
@@ -4789,22 +4815,20 @@ skip_id_custom_self:
 
         NEXT_INSTRUCTION();
     }
-    DEFINE_OPCODE(op_push_scope) {
-        /* push_scope scope(r)
+    DEFINE_OPCODE(op_push_with_scope) {
+        /* push_with_scope scope(r)
 
            Converts register scope to object, and pushes it onto the top
-           of the current scope chain.  The contents of the register scope
-           are replaced by the result of toObject conversion of the scope.
+           of the scope chain.
         */
         int scope = vPC[1].u.operand;
         JSValue v = callFrame->r(scope).jsValue();
         JSObject* o = v.toObject(callFrame);
         CHECK_FOR_EXCEPTION();
 
-        callFrame->uncheckedR(scope) = JSValue(o);
         callFrame->setScope(JSWithScope::create(callFrame, o));
 
-        vPC += OPCODE_LENGTH(op_push_scope);
+        vPC += OPCODE_LENGTH(op_push_with_scope);
         NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_pop_scope) {
@@ -4902,16 +4926,15 @@ skip_id_custom_self:
     // Appease GCC
     goto *(&&skip_new_scope);
 #endif
-    DEFINE_OPCODE(op_push_new_scope) {
-        /* new_scope dst(r) property(id) value(r)
+    DEFINE_OPCODE(op_push_name_scope) {
+        /* new_scope property(id) value(r) attributes(unsigned)
          
-           Constructs a new NameScopeObject with property set to value.  That scope
-           object is then pushed onto the ScopeChain.  The scope object is then stored
-           in dst for GC.
+           Constructs a name scope of the form { property<attributes>: value },
+           and pushes it onto the scope chain.
          */
-        callFrame->setScope(createExceptionScope(callFrame, vPC));
+        callFrame->setScope(createNameScope(callFrame, vPC));
 
-        vPC += OPCODE_LENGTH(op_push_new_scope);
+        vPC += OPCODE_LENGTH(op_push_name_scope);
         NEXT_INSTRUCTION();
     }
 #if ENABLE(COMPUTED_GOTO_CLASSIC_INTERPRETER)
@@ -5091,6 +5114,9 @@ skip_id_custom_self:
     #undef CHECK_FOR_TIMEOUT
 #endif // ENABLE(CLASSIC_INTERPRETER)
 }
+
+#endif // !ENABLE(LLINT_C_LOOP)
+
 
 JSValue Interpreter::retrieveArgumentsFromVMCode(CallFrame* callFrame, JSFunction* function) const
 {

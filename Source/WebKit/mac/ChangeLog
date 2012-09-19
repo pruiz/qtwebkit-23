@@ -1,3 +1,44 @@
+2012-09-01  Mark Lam  <mark.lam@apple.com>
+
+        Added #include <JavaScriptCore/Identifier.h>.
+        https://bugs.webkit.org/show_bug.cgi?id=95641.
+
+        Reviewed by Dan Bernstein.
+
+        The code references JSC::Indentifier but was previously depending on
+        someone else to #include it. This results in build problems when
+        building for the llint C loop configuration.
+
+        * Plugins/Hosted/NetscapePluginInstanceProxy.h:
+
+2012-08-31  Tony Chang  <tony@chromium.org>
+
+        Remove ENABLE_CSS3_FLEXBOX compile time flag
+        https://bugs.webkit.org/show_bug.cgi?id=95382
+
+        Reviewed by Ojan Vafai.
+
+        Everyone is already enabling this by default and the spec has stablized.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-08-31  Pratik Solanki  <psolanki@apple.com>
+
+        objc_msgSend and IMP should be cast appropriately before using
+        https://bugs.webkit.org/show_bug.cgi?id=95242
+
+        Reviewed by Benjamin Poulain.
+
+        Fix for older compilers. Pass id as the return type to the template
+        instead of relying on default type.
+
+        * WebView/WebDelegateImplementationCaching.mm:
+        (CallDelegate):
+        (CallFormDelegate):
+        * WebView/WebHTMLView.mm:
+        (setCursor):
+        (setNeedsDisplayInRect):
+
 2012-08-30  Geoffrey Garen  <ggaren@apple.com>
 
         Use one object instead of two for closures, eliminating ScopeChainNode

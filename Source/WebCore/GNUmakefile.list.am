@@ -627,12 +627,18 @@ webcore_built_sources += \
 	DerivedSources/WebCore/JSRequestAnimationFrameCallback.h \
 	DerivedSources/WebCore/JSRGBColor.cpp \
 	DerivedSources/WebCore/JSRGBColor.h \
+	DerivedSources/WebCore/JSRTCErrorCallback.cpp \
+	DerivedSources/WebCore/JSRTCErrorCallback.h \
 	DerivedSources/WebCore/JSRTCIceCandidate.cpp \
 	DerivedSources/WebCore/JSRTCIceCandidate.h \
+	DerivedSources/WebCore/JSRTCIceCandidateEvent.cpp \
+	DerivedSources/WebCore/JSRTCIceCandidateEvent.h \
 	DerivedSources/WebCore/JSRTCPeerConnection.cpp \
 	DerivedSources/WebCore/JSRTCPeerConnection.h \
 	DerivedSources/WebCore/JSRTCSessionDescription.cpp \
 	DerivedSources/WebCore/JSRTCSessionDescription.h \
+	DerivedSources/WebCore/JSRTCSessionDescriptionCallback.cpp \
+	DerivedSources/WebCore/JSRTCSessionDescriptionCallback.h \
 	DerivedSources/WebCore/JSScreen.cpp \
 	DerivedSources/WebCore/JSScreen.h \
 	DerivedSources/WebCore/JSScriptProfile.cpp \
@@ -1223,9 +1229,12 @@ dom_binding_idls += \
 	$(WebCore)/Modules/mediastream/NavigatorUserMediaErrorCallback.idl \
 	$(WebCore)/Modules/mediastream/NavigatorUserMediaSuccessCallback.idl \
 	$(WebCore)/Modules/mediastream/PeerConnection00.idl \
+	$(WebCore)/Modules/mediastream/RTCErrorCallback.idl \
 	$(WebCore)/Modules/mediastream/RTCIceCandidate.idl \
+	$(WebCore)/Modules/mediastream/RTCIceCandidateEvent.idl \
 	$(WebCore)/Modules/mediastream/RTCPeerConnection.idl \
 	$(WebCore)/Modules/mediastream/RTCSessionDescription.idl \
+	$(WebCore)/Modules/mediastream/RTCSessionDescriptionCallback.idl \
 	$(WebCore)/Modules/mediastream/SessionDescription.idl \
 	$(WebCore)/Modules/navigatorcontentutils/NavigatorContentUtils.idl \
 	$(WebCore)/Modules/notifications/Notification.idl \
@@ -1840,8 +1849,6 @@ webcore_modules_sources += \
 	Source/WebCore/Modules/indexeddb/IDBIndex.h \
 	Source/WebCore/Modules/indexeddb/IDBKey.cpp \
 	Source/WebCore/Modules/indexeddb/IDBKey.h \
-	Source/WebCore/Modules/indexeddb/IDBKeyPathBackendImpl.cpp \
-	Source/WebCore/Modules/indexeddb/IDBKeyPathBackendImpl.h \
 	Source/WebCore/Modules/indexeddb/IDBKeyPath.cpp \
 	Source/WebCore/Modules/indexeddb/IDBKeyPath.h \
 	Source/WebCore/Modules/indexeddb/IDBKeyRange.cpp \
@@ -1917,12 +1924,18 @@ webcore_modules_sources += \
 	Source/WebCore/Modules/mediastream/NavigatorUserMediaSuccessCallback.h \
 	Source/WebCore/Modules/mediastream/PeerConnection00.cpp \
 	Source/WebCore/Modules/mediastream/PeerConnection00.h \
+	Source/WebCore/Modules/mediastream/RTCErrorCallback.h \
 	Source/WebCore/Modules/mediastream/RTCIceCandidate.cpp \
 	Source/WebCore/Modules/mediastream/RTCIceCandidate.h \
+	Source/WebCore/Modules/mediastream/RTCIceCandidateEvent.cpp \
+	Source/WebCore/Modules/mediastream/RTCIceCandidateEvent.h \
 	Source/WebCore/Modules/mediastream/RTCPeerConnection.cpp \
 	Source/WebCore/Modules/mediastream/RTCPeerConnection.h \
 	Source/WebCore/Modules/mediastream/RTCSessionDescription.cpp \
 	Source/WebCore/Modules/mediastream/RTCSessionDescription.h \
+	Source/WebCore/Modules/mediastream/RTCSessionDescriptionCallback.h \
+	Source/WebCore/Modules/mediastream/RTCSessionDescriptionRequestImpl.cpp \
+	Source/WebCore/Modules/mediastream/RTCSessionDescriptionRequestImpl.h \
 	Source/WebCore/Modules/mediastream/SessionDescription.cpp \
 	Source/WebCore/Modules/mediastream/SessionDescription.h \
 	Source/WebCore/Modules/mediastream/UserMediaClient.h \
@@ -4549,6 +4562,7 @@ webcore_sources += \
 	Source/WebCore/platform/mediastream/RTCPeerConnectionHandler.cpp \
 	Source/WebCore/platform/mediastream/RTCPeerConnectionHandler.h \
 	Source/WebCore/platform/mediastream/RTCPeerConnectionHandlerClient.h \
+	Source/WebCore/platform/mediastream/RTCSessionDescriptionRequest.h \
 	Source/WebCore/platform/mediastream/RTCSessionDescriptionDescriptor.cpp \
 	Source/WebCore/platform/mediastream/RTCSessionDescriptionDescriptor.h \
 	Source/WebCore/platform/mediastream/SessionDescriptionDescriptor.cpp \
@@ -4748,11 +4762,11 @@ webcore_sources += \
 	Source/WebCore/platform/text/RegularExpression.h \
 	Source/WebCore/platform/text/SegmentedString.cpp \
 	Source/WebCore/platform/text/SegmentedString.h \
-	Source/WebCore/platform/text/String.cpp \
 	Source/WebCore/platform/text/StringWithDirection.h \
 	Source/WebCore/platform/text/SuffixTree.h \
 	Source/WebCore/platform/text/TextBoundaries.cpp \
 	Source/WebCore/platform/text/TextBoundaries.h \
+	Source/WebCore/platform/text/TextBreakIterator.cpp \
 	Source/WebCore/platform/text/TextBreakIterator.h \
 	Source/WebCore/platform/text/TextCheckerClient.h \
 	Source/WebCore/platform/text/TextChecking.h \

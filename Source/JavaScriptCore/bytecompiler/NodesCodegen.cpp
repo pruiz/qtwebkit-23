@@ -609,11 +609,8 @@ RegisterID* PostfixResolveNode::emitBytecode(BytecodeGenerator& generator, Regis
     ResolveResult resolveResult = generator.resolve(m_ident);
 
     if (RegisterID* local = resolveResult.local()) {
-        if (resolveResult.isReadOnly()) {
-            if (dst == generator.ignoredResult())
-                return 0;
+        if (resolveResult.isReadOnly())
             return generator.emitToJSNumber(generator.finalDestination(dst), local);
-        }
         if (dst == generator.ignoredResult())
             return emitPreIncOrDec(generator, local, m_operator);
         return emitPostIncOrDec(generator, generator.finalDestination(dst), local, m_operator);
@@ -796,9 +793,10 @@ RegisterID* PrefixResolveNode::emitBytecode(BytecodeGenerator& generator, Regist
     if (RegisterID* local = resolveResult.local()) {
         if (resolveResult.isReadOnly()) {
             if (dst == generator.ignoredResult())
-                return 0;
-            RefPtr<RegisterID> r0 = generator.emitLoad(generator.finalDestination(dst), (m_operator == OpPlusPlus) ? 1.0 : -1.0);
-            return generator.emitBinaryOp(op_add, r0.get(), local, r0.get(), OperandTypes());
+                return generator.emitToJSNumber(generator.newTemporary(), local);
+            RefPtr<RegisterID> r0 = generator.emitLoad(generator.tempDestination(dst), (m_operator == OpPlusPlus) ? 1.0 : -1.0);
+            generator.emitBinaryOp(op_add, r0.get(), local, r0.get(), OperandTypes());
+            return generator.moveToDestinationIfNeeded(dst, r0.get());
         }
         emitPreIncOrDec(generator, local, m_operator);
         return generator.moveToDestinationIfNeeded(dst, local);
@@ -1756,11 +1754,10 @@ RegisterID* ReturnNode::emitBytecode(BytecodeGenerator& generator, RegisterID* d
 RegisterID* WithNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
 {
     generator.emitDebugHook(WillExecuteStatement, firstLine(), lastLine(), column());
-    
-    RefPtr<RegisterID> scope = generator.newTemporary();
-    generator.emitNode(scope.get(), m_expr); // scope must be protected until popped
+
+    RefPtr<RegisterID> scope = generator.emitNode(m_expr);
     generator.emitExpressionInfo(m_divot, m_expressionLength, 0);
-    generator.emitPushScope(scope.get());
+    generator.emitPushWithScope(scope.get());
     RegisterID* result = generator.emitNode(dst, m_statement);
     generator.emitPopScope();
     return result;
@@ -1996,7 +1993,7 @@ RegisterID* TryNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
             tryData = generator.pushTry(here.get());
         }
         
-        generator.emitPushNewScope(exceptionRegister.get(), m_exceptionIdent, exceptionRegister.get());
+        generator.emitPushNameScope(m_exceptionIdent, exceptionRegister.get(), DontDelete);
         generator.emitNode(dst, m_catchBlock);
         generator.emitPopScope();
         generator.emitLabel(catchEndLabel.get());

@@ -108,13 +108,16 @@ macro cCall2(function, arg1, arg2)
     if ARMv7
         move arg1, t0
         move arg2, t1
+        call function
     elsif X86
         poke arg1, 0
         poke arg2, 1
+        call function
+    elsif C_LOOP
+        cloopCallSlowPath function, arg1, arg2
     else
         error
     end
-    call function
 end
 
 # This barely works. arg3 and arg4 should probably be immediates.
@@ -124,15 +127,18 @@ macro cCall4(function, arg1, arg2, arg3, arg4)
         move arg2, t1
         move arg3, t2
         move arg4, t3
+        call function
     elsif X86
         poke arg1, 0
         poke arg2, 1
         poke arg3, 2
         poke arg4, 3
+        call function
+    elsif C_LOOP
+        error
     else
         error
     end
-    call function
 end
 
 macro callSlowPath(slowPath)
@@ -1022,8 +1028,9 @@ end
 
 _llint_op_resolve_global_dynamic:
     traceExecution()
-    loadp JITStackFrame::globalData[sp], t3
-    loadp JSGlobalData::activationStructure[t3], t3
+    loadp CodeBlock[cfr], t3
+    loadp CodeBlock::m_globalObject[t3], t3
+    loadp JSGlobalObject::m_activationStructure[t3], t3
     getScope(
         20[PC],
         macro (scope, scratch)
@@ -1622,8 +1629,7 @@ macro doCall(slowPath)
     storei CellTag, Callee + TagOffset[t3]
     storei CellTag, ScopeChain + TagOffset[t3]
     move t3, cfr
-    call LLIntCallLinkInfo::machineCodeTarget[t1]
-    dispatchAfterCall()
+    callTargetFunction(t1)
 
 .opCallSlow:
     slowPathForCall(6, slowPath)
@@ -1821,6 +1827,19 @@ macro nativeCallTrampoline(executableOffsetToFunction)
         loadp JSFunction::m_executable[t1], t1
         move t2, cfr
         call executableOffsetToFunction[t1]
+        restoreReturnAddressBeforeReturn(t3)
+        loadp JITStackFrame::globalData[sp], t3
+    elsif C_LOOP
+        loadp JITStackFrame::globalData[sp], t3
+        storep cfr, JSGlobalData::topCallFrame[t3]
+        move t0, t2
+        preserveReturnAddressAfterCall(t3)
+        storep t3, ReturnPC[cfr]
+        move cfr, t0
+        loadi Callee + PayloadOffset[cfr], t1
+        loadp JSFunction::m_executable[t1], t1
+        move t2, cfr
+        cloopCallNative executableOffsetToFunction[t1]
         restoreReturnAddressBeforeReturn(t3)
         loadp JITStackFrame::globalData[sp], t3
     else  

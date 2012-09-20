@@ -69,7 +69,9 @@ haveQt(5) {
         }
     }
 } else {
-    VERSION = $$QT_VERSION
+    MODULE_PRI = ../Tools/qmake/qt_webkit.pri
+    include($$MODULE_PRI)
+    VERSION = $$QT.webkit.VERSION
     DESTDIR = $$WEBKIT_DESTDIR
 }
 

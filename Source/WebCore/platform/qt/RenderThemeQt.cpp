@@ -869,7 +869,7 @@ String RenderThemeQt::fileListNameForWidth(const FileList* fileList, const Font&
         int n = fileList->length();
         string = QCoreApplication::translate("QWebPage", "%n file(s)",
                                              "number of chosen file",
-                                             n);
+                                             QCoreApplication::DefaultCodec, n);
     }
 
     return string;

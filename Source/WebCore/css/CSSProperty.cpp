@@ -23,7 +23,6 @@
 
 #include "CSSValueList.h"
 #include "MemoryInstrumentation.h"
-#include "PlatformString.h"
 #include "RenderStyleConstants.h"
 #include "StylePropertyShorthand.h"
 
@@ -477,6 +476,7 @@ bool CSSProperty::isInheritedProperty(CSSPropertyID propertyID)
     case CSSPropertyOutlineStyle:
     case CSSPropertyOutlineWidth:
     case CSSPropertyOverflow:
+    case CSSPropertyOverflowWrap:
     case CSSPropertyOverflowX:
     case CSSPropertyOverflowY:
     case CSSPropertyPadding:
@@ -714,7 +714,7 @@ bool CSSProperty::isInheritedProperty(CSSPropertyID propertyID)
 
 void CSSProperty::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CSS);
     info.addInstrumentedMember(m_value);
 }
 

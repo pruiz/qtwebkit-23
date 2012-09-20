@@ -70,22 +70,15 @@ void ScrollingTreeNodeMac::update(ScrollingTreeState* state)
     if (state->changedProperties() & (ScrollingTreeState::ScrollLayer | ScrollingTreeState::ContentsSize | ScrollingTreeState::ViewportRect))
         updateMainFramePinState(scrollPosition());
 
-    if ((state->changedProperties() & ScrollingTreeState::ShouldUpdateScrollLayerPositionOnMainThread)) {
-        bool updateScrollLayerPositionOnMainThread = shouldUpdateScrollLayerPositionOnMainThread();
-        
-        if (updateScrollLayerPositionOnMainThread) {
-            // We're transitioning to the slow "update scroll layer position on the main thread" mode.
-            // Initialize the probable main thread scroll position with the current scroll layer position.
-            if (state->changedProperties() & ScrollingTreeState::RequestedScrollPosition)
-                m_probableMainThreadScrollPosition = state->requestedScrollPosition();
-            else {
-                CGPoint scrollLayerPosition = m_scrollLayer.get().position;
-                m_probableMainThreadScrollPosition = IntPoint(-scrollLayerPosition.x, -scrollLayerPosition.y);
-            }
+    if ((state->changedProperties() & ScrollingTreeState::ShouldUpdateScrollLayerPositionOnMainThread) && shouldUpdateScrollLayerPositionOnMainThread()) {
+        // We're transitioning to the slow "update scroll layer position on the main thread" mode.
+        // Initialize the probable main thread scroll position with the current scroll layer position.
+        if (state->changedProperties() & ScrollingTreeState::RequestedScrollPosition)
+            m_probableMainThreadScrollPosition = state->requestedScrollPosition();
+        else {
+            CGPoint scrollLayerPosition = m_scrollLayer.get().position;
+            m_probableMainThreadScrollPosition = IntPoint(-scrollLayerPosition.x, -scrollLayerPosition.y);
         }
-        
-        if (scrollingTree()->scrollingPeformanceLoggingEnabled())
-            printf("SCROLLING: Switching to %s scrolling mode. Time: %f\n", updateScrollLayerPositionOnMainThread ? "slow" : "fast", WTF::monotonicallyIncreasingTime());
     }
 }
 
@@ -334,7 +327,7 @@ void ScrollingTreeNodeMac::logExposedUnfilledArea()
     unsigned unfilledArea = TileCache::blankPixelCountForTiles(tiles, viewportRect(), IntPoint(-scrollPosition.x(), -scrollPosition.y()));
 
     if (unfilledArea)
-        printf("SCROLLING: Exposed tileless area. Time: %f Unfilled Pixels: %u\n", WTF::monotonicallyIncreasingTime(), unfilledArea);
+        WTFLogAlways("SCROLLING: Exposed tileless area. Time: %f Unfilled Pixels: %u\n", WTF::monotonicallyIncreasingTime(), unfilledArea);
 }
 
 } // namespace WebCore

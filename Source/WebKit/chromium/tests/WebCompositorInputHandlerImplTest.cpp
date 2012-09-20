@@ -30,14 +30,14 @@
 #include "CCActiveGestureAnimation.h"
 #include "CCInputHandler.h"
 #include "CCSingleThreadProxy.h"
+#include "WebCompositorInitializer.h"
 #include "WebCompositorInputHandlerClient.h"
 #include "WebInputEvent.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 #include <public/WebCompositor.h>
 #include <public/WebFloatPoint.h>
 #include <public/WebPoint.h>
-
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
 #include <wtf/OwnPtr.h>
 
 using namespace WebKit;
@@ -93,7 +93,7 @@ public:
 
 TEST(WebCompositorInputHandlerImpl, fromIdentifier)
 {
-    WebCompositor::initialize(0);
+    WebKitTests::WebCompositorInitializer initializer(0);
     WebCore::DebugScopedSetImplThread alwaysImplThread;
 
     // Before creating any WebCompositorInputHandlers, lookups for any value should fail and not crash.
@@ -114,26 +114,13 @@ TEST(WebCompositorInputHandlerImpl, fromIdentifier)
 
     // After the compositor is destroyed, its entry should be removed from the map.
     EXPECT_EQ(0, WebCompositorInputHandler::fromIdentifier(compositorIdentifier));
-    WebCompositor::shutdown();
 }
-
-class WebCompositorInitializer {
-public:
-    WebCompositorInitializer()
-    {
-        WebCompositor::initialize(0);
-    }
-
-    ~WebCompositorInitializer()
-    {
-        WebCompositor::shutdown();
-    }
-};
 
 class WebCompositorInputHandlerImplTest : public testing::Test {
 public:
     WebCompositorInputHandlerImplTest()
-        : m_expectedDisposition(DidHandle)
+        : m_initializer(0)
+        , m_expectedDisposition(DidHandle)
     {
         m_inputHandler = WebCompositorInputHandlerImpl::create(&m_mockCCInputHandlerClient);
         m_inputHandler->setClient(&m_mockClient);
@@ -178,7 +165,7 @@ protected:
     MockWebCompositorInputHandlerClient m_mockClient;
     WebGestureEvent gesture;
     WebCore::DebugScopedSetImplThread alwaysImplThread;
-    WebCompositorInitializer initializer;
+    WebKitTests::WebCompositorInitializer m_initializer;
 
     enum ExpectedDisposition { DidHandle, DidNotHandle, DropEvent };
     ExpectedDisposition m_expectedDisposition;
@@ -200,14 +187,14 @@ TEST_F(WebCompositorInputHandlerImplTest, gestureScrollStarted)
     VERIFY_AND_RESET_MOCKS();
 
     gesture.type = WebInputEvent::GestureScrollUpdate;
-    gesture.deltaY = -40; // -Y means scroll down - i.e. in the +Y direction.
+    gesture.data.scrollUpdate.deltaY = -40; // -Y means scroll down - i.e. in the +Y direction.
     EXPECT_CALL(m_mockCCInputHandlerClient, scrollBy(testing::_, testing::Property(&WebCore::IntSize::height, testing::Gt(0))));
     m_inputHandler->handleInputEvent(gesture);
 
     VERIFY_AND_RESET_MOCKS();
 
     gesture.type = WebInputEvent::GestureScrollEnd;
-    gesture.deltaY = 0;
+    gesture.data.scrollUpdate.deltaY = 0;
     EXPECT_CALL(m_mockCCInputHandlerClient, scrollEnd());
     m_inputHandler->handleInputEvent(gesture);
 }
@@ -227,13 +214,13 @@ TEST_F(WebCompositorInputHandlerImplTest, gestureScrollOnMainThread)
     VERIFY_AND_RESET_MOCKS();
 
     gesture.type = WebInputEvent::GestureScrollUpdate;
-    gesture.deltaY = 40;
+    gesture.data.scrollUpdate.deltaY = 40;
     m_inputHandler->handleInputEvent(gesture);
 
     VERIFY_AND_RESET_MOCKS();
 
     gesture.type = WebInputEvent::GestureScrollEnd;
-    gesture.deltaY = 0;
+    gesture.data.scrollUpdate.deltaY = 0;
     m_inputHandler->handleInputEvent(gesture);
 }
 
@@ -266,7 +253,7 @@ TEST_F(WebCompositorInputHandlerImplTest, gesturePinch)
     VERIFY_AND_RESET_MOCKS();
 
     gesture.type = WebInputEvent::GesturePinchUpdate;
-    gesture.deltaX = 1.5;
+    gesture.data.pinchUpdate.scale = 1.5;
     gesture.x = 7;
     gesture.y = 13;
     EXPECT_CALL(m_mockCCInputHandlerClient, pinchGestureUpdate(1.5, WebCore::IntPoint(7, 13)));
@@ -275,7 +262,7 @@ TEST_F(WebCompositorInputHandlerImplTest, gesturePinch)
     VERIFY_AND_RESET_MOCKS();
 
     gesture.type = WebInputEvent::GesturePinchUpdate;
-    gesture.deltaX = 0.5;
+    gesture.data.pinchUpdate.scale = 0.5;
     gesture.x = 9;
     gesture.y = 6;
     EXPECT_CALL(m_mockCCInputHandlerClient, pinchGestureUpdate(.5, WebCore::IntPoint(9, 6)));
@@ -298,7 +285,7 @@ TEST_F(WebCompositorInputHandlerImplTest, gestureFlingStarted)
         .WillOnce(testing::Return(WebCore::CCInputHandlerClient::ScrollStarted));
 
     gesture.type = WebInputEvent::GestureFlingStart;
-    gesture.deltaX = 10;
+    gesture.data.flingStart.velocityX = 10;
     EXPECT_CALL(m_mockCCInputHandlerClient, scheduleAnimation());
     m_inputHandler->handleInputEvent(gesture);
 
@@ -359,8 +346,8 @@ TEST_F(WebCompositorInputHandlerImplTest, gestureFlingAnimates)
     WebPoint flingPoint = WebPoint(7, 13);
     WebPoint flingGlobalPoint = WebPoint(17, 23);
     int modifiers = 7;
-    gesture.deltaX = flingDelta.x;
-    gesture.deltaY = flingDelta.y;
+    gesture.data.flingStart.velocityX = flingDelta.x;
+    gesture.data.flingStart.velocityY = flingDelta.y;
     gesture.x = flingPoint.x;
     gesture.y = flingPoint.y;
     gesture.globalX = flingGlobalPoint.x;
@@ -443,8 +430,8 @@ TEST_F(WebCompositorInputHandlerImplTest, gestureFlingTransferResets)
     WebPoint flingPoint = WebPoint(7, 13);
     WebPoint flingGlobalPoint = WebPoint(17, 23);
     int modifiers = 1;
-    gesture.deltaX = flingDelta.x;
-    gesture.deltaY = flingDelta.y;
+    gesture.data.flingStart.velocityX = flingDelta.x;
+    gesture.data.flingStart.velocityY = flingDelta.y;
     gesture.x = flingPoint.x;
     gesture.y = flingPoint.y;
     gesture.globalX = flingGlobalPoint.x;
@@ -522,8 +509,8 @@ TEST_F(WebCompositorInputHandlerImplTest, gestureFlingTransferResets)
     flingPoint = WebPoint(95, 87);
     flingGlobalPoint = WebPoint(32, 71);
     modifiers = 2;
-    gesture.deltaX = flingDelta.x;
-    gesture.deltaY = flingDelta.y;
+    gesture.data.flingStart.velocityX = flingDelta.x;
+    gesture.data.flingStart.velocityY = flingDelta.y;
     gesture.x = flingPoint.x;
     gesture.y = flingPoint.y;
     gesture.globalX = flingGlobalPoint.x;

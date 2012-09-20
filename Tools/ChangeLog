@@ -1,3 +1,430 @@
+2012-09-06  Peter Beverloo  <peter@chromium.org>
+
+        Introduce the Chromium Android Release (Tests) bot
+        https://bugs.webkit.org/show_bug.cgi?id=95980
+
+        Reviewed by Adam Barth.
+
+        This adds the Chromium Android Release (Tests) bot to the WebKit waterfall,
+        which will be running layout tests on actual Android devices. Right now,
+        four Galaxy Nexus phones are attached.
+
+        * BuildSlaveSupport/build.webkit.org-config/config.json:
+
+2012-09-06  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Use WebCompositorSupport functions instead of WebCompositor statics
+        https://bugs.webkit.org/show_bug.cgi?id=96007
+
+        Reviewed by Adrienne Walker.
+
+        Fixes initialization / settings code to use WebCompositorSupport.
+
+        * DumpRenderTree/chromium/DumpRenderTree.cpp:
+        (main):
+        * DumpRenderTree/chromium/TestShell.cpp:
+        (TestShell::initialize):
+        (TestShell::setPerTilePaintingEnabled):
+
+2012-09-06  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Provide implementation for PlatformWebView::windowFrame()
+        https://bugs.webkit.org/show_bug.cgi?id=95995
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Provide proper implementation for PlatformWebView::windowFrame()
+        in EFL's WebKitTestRunner.
+
+        * WebKitTestRunner/efl/PlatformWebViewEfl.cpp:
+        (WTR::PlatformWebView::windowFrame):
+
+2012-09-06  Fady Samuel  <fsamuel@chromium.org>
+
+        Fix WTF.Lrint on 32-bit platforms
+        https://bugs.webkit.org/show_bug.cgi?id=96003
+
+        Reviewed by Benjamin Poulain.
+
+        Fixed failing WTF.Lrint test on 32-bit platforms.
+
+        * TestWebKitAPI/Tests/WTF/MathExtras.cpp:
+        (TestWebKitAPI::TEST):
+
+2012-09-06  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Add the local and remote description functionality to RTCPeerConnection
+        https://bugs.webkit.org/show_bug.cgi?id=95839
+
+        Reviewed by Adam Barth.
+
+        In addition to adding the new methods to MockWebRTCPeerConnectionHandler I cleaned
+        up the task definitions a bit. There was no need to have them in the header file.
+
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.cpp:
+        (RTCSessionDescriptionRequestSuccededTask):
+        (RTCSessionDescriptionRequestSuccededTask::RTCSessionDescriptionRequestSuccededTask):
+        (RTCSessionDescriptionRequestFailedTask):
+        (RTCSessionDescriptionRequestFailedTask::RTCSessionDescriptionRequestFailedTask):
+        (RTCVoidRequestTask):
+        (RTCVoidRequestTask::RTCVoidRequestTask):
+        (MockWebRTCPeerConnectionHandler::createOffer):
+        (MockWebRTCPeerConnectionHandler::setLocalDescription):
+        (MockWebRTCPeerConnectionHandler::setRemoteDescription):
+        (MockWebRTCPeerConnectionHandler::localDescription):
+        (MockWebRTCPeerConnectionHandler::remoteDescription):
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.h:
+        (MockWebRTCPeerConnectionHandler):
+
+2012-09-06  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        [Qt] Fix build on Mac OS X 10.6
+        https://bugs.webkit.org/show_bug.cgi?id=95200
+
+        Reviewed by Tor Arne Vestbø.
+
+        The build on Mac OS X 10.6 is broken when using QuickTime. Enable it only for
+        10.7 and newer.
+
+        * qmake/mkspecs/features/features.prf:
+
+2012-09-06  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [WKTR] addSelectionKey should be mapped to "Control" modifiers on other OSes than Mac
+        https://bugs.webkit.org/show_bug.cgi?id=95973
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Correctly map "addSelectionKey" to "Control" modifier
+        in WKTR's EventSender on other OSes than Mac OS X,
+        instead of mapping it to the "Meta" modifier.
+
+        * WebKitTestRunner/InjectedBundle/EventSendingController.cpp:
+        (WTR::parseModifier):
+
+2012-09-06  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [nrwt] Harden against empty stdout/stderr after stopping a crashed/timed out driver
+        https://bugs.webkit.org/show_bug.cgi?id=95710
+
+        Reviewed by Dirk Pranke.
+
+        The stdout / stderr output can be None so make sure
+        we won't raise an exception in this case.
+
+        * Scripts/webkitpy/layout_tests/port/driver.py:
+        (Driver.run_test):
+
+2012-09-06  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Sanitize URLs in EWebLauncher / Minibrowser
+        https://bugs.webkit.org/show_bug.cgi?id=95849
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Sanitize URLs passed by the user as program
+        argument or typed in the URL bar in order to
+        be more tolerant.
+
+        * EWebLauncher/CMakeLists.txt:
+        * EWebLauncher/main.c:
+        (main):
+        * EWebLauncher/url_bar.c:
+        (_url_bar_url_get_with_protocol):
+        (on_urlbar_key_down):
+        * EWebLauncher/url_utils.c: Added.
+        (has_scheme):
+        (url_from_user_input): Add utility function to construct a
+        URL from user input.
+        * EWebLauncher/url_utils.h: Added.
+        * MiniBrowser/efl/CMakeLists.txt:
+        * MiniBrowser/efl/main.c:
+        (main):
+
+2012-09-06  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        [Qt] Various small Windows / MSVC build fixes
+        https://bugs.webkit.org/show_bug.cgi?id=95934
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        setFocus takes a boolean as argument: Don't try to implicitly convert
+        an enum to a boolean, MSVC doesn't like that. The intent here is to
+        enable focus, so just pass true.
+
+        * WebKitTestRunner/qt/PlatformWebViewQt.cpp:
+        (WTR::PlatformWebView::focus):
+
+2012-09-06  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        [Qt] Fix build with ANGLE on platforms that provide EGL/GLESv2
+        https://bugs.webkit.org/show_bug.cgi?id=95965
+
+        Reviewed by Tor Arne Vestbø.
+
+        Add ANGLE as a static library module to the Qt WebKit build system.
+
+        * qmake/mkspecs/features/default_post.prf:
+        * qmake/mkspecs/modules/angle.prf: Added.
+
+2012-09-06  Andras Becsi  <andras.becsi@nokia.com>
+
+        [WK2] Make [Qt]ViewportHandler cross platform
+        https://bugs.webkit.org/show_bug.cgi?id=91257
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Remove initial scale from viewport info item since it is
+        set to -1 after applied thus it does not hold any valuable
+        information.
+
+        * MiniBrowser/qt/qml/ViewportInfoItem.qml:
+
+2012-09-05  Tony Chang  <tony@chromium.org>
+
+        [chromium] Remove dependency on webkit_user_agent
+        https://bugs.webkit.org/show_bug.cgi?id=95886
+
+        Reviewed by Adam Barth.
+
+        The code isn't used by DumpRenderTree.
+
+        * DumpRenderTree/DumpRenderTree.gyp/DumpRenderTree.gyp:
+
+2012-09-05  Rick Byers  <rbyers@chromium.org>
+
+        Update chromium DumpRenderTree for new WebGestureEvent fields
+        https://bugs.webkit.org/show_bug.cgi?id=95573
+
+        Reviewed by James Robinson.
+
+        Update EventSender to write gesture details into the appropriate
+        type-specific WebGestureEvent fields.
+        * DumpRenderTree/chromium/TestRunner/EventSender.cpp:
+        (EventSender::gestureEvent):
+        (EventSender::gestureFlingStart):
+
+2012-09-05  Dirk Pranke  <dpranke@chromium.org>
+
+        NRWT lies about the number of tests that it's skipping when used with --repeat-each
+        https://bugs.webkit.org/show_bug.cgi?id=95789
+
+        Reviewed by Ojan Vafai.
+
+        Fix miscalculation in log message.
+
+        * Scripts/webkitpy/layout_tests/views/printing.py:
+        (Printer.print_found):
+
+2012-09-05  Kenichi Ishibashi  <bashi@chromium.org>
+
+        Unreviewed, rolling out r127612, r127660, and r127664.
+        http://trac.webkit.org/changeset/127612
+        http://trac.webkit.org/changeset/127660
+        http://trac.webkit.org/changeset/127664
+        https://bugs.webkit.org/show_bug.cgi?id=95920
+
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.cpp:
+        (MockWebRTCPeerConnectionHandler::SuccessCallbackTask::SuccessCallbackTask):
+        (MockWebRTCPeerConnectionHandler::SuccessCallbackTask::runIfValid):
+        (MockWebRTCPeerConnectionHandler::FailureCallbackTask::FailureCallbackTask):
+        (MockWebRTCPeerConnectionHandler::FailureCallbackTask::runIfValid):
+        (MockWebRTCPeerConnectionHandler::createOffer):
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.h:
+        (MockWebRTCPeerConnectionHandler):
+        (SuccessCallbackTask):
+        (FailureCallbackTask):
+
+2012-09-05  Allan Sandfeld Jensen  <allan.jensen@nokia.com>
+
+        Ignore-metrics includes scroll offsets.
+        https://bugs.webkit.org/show_bug.cgi?id=95845
+
+        Reviewed by Dirk Pranke.
+
+        Strip scroll-offsets the same way scroll-height and scroll-width is stripped.
+
+        * Scripts/old-run-webkit-tests:
+        (stripMetrics):
+        * Scripts/webkitpy/layout_tests/port/driver.py:
+        (DriverOutput):
+
+2012-09-05  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed test fix.
+
+        Including a plugin source file into the build that was added in r127595.
+
+        * GNUmakefile.am:
+
+2012-09-05  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Add the local and remote description functionality to RTCPeerConnection
+        https://bugs.webkit.org/show_bug.cgi?id=95839
+
+        Reviewed by Adam Barth.
+
+        In addition to adding the new methods to MockWebRTCPeerConnectionHandler I cleaned
+        up the task definitions a bit. There was no need to have them in the header file.
+
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.cpp:
+        (RTCSessionDescriptionRequestSuccededTask):
+        (RTCSessionDescriptionRequestSuccededTask::RTCSessionDescriptionRequestSuccededTask):
+        (RTCSessionDescriptionRequestFailedTask):
+        (RTCSessionDescriptionRequestFailedTask::RTCSessionDescriptionRequestFailedTask):
+        (RTCVoidRequestTask):
+        (RTCVoidRequestTask::RTCVoidRequestTask):
+        (MockWebRTCPeerConnectionHandler::createOffer):
+        (MockWebRTCPeerConnectionHandler::setLocalDescription):
+        (MockWebRTCPeerConnectionHandler::setRemoteDescription):
+        (MockWebRTCPeerConnectionHandler::localDescription):
+        (MockWebRTCPeerConnectionHandler::remoteDescription):
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.h:
+        (MockWebRTCPeerConnectionHandler):
+
+2012-09-05  Kangil Han  <kangil.han@samsung.com>
+
+        [EFL] Remove '+=' usage in String
+        https://bugs.webkit.org/show_bug.cgi?id=95808
+
+        Reviewed by Benjamin Poulain.
+
+        Replaced use of String operator '+=' with StringBuilder.append*() in order to adopt efficient String concatenation.
+
+        * DumpRenderTree/efl/DumpRenderTreeChrome.cpp:
+        (descriptionSuitableForTestResult):
+
+2012-09-05  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Provide implementation for TestRunner::pathToLocalResource()
+        https://bugs.webkit.org/show_bug.cgi?id=95842
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Provide proper implementation for TestRunner::pathToLocalResource()
+        in EFL WKTR, identical to the one for DumpRenderTree.
+
+        Map /tmp to ${DUMPRENDERTREE_TEMP} environment variable and
+        /tmp/LayoutTests to ${LOCAL_RESOURCE_ROOT} so that local resources
+        are found my WebKitTestRunner.
+
+        * WebKitTestRunner/InjectedBundle/efl/TestRunnerEfl.cpp:
+        (WTR::TestRunner::pathToLocalResource):
+
+2012-09-05  Brady Eidson  <beidson@apple.com>
+
+        Frequent crashes in PluginView::scriptObject under runtimeObjectCustomGetOwnPropertySlot
+        <rdar://problem/12142226> and https://bugs.webkit.org/show_bug.cgi?id=95026
+
+        Reviewed by Andy Estes.
+
+        Add a plug-in that always fails to initialize:
+        * DumpRenderTree/TestNetscapePlugIn/Tests/NPPNewFails.cpp: Added.
+        (NPPNewFails):
+        (NPPNewFails::NPPNewFails):
+        (NPPNewFails::NPP_New):
+
+        Add it to all the project files:
+        * DumpRenderTree/DumpRenderTree.gypi:
+        * DumpRenderTree/DumpRenderTree.xcodeproj/project.pbxproj:
+        * DumpRenderTree/TestNetscapePlugIn/CMakeLists.txt:
+        * DumpRenderTree/TestNetscapePlugIn/win/TestNetscapePlugin.vcproj:
+        * DumpRenderTree/qt/TestNetscapePlugin/TestNetscapePlugin.pro:
+
+2012-09-05  Tor Arne Vestbø  <tor.arne.vestbo@nokia.com>
+
+        [Qt] Fix makefile race condition between derived sources and target
+
+        r121966 removed too much of the old qmake logic, including the rule
+        that ensured that qmake_all would not trigger dual runs of qmake --
+        one of the derived sources -qmake-all rule, and one for making the
+        derived sources.
+
+        We now follow a similar pattern as before, by introducing a custom
+        target that explicitly depends on the derived sources' qmake-all before
+        doing a manual run of make. That ensures a single qmake run for the derived
+        sources.
+
+        https://bugs.webkit.org/show_bug.cgi?id=93847
+
+        Reviewed by Csaba Osztrogonác.
+
+        * qmake/mkspecs/features/functions.prf:
+
+2012-09-05  Christophe Dumez  <christophe.dumez@intel.com>
+
+        WKTR doesn't implement dumpWillCacheResponse()
+        https://bugs.webkit.org/show_bug.cgi?id=94607
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Define shouldCacheResponse() callback in resource
+        load client and provide implementation for
+        dumpWillCacheResponse() in WebKitTestRunner.
+
+        * WebKitTestRunner/InjectedBundle/Bindings/TestRunner.idl:
+        * WebKitTestRunner/InjectedBundle/InjectedBundlePage.cpp:
+        (WTR::InjectedBundlePage::InjectedBundlePage):
+        (WTR::InjectedBundlePage::shouldCacheResponse):
+        (WTR):
+        * WebKitTestRunner/InjectedBundle/InjectedBundlePage.h:
+        (InjectedBundlePage):
+        * WebKitTestRunner/InjectedBundle/TestRunner.cpp:
+        (WTR::TestRunner::TestRunner):
+        * WebKitTestRunner/InjectedBundle/TestRunner.h:
+        (WTR::TestRunner::dumpWillCacheResponse):
+        (WTR::TestRunner::shouldDumpWillCacheResponse):
+        (TestRunner):
+
+2012-09-05  Kaustubh Atrawalkar  <kaustubh@motorola.com>
+
+        [DRT] LTC:: Move printing related APIs from LayoutTestController to Internals
+        https://bugs.webkit.org/show_bug.cgi?id=92735
+
+        Reviewed by Hajime Morita.
+
+        Move numberOfPages, pageProperty & pageSizeAndMarginsInPixels in Internals and remove duplicated code from DumprenderTree & WebkitTestRunner.
+
+        * DumpRenderTree/TestRunner.cpp:
+        (TestRunner::staticFunctions):
+        * DumpRenderTree/TestRunner.h:
+        (TestRunner):
+        * DumpRenderTree/blackberry/TestRunnerBlackBerry.cpp:
+        (TestRunner::addUserStyleSheet):
+        * DumpRenderTree/chromium/DRTTestRunner.cpp:
+        (DRTTestRunner::DRTTestRunner):
+        (DRTTestRunner::hasCustomPageSizeStyle):
+        * DumpRenderTree/chromium/DRTTestRunner.h:
+        (DRTTestRunner):
+        * DumpRenderTree/efl/TestRunnerEfl.cpp:
+        * DumpRenderTree/gtk/TestRunnerGtk.cpp:
+        * DumpRenderTree/mac/TestRunnerMac.mm:
+        * DumpRenderTree/qt/TestRunnerQt.cpp:
+        (TestRunner::evaluateScriptInIsolatedWorld):
+        * DumpRenderTree/qt/TestRunnerQt.h:
+        (TestRunner):
+        * DumpRenderTree/win/TestRunnerWin.cpp:
+        * DumpRenderTree/wx/TestRunnerWx.cpp:
+        (TestRunner::abortModal):
+        * WebKitTestRunner/InjectedBundle/Bindings/TestRunner.idl:
+        * WebKitTestRunner/InjectedBundle/TestRunner.cpp:
+        (WTR):
+        * WebKitTestRunner/InjectedBundle/TestRunner.h:
+        (TestRunner):
+
+2012-09-05  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        [Qt] Automate the use of AllInOne files in the Qt build
+        https://bugs.webkit.org/show_bug.cgi?id=95837
+
+        Reviewed by Tor Arne Vestbø.
+
+        New feature file that implements the all-in-one file automation by
+        adding the requested all-in-one files to SOURCES and removing the files
+        it includes from SOURCES.
+
+        * qmake/mkspecs/features/use_all_in_one_files.prf: Added.
+
 2012-09-04  Tim Horton  <timothy_horton@apple.com>
 
         Have NRWT log more output when crash logs are missing

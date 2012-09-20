@@ -28,9 +28,9 @@
 
 #include "CSSValueList.h"
 #include "MemoryInstrumentation.h"
-#include "PlatformString.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/text/StringBuilder.h>
+#include <wtf/text/WTFString.h>
 
 namespace WebCore {
 
@@ -107,7 +107,7 @@ PassRefPtr<WebKitCSSTransformValue> WebKitCSSTransformValue::cloneForCSSOM() con
 
 void WebKitCSSTransformValue::reportDescendantMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CSS);
+    MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CSS);
     CSSValueList::reportDescendantMemoryUsage(memoryObjectInfo);
 }
 

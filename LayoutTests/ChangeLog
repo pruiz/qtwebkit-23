@@ -1,3 +1,1234 @@
+2012-09-07  Anna Cavender  <annacc@chromium.org>
+
+        Rebaselines for windows due to r127831.
+
+        Unreviewed gardening.
+
+        * platform/chromium-linux/media/track/track-cue-rendering-horizontal-expected.txt: Removed.
+        * platform/chromium-win/media/track/track-cue-rendering-horizontal-expected.png:
+        * platform/chromium-win/media/track/track-cue-rendering-horizontal-expected.txt:
+
+2012-09-06  Anna Cavender  <annacc@chromium.org>
+
+        Rebaselines due to r127831.
+
+        Unreviewed gardening.
+
+        * platform/chromium-linux/media/track/track-cue-rendering-horizontal-expected.png:
+        * platform/chromium-linux/media/track/track-cue-rendering-horizontal-expected.txt: Added.
+        * platform/chromium-linux/media/track/track-cue-rendering-vertical-expected.png:
+        * platform/chromium-linux/media/track/track-cue-rendering-vertical-expected.txt:
+        * platform/chromium-mac-snowleopard/media/track/track-cue-rendering-horizontal-expected.png:
+        * platform/chromium-mac-snowleopard/media/track/track-cue-rendering-vertical-expected.png:
+        * platform/chromium-mac/media/track/track-cue-rendering-horizontal-expected.png:
+        * platform/chromium-mac/media/track/track-cue-rendering-horizontal-expected.txt:
+        * platform/chromium-mac/media/track/track-cue-rendering-vertical-expected.png:
+        * platform/chromium-mac/media/track/track-cue-rendering-vertical-expected.txt:
+
+2012-09-06  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Updating baselines for two MathML tests after r127769.
+
+        Removing failure expectations for tests fixed by changes in r127798,
+        rollout in r127774 and rebaseline in r127825.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/mathml/presentation/roots-expected.txt:
+        * platform/gtk/mathml/presentation/sup-expected.txt:
+
+2012-09-06  Matt Falkenhagen  <falken@chromium.org>
+
+        [Tests] Skip Dialog element tests on Win
+        https://bugs.webkit.org/show_bug.cgi?id=96051
+
+        Reviewed by Hajime Morita.
+
+        Dialog is not yet enabled except on Chromium. Dialog tests should have
+        been added to the Win port's skipped list as part of r122420.
+
+        * platform/win/Skipped:
+
+2012-09-06  Csaba Osztrogonác  <ossy@webkit.org>
+
+        REGRESSION(127810): It broke inspector/debugger/debugger-expand-scope.html
+        https://bugs.webkit.org/show_bug.cgi?id=96065
+
+        Unreviewed, reverting the expected file change.
+
+        * inspector/debugger/debugger-expand-scope-expected.txt:
+
+2012-09-06  Elliott Sprehn  <esprehn@chromium.org>
+
+        Add methods to CounterDirectives to clean up StyleBuilder and RenderCounter.
+        https://bugs.webkit.org/show_bug.cgi?id=94587
+
+        Reviewed by Julien Chaffraix.
+
+        Tests for bug 94642 exposing an unitialized read when using counter-reset and
+        counter-increment: inherit.
+
+        * fast/css/counters/counter-reset-inherit-bug-94642-expected.html: Added.
+        * fast/css/counters/counter-reset-inherit-bug-94642.html: Added.
+
+2012-09-06  Joanmarie Diggs  <jdiggs@igalia.com>
+
+        [Gtk] accessibility/canvas-description-and-role expected results needed
+        https://bugs.webkit.org/show_bug.cgi?id=95644
+
+        Reviewed by Martin Robinson.
+
+        Generated expected results for Gtk. These results reflect the revised
+        mapping of CanvasRole to ATK_ROLE_CANVAS rather than ATK_ROLE_IMAGE.
+
+        * platform/gtk/accessibility/canvas-description-and-role-expected.txt: Added.
+
+2012-09-06  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r127808.
+        http://trac.webkit.org/changeset/127808
+        https://bugs.webkit.org/show_bug.cgi?id=96057
+
+        geoff rolled back in his change, but not this part (Requested
+        by thorton on #webkit).
+
+        * inspector/debugger/debugger-expand-scope-expected.txt:
+
+2012-09-06  Pravin D  <pravind.2k4@gmail.com>
+
+        fast/table/empty-row-crash.html and fast/table/inline-form-assert.html should be dumpAsText tests
+        https://bugs.webkit.org/show_bug.cgi?id=95613
+
+        Reviewed by Julien Chaffraix.
+
+        Modified the test cases empty-row-crash.html and inline-form-assert.html to dumpAsText tests.
+        As the testcases check for crash/assert and not for the correctness of content layout or painting
+        they can be safely modified to dumpAsText tests.
+
+        * fast/table/empty-row-crash-expected.txt: Added.
+         New expected file.
+        * fast/table/empty-row-crash.html:
+         Added a short description about the testcase.
+
+        * fast/table/inline-form-assert-expected.txt: Added.
+         New expected file.
+        * fast/table/inline-form-assert.html:
+
+        * platform/chromium-linux/fast/table/empty-row-crash-expected.png: Removed.
+        * platform/chromium-linux/fast/table/inline-form-assert-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/table/empty-row-crash-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/table/inline-form-assert-expected.png: Removed.
+        * platform/chromium-mac/fast/table/empty-row-crash-expected.png: Removed.
+        * platform/chromium-mac/fast/table/inline-form-assert-expected.png: Removed.
+        * platform/chromium-win/fast/table/empty-row-crash-expected.png: Removed.
+        * platform/chromium-win/fast/table/empty-row-crash-expected.txt: Removed.
+        * platform/chromium-win/fast/table/inline-form-assert-expected.png: Removed.
+        * platform/chromium-win/fast/table/inline-form-assert-expected.txt: Removed.
+        * platform/efl/fast/table/empty-row-crash-expected.png: Removed.
+        * platform/efl/fast/table/empty-row-crash-expected.txt: Removed.
+        * platform/efl/fast/table/inline-form-assert-expected.png: Removed.
+        * platform/efl/fast/table/inline-form-assert-expected.txt: Removed.
+        * platform/gtk/fast/table/empty-row-crash-expected.png: Removed.
+        * platform/gtk/fast/table/empty-row-crash-expected.txt: Removed.
+        * platform/gtk/fast/table/inline-form-assert-expected.png: Removed.
+        * platform/gtk/fast/table/inline-form-assert-expected.txt: Removed.
+        * platform/mac/fast/table/empty-row-crash-expected.png: Removed.
+        * platform/mac/fast/table/empty-row-crash-expected.txt: Removed.
+        * platform/mac/fast/table/inline-form-assert-expected.png: Removed.
+        * platform/mac/fast/table/inline-form-assert-expected.txt: Removed.
+        * platform/qt/fast/table/empty-row-crash-expected.png: Removed.
+        * platform/qt/fast/table/empty-row-crash-expected.txt: Removed.
+        * platform/qt/fast/table/inline-form-assert-expected.png: Removed.
+        * platform/qt/fast/table/inline-form-assert-expected.txt: Removed.
+         Removed obsolete baselines.
+
+2012-09-06  Geoffrey Garen  <ggaren@apple.com>
+
+        Rolled back in <http://trac.webkit.org/changeset/127698> with a fix for
+        fast/dom/HTMLScriptElement/script-reexecution-pretty-diff.html.
+
+        Added a more explicit test for the feature I broke in 
+        fast/dom/HTMLScriptElement/script-reexecution-pretty-diff.html.
+
+        Reviewed by Gavin Barraclough.
+
+            Named functions should not allocate scope objects for their names
+            https://bugs.webkit.org/show_bug.cgi?id=95659
+
+            Reviewed by Oliver Hunt.
+
+        * fast/dom/HTMLScriptElement/script-reexecution.html:
+        * fast/js/function-name-is-in-scope-expected.txt: Added.
+        * fast/js/function-name-is-in-scope.html: Added.
+
+2012-09-06  Tim Horton  <timothy_horton@apple.com>
+
+        Unreviewed, revert part of http://trac.webkit.org/changeset/127698
+        which accidentally didn't get reverted in
+        http://trac.webkit.org/changeset/127774.
+
+        * inspector/debugger/debugger-expand-scope-expected.txt:
+
+2012-09-06  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        [Qt] Unskip two encoding tests that pass now
+        https://bugs.webkit.org/show_bug.cgi?id=96013
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        The result for frame-default-enc was incorrect and we succeed in
+        producing the existing cross-platform result. The other test passes
+        just fine.
+
+        * platform/qt/Skipped:
+        * platform/qt/fast/encoding/frame-default-enc-expected.txt: Removed.
+
+2012-09-06  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] 2 mathml tests need rebaseline after r127769
+        https://bugs.webkit.org/show_bug.cgi?id=96009
+
+        Unreviewed EFL gardening.
+
+        Update baselines for 2 mathml test cases needed after
+        r127769.
+
+        * platform/efl/mathml/presentation/roots-expected.png:
+        * platform/efl/mathml/presentation/roots-expected.txt:
+        * platform/efl/mathml/presentation/sup-expected.png:
+        * platform/efl/mathml/presentation/sup-expected.txt:
+
+2012-09-06  Tony Chang  <tony@chromium.org>
+
+        Chromium Linux EWS bots and CQ bots are flaky
+        https://bugs.webkit.org/show_bug.cgi?id=96041
+
+        Reviewed by Adam Barth.
+
+        Skip platform/chromium-linux/compositing/gestures tests on the
+        Chromium Linux EWS and CQ bots. By marking them as flaky, they won't
+        be run (the bots use --skip-failing-tests which causes them to skip
+        these tests).  These will still run on the waterfall bots.
+
+        * platform/chromium/TestExpectations:
+
+2012-09-06  Adam Barth  <abarth@webkit.org>
+
+        New tests introduced in r127704 fail
+        https://bugs.webkit.org/show_bug.cgi?id=95952
+
+        Reviewed by Dan Bernstein.
+
+        Use the testRunner rather than layoutTestController because
+        layoutTestControler doesn't exist anymore.
+
+        * fast/viewport/viewport-limits-adjusted-for-no-user-scale-control.html:
+        * fast/viewport/viewport-limits-adjusted-for-no-user-scale.html:
+
+2012-09-06  Alok Priyadarshi  <alokp@chromium.org>
+
+        [chromium] Remove failures for acceletared-drawing tests.
+
+        Unreviewed.
+
+        Update chromium TestExpectations to remove failures for accelerated-painting.
+        They were fixed in r127294.
+
+        * platform/chromium/TestExpectations:
+
+2012-09-06  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Classify several test cases in TestExpectations
+        https://bugs.webkit.org/show_bug.cgi?id=95947
+
+        Unreviewed EFL gardening.
+
+        Update TestExpectations to classify a few test case failures
+        as being caused by lack on undo/redo stack implementation
+        in EFL WK2.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-09-06  Andrei Poenaru  <poenaru@adobe.com>
+
+        Web Inspector: Protocol Extension: Add "regionLayoutUpdate" event
+        https://bugs.webkit.org/show_bug.cgi?id=93443
+
+        Reviewed by Alexander Pavlov.
+
+        Validate "regionLayoutUpdate" event.
+
+        * inspector/styles/protocol-css-regions-commands-expected.txt:
+        * inspector/styles/protocol-css-regions-commands.html:
+
+2012-09-06  Anna Cavender  <annacc@chromium.org>
+
+        ASSERT reached when TextTrack.mode is set to DISABLED.
+        https://bugs.webkit.org/show_bug.cgi?id=94651
+
+        Reviewed by Eric Carlson.
+
+        This patch ensures that cues that have already been added to the
+        cueTree in HTMLMediaElement, are not added again.
+
+        * media/track/track-mode-disabled-crash-expected.txt: Added.
+        * media/track/track-mode-disabled-crash.html: Added.
+
+2012-09-06  Geoffrey Garen  <ggaren@apple.com>
+
+        Unskipped fast/dom/HTMLScriptElement/script-reexecution-pretty-diff.html
+        because I rolled out the patch that broke it.
+
+        * platform/qt/Skipped:
+        * platform/win/Skipped:
+
+2012-09-06  Alex Sakhartchouk  <alexst@chromium.org>
+
+        [chromium] Need to rebaseline chromium tests after hidpi changes
+        https://bugs.webkit.org/show_bug.cgi?id=95579
+
+        Reviewed by James Robinson.
+
+        Adding double resolution files for hidpi tests and updating expectations for broken image tests. 
+
+        * platform/chromium-linux/fast/hidpi/broken-image-icon-hidpi-expected.png: Removed.
+        * platform/chromium-linux/fast/hidpi/broken-image-with-size-hidpi-expected.png: Removed.
+        * platform/chromium-linux/fast/hidpi/device-scale-factor-paint-expected.png: Removed.
+        * platform/chromium-linux/fast/hidpi/focus-rings-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/broken-image-icon-hidpi-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/broken-image-with-size-hidpi-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/clip-text-in-hidpi-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/device-scale-factor-paint-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/focus-rings-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/image-set-as-background-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/image-set-background-dynamic-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/image-set-background-repeat-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/image-set-background-repeat-without-size-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/image-set-border-image-comparison-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/image-set-border-image-dynamic-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/image-set-border-image-simple-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/image-set-in-content-dynamic-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/image-set-out-of-order-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/image-set-simple-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/image-set-without-specified-width-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/resize-corner-hidpi-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/hidpi/video-controls-in-hidpi-expected.png: Removed.
+        * platform/chromium-mac/fast/hidpi/clip-text-in-hidpi-expected.png:
+        * platform/chromium-mac/fast/hidpi/device-scale-factor-paint-expected.png: Removed.
+        * platform/chromium-mac/fast/hidpi/focus-rings-expected.png:
+        * platform/chromium-mac/fast/hidpi/image-set-as-background-expected.png:
+        * platform/chromium-mac/fast/hidpi/image-set-background-dynamic-expected.png:
+        * platform/chromium-mac/fast/hidpi/image-set-background-repeat-expected.png:
+        * platform/chromium-mac/fast/hidpi/image-set-background-repeat-without-size-expected.png:
+        * platform/chromium-mac/fast/hidpi/image-set-border-image-comparison-expected.png:
+        * platform/chromium-mac/fast/hidpi/image-set-border-image-dynamic-expected.png:
+        * platform/chromium-mac/fast/hidpi/image-set-border-image-simple-expected.png:
+        * platform/chromium-mac/fast/hidpi/image-set-in-content-dynamic-expected.png:
+        * platform/chromium-mac/fast/hidpi/image-set-out-of-order-expected.png:
+        * platform/chromium-mac/fast/hidpi/image-set-simple-expected.png:
+        * platform/chromium-mac/fast/hidpi/image-set-without-specified-width-expected.png:
+        * platform/chromium-mac/fast/hidpi/resize-corner-hidpi-expected.png:
+        * platform/chromium-mac/fast/hidpi/video-controls-in-hidpi-expected.png:
+        * platform/chromium-win/fast/hidpi/clip-text-in-hidpi-expected.png:
+        * platform/chromium-win/fast/hidpi/device-scale-factor-paint-expected.png:
+        * platform/chromium-win/fast/hidpi/focus-rings-expected.png:
+        * platform/chromium-win/fast/hidpi/image-set-as-background-expected.png:
+        * platform/chromium-win/fast/hidpi/image-set-background-dynamic-expected.png:
+        * platform/chromium-win/fast/hidpi/image-set-background-repeat-expected.png:
+        * platform/chromium-win/fast/hidpi/image-set-background-repeat-without-size-expected.png:
+        * platform/chromium-win/fast/hidpi/image-set-border-image-comparison-expected.png:
+        * platform/chromium-win/fast/hidpi/image-set-border-image-dynamic-expected.png:
+        * platform/chromium-win/fast/hidpi/image-set-border-image-simple-expected.png:
+        * platform/chromium-win/fast/hidpi/image-set-in-content-dynamic-expected.png:
+        * platform/chromium-win/fast/hidpi/image-set-out-of-order-expected.png:
+        * platform/chromium-win/fast/hidpi/image-set-simple-expected.png:
+        * platform/chromium-win/fast/hidpi/image-set-without-specified-width-expected.png:
+        * platform/chromium-win/fast/hidpi/resize-corner-hidpi-expected.png:
+        * platform/chromium-win/fast/hidpi/video-controls-in-hidpi-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-09-06  Roger Fong  <roger_fong@apple.com>
+
+        Unreviewed. Skipping failing test: fast/forms/number/number-interactive-validation-required.html
+        Interactive form validation is not enabled on Windows. It's fine to skip this test.
+
+        * platform/win/Skipped:
+
+2012-09-06  David Barton  <dbarton@mathscribe.com>
+
+        mathml.css: Add more { white-space: nowrap } declarations
+        https://bugs.webkit.org/show_bug.cgi?id=95404
+
+        Reviewed by Eric Seidel.
+
+        mathml.css declared { white-space: nowrap } for mrow, mfenced, msqrt. It is also needed
+        for other tags such as msub, msup, msubsup.
+
+        Added a test to mathml/presentation/sup.xhtml, and a regression test to roots.xhtml.
+
+        * mathml/presentation/roots.xhtml:
+        * mathml/presentation/sup.xhtml:
+        * platform/mac/mathml/presentation/roots-expected.png:
+        * platform/mac/mathml/presentation/roots-expected.txt:
+        * platform/mac/mathml/presentation/sup-expected.png:
+        * platform/mac/mathml/presentation/sup-expected.txt:
+
+2012-09-06  Roger Fong  <roger_fong@apple.com>
+
+        Unreviewed gardening. Skip failing test: fast/dom/HTMLScriptElement/script-reexecution.html
+        https://bugs.webkit.org/show_bug.cgi?id=95944
+
+        * platform/win/Skipped:
+
+2012-09-06  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Add the local and remote description functionality to RTCPeerConnection
+        https://bugs.webkit.org/show_bug.cgi?id=95839
+
+        Reviewed by Adam Barth.
+
+        * fast/mediastream/RTCPeerConnection-createOffer.html:
+        * fast/mediastream/RTCPeerConnection-localDescription-expected.txt: Added.
+        * fast/mediastream/RTCPeerConnection-localDescription.html: Copied from LayoutTests/fast/mediastream/RTCPeerConnection-createOffer.html.
+        * fast/mediastream/RTCPeerConnection-remoteDescription-expected.txt: Added.
+        * fast/mediastream/RTCPeerConnection-remoteDescription.html: Copied from LayoutTests/fast/mediastream/RTCPeerConnection-createOffer.html.
+
+2012-09-06  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Generating required platform-specific baselines after r127608.
+
+        Adding failure expectations for regressions introduced in r127698 and r127704.
+
+        Fixing and removing duplicate expectations to get the file to pass linting.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/css3/masking: Added.
+        * platform/gtk/css3/masking/clip-path-circle-expected.png: Added.
+        * platform/gtk/css3/masking/clip-path-circle-expected.txt: Added.
+        * platform/gtk/css3/masking/clip-path-circle-filter-expected.png: Added.
+        * platform/gtk/css3/masking/clip-path-circle-filter-expected.txt: Added.
+        * platform/gtk/css3/masking/clip-path-circle-overflow-expected.png: Added.
+        * platform/gtk/css3/masking/clip-path-circle-overflow-expected.txt: Added.
+        * platform/gtk/css3/masking/clip-path-circle-overflow-hidden-expected.png: Added.
+        * platform/gtk/css3/masking/clip-path-circle-overflow-hidden-expected.txt: Added.
+        * platform/gtk/css3/masking/clip-path-circle-relative-overflow-expected.png: Added.
+        * platform/gtk/css3/masking/clip-path-circle-relative-overflow-expected.txt: Added.
+        * platform/gtk/css3/masking/clip-path-ellipse-expected.png: Added.
+        * platform/gtk/css3/masking/clip-path-ellipse-expected.txt: Added.
+        * platform/gtk/css3/masking/clip-path-polygon-evenodd-expected.png: Added.
+        * platform/gtk/css3/masking/clip-path-polygon-evenodd-expected.txt: Added.
+        * platform/gtk/css3/masking/clip-path-polygon-expected.png: Added.
+        * platform/gtk/css3/masking/clip-path-polygon-expected.txt: Added.
+        * platform/gtk/css3/masking/clip-path-polygon-nonzero-expected.png: Added.
+        * platform/gtk/css3/masking/clip-path-polygon-nonzero-expected.txt: Added.
+        * platform/gtk/css3/masking/clip-path-rectangle-expected.png: Added.
+        * platform/gtk/css3/masking/clip-path-rectangle-expected.txt: Added.
+
+2012-09-06  Alex Sakhartchouk  <alexst@chromium.org>
+
+        gradient-with-scaled-ancestor.html is not calling setDeviceScaleFactor
+        https://bugs.webkit.org/show_bug.cgi?id=95847
+
+        Reviewed by Beth Dakin.
+
+        Setting the device scale factor in the layout test and updating expectations until we can rebase 
+
+        * fast/hidpi/gradient-with-scaled-ancestor.html:
+        * platform/chromium/TestExpectations:
+
+2012-09-06  Dan Bernstein  <mitz@apple.com>
+
+        REGRESSION(r127712): It broke http/tests/xmlhttprequest/basic-auth.html on JSC platforms
+        https://bugs.webkit.org/show_bug.cgi?id=95972
+
+        Removed the failing test from the skipped list.
+
+        * platform/qt/Skipped:
+
+2012-09-06  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL] Gardening after r127728, r127534
+        https://bugs.webkit.org/show_bug.cgi?id=95975
+
+        Unreviewed gardening.
+
+        Following tests were added to TestExpectations:
+        http/tests/xmlhttprequest/basic-auth.html fails after r127728.
+        fast/innerHTML/innerHTML-iframe.html fails after r127534.
+
+        * platform/efl/fast/innerHTML/innerHTML-iframe-expected.txt: Removed.
+        * platform/efl/TestExpectations:
+
+2012-09-06  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Unreviewed rebaseline for Web Inspector NMI test. It was broken at r127738.
+
+        * inspector/profiler/memory-instrumentation-cached-images-expected.txt:
+        * inspector/profiler/memory-instrumentation-cached-images.html:
+
+2012-09-06  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [WKTR] addSelectionKey should be mapped to "Control" modifiers on other OSes than Mac
+        https://bugs.webkit.org/show_bug.cgi?id=95973
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskip several test cases that are passing on WebKit2
+        now that "addSelectionKey" is properly mapped to
+        "Control" modifier on other OSes than Mac OS X, in
+        WKTR's EventSender.
+
+        * platform/efl-wk2/TestExpectations:
+        * platform/gtk-wk2/Skipped:
+        * platform/win-wk2/Skipped:
+
+2012-09-06  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        CSS 3 'overflow-wrap' property implementation
+        https://bugs.webkit.org/show_bug.cgi?id=94475
+
+        Reviewed by Ojan Vafai.
+
+        Added 'overflow-wrap' property implementation according to
+        http://www.w3.org/TR/2012/WD-css3-text-20120814/#overflow-wrap.
+        New ref-test is added to check the simularity
+        in behaviour of 'overflow-wrap' and 'word-wrap' properties.
+
+        * fast/text/overflow-wrap-expected.html: Added.
+        * fast/text/overflow-wrap.html: Added.
+
+2012-09-06  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Update TestExpectations for fast/events/tab-focus-link-in-canvas.html
+        https://bugs.webkit.org/show_bug.cgi?id=95970
+
+        Unreviewed EFL gardening.
+
+        Update WK2-EFL TestExpectations to add bug number for:
+        fast/events/tab-focus-link-in-canvas.html
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-09-06  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Provide implementation for WebPage::performDefaultBehaviorForKeyEvent()
+        https://bugs.webkit.org/show_bug.cgi?id=95943
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskip several test cases that are passing now that EFL WK2
+        has a proper implementation for
+        WebPage::performDefaultBehaviorForKeyEvent().
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-09-06  Mike Lawther  <mikelawther@chromium.org>
+
+        Rewrite zooming test to no longer output pixel numbers
+        https://bugs.webkit.org/show_bug.cgi?id=95922
+
+        Reviewed by Dan Bernstein.
+
+        The original version of this test output pixel sizes, which had different results on 
+        different ports. The test has been rewritten to suppress the pixel size output.
+
+        * css3/calc/zoom-with-em-expected.txt:
+        * css3/calc/zoom-with-em.html:
+        * platform/chromium/css3/calc/zoom-with-em-expected.txt: Removed.
+
+2012-09-06  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, skip one more failing test,
+        because we like regressions in the trunk. :)
+
+        * platform/qt/Skipped:
+
+2012-09-06  Keishi Hattori  <keishi@webkit.org>
+
+        Refactor CalendarPicker to not use global variables.
+        https://bugs.webkit.org/show_bug.cgi?id=95830
+
+        Reviewed by Kent Tamura.
+
+        * fast/forms/date/calendar-picker-appearance-pre-100.html:
+
+2012-09-06  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL] Gardening after r127620, r127698 and r127704
+        https://bugs.webkit.org/show_bug.cgi?id=95963
+
+        Unreviewed gardening.
+
+        Following tests were added to TestExpectations:
+        compositing/overflow/overflow-auto-with-touch-toggle.html fails after r127620.
+        fast/dom/HTMLScriptElement/script-reexecution.html fails after r127698.
+        fast/viewport/viewport-limits-adjusted-for-no-user-scale-control.html fails after r127704.
+        fast/viewport/viewport-limits-adjusted-for-no-user-scale.html fails after r127704.
+
+        * platform/efl/TestExpectations:
+
+2012-09-06  Adam Barth  <abarth@chromium.org>
+
+        Three XSLTProcessor functions don't need to be [Custom]
+        https://bugs.webkit.org/show_bug.cgi?id=95899
+
+        Reviewed by Kentaro Hara.
+
+        Update results to show that we return null rather than undefined on a
+        type error.
+
+        * fast/xsl/transform-xhr-doc-expected.txt:
+        * fast/xsl/xslt-processor-expected.txt:
+        * platform/chromium/fast/xsl/transform-xhr-doc-expected.txt:
+
+2012-09-06  Kristóf Kosztyó  <kkristof@inf.u-szeged.hu>
+
+        [Qt] Unreviewed gardening. Skip the failing tests.
+
+        * platform/qt/Skipped:
+
+2012-09-04  Vsevolod Vlasov  <vsevik@chromium.org>
+
+        Web Inspector: Fix inconsistencies in NetworkUISourceCodeProvider implementation.
+        https://bugs.webkit.org/show_bug.cgi?id=95752
+
+        Reviewed by Alexander Pavlov.
+
+        * http/tests/inspector/network/network-request-revision-content-expected.txt:
+        * http/tests/inspector/network/network-request-revision-content.html:
+        * inspector/console/console-uncaught-exception-expected.txt:
+        * inspector/debugger/network-uisourcecode-provider-expected.txt:
+        * inspector/debugger/network-uisourcecode-provider.html:
+        * inspector/debugger/script-snippet-model.html:
+        * inspector/debugger/scripts-panel.html:
+
+2012-09-06  Adam Barth  <abarth@webkit.org>
+
+        Chromium should call restrictScaleFactorToInitialScaleIfNotUserScalable unless/until userScalable is supported directly.
+        https://bugs.webkit.org/show_bug.cgi?id=91110
+
+        Reviewed by Tony Chang.
+
+        Test that the scale limits are clamped when user-scalable is set to no.
+
+        * fast/viewport/viewport-limits-adjusted-for-no-user-scale-control-expected.txt: Added.
+        * fast/viewport/viewport-limits-adjusted-for-no-user-scale-control.html: Added.
+        * fast/viewport/viewport-limits-adjusted-for-no-user-scale-expected.txt: Added.
+        * fast/viewport/viewport-limits-adjusted-for-no-user-scale.html: Added.
+
+2012-09-06  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r127700.
+        http://trac.webkit.org/changeset/127700
+        https://bugs.webkit.org/show_bug.cgi?id=95941
+
+        Breaks inspector closure compilation, uses not defined
+        variables. (Requested by vsevik on #webkit).
+
+        * inspector/styles/protocol-css-regions-commands-expected.txt:
+        * inspector/styles/protocol-css-regions-commands.html:
+
+2012-09-05  Andrei Poenaru  <poenaru@adobe.com>
+
+        Web Inspector: Protocol Extension: Add "regionLayoutUpdate" event
+        https://bugs.webkit.org/show_bug.cgi?id=93443
+
+        Reviewed by Alexander Pavlov.
+
+        Validate "regionLayoutUpdate" event.
+
+        * inspector/styles/protocol-css-regions-commands-expected.txt:
+        * inspector/styles/protocol-css-regions-commands.html:
+
+2012-09-03  Geoffrey Garen  <ggaren@apple.com>
+
+        Named functions should not allocate scope objects for their names
+        https://bugs.webkit.org/show_bug.cgi?id=95659
+
+        Reviewed by Oliver Hunt.
+
+        Added coverage for some extra-tricky cases.
+
+        * fast/js/named-function-expression-expected.txt:
+        * fast/js/script-tests/named-function-expression.js:
+        (shouldBeTrueWithDescription): I rolled my own shouldBeTrue() here to avoid the
+        built-in shouldBe()'s eval scoping, which can change the variable
+        resolution rules I'm trying to test.
+
+        * inspector/debugger/debugger-expand-scope-expected.txt: Not sure why this
+        result used to miss the function name scope, but the new result is a
+        progression, so I've updated the expected results.
+
+2012-09-05  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, skip new fasiling tests.
+
+        * platform/qt-5.0-wk2/Skipped:
+        * platform/qt/Skipped:
+
+2012-09-05  Lauro Neto  <lauro.neto@openbossa.org>
+
+        [Qt] platform/qt/plugins/qt-qwidget-plugin.html fails
+        https://bugs.webkit.org/show_bug.cgi?id=92141
+
+        Reviewed by Simon Hausmann.
+
+        Only Qt WK2 does not support Qt plugins. Moving skip to proper place.
+
+        * platform/qt-5.0-wk2/Skipped:
+        * platform/qt-5.0/Skipped:
+
+        Updated test to point to a existing image.
+
+        * platform/qt/plugins/qt-qwidget-plugin.html:
+
+2012-09-05  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: Large integer versions not persisted correctly
+        https://bugs.webkit.org/show_bug.cgi?id=95873
+
+        Reviewed by Tony Chang.
+
+        Verify large integer versions that encode differently as Ints vs. VarInts.
+
+        * storage/indexeddb/intversion-encoding-expected.txt: Added.
+        * storage/indexeddb/intversion-encoding.html: Added.
+        * storage/indexeddb/resources/intversion-encoding.js: Added.
+        (test):
+        (openFirstTime.request.onupgradeneeded):
+        (openFirstTime.request.onsuccess):
+        (openFirstTime):
+        (openSecondTime.request.onsuccess):
+        (openSecondTime):
+
+2012-09-05  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r127596.
+        http://trac.webkit.org/changeset/127596
+        https://bugs.webkit.org/show_bug.cgi?id=95928
+
+        newly added tests are failing (Requested by bashi1 on
+        #webkit).
+
+        * fast/regions/autowidth-abspos-expected.html: Removed.
+        * fast/regions/autowidth-abspos-regionchain-expected.html: Removed.
+        * fast/regions/autowidth-abspos-regionchain.html: Removed.
+        * fast/regions/autowidth-abspos.html: Removed.
+        * fast/regions/autowidth-float-expected.html: Removed.
+        * fast/regions/autowidth-float.html: Removed.
+        * fast/regions/autowidth-inlineblock-expected.html: Removed.
+        * fast/regions/autowidth-inlineblock.html: Removed.
+        * fast/regions/autowidth-nonreplaced-abspos-expected.html: Removed.
+        * fast/regions/autowidth-nonreplaced-abspos.html: Removed.
+        * fast/regions/autowidth-nonreplacedblock-normalflow-expected.html: Removed.
+        * fast/regions/autowidth-nonreplacedblock-normalflow.html: Removed.
+        * fast/regions/autowidth-normalflow-expected.html: Removed.
+        * fast/regions/autowidth-normalflow-maxwidth-expected.html: Removed.
+        * fast/regions/autowidth-normalflow-maxwidth.html: Removed.
+        * fast/regions/autowidth-normalflow-minmaxwidth-expected.html: Removed.
+        * fast/regions/autowidth-normalflow-minmaxwidth.html: Removed.
+        * fast/regions/autowidth-normalflow-minwidth-expected.html: Removed.
+        * fast/regions/autowidth-normalflow-minwidth.html: Removed.
+        * fast/regions/autowidth-normalflow-vertrl-expected.html: Removed.
+        * fast/regions/autowidth-normalflow-vertrl.html: Removed.
+        * fast/regions/autowidth-normalflow.html: Removed.
+        * fast/regions/bottom-overflow-out-of-first-region.html:
+        * fast/regions/flows-dependency-dynamic-remove.html:
+        * fast/regions/flows-dependency-same-flow.html:
+        * fast/regions/render-region-renderer-expected.html:
+        * fast/regions/top-overflow-out-of-second-region.html:
+
+2012-09-05  Michelangelo De Simone  <michelangelo@webkit.org>
+
+        Parse the array() function for custom filters
+        https://bugs.webkit.org/show_bug.cgi?id=94226
+
+        Reviewed by Dirk Schulze.
+
+        New negative and positive test cases have been added for the array()
+        function parsing.
+
+        Also a new test case has been added to further test multiple 3d-transforms.
+
+        * css3/filters/custom/custom-filter-property-parsing-expected.txt:
+        * css3/filters/custom/custom-filter-property-parsing-invalid-expected.txt:
+        * css3/filters/script-tests/custom-filter-property-parsing-invalid.js:
+        * css3/filters/script-tests/custom-filter-property-parsing.js:
+        * platform/chromium/css3/filters/custom/custom-filter-property-parsing-expected.txt:
+
+2012-09-05  Matt Falkenhagen  <falken@chromium.org>
+
+        Vertically center non-anchored <dialog> elements
+        https://bugs.webkit.org/show_bug.cgi?id=90670
+
+        Reviewed by Ojan Vafai.
+
+        * fast/dom/HTMLDialogElement/non-anchored-dialog-positioning-expected.txt: Added.
+        * fast/dom/HTMLDialogElement/non-anchored-dialog-positioning.html: Added.
+
+2012-09-05  Kenichi Ishibashi  <bashi@chromium.org>
+
+        Unreviewed, rolling out r127612, r127660, and r127664.
+        http://trac.webkit.org/changeset/127612
+        http://trac.webkit.org/changeset/127660
+        http://trac.webkit.org/changeset/127664
+        https://bugs.webkit.org/show_bug.cgi?id=95920
+
+        * fast/mediastream/RTCPeerConnection-createOffer.html:
+        * fast/mediastream/RTCPeerConnection-localDescription-expected.txt: Removed.
+        * fast/mediastream/RTCPeerConnection-localDescription.html: Removed.
+        * fast/mediastream/RTCPeerConnection-remoteDescription-expected.txt: Removed.
+        * fast/mediastream/RTCPeerConnection-remoteDescription.html: Removed.
+
+2012-09-05  Gavin Barraclough  <barraclough@apple.com>
+
+        a = data[a]++; sets the wrong key in data
+        https://bugs.webkit.org/show_bug.cgi?id=91270
+
+        Reviewed by Oliver Hunt.
+
+        Added test cases.
+
+        * fast/js/post-inc-assign-overwrites-expected.txt: Added.
+        * fast/js/post-inc-assign-overwrites.html: Added.
+        * fast/js/script-tests/post-inc-assign-overwrites.js: Added.
+        (postIncDotAssignToBase):
+        (postIncBracketAssignToBase):
+        (postIncBracketAssignToSubscript):
+
+2012-09-05  Victoria Kirst  <vrk@chromium.org>
+
+        Add the duration attribute to MediaSource
+        https://bugs.webkit.org/show_bug.cgi?id=95149
+
+        Reviewed by Eric Carlson.
+
+        Add support for the duration attribute recently added to the MediaSource spec.
+        http://dev.w3.org/html5/spec/media-elements.html#dom-media-duration
+
+        * http/tests/media/media-source/media-source.js:
+        (MediaSourceTest.SegmentHelper): Add parameter to specify whether full file should be loaded.
+        (MediaSourceTest.SegmentHelper.prototype.appendAllMediaSegments): Added method to append all file segments.
+        (MediaSourceTest.roundedEquals_): Added to see if values are equivalent after rounding.
+        (MediaSourceTest.expectDuration): Added to check for expected duration.
+        (MediaSourceTest.expectBufferedRange): Added to check for the expected buffered attribute value.
+        * http/tests/media/media-source/video-media-source-duration-changed-expected.txt: Added.
+        * http/tests/media/media-source/video-media-source-duration-changed.html: Added.
+
+2012-09-05  Kenichi Ishibashi  <bashi@chromium.org>
+
+        [Chromium] unreviewed gardening after r127564
+
+        Added missing text expectation.
+
+        * fast/forms/datetime/datetime-interactive-validation-required-expected.txt: Added.
+
+2012-09-05  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: Integer version lost after first open/close/open cycle
+        https://bugs.webkit.org/show_bug.cgi?id=95864
+
+        Reviewed by Tony Chang.
+
+        Ensure integer versions are persisted across open/close/open cycles.
+
+        Note that although this is a useful and valid test in general, the specific bug that
+        prompted adding this test will only repro if the origin has no pre-existing backing
+        store, which is not guaranteed by DRT or other shells. See http://webkit.org/b/92166
+
+        * storage/indexeddb/intversion-persistence-expected.txt: Added.
+        * storage/indexeddb/intversion-persistence.html: Added.
+        * storage/indexeddb/resources/intversion-persistence.js: Added.
+        (test):
+        (openFirstTime.request.onupgradeneeded):
+        (openFirstTime.request.onsuccess):
+        (openFirstTime):
+        (openSecondTime.request.onsuccess):
+        (openSecondTime):
+
+2012-09-05  Yoshifumi Inoue  <yosin@chromium.org>
+
+        [Tests] We should have mouse events test for multiple fields time input UI
+        https://bugs.webkit.org/show_bug.cgi?id=95829
+
+        Reviewed by Kent Tamura.
+
+        This patch adds test cases of mouse actions on multiple fields time
+        input UI.
+
+        The test checks:
+         - Mouse click to set focus to field under mouse pointer
+         - Mouse click on spin button
+
+        This patch affects ports which enable both ENABLE_INPUT_TYPE_TIME and
+        ENABLE_INPUT_TYPE_TIME_MULTIPLE_FIELDS.
+
+        * fast/forms/time-multiple-fields/time-multiple-fields-mouse-events-expected.txt: Added.
+        * fast/forms/time-multiple-fields/time-multiple-fields-mouse-events.html: Added.
+
+2012-09-05  Kenichi Ishibashi  <bashi@chromium.org>
+
+        [Chromium] unreviewed test expectation update
+
+        * platform/chromium/TestExpectations:
+
+2012-09-05  Gavin Barraclough  <barraclough@apple.com>
+
+        Bug, assignment within subscript of prefix/postfix increment of bracket access
+        https://bugs.webkit.org/show_bug.cgi?id=95913
+
+        Reviewed by Oliver Hunt.
+
+        Added test cases.
+
+        * fast/js/inc-bracket-assign-subscript-expected.txt: Added.
+        * fast/js/inc-bracket-assign-subscript.html: Added.
+        * fast/js/script-tests/inc-bracket-assign-subscript.js: Added.
+        (testPreIncBracketAccessWithAssignSubscript):
+        (testPostIncBracketAccessWithAssignSubscript):
+            - Tests a pre/post increment to a bracket access, where subscript contains assignment.
+
+2012-09-05  Dan Bernstein  <mitz@apple.com>
+
+        Renamed a misnamed expected result.
+
+        * platform/mac/compositing/overflow/overflow-auto-with-touch-toggle-expected.txt: Copied from LayoutTests/platform/mac/compositing/overflow/overflow-with-touch-toggle-expected.txt.
+        * platform/mac/compositing/overflow/overflow-with-touch-toggle-expected.txt: Removed.
+
+2012-09-05  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Provide implementation for WebProcess functions
+        https://bugs.webkit.org/show_bug.cgi?id=95857
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskip several test cases that are now passing on
+        WK2 EFL since WebProcess platform functions have been
+        implemented.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-09-05  Roger Fong  <roger_fong@apple.com>
+
+        Unreviewed. Some flaky http/tests/security tests on Windows. Adding to skip list.
+        https://bugs.webkit.org/show_bug.cgi?id=95803
+
+        * platform/win/Skipped:
+
+2012-09-05  Dan Bernstein  <mitz@apple.com>
+
+        Added expected results for this test from r127620 for the Mac port, which does not have
+        OVERFLOW_SCROLLING enabled at this time.
+
+        * platform/mac/compositing/overflow/overflow-with-touch-toggle-expected.txt: Added.
+
+2012-09-05  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [EFL] Slider progress bar goes crazy with negative ranges
+        https://bugs.webkit.org/show_bug.cgi?id=95753
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added ref test to check if rendering results of sliders using
+        negative value ranges are coherent.
+
+        * fast/forms/range/input-range-progress-indicator-expected.html: Added.
+        * fast/forms/range/input-range-progress-indicator.html: Added.
+
+2012-09-05  Sami Kyostila  <skyostil@google.com>
+
+        Enable/disable composited scrolling based on overflow
+        https://bugs.webkit.org/show_bug.cgi?id=95323
+
+        Reviewed by Simon Fraser.
+
+        Added a new test for making sure composited scrolling is enabled when overflow
+        is introduced.
+
+        Note that this test will pass only if OVERFLOW_SCROLLING is enabled.
+
+        * compositing/overflow/overflow-auto-with-touch-toggle-expected.txt: Added.
+        * compositing/overflow/overflow-auto-with-touch-toggle.html: Added.
+        * platform/chromium/TestExpectations:
+
+2012-09-05  Max Vujovic  <mvujovic@adobe.com>
+
+        [CSS Shaders] Update custom filter tests to use the new security model
+        https://bugs.webkit.org/show_bug.cgi?id=95760
+
+        Reviewed by Dirk Schulze.
+
+        This patch updates the custom filter tests to not sample u_texture and not write
+        to gl_FragColor. Now, the tests use the new security model by writing to
+        css_MixColor and indirectly blending with the DOM element texture.
+
+        This patch prepares us to remove direct DOM texture access via "u_texture":
+        https://bugs.webkit.org/show_bug.cgi?id=93871
+
+        * css3/filters/custom/custom-filter-css-keyword-as-parameter-name-expected.png:
+        * css3/filters/custom/custom-filter-shader-cache-expected.png:
+        * css3/filters/custom/custom-filter-shader-cache.html:
+            Use the CSS mix function with the updated color-offset.fs.
+        * css3/filters/custom/effect-color-check-expected.png:
+        * css3/filters/custom/effect-color-check.html:
+            Use the CSS mix function with the updated color-fill.fs.
+        * css3/filters/custom/effect-custom-combined-missing-expected.png:
+        * css3/filters/custom/effect-custom-combined-missing.html:
+            Use the CSS mix function with the updated color-offset.fs.           
+        * css3/filters/custom/effect-custom-expected.png:
+        * css3/filters/custom/effect-custom-parameters-expected.png:
+        * css3/filters/custom/effect-custom-parameters.html:
+            Use the mix-color.fs shader instead of color-offset-parameters.fs.
+        * css3/filters/custom/effect-custom.html:
+            Use the CSS mix function with the updated color-offset.fs.
+        * css3/filters/custom/filter-repaint-custom-clipped-expected.png:
+        * css3/filters/custom/filter-repaint-custom-clipped.html:
+            Use the mix-color.fs shader instead of color-add.fs.
+        * css3/filters/custom/filter-repaint-custom-expected.png:
+        * css3/filters/custom/filter-repaint-custom-rotated-expected.png:
+        * css3/filters/custom/filter-repaint-custom-rotated.html:
+            Use the mix-color.fs shader instead of color-add.fs. Fix a small typo in a comment.
+        * css3/filters/custom/filter-repaint-custom.html:
+            Use the mix-color.fs shader instead of color-add.fs.
+        * css3/filters/custom/invalid-custom-filter-shader.html:
+            Use the CSS mix function with the updated color-offset.fs.
+        * css3/filters/custom/missing-custom-filter-shader-expected.png:
+        * css3/filters/custom/missing-custom-filter-shader.html:
+            Use the CSS mix function with the updated color-offset.fs.
+        * css3/filters/resources/color-add.fs:
+            Removed. The mix-color.fs shader can perform this shader's function.
+        * css3/filters/resources/color-fill.fs:
+            Rewrote this shader to write to css_MixColor instead of sampling u_texture and writing
+            to gl_FragColor.
+        * css3/filters/resources/color-offset-parameters.fs:
+            Removed. The mix-color.fs shader can perform this shader's function.
+        * css3/filters/resources/color-offset.fs:
+            Rewrote this shader to write to css_MixColor instead of sampling u_texture and writing
+            to gl_FragColor.
+        * platform/chromium-mac/css3/filters/custom/custom-filter-shader-cache-expected.png:
+        * platform/chromium-mac/css3/filters/custom/effect-color-check-expected.png:
+        * platform/chromium-mac/css3/filters/custom/effect-custom-combined-missing-expected.png:
+        * platform/chromium-mac/css3/filters/custom/effect-custom-expected.png:
+        * platform/chromium-mac/css3/filters/custom/effect-custom-parameters-expected.png:
+        * platform/chromium-mac/css3/filters/custom/filter-repaint-custom-clipped-expected.png:
+        * platform/chromium-mac/css3/filters/custom/filter-repaint-custom-expected.png:
+        * platform/chromium-mac/css3/filters/custom/filter-repaint-custom-rotated-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-09-05  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Add the local and remote description functionality to RTCPeerConnection
+        https://bugs.webkit.org/show_bug.cgi?id=95839
+
+        Reviewed by Adam Barth.
+
+        * fast/mediastream/RTCPeerConnection-createOffer.html:
+        * fast/mediastream/RTCPeerConnection-localDescription-expected.txt: Added.
+        * fast/mediastream/RTCPeerConnection-localDescription.html: Copied from LayoutTests/fast/mediastream/RTCPeerConnection-createOffer.html.
+        * fast/mediastream/RTCPeerConnection-remoteDescription-expected.txt: Added.
+        * fast/mediastream/RTCPeerConnection-remoteDescription.html: Copied from LayoutTests/fast/mediastream/RTCPeerConnection-createOffer.html.
+
+2012-09-01  Dirk Schulze  <krit@webkit.org>
+
+        Use -webkit-clip-path shapes to clip HTML elements
+        https://bugs.webkit.org/show_bug.cgi?id=95646
+
+        Reviewed by Dean Jackson.
+
+        Added new tests for the -webkit-clip-path property applied to HTML content.
+
+        * css3/masking/clip-path-circle-filter.html: Added.
+        * css3/masking/clip-path-circle-overflow.html: Added.
+        * css3/masking/clip-path-circle-relative-overflow.html: Added.
+        * css3/masking/clip-path-circle-overflow-hidden.html: Added.
+        * css3/masking/clip-path-circle.html: Added.
+        * css3/masking/clip-path-ellipse.html: Added.
+        * css3/masking/clip-path-polygon-evenodd.html: Added.
+        * css3/masking/clip-path-polygon-nonzero.html: Added.
+        * css3/masking/clip-path-polygon.html: Added.
+        * css3/masking/clip-path-rectangle.html: Added.
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/css3/masking/clip-path-circle-expected.png: Added.
+        * platform/mac/css3/masking/clip-path-circle-expected.txt: Added.
+        * platform/mac/css3/masking/clip-path-circle-filter-expected.png: Added.
+        * platform/mac/css3/masking/clip-path-circle-filter-expected.txt: Added.
+        * platform/mac/css3/masking/clip-path-circle-overflow-expected.png: Added.
+        * platform/mac/css3/masking/clip-path-circle-overflow-expected.txt: Added.
+        * platform/mac/css3/masking/clip-path-circle-overflow-hidden-expected.png: Added.
+        * platform/mac/css3/masking/clip-path-circle-overflow-hidden-expected.txt: Added.
+        * platform/mac/css3/masking/clip-path-circle-relative-overflow-expected.png: Added.
+        * platform/mac/css3/masking/clip-path-circle-relative-overflow-expected.txt: Added.
+        * platform/mac/css3/masking/clip-path-ellipse-expected.png: Added.
+        * platform/mac/css3/masking/clip-path-ellipse-expected.txt: Added.
+        * platform/mac/css3/masking/clip-path-polygon-evenodd-expected.png: Added.
+        * platform/mac/css3/masking/clip-path-polygon-evenodd-expected.txt: Added.
+        * platform/mac/css3/masking/clip-path-polygon-expected.png: Added.
+        * platform/mac/css3/masking/clip-path-polygon-expected.txt: Added.
+        * platform/mac/css3/masking/clip-path-polygon-nonzero-expected.png: Added.
+        * platform/mac/css3/masking/clip-path-polygon-nonzero-expected.txt: Added.
+        * platform/mac/css3/masking/clip-path-rectangle-expected.png: Added.
+        * platform/mac/css3/masking/clip-path-rectangle-expected.txt: Added.
+
+2012-09-05  Vincent Scheib  <scheib@chromium.org>
+
+        webkitPointerLockElement returns null when pointer lock request is pending.
+        https://bugs.webkit.org/show_bug.cgi?id=91186
+
+        Reviewed by Dimitri Glazkov.
+
+        * pointer-lock/locked-element-iframe-removed-from-dom-expected.txt:
+        * pointer-lock/locked-element-iframe-removed-from-dom.html:
+             Updated to reflect new behavior of null returned when lock is pending.
+        * pointer-lock/pointerlockelement-null-when-pending-expected.txt: Added.
+        * pointer-lock/pointerlockelement-null-when-pending.html: Added.
+             New test specifically for testing null return when lock is pending.
+
+2012-09-05  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Provide implementation for TestRunner::pathToLocalResource()
+        https://bugs.webkit.org/show_bug.cgi?id=95842
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskip fast/dom/frame-loading-via-document-write.html that
+        was failing due to incomplete implementation for
+        TestRunner::pathToLocalResource() in EFL WKTR.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-09-05  Mihnea Ovidenie  <mihnea@adobe.com>
+
+        [CSS Regions] Auto width is not working for Regions
+        https://bugs.webkit.org/show_bug.cgi?id=74135
+
+        Reviewed by Julien Chaffraix.
+
+        It was not possible to flow content into a region having { width: auto; } since in such case, the region width was computed to 0.
+        Now, a region having auto width, will have its width computed following the rules for calculation of widths and margins
+        (http://www.w3.org/TR/CSS2/visudet.html#Computing_widths_and_margins).
+        For those cases in which resolving the width requires measuring of content's min/max-content values, we use the associated named flow min/max-content
+        values (the same for all regions with width auto in a region chain).
+
+        Besides adding new tests, i have modified existing tests that were having regions with width:auto as they were failing after this patch.
+
+        * fast/regions/autowidth-abspos-expected.html: Added.
+        * fast/regions/autowidth-abspos-regionchain-expected.html: Added.
+        * fast/regions/autowidth-abspos-regionchain.html: Added.
+        * fast/regions/autowidth-abspos.html: Added.
+        * fast/regions/autowidth-float-expected.html: Added.
+        * fast/regions/autowidth-float.html: Added.
+        * fast/regions/autowidth-inlineblock-expected.html: Added.
+        * fast/regions/autowidth-inlineblock.html: Added.
+        * fast/regions/autowidth-nonreplaced-abspos-expected.html: Added.
+        * fast/regions/autowidth-nonreplaced-abspos.html: Added.
+        * fast/regions/autowidth-nonreplacedblock-normalflow-expected.html: Added.
+        * fast/regions/autowidth-nonreplacedblock-normalflow.html: Added.
+        * fast/regions/autowidth-normalflow-expected.html: Added.
+        * fast/regions/autowidth-normalflow-maxwidth-expected.html: Added.
+        * fast/regions/autowidth-normalflow-maxwidth.html: Added.
+        * fast/regions/autowidth-normalflow-minmaxwidth-expected.html: Added.
+        * fast/regions/autowidth-normalflow-minmaxwidth.html: Added.
+        * fast/regions/autowidth-normalflow-minwidth-expected.html: Added.
+        * fast/regions/autowidth-normalflow-minwidth.html: Added.
+        * fast/regions/autowidth-normalflow-vertrl-expected.html: Added.
+        * fast/regions/autowidth-normalflow-vertrl.html: Added.
+        * fast/regions/autowidth-normalflow.html: Added.
+        * fast/regions/bottom-overflow-out-of-first-region.html:
+        * fast/regions/flows-dependency-dynamic-remove.html:
+        * fast/regions/flows-dependency-same-flow.html:
+        * fast/regions/render-region-renderer-expected.html:
+        * fast/regions/top-overflow-out-of-second-region.html:
+
+2012-09-05  Brady Eidson  <beidson@apple.com>
+
+        Frequent crashes in PluginView::scriptObject under runtimeObjectCustomGetOwnPropertySlot
+        <rdar://problem/12142226> and https://bugs.webkit.org/show_bug.cgi?id=95026
+
+        Reviewed by Andy Estes.
+
+        * plugins/npp-new-fails-expected.txt: Added.
+        * plugins/npp-new-fails.html: Added.
+
+2012-09-05  Dominik Röttsches  <dominik.rottsches@intel.com>
+
+        [EFL] Unreviewed gardening.
+
+        Adding a platform specififc baseline after r127534.
+
+        * platform/efl/fast/innerHTML/innerHTML-iframe-expected.txt: Added.
+
+2012-09-05  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Provide implementation for WebFrameNetworkingContext
+        https://bugs.webkit.org/show_bug.cgi?id=95826
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskip several cookie-related test cases for WK2 EFL
+        now that WebFrameNetworkingContext is implemented.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-09-05  MORITA Hajime  <morrita@google.com>
+
+        ShadowRoot.cloneNode() must always throw a DATA_CLONE_ERR exception.
+        https://bugs.webkit.org/show_bug.cgi?id=91704
+
+        Reviewed by Kentaro Hara.
+
+        * fast/dom/shadow/shadowroot-clonenode-expected.txt: Added.
+        * fast/dom/shadow/shadowroot-clonenode.html: Added.
+
+2012-09-05  Christophe Dumez  <christophe.dumez@intel.com>
+
+        WKTR doesn't implement dumpWillCacheResponse()
+        https://bugs.webkit.org/show_bug.cgi?id=94607
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskip http/tests/misc/willCacheResponse-delegate-callback.html
+        now that WebKitTestRunner implements dumpWillCacheResponse().
+
+        * platform/efl-wk2/TestExpectations:
+        * platform/wk2/Skipped:
+
+2012-09-05  Kaustubh Atrawalkar  <kaustubh@motorola.com>
+
+        [DRT] LTC:: Move printing related APIs from LayoutTestController to Internals
+        https://bugs.webkit.org/show_bug.cgi?id=92735
+
+        Reviewed by Hajime Morita.
+
+        Move numberOfPages, pageProperty & pageSizeAndMarginsInPixels in Internals and remove duplicated code from DumprenderTree & WebkitTestRunner.
+        Fixed test cases to use internals API instead of testRunner.
+
+        * printing/numberOfPages-expected.txt:
+        * printing/page-count-layout-overflow.html:
+        * printing/page-count-relayout-shrink.html:
+        * printing/page-count-with-one-word.html:
+        * printing/page-format-data-display-none.html:
+        * printing/page-format-data-expected.txt:
+        * printing/page-format-data.html:
+        * printing/page-rule-selection-expected.txt:
+        * printing/page-rule-selection.html:
+        * printing/resources/paged-media-test-utils.js:
+        (numberOfPagesShouldBe):
+        * printing/script-tests/numberOfPages.js:
+        * printing/zoomed-document.html:
+
+2012-09-05  Dominik Röttsches  <dominik.rottsches@intel.com>
+
+        [EFL] Unreviewed gardening after r127513
+
+        Marking plugin third-party storage tests as failing on EFL.
+
+        * platform/efl/TestExpectations:
+
 2012-09-05  Zoltan Arvai  <zarvai@inf.u-szeged.hu>
 
         [Qt] Unreviewed gardening.

@@ -414,11 +414,18 @@ void CCLayerTreeHost::setVisible(bool visible)
     m_proxy->setVisible(visible);
 }
 
-void CCLayerTreeHost::evictAllContentTextures()
+void CCLayerTreeHost::unlinkAllContentTextures()
 {
     ASSERT(CCProxy::isMainThread());
     ASSERT(m_contentsTextureManager.get());
-    m_contentsTextureManager->allBackingTexturesWereDeleted();
+    m_contentsTextureManager->unlinkAllBackings();
+}
+
+void CCLayerTreeHost::deleteUnlinkedTextures()
+{
+    ASSERT(CCProxy::isImplThread() && CCProxy::isMainThreadBlocked());
+    ASSERT(m_contentsTextureManager.get());
+    m_contentsTextureManager->deleteAllUnlinkedBackings();
 }
 
 void CCLayerTreeHost::startPageScaleAnimation(const IntSize& targetPosition, bool useAnchor, float scale, double durationSec)
@@ -464,7 +471,6 @@ bool CCLayerTreeHost::initializeRendererIfNeeded()
     return true;
 }
 
-
 void CCLayerTreeHost::updateLayers(CCTextureUpdateQueue& queue, size_t memoryAllocationLimitBytes)
 {
     ASSERT(m_rendererInitialized);
@@ -481,9 +487,36 @@ void CCLayerTreeHost::updateLayers(CCTextureUpdateQueue& queue, size_t memoryAll
     updateLayers(rootLayer(), queue);
 }
 
+static void setScale(LayerChromium* layer, float deviceScaleFactor, float pageScaleFactor)
+{
+    if (layer->boundsContainPageScale())
+        layer->setContentsScale(deviceScaleFactor);
+    else
+        layer->setContentsScale(deviceScaleFactor * pageScaleFactor);
+}
+
+static void updateLayerScale(LayerChromium* layer, float deviceScaleFactor, float pageScaleFactor)
+{
+    setScale(layer, deviceScaleFactor, pageScaleFactor);
+
+    LayerChromium* maskLayer = layer->maskLayer();
+    if (maskLayer)
+        setScale(maskLayer, deviceScaleFactor, pageScaleFactor);
+
+    LayerChromium* replicaMaskLayer = layer->replicaLayer() ? layer->replicaLayer()->maskLayer() : 0;
+    if (replicaMaskLayer)
+        setScale(replicaMaskLayer, deviceScaleFactor, pageScaleFactor);
+
+    const Vector<RefPtr<LayerChromium> >& children = layer->children();
+    for (unsigned int i = 0; i < children.size(); ++i)
+        updateLayerScale(children[i].get(), deviceScaleFactor, pageScaleFactor);
+}
+
 void CCLayerTreeHost::updateLayers(LayerChromium* rootLayer, CCTextureUpdateQueue& queue)
 {
     TRACE_EVENT0("cc", "CCLayerTreeHost::updateLayers");
+
+    updateLayerScale(rootLayer, m_deviceScaleFactor, m_pageScaleFactor);
 
     LayerList updateList;
 
@@ -658,7 +691,7 @@ void CCLayerTreeHost::applyScrollAndScale(const CCScrollAndScaleSet& info)
         if (layer == rootScrollLayer)
             rootScrollDelta += info.scrolls[i].scrollDelta;
         else
-            layer->scrollBy(info.scrolls[i].scrollDelta);
+            layer->setScrollPosition(layer->scrollPosition() + info.scrolls[i].scrollDelta);
     }
     if (!rootScrollDelta.isZero() || info.pageScaleDelta != 1)
         m_client->applyScrollAndScale(rootScrollDelta, info.pageScaleDelta);

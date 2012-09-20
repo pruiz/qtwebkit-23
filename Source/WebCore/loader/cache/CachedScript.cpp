@@ -90,14 +90,6 @@ void CachedScript::data(PassRefPtr<SharedBuffer> data, bool allDataReceived)
     checkNotify();
 }
 
-void CachedScript::error(CachedResource::Status status)
-{
-    setStatus(status);
-    ASSERT(errorOccurred());
-    setLoading(false);
-    checkNotify();
-}
-
 void CachedScript::destroyDecodedData()
 {
     m_script = String();
@@ -129,7 +121,7 @@ void CachedScript::sourceProviderCacheSizeChanged(int delta)
 
 void CachedScript::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::CachedResourceScript);
+    MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CachedResourceScript);
     CachedResource::reportMemoryUsage(memoryObjectInfo);
     info.addInstrumentedMember(m_script);
     info.addMember(m_decoder);

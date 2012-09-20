@@ -2655,6 +2655,12 @@ void RenderLayer::updateScrollInfoAfterLayout()
 
     if (originalScrollOffset != scrollOffset())
         scrollToOffsetWithoutAnimation(toPoint(scrollOffset()));
+
+#if USE(ACCELERATED_COMPOSITING)
+    // Composited scrolling may need to be enabled or disabled if the amount of overflow changed.
+    if (renderer()->view() && compositor()->updateLayerCompositingState(this))
+        compositor()->setCompositingLayersNeedRebuild();
+#endif
 }
 
 void RenderLayer::paintOverflowControls(GraphicsContext* context, const IntPoint& paintOffset, const IntRect& damageRect, bool paintingOverlayControls)
@@ -3122,6 +3128,18 @@ void RenderLayer::paintLayerContents(RenderLayer* rootLayer, GraphicsContext* co
     
     // Ensure our lists are up-to-date.
     updateLayerListsIfNeeded();
+
+    // Apply clip-path to context.
+    RenderStyle* style = renderer()->style();
+    if (renderer()->hasClipPath() && !context->paintingDisabled() && style) {
+        if (BasicShape* clipShape = style->clipPath()) {
+            // FIXME: Investigate if it is better to store and update a Path object in RenderStyle.
+            // https://bugs.webkit.org/show_bug.cgi?id=95619
+            Path clipPath;
+            clipShape->path(clipPath, calculateLayerBounds(this, rootLayer, 0));
+            transparencyLayerContext->clipPath(clipPath, clipShape->windRule());
+        }
+    }
 
 #if ENABLE(CSS_FILTERS)
     FilterEffectRendererHelper filterPainter(filterRenderer() && paintsWithFilters());
@@ -4820,6 +4838,7 @@ bool RenderLayer::shouldBeNormalFlowOnly() const
                 || (renderer()->style()->specifiesColumns() && !isRootLayer()))
             && !renderer()->isPositioned()
             && !renderer()->hasTransform()
+            && !renderer()->hasClipPath()
 #if ENABLE(CSS_FILTERS)
             && !renderer()->hasFilter()
 #endif
@@ -4834,6 +4853,7 @@ bool RenderLayer::shouldBeSelfPaintingLayer() const
 {
     return !isNormalFlowOnly()
         || hasOverlayScrollbars()
+        || usesCompositedScrolling()
         || renderer()->hasReflection()
         || renderer()->hasMask()
         || renderer()->isTableRow()

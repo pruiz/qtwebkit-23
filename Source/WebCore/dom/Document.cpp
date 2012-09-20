@@ -5872,7 +5872,7 @@ void Document::webkitExitPointerLock()
 
 Element* Document::webkitPointerLockElement() const
 {
-    if (!page())
+    if (!page() || page()->pointerLockController()->lockPending())
         return 0;
     if (Element* element = page()->pointerLockController()->element()) {
         if (element->document() == this)
@@ -6123,7 +6123,7 @@ void Document::setContextFeatures(PassRefPtr<ContextFeatures> features)
 
 void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
-    MemoryClassInfo info(memoryObjectInfo, this, MemoryInstrumentation::DOM);
+    MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::DOM);
     info.addInstrumentedMember(m_styleResolver);
     ContainerNode::reportMemoryUsage(memoryObjectInfo);
     info.addVector(m_customFonts);

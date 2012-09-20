@@ -27,7 +27,6 @@
 #include "EventHandler.h"
 #include "GraphicsContext.h"
 #include "KURL.h"
-#include "PlatformString.h"
 #if ENABLE(ORIENTATION_EVENTS)
 #include "qorientationsensor.h"
 #if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
@@ -38,6 +37,7 @@ using QTM_NAMESPACE::QOrientationSensor;
 #include "wtf/RefPtr.h"
 #include "Frame.h"
 #include "ViewportArguments.h"
+#include <wtf/text/WTFString.h>
 
 #if USE(ACCELERATED_COMPOSITING)
 #include "texmap/TextureMapper.h"

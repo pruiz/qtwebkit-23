@@ -300,6 +300,7 @@ fast/sub-pixel/float-wrap-with-subpixel-top.html
 fast/sub-pixel/inline-block-should-not-wrap.html
 fast/sub-pixel/inline-block-with-margin.html
 fast/sub-pixel/inline-block-with-padding.html
+fast/sub-pixel/large-sizes.html
 fast/sub-pixel/layout-boxes-with-zoom.html
 fast/sub-pixel/position-right-aligns-with-container.html
 fast/sub-pixel/selection/selection-gaps-at-fractional-offsets.html
@@ -1536,7 +1537,6 @@ css2.1/t1008-c44-ln-box-02-d-ag.html
 css2.1/t1202-counters-04-b.html
 css2.1/t1601-c547-indent-00-b-a.html
 css2.1/t1602-c43-center-00-d-ag.html
-css2.1/t1604-c541-word-sp-00-b-a.html
 css2.1/t1604-c542-letter-sp-00-b-a.html
 css2.1/t1604-c542-letter-sp-01-b-a.html
 css2.1/t1605-c545-txttrans-00-b-ag.html
@@ -1644,10 +1644,6 @@ fast/repaint/inline-relative-positioned.html
 # Relies on WebKit API [WebView _loadBackForwardListFromOtherView:]
 fast/loader/crash-copying-backforwardlist.html
 
-# Needs platform specific API implemented in DRT, maybe not relevant for non-Mac and non-Windows ports
-fast/loader/api-test-new-window-data-load-base-url.html
-fast/loader/api-test-go-to-current-back-forward-item.html
-
 # Slider tests that need new results
 fast/forms/range/slider-thumb-shared-style.html
 fast/forms/range/slider-thumb-stylability.html
@@ -1723,7 +1719,6 @@ fast/table/giantCellspacing.html
 fast/text/atsui-pointtooffset-calls-cg.html
 fast/text/atsui-rtl-override-selection.html
 fast/text/in-rendered-text-rtl.html
-fast/text/large-text-composed-char-dos.html
 fast/text/international/002.html
 fast/canvas/canvas-gradient-addStop-error.html
 fast/css/zoom-body-scroll.html
@@ -2772,8 +2767,6 @@ fast/forms/range/range-hit-test-with-padding.html
 http/tests/inspector-enabled/console-clear-arguments-on-frame-navigation.html
 http/tests/inspector-enabled/contentSecurityPolicy-blocks-setInterval.html
 http/tests/inspector-enabled/contentSecurityPolicy-blocks-setTimeout.html
-http/tests/inspector/csp-injected-content-warning-contains-stacktrace.html
-http/tests/inspector/csp-inline-warning-contains-stacktrace.html
 
 # [Qt] New svg/custom/clamped-masking-clipping.svg asserts
 # https://bugs.webkit.org/show_bug.cgi?id=95431
@@ -2796,3 +2789,13 @@ fast/innerHTML/innerHTML-iframe.html
 # https://bugs.webkit.org/show_bug.cgi?id=95952
 fast/viewport/viewport-limits-adjusted-for-no-user-scale-control.html
 fast/viewport/viewport-limits-adjusted-for-no-user-scale.html
+
+# REGRESSION (r128006): Three spatial navigation tests are failing
+# https://bugs.webkit.org/show_bug.cgi?id=96226
+fast/spatial-navigation/snav-container-white-space.html
+fast/spatial-navigation/snav-div-overflow-scrol-hidden.html
+fast/spatial-navigation/snav-imagemap-overlapped-areas.html
+
+# New fast/canvas/canvas-lineDash.html introduced in r128116 fails
+# https://bugs.webkit.org/show_bug.cgi?id=96360
+fast/canvas/canvas-lineDash.html

@@ -57,6 +57,7 @@ WK_EXPORT void WKBundleActivateMacFontAscentHack(WKBundleRef bundle);
 WK_EXPORT void WKBundleOverrideBoolPreferenceForTestRunner(WKBundleRef bundle, WKBundlePageGroupRef pageGroup, WKStringRef preference, bool enabled);
 WK_EXPORT void WKBundleSetAllowUniversalAccessFromFileURLs(WKBundleRef bundle, WKBundlePageGroupRef pageGroup, bool enabled);
 WK_EXPORT void WKBundleSetAllowFileAccessFromFileURLs(WKBundleRef bundle, WKBundlePageGroupRef pageGroup, bool enabled);
+WK_EXPORT void WKBundleSetMinimumLogicalFontSize(WKBundleRef bundleRef, WKBundlePageGroupRef pageGroupRef, int size);
 WK_EXPORT void WKBundleSetFrameFlatteningEnabled(WKBundleRef bundle, WKBundlePageGroupRef pageGroup, bool enabled);
 WK_EXPORT void WKBundleSetPluginsEnabled(WKBundleRef bundle, WKBundlePageGroupRef pageGroup, bool enabled);
 WK_EXPORT void WKBundleSetGeolocationPermission(WKBundleRef bundle, WKBundlePageGroupRef pageGroup, bool enabled);
@@ -76,6 +77,7 @@ WK_EXPORT void WKBundleSetUserStyleSheetLocation(WKBundleRef bundle, WKBundlePag
 WK_EXPORT void WKBundleSetWebNotificationPermission(WKBundleRef bundle, WKBundlePageRef page, WKStringRef originStringRef, bool allowed);
 WK_EXPORT void WKBundleRemoveAllWebNotificationPermissions(WKBundleRef bundle, WKBundlePageRef page);
 WK_EXPORT uint64_t WKBundleGetWebNotificationID(WKBundleRef bundle, JSContextRef context, JSValueRef notification);
+WK_EXPORT void WKBundleSetMinimumTimerInterval(WKBundleRef bundleRef, WKBundlePageGroupRef pageGroupRef, double interval);
 
 // UserContent API
 WK_EXPORT void WKBundleAddUserScript(WKBundleRef bundle, WKBundlePageGroupRef pageGroup, WKBundleScriptWorldRef scriptWorld, WKStringRef source, WKURLRef url, WKArrayRef whitelist, WKArrayRef blacklist, WKUserScriptInjectionTime injectionTime, WKUserContentInjectedFrames injectedFrames);
@@ -93,6 +95,7 @@ WK_EXPORT void WKBundleSetDatabaseQuota(WKBundleRef bundle, uint64_t);
 // Application Cache API
 WK_EXPORT void WKBundleClearApplicationCache(WKBundleRef bundle);
 WK_EXPORT void WKBundleSetAppCacheMaximumSize(WKBundleRef bundle, uint64_t size);
+WK_EXPORT uint64_t WKBundleGetAppCacheUsageForOrigin(WKBundleRef bundle, WKStringRef origin);
 
 // Garbage collection API
 WK_EXPORT void WKBundleGarbageCollectJavaScriptObjects(WKBundleRef bundle);

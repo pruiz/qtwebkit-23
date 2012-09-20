@@ -35,7 +35,6 @@
 #include "DOMStringList.h"
 #include "Element.h"
 #include "Frame.h"
-#include "MemoryInstrumentation.h"
 #include "PlatformSupport.h"
 #include "QualifiedName.h"
 #include "Settings.h"
@@ -45,6 +44,7 @@
 #include "V8ObjectConstructor.h"
 #include "V8WorkerContext.h"
 #include "V8XPathNSResolver.h"
+#include "WebCoreMemoryInstrumentation.h"
 #include "WorkerContext.h"
 #include "WorkerContextExecutionProxy.h"
 #include "WorldContextHandle.h"
@@ -254,6 +254,11 @@ PassRefPtr<XPathNSResolver> toXPathNSResolver(v8::Handle<v8::Value> value)
     return resolver;
 }
 
+v8::Handle<v8::Object> toInnerGlobalObject(v8::Handle<v8::Context> context)
+{
+    return v8::Handle<v8::Object>::Cast(context->Global()->GetPrototype());
+}
+
 DOMWindow* toDOMWindow(v8::Handle<v8::Context> context)
 {
     v8::Handle<v8::Object> global = context->Global();
@@ -305,9 +310,9 @@ v8::Local<v8::Context> toV8Context(ScriptExecutionContext* context, const WorldC
 
 V8PerContextData* perContextDataForCurrentWorld(Frame* frame)
 {
-    V8IsolatedContext* isolatedContext;
-    if (UNLIKELY(!!(isolatedContext = V8IsolatedContext::getEntered())))
-        return isolatedContext->perContextData();
+    V8DOMWindowShell* isolatedShell;
+    if (UNLIKELY(!!(isolatedShell = V8DOMWindowShell::getEntered())))
+        return isolatedShell->perContextData();
     return frame->script()->windowShell()->perContextData();
 }
 

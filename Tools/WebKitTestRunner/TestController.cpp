@@ -55,10 +55,10 @@
 
 namespace WTR {
 
-// defaultLongTimeout + defaultShortTimeout should be less than 50,
+// defaultLongTimeout + defaultShortTimeout should be less than 80,
 // the default timeout value of the test harness so we can detect an
 // unresponsive web process.
-static const double defaultLongTimeout = 30;
+static const double defaultLongTimeout = 60;
 static const double defaultShortTimeout = 15;
 static const double defaultNoTimeout = -1;
 
@@ -475,6 +475,8 @@ bool TestController::resetStateToConsistentValues()
     WKPreferencesSetAsynchronousPluginInitializationEnabled(preferences, false);
     WKPreferencesSetAsynchronousPluginInitializationEnabledForAllPlugins(preferences, false);
     WKPreferencesSetArtificialPluginInitializationDelayEnabled(preferences, false);
+    WKPreferencesSetTabToLinksEnabled(preferences, false);
+    WKPreferencesSetInteractiveFormValidationEnabled(preferences, true);
 
 // [Qt][WK2]REGRESSION(r104881):It broke hundreds of tests
 // FIXME: https://bugs.webkit.org/show_bug.cgi?id=76247

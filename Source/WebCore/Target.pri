@@ -412,7 +412,6 @@ SOURCES += \
     dom/IdTargetObserver.cpp \
     dom/IdTargetObserverRegistry.cpp \
     dom/KeyboardEvent.cpp \
-    dom/MemoryInstrumentation.cpp \
     dom/MessageChannel.cpp \
     dom/MessageEvent.cpp \
     dom/MessagePort.cpp \
@@ -478,6 +477,7 @@ SOURCES += \
     dom/UserGestureIndicator.cpp \
     dom/UserTypingGestureIndicator.cpp \
     dom/ViewportArguments.cpp \
+    dom/WebCoreMemoryInstrumentation.cpp \
     dom/WebKitAnimationEvent.cpp \
     dom/WebKitTransitionEvent.cpp \
     dom/WheelEvent.cpp \
@@ -670,6 +670,7 @@ SOURCES += \
     html/ImageDocument.cpp \
     html/ImageInputType.cpp \
     html/InputType.cpp \
+    html/InputTypeNames.cpp \
     html/LabelableElement.cpp \
     html/LabelsNodeList.cpp \
     html/LinkRelAttribute.cpp \
@@ -1099,6 +1100,9 @@ SOURCES += \
     rendering/BidiRun.cpp \
     rendering/CounterNode.cpp \
     rendering/EllipsisBox.cpp \
+    rendering/ExclusionInterval.cpp \
+    rendering/ExclusionRectangle.cpp \
+    rendering/ExclusionShape.cpp \
     rendering/FilterEffectRenderer.cpp \
     rendering/FixedTableLayout.cpp \
     rendering/FlowThreadController.cpp \
@@ -1555,7 +1559,6 @@ HEADERS += \
     dom/IdTargetObserver.h \
     dom/IdTargetObserverRegistry.h \
     dom/KeyboardEvent.h \
-    dom/MemoryInstrumentation.h \
     dom/MessageChannel.h \
     dom/MessageEvent.h \
     dom/MessagePortChannel.h \
@@ -1615,6 +1618,7 @@ HEADERS += \
     dom/UIEventWithKeyState.h \
     dom/UserGestureIndicator.h \
     dom/ViewportArguments.h \
+    dom/WebCoreMemoryInstrumentation.h \
     dom/WebKitAnimationEvent.h \
     dom/WebKitNamedFlow.h \
     dom/WebKitTransitionEvent.h \
@@ -2046,6 +2050,7 @@ HEADERS += \
     platform/graphics/CrossfadeGeneratedImage.h \
     platform/graphics/filters/CustomFilterGlobalContext.h \
     platform/graphics/filters/CustomFilterMesh.h \
+    platform/graphics/filters/CustomFilterMeshGenerator.h \
     platform/graphics/filters/CustomFilterNumberParameter.h \
     platform/graphics/filters/CustomFilterCompiledProgram.h \
     platform/graphics/filters/CustomFilterOperation.h \
@@ -2277,6 +2282,9 @@ HEADERS += \
     rendering/break_lines.h \
     rendering/CounterNode.h \
     rendering/EllipsisBox.h \
+    rendering/ExclusionInterval.h \
+    rendering/ExclusionRectangle.h \
+    rendering/ExclusionShape.h \
     rendering/FilterEffectRenderer.h \
     rendering/FixedTableLayout.h \
     rendering/HitTestingTransformState.h \
@@ -3456,6 +3464,7 @@ contains(DEFINES, ENABLE_FILTERS=1) {
         platform/graphics/filters/CustomFilterProgram.cpp \
         platform/graphics/filters/CustomFilterCompiledProgram.cpp \
         platform/graphics/filters/CustomFilterMesh.cpp \
+        platform/graphics/filters/CustomFilterMeshGenerator.cpp \
         platform/graphics/filters/CustomFilterValidatedProgram.cpp \
         platform/graphics/filters/DistantLightSource.cpp \
         platform/graphics/filters/FEBlend.cpp \
@@ -4050,6 +4059,7 @@ ALL_IN_ONE_SOURCES += \
     accessibility/AccessibilityAllInOne.cpp \
     inspector/InspectorAllInOne.cpp \
     loader/appcache/ApplicationCacheAllInOne.cpp \
+    platform/text/TextAllInOne.cpp \
     rendering/style/StyleAllInOne.cpp
 
 contains(DEFINES, ENABLE_XSLT=1):contains(DEFINES, WTF_USE_LIBXML2=1) {

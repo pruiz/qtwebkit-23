@@ -146,6 +146,11 @@ void WKBundleSetAllowFileAccessFromFileURLs(WKBundleRef bundleRef, WKBundlePageG
     toImpl(bundleRef)->setAllowFileAccessFromFileURLs(toImpl(pageGroupRef), enabled);
 }
 
+void WKBundleSetMinimumLogicalFontSize(WKBundleRef bundleRef, WKBundlePageGroupRef pageGroupRef, int size)
+{
+    toImpl(bundleRef)->setMinimumLogicalFontSize(toImpl(pageGroupRef), size);
+}
+
 void WKBundleSetFrameFlatteningEnabled(WKBundleRef bundleRef, WKBundlePageGroupRef pageGroupRef, bool enabled)
 {
     toImpl(bundleRef)->setFrameFlatteningEnabled(toImpl(pageGroupRef), enabled);
@@ -224,6 +229,16 @@ void WKBundleClearApplicationCache(WKBundleRef bundleRef)
 void WKBundleSetAppCacheMaximumSize(WKBundleRef bundleRef, uint64_t size)
 {
     toImpl(bundleRef)->setAppCacheMaximumSize(size);
+}
+
+uint64_t WKBundleGetAppCacheUsageForOrigin(WKBundleRef bundleRef, WKStringRef origin)
+{
+    return toImpl(bundleRef)->appCacheUsageForOrigin(toImpl(origin)->string());
+}
+
+void WKBundleSetMinimumTimerInterval(WKBundleRef bundleRef, WKBundlePageGroupRef pageGroupRef, double seconds)
+{
+    toImpl(bundleRef)->setMinimumTimerInterval(toImpl(pageGroupRef), seconds);
 }
 
 int WKBundleNumberOfPages(WKBundleRef bundleRef, WKBundleFrameRef frameRef, double pageWidthInPixels, double pageHeightInPixels)

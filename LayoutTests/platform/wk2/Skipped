@@ -54,10 +54,6 @@ compositing/iframes/iframe-src-change.html
 # <https://bugs.webkit.org/show_bug.cgi?id=57638>
 inspector/styles/styles-add-blank-property.html
 
-# Flakey on both Snow Leopard and Windows 7
-# https://bugs.webkit.org/show_bug.cgi?id=58337
-fast/dom/StyleSheet/detached-stylesheet-without-wrapper.html
-
 # Flakey on Snow Leopard Intel WebKit2 Release Tests
 # https://bugs.webkit.org/show_bug.cgi?id=58183
 editing/execCommand/convert-style-elements-to-spans.html
@@ -94,6 +90,7 @@ fast/sub-pixel/float-wrap-with-subpixel-top.html
 fast/sub-pixel/inline-block-should-not-wrap.html
 fast/sub-pixel/inline-block-with-margin.html
 fast/sub-pixel/inline-block-with-padding.html
+fast/sub-pixel/large-sizes.html
 fast/sub-pixel/layout-boxes-with-zoom.html
 fast/sub-pixel/position-right-aligns-with-container.html
 fast/sub-pixel/selection/selection-gaps-at-fractional-offsets.html
@@ -205,17 +202,8 @@ fast/harness/override-preferences-2.html
 fast/images/animated-gif-restored-from-bfcache.html
 fast/text/zero-font-size.html
 
-# WTR needs an implementation of applicationCacheDiskUsageForOrigin
-# https://bugs.webkit.org/show_bug.cgi?id=87188
+# WTR needs an implementation of dumpApplicationCacheDelegateCallbacks
 http/tests/appcache/origin-usage.html
-http/tests/canvas/webgl/origin-clean-conformance.html
-http/tests/navigation/ping-cross-origin-from-https.html
-http/tests/security/webgl-remote-read-remote-image-allowed.html
-http/tests/security/webgl-remote-read-remote-image-allowed-with-credentials.html
-http/tests/security/webgl-remote-read-remote-image-blocked-no-crossorigin.html
-loader/go-back-to-different-window-size.html
-media/restore-from-page-cache.html
-java/embedding-java-with-object.html
 
 # WebKitTestRunner needs to support layoutTestController.dumpDOMAsWebArchive
 # <https://bugs.webkit.org/show_bug.cgi?id=42324>
@@ -830,14 +818,6 @@ java
 compositing/plugins/invalidate_rect.html
 plugins/windowless_plugin_paint_test.html
 
-# WebKitTestRunner needs layoutTestController.setMinimumTimerInterval
-fast/dom/timer-increase-min-interval-and-reset-part-1.html
-fast/dom/timer-increase-min-interval-and-reset-part-2.html
-fast/dom/timer-increase-min-interval-repeating.html
-fast/dom/timer-increase-min-interval.html
-fast/dom/timer-increase-then-decrease-min-interval-repeating.html
-fast/dom/timer-increase-then-decrease-min-interval.html
-
 # WebKitTestRunner needs layoutTestController.originsWithLocalStorage
 storage/domstorage/localstorage/storagetracker/storage-tracker-1-prepare.html
 storage/domstorage/localstorage/storagetracker/storage-tracker-2-create.html
@@ -1279,10 +1259,6 @@ fast/parser/pre-html5-parser-quirks.html
 # [WK2] New fast/events/drag-display-none-element.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=90177
 fast/events/drag-display-none-element.html
-
-# [WK2] New fast/events/tab-focus-link-in-canvas.html fails
-# https://bugs.webkit.org/show_bug.cgi?id=95329
-fast/events/tab-focus-link-in-canvas.html
 
 # Skip tests in fast/text/shaping
 fast/text/shaping

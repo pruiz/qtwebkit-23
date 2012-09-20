@@ -540,6 +540,7 @@ WONTFIX SKIP : http/tests/security/contentSecurityPolicy/shared-worker-connect-s
 WONTFIX SKIP : http/tests/security/contentSecurityPolicy/shared-worker-connect-src-blocked.html = TEXT
 WONTFIX SKIP : http/tests/security/cross-origin-shared-worker.html = TEXT
 WONTFIX SKIP : http/tests/security/cross-origin-shared-worker-allowed.html = TEXT
+WONTFIX SKIP : http/tests/security/same-origin-shared-worker-blocked.html = TEXT
 WONTFIX SKIP : storage/indexeddb/basics-shared-workers.html = PASS
 
 // test_shell does not support message ports
@@ -888,6 +889,11 @@ WONTFIX SKIP : media/video-controls-fullscreen-volume.html = TEXT
 
 // Test fails because it's trying to load a plugin we don't have. We probably don't need to fix this.
 WONTFIX : platform/gtk/plugins/invalidate-rect-with-null-npp-argument.html = TEXT
+
+// Mac and Win does not have global selection.
+WONTFIX MAC WIN : editing/pasteboard/paste-global-selection.html = TEXT
+
+BUGWK96109 SKIP LINUX : editing/pasteboard/paste-global-selection.html = TEXT
 
 // Skipping rules for ANDROID are in platform/chromium-android/TestExpectations.
 
@@ -2483,7 +2489,14 @@ BUGWK74137 SNOWLEOPARD : fast/regions/region-overflow-auto-overflow-visible.html
 BUGWK74137 WIN LINUX ANDROID LION : fast/regions/region-overflow-auto-overflow-visible.html = PASS MISSING
 
 // CSS3 filters needs rebaselines on windows after 94372
-BUGWK82783 WIN : css3/filters/ = PASS IMAGE
+BUGWK82783 WIN : css3/filters/filter-change-repaint.html = IMAGE
+BUGWK82783 WIN : css3/filters/filter-change-repaint-composited.html = IMAGE
+BUGWK82783 WIN : css3/filters/filter-repaint-composited-fallback-crash.html = IMAGE
+BUGWK82783 WIN : css3/filters/filter-repaint-composited-fallback.html = IMAGE
+BUGWK82783 WIN : css3/filters/filter-repaint-child-layers.html = IMAGE
+BUGWK82783 WIN : css3/filters/effect-brightness.html = IMAGE
+BUGWK82783 WIN : css3/filters/crash-hw-sw-switch.html = IMAGE
+BUGWK82783 WIN : css3/filters/effect-brightness-clamping.html = IMAGE
 
 // CSS Regions tests for region styling and scoped styles
 BUGWK49142 : fast/regions/style-scoped-in-flow-override-container-style.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
@@ -2628,8 +2641,6 @@ BUGWK92511 SKIP : svg/as-image/animated-svg-repaints-completely-in-hidpi.html = 
 // Swidth DRT to high DPI output mode, which temporarily breaks IMAGE
 BUGCR146756 LINUX WIN ANDROID MAC : fast/hidpi/broken-image-icon-hidpi.html = IMAGE
 BUGCR146756 LINUX WIN ANDROID MAC : fast/hidpi/broken-image-with-size-hidpi.html = IMAGE
-
-BUGWK95847 LINUX WIN ANDROID MAC : fast/hidpi/gradient-with-scaled-ancestor.html = IMAGE
 
 // Flaky tests from ~r97647
 BUGWK70298 MAC : fast/table/border-collapsing/cached-69296.html = IMAGE
@@ -2854,8 +2865,6 @@ BUGWK81803 MAC : platform/chromium/compositing/rubberbanding/transform-overhang-
 
 BUGWK81931 SNOWLEOPARD WIN DEBUG : fast/images/destroyed-image-load-event.html = PASS TIMEOUT
 
-BUGWK37244 : tables/mozilla/bugs/bug27038-1.html = IMAGE+TEXT
-BUGWK37244 : tables/mozilla/bugs/bug27038-2.html = IMAGE+TEXT
 
 // The majority of these are only failing on the debug bots
 BUGWK82122 MAC DEBUG : css3/selectors3/xml/css3-modsel-100.xml = TEXT PASS
@@ -3022,9 +3031,6 @@ BUGWK83635 : fast/canvas/2d.imageDataHD.html = TEXT TIMEOUT
 BUGWK83635 : platform/chromium/virtual/gpu/fast/canvas/2d.imageDataHD.html = TEXT TIMEOUT
 
 BUGWK83647 WIN LINUX ANDROID : fast/multicol/cell-shrinkback.html = IMAGE
-
-BUGWK84065 DEBUG : fast/canvas/webgl/shader-precision-format.html = TEXT
-BUGWK84065 DEBUG : platform/chromium/virtual/gpu/fast/canvas/webgl/shader-precision-format.html = TEXT
 
 // IETC grid layout
 BUGWK83906 : ietestcenter/css3/grid/grid-column-001.htm = IMAGE
@@ -3312,13 +3318,38 @@ BUGWK92022 DEBUG : svg/W3C-SVG-1.1/struct-dom-06-b.svg = TEXT PASS
 BUGWK92026 DEBUG SNOWLEOPARD : css3/selectors3/xml/css3-modsel-179a.xml = PASS IMAGE+TEXT
 BUGWK92027 DEBUG SNOWLEOPARD : fast/performance/performance-now-timestamps.html = PASS TEXT
 BUGWK92288 SNOWLEOPARD DEBUG : plugins/update-widgets-crash.html = PASS TIMEOUT
-BUGWK92297 DEBUG : media/video-set-rate-from-pause.html = PASS CRASH
+BUGWK92297 WIN LINUX MAC DEBUG : media/video-set-rate-from-pause.html = PASS CRASH
 
 BUGWK92570 WIN DEBUG : inspector/debugger/dom-breakpoints.html = PASS TIMEOUT
 BUGWK92570 WIN DEBUG : inspector/timeline/timeline-network-received-data.html = TEXT PASS TIMEOUT
 BUGWK92570 WIN DEBUG : inspector/timeline/timeline-start-time.html = TEXT PASS TIMEOUT
 
 BUGWK94242 DEBUG : media/track/track-cues-sorted-before-dispatch.html = PASS TIMEOUT
+
+// Need rebaseline.
+BUGWK89344 : media/audio-controls-rendering.html = IMAGE+TEXT
+BUGCR145590 BUGWK89344 : media/audio-repaint.html = IMAGE+TEXT TIMEOUT
+BUGWK89344 : media/controls-after-reload.html = IMAGE+TEXT
+BUGWK89344 : media/controls-layout-direction.html = IMAGE
+BUGWK89344 : media/controls-strict.html = IMAGE+TEXT
+BUGWK89344 : media/controls-styling-strict.html = IMAGE+TEXT
+BUGWK89344 : media/controls-styling.html = IMAGE+TEXT
+BUGWK89344 : media/controls-without-preload.html = IMAGE+TEXT
+BUGWK89344 : media/media-controls-clone.html = IMAGE+TEXT
+BUGWK89344 : media/media-document-audio-repaint.html = IMAGE+TEXT
+BUGWK89344 : media/track/track-cue-rendering-horizontal.html = IMAGE+TEXT
+BUGWK89344 : media/track/track-cue-rendering-vertical.html = IMAGE+TEXT
+BUGWK89344 : media/video-controls-rendering.html = IMAGE+TEXT
+BUGWK89344 : media/video-display-toggle.html = IMAGE+TEXT
+BUGWK89344 : media/video-empty-source.html = IMAGE+TEXT
+BUGWK89344 : media/video-no-audio.html = IMAGE+TEXT
+BUGWK89344 : media/video-playing-and-pause.html = IMAGE+TEXT
+BUGWK89344 : media/video-zoom-controls.html = IMAGE+TEXT
+BUGWK89344 : http/tests/media/video-buffered-range-contains-currentTime.html = IMAGE
+BUGWK89344 : fast/hidpi/video-controls-in-hidpi.html = IMAGE+TEXT
+BUGWK89344 : fast/layers/video-layer.html = IMAGE+TEXT
+BUGWK89344 : compositing/video/video-controls-layer-creation.html = IMAGE
+BUGWK89344 LINUX ANDROID WIN : platform/chromium/media/controls-video-sizes.html = IMAGE
 
 // Supposedly started failing between CR r140760 and CR r141216.  The failures
 // look like they involve antialiasing; the fact that the test clearly expects
@@ -3410,16 +3441,16 @@ BUGWK94078 WIN RELEASE : http/tests/inspector/web-socket-frame-error.html = PASS
 BUGWK94256 DEBUG : fast/block/inline-children-root-linebox-crash.html = PASS CRASH
 
 // Following tests need baselines on Win and Linux 
-BUGWK94492 WIN LINUX : css3/filters/custom/custom-filter-color-matrix.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
-BUGWK94492 WIN LINUX : css3/filters/custom/custom-filter-composite-source-atop.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
-BUGWK94492 WIN LINUX : css3/filters/custom/custom-filter-shader-cache.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
-BUGWK94492 WIN LINUX : css3/filters/custom/effect-color-check.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
-BUGWK94492 WIN LINUX : css3/filters/custom/effect-custom-combined-missing.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
-BUGWK94492 WIN LINUX : css3/filters/custom/effect-custom.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
-BUGWK94492 WIN LINUX : css3/filters/custom/effect-custom-parameters.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
-BUGWK94492 WIN LINUX : css3/filters/custom/filter-repaint-custom-clipped.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
-BUGWK94492 WIN LINUX : css3/filters/custom/filter-repaint-custom.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
-BUGWK94492 WIN LINUX : css3/filters/custom/filter-repaint-custom-rotated.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
+BUGWK94492 WIN LINUX : css3/filters/custom/custom-filter-color-matrix.html = IMAGE
+BUGWK94492 WIN LINUX : css3/filters/custom/custom-filter-composite-source-atop.html = IMAGE
+BUGWK94492 WIN LINUX : css3/filters/custom/custom-filter-shader-cache.html = IMAGE
+BUGWK94492 WIN LINUX : css3/filters/custom/effect-color-check.html = IMAGE
+BUGWK94492 WIN LINUX : css3/filters/custom/effect-custom-combined-missing.html = IMAGE
+BUGWK94492 WIN LINUX : css3/filters/custom/effect-custom.html = IMAGE
+BUGWK94492 WIN LINUX : css3/filters/custom/effect-custom-parameters.html = IMAGE
+BUGWK94492 WIN LINUX : css3/filters/custom/filter-repaint-custom-clipped.html = IMAGE
+BUGWK94492 WIN LINUX : css3/filters/custom/filter-repaint-custom.html = IMAGE
+BUGWK94492 WIN LINUX : css3/filters/custom/filter-repaint-custom-rotated.html = IMAGE
 
 // Flaky
 BUGWK95246 : http/tests/security/mixedContent/filesystem-url-in-iframe.html = PASS TEXT
@@ -3531,7 +3562,6 @@ BUGCR145590 ANDROID : http/tests/security/video-cross-origin-readback.html = TEX
 BUGCR145590 ANDROID : media/W3C/video/canPlayType/canPlayType_two_implies_one_5.html = TEXT
 BUGCR145590 ANDROID : media/W3C/video/canPlayType/canPlayType_two_implies_one_6.html = TEXT
 BUGCR145590 ANDROID : media/audio-data-url.html = TEXT
-BUGCR145590 ANDROID : media/audio-repaint.html = TEXT TIMEOUT
 BUGCR145590 ANDROID : media/encrypted-media/encrypted-media-events.html = TIMEOUT
 BUGCR145590 ANDROID : media/encrypted-media/encrypted-media-not-loaded.html = TEXT
 BUGCR145590 ANDROID : media/encrypted-media/encrypted-media-syntax.html = TEXT
@@ -3540,6 +3570,7 @@ BUGCR145590 ANDROID : media/video-aspect-ratio.html = TEXT // 8 videos
 BUGCR145590 ANDROID : media/video-buffered.html = TEXT
 BUGCR145590 ANDROID : media/video-canvas-source.html = TEXT
 BUGCR145590 ANDROID : media/video-error-does-not-exist.html = TEXT
+BUGCR145590 ANDROID : media/video-set-rate-from-pause.html = TIMEOUT
 BUGCR145590 ANDROID : media/video-source-error-no-candidate.html = TIMEOUT PASS
 BUGCR145590 ANDROID : media/video-source-type-params.html = TEXT
 BUGCR145590 ANDROID : platform/chromium/compositing/video-frame-size-change.html = TIMEOUT
@@ -3561,6 +3592,9 @@ BUGWK95136 : fast/css/sticky/sticky-writing-mode-vertical-rl.html = IMAGE
 
 BUGWK95617 : fast/js/function-constructor-this-value.html = PASS TEXT
 
+// These tests appear to be making bots flaky. See bug for details.
+BUGWK96041 SKIP : platform/chromium-linux/compositing/gestures = PASS IMAGE
+
 //Require rebaseline after https://bugs.webkit.org/show_bug.cgi?id=80394
 BUGWK80394 MAC WIN : fast/block/margin-collapse/empty-clear-blocks.html = IMAGE+TEXT
 BUGWK80394 MAC WIN : fast/block/float/024.html = IMAGE+TEXT
@@ -3568,16 +3602,16 @@ BUGWK80394 MAC WIN : fast/block/margin-collapse/025.html = TEXT
 BUGWK80394 MAC WIN : fast/block/margin-collapse/block-inside-inline/025.html = TEXT
 
 // Following tests need baselines on Mac, Win and Linux  
-BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-circle.html = PASS IMAGE IMAGE+TEXT TEXT MISSING 
-BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-ellipse.html = PASS IMAGE IMAGE+TEXT TEXT MISSING 
-BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-rectangle.html = PASS IMAGE IMAGE+TEXT TEXT MISSING 
-BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-polygon.html = PASS IMAGE IMAGE+TEXT TEXT MISSING 
-BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-polygon-evenodd.html = PASS IMAGE IMAGE+TEXT TEXT MISSING 
-BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-polygon-nonzero.html = PASS IMAGE IMAGE+TEXT TEXT MISSING 
-BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-circle-filter.html = PASS IMAGE IMAGE+TEXT TEXT MISSING 
-BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-circle-overflow.html = PASS IMAGE IMAGE+TEXT TEXT MISSING 
-BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-circle-relative-overflow.html = PASS IMAGE IMAGE+TEXT TEXT MISSING 
-BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-circle-overflow-hidden.html = PASS IMAGE IMAGE+TEXT TEXT MISSING 
+BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-circle.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
+BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-ellipse.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
+BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-rectangle.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
+BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-polygon.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
+BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-polygon-evenodd.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
+BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-polygon-nonzero.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
+BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-circle-filter.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
+BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-circle-overflow.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
+BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-circle-relative-overflow.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
+BUGWK95646 MAC WIN LINUX : css3/masking/clip-path-circle-overflow-hidden.html = PASS IMAGE IMAGE+TEXT TEXT MISSING
 
 // Does not yet support new web notifications TestRunner API
 BUGWK95506 SKIP : http/tests/notifications = PASS
@@ -3590,9 +3624,11 @@ BUGCR146401 ANDROID : css3/filters/custom/effect-custom-transform-parameters.htm
 BUGCR146401 ANDROID : css3/filters/custom/filter-fallback-to-software.html = IMAGE
 BUGCR146401 ANDROID : fast/css/sticky/sticky-writing-mode-vertical-lr.html = IMAGE
 
-// Started failing after r127457
-BUGWK95799 MAC : touchadjustment/iframe-boundary.html = TEXT
-
 BUGWK95813 : fast/innerHTML/innerHTML-iframe.html = TEXT PASS
 
-BUGWK96041 LINUX : platform/chromium-linux/compositing/gestures = PASS IMAGE
+
+BUGWK96041 LINUX : http/tests/cache/cancel-during-revalidation-succeeded.html = PASS TEXT
+
+BUGWK96227 SKIP : fast/js/function-dot-arguments-identity.html = TEXT
+
+BUGWK128105 : fast/hidpi/gradient-with-scaled-ancestor.html = IMAGE PASS

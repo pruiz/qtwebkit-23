@@ -1,3 +1,66 @@
+2012-09-10  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [CMake][EFL] Enable the LLInt
+        https://bugs.webkit.org/show_bug.cgi?id=92682
+
+        Reviewed by Csaba Osztrogonác.
+
+        Added LLInt to CMake buildsystem and enabled it by default on EFL.
+        Note that Ruby is not enforced: a secondary check is done when LLInt
+        is enabled on the JSC's CMakeLists.txt.
+
+        * CMakeLists.txt:
+        * Source/cmake/OptionsEfl.cmake:
+        * Source/cmake/WebKitFeatures.cmake:
+        * Source/cmakeconfig.h.cmake:
+
+2012-09-07  Simon Fraser  <simon.fraser@apple.com>
+
+        box-shadow causes overlay scrollbars to be in the wrong position when element is composited
+        https://bugs.webkit.org/show_bug.cgi?id=85647
+
+        Reviewed by James Robinson.
+
+        Test overlay scrollbars in composited layers.
+
+        * ManualTests/scrollbars/scrollbars-in-composited-layers.html: Added.
+
+2012-09-07  Martin Robinson  <mrobinson@igalia.com>
+
+        [GTK] Move user agent helpers to WebCore
+        https://bugs.webkit.org/show_bug.cgi?id=95745
+
+        Reviewed by Carlos Garcia Campos.
+
+        Added an autoconf step for the new user agent shared code header in
+        WebCore. This is necessary so that we can use the user agent version
+        based on the information in the configure.ac file.
+
+        * configure.ac:
+
+2012-09-07  Allan Sandfeld Jensen  <allan.jensen@nokia.com>
+
+        Simplify hitTestResultAtPoint and nodesFromRect APIs
+        https://bugs.webkit.org/show_bug.cgi?id=95720
+
+        Reviewed by Antonio Gomes.
+
+        Update exported symbols.
+
+        * Source/autotools/symbols.filter:
+
+2012-09-07  Zan Dobersek  <zandobersek@gmail.com>
+
+        [GTK] Multiple feature defines in webcore_cppflags can occur
+        https://bugs.webkit.org/show_bug.cgi?id=95942
+
+        Reviewed by Martin Robinson.
+
+        Add the feature_defines_unstable variable that should control values of feature
+        defines for unstable features when unstable features are not enabled (e.g. release builds).
+
+        * GNUmakefile.am:
+
 2012-09-06  Zan Dobersek  <zandobersek@gmail.com>
 
         [Gtk] Remove configuration options for features that are not supported by the Gtk port

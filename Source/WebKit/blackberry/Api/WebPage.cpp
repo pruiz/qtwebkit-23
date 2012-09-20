@@ -20,6 +20,7 @@
 #include "WebPage.h"
 
 #include "ApplicationCacheStorage.h"
+#include "AuthenticationChallengeManager.h"
 #include "AutofillManager.h"
 #include "BackForwardController.h"
 #include "BackForwardListImpl.h"
@@ -2267,14 +2268,20 @@ bool WebPagePrivate::isActive() const
     return m_client->isActive();
 }
 
-bool WebPagePrivate::authenticationChallenge(const KURL& url, const ProtectionSpace& protectionSpace, Credential& inputCredential)
+void WebPagePrivate::authenticationChallenge(const KURL& url, const ProtectionSpace& protectionSpace, const Credential& inputCredential, AuthenticationChallengeClient* client)
 {
     WebString username;
     WebString password;
 
 #if !defined(PUBLIC_BUILD) || !PUBLIC_BUILD
-    if (m_dumpRenderTree)
-        return m_dumpRenderTree->didReceiveAuthenticationChallenge(inputCredential);
+    if (m_dumpRenderTree) {
+        Credential credential(inputCredential, inputCredential.persistence());
+        if (m_dumpRenderTree->didReceiveAuthenticationChallenge(credential))
+            client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeSuccess, credential);
+        else
+            client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeCancelled, inputCredential);
+        return;
+    }
 #endif
 
 #if ENABLE(BLACKBERRY_CREDENTIAL_PERSIST)
@@ -2291,8 +2298,11 @@ bool WebPagePrivate::authenticationChallenge(const KURL& url, const ProtectionSp
 #else
     Credential credential(username, password, CredentialPersistenceNone);
 #endif
-    inputCredential = credential;
-    return isConfirmed;
+
+    if (isConfirmed)
+        client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeSuccess, credential);
+    else
+        client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeCancelled, inputCredential);
 }
 
 PageClientBlackBerry::SaveCredentialType WebPagePrivate::notifyShouldSaveCredential(bool isNew)
@@ -2753,7 +2763,7 @@ PassRefPtr<Node> WebPagePrivate::contextNode(TargetDetectionStrategy strategy)
         return result.node(FatFingersResult::ShadowContentNotAllowed);
     }
 
-    HitTestResult result = eventHandler->hitTestResultAtPoint(contentPos, false /*allowShadowContent*/);
+    HitTestResult result = eventHandler->hitTestResultAtPoint(contentPos);
     return result.innerNode();
 }
 
@@ -2825,7 +2835,7 @@ Node* WebPagePrivate::nodeForZoomUnderPoint(const IntPoint& point)
     if (!m_mainFrame)
         return 0;
 
-    HitTestResult result = m_mainFrame->eventHandler()->hitTestResultAtPoint(mapFromTransformed(point), false);
+    HitTestResult result = m_mainFrame->eventHandler()->hitTestResultAtPoint(mapFromTransformed(point));
 
     Node* node = result.innerNonSharedNode();
 
@@ -3811,16 +3821,17 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
 
     // We might need to layout here to get a correct contentsSize so that zoomToFit
     // is calculated correctly.
-    while (needsLayout) {
+    bool stillNeedsLayout = needsLayout;
+    while (stillNeedsLayout) {
         setNeedsLayout();
         requestLayoutIfNeeded();
-        needsLayout = false;
+        stillNeedsLayout = false;
 
         // Emulate the zoomToFitWidthOnLoad algorithm if we're rotating.
         ++m_nestedLayoutFinishedCount;
         if (needsLayoutToFindContentSize) {
             if (setViewMode(viewMode()))
-                needsLayout = true;
+                stillNeedsLayout = true;
         }
     }
     m_nestedLayoutFinishedCount = 0;
@@ -4034,7 +4045,7 @@ bool WebPagePrivate::handleMouseEvent(PlatformMouseEvent& mouseEvent)
     }
 
     if (!node) {
-        HitTestResult result = eventHandler->hitTestResultAtPoint(mapFromViewportToContents(mouseEvent.position()), false /*allowShadowContent*/);
+        HitTestResult result = eventHandler->hitTestResultAtPoint(mapFromViewportToContents(mouseEvent.position()));
         node = result.innerNode();
     }
 
@@ -5197,7 +5208,7 @@ WebDOMDocument WebPage::document() const
 
 WebDOMNode WebPage::nodeAtPoint(int x, int y)
 {
-    HitTestResult result = d->m_mainFrame->eventHandler()->hitTestResultAtPoint(d->mapFromTransformed(IntPoint(x, y)), false);
+    HitTestResult result = d->m_mainFrame->eventHandler()->hitTestResultAtPoint(d->mapFromTransformed(IntPoint(x, y)));
     Node* node = result.innerNonSharedNode();
     return WebDOMNode(node);
 }
@@ -6014,7 +6025,7 @@ void WebPagePrivate::exitFullScreenForElement(Element* element)
 {
 #if ENABLE(VIDEO)
     // TODO: We should not check video tag when we decide to support all elements.
-    if (!element || !element->hasTagName(HTMLNames::videoTag))
+    if (!element || (!element->hasTagName(HTMLNames::videoTag) && !containsVideoTags(element)))
         return;
     if (m_webSettings->fullScreenVideoCapable()) {
         // The Browser chrome has its own fullscreen video widget.

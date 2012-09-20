@@ -515,7 +515,7 @@ EditorState WebPage::editorState() const
     }
 
     if (selectionRoot)
-        result.editorRect = frame->view()->contentsToWindow(selectionRoot->getPixelSnappedRect());
+        result.editorRect = frame->view()->contentsToWindow(selectionRoot->pixelSnappedBoundingBox());
 
     RefPtr<Range> range;
     if (result.hasComposition && (range = frame->editor()->compositionRange())) {
@@ -1124,6 +1124,11 @@ void WebPage::setFixedLayoutSize(const IntSize& size)
         view->forceLayout();
 }
 
+void WebPage::setSuppressScrollbarAnimations(bool suppressAnimations)
+{
+    m_page->setShouldSuppressScrollbarAnimations(suppressAnimations);
+}
+
 void WebPage::setPaginationMode(uint32_t mode)
 {
     Pagination pagination = m_page->pagination();
@@ -1310,7 +1315,7 @@ static bool isContextClick(const PlatformMouseEvent& event)
 static bool handleContextMenuEvent(const PlatformMouseEvent& platformMouseEvent, WebPage* page)
 {
     IntPoint point = page->corePage()->mainFrame()->view()->windowToContents(platformMouseEvent.position());
-    HitTestResult result = page->corePage()->mainFrame()->eventHandler()->hitTestResultAtPoint(point, false);
+    HitTestResult result = page->corePage()->mainFrame()->eventHandler()->hitTestResultAtPoint(point);
 
     Frame* frame = page->corePage()->mainFrame();
     if (result.innerNonSharedNode())
@@ -1351,8 +1356,14 @@ static bool handleMouseEvent(const WebMouseEvent& mouseEvent, WebPage* page, boo
 
             return handled;
         }
-        case PlatformEvent::MouseReleased:
-            return frame->eventHandler()->handleMouseReleaseEvent(platformMouseEvent);
+        case PlatformEvent::MouseReleased: {
+            bool handled = frame->eventHandler()->handleMouseReleaseEvent(platformMouseEvent);
+#if PLATFORM(QT)
+            if (!handled)
+                handled = page->handleMouseReleaseEvent(platformMouseEvent);
+#endif
+            return handled;
+        }
         case PlatformEvent::MouseMoved:
             if (onlyUpdateScrollbars)
                 return frame->eventHandler()->passMouseMovedEventToScrollbars(platformMouseEvent);
@@ -1555,7 +1566,7 @@ void WebPage::highlightPotentialActivation(const IntPoint& point, const IntSize&
             return;
 
 #else
-        HitTestResult result = mainframe->eventHandler()->hitTestResultAtPoint(mainframe->view()->windowToContents(point), /*allowShadowContent*/ false, /*ignoreClipping*/ true);
+        HitTestResult result = mainframe->eventHandler()->hitTestResultAtPoint(mainframe->view()->windowToContents(point), HitTestRequest::ReadOnly | HitTestRequest::Active | HitTestRequest::AllowShadowContent);
         adjustedNode = result.innerNode();
 #endif
         // Find the node to highlight. This is not the same as the node responding the tap gesture, because many
@@ -2068,6 +2079,7 @@ void WebPage::updatePreferences(const WebPreferencesStore& store)
 #if ENABLE(SMOOTH_SCROLLING)
     settings->setEnableScrollAnimator(store.getBoolValueForKey(WebPreferencesKey::scrollAnimatorEnabledKey()));
 #endif
+    settings->setInteractiveFormValidationEnabled(store.getBoolValueForKey(WebPreferencesKey::interactiveFormValidationEnabledKey()));
 
     // <rdar://problem/10697417>: It is necessary to force compositing when accelerate drawing
     // is enabled on Mac so that scrollbars are always in their own layers.
@@ -2113,7 +2125,7 @@ void WebPage::updatePreferences(const WebPreferencesStore& store)
 #endif
 
     settings->setShouldRespectImageOrientation(store.getBoolValueForKey(WebPreferencesKey::shouldRespectImageOrientationKey()));
-    settings->setThirdPartyStorageBlockingEnabled(store.getBoolValueForKey(WebPreferencesKey::thirdPartyStorageBlockingEnabledKey()));
+    settings->setStorageBlockingPolicy(static_cast<SecurityOrigin::StorageBlockingPolicy>(store.getUInt32ValueForKey(WebPreferencesKey::storageBlockingPolicyKey())));
 
     settings->setDiagnosticLoggingEnabled(store.getBoolValueForKey(WebPreferencesKey::diagnosticLoggingEnabledKey()));
 
@@ -2724,7 +2736,7 @@ void WebPage::findZoomableAreaForPoint(const WebCore::IntPoint& point, const Web
 {
     UNUSED_PARAM(area);
     Frame* mainframe = m_mainFrame->coreFrame();
-    HitTestResult result = mainframe->eventHandler()->hitTestResultAtPoint(mainframe->view()->windowToContents(point), /*allowShadowContent*/ false, /*ignoreClipping*/ true);
+    HitTestResult result = mainframe->eventHandler()->hitTestResultAtPoint(mainframe->view()->windowToContents(point), HitTestRequest::ReadOnly | HitTestRequest::Active | HitTestRequest::IgnoreClipping);
 
     Node* node = result.innerNode();
 
@@ -3241,7 +3253,7 @@ static bool pageContainsAnyHorizontalScrollbars(Frame* mainFrame)
 
         for (HashSet<ScrollableArea*>::const_iterator it = scrollableAreas->begin(), end = scrollableAreas->end(); it != end; ++it) {
             ScrollableArea* scrollableArea = *it;
-            if (!scrollableArea->isOnActivePage())
+            if (!scrollableArea->scrollbarsCanBeActive())
                 continue;
 
             if (hasEnabledHorizontalScrollbar(scrollableArea))

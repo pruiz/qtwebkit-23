@@ -75,7 +75,7 @@ public:
     LayoutUnit logicalWidth() const { return style()->isHorizontalWritingMode() ? width() : height(); }
     LayoutUnit logicalHeight() const { return style()->isHorizontalWritingMode() ? height() : width(); }
 
-    LayoutUnit constrainLogicalWidthInRegionByMinMax(LayoutUnit, LayoutUnit, RenderBlock*, RenderRegion* = 0, LayoutUnit offsetFromLogicalTopOfFirstPage = ZERO_LAYOUT_UNIT);
+    LayoutUnit constrainLogicalWidthInRegionByMinMax(LayoutUnit, LayoutUnit, RenderBlock*, RenderRegion* = 0, LayoutUnit offsetFromLogicalTopOfFirstPage = ZERO_LAYOUT_UNIT) const;
     LayoutUnit constrainLogicalHeightByMinMax(LayoutUnit) const;
 
     int pixelSnappedLogicalHeight() const { return style()->isHorizontalWritingMode() ? pixelSnappedHeight() : pixelSnappedWidth(); }
@@ -299,10 +299,10 @@ public:
 
     virtual LayoutSize offsetFromContainer(RenderObject*, const LayoutPoint&, bool* offsetDependsOnPoint = 0) const;
     
-    LayoutUnit computeBorderBoxLogicalWidth(LayoutUnit width) const;
-    LayoutUnit computeBorderBoxLogicalHeight(LayoutUnit height) const;
-    LayoutUnit computeContentBoxLogicalWidth(LayoutUnit width) const;
-    LayoutUnit computeContentBoxLogicalHeight(LayoutUnit height) const;
+    LayoutUnit adjustBorderBoxLogicalWidthForBoxSizing(LayoutUnit width) const;
+    LayoutUnit adjustBorderBoxLogicalHeightForBoxSizing(LayoutUnit height) const;
+    LayoutUnit adjustContentBoxLogicalWidthForBoxSizing(LayoutUnit width) const;
+    LayoutUnit adjustContentBoxLogicalHeightForBoxSizing(LayoutUnit height) const;
 
     virtual void borderFitAdjust(LayoutRect&) const { } // Shrink the box in which the border paints if border-fit is set.
 
@@ -364,12 +364,12 @@ public:
     LayoutUnit containingBlockAvailableLineWidthInRegion(RenderRegion*, LayoutUnit offsetFromLogicalTopOfFirstPage) const;
     LayoutUnit perpendicularContainingBlockLogicalHeight() const;
 
-    virtual void computeLogicalWidth();
+    virtual void updateLogicalWidth();
     virtual void computeLogicalHeight();
     void computeLogicalHeight(LogicalExtentComputedValues&) const;
 
     RenderBoxRegionInfo* renderBoxRegionInfo(RenderRegion*, LayoutUnit offsetFromLogicalTopOfFirstPage, RenderBoxRegionInfoFlags = CacheRenderBoxRegionInfo) const;
-    void computeLogicalWidthInRegion(RenderRegion* = 0, LayoutUnit offsetFromLogicalTopOfFirstPage = ZERO_LAYOUT_UNIT);
+    void computeLogicalWidthInRegion(LogicalExtentComputedValues&, RenderRegion* = 0, LayoutUnit offsetFromLogicalTopOfFirstPage = ZERO_LAYOUT_UNIT) const;
 
     bool stretchesToViewport() const
     {
@@ -385,9 +385,9 @@ public:
     bool sizesLogicalWidthToFitContent(SizeType) const;
     virtual bool stretchesToMinIntrinsicLogicalWidth() const { return false; }
 
-    LayoutUnit shrinkLogicalWidthToAvoidFloats(LayoutUnit childMarginStart, LayoutUnit childMarginEnd, const RenderBlock* cb, RenderRegion*, LayoutUnit offsetFromLogicalTopOfFirstPage);
+    LayoutUnit shrinkLogicalWidthToAvoidFloats(LayoutUnit childMarginStart, LayoutUnit childMarginEnd, const RenderBlock* cb, RenderRegion*, LayoutUnit offsetFromLogicalTopOfFirstPage) const;
 
-    LayoutUnit computeLogicalWidthInRegionUsing(SizeType, LayoutUnit availableLogicalWidth, const RenderBlock* containingBlock, RenderRegion*, LayoutUnit offsetFromLogicalTopOfFirstPage);
+    LayoutUnit computeLogicalWidthInRegionUsing(SizeType, LayoutUnit availableLogicalWidth, const RenderBlock* containingBlock, RenderRegion*, LayoutUnit offsetFromLogicalTopOfFirstPage) const;
     LayoutUnit computeLogicalHeightUsing(SizeType, const Length& height) const;
     LayoutUnit computeLogicalClientHeight(SizeType, const Length& height);
     LayoutUnit computeContentLogicalHeightUsing(SizeType, const Length& height) const;
@@ -449,7 +449,7 @@ public:
     bool tryLayoutDoingPositionedMovementOnly()
     {
         LayoutUnit oldWidth = width();
-        computeLogicalWidth();
+        updateLogicalWidth();
         // If we shrink to fit our width may have changed, so we still need full layout.
         if (oldWidth != width())
             return false;

@@ -384,7 +384,7 @@ END
     {
         return reinterpret_cast<${nativeType}*>(object->GetPointerFromInternalField(v8DOMWrapperObjectIndex));
     }
-    inline static v8::Handle<v8::Object> wrap(${nativeType}*, v8::Handle<v8::Context> creationContext = v8::Handle<v8::Context>(), v8::Isolate* = 0${forceNewObjectParameter});
+    inline static v8::Handle<v8::Object> wrap(${nativeType}*, v8::Handle<v8::Object> creationContext = v8::Handle<v8::Object>(), v8::Isolate* = 0${forceNewObjectParameter});
     static void derefObject(void*);
     static void visitDOMWrapper(DOMDataStore*, void*, v8::Persistent<v8::Object>);
     static WrapperTypeInfo info;
@@ -402,7 +402,7 @@ END
     if ($implClassName eq "HTMLDocument") {
       push(@headerContent, <<END);
   static v8::Local<v8::Object> wrapInShadowObject(v8::Local<v8::Object> wrapper, Node* impl);
-  static v8::Handle<v8::Value> getNamedProperty(HTMLDocument* htmlDocument, const AtomicString& key, v8::Handle<v8::Context> creationContext, v8::Isolate*);
+  static v8::Handle<v8::Value> getNamedProperty(HTMLDocument* htmlDocument, const AtomicString& key, v8::Handle<v8::Object> creationContext, v8::Isolate*);
 END
     }
 
@@ -477,13 +477,13 @@ END
     my $wrapSlowArgumentType = GetPassRefPtrType($nativeType);
     push(@headerContent, <<END);
 private:
-    static v8::Handle<v8::Object> wrapSlow(${wrapSlowArgumentType}, v8::Handle<v8::Context> creationContext, v8::Isolate*);
+    static v8::Handle<v8::Object> wrapSlow(${wrapSlowArgumentType}, v8::Handle<v8::Object> creationContext, v8::Isolate*);
 };
 
 END
 
     push(@headerContent, <<END);
-v8::Handle<v8::Object> ${className}::wrap(${nativeType}* impl, v8::Handle<v8::Context> creationContext, v8::Isolate* isolate${forceNewObjectInput})
+v8::Handle<v8::Object> ${className}::wrap(${nativeType}* impl, v8::Handle<v8::Object> creationContext, v8::Isolate* isolate${forceNewObjectInput})
 {
 END
     push(@headerContent, "    if (!forceNewObject) {\n") if IsDOMNodeType($interfaceName);
@@ -505,7 +505,7 @@ END
     } elsif (!($dataNode->extendedAttributes->{"CustomToJSObject"} or $dataNode->extendedAttributes->{"V8CustomToJSObject"})) {
         push(@headerContent, <<END);
 
-inline v8::Handle<v8::Value> toV8(${nativeType}* impl, v8::Handle<v8::Context> creationContext = v8::Handle<v8::Context>(), v8::Isolate* isolate = 0${forceNewObjectParameter})
+inline v8::Handle<v8::Value> toV8(${nativeType}* impl, v8::Handle<v8::Object> creationContext = v8::Handle<v8::Object>(), v8::Isolate* isolate = 0${forceNewObjectParameter})
 {
     if (!impl)
         return v8NullWithCheck(isolate);
@@ -515,14 +515,14 @@ END
     } elsif ($interfaceName ne 'Node') {
         push(@headerContent, <<END);
 
-v8::Handle<v8::Value> toV8(${nativeType}*, v8::Handle<v8::Context> creationContext = v8::Handle<v8::Context>(), v8::Isolate* = 0${forceNewObjectParameter});
+v8::Handle<v8::Value> toV8(${nativeType}*, v8::Handle<v8::Object> creationContext = v8::Handle<v8::Object>(), v8::Isolate* = 0${forceNewObjectParameter});
 END
     } else {
         push(@headerContent, <<END);
 
-v8::Handle<v8::Value> toV8Slow(Node*, v8::Handle<v8::Context> creationContext, v8::Isolate*, bool);
+v8::Handle<v8::Value> toV8Slow(Node*, v8::Handle<v8::Object> creationContext, v8::Isolate*, bool);
 
-inline v8::Handle<v8::Value> toV8(Node* impl, v8::Handle<v8::Context> creationContext = v8::Handle<v8::Context>(), v8::Isolate* isolate = 0, bool forceNewObject = false)
+inline v8::Handle<v8::Value> toV8(Node* impl, v8::Handle<v8::Object> creationContext = v8::Handle<v8::Object>(), v8::Isolate* isolate = 0, bool forceNewObject = false)
 {
     if (UNLIKELY(!impl))
         return v8NullWithCheck(isolate);
@@ -537,7 +537,7 @@ END
     }
 
     push(@headerContent, <<END);
-inline v8::Handle<v8::Value> toV8(PassRefPtr< ${nativeType} > impl, v8::Handle<v8::Context> creationContext = v8::Handle<v8::Context>(), v8::Isolate* isolate = 0${forceNewObjectParameter})
+inline v8::Handle<v8::Value> toV8(PassRefPtr< ${nativeType} > impl, v8::Handle<v8::Object> creationContext = v8::Handle<v8::Object>(), v8::Isolate* isolate = 0${forceNewObjectParameter})
 {
     return toV8(impl.get(), creationContext, isolate${forceNewObjectCall});
 }
@@ -984,7 +984,7 @@ END
     # Special case for readonly or Replaceable attributes (with a few exceptions). This attempts to ensure that JS wrappers don't get
     # garbage-collected prematurely when their lifetime is strongly tied to their owner. We accomplish this by inserting a reference to
     # the newly created wrapper into an internal field of the holder object.
-    if (!IsNodeSubType($dataNode) && $attrName ne "self" && (IsWrapperType($returnType) && ($attribute->type =~ /^readonly/ || $attribute->signature->extendedAttributes->{"Replaceable"})
+    if (!IsNodeSubType($dataNode) && $attrName ne "self" && (IsWrapperType($returnType) && ($attribute->type =~ /^readonly/ || $attribute->signature->extendedAttributes->{"Replaceable"} || $attrName eq "location")
         && $returnType ne "EventTarget" && $returnType ne "SerializedScriptValue" && $returnType ne "DOMWindow" 
         && $returnType ne "MessagePortArray"
         && $returnType !~ /SVG/ && $returnType !~ /HTML/ && !IsDOMNodeType($returnType))) {
@@ -1007,14 +1007,9 @@ END
         my $domMapFunction = GetDomMapFunction($dataNode, $interfaceName, "info.GetIsolate()");
         push(@implContentDecls, "    v8::Handle<v8::Value> wrapper = result.get() ? ${domMapFunction}.get(result.get()) : v8Undefined();\n");
         push(@implContentDecls, "    if (wrapper.IsEmpty()) {\n");
-        push(@implContentDecls, "        wrapper = toV8(result.get(), info.Holder()->CreationContext(), info.GetIsolate());\n");
+        push(@implContentDecls, "        wrapper = toV8(result.get(), info.Holder(), info.GetIsolate());\n");
         push(@implContentDecls, "        if (!wrapper.IsEmpty())\n");
-        if ($dataNode->name eq "DOMWindow") {
-            AddToImplIncludes("Frame.h");
-            push(@implContentDecls, "            V8DOMWrapper::setNamedHiddenWindowReference(imp->frame(), \"${attrName}\", wrapper);\n");
-        } else {
-            push(@implContentDecls, "            V8DOMWrapper::setNamedHiddenReference(info.Holder(), \"${attrName}\", wrapper);\n");
-        }
+        push(@implContentDecls, "            V8DOMWrapper::setNamedHiddenReference(info.Holder(), \"${attrName}\", wrapper);\n");
         push(@implContentDecls, "    }\n");
         push(@implContentDecls, "    return wrapper;\n");
         push(@implContentDecls, "}\n\n");
@@ -1026,7 +1021,7 @@ END
         AddToImplIncludes("V8$attrType.h");
         my $svgNativeType = $codeGenerator->GetSVGTypeNeedingTearOff($attrType);
         # Convert from abstract SVGProperty to real type, so the right toJS() method can be invoked.
-        push(@implContentDecls, "    return toV8(static_cast<$svgNativeType*>($result), info.Holder()->CreationContext(), info.GetIsolate());\n");
+        push(@implContentDecls, "    return toV8(static_cast<$svgNativeType*>($result), info.Holder(), info.GetIsolate());\n");
     } elsif ($codeGenerator->IsSVGTypeNeedingTearOff($attrType) and not $implClassName =~ /List$/) {
         AddToImplIncludes("V8$attrType.h");
         AddToImplIncludes("SVGPropertyTearOff.h");
@@ -1049,19 +1044,19 @@ END
                     $result =~ s/matrix/svgMatrix/;
                 }
 
-                push(@implContentDecls, "    return toV8(WTF::getPtr(${tearOffType}::create(wrapper, $result, $updateMethod)), info.Holder()->CreationContext(), info.GetIsolate());\n");
+                push(@implContentDecls, "    return toV8(WTF::getPtr(${tearOffType}::create(wrapper, $result, $updateMethod)), info.Holder(), info.GetIsolate());\n");
             } else {
                 AddToImplIncludes("SVGStaticPropertyTearOff.h");
                 $tearOffType =~ s/SVGPropertyTearOff</SVGStaticPropertyTearOff<$implClassName, /;
 
-                push(@implContentDecls, "    return toV8(WTF::getPtr(${tearOffType}::create(imp, $result, $updateMethod)), info.Holder()->CreationContext(), info.GetIsolate());\n");
+                push(@implContentDecls, "    return toV8(WTF::getPtr(${tearOffType}::create(imp, $result, $updateMethod)), info.Holder(), info.GetIsolate());\n");
             }
         } elsif ($tearOffType =~ /SVGStaticListPropertyTearOff/) {
-            push(@implContentDecls, "    return toV8(WTF::getPtr(${tearOffType}::create(imp, $result)), info.Holder()->CreationContext(), info.GetIsolate());\n");
+            push(@implContentDecls, "    return toV8(WTF::getPtr(${tearOffType}::create(imp, $result)), info.Holder(), info.GetIsolate());\n");
         } elsif ($tearOffType =~ /SVG(Point|PathSeg)List/) {
-            push(@implContentDecls, "    return toV8(WTF::getPtr($result), info.Holder()->CreationContext(), info.GetIsolate());\n");
+            push(@implContentDecls, "    return toV8(WTF::getPtr($result), info.Holder(), info.GetIsolate());\n");
         } else {
-            push(@implContentDecls, "    return toV8(WTF::getPtr(${tearOffType}::create($result)), info.Holder()->CreationContext(), info.GetIsolate());\n");
+            push(@implContentDecls, "    return toV8(WTF::getPtr(${tearOffType}::create($result)), info.Holder(), info.GetIsolate());\n");
         }
     } elsif ($attribute->signature->type eq "MessagePortArray") {
         AddToImplIncludes("MessagePort.h");
@@ -1074,7 +1069,7 @@ END
     MessagePortArray portsCopy(*ports);
     v8::Local<v8::Array> portArray = v8::Array::New(portsCopy.size());
     for (size_t i = 0; i < portsCopy.size(); ++i)
-        portArray->Set(v8Integer(i, info.GetIsolate()), toV8(portsCopy[i].get(), info.Holder()->CreationContext(), info.GetIsolate()));
+        portArray->Set(v8Integer(i, info.GetIsolate()), toV8(portsCopy[i].get(), info.Holder(), info.GetIsolate()));
     return portArray;
 END
     } else {
@@ -1087,7 +1082,7 @@ END
     return value;
 END
         } else {
-            push(@implContentDecls, "    " . ReturnNativeToJSValue($attribute->signature, $result, "info.GetIsolate()").";\n");
+            push(@implContentDecls, "    " . ReturnNativeToJSValue($attribute->signature, $result, "info.Holder()", "info.GetIsolate()").";\n");
         }
     }
 
@@ -1603,8 +1598,6 @@ sub GenerateCallWith
     }
     if ($codeGenerator->ExtendedAttributeContains($callWith, "ScriptExecutionContext")) {
         push(@$outputArray, $indent . "ScriptExecutionContext* scriptContext = getScriptExecutionContext();\n");
-        push(@$outputArray, $indent . "if (!scriptContext)\n");
-        push(@$outputArray, $indent . "    return" . ($returnVoid ? "" : " v8Undefined()") . ";\n");
         push(@callWithArgs, "scriptContext");
     }
     if ($function and $codeGenerator->ExtendedAttributeContains($callWith, "ScriptArguments")) {
@@ -1853,8 +1846,6 @@ END
         push(@implContent, <<END);
 
     ScriptExecutionContext* context = getScriptExecutionContext();
-    if (!context)
-        return throwError(ReferenceError, "${implClassName} constructor's associated context is not available", args.GetIsolate());
 END
     }
 
@@ -2027,15 +2018,11 @@ static v8::Handle<v8::Value> V8${implClassName}ConstructorCallback(const v8::Arg
     if (ConstructorMode::current() == ConstructorMode::WrapExistingObject)
         return args.Holder();
 
-    Frame* frame = currentFrame(BindingState::instance());
-    if (!frame)
-        return throwError(ReferenceError, "${implClassName} constructor associated frame is unavailable", args.GetIsolate());
-
-    Document* document = frame->document();
+    Document* document = currentDocument(BindingState::instance());
 
     // Make sure the document is added to the DOM Node map. Otherwise, the ${implClassName} instance
     // may end up being the only node in the map and get garbage-collected prematurely.
-    toV8(document, args.Holder()->CreationContext(), args.GetIsolate());
+    toV8(document, args.Holder(), args.GetIsolate());
 
 END
 
@@ -2532,7 +2519,6 @@ sub GenerateImplementation
     AddToImplIncludes("RuntimeEnabledFeatures.h");
     AddToImplIncludes("V8Binding.h");
     AddToImplIncludes("V8DOMWrapper.h");
-    AddToImplIncludes("V8IsolatedContext.h");
 
     AddIncludesForType($interfaceName);
 
@@ -2623,7 +2609,7 @@ sub GenerateImplementation
     if ($dataNode->extendedAttributes->{"TypedArray"}) {
         my $viewType = GetTypeNameOfExternalTypedArray($dataNode);
         push(@implContent, <<END);
-v8::Handle<v8::Value> toV8($implClassName* impl, v8::Handle<v8::Context> creationContext, v8::Isolate* isolate)
+v8::Handle<v8::Value> toV8($implClassName* impl, v8::Handle<v8::Object> creationContext, v8::Isolate* isolate)
 {
     if (!impl)
         return v8NullWithCheck(isolate);
@@ -3348,7 +3334,7 @@ sub GenerateToV8Converters
 
     push(@implContent, <<END);
 
-v8::Handle<v8::Object> ${className}::wrapSlow(${wrapSlowArgumentType} impl, v8::Handle<v8::Context> creationContext, v8::Isolate* isolate)
+v8::Handle<v8::Object> ${className}::wrapSlow(${wrapSlowArgumentType} impl, v8::Handle<v8::Object> creationContext, v8::Isolate* isolate)
 {
     v8::Handle<v8::Object> wrapper;
 END
@@ -3359,71 +3345,34 @@ END
     }
 
     AddToImplIncludes("Frame.h");
-    my $frame = "0";
-    if (IsNodeSubType($dataNode)) {
-        # DocumentType nodes are the only nodes that may have a NULL document.
-        if ($interfaceName eq "DocumentType") {
-            $frame = "impl->document() ? impl->document()->frame() : 0";
-        } else {
-            $frame = "impl->document()->frame()";
-        }
-    }
-    push(@implContent, <<END);
-    Frame* frame = $frame;
-END
 
     if (IsSubType($dataNode, "Document")) {
         push(@implContent, <<END);
-    if (frame && frame->script()->windowShell()->context().IsEmpty() && frame->script()->windowShell()->initializeIfNeeded()) {
-        // initializeIfNeeded may have created a wrapper for the object, retry from the start.
-        return ${className}::wrap(impl.get(), creationContext, isolate);
-    }
-END
-    }
-
-    # FIXME: We need a better way of recovering the correct prototype chain
-    # for every sort of object. For now, we special-case cross-origin visible
-    # objects (i.e., those with CheckSecurity).
-    if (IsVisibleAcrossOrigins($dataNode)) {
-        AddToImplIncludes("Frame.h");
-        push(@implContent, <<END);
-    if (impl->frame()) {
-        frame = impl->frame();
-        frame->script()->windowShell()->initializeIfNeeded();
-    }
-END
-    }
-
-    if (IsNodeSubType($dataNode) || IsVisibleAcrossOrigins($dataNode)) {
-        push(@implContent, <<END);
-
-    // Enter the node's context and create the wrapper in that context.
-    v8::Handle<v8::Context> context;
-    if (frame) {
-        v8::Handle<v8::Context> underlyingHandle = frame->script()->unsafeHandleToCurrentWorldContext();
-        if (v8::Context::GetCurrent() != underlyingHandle) {
-            // For performance, we enter the context only if the currently running context
-            // is different from the context that we are about to enter.
-            context = v8::Local<v8::Context>::New(underlyingHandle);
-            if (!context.IsEmpty())
-                context->Enter();
+    if (Frame* frame = impl->frame()) {
+        if (frame->script()->windowShell()->context().IsEmpty() && frame->script()->windowShell()->initializeIfNeeded()) {
+            // initializeIfNeeded may have created a wrapper for the object, retry from the start.
+            return ${className}::wrap(impl.get(), creationContext, isolate);
         }
     }
 END
     }
 
     push(@implContent, <<END);
-    wrapper = V8DOMWrapper::instantiateV8Object(frame, &info, impl.get());
-END
-    if (IsNodeSubType($dataNode) || IsVisibleAcrossOrigins($dataNode)) {
-        push(@implContent, <<END);
-    // Exit the node's context if it was entered.
-    if (!context.IsEmpty())
-        context->Exit();
-END
+
+    v8::Handle<v8::Context> context;
+    if (!creationContext.IsEmpty() && creationContext->CreationContext() != v8::Context::GetCurrent()) {
+        // For performance, we enter the context only if the currently running context
+        // is different from the context that we are about to enter.
+        context = v8::Local<v8::Context>::New(creationContext->CreationContext());
+        ASSERT(!context.IsEmpty());
+        context->Enter();
     }
 
-    push(@implContent, <<END);
+    wrapper = V8DOMWrapper::instantiateV8Object(&info, impl.get());
+
+    if (!context.IsEmpty())
+        context->Exit();
+
     if (UNLIKELY(wrapper.IsEmpty()))
         return wrapper;
 END
@@ -3589,7 +3538,7 @@ sub GenerateFunctionCallString()
         AddToImplIncludes("V8$returnType.h");
         AddToImplIncludes("SVGPropertyTearOff.h");
         my $svgNativeType = $codeGenerator->GetSVGTypeNeedingTearOff($returnType);
-        $result .= $indent . "return toV8(WTF::getPtr(${svgNativeType}::create($return)), args.Holder()->CreationContext(), args.GetIsolate());\n";
+        $result .= $indent . "return toV8(WTF::getPtr(${svgNativeType}::create($return)), args.Holder(), args.GetIsolate());\n";
         return $result;
     }
 
@@ -3599,7 +3548,7 @@ sub GenerateFunctionCallString()
     }
 
     $return .= ".release()" if ($returnIsRef);
-    $result .= $indent . ReturnNativeToJSValue($function->signature, $return, "args.GetIsolate()") . ";\n";
+    $result .= $indent . ReturnNativeToJSValue($function->signature, $return, "args.Holder()", "args.GetIsolate()") . ";\n";
 
     return $result;
 }
@@ -4030,6 +3979,8 @@ sub NativeToJSValue
 {
     my $signature = shift;
     my $value = shift;
+    my $getCreationContext = shift;
+    my $getCreationContextArg = $getCreationContext ? ", $getCreationContext" : "";
     my $getIsolate = shift;
     my $getIsolateArg = $getIsolate ? ", $getIsolate" : "";
     my $type = GetTypeFromSignature($signature);
@@ -4086,18 +4037,18 @@ sub NativeToJSValue
             AddToImplIncludes("V8$sequenceType.h");
             AddToImplIncludes("$sequenceType.h");
         }
-        return "v8Array($value, $getIsolate)";
+        return "v8Array($value$getIsolateArg)";
     }
 
     AddIncludesForType($type);
 
     # special case for non-DOM node interfaces
     if (IsDOMNodeType($type)) {
-        return "toV8(${value}, v8::Handle<v8::Context>()" . ($signature->extendedAttributes->{"ReturnNewObject"} ? "$getIsolateArg, true)" : "$getIsolateArg)");
+        return "toV8(${value}$getCreationContextArg$getIsolateArg" . ($signature->extendedAttributes->{"ReturnNewObject"} ? ", true)" : ")");
     }
 
     if ($type eq "EventTarget") {
-        return "V8DOMWrapper::convertEventTargetToV8Object($value, v8::Handle<v8::Context>()$getIsolateArg)";
+        return "V8DOMWrapper::convertEventTargetToV8Object($value$getCreationContextArg$getIsolateArg)";
     }
 
     if ($type eq "EventListener") {
@@ -4114,7 +4065,7 @@ sub NativeToJSValue
     AddToImplIncludes("wtf/RefPtr.h");
     AddToImplIncludes("wtf/GetPtr.h");
 
-    return "toV8($value, v8::Handle<v8::Context>()$getIsolateArg)";
+    return "toV8($value$getCreationContextArg$getIsolateArg)";
 }
 
 sub ReturnNativeToJSValue

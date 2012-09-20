@@ -485,6 +485,8 @@
                 'src/WebCache.cpp',
                 'src/WebColorName.cpp',
                 'src/WebCommon.cpp',
+                'src/WebCompositorInputHandlerImpl.cpp',
+                'src/WebCompositorInputHandlerImpl.h',
                 'src/WebCrossOriginPreflightResultCache.cpp',
                 'src/WebCursorInfo.cpp',
                 'src/WebDOMEvent.cpp',
@@ -863,11 +865,13 @@
             'target_name': 'webkit_wtf_support',
             'type': 'static_library',
             'dependencies': [
-                '../../Platform/Platform.gyp/Platform.gyp:webkit_platform',
                 '../../WTF/WTF.gyp/WTF.gyp:wtf',
             ],
             'defines': [
                 'WEBKIT_IMPLEMENTATION=1',
+            ],
+            'include_dirs': [
+                '../../Platform/chromium',
             ],
             'sources': [
                 'src/ChromiumCurrentTime.cpp',

@@ -207,7 +207,7 @@ contains(DEFINES, ENABLE_WEB_AUDIO=1) {
 }
 
 contains(DEFINES, WTF_USE_3D_GRAPHICS=1) {
-    contains(QT_CONFIG, opengles2): LIBS += -lEGL
+    contains(QT_CONFIG, opengles2):!win32: LIBS += -lEGL
     mac: LIBS += -framework IOSurface -framework CoreFoundation
     linux-*:contains(DEFINES, HAVE_XCOMPOSITE=1): LIBS += -lXcomposite
     haveQt(4): QT *= opengl

@@ -1,3 +1,68 @@
+2012-09-10  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Create a toggle button for closed captions
+        https://bugs.webkit.org/show_bug.cgi?id=96259
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Add closed caption toggling button to default WebKitEFL
+        theme.
+
+        * DefaultTheme/default.edc:
+        * DefaultTheme/widget/mediacontrol/togglecaptionsbutton/closedcaption.png: Added.
+        * DefaultTheme/widget/mediacontrol/togglecaptionsbutton/closedcaption_disabled.png: Added.
+        * DefaultTheme/widget/mediacontrol/togglecaptionsbutton/toggle_captions_button.edc: Added.
+
+2012-09-09  Emil A Eklund  <eae@chromium.org>
+
+        Rename Node::getRect/getPixelSnappedRect and remove ContainerNode::getRect
+        https://bugs.webkit.org/show_bug.cgi?id=81413
+
+        Reviewed by David Hyatt.
+
+        Update ewk_frame to call pixelSnappedBoundingBox.
+
+        * ewk/ewk_frame.cpp:
+        (ewk_frame_focused_element_geometry_get):
+
+2012-09-07  Benjamin Poulain  <bpoulain@apple.com>
+
+        Rename the ustring() accessor to string()
+        https://bugs.webkit.org/show_bug.cgi?id=95919
+
+        Reviewed by Geoffrey Garen.
+
+        * WebCoreSupport/DumpRenderTreeSupportEfl.cpp:
+        (DumpRenderTreeSupportEfl::sendWebIntentResponse):
+        (DumpRenderTreeSupportEfl::deliverWebIntent):
+        Aslo update the code from the UString->String conversion through StringImpl.
+
+2012-09-07  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Use same default minimum logical font size in DRT and WTR
+        https://bugs.webkit.org/show_bug.cgi?id=96116
+
+        Reviewed by Martin Robinson.
+
+        Add DRT helper function to set the minimum logical
+        font size setting.
+
+        * WebCoreSupport/DumpRenderTreeSupportEfl.cpp:
+        (DumpRenderTreeSupportEfl::setMinimumLogicalFontSize):
+        * WebCoreSupport/DumpRenderTreeSupportEfl.h:
+
+2012-09-07  Allan Sandfeld Jensen  <allan.jensen@nokia.com>
+
+        Simplify hitTestResultAtPoint and nodesFromRect APIs
+        https://bugs.webkit.org/show_bug.cgi?id=95720
+
+        Reviewed by Antonio Gomes.
+
+        Update calls to new API.
+
+        * ewk/ewk_frame.cpp:
+        (ewk_frame_hit_test_new):
+
 2012-09-07  Gyuyoung Kim  <gyuyoung.kim@samsung.com>
 
         Unreviewed, rolling out r127839.

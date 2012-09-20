@@ -37,7 +37,7 @@
 #include "NodeFilter.h"
 #include "V8CustomXPathNSResolver.h"
 #include "V8DOMMap.h"
-#include "V8IsolatedContext.h"
+#include "V8DOMWindowShell.h"
 #include "V8Utilities.h"
 #include "WrapperTypeInfo.h"
 #include <v8.h>
@@ -81,12 +81,12 @@ namespace WebCore {
 
         static WrapperTypeInfo* domWrapperType(v8::Handle<v8::Object>);
 
-        static v8::Handle<v8::Value> convertEventTargetToV8Object(PassRefPtr<EventTarget> eventTarget, v8::Handle<v8::Context> creationContext = v8::Handle<v8::Context>(), v8::Isolate* isolate = 0)
+        static v8::Handle<v8::Value> convertEventTargetToV8Object(PassRefPtr<EventTarget> eventTarget, v8::Handle<v8::Object> creationContext = v8::Handle<v8::Object>(), v8::Isolate* isolate = 0)
         {
             return convertEventTargetToV8Object(eventTarget.get(), creationContext, isolate);
         }
 
-        static v8::Handle<v8::Value> convertEventTargetToV8Object(EventTarget*, v8::Handle<v8::Context> creationContext = v8::Handle<v8::Context>(), v8::Isolate* = 0);
+        static v8::Handle<v8::Value> convertEventTargetToV8Object(EventTarget*, v8::Handle<v8::Object> creationContext = v8::Handle<v8::Object>(), v8::Isolate* = 0);
 
         static PassRefPtr<EventListener> getEventListener(v8::Local<v8::Value> value, bool isAttribute, ListenerLookupType lookup);
 
@@ -110,16 +110,9 @@ namespace WebCore {
         // Check whether a V8 value is a wrapper of type |classType|.
         static bool isWrapperOfType(v8::Handle<v8::Value>, WrapperTypeInfo*);
 
-        // Proper object lifetime support.
-        //
-        // Helper functions to make sure the child object stays alive
-        // while the parent is alive. Using the name more than once
-        // overwrites previous references making it possible to free
-        // old children.
         static void setNamedHiddenReference(v8::Handle<v8::Object> parent, const char* name, v8::Handle<v8::Value> child);
-        static void setNamedHiddenWindowReference(Frame*, const char*, v8::Handle<v8::Value>);
 
-        static v8::Local<v8::Object> instantiateV8Object(Frame*, WrapperTypeInfo*, void*);
+        static v8::Local<v8::Object> instantiateV8Object(WrapperTypeInfo*, void*);
 
         static v8::Handle<v8::Object> getCachedWrapper(Node* node)
         {
@@ -130,7 +123,7 @@ namespace WebCore {
                     return *wrapper;
             }
 
-            V8IsolatedContext* context = V8IsolatedContext::getEntered();
+            V8DOMWindowShell* context = V8DOMWindowShell::getEntered();
             if (LIKELY(!context)) {
                 v8::Persistent<v8::Object>* wrapper = node->wrapper();
                 if (!wrapper)

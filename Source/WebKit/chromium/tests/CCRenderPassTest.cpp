@@ -48,7 +48,7 @@ public:
 
 struct CCRenderPassSize {
     // If you add a new field to this class, make sure to add it to the copy() tests.
-    int m_id;
+    CCRenderPass::Id m_id;
     CCQuadList m_quadList;
     CCSharedQuadStateList m_sharedQuadStateList;
     WebKit::WebTransformationMatrix m_transformToRootTarget;
@@ -62,7 +62,7 @@ struct CCRenderPassSize {
 
 TEST(CCRenderPassTest, copyShouldBeIdenticalExceptIdAndQuads)
 {
-    int id = 3;
+    CCRenderPass::Id id(3, 2);
     IntRect outputRect(45, 22, 120, 13);
     WebTransformationMatrix transformToRoot(1, 0.5, 0.5, -0.5, -1, 0);
 
@@ -88,7 +88,7 @@ TEST(CCRenderPassTest, copyShouldBeIdenticalExceptIdAndQuads)
     testPass->sharedQuadStateList().append(CCSharedQuadState::create(WebTransformationMatrix(), IntRect(), IntRect(), 1, false));
     testPass->quadList().append(CCCheckerboardDrawQuad::create(testPass->sharedQuadStateList().last().get(), IntRect()));
 
-    int newId = 63;
+    CCRenderPass::Id newId(63, 4);
 
     OwnPtr<CCRenderPass> copy(pass->copy(newId));
     EXPECT_EQ(newId, copy->id());

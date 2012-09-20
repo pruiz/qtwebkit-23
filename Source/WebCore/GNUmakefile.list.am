@@ -1145,6 +1145,7 @@ webcore_built_sources += \
 	DerivedSources/WebCore/MathMLNames.h \
 	DerivedSources/WebCore/SVGElementFactory.cpp \
 	DerivedSources/WebCore/SVGNames.cpp \
+	DerivedSources/WebCore/UserAgentGtk.h \
 	DerivedSources/WebCore/UserAgentStyleSheetsData.cpp \
 	DerivedSources/WebCore/UserAgentStyleSheets.h \
 	DerivedSources/WebCore/WebKitFontFamilyNames.cpp \
@@ -2807,8 +2808,6 @@ webcore_sources += \
 	Source/WebCore/dom/HashChangeEvent.h \
 	Source/WebCore/dom/KeyboardEvent.cpp \
 	Source/WebCore/dom/KeyboardEvent.h \
-	Source/WebCore/dom/MemoryInstrumentation.cpp \
-	Source/WebCore/dom/MemoryInstrumentation.h \
 	Source/WebCore/dom/MessageChannel.cpp \
 	Source/WebCore/dom/MessageChannel.h \
 	Source/WebCore/dom/MessageEvent.cpp \
@@ -2945,6 +2944,8 @@ webcore_sources += \
 	Source/WebCore/dom/UserTypingGestureIndicator.h \
 	Source/WebCore/dom/ViewportArguments.cpp \
 	Source/WebCore/dom/ViewportArguments.h \
+	Source/WebCore/dom/WebCoreMemoryInstrumentation.cpp \
+	Source/WebCore/dom/WebCoreMemoryInstrumentation.h \
 	Source/WebCore/dom/WebKitAnimationEvent.cpp \
 	Source/WebCore/dom/WebKitAnimationEvent.h \
 	Source/WebCore/dom/WebKitNamedFlow.cpp \
@@ -3432,6 +3433,8 @@ webcore_sources += \
 	Source/WebCore/html/ImageInputType.h \
 	Source/WebCore/html/InputType.cpp \
 	Source/WebCore/html/InputType.h \
+	Source/WebCore/html/InputTypeNames.cpp \
+	Source/WebCore/html/InputTypeNames.h \
 	Source/WebCore/html/LabelableElement.cpp \
 	Source/WebCore/html/LabelableElement.h \
 	Source/WebCore/html/LabelsNodeList.cpp \
@@ -4183,6 +4186,8 @@ webcore_sources += \
 	Source/WebCore/platform/Cursor.h \
 	Source/WebCore/platform/DateComponents.cpp \
 	Source/WebCore/platform/DateComponents.h \
+	Source/WebCore/platform/DateTimeChooser.h \
+	Source/WebCore/platform/DateTimeChooserClient.h \
 	Source/WebCore/platform/Decimal.cpp \
 	Source/WebCore/platform/Decimal.h \
 	Source/WebCore/platform/DragData.cpp \
@@ -4250,6 +4255,8 @@ webcore_sources += \
 	Source/WebCore/platform/graphics/filters/CustomFilterGlobalContext.h \
 	Source/WebCore/platform/graphics/filters/CustomFilterMesh.cpp \
 	Source/WebCore/platform/graphics/filters/CustomFilterMesh.h \
+	Source/WebCore/platform/graphics/filters/CustomFilterMeshGenerator.cpp \
+	Source/WebCore/platform/graphics/filters/CustomFilterMeshGenerator.h \
 	Source/WebCore/platform/graphics/filters/CustomFilterNumberParameter.h \
 	Source/WebCore/platform/graphics/filters/CustomFilterOperation.cpp \
 	Source/WebCore/platform/graphics/filters/CustomFilterOperation.h \
@@ -4485,6 +4492,7 @@ webcore_sources += \
 	Source/WebCore/platform/gtk/LoggingGtk.cpp \
 	Source/WebCore/platform/gtk/MIMETypeRegistryGtk.cpp \
 	Source/WebCore/platform/gtk/SharedBufferGtk.cpp \
+	Source/WebCore/platform/gtk/UserAgentGtk.cpp \
 	Source/WebCore/platform/gtk/TemporaryLinkStubs.cpp \
 	Source/WebCore/platform/HostWindow.h \
 	Source/WebCore/platform/KillRing.h \
@@ -4802,8 +4810,9 @@ webcore_sources += \
 	Source/WebCore/platform/text/UnicodeBidi.h \
 	Source/WebCore/platform/text/UnicodeRange.cpp \
 	Source/WebCore/platform/text/UnicodeRange.h \
-	Source/WebCore/platform/TouchpadFlingPlatformGestureCurve.cpp \
-	Source/WebCore/platform/TouchpadFlingPlatformGestureCurve.h \
+	Source/WebCore/platform/text/WritingMode.h \
+	Source/WebCore/platform/TouchFlingPlatformGestureCurve.cpp \
+	Source/WebCore/platform/TouchFlingPlatformGestureCurve.h \
 	Source/WebCore/platform/ThemeTypes.h \
 	Source/WebCore/platform/ThreadCheck.h \
 	Source/WebCore/platform/ThreadGlobalData.cpp \
@@ -4862,6 +4871,12 @@ webcore_sources += \
 	Source/WebCore/rendering/CounterNode.h \
 	Source/WebCore/rendering/EllipsisBox.cpp \
 	Source/WebCore/rendering/EllipsisBox.h \
+	Source/WebCore/rendering/ExclusionInterval.cpp \
+	Source/WebCore/rendering/ExclusionInterval.h \
+	Source/WebCore/rendering/ExclusionRectangle.cpp \
+	Source/WebCore/rendering/ExclusionRectangle.h \
+	Source/WebCore/rendering/ExclusionShape.cpp \
+	Source/WebCore/rendering/ExclusionShape.h \
 	Source/WebCore/rendering/FilterEffectRenderer.cpp \
 	Source/WebCore/rendering/FilterEffectRenderer.h \
 	Source/WebCore/rendering/FixedTableLayout.cpp \
@@ -4884,6 +4899,7 @@ webcore_sources += \
 	Source/WebCore/rendering/LayoutState.cpp \
 	Source/WebCore/rendering/LayoutState.h \
 	Source/WebCore/rendering/LayoutTypes.h \
+	Source/WebCore/rendering/LayoutTypesInlineMethods.h \
 	Source/WebCore/rendering/LayoutRepainter.h \
 	Source/WebCore/rendering/LayoutRepainter.cpp \
 	Source/WebCore/rendering/OverlapTestRequestClient.h \

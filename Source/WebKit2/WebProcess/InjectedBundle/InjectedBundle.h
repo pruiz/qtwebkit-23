@@ -108,6 +108,7 @@ public:
     void overrideXSSAuditorEnabledForTestRunner(WebPageGroupProxy* pageGroup, bool enabled);
     void setAllowUniversalAccessFromFileURLs(WebPageGroupProxy*, bool);
     void setAllowFileAccessFromFileURLs(WebPageGroupProxy*, bool);
+    void setMinimumLogicalFontSize(WebPageGroupProxy*, int size);
     void setFrameFlatteningEnabled(WebPageGroupProxy*, bool);
     void setPluginsEnabled(WebPageGroupProxy*, bool);
     void setGeoLocationPermission(WebPageGroupProxy*, bool);
@@ -124,6 +125,7 @@ public:
     String pageSizeAndMarginsInPixels(WebFrame*, int, int, int, int, int, int, int);
     bool isPageBoxVisible(WebFrame*, int);
     void setUserStyleSheetLocation(WebPageGroupProxy*, const String&);
+    void setMinimumTimerInterval(WebPageGroupProxy*, double seconds);
     void setWebNotificationPermission(WebPage*, const String& originString, bool allowed);
     void removeAllWebNotificationPermissions(WebPage*);
     uint64_t webNotificationID(JSContextRef, JSValueRef);
@@ -144,6 +146,7 @@ public:
     // Application Cache API
     void clearApplicationCache();
     void setAppCacheMaximumSize(uint64_t);
+    uint64_t appCacheUsageForOrigin(const String& origin);
 
     // Garbage collection API
     void garbageCollectJavaScriptObjects();

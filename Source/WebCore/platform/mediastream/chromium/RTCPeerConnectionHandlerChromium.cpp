@@ -45,8 +45,8 @@
 #include <public/WebMediaConstraints.h>
 #include <public/WebMediaStreamDescriptor.h>
 #include <public/WebRTCConfiguration.h>
-#include <public/WebRTCICECandidateDescriptor.h>
-#include <public/WebRTCSessionDescriptionDescriptor.h>
+#include <public/WebRTCICECandidate.h>
+#include <public/WebRTCSessionDescription.h>
 #include <public/WebRTCSessionDescriptionRequest.h>
 #include <public/WebRTCVoidRequest.h>
 #include <wtf/PassOwnPtr.h>
@@ -81,6 +81,15 @@ void RTCPeerConnectionHandlerChromium::createOffer(PassRefPtr<RTCSessionDescript
         return;
 
     m_webHandler->createOffer(request, constraints);
+}
+
+void RTCPeerConnectionHandlerChromium::createAnswer(PassRefPtr<RTCSessionDescriptionRequest> request, PassRefPtr<MediaConstraints> constraints)
+{
+    // FIXME: Should the error callback be triggered here?
+    if (!m_webHandler)
+        return;
+
+    m_webHandler->createAnswer(request, constraints);
 }
 
 void RTCPeerConnectionHandlerChromium::setLocalDescription(PassRefPtr<RTCVoidRequest> request, PassRefPtr<RTCSessionDescriptionDescriptor> sessionDescription)
@@ -155,7 +164,12 @@ void RTCPeerConnectionHandlerChromium::stop()
     m_webHandler->stop();
 }
 
-void RTCPeerConnectionHandlerChromium::didGenerateICECandidate(const WebKit::WebRTCICECandidateDescriptor& iceCandidate)
+void RTCPeerConnectionHandlerChromium::negotiationNeeded()
+{
+    m_client->negotiationNeeded();
+}
+
+void RTCPeerConnectionHandlerChromium::didGenerateICECandidate(const WebKit::WebRTCICECandidate& iceCandidate)
 {
     m_client->didGenerateIceCandidate(iceCandidate);
 }

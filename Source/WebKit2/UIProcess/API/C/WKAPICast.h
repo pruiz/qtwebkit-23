@@ -37,6 +37,7 @@
 #include "WKCookieManager.h"
 #include "WKCredentialTypes.h"
 #include "WKPage.h"
+#include "WKPreferences.h"
 #include "WKPreferencesPrivate.h"
 #include "WKProtectionSpaceTypes.h"
 #include "WKResourceCacheManager.h"
@@ -385,6 +386,36 @@ inline WKHTTPCookieAcceptPolicy toAPI(HTTPCookieAcceptPolicy policy)
     return kWKHTTPCookieAcceptPolicyAlways;
 }
 
+inline WebCore::SecurityOrigin::StorageBlockingPolicy toStorageBlockingPolicy(WKStorageBlockingPolicy policy)
+{
+    switch (policy) {
+    case kWKAllowAllStorage:
+        return WebCore::SecurityOrigin::AllowAllStorage;
+    case kWKBlockThirdPartyStorage:
+        return WebCore::SecurityOrigin::BlockThirdPartyStorage;
+    case kWKBlockAllStorage:
+        return WebCore::SecurityOrigin::BlockAllStorage;
+    }
+
+    ASSERT_NOT_REACHED();
+    return WebCore::SecurityOrigin::AllowAllStorage;
+}
+
+inline WKStorageBlockingPolicy toAPI(WebCore::SecurityOrigin::StorageBlockingPolicy policy)
+{
+    switch (policy) {
+    case WebCore::SecurityOrigin::AllowAllStorage:
+        return kWKAllowAllStorage;
+    case WebCore::SecurityOrigin::BlockThirdPartyStorage:
+        return kWKBlockThirdPartyStorage;
+    case WebCore::SecurityOrigin::BlockAllStorage:
+        return kWKBlockAllStorage;
+    }
+
+    ASSERT_NOT_REACHED();
+    return kWKAllowAllStorage;
+}
+
 inline ProxyingRefPtr<WebGrammarDetail> toAPI(const WebCore::GrammarDetail& grammarDetail)
 {
     return ProxyingRefPtr<WebGrammarDetail>(WebGrammarDetail::create(grammarDetail));
@@ -392,7 +423,7 @@ inline ProxyingRefPtr<WebGrammarDetail> toAPI(const WebCore::GrammarDetail& gram
 
 } // namespace WebKit
 
-#if defined(WIN32) || defined(_WIN32)
+#if (defined(WIN32) || defined(_WIN32)) && !defined(BUILDING_QT__)
 #include "WKAPICastWin.h"
 #endif
 

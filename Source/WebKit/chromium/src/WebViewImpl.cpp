@@ -124,6 +124,7 @@
 #include "WebAccessibilityObject.h"
 #include "WebActiveWheelFlingParameters.h"
 #include "WebAutofillClient.h"
+#include "WebCompositorInputHandlerImpl.h"
 #include "WebDevToolsAgentImpl.h"
 #include "WebDevToolsAgentPrivate.h"
 #include "WebFrameImpl.h"
@@ -415,6 +416,7 @@ WebViewImpl::WebViewImpl(WebViewClient* client)
     , m_recreatingGraphicsContext(false)
     , m_compositorSurfaceReady(false)
     , m_deviceScaleInCompositor(1)
+    , m_inputHandlerIdentifier(-1)
 #endif
 #if ENABLE(INPUT_SPEECH)
     , m_speechInputClient(SpeechInputClientImpl::create(client))
@@ -637,17 +639,13 @@ void WebViewImpl::handleMouseUp(Frame& mainFrame, const WebMouseEvent& event)
         FrameView* view = m_page->mainFrame()->view();
         IntPoint clickPoint(m_lastMouseDownPoint.x, m_lastMouseDownPoint.y);
         IntPoint contentPoint = view->windowToContents(clickPoint);
-        HitTestResult hitTestResult = focused->eventHandler()->hitTestResultAtPoint(contentPoint, false, false, ShouldHitTestScrollbars);
+        HitTestResult hitTestResult = focused->eventHandler()->hitTestResultAtPoint(contentPoint, HitTestRequest::ReadOnly | HitTestRequest::Active | HitTestRequest::TestChildFrameScrollBars);
         // We don't want to send a paste when middle clicking a scroll bar or a
         // link (which will navigate later in the code).  The main scrollbars
         // have to be handled separately.
         if (!hitTestResult.scrollbar() && !hitTestResult.isLiveLink() && focused && !view->scrollbarAtPoint(clickPoint)) {
             Editor* editor = focused->editor();
-            Pasteboard* pasteboard = Pasteboard::generalPasteboard();
-            bool oldSelectionMode = pasteboard->isSelectionMode();
-            pasteboard->setSelectionMode(true);
-            editor->command(AtomicString("Paste")).execute();
-            pasteboard->setSelectionMode(oldSelectionMode);
+            editor->command(AtomicString("PasteGlobalSelection")).execute();
         }
     }
 #endif
@@ -713,9 +711,10 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
         hideSelectPopup();
         ASSERT(!m_selectPopup);
 
-        if (!event.boundingBox.isEmpty()) {
+        if (event.data.tap.width > 0) {
+            IntRect boundingBox(event.x - event.data.tap.width / 2, event.y - event.data.tap.height / 2, event.data.tap.width, event.data.tap.height);
             Vector<IntRect> goodTargets;
-            findGoodTouchTargets(event.boundingBox, mainFrameImpl()->frame(), pageScaleFactor(), goodTargets);
+            findGoodTouchTargets(boundingBox, mainFrameImpl()->frame(), pageScaleFactor(), goodTargets);
             // FIXME: replace touch adjustment code when numberOfGoodTargets == 1?
             // Single candidate case is currently handled by: https://bugs.webkit.org/show_bug.cgi?id=85101
             if (goodTargets.size() >= 2 && m_client && m_client->didTapMultipleTargets(event, goodTargets))
@@ -772,6 +771,10 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
         PlatformGestureEventBuilder platformEvent(mainFrameImpl()->frameView(), event);
         return mainFrameImpl()->frame()->eventHandler()->handleGestureEvent(platformEvent);
     }
+    case WebInputEvent::GestureTapCancel:
+        // FIXME: Update WebCore to handle this event after chromium has been updated to send it
+        // http://wkb.ug/96060
+        return false;
     default:
         ASSERT_NOT_REACHED();
     }
@@ -1005,9 +1008,8 @@ WebRect WebViewImpl::computeBlockBounds(const WebRect& rect, AutoZoomType zoomTy
 
     // Use the rect-based hit test to find the node.
     IntPoint point = mainFrameImpl()->frameView()->windowToContents(IntPoint(rect.x, rect.y));
-    HitTestResult result = mainFrameImpl()->frame()->eventHandler()->hitTestResultAtPoint(point,
-            false, zoomType == FindInPage, DontHitTestScrollbars, HitTestRequest::Active | HitTestRequest::ReadOnly,
-            IntSize(rect.width, rect.height));
+    HitTestRequest::HitTestRequestType hitType = HitTestRequest::ReadOnly | HitTestRequest::Active | ((zoomType == FindInPage) ? HitTestRequest::IgnoreClipping : 0);
+    HitTestResult result = mainFrameImpl()->frame()->eventHandler()->hitTestResultAtPoint(point, hitType, IntSize(rect.width, rect.height));
 
     Node* node = result.innerNonSharedNode();
     if (!node)
@@ -1019,7 +1021,7 @@ WebRect WebViewImpl::computeBlockBounds(const WebRect& rect, AutoZoomType zoomTy
 
     // Return the bounding box in the window coordinate system.
     if (node) {
-        IntRect rect = node->Node::getPixelSnappedRect();
+        IntRect rect = node->Node::pixelSnappedBoundingBox();
         Frame* frame = node->document()->frame();
         return frame->view()->contentsToWindow(rect);
     }
@@ -2926,6 +2928,18 @@ void WebViewImpl::resetSavedScrollAndScaleState()
     m_savedScrollOffset = IntSize();
 }
 
+void WebViewImpl::resetScrollAndScaleState()
+{
+    page()->setPageScaleFactor(0, IntPoint());
+    m_pageScaleFactorIsSet = false;
+
+    // Clobber saved scales and scroll offsets.
+    if (FrameView* view = page()->mainFrame()->document()->view())
+        view->cacheCurrentScrollPosition();
+    resetSavedScrollAndScaleState();
+    page()->mainFrame()->loader()->history()->saveDocumentAndScrollState();
+}
+
 WebSize WebViewImpl::fixedLayoutSize() const
 {
     if (!page())
@@ -3310,7 +3324,7 @@ void WebViewImpl::applyAutofillSuggestions(
         refreshAutofillPopup();
     } else {
         m_autofillPopupShowing = true;
-        m_autofillPopup->showInRect(focusedNode->getPixelSnappedRect(), focusedNode->ownerDocument()->view(), 0);
+        m_autofillPopup->showInRect(focusedNode->pixelSnappedBoundingBox(), focusedNode->ownerDocument()->view(), 0);
     }
 }
 
@@ -3618,7 +3632,7 @@ void WebViewImpl::refreshAutofillPopup()
         return;
     }
 
-    WebRect newWidgetRect = m_autofillPopup->refresh(focusedWebCoreNode()->getPixelSnappedRect());
+    WebRect newWidgetRect = m_autofillPopup->refresh(focusedWebCoreNode()->pixelSnappedBoundingBox());
     // Let's resize the backing window if necessary.
     WebPopupMenuImpl* popupMenu = static_cast<WebPopupMenuImpl*>(m_autofillPopup->client());
     if (popupMenu && popupMenu->client()->windowRect() != newWidgetRect)
@@ -3777,7 +3791,7 @@ void WebViewImpl::setIsAcceleratedCompositingActive(bool active)
         m_isAcceleratedCompositingActive = true;
         updateLayerTreeViewport();
 
-        m_client->didActivateCompositor(m_layerTreeView->compositorIdentifier());
+        m_client->didActivateCompositor(m_inputHandlerIdentifier);
     } else {
         TRACE_EVENT0("webkit", "WebViewImpl::setIsAcceleratedCompositingActive(true)");
 
@@ -3795,7 +3809,7 @@ void WebViewImpl::setIsAcceleratedCompositingActive(bool active)
         m_nonCompositedContentHost->setShowDebugBorders(page()->settings()->showDebugBorders());
         m_nonCompositedContentHost->setOpaque(!isTransparent());
 
-        m_layerTreeView = adoptPtr(WebLayerTreeView::create(this, *m_rootLayer, layerTreeViewSettings));
+        m_layerTreeView = adoptPtr(Platform::current()->compositorSupport()->createLayerTreeView(this, *m_rootLayer, layerTreeViewSettings));
         if (m_layerTreeView) {
             if (m_webSettings->applyDefaultDeviceScaleFactorInCompositor() && page()->deviceScaleFactor() != 1) {
                 ASSERT(page()->deviceScaleFactor());
@@ -3811,7 +3825,7 @@ void WebViewImpl::setIsAcceleratedCompositingActive(bool active)
                 m_layerTreeView->setSurfaceReady();
             m_layerTreeView->setHasTransparentBackground(isTransparent());
             updateLayerTreeViewport();
-            m_client->didActivateCompositor(m_layerTreeView->compositorIdentifier());
+            m_client->didActivateCompositor(m_inputHandlerIdentifier);
             m_isAcceleratedCompositingActive = true;
             m_compositorCreationFailed = false;
             if (m_pageOverlays)
@@ -3895,6 +3909,13 @@ WebGraphicsContext3D* WebViewImpl::createContext3D()
 WebCompositorOutputSurface* WebViewImpl::createOutputSurface()
 {
     return m_client->createOutputSurface();
+}
+
+WebInputHandler* WebViewImpl::createInputHandler()
+{
+    WebCompositorInputHandlerImpl* handler = new WebCompositorInputHandlerImpl();
+    m_inputHandlerIdentifier = handler->identifier();
+    return handler;
 }
 
 void WebViewImpl::applyScrollAndScale(const WebSize& scrollDelta, float pageScaleDelta)

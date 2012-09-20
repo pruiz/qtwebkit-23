@@ -1149,7 +1149,6 @@ SET(WebCore_SOURCES
     dom/IdTargetObserver.cpp
     dom/IdTargetObserverRegistry.cpp
     dom/KeyboardEvent.cpp
-    dom/MemoryInstrumentation.cpp
     dom/MessageChannel.cpp
     dom/MessageEvent.cpp
     dom/MessagePortChannel.cpp
@@ -1215,6 +1214,7 @@ SET(WebCore_SOURCES
     dom/UserGestureIndicator.cpp
     dom/UserTypingGestureIndicator.cpp
     dom/ViewportArguments.cpp
+    dom/WebCoreMemoryInstrumentation.cpp
     dom/WebKitAnimationEvent.cpp
     dom/WebKitNamedFlow.cpp
     dom/WebKitTransitionEvent.cpp
@@ -1420,6 +1420,7 @@ SET(WebCore_SOURCES
     html/ImageDocument.cpp
     html/ImageInputType.cpp
     html/InputType.cpp
+    html/InputTypeNames.cpp
     html/LabelableElement.cpp
     html/LabelsNodeList.cpp
     html/LinkRelAttribute.cpp
@@ -1935,6 +1936,7 @@ SET(WebCore_SOURCES
     platform/mediastream/IceOptions.cpp
     platform/mediastream/MediaHints.cpp
     platform/mediastream/MediaStreamCenter.cpp
+    platform/mediastream/MediaStreamSource.cpp
     platform/mediastream/PeerConnection00Handler.cpp
     platform/mediastream/RTCIceCandidateDescriptor.cpp
     platform/mediastream/RTCPeerConnectionHandler.cpp
@@ -2014,6 +2016,9 @@ SET(WebCore_SOURCES
     rendering/BidiRun.cpp
     rendering/CounterNode.cpp
     rendering/EllipsisBox.cpp
+    rendering/ExclusionInterval.cpp
+    rendering/ExclusionRectangle.cpp
+    rendering/ExclusionShape.cpp
     rendering/FilterEffectRenderer.cpp
     rendering/FixedTableLayout.cpp
     rendering/FlowThreadController.cpp
@@ -2490,7 +2495,7 @@ IF (ENABLE_SMOOTH_SCROLLING)
     LIST(APPEND WebCore_SOURCES
         platform/ActivePlatformGestureAnimation.cpp
         platform/ScrollAnimatorNone.cpp
-        platform/TouchpadFlingPlatformGestureCurve.cpp
+        platform/TouchFlingPlatformGestureCurve.cpp
     )
 ENDIF ()
 
@@ -2674,28 +2679,6 @@ IF (WTF_USE_3D_GRAPHICS)
         platform/graphics/ANGLEWebKitBridge.cpp
         platform/graphics/GraphicsContext3D.cpp
         platform/graphics/gpu/DrawingBuffer.cpp
-    )
-ENDIF ()
-
-IF (ENABLE_REQUEST_ANIMATION_FRAME)
-    LIST(APPEND WebCore_IDL_FILES
-        dom/RequestAnimationFrameCallback.idl
-    )
-    LIST(APPEND WebCore_SOURCES
-        dom/ScriptedAnimationController.cpp
-    )
-ENDIF ()
-
-IF (ENABLE_VIBRATION)
-    LIST(APPEND WebCore_INCLUDE_DIRECTORIES
-        ${WEBCORE_DIR}/Modules/vibration
-    )
-    LIST(APPEND WebCore_IDL_FILES
-        Modules/vibration/NavigatorVibration.idl
-    )
-    LIST(APPEND WebCore_SOURCES
-        Modules/vibration/NavigatorVibration.cpp
-        Modules/vibration/Vibration.cpp
     )
 ENDIF ()
 

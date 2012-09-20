@@ -31,7 +31,6 @@
 #include "TestSupplemental.h"
 #include "V8Binding.h"
 #include "V8DOMWrapper.h"
-#include "V8IsolatedContext.h"
 #include "V8Node.h"
 #include "V8TestObj.h"
 #include <wtf/GetPtr.h>
@@ -120,7 +119,7 @@ static v8::Handle<v8::Value> supplementalNodeAttrGetter(v8::Local<v8::String> na
 {
     INC_STATS("DOM.TestInterface.supplementalNode._get");
     TestInterface* imp = V8TestInterface::toNative(info.Holder());
-    return toV8(TestSupplemental::supplementalNode(imp), info.GetIsolate());
+    return toV8(TestSupplemental::supplementalNode(imp), info.Holder(), info.GetIsolate());
 }
 
 #endif // ENABLE(Condition11) || ENABLE(Condition12)
@@ -163,12 +162,10 @@ static v8::Handle<v8::Value> supplementalMethod2Callback(const v8::Arguments& ar
     STRING_TO_V8PARAMETER_EXCEPTION_BLOCK(V8Parameter<>, strArg, MAYBE_MISSING_PARAMETER(args, 0, DefaultIsUndefined));
     EXCEPTION_BLOCK(TestObj*, objArg, V8TestObj::HasInstance(MAYBE_MISSING_PARAMETER(args, 1, DefaultIsUndefined)) ? V8TestObj::toNative(v8::Handle<v8::Object>::Cast(MAYBE_MISSING_PARAMETER(args, 1, DefaultIsUndefined))) : 0);
     ScriptExecutionContext* scriptContext = getScriptExecutionContext();
-    if (!scriptContext)
-        return v8Undefined();
     RefPtr<TestObj> result = TestSupplemental::supplementalMethod2(scriptContext, imp, strArg, objArg, ec);
     if (UNLIKELY(ec))
         goto fail;
-    return toV8(result.release(), args.GetIsolate());
+    return toV8(result.release(), args.Holder(), args.GetIsolate());
     }
     fail:
     return setDOMException(ec, args.GetIsolate());
@@ -259,8 +256,6 @@ v8::Handle<v8::Value> V8TestInterface::constructorCallback(const v8::Arguments& 
     STRING_TO_V8PARAMETER_EXCEPTION_BLOCK(V8Parameter<>, str2, MAYBE_MISSING_PARAMETER(args, 1, DefaultIsUndefined));
 
     ScriptExecutionContext* context = getScriptExecutionContext();
-    if (!context)
-        return throwError(ReferenceError, "TestInterface constructor's associated context is not available", args.GetIsolate());
 
     RefPtr<TestInterface> impl = TestInterface::create(context, str1, str2, ec);
     v8::Handle<v8::Object> wrapper = args.Holder();
@@ -344,11 +339,24 @@ ActiveDOMObject* V8TestInterface::toActiveDOMObject(v8::Handle<v8::Object> objec
     return toNative(object);
 }      
 
-v8::Handle<v8::Object> V8TestInterface::wrapSlow(PassRefPtr<TestInterface> impl, v8::Isolate* isolate)
+v8::Handle<v8::Object> V8TestInterface::wrapSlow(PassRefPtr<TestInterface> impl, v8::Handle<v8::Object> creationContext, v8::Isolate* isolate)
 {
     v8::Handle<v8::Object> wrapper;
-    Frame* frame = 0;
-    wrapper = V8DOMWrapper::instantiateV8Object(frame, &info, impl.get());
+
+    v8::Handle<v8::Context> context;
+    if (!creationContext.IsEmpty() && creationContext->CreationContext() != v8::Context::GetCurrent()) {
+        // For performance, we enter the context only if the currently running context
+        // is different from the context that we are about to enter.
+        context = v8::Local<v8::Context>::New(creationContext->CreationContext());
+        ASSERT(!context.IsEmpty());
+        context->Enter();
+    }
+
+    wrapper = V8DOMWrapper::instantiateV8Object(&info, impl.get());
+
+    if (!context.IsEmpty())
+        context->Exit();
+
     if (UNLIKELY(wrapper.IsEmpty()))
         return wrapper;
     v8::Persistent<v8::Object> wrapperHandle = V8DOMWrapper::setJSWrapperForActiveDOMObject(impl, wrapper, isolate);

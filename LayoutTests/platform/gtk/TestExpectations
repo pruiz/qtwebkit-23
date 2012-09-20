@@ -180,6 +180,7 @@ BUGWKGTK SKIP : fast/forms/color = TEXT
 
 // ENABLE_INPUT_TYPE_* are not enabled.
 BUGWK29359 : fast/forms/date = TEXT
+BUGWK29359 : fast/forms/date/date-interactive-validation-required.html = PASS
 BUGWK29359 SKIP : fast/forms/date/calendar-picker-appearance-pre-100.html = TEXT
 BUGWK29359 SKIP : fast/forms/date/calendar-picker-appearance.html = TEXT
 BUGWK29359 : fast/forms/date/calendar-picker-type-change-onclick.html = PASS
@@ -190,11 +191,16 @@ BUGWK29359 : fast/css/pseudo-in-range.html = TEXT
 BUGWK29359 : fast/css/pseudo-out-of-range.html = TEXT
 BUGWK29359 : fast/css/pseudo-in-range-invalid-value.html = TEXT
 BUGWK29359 : fast/forms/datetime = TEXT
+BUGWK29359 : fast/forms/datetime/datetime-interactive-validation-required.html = PASS
 BUGWK29359 : fast/forms/datetimelocal = TEXT
+BUGWK29359 : fast/forms/datetimelocal/datetimelocal-interactive-validation-required.html = PASS
 BUGWK29359 : fast/forms/datetimelocal/input-valueasdate-datetimelocal.html = PASS
 BUGWK29359 : fast/forms/month = TEXT
+BUGWK29359 : fast/forms/month/month-interactive-validation-required.html = PASS
 BUGWK29359 : fast/forms/time = TEXT
+BUGWK29359 : fast/forms/time/time-interactive-validation-required.html = PASS
 BUGWK29359 : fast/forms/week = TEXT
+BUGWK29359 : fast/forms/week/week-interactive-validation-required.html = PASS
 
 // ENABLE_GAMEPAD not enabled.
 BUGWKGTK SKIP : gamepad = TEXT
@@ -361,12 +367,15 @@ BUGWK85212 : ietestcenter/css3/flexbox/flexbox-layout-002.htm = IMAGE
 
 // These tests require subpixel layout to be enabled
 BUGWK85532 : fast/sub-pixel = TEXT IMAGE
+BUGWK85532 : fast/sub-pixel/auto-table-layout-should-avoid-text-wrapping.html = PASS
+BUGWK85532 : fast/sub-pixel/block-preferred-widths-with-sub-pixel-floats.html = PASS
 BUGWK85532 : fast/sub-pixel/column-clipping.html = PASS
 BUGWK85532 : fast/sub-pixel/file-upload-control-at-fractional-offset.html = PASS
 BUGWK85532 : fast/sub-pixel/float-containing-block-with-margin.html = PASS
 BUGWK85532 : fast/sub-pixel/float-with-margin-in-container.html = PASS
 BUGWK85532 : fast/sub-pixel/float-with-right-margin-zoom.html = PASS
 BUGWK85532 : fast/sub-pixel/float-wrap-with-subpixel-top.html = PASS
+BUGWK85532 : fast/sub-pixel/inline-block-should-not-wrap.html = PASS
 BUGWK85532 : fast/sub-pixel/inline-block-with-margin.html = PASS
 BUGWK85532 : fast/sub-pixel/size-of-span-with-different-positions.html = PASS
 BUGWK85532 : fast/sub-pixel/table-cells-with-padding-do-not-wrap.html = PASS
@@ -455,9 +464,10 @@ BUGWK93727 DEBUG : fullscreen/full-screen-iframe-not-allowed.html = CRASH PASS
 BUGWK93727 DEBUG : fullscreen/exit-full-screen-iframe.html = CRASH PASS
 BUGWK93727 DEBUG : svg/custom/use-instanceRoot-as-event-target.xhtml = CRASH PASS
 
-BUGWK90957 : fast/js/random-array-gc-stress.html = CRASH PASS
+BUGWK90957 RELEASE : fast/js/random-array-gc-stress.html = CRASH PASS
 
 BUGWK94458 DEBUG : http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-in-body.html = CRASH TEXT
+BUGWK94458 DEBUG : fast/events/message-port-context-destroyed.html = CRASH PASS
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // End of Crashing tests
@@ -476,8 +486,6 @@ BUGWK56561 : svg/custom/clip-path-referencing-use2.svg = PASS TEXT
 BUGWK62204 : svg/custom/circular-marker-reference-4.svg = PASS TEXT
 
 BUGWK89097 : plugins/plugin-initiate-popup-window.html = PASS TEXT
-
-BUGWK61932 : jquery/manipulation.html = PASS TEXT
 
 BUGWK71777 : fast/lists/inlineBoxWrapperNullCheck.html = PASS TEXT
 
@@ -1081,9 +1089,6 @@ BUGWK84044 SKIP : accessibility/image-link.html = TEXT
 BUGWK84045 SKIP : accessibility/image-map1.html = TEXT
 BUGWK84045 SKIP : accessibility/image-map2.html = TEXT
 
-// Properly expose <legend> elements to ATs
-BUGWK84137 SKIP : accessibility/legend.html = TEXT
-
 // [DRT] didDetectXSS is not implemented
 BUGWK71465 : http/tests/security/xssAuditor/script-tag-with-callbacks.html = TEXT
 
@@ -1140,7 +1145,7 @@ BUGWK83913 : ietestcenter/css3/grid/grid-items-003.htm = IMAGE
 
 BUGWK86971 : svg/custom/non-scaling-stroke.svg = TEXT
 
-BUGWK84678 : fast/spatial-navigation/snav-container-white-space.html = TEXT
+BUGWK84678 BUGWK96226 : fast/spatial-navigation/snav-container-white-space.html = TEXT
 BUGWK84678 : fast/spatial-navigation/snav-fully-aligned-horizontally.html = TEXT
 BUGWK84678 : fast/spatial-navigation/snav-iframe-no-scrollable-content.html = TEXT
 
@@ -1296,6 +1301,14 @@ BUGWK95429 : svg/custom/clamped-masking-clipping.svg = IMAGE
 BUGWK94677 : http/tests/security/contentSecurityPolicy/register-bypassing-scheme.html = TEXT
 
 BUGWK95530 : http/tests/security/inactive-document-with-empty-security-origin.html = TEXT
+
+BUGWK88238 : editing/pasteboard/paste-global-selection.html = TEXT
+
+BUGWK96196 : accessibility/spinbutton-value.html = TEXT
+
+BUGWK96226 : fast/spatial-navigation/snav-div-overflow-scrol-hidden.html = TEXT
+BUGWK96226 : fast/spatial-navigation/snav-fully-aligned-vertically.html = TEXT
+BUGWK96226 : fast/spatial-navigation/snav-imagemap-overlapped-areas.html = TEXT
 
 //////////////////////////////////////////////////////////////////////////////////////////
 // End of Tests failing

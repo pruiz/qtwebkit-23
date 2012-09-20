@@ -46,6 +46,7 @@
 #include "WebProcess.h"
 #include <JavaScriptCore/APICast.h>
 #include <JavaScriptCore/JSLock.h>
+#include <WebCore/ApplicationCache.h>
 #include <WebCore/Frame.h>
 #include <WebCore/FrameView.h>
 #include <WebCore/GCController.h>
@@ -131,7 +132,13 @@ void InjectedBundle::overrideBoolPreferenceForTestRunner(WebPageGroupProxy* page
 {
     const HashSet<Page*>& pages = PageGroup::pageGroup(pageGroup->identifier())->pages();
 
-    // FIXME: Need an explicit way to set "WebKitTabToLinksPreferenceKey" directly in WebPage.
+    if (preference == "WebKitTabToLinksPreferenceKey") {
+       WebPreferencesStore::overrideBoolValueForKey(WebPreferencesKey::tabsToLinksKey(), enabled);
+       for (HashSet<Page*>::iterator i = pages.begin(); i != pages.end(); ++i) {
+            WebPage* webPage = static_cast<WebFrameLoaderClient*>((*i)->mainFrame()->loader()->client())->webFrame()->page();
+            webPage->setTabToLinksEnabled(enabled);
+        }
+    }
 
     if (preference == "WebKit2AsynchronousPluginInitializationEnabled") {
         WebPreferencesStore::overrideBoolValueForKey(WebPreferencesKey::asynchronousPluginInitializationEnabledKey(), enabled);
@@ -216,6 +223,13 @@ void InjectedBundle::setAllowFileAccessFromFileURLs(WebPageGroupProxy* pageGroup
     const HashSet<Page*>& pages = PageGroup::pageGroup(pageGroup->identifier())->pages();
     for (HashSet<Page*>::iterator iter = pages.begin(); iter != pages.end(); ++iter)
         (*iter)->settings()->setAllowFileAccessFromFileURLs(enabled);
+}
+
+void InjectedBundle::setMinimumLogicalFontSize(WebPageGroupProxy* pageGroup, int size)
+{
+    const HashSet<Page*>& pages = PageGroup::pageGroup(pageGroup->identifier())->pages();
+    for (HashSet<Page*>::iterator iter = pages.begin(); iter != pages.end(); ++iter)
+        (*iter)->settings()->setMinimumLogicalFontSize(size);
 }
 
 void InjectedBundle::setFrameFlatteningEnabled(WebPageGroupProxy* pageGroup, bool enabled)
@@ -316,6 +330,12 @@ void InjectedBundle::clearApplicationCache()
 void InjectedBundle::setAppCacheMaximumSize(uint64_t size)
 {
     WebApplicationCacheManager::shared().setAppCacheMaximumSize(size);
+}
+
+uint64_t InjectedBundle::appCacheUsageForOrigin(const String& originString)
+{
+    RefPtr<SecurityOrigin> origin = SecurityOrigin::createFromString(originString);
+    return ApplicationCache::diskUsageForOrigin(origin.get());
 }
 
 int InjectedBundle::numberOfPages(WebFrame* frame, double pageWidthInPixels, double pageHeightInPixels)
@@ -535,6 +555,13 @@ void InjectedBundle::setUserStyleSheetLocation(WebPageGroupProxy* pageGroup, con
     const HashSet<Page*>& pages = PageGroup::pageGroup(pageGroup->identifier())->pages();
     for (HashSet<Page*>::iterator iter = pages.begin(); iter != pages.end(); ++iter)
         (*iter)->settings()->setUserStyleSheetLocation(KURL(KURL(), location));
+}
+
+void InjectedBundle::setMinimumTimerInterval(WebPageGroupProxy* pageGroup, double seconds)
+{
+    const HashSet<Page*>& pages = PageGroup::pageGroup(pageGroup->identifier())->pages();
+    for (HashSet<Page*>::iterator iter = pages.begin(); iter != pages.end(); ++iter)
+        (*iter)->settings()->setMinDOMTimerInterval(seconds);
 }
 
 void InjectedBundle::setWebNotificationPermission(WebPage* page, const String& originString, bool allowed)

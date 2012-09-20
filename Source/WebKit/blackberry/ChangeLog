@@ -1,3 +1,187 @@
+2012-09-10  Antonio Gomes  <agomes@rim.com>
+
+        [BlackBerry] add a way to overscroll non-overflown content
+        https://bugs.webkit.org/show_bug.cgi?id=96331
+        [UxD] Vertical lists should always be scrollable
+        PR #195305
+
+        Reviewed by Yong Li.
+        Internally reviewed by Gen Mak.
+
+        Check if the RenderLayer is composited / hardware acceleratable prior to
+        check if its contents overflows. If that is the case, check if
+        our custom data-blackberry-force-overscroll is present.
+
+        That makes it possible for us to align to UX requirements: settings
+        and CCM panels should be always scrollable.
+
+        * Api/InRegionScroller.cpp:
+        (BlackBerry::WebKit::canScrollRenderBox):
+        * WebKitSupport/InRegionScrollableArea.cpp:
+        (BlackBerry::WebKit::InRegionScrollableArea::InRegionScrollableArea):
+
+2012-09-10  Genevieve Mak  <gmak@rim.com>
+
+        Change -data-blackberry-webworks-context to -data-webworks-context
+        because not all webworks apps are blackberry apps.
+        https://bugs.webkit.org/show_bug.cgi?id=96297
+
+        Reviewed by Antonio Gomes.
+
+        PR #193726
+        Rubber Stamped interally by Mike Fenton.
+
+        * WebKitSupport/DOMSupport.cpp:
+        (BlackBerry::WebKit::DOMSupport::webWorksContext):
+
+2012-09-09  Arvid Nilsson  <anilsson@rim.com>
+
+        [BlackBerry] Fix flicker due to introduction of the fence extension.
+        https://bugs.webkit.org/show_bug.cgi?id=96207
+
+        Reviewed by George Staikos.
+
+        Don't immediately add fence to garbage list, so it is destroyed
+        after only one swap, for a set of tiles just because one tile in
+        the set gets a new fence, the old fence may still not be signalled
+        and before rendering the other tiles in the set we have to wait for it.
+
+        * WebKitSupport/BackingStoreTile.cpp:
+        (BlackBerry::WebKit::Fence::~Fence):
+        (WebKit):
+        * WebKitSupport/BackingStoreTile.h:
+        (WebKit):
+        (Fence):
+        * WebKitSupport/SurfacePool.cpp:
+        (BlackBerry::WebKit::SurfacePool::initialize):
+        (BlackBerry::WebKit::SurfacePool::notifyBuffersComposited):
+        (WebKit):
+        (BlackBerry::WebKit::SurfacePool::destroyPlatformSync):
+        * WebKitSupport/SurfacePool.h:
+        (SurfacePool):
+
+2012-09-08  Max Feil  <mfeil@rim.com>
+
+        [BlackBerry] Exiting fullscreen mode can leave user stuck without Browser menus
+        https://bugs.webkit.org/show_bug.cgi?id=96027
+
+        Reviewed by Antonio Gomes.
+
+        The changes for bug 87337 (landed as trunk svn revision 119119)
+        introduced a bug. The same conditions are not checked on enter
+        fullscreen vs. exit. Web sites such as http://videojs.com
+        and youtube's mobile HTML5 player make the div container
+        of the video element go fullscreen. This is allowed in
+        WebPagePrivate::enterFullScreenForElement() but disallowed in
+        WebPagePrivate::exitFullScreenForElement(). I am fixing this by
+        allowing containers of video elements to exit fullscreen.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::exitFullScreenForElement):
+
+2012-09-07  Ming Xie  <mxie@rim.com>
+
+
+        [BlackBerry] Remove browser from the build info page
+        https://bugs.webkit.org/show_bug.cgi?id=96162
+
+        Reviewed by George Staikos.
+        Internal reviewed by Jeff Rogers.
+
+        WebKit build should not have the build info for browser which is
+        built on top of webkit.
+
+        * WebKitSupport/AboutData.cpp:
+        (BlackBerry::WebKit::buildPage):
+
+2012-09-07  Yongxin Dai  <yodai@rim.com>
+
+        [BlackBerry] Initialize caret rectangle with invalid location
+        https://bugs.webkit.org/show_bug.cgi?id=96011
+
+        Reviewed by Rob Buis.
+
+        In SelectionHandler::selectionPositionChanged() method, startCaret and
+        endCaret are used to notify clients about new caret positions. This patch
+        initializes startCaret and endCaret with location(-1. -1), and keeps them
+        empty before they are assigned to valid values. This would help for other
+        classes to check validity of the caret correctly.
+
+        Internal reviewed by Mike Fenton.
+
+        * WebKitSupport/SelectionHandler.cpp:
+        (BlackBerry::WebKit::adjustCaretRects):
+        (BlackBerry::WebKit::SelectionHandler::selectionPositionChanged):
+
+2012-09-07  Lianghui Chen  <liachen@rim.com>
+
+        [BlackBerry] when one of multiple tabs uses authentication, user can get the auth dialog while the other tab has focus.
+        https://bugs.webkit.org/show_bug.cgi?id=95488
+        PR: 186597.
+
+        Internally reviewed by Joe Mason.
+        Reviewed by Yong Li.
+
+        Use new AuthenticationChallengeClient interface to make authentication
+        challenge asynchronous to NetworkJob, MediaPlayerPrivateBlackBerry, and
+        other module that will use HTTP authentication. WebPage itself still use
+        synchronous authentication though. Switching to asynchronous authentication
+        in WebPage will require bigger platform layer change and not very necessary
+        at the moment for this bug.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::authenticationChallenge):
+        * Api/WebPage_p.h:
+        (WebCore):
+        (WebPagePrivate):
+
+2012-09-07  Rob Buis  <rbuis@rim.com>
+
+        [BlackBerry] Remove feature about:cache/disable and about:cache/enable
+        https://bugs.webkit.org/show_bug.cgi?id=95820
+
+        Reviewed by Yong Li.
+
+        Fix warning that was caused by r127680.
+
+        * WebKitSupport/AboutData.cpp:
+        (BlackBerry::WebKit::cachePage):
+
+2012-09-07  Allan Sandfeld Jensen  <allan.jensen@nokia.com>
+
+        Simplify hitTestResultAtPoint and nodesFromRect APIs
+        https://bugs.webkit.org/show_bug.cgi?id=95720
+
+        Reviewed by Antonio Gomes.
+
+        Update calls to new API.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::contextNode):
+        (BlackBerry::WebKit::WebPagePrivate::nodeForZoomUnderPoint):
+        (BlackBerry::WebKit::WebPagePrivate::handleMouseEvent):
+        (BlackBerry::WebKit::WebPage::nodeAtPoint):
+        * WebKitSupport/FatFingers.cpp:
+        (BlackBerry::WebKit::FatFingers::getNodesFromRect):
+        (BlackBerry::WebKit::FatFingers::getRelevantInfoFromPoint):
+        * WebKitSupport/SelectionHandler.cpp:
+        (BlackBerry::WebKit::visiblePositionForPointIgnoringClipping):
+
+2012-09-07  Robin Cao  <robin.cao@torchmobile.com.cn>
+
+        [BlackBerry] Rendering issue after rotation
+        https://bugs.webkit.org/show_bug.cgi?id=96094
+        PR #201930
+
+        Reviewed by George Staikos.
+
+        The cause of the rendering issue is that the BackingStore tiles
+        are not reset after layout. This is a regression of r125680, which
+        overwrites a local variable that are used later in the function.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::setViewportSize):
+
 2012-09-06  Crystal Zhang  <haizhang@rim.com>
 
         [BlackBerry]  Implement a color picker

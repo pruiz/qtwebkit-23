@@ -105,7 +105,6 @@ fast/text/international/bidi-neutral-run.html
 fast/text/international/bidi-neutral-directionality-paragraph-start.html
 svg/W3C-SVG-1.1/fonts-glyph-02-t.svg
 svg/W3C-SVG-1.1/text-intro-05-t.svg
-svg/batik/text/textBiDi.svg
 svg/text/text-intro-05-t.svg
 #                           - Mac OS X and Windows do not have a CJK font in common
 fast/encoding/denormalised-voiced-japanese-chars.html
@@ -258,6 +257,7 @@ http/tests/fileapi
 fast/dom/DOMURL/check-instanceof-domurl-functions.html
 fast/forms/file/input-file-entries.html
 fast/forms/file/recover-file-input-in-unposted-form.html
+http/tests/security/contentSecurityPolicy/blob-urls-match-self.html
 
 # Need to add functionality to DumpRenderTree to test IDN <rdar://problem/5301954>
 fast/encoding/idn-security.html
@@ -513,7 +513,6 @@ editing/pasteboard/undoable-fragment-removes.html
 editing/execCommand/enabling-and-selection-2.html
 
 # Needs custom policy delegate enhancement in DRT
-http/tests/navigation/post-goback-repost-policy.html
 http/tests/download
 
 # Needs scheduleAsynchronousClick method for EventSender
@@ -593,7 +592,6 @@ accessibility/aria-tab-roles.html
 accessibility/aria-text-role.html
 accessibility/aria-used-on-image-maps.html
 accessibility/button-press-action.html
-accessibility/canvas.html
 accessibility/document-attributes.html
 accessibility/editable-webarea-context-menu-point.html
 accessibility/ignore-spacer-elements.html
@@ -620,6 +618,7 @@ accessibility/radio-button-checkbox-size.html
 accessibility/radio-button-group-members.html
 accessibility/radio-button-title-label.html
 accessibility/secure-textfield-title-ui.html
+accessibility/spinbutton-value.html
 accessibility/table-attributes.html
 accessibility/table-cell-spans.html
 accessibility/table-cells.html
@@ -962,9 +961,6 @@ media/video-display-aspect-ratio.html
 
 # Accept header is handled by the browser
 http/tests/misc/image-checks-for-accept.html
-
-# Needs platform specific API implemented in DRT, maybe not relevant for non-Mac and non-Windows ports
-fast/loader/api-test-new-window-data-load-base-url.html
 
 # Needs to implement NPP_HandleEvent() in TestNetscapePlugin
 plugins/keyboard-events.html
@@ -1742,6 +1738,7 @@ fast/sub-pixel/float-wrap-with-subpixel-top.html
 fast/sub-pixel/inline-block-should-not-wrap.html
 fast/sub-pixel/inline-block-with-margin.html
 fast/sub-pixel/inline-block-with-padding.html
+fast/sub-pixel/large-sizes.html
 fast/sub-pixel/layout-boxes-with-zoom.html
 fast/sub-pixel/position-right-aligns-with-container.html
 fast/sub-pixel/selection/selection-gaps-at-fractional-offsets.html
@@ -1987,7 +1984,6 @@ fast/borders/only-one-border-with-width.html
 fast/multicol/progression-reverse.html
 fast/multicol/vertical-lr/rules-with-border-before.html
 fast/multicol/vertical-rl/rules-with-border-before.html
-css1/box_properties/border_bottom-expected.png
 css2.1/t0805-c5519-brdr-r-00-a.html
 css2.1/t0805-c5519-brdr-r-01-e.html
 css2.1/t0805-c5520-brdr-b-01-e.html
@@ -2154,7 +2150,6 @@ http/tests/security/referrer-policy-https-always.html
 http/tests/security/referrer-policy-https-default.html
 http/tests/security/referrer-policy-https-never.html
 http/tests/security/referrer-policy-redirect.html
-http/tests/security/referrer-policy-rel-noreferrer.htm
 
 # As usual, DRT on Windows has problems knowing how to continue a test when focus moves to a popup window, in this case the file chooser
 # https://bugs.webkit.org/show_bug.cgi?id=87469
@@ -2220,3 +2215,6 @@ fast/forms/number/number-interactive-validation-required.html
 
 # Dialog element is not yet enabled.
 fast/dom/HTMLDialogElement
+
+# Windows does not have global selection.
+editing/pasteboard/paste-global-selection.html

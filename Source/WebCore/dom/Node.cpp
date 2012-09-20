@@ -68,7 +68,6 @@
 #include "KeyboardEvent.h"
 #include "LabelsNodeList.h"
 #include "Logging.h"
-#include "MemoryInstrumentation.h"
 #include "MouseEvent.h"
 #include "MutationEvent.h"
 #include "NameNodeList.h"
@@ -99,6 +98,7 @@
 #include "TreeScopeAdopter.h"
 #include "UIEvent.h"
 #include "UIEventWithKeyState.h"
+#include "WebCoreMemoryInstrumentation.h"
 #include "WheelEvent.h"
 #include "WindowEventContext.h"
 #include "XMLNames.h"
@@ -796,7 +796,7 @@ RenderBoxModelObject* Node::renderBoxModelObject() const
     return m_renderer && m_renderer->isBoxModelObject() ? toRenderBoxModelObject(m_renderer) : 0;
 }
 
-LayoutRect Node::getRect() const
+LayoutRect Node::boundingBox() const
 {
     if (renderer())
         return renderer()->absoluteBoundingBoxRect();

@@ -1,9 +1,9 @@
 # These variables define the library version, which is based on the original
 # Qt library version. It is not related to the release-version of QtWebKit.
-QT.webkit.MAJOR_VERSION = 5
-QT.webkit.MINOR_VERSION = 0
+QT.webkit.MAJOR_VERSION = 4
+QT.webkit.MINOR_VERSION = 10
 QT.webkit.PATCH_VERSION = 0
-QT.webkit.VERSION = 5.0.0
+QT.webkit.VERSION = 4.10.0
 
 QT.webkit.name = QtWebKit
 QT.webkit.bins = $$QT_MODULE_BIN_BASE

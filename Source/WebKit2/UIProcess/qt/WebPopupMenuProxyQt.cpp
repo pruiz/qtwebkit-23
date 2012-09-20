@@ -55,7 +55,6 @@ public:
     PopupMenuItemModel(const Vector<WebPopupItem>&, bool multiple);
     virtual int rowCount(const QModelIndex& parent = QModelIndex()) const { return m_items.size(); }
     virtual QVariant data(const QModelIndex&, int role = Qt::DisplayRole) const;
-    virtual QHash<int, QByteArray> roleNames() const;
 
     Q_INVOKABLE void select(int);
 
@@ -168,13 +167,9 @@ PopupMenuItemModel::PopupMenuItemModel(const Vector<WebPopupItem>& webPopupItems
     : m_selectedModelIndex(-1)
     , m_allowMultiples(multiple)
 {
-    buildItems(webPopupItems);
-}
-
-QHash<int, QByteArray> PopupMenuItemModel::roleNames() const
-{
     static QHash<int, QByteArray> roles = createRoleNamesHash();
-    return roles;
+    setRoleNames(roles);
+    buildItems(webPopupItems);
 }
 
 QVariant PopupMenuItemModel::data(const QModelIndex& index, int role) const

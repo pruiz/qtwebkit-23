@@ -184,7 +184,7 @@ void tst_QGraphicsWebView::widgetsRenderingThroughCache()
     scene->addItem(webView);
     view.setGeometry(QRect(0, 0, 500, 500));
     QWidget *const widget = &view;
-    QTest::qWaitForWindowExposed(widget);
+    QTest::qWaitForWindowShown(widget);
 
     // 1. Reference without tiling.
     webView->settings()->setAttribute(QWebSettings::TiledBackingStoreEnabled, false);
@@ -409,11 +409,11 @@ void tst_QGraphicsWebView::setPalette()
     QVERIFY(webView1.palette() == palette1);
     QVERIFY(webView1.page()->palette() == palette1);
 
-    QTest::qWaitForWindowExposed(&view1);
+    QTest::qWaitForWindowShown(&view1);
 
     if (!active) {
         controlView.show();
-        QTest::qWaitForWindowExposed(&controlView);
+        QTest::qWaitForWindowShown(&controlView);
         QApplication::setActiveWindow(&controlView);
         activeView = &controlView;
         controlView.activateWindow();
@@ -464,11 +464,11 @@ void tst_QGraphicsWebView::setPalette()
     webView2.setPalette(palette2);
     view2.show();
 
-    QTest::qWaitForWindowExposed(&view2);
+    QTest::qWaitForWindowShown(&view2);
 
     if (!active) {
         controlView.show();
-        QTest::qWaitForWindowExposed(&controlView);
+        QTest::qWaitForWindowShown(&controlView);
         QApplication::setActiveWindow(&controlView);
         activeView = &controlView;
         controlView.activateWindow();
@@ -610,7 +610,7 @@ void tst_QGraphicsWebView::compareCanvasToImage(const QUrl& url, const QImage& r
 {
     GraphicsView view;
     view.show();
-    QTest::qWaitForWindowExposed(&view);
+    QTest::qWaitForWindowShown(&view);
 
     QGraphicsWebView* const graphicsWebView = view.m_webView;
     graphicsWebView->load(url);
@@ -620,6 +620,7 @@ void tst_QGraphicsWebView::compareCanvasToImage(const QUrl& url, const QImage& r
         QPainter painter(&pixmap);
         view.render(&painter);
     }
+    QApplication::syncX();
 
     const QSize imageSize = reference.size();
 

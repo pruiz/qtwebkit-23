@@ -96,12 +96,13 @@ void QWebNavigationHistoryPrivate::goForwardTo(int index)
         WKPageGoToBackForwardListItem(m_page.get(), itemRef.get());
 }
 
-QHash<int, QByteArray> QWebNavigationListModel::roleNames() const
+QWebNavigationListModel::QWebNavigationListModel()
+    : QAbstractListModel()
 {
     QHash<int, QByteArray> roles;
     roles[QWebNavigationHistory::UrlRole] = "url";
     roles[QWebNavigationHistory::TitleRole] = "title";
-    return roles;
+    setRoleNames(roles);
 }
 
 QWebNavigationListModel::~QWebNavigationListModel()
@@ -134,12 +135,6 @@ QVariant QWebNavigationListModel::data(const QModelIndex& index, int role) const
     }
 
     return QVariant();
-}
-
-void QWebNavigationListModel::reset()
-{
-    beginResetModel();
-    endResetModel();
 }
 
 QWebNavigationHistory::QWebNavigationHistory()

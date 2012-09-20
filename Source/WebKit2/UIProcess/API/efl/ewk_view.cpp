@@ -32,6 +32,7 @@
 #include "WKString.h"
 #include "WKURL.h"
 #include "WebContext.h"
+#include "WebPageGroup.h"
 #include "WebPopupItem.h"
 #include "WebPopupMenuProxyEfl.h"
 #include "ewk_back_forward_list_private.h"
@@ -41,6 +42,7 @@
 #include "ewk_popup_menu_item.h"
 #include "ewk_popup_menu_item_private.h"
 #include "ewk_private.h"
+#include "ewk_settings_private.h"
 #include "ewk_view_find_client_private.h"
 #include "ewk_view_form_client_private.h"
 #include "ewk_view_loader_client_private.h"
@@ -53,6 +55,7 @@
 #include <Edje.h>
 #include <WebCore/Cursor.h>
 #include <WebCore/EflScreenUtilities.h>
+#include <WebKit2/WKPageGroup.h>
 #include <wtf/text/CString.h>
 
 #if USE(ACCELERATED_COMPOSITING)
@@ -88,6 +91,7 @@ struct _Ewk_View_Private_Data {
     Evas_Object* cursorObject;
     LoadingResourcesMap loadingResourcesMap;
     Ewk_Back_Forward_List* backForwardList;
+    OwnPtr<Ewk_Settings> settings;
 
     WebPopupMenuProxyEfl* popupMenuProxy;
     Eina_List* popupMenuItems;
@@ -163,15 +167,17 @@ struct _Ewk_View_Private_Data {
     EWK_VIEW_TYPE_CHECK(ewkView, _tmp_result);                                 \
     Ewk_View_Smart_Data* smartData = 0;                                        \
     if (_tmp_result)                                                           \
-        smartData = (Ewk_View_Smart_Data*)evas_object_smart_data_get(ewkView);
+        smartData = (Ewk_View_Smart_Data*)evas_object_smart_data_get(ewkView)
 
 #define EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData, ...)                     \
     EWK_VIEW_SD_GET(ewkView, smartData);                                       \
-    if (!smartData) {                                                          \
-        EINA_LOG_CRIT("no smart data for object %p (%s)",                      \
-                 ewkView, evas_object_type_get(ewkView));                      \
-        return __VA_ARGS__;                                                    \
-    }
+    do {                                                                       \
+        if (!smartData) {                                                      \
+            EINA_LOG_CRIT("no smart data for object %p (%s)",                  \
+                     ewkView, evas_object_type_get(ewkView));                  \
+            return __VA_ARGS__;                                                \
+        }                                                                      \
+    } while (0)
 
 #define EWK_VIEW_PRIV_GET(smartData, priv)                                     \
     Ewk_View_Private_Data* priv = smartData->priv
@@ -182,11 +188,13 @@ struct _Ewk_View_Private_Data {
         return __VA_ARGS__;                                                    \
     }                                                                          \
     EWK_VIEW_PRIV_GET(smartData, priv);                                        \
-    if (!priv) {                                                               \
-        EINA_LOG_CRIT("no private data for object %p (%s)",                    \
-                 smartData->self, evas_object_type_get(smartData->self));      \
-        return __VA_ARGS__;                                                    \
-    }
+    do {                                                                       \
+        if (!priv) {                                                           \
+            EINA_LOG_CRIT("no private data for object %p (%s)",                \
+                     smartData->self, evas_object_type_get(smartData->self));  \
+            return __VA_ARGS__;                                                \
+        }                                                                      \
+    } while (0)
 
 static void _ewk_view_smart_changed(Ewk_View_Smart_Data* smartData)
 {
@@ -199,7 +207,7 @@ static void _ewk_view_smart_changed(Ewk_View_Smart_Data* smartData)
 // Default Event Handling.
 static Eina_Bool _ewk_view_smart_focus_in(Ewk_View_Smart_Data* smartData)
 {
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false)
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     priv->pageProxy->viewStateDidChange(WebPageProxy::ViewIsFocused | WebPageProxy::ViewWindowIsActive);
     return true;
@@ -207,7 +215,7 @@ static Eina_Bool _ewk_view_smart_focus_in(Ewk_View_Smart_Data* smartData)
 
 static Eina_Bool _ewk_view_smart_focus_out(Ewk_View_Smart_Data* smartData)
 {
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false)
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     priv->pageProxy->viewStateDidChange(WebPageProxy::ViewIsFocused | WebPageProxy::ViewWindowIsActive);
     return true;
@@ -215,7 +223,7 @@ static Eina_Bool _ewk_view_smart_focus_out(Ewk_View_Smart_Data* smartData)
 
 static Eina_Bool _ewk_view_smart_mouse_wheel(Ewk_View_Smart_Data* smartData, const Evas_Event_Mouse_Wheel* wheelEvent)
 {
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false)
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     Evas_Point position = {smartData->view.x, smartData->view.y};
     priv->pageProxy->handleWheelEvent(NativeWebWheelEvent(wheelEvent, &position));
@@ -224,7 +232,7 @@ static Eina_Bool _ewk_view_smart_mouse_wheel(Ewk_View_Smart_Data* smartData, con
 
 static Eina_Bool _ewk_view_smart_mouse_down(Ewk_View_Smart_Data* smartData, const Evas_Event_Mouse_Down* downEvent)
 {
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false)
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     Evas_Point position = {smartData->view.x, smartData->view.y};
     priv->pageProxy->handleMouseEvent(NativeWebMouseEvent(downEvent, &position));
@@ -233,7 +241,7 @@ static Eina_Bool _ewk_view_smart_mouse_down(Ewk_View_Smart_Data* smartData, cons
 
 static Eina_Bool _ewk_view_smart_mouse_up(Ewk_View_Smart_Data* smartData, const Evas_Event_Mouse_Up* upEvent)
 {
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false)
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     Evas_Point position = {smartData->view.x, smartData->view.y};
     priv->pageProxy->handleMouseEvent(NativeWebMouseEvent(upEvent, &position));
@@ -242,7 +250,7 @@ static Eina_Bool _ewk_view_smart_mouse_up(Ewk_View_Smart_Data* smartData, const 
 
 static Eina_Bool _ewk_view_smart_mouse_move(Ewk_View_Smart_Data* smartData, const Evas_Event_Mouse_Move* moveEvent)
 {
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false)
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     Evas_Point position = {smartData->view.x, smartData->view.y};
     priv->pageProxy->handleMouseEvent(NativeWebMouseEvent(moveEvent, &position));
@@ -251,7 +259,7 @@ static Eina_Bool _ewk_view_smart_mouse_move(Ewk_View_Smart_Data* smartData, cons
 
 static Eina_Bool _ewk_view_smart_key_down(Ewk_View_Smart_Data* smartData, const Evas_Event_Key_Down* downEvent)
 {
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false)
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     priv->pageProxy->handleKeyboardEvent(NativeWebKeyboardEvent(downEvent));
     return true;
@@ -259,7 +267,7 @@ static Eina_Bool _ewk_view_smart_key_down(Ewk_View_Smart_Data* smartData, const 
 
 static Eina_Bool _ewk_view_smart_key_up(Ewk_View_Smart_Data* smartData, const Evas_Event_Key_Up* upEvent)
 {
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false)
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     priv->pageProxy->handleKeyboardEvent(NativeWebKeyboardEvent(upEvent));
     return true;
@@ -673,7 +681,7 @@ static inline Evas_Smart* _ewk_view_smart_class_new(void)
 static void _ewk_view_initialize(Evas_Object* ewkView, Ewk_Context* context, WKPageGroupRef pageGroupRef)
 {
     EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv)
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
     EINA_SAFETY_ON_NULL_RETURN(context);
 
     if (priv->pageClient)
@@ -681,7 +689,10 @@ static void _ewk_view_initialize(Evas_Object* ewkView, Ewk_Context* context, WKP
 
     priv->pageClient = PageClientImpl::create(ewkView);
 
-    priv->pageProxy = toImpl(ewk_context_WKContext_get(context))->createWebPage(priv->pageClient.get(), toImpl(pageGroupRef));
+    if (pageGroupRef)
+        priv->pageProxy = toImpl(ewk_context_WKContext_get(context))->createWebPage(priv->pageClient.get(), toImpl(pageGroupRef));
+    else
+        priv->pageProxy = toImpl(ewk_context_WKContext_get(context))->createWebPage(priv->pageClient.get(), WebPageGroup::create().get());
 #if USE(COORDINATED_GRAPHICS)
     priv->pageProxy->pageGroup()->preferences()->setAcceleratedCompositingEnabled(true);
     priv->pageProxy->pageGroup()->preferences()->setForceCompositingMode(true);
@@ -690,6 +701,7 @@ static void _ewk_view_initialize(Evas_Object* ewkView, Ewk_Context* context, WKP
     priv->pageProxy->initializeWebPage();
 
     priv->backForwardList = ewk_back_forward_list_new(toAPI(priv->pageProxy->backForwardList()));
+    priv->settings = adoptPtr(new Ewk_Settings(WKPageGroupGetPreferences(WKPageGetPageGroup(toAPI(priv->pageProxy.get())))));
 
 #if USE(COORDINATED_GRAPHICS)
     priv->viewportHandler = EflViewportHandler::create(ewkView);
@@ -702,8 +714,6 @@ static void _ewk_view_initialize(Evas_Object* ewkView, Ewk_Context* context, WKP
     ewk_view_policy_client_attach(wkPage, ewkView);
     ewk_view_resource_load_client_attach(wkPage, ewkView);
     ewk_view_ui_client_attach(wkPage, ewkView);
-
-    ewk_view_theme_set(ewkView, DEFAULT_THEME_PATH"/default.edj");
 }
 
 static Evas_Object* _ewk_view_add_with_smart(Evas* canvas, Evas_Smart* smart)
@@ -845,6 +855,14 @@ Eina_Bool ewk_view_stop(Evas_Object* ewkView)
     priv->pageProxy->stopLoading();
 
     return true;
+}
+
+Ewk_Settings* ewk_view_settings_get(const Evas_Object* ewkView)
+{
+    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData, 0);
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, 0);
+
+    return priv->settings.get();
 }
 
 /**

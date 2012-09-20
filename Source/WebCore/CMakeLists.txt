@@ -222,9 +222,12 @@ SET(WebCore_IDL_FILES
     Modules/mediastream/NavigatorUserMediaErrorCallback.idl
     Modules/mediastream/NavigatorUserMediaSuccessCallback.idl
     Modules/mediastream/PeerConnection00.idl
+    Modules/mediastream/RTCErrorCallback.idl
     Modules/mediastream/RTCIceCandidate.idl
+    Modules/mediastream/RTCIceCandidateEvent.idl
     Modules/mediastream/RTCPeerConnection.idl
     Modules/mediastream/RTCSessionDescription.idl
+    Modules/mediastream/RTCSessionDescriptionCallback.idl
     Modules/mediastream/SessionDescription.idl
 
     Modules/navigatorcontentutils/NavigatorContentUtils.idl
@@ -817,7 +820,6 @@ SET(WebCore_SOURCES
     Modules/indexeddb/IDBKey.cpp
     Modules/indexeddb/IDBKeyRange.cpp
     Modules/indexeddb/IDBKeyPath.cpp
-    Modules/indexeddb/IDBKeyPathBackendImpl.cpp
     Modules/indexeddb/IDBLevelDBBackingStore.cpp
     Modules/indexeddb/IDBLevelDBCoding.cpp
     Modules/indexeddb/IDBObjectStore.cpp
@@ -855,8 +857,10 @@ SET(WebCore_SOURCES
     Modules/mediastream/NavigatorMediaStream.cpp
     Modules/mediastream/PeerConnection00.cpp
     Modules/mediastream/RTCIceCandidate.cpp
+    Modules/mediastream/RTCIceCandidateEvent.cpp
     Modules/mediastream/RTCPeerConnection.cpp
     Modules/mediastream/RTCSessionDescription.cpp
+    Modules/mediastream/RTCSessionDescriptionRequestImpl.cpp
     Modules/mediastream/SessionDescription.cpp
     Modules/mediastream/UserMediaController.cpp
     Modules/mediastream/UserMediaRequest.cpp
@@ -1983,8 +1987,8 @@ SET(WebCore_SOURCES
     platform/text/QuotedPrintable.cpp
     platform/text/RegularExpression.cpp
     platform/text/SegmentedString.cpp
-    platform/text/String.cpp
     platform/text/TextBoundaries.cpp
+    platform/text/TextBreakIterator.cpp
     platform/text/TextCodec.cpp
     platform/text/TextCodecLatin1.cpp
     platform/text/TextCodecUTF16.cpp

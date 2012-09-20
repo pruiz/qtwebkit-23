@@ -718,7 +718,7 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
             findGoodTouchTargets(event.boundingBox, mainFrameImpl()->frame(), pageScaleFactor(), goodTargets);
             // FIXME: replace touch adjustment code when numberOfGoodTargets == 1?
             // Single candidate case is currently handled by: https://bugs.webkit.org/show_bug.cgi?id=85101
-            if (goodTargets.size() >= 2 && m_client && m_client->handleDisambiguationPopup(event, goodTargets))
+            if (goodTargets.size() >= 2 && m_client && m_client->didTapMultipleTargets(event, goodTargets))
                 return true;
         }
 
@@ -1141,8 +1141,7 @@ void WebViewImpl::computeScaleAndScrollForHitRect(const WebRect& hitRect, AutoZo
 
 static bool highlightConditions(Node* node)
 {
-    return node->isLink()
-           || node->supportsFocus()
+    return node->supportsFocus()
            || node->hasEventListeners(eventNames().clickEvent)
            || node->hasEventListeners(eventNames().mousedownEvent)
            || node->hasEventListeners(eventNames().mouseupEvent);
@@ -1163,8 +1162,10 @@ Node* WebViewImpl::bestTouchLinkNode(IntPoint touchEventLocation)
     while (bestTouchNode && !highlightConditions(bestTouchNode))
         bestTouchNode = bestTouchNode->parentNode();
 
-    // If the document has click handlers installed, we don't want to default to applying the highlight to the entire RenderView.
-    if (bestTouchNode && (!bestTouchNode->renderer() || bestTouchNode->renderer()->isRenderView()))
+    // If the document has click handlers installed, we don't want to default to applying the highlight to the entire RenderView, or the
+    // entire body. Also, if the node has non-auto Z-index, we cannot be sure of it's ordering with respect to other possible target nodes.
+    RenderObject* touchNodeRenderer = bestTouchNode ? bestTouchNode->renderer() : 0;
+    if (bestTouchNode && (!touchNodeRenderer || touchNodeRenderer->isRenderView() || touchNodeRenderer->isBody() || !touchNodeRenderer->style()->hasAutoZIndex()))
         return 0;
 
     return bestTouchNode;

@@ -2124,7 +2124,7 @@ LayoutUnit RenderBlock::clearFloatsIfNeeded(RenderBox* child, MarginInfo& margin
     LayoutUnit logicalTop = yPos + heightIncrease;
     // After margin collapsing, one of our floats may now intrude into the child. If the child doesn't contain floats of its own it
     // won't get picked up for relayout even though the logical top estimate was wrong - so add the newly intruding float now.
-    if (containsFloats() && child->isRenderBlock() && !toRenderBlock(child)->containsFloats() && lowestFloatLogicalBottom() > logicalTop)
+    if (containsFloats() && child->isRenderBlock() && !toRenderBlock(child)->containsFloats() && !child->avoidsFloats() && lowestFloatLogicalBottom() > logicalTop)
         toRenderBlock(child)->addIntrudingFloats(this, logicalLeftOffsetForContent(), logicalTop);
 
     return logicalTop;
@@ -2164,7 +2164,7 @@ void RenderBlock::marginBeforeEstimateForChild(RenderBox* child, LayoutUnit& pos
 
     // Make sure to update the block margins now for the grandchild box so that we're looking at current values.
     if (grandchildBox->needsLayout()) {
-        grandchildBox->computeBlockDirectionMargins(this); 
+        grandchildBox->computeAndSetBlockDirectionMargins(this);
         grandchildBox->setMarginBeforeQuirk(grandchildBox->style()->marginBefore().quirk());
         grandchildBox->setMarginAfterQuirk(grandchildBox->style()->marginAfter().quirk());
     }
@@ -2411,7 +2411,7 @@ void RenderBlock::layoutBlockChild(RenderBox* child, MarginInfo& marginInfo, Lay
     LayoutUnit oldNegMarginBefore = maxNegativeMarginBefore();
 
     // The child is a normal flow object.  Compute the margins we will use for collapsing now.
-    child->computeBlockDirectionMargins(this);
+    child->computeAndSetBlockDirectionMargins(this);
 
     // Do not allow a collapse if the margin-before-collapse style is set to SEPARATE.
     RenderStyle* childStyle = child->style();
@@ -3761,7 +3761,7 @@ RenderBlock::FloatingObject* RenderBlock::insertFloatingObject(RenderBox* o)
         o->layoutIfNeeded();
     else {
         o->computeLogicalWidth();
-        o->computeBlockDirectionMargins(this);
+        o->computeAndSetBlockDirectionMargins(this);
     }
     setLogicalWidthForFloat(newObj, logicalWidthForChild(o) + marginStartForChild(o) + marginEndForChild(o));
 
@@ -4511,6 +4511,8 @@ bool RenderBlock::hasOverhangingFloat(RenderBox* renderer)
 
 void RenderBlock::addIntrudingFloats(RenderBlock* prev, LayoutUnit logicalLeftOffset, LayoutUnit logicalTopOffset)
 {
+    ASSERT(!avoidsFloats());
+
     // If the parent or previous sibling doesn't have any floats to add, don't bother.
     if (!prev->m_floatingObjects)
         return;
@@ -4704,7 +4706,7 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request, HitTestResult& resu
     if ((hitTestAction == HitTestBlockBackground || hitTestAction == HitTestChildBlockBackground) && isPointInOverflowControl(result, locationInContainer.point(), adjustedLocation)) {
         updateHitTestResult(result, locationInContainer.point() - localOffset);
         // FIXME: isPointInOverflowControl() doesn't handle rect-based tests yet.
-        if (!result.addNodeToRectBasedTestResult(node(), locationInContainer))
+        if (!result.addNodeToRectBasedTestResult(node(), request, locationInContainer))
            return true;
     }
 
@@ -4737,7 +4739,7 @@ bool RenderBlock::nodeAtPoint(const HitTestRequest& request, HitTestResult& resu
         LayoutRect boundsRect(adjustedLocation, size());
         if (visibleToHitTesting() && locationInContainer.intersects(boundsRect)) {
             updateHitTestResult(result, flipForWritingMode(locationInContainer.point() - localOffset));
-            if (!result.addNodeToRectBasedTestResult(node(), locationInContainer, boundsRect))
+            if (!result.addNodeToRectBasedTestResult(node(), request, locationInContainer, boundsRect))
                 return true;
         }
     }

@@ -1003,11 +1003,11 @@ void JIT::emit_op_next_pname(Instruction* currentInstruction)
     end.link(this);
 }
 
-void JIT::emit_op_push_scope(Instruction* currentInstruction)
+void JIT::emit_op_push_with_scope(Instruction* currentInstruction)
 {
-    JITStubCall stubCall(this, cti_op_push_scope);
+    JITStubCall stubCall(this, cti_op_push_with_scope);
     stubCall.addArgument(currentInstruction[1].u.operand, regT2);
-    stubCall.call(currentInstruction[1].u.operand);
+    stubCall.call();
 }
 
 void JIT::emit_op_pop_scope(Instruction*)
@@ -1072,12 +1072,13 @@ void JIT::emit_op_to_jsnumber(Instruction* currentInstruction)
     emitPutVirtualRegister(currentInstruction[1].u.operand);
 }
 
-void JIT::emit_op_push_new_scope(Instruction* currentInstruction)
+void JIT::emit_op_push_name_scope(Instruction* currentInstruction)
 {
-    JITStubCall stubCall(this, cti_op_push_new_scope);
-    stubCall.addArgument(TrustedImmPtr(&m_codeBlock->identifier(currentInstruction[2].u.operand)));
-    stubCall.addArgument(currentInstruction[3].u.operand, regT2);
-    stubCall.call(currentInstruction[1].u.operand);
+    JITStubCall stubCall(this, cti_op_push_name_scope);
+    stubCall.addArgument(TrustedImmPtr(&m_codeBlock->identifier(currentInstruction[1].u.operand)));
+    stubCall.addArgument(currentInstruction[2].u.operand, regT2);
+    stubCall.addArgument(TrustedImm32(currentInstruction[3].u.operand));
+    stubCall.call();
 }
 
 void JIT::emit_op_catch(Instruction* currentInstruction)
@@ -1591,12 +1592,12 @@ void JIT::emit_op_resolve_global_dynamic(Instruction* currentInstruction)
         Jump activationNotCreated;
         if (checkTopLevel)
             activationNotCreated = branchTestPtr(Zero, addressFor(m_codeBlock->activationRegister()));
-        addSlowCase(checkStructure(regT0, m_globalData->activationStructure.get()));
+        addSlowCase(checkStructure(regT0, m_codeBlock->globalObject()->activationStructure()));
         loadPtr(Address(regT0, JSScope::offsetOfNext()), regT0);
         activationNotCreated.link(this);
     }
     while (skip--) {
-        addSlowCase(checkStructure(regT0, m_globalData->activationStructure.get()));
+        addSlowCase(checkStructure(regT0, m_codeBlock->globalObject()->activationStructure()));
         loadPtr(Address(regT0, JSScope::offsetOfNext()), regT0);
     }
     emit_op_resolve_global(currentInstruction, true);

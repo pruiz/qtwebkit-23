@@ -1,3 +1,117 @@
+2012-09-04  Rob Buis  <rbuis@rim.com>
+
+        [BlackBerry] FatFingers::cachingStrategy uses incorrect enum value
+        https://bugs.webkit.org/show_bug.cgi?id=95783
+
+        Reviewed by Antonio Gomes.
+
+        Use the correct enum values.
+
+        * WebKitSupport/FatFingers.cpp:
+        (BlackBerry::WebKit::FatFingers::cachingStrategy):
+
+2012-09-04  Antonio Gomes  <agomes@rim.com>
+
+        [BlackBerry] Use child/ScrollableContent layer's position instead of parent/ScrollLayer's boundsOrigin
+        https://bugs.webkit.org/show_bug.cgi?id=95778
+        PR #202252
+
+        Reviewed by Rob Buis.
+        Internally reviewed by Arvid Nilsson.
+
+        Upstream has switch away from using the parent scroll layer's bounds origin
+        in order to translate contents of all its child layers. Instead now, it directly
+        sets the scroll position of the child scrollable contents layer.
+
+        Source/WebKit/blackberry:
+        * Api/InRegionScroller.cpp:
+        (BlackBerry::WebKit::InRegionScrollerPrivate::setScrollPositionCompositingThread):
+        * WebKitSupport/InRegionScrollableArea.cpp:
+        (BlackBerry::WebKit::InRegionScrollableArea::InRegionScrollableArea):
+
+        No new tests, since it is a catch-up with upstreaming code.
+
+2012-09-04  George Staikos  <staikos@webkit.org>
+
+        [BlackBerry] Fix memory leak in InputHandler
+        https://bugs.webkit.org/show_bug.cgi?id=95771
+
+        Reviewed by Rob Buis.
+
+        Simply delete the arrays at function exit.
+
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::openSelectPopup):
+
+2012-09-04  George Staikos  <staikos@webkit.org>
+
+        [BlackBerry] pass isMainFrame() through to notifyDocumentOnLoad()
+        https://bugs.webkit.org/show_bug.cgi?id=95766
+
+        Reviewed by Rob Buis.
+
+        Passing the frame status through will allow the client to make better
+        decisions about how to act on the onload.
+
+        * Api/WebPageClient.h:
+        * WebCoreSupport/FrameLoaderClientBlackBerry.cpp:
+        (WebCore::FrameLoaderClientBlackBerry::dispatchDidHandleOnloadEvents):
+
+2012-09-04  Rob Buis  <rbuis@rim.com>
+
+        [BlackBerry] Provide virtual dtor for DumpRenderTreeClient
+        https://bugs.webkit.org/show_bug.cgi?id=95769
+
+        Reviewed by Yong Li.
+
+        Also remove WTF prefixes.
+
+        * Api/DumpRenderTreeClient.h:
+
+2012-09-04  Mary Wu  <mary.wu@torchmobile.com.cn>
+
+        [BlackBerry] Add webplatform and browser to build info
+        https://bugs.webkit.org/show_bug.cgi?id=95715
+
+        Reviewed by George Staikos.
+
+        PR# 202102
+
+        * WebKitSupport/AboutData.cpp:
+        (BlackBerry::WebKit::buildPage):
+
+2012-08-31  Jacky Jiang  <zhajiang@rim.com>
+
+        [BlackBerry] ASSERT failure in RenderBlock::checkPositionedObjectsNeedLayout
+        https://bugs.webkit.org/show_bug.cgi?id=95611
+
+        Reviewed by Antonio Gomes.
+
+        PR:200127
+        Remove r118405 now as we already have a new fix webkit/43f8394b for
+        that issue and it is not reproducible anymore after the removal.
+        In this way, we can get rid of this ASSERT failure as well.
+        Thanks Antonio for the suggestion.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::setViewportSize):
+
+2012-08-31  Joshua Netterfield  <jnetterfield@rim.com>
+
+        [BlackBerry] Eliminate WebGL IT policy
+        https://bugs.webkit.org/show_bug.cgi?id=95604
+        Internal RIM PR #198764
+
+        Reviewed by Rob Buis.
+
+        This is no longer a requirement for the BlackBerry port.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::init):
+        (BlackBerry::WebKit::WebPage::setWebGLEnabled):
+        * WebKitSupport/AboutData.cpp:
+        (BlackBerry::WebKit::configPage):
+
 2012-08-30  Benjamin Poulain  <bpoulain@apple.com>
 
         Replace JSC::UString by WTF::String

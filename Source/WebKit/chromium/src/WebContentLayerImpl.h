@@ -26,16 +26,16 @@
 #ifndef WebContentLayerImpl_h
 #define WebContentLayerImpl_h
 
-#include "ContentLayerChromium.h"
+#include "ContentLayerChromiumClient.h"
 #include "WebLayerImpl.h"
 #include <public/WebContentLayer.h>
-#include <wtf/PassRefPtr.h>
+#include <wtf/OwnPtr.h>
 
 namespace WebKit {
 class WebContentLayerClient;
 
 class WebContentLayerImpl : public WebContentLayer,
-                            public WebCore::ContentLayerDelegate {
+                            public WebCore::ContentLayerChromiumClient {
 public:
     explicit WebContentLayerImpl(WebContentLayerClient*);
 
@@ -49,10 +49,10 @@ public:
 protected:
     virtual ~WebContentLayerImpl();
 
-    // ContentLayerDelegate implementation.
+    // ContentLayerChromiumClient implementation.
     virtual void paintContents(SkCanvas*, const WebCore::IntRect& clip, WebCore::FloatRect& opaque) OVERRIDE;
 
-    OwnPtr<WebLayerImpl> m_webLayerImpl;
+    OwnPtr<WebLayerImpl> m_layer;
     WebContentLayerClient* m_client;
     bool m_drawsContent;
 };

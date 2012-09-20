@@ -109,13 +109,13 @@
 #include "WebTextCheckingResult.h"
 #include "WebTextCheckingType.h"
 #include "WebView.h"
-#include "platform/WebICEOptions.h"
-#include "platform/WebMediaStreamSource.h"
-#include "platform/WebPeerConnection00Handler.h"
-#include "platform/WebPeerConnection00HandlerClient.h"
 #include <public/WebClipboard.h>
 #include <public/WebFileSystem.h>
 #include <public/WebFilterOperation.h>
+#include <public/WebICEOptions.h>
+#include <public/WebMediaStreamSource.h>
+#include <public/WebPeerConnection00Handler.h>
+#include <public/WebPeerConnection00HandlerClient.h>
 #include <public/WebRTCPeerConnectionHandler.h>
 #include <public/WebRTCPeerConnectionHandlerClient.h>
 #include <public/WebReferrerPolicy.h>
@@ -602,6 +602,15 @@ COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ReadyStateOpenin
 COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ReadyStateActive, RTCPeerConnectionHandlerClient::ReadyStateActive);
 COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ReadyStateClosing, RTCPeerConnectionHandlerClient::ReadyStateClosing);
 COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ReadyStateClosed, RTCPeerConnectionHandlerClient::ReadyStateClosed);
+
+COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ICEStateNew, RTCPeerConnectionHandlerClient::IceStateNew);
+COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ICEStateGathering, RTCPeerConnectionHandlerClient::IceStateGathering);
+COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ICEStateWaiting, RTCPeerConnectionHandlerClient::IceStateWaiting);
+COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ICEStateChecking, RTCPeerConnectionHandlerClient::IceStateChecking);
+COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ICEStateConnected, RTCPeerConnectionHandlerClient::IceStateConnected);
+COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ICEStateCompleted, RTCPeerConnectionHandlerClient::IceStateCompleted);
+COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ICEStateFailed, RTCPeerConnectionHandlerClient::IceStateFailed);
+COMPILE_ASSERT_MATCHING_ENUM(WebRTCPeerConnectionHandlerClient::ICEStateClosed, RTCPeerConnectionHandlerClient::IceStateClosed);
 #endif
 
 #if ENABLE(SCRIPTED_SPEECH)

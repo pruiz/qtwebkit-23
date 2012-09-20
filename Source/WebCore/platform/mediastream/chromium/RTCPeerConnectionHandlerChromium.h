@@ -33,11 +33,17 @@
 
 #if ENABLE(MEDIA_STREAM)
 
+#include "MediaStreamDescriptor.h"
 #include "RTCPeerConnectionHandler.h"
 #include <public/WebRTCPeerConnectionHandler.h>
 #include <public/WebRTCPeerConnectionHandlerClient.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/PassRefPtr.h>
+
+namespace WebKit {
+class WebMediaStreamDescriptor;
+class WebRTCICECandidateDescriptor;
+}
 
 namespace WebCore {
 
@@ -47,10 +53,20 @@ public:
     virtual ~RTCPeerConnectionHandlerChromium();
 
     virtual bool initialize(PassRefPtr<RTCConfiguration>, PassRefPtr<MediaConstraints>) OVERRIDE;
+
+    virtual void createOffer(PassRefPtr<RTCSessionDescriptionRequest>, PassRefPtr<MediaConstraints>) OVERRIDE;
+    virtual bool updateIce(PassRefPtr<RTCConfiguration>, PassRefPtr<MediaConstraints>) OVERRIDE;
+    virtual bool addIceCandidate(PassRefPtr<RTCIceCandidateDescriptor>) OVERRIDE;
+    virtual bool addStream(PassRefPtr<MediaStreamDescriptor>, PassRefPtr<MediaConstraints>) OVERRIDE;
+    virtual void removeStream(PassRefPtr<MediaStreamDescriptor>) OVERRIDE;
     virtual void stop() OVERRIDE;
 
     // WebKit::WebRTCPeerConnectionHandlerClient implementation.
+    virtual void didGenerateICECandidate(const WebKit::WebRTCICECandidateDescriptor&) OVERRIDE;
     virtual void didChangeReadyState(WebKit::WebRTCPeerConnectionHandlerClient::ReadyState) OVERRIDE;
+    virtual void didChangeICEState(WebKit::WebRTCPeerConnectionHandlerClient::ICEState) OVERRIDE;
+    virtual void didAddRemoteStream(const WebKit::WebMediaStreamDescriptor&) OVERRIDE;
+    virtual void didRemoveRemoteStream(const WebKit::WebMediaStreamDescriptor&) OVERRIDE;
 
 private:
     OwnPtr<WebKit::WebRTCPeerConnectionHandler> m_webHandler;

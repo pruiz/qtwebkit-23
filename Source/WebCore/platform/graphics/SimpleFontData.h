@@ -346,5 +346,4 @@ ALWAYS_INLINE float SimpleFontData::widthForGlyph(Glyph glyph) const
 #endif // HAVE(QRAWFONT)
 
 } // namespace WebCore
-
 #endif // SimpleFontData_h

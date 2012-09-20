@@ -138,6 +138,14 @@ void Options::initialize()
     ; // Deconfuse editors that do auto indentation
 #endif
     
+#if !ENABLE(JIT)
+    useJIT() = false;
+    useDFGJIT() = false;
+#endif
+#if !ENABLE(YARR_JIT)
+    useYarrJIT() = false;
+#endif
+
     // Do range checks where needed and make corrections to the options:
     ASSERT(thresholdForOptimizeAfterLongWarmUp() >= thresholdForOptimizeAfterWarmUp());
     ASSERT(thresholdForOptimizeAfterWarmUp() >= thresholdForOptimizeSoon());

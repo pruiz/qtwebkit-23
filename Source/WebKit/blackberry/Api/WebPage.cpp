@@ -153,7 +153,6 @@
 
 #include <BlackBerryPlatformDeviceInfo.h>
 #include <BlackBerryPlatformExecutableMessage.h>
-#include <BlackBerryPlatformITPolicy.h>
 #include <BlackBerryPlatformKeyboardEvent.h>
 #include <BlackBerryPlatformMessageClient.h>
 #include <BlackBerryPlatformMouseEvent.h>
@@ -569,8 +568,7 @@ void WebPagePrivate::init(const WebString& pageGroupName)
     m_inRegionScroller = adoptPtr(new InRegionScroller(this));
 
 #if ENABLE(WEBGL)
-    Platform::Settings* settings = Platform::Settings::instance();
-    m_page->settings()->setWebGLEnabled(settings && settings->isWebGLSupported());
+    m_page->settings()->setWebGLEnabled(true);
 #endif
 #if ENABLE(ACCELERATED_2D_CANVAS)
     m_page->settings()->setCanvasUsesAcceleratedDrawing(true);
@@ -3692,27 +3690,11 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
     if (!m_visible || !m_backingStore->d->isActive())
         setShouldResetTilesWhenShown(true);
 
-    bool needsLayout = false;
     bool hasPendingOrientation = m_pendingOrientation != -1;
 
     if (m_hasPendingSurfaceSizeChange) {
         resizeSurfaceIfNeeded();
         m_hasPendingSurfaceSizeChange = false;
-    }
-    if (!hasPendingOrientation) {
-        // If we are not rotating and we've started a viewport resize with
-        // the Render tree in dirty state (i.e. it needs layout), lets
-        // reset the needsLayout flag for now but set our own 'needsLayout'.
-        //
-        // Reason: calls like ScrollView::setFixedLayoutSize can trigger a layout
-        // if the render tree needs it. We want to avoid it till the viewport resize
-        // is actually done (i.e. ScrollView::setViewportSize gets called
-        // further down the method).
-        if (m_mainFrame->view()->needsLayout()) {
-            m_mainFrame->view()->unscheduleRelayout();
-            m_mainFrame->contentRenderer()->setNeedsLayout(false);
-            needsLayout = true;
-        }
     }
 
     // The window buffers might have been recreated, cleared, moved, etc., so:
@@ -3738,6 +3720,7 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
     setDefaultLayoutSize(transformedActualVisibleSize);
 
     // Recompute our virtual viewport.
+    bool needsLayout = false;
     static ViewportArguments defaultViewportArguments;
     if (m_viewportArguments != defaultViewportArguments) {
         // We may need to infer the width and height for the viewport with respect to the rotation.
@@ -6211,10 +6194,6 @@ void WebPagePrivate::scheduleCompositingRun()
 
 void WebPage::setWebGLEnabled(bool enabled)
 {
-    if (!Platform::ITPolicy::isWebGLEnabled()) {
-        d->m_page->settings()->setWebGLEnabled(false);
-        return;
-    }
     d->m_page->settings()->setWebGLEnabled(enabled);
 }
 

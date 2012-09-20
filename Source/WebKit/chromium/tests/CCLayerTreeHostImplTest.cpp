@@ -27,12 +27,12 @@
 #include "CCLayerTreeHostImpl.h"
 
 #include "CCAnimationTestCommon.h"
+#include "CCGeometryTestUtils.h"
 #include "CCHeadsUpDisplayLayerImpl.h"
 #include "CCIOSurfaceLayerImpl.h"
 #include "CCLayerImpl.h"
 #include "CCLayerTestCommon.h"
 #include "CCLayerTilingData.h"
-#include "CCLayerTreeTestCommon.h"
 #include "CCQuadSink.h"
 #include "CCRenderPassDrawQuad.h"
 #include "CCRendererGL.h"
@@ -70,7 +70,8 @@ namespace {
 class CCLayerTreeHostImplTest : public testing::Test, public CCLayerTreeHostImplClient {
 public:
     CCLayerTreeHostImplTest()
-        : m_didRequestCommit(false)
+        : m_onCanDrawStateChangedCalled(false)
+        , m_didRequestCommit(false)
         , m_didRequestRedraw(false)
     {
         CCLayerTreeSettings settings;
@@ -84,6 +85,7 @@ public:
     virtual void didLoseContextOnImplThread() OVERRIDE { }
     virtual void onSwapBuffersCompleteOnImplThread() OVERRIDE { }
     virtual void onVSyncParametersChanged(double, double) OVERRIDE { }
+    virtual void onCanDrawStateChanged(bool canDraw) OVERRIDE { m_onCanDrawStateChangedCalled = true; }
     virtual void setNeedsRedrawOnImplThread() OVERRIDE { m_didRequestRedraw = true; }
     virtual void setNeedsCommitOnImplThread() OVERRIDE { m_didRequestCommit = true; }
     virtual void postAnimationEventsToMainThreadOnImplThread(PassOwnPtr<CCAnimationEventsVector>, double wallClockTime) OVERRIDE { }
@@ -185,6 +187,7 @@ protected:
     DebugScopedSetMainThreadBlocked m_alwaysMainThreadBlocked;
 
     OwnPtr<CCLayerTreeHostImpl> m_hostImpl;
+    bool m_onCanDrawStateChangedCalled;
     bool m_didRequestCommit;
     bool m_didRequestRedraw;
     CCScopedSettings m_scopedSettings;
@@ -194,6 +197,53 @@ class FakeWebGraphicsContext3DMakeCurrentFails : public FakeWebGraphicsContext3D
 public:
     virtual bool makeContextCurrent() { return false; }
 };
+
+TEST_F(CCLayerTreeHostImplTest, notifyIfCanDrawChanged)
+{
+    // Note: It is not possible to disable the renderer once it has been set,
+    // so we do not need to test that disabling the renderer notifies us
+    // that canDraw changed.
+    EXPECT_FALSE(m_hostImpl->canDraw());
+    m_onCanDrawStateChangedCalled = false;
+
+    setupScrollAndContentsLayers(IntSize(100, 100));
+    EXPECT_TRUE(m_hostImpl->canDraw());
+    EXPECT_TRUE(m_onCanDrawStateChangedCalled);
+    m_onCanDrawStateChangedCalled = false;
+
+    // Toggle the root layer to make sure it toggles canDraw
+    m_hostImpl->setRootLayer(adoptPtr<CCLayerImpl>(0));
+    EXPECT_FALSE(m_hostImpl->canDraw());
+    EXPECT_TRUE(m_onCanDrawStateChangedCalled);
+    m_onCanDrawStateChangedCalled = false;
+
+    setupScrollAndContentsLayers(IntSize(100, 100));
+    EXPECT_TRUE(m_hostImpl->canDraw());
+    EXPECT_TRUE(m_onCanDrawStateChangedCalled);
+    m_onCanDrawStateChangedCalled = false;
+
+    // Toggle the device viewport size to make sure it toggles canDraw.
+    m_hostImpl->setViewportSize(IntSize(100, 100), IntSize(0, 0));
+    EXPECT_FALSE(m_hostImpl->canDraw());
+    EXPECT_TRUE(m_onCanDrawStateChangedCalled);
+    m_onCanDrawStateChangedCalled = false;
+
+    m_hostImpl->setViewportSize(IntSize(100, 100), IntSize(100, 100));
+    EXPECT_TRUE(m_hostImpl->canDraw());
+    EXPECT_TRUE(m_onCanDrawStateChangedCalled);
+    m_onCanDrawStateChangedCalled = false;
+
+    // Toggle contents textures purged to make sure it toggles canDraw
+    m_hostImpl->releaseContentsTextures();
+    EXPECT_FALSE(m_hostImpl->canDraw());
+    EXPECT_TRUE(m_onCanDrawStateChangedCalled);
+    m_onCanDrawStateChangedCalled = false;
+
+    m_hostImpl->resetContentsTexturesPurged();
+    EXPECT_TRUE(m_hostImpl->canDraw());
+    EXPECT_TRUE(m_onCanDrawStateChangedCalled);
+    m_onCanDrawStateChangedCalled = false;
+}
 
 TEST_F(CCLayerTreeHostImplTest, scrollDeltaNoLayers)
 {
@@ -2820,7 +2870,7 @@ TEST_F(CCLayerTreeHostImplTest, textureCachingWithClipping)
         EXPECT_LT(quadVisibleRect.width(), 100);
 
         // Verify that the render surface texture is *not* clipped.
-        EXPECT_INT_RECT_EQ(IntRect(0, 0, 100, 100), frame.renderPasses[0]->outputRect());
+        EXPECT_RECT_EQ(IntRect(0, 0, 100, 100), frame.renderPasses[0]->outputRect());
 
         EXPECT_EQ(CCDrawQuad::RenderPass, frame.renderPasses[1]->quadList()[0]->material());
         CCRenderPassDrawQuad* quad = static_cast<CCRenderPassDrawQuad*>(frame.renderPasses[1]->quadList()[0].get());

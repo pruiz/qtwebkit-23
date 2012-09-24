@@ -5,7 +5,7 @@
 # See 'Tools/qmake/README' for an overview of the build system
 # -------------------------------------------------------------------
 
-haveQt(4) {
+equals(QT_MAJOR_VERSION, 4) {
     QMAKEPATH = $$(QMAKEPATH)
     isEmpty(QMAKEPATH)|!exists($${QMAKEPATH}/mkspecs) {
         error("The environment variable QMAKEPATH needs to point to $WEBKITSRC/Tools/qmake")

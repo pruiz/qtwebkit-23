@@ -598,7 +598,30 @@ QWebFrame::~QWebFrame()
 }
 
 /*!
-    \fn void QWebFrame::addToJavaScriptWindowObject(const QString &name, QObject *object, ValueOwnership own)
+    Make \a object available under \a name from within the frame's JavaScript
+    context. The \a object will be inserted as a child of the frame's window
+    object.
+
+    Qt properties will be exposed as JavaScript properties and slots as
+    JavaScript methods.
+    The interaction between C++ and JavaScript is explained in the documentation of the \l{The QtWebKit Bridge}{QtWebKit bridge}.
+
+    If you want to ensure that your QObjects remain accessible after loading a
+    new URL, you should add them in a slot connected to the
+    javaScriptWindowObjectCleared() signal.
+
+    If Javascript is not enabled for this page, then this method does nothing.
+
+    The \a object will never be explicitly deleted by QtWebKit.
+*/
+void QWebFrame::addToJavaScriptWindowObject(const QString &name, QObject *object)
+{
+    addToJavaScriptWindowObject(name, object, QScriptEngine::QtOwnership);
+}
+
+/*!
+    \fn void QWebFrame::addToJavaScriptWindowObject(const QString &name, QObject *object, QScriptEngine::ValueOwnership own)
+    \overload
 
     Make \a object available under \a name from within the frame's JavaScript
     context. The \a object will be inserted as a child of the frame's window

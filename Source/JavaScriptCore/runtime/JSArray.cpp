@@ -34,7 +34,6 @@
 #include "IndexingHeaderInlineMethods.h"
 #include "PropertyNameArray.h"
 #include "Reject.h"
-#include "SparseArrayValueMapInlineMethods.h"
 #include <wtf/AVLTree.h>
 #include <wtf/Assertions.h>
 #include <wtf/OwnPtr.h>
@@ -478,8 +477,8 @@ void JSArray::push(ExecState* exec, JSValue value)
             return;
         }
 
-        // Pushing to an array of length 2^32-1 stores the property, but throws a range error.
-        if (UNLIKELY(storage->length() == 0xFFFFFFFFu)) {
+        // Pushing to an array of invalid length (2^31-1) stores the property, but throws a range error.
+        if (storage->length() > MAX_ARRAY_INDEX) {
             methodTable()->putByIndex(this, exec, storage->length(), value, true);
             // Per ES5.1 15.4.4.7 step 6 & 15.4.5.1 step 3.d.
             if (!exec->hadException())
@@ -549,7 +548,9 @@ bool JSArray::unshiftCount(ExecState* exec, unsigned count)
         storage = m_butterfly->arrayStorage();
         storage->m_indexBias -= count;
         storage->setVectorLength(storage->vectorLength() + count);
-    } else if (!unshiftCountSlowCase(exec->globalData(), count)) {
+    } else if (unshiftCountSlowCase(exec->globalData(), count))
+        storage = arrayStorage();
+    else {
         throwOutOfMemoryError(exec);
         return true;
     }

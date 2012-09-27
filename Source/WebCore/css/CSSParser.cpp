@@ -199,6 +199,7 @@ CSSParserContext::CSSParserContext(CSSParserMode mode, const KURL& baseURL)
     , mode(mode)
     , isHTMLDocument(false)
     , isCSSCustomFilterEnabled(false)
+    , isCSSStickyPositionEnabled(false)
     , isCSSRegionsEnabled(false)
     , isCSSGridLayoutEnabled(false)
 #if ENABLE(CSS_VARIABLES)
@@ -215,6 +216,7 @@ CSSParserContext::CSSParserContext(Document* document, const KURL& baseURL, cons
     , mode(document->inQuirksMode() ? CSSQuirksMode : CSSStrictMode)
     , isHTMLDocument(document->isHTMLDocument())
     , isCSSCustomFilterEnabled(document->settings() ? document->settings()->isCSSCustomFilterEnabled() : false)
+    , isCSSStickyPositionEnabled(document->cssStickyPositionEnabled())
     , isCSSRegionsEnabled(document->cssRegionsEnabled())
     , isCSSGridLayoutEnabled(document->cssGridLayoutEnabled())
 #if ENABLE(CSS_VARIABLES)
@@ -232,6 +234,7 @@ bool operator==(const CSSParserContext& a, const CSSParserContext& b)
         && a.mode == b.mode
         && a.isHTMLDocument == b.isHTMLDocument
         && a.isCSSCustomFilterEnabled == b.isCSSCustomFilterEnabled
+        && a.isCSSStickyPositionEnabled == b.isCSSStickyPositionEnabled
         && a.isCSSRegionsEnabled == b.isCSSRegionsEnabled
         && a.isCSSGridLayoutEnabled == b.isCSSGridLayoutEnabled
 #if ENABLE(CSS_VARIABLES)
@@ -670,7 +673,7 @@ static inline bool isValidKeywordPropertyAndValue(CSSPropertyID propertyId, int 
     case CSSPropertyPosition: // static | relative | absolute | fixed | sticky | inherit
         if (valueID == CSSValueStatic || valueID == CSSValueRelative || valueID == CSSValueAbsolute || valueID == CSSValueFixed
 #if ENABLE(CSS_STICKY_POSITION)
-            || valueID == CSSValueWebkitSticky
+            || (parserContext.isCSSStickyPositionEnabled && valueID == CSSValueWebkitSticky)
 #endif
             )
             return true;
@@ -3200,18 +3203,19 @@ bool CSSParser::parseAnimationShorthand(bool important)
 
 bool CSSParser::parseTransitionShorthand(bool important)
 {
-    const unsigned numProperties = webkitTransitionShorthand().length();
+    const unsigned numProperties = 4;
+    ASSERT(numProperties == webkitTransitionShorthand().length());
 
     ShorthandScope scope(this, CSSPropertyWebkitTransition);
 
-    bool parsedProperty[] = { false, false, false, false };
-    RefPtr<CSSValue> values[4];
+    bool parsedProperty[numProperties] = { false };
+    RefPtr<CSSValue> values[numProperties];
 
     unsigned i;
     while (m_valueList->current()) {
         CSSParserValue* val = m_valueList->current();
         if (val->unit == CSSParserValue::Operator && val->iValue == ',') {
-            // We hit the end.  Fill in all remaining values with the initial value.
+            // We hit the end. Fill in all remaining values with the initial value.
             m_valueList->next();
             for (i = 0; i < numProperties; ++i) {
                 if (!parsedProperty[i])

@@ -1139,6 +1139,11 @@ bool Document::regionBasedColumnsEnabled() const
     return settings() && settings()->regionBasedColumnsEnabled(); 
 }
 
+bool Document::cssStickyPositionEnabled() const
+{
+    return settings() && settings()->cssStickyPositionEnabled(); 
+}
+
 bool Document::cssRegionsEnabled() const
 {
     return settings() && settings()->cssRegionsEnabled(); 
@@ -1387,7 +1392,7 @@ String Document::suggestedMIMEType() const
 // * making it receive a rect as parameter, i.e. nodesFromRect(x, y, w, h);
 // * making it receive the expading size of each direction separately,
 //   i.e. nodesFromRect(x, y, topSize, rightSize, bottomSize, leftSize);
-PassRefPtr<NodeList> Document::nodesFromRect(int centerX, int centerY, unsigned topPadding, unsigned rightPadding, unsigned bottomPadding, unsigned leftPadding, bool ignoreClipping, bool allowShadowContent, bool allowChildFrameContent) const
+PassRefPtr<NodeList> Document::nodesFromRect(int centerX, int centerY, unsigned topPadding, unsigned rightPadding, unsigned bottomPadding, unsigned leftPadding, bool ignoreClipping, bool allowShadowContent) const
 {
     // FIXME: Share code between this, elementFromPoint and caretRangeFromPoint.
     if (!renderer())
@@ -1411,8 +1416,6 @@ PassRefPtr<NodeList> Document::nodesFromRect(int centerX, int centerY, unsigned 
         return 0;
     if (allowShadowContent)
         type |= HitTestRequest::AllowShadowContent;
-    if (allowChildFrameContent)
-        type |= HitTestRequest::AllowChildFrameContent;
 
     HitTestRequest request(type);
 
@@ -2821,12 +2824,12 @@ String Document::userAgent(const KURL& url) const
     return frame() ? frame()->loader()->userAgent(url) : String();
 }
 
-void Document::disableEval()
+void Document::disableEval(const String& errorMessage)
 {
     if (!frame())
         return;
 
-    frame()->script()->disableEval();
+    frame()->script()->disableEval(errorMessage);
 }
 
 bool Document::canNavigate(Frame* targetFrame)
@@ -4550,6 +4553,12 @@ void Document::registerForMediaVolumeCallbacks(Element* e)
 void Document::unregisterForMediaVolumeCallbacks(Element* e)
 {
     m_mediaVolumeCallbackElements.remove(e);
+}
+
+void Document::storageBlockingStateDidChange()
+{
+    if (Settings* settings = this->settings())
+        securityOrigin()->setStorageBlockingPolicy(settings->storageBlockingPolicy());
 }
 
 void Document::privateBrowsingStateDidChange() 
@@ -6322,7 +6331,7 @@ public:
     unsigned hash() const
     {
         unsigned attributeHash = StringHasher::hashMemory(m_attributes, m_attributeCount * sizeof(Attribute));
-        return WTF::intHash((static_cast<uint64_t>(m_localName->existingHash()) << 32 | attributeHash));
+        return WTF::pairIntHash(m_localName->existingHash(), attributeHash);
     }
 
 private:

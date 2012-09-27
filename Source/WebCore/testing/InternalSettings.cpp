@@ -98,7 +98,11 @@ InternalSettings::Backup::Backup(Page* page, Settings* settings)
 #endif
     , m_canStartMedia(page->canStartMedia())
     , m_originalMockScrollbarsEnabled(settings->mockScrollbarsEnabled())
+#if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
+    // FIXME: This is a workaround for Apple Windows crash.
     , m_langAttributeAwareFormControlUIEnabled(RuntimeEnabledFeatures::langAttributeAwareFormControlUIEnabled())
+#endif
+    , m_imagesEnabled(settings->areImagesEnabled())
 {
 }
 
@@ -132,7 +136,10 @@ void InternalSettings::Backup::restoreTo(Page* page, Settings* settings)
 #endif
     page->setCanStartMedia(m_canStartMedia);
     settings->setMockScrollbarsEnabled(m_originalMockScrollbarsEnabled);
+#if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
     RuntimeEnabledFeatures::setLangAttributeAwareFormControlUIEnabled(m_langAttributeAwareFormControlUIEnabled);
+#endif
+    settings->setImagesEnabled(m_imagesEnabled);
 }
 
 InternalSettings* InternalSettings::from(Page* page)
@@ -648,7 +655,17 @@ void InternalSettings::setStorageBlockingPolicy(const String& mode, ExceptionCod
 
 void InternalSettings::setLangAttributeAwareFormControlUIEnabled(bool enabled)
 {
+#if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
     RuntimeEnabledFeatures::setLangAttributeAwareFormControlUIEnabled(enabled);
+#else
+    UNUSED_PARAM(enabled);
+#endif
+}
+
+void InternalSettings::setImagesEnabled(bool enabled, ExceptionCode& ec)
+{
+    InternalSettingsGuardForSettings();
+    settings()->setImagesEnabled(enabled);
 }
 
 }

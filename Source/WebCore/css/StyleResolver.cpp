@@ -147,6 +147,7 @@
 #endif
 
 #if ENABLE(CSS_SHADERS)
+#include "CustomFilterArrayParameter.h"
 #include "CustomFilterNumberParameter.h"
 #include "CustomFilterOperation.h"
 #include "CustomFilterParameter.h"
@@ -3438,11 +3439,11 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
     const PropertyHandler& handler = m_styleBuilder.propertyHandler(id);
     if (handler.isValid()) {
         if (isInherit)
-            handler.applyInheritValue(this);
+            handler.applyInheritValue(id, this);
         else if (isInitial)
-            handler.applyInitialValue(this);
+            handler.applyInitialValue(id, this);
         else
-            handler.applyValue(this, value);
+            handler.applyValue(id, this, value);
         return;
     }
 
@@ -5252,6 +5253,21 @@ static bool sortParametersByNameComparator(const RefPtr<CustomFilterParameter>& 
     return codePointCompareLessThan(a->name(), b->name());
 }
 
+PassRefPtr<CustomFilterParameter> StyleResolver::parseCustomFilterArrayParameter(const String& name, CSSValueList* values)
+{
+    RefPtr<CustomFilterArrayParameter> arrayParameter = CustomFilterArrayParameter::create(name);
+    for (unsigned i = 0, length = values->length(); i < length; ++i) {
+        CSSValue* value = values->itemWithoutBoundsCheck(i);
+        if (!value->isPrimitiveValue())
+            return 0;
+        CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
+        if (primitiveValue->primitiveType() != CSSPrimitiveValue::CSS_NUMBER)
+            return 0;
+        arrayParameter->addValue(primitiveValue->getDoubleValue());
+    }
+    return arrayParameter.release();
+}
+
 PassRefPtr<CustomFilterParameter> StyleResolver::parseCustomFilterNumberParameter(const String& name, CSSValueList* values)
 {
     RefPtr<CustomFilterNumberParameter> numberParameter = CustomFilterNumberParameter::create(name);
@@ -5282,6 +5298,8 @@ PassRefPtr<CustomFilterParameter> StyleResolver::parseCustomFilterParameter(cons
     // booleans: https://bugs.webkit.org/show_bug.cgi?id=76438
     // textures: https://bugs.webkit.org/show_bug.cgi?id=71442
     // mat2, mat3, mat4: https://bugs.webkit.org/show_bug.cgi?id=71444
+    // Number parameters are wrapped inside a CSSValueList and all
+    // the other functions values inherit from CSSValueList.
     if (!parameterValue->isValueList())
         return 0;
 
@@ -5289,9 +5307,16 @@ PassRefPtr<CustomFilterParameter> StyleResolver::parseCustomFilterParameter(cons
     if (!values->length())
         return 0;
 
+    if (parameterValue->isWebKitCSSArrayFunctionValue())
+        return parseCustomFilterArrayParameter(name, values);
+
+    // If the first value of the list is a transform function,
+    // then we could safely assume that all the remaining items
+    // are transforms. parseCustomFilterTransformParameter will
+    // return 0 if that assumption is incorrect.
     if (values->itemWithoutBoundsCheck(0)->isWebKitCSSTransformValue())
         return parseCustomFilterTransformParameter(name, values);
-    
+
     // We can have only arrays of booleans or numbers, so use the first value to choose between those two.
     // We need up to 4 values (all booleans or all numbers).
     if (!values->itemWithoutBoundsCheck(0)->isPrimitiveValue() || values->length() > 4)

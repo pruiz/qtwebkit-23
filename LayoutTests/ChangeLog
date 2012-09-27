@@ -1,3 +1,1045 @@
+2012-09-17  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Several CSS tests need rebaseline after r126911
+        https://bugs.webkit.org/show_bug.cgi?id=96898
+
+        Unreviewed EFL gardening.
+
+        Rebaseline 3 CSS tests due to r126911.
+
+        * platform/efl/TestExpectations:
+        * platform/efl/fast/css/absolute-child-with-percent-height-inside-relative-parent-expected.png:
+        * platform/efl/fast/css/absolute-child-with-percent-height-inside-relative-parent-expected.txt: Added.
+        * platform/efl/fast/inline/absolute-positioned-inline-in-centred-block-expected.png:
+        * platform/efl/fast/inline/absolute-positioned-inline-in-centred-block-expected.txt: Added.
+        * platform/efl/fast/inline/left-right-center-inline-alignment-in-ltr-and-rtl-blocks-expected.png:
+        * platform/efl/fast/inline/left-right-center-inline-alignment-in-ltr-and-rtl-blocks-expected.txt: Added.
+
+2012-09-16  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Skip http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-in-body.html
+        https://bugs.webkit.org/show_bug.cgi?id=96895
+
+        Unreviewed EFL gardening.
+
+        Skip http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-in-body.html for
+        EFL port since it sometimes asserts in MessagePort::contextDestroyed.
+
+        * platform/efl/TestExpectations:
+
+2012-09-16  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Mark inspector/elements/delete-from-document.html as flaky
+        https://bugs.webkit.org/show_bug.cgi?id=96897
+
+        Unreviewed EFL gardening.
+
+        Mark inspector/elements/delete-from-document.html as flaky.
+        It sometimes times out of the WK2-EFL bot.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-09-16  Shinya Kawanaka  <shinyak@chromium.org>
+
+        Unreviewed gardening. Rebaseline after r128691
+        https://bugs.webkit.org/show_bug.cgi?id=96892
+
+        Rebaseline fast/css/word-space-extra.html for chromium.
+
+        * platform/chromium-linux/fast/css/word-space-extra-expected.txt: Added.
+
+2012-09-16  Dan Bernstein  <mitz@apple.com>
+
+        REGRESSION (r126763): css1/pseudo/firstline.html fails when using the complex text code path
+        https://bugs.webkit.org/show_bug.cgi?id=96890
+
+        Reviewed by Sam Weinig.
+
+        * fast/text/stale-TextLayout-from-first-line-expected.html: Added.
+        * fast/text/stale-TextLayout-from-first-line.html: Added.
+
+2012-09-16  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Skip fast/loader/display-image-unset-can-block-image-and-can-reload-in-place.html
+        https://bugs.webkit.org/show_bug.cgi?id=96884
+
+        Unreviewed EFL gardening.
+
+        Skip fast/loader/display-image-unset-can-block-image-and-can-reload-in-place.html
+        because EFL's DRT does not support overriding 'WebKitDisplayImagesKey'
+        preference yet.
+
+        * platform/efl-wk1/TestExpectations:
+
+2012-09-16  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Update TestExpectations for tests requiring plugins support
+        https://bugs.webkit.org/show_bug.cgi?id=96882
+
+        Unreviewed EFL gardening.
+
+        Regroup all test requiring plugins support in TestExpectation file
+        and update their bug number.
+
+        * platform/efl/Skipped:
+        * platform/efl/TestExpectations:
+
+2012-09-16  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Mark inspector/debugger/dynamic-script-tag.html as flaky
+        https://bugs.webkit.org/show_bug.cgi?id=96887
+
+        Unreviewed EFL gardening.
+
+        Mark inspector/debugger/dynamic-script-tag.html as flaky
+        in EFL's TestExpectations.
+
+        * platform/efl/TestExpectations:
+
+2012-09-16  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] 3 spatial navigation tests can be unskipped after r128644
+        https://bugs.webkit.org/show_bug.cgi?id=96880
+
+        Unreviewed EFL gardening.
+
+        Unskip 3 spatial navigation tests that have been fixed in r128644.
+
+        * platform/efl/TestExpectations:
+
+2012-09-16  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Skip fast/events/message-port-constructor-for-deleted-document.html
+        https://bugs.webkit.org/show_bug.cgi?id=96885
+
+        Unreviewed EFL gardening.
+
+        Causes assertion failure in MessagePort::contextDestroyed in
+        http/tests/security/MessagePort/event-listener-context.html, usually
+        attributed to later tests. We need to skip the test for now.
+
+        * platform/efl/TestExpectations:
+
+2012-09-15  Mike West  <mkwst@chromium.org>
+
+        Break on inline scripts blocked by CSP.
+        https://bugs.webkit.org/show_bug.cgi?id=93865
+
+        Reviewed by Pavel Feldman.
+
+        * inspector/debugger/debugger-pause-on-blocked-event-handler-expected.txt: Added.
+        * inspector/debugger/debugger-pause-on-blocked-event-handler.html: Added.
+        * inspector/debugger/debugger-pause-on-blocked-script-injection-expected.txt: Added.
+        * inspector/debugger/debugger-pause-on-blocked-script-injection.html: Added.
+        * inspector/debugger/debugger-pause-on-blocked-script-url-expected.txt: Added.
+        * inspector/debugger/debugger-pause-on-blocked-script-url.html: Added.
+        * inspector/debugger/resources/pause-on-blocked-by-csp.js: Added.
+        (test.setStatus):
+        (test.step1):
+        (test.step2):
+        (test):
+        * inspector/debugger/resources/pause-on-blocked-event-handler.js: Added.
+        (testAction):
+        * inspector/debugger/resources/pause-on-blocked-script-injection.js: Added.
+        (testAction):
+        * inspector/debugger/resources/pause-on-blocked-script-url.js: Added.
+        (testAction):
+
+2012-09-15  Florin Malita  <fmalita@chromium.org>
+
+        <use> not working when the SVG doc is embedded as <object> data
+        https://bugs.webkit.org/show_bug.cgi?id=96816
+
+        Reviewed by Dirk Schulze.
+
+        * svg/custom/object-data-href-expected.html: Added.
+        * svg/custom/object-data-href.html: Added.
+
+2012-09-15  Andreas Kling  <kling@webkit.org>
+
+        REGRESSION(r127438): Google Docs to renders text too small.
+        <http://webkit.org/b/96554>
+
+        Reviewed by Antti Koivisto.
+
+        Add a test that an element that shared its inline style with another element works as expected
+        after the other element is destroyed.
+
+        * fast/dom/shared-inline-style-after-node-removal-expected.txt: Added.
+        * fast/dom/shared-inline-style-after-node-removal.html: Added.
+
+2012-09-15  Dan Bernstein  <mitz@apple.com>
+
+        REGRESSION (r125578): The monospace code path in RenderText::widthFromCache disagrees with Font::width on word spacing
+        https://bugs.webkit.org/show_bug.cgi?id=96869
+
+        Reviewed by Eric Seidel.
+
+        * fast/text/word-space-monospace-expected.html: Added.
+        * fast/text/word-space-monospace.html: Added.
+        * platform/mac/TestExpectations: Removed fast/css/word-spacing-characters.html.
+        * platform/mac/fast/css/word-space-extra-expected.png: Updated.
+        * platform/mac/fast/css/word-space-extra-expected.txt: Updated.
+
+2012-09-15  Dan Bernstein  <mitz@apple.com>
+
+        REGRESSION (r125578): Word spacing not applied to newline and tab characters that are treated as spaces
+        https://bugs.webkit.org/show_bug.cgi?id=96865
+
+        Reviewed by Sam Weinig.
+
+        * fast/text/atsui-negative-spacing-features.html: Reverted changes made in r128691, now that
+        both code paths handle newlines correctly.
+        * fast/text/atsui-spacing-features.html: Ditto.
+        * platform/mac/TestExpectations: Removed fast/css/word-space-extra.html.
+
+2012-09-15  Dan Bernstein  <mitz@apple.com>
+
+        REGRESSION (r125578): The Mac complex text code path disagrees with the fast path on word spacing
+        https://bugs.webkit.org/show_bug.cgi?id=96857
+
+        Reviewed by Anders Carlsson.
+
+        * fast/text/atsui-negative-spacing-features.html: Removed some newlines from this test,
+        because now that the complex text code path matches the fast path, it too suffers from a bug
+        where word spacing is not added at a newline.
+        * fast/text/atsui-spacing-features.html: Ditto.
+        * platform/mac/TestExpectations: Removed fast/css/word-spacing-characters-complex-text.html.
+
+2012-09-15  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Update test expectation
+
+        * platform/chromium/TestExpectations:
+        Don't run an inspector test on Mac.
+
+2012-09-15  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt][WK2] Unreviewed weekend gardening. Skip 4 new failing tests to paint the bot green.
+
+        * platform/qt-5.0-wk2/Skipped:
+
+2012-09-15  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed weekend gardening. Skip 2 new tests, because 
+        TestRunner::overridePreference() does not support the 'WebKitDisplayImagesKey' preference
+
+        * platform/qt/Skipped:
+
+2012-09-14  James Robinson  <jamesr@chromium.org>
+
+        Unreviewed gardening - more position:fixed stacking context rebaselines.
+
+        * fast/block/positioning/016-expected.txt: Renamed from LayoutTests/platform/chromium-linux-x86/fast/block/positioning/016-expected.txt.
+        * fast/block/positioning/025-expected.txt: Renamed from LayoutTests/platform/chromium-linux-x86/fast/block/positioning/025-expected.txt.
+        * platform/chromium-linux/compositing/geometry/fixed-position-composited-switch-expected.txt: Removed.
+        * platform/chromium-linux/fast/block/positioning/fixed-position-stacking-context-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/compositing/geometry/fixed-position-composited-switch-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/block/positioning/016-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/block/positioning/025-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/block/positioning/fixed-position-stacking-context-expected.txt: Removed.
+        * platform/chromium-mac/compositing/geometry/fixed-position-composited-switch-expected.txt: Removed.
+        * platform/chromium-mac/fast/block/positioning/016-expected.txt: Removed.
+        * platform/chromium-mac/fast/block/positioning/025-expected.txt: Removed.
+        * platform/chromium-mac/fast/block/positioning/fixed-position-stacking-context-expected.txt: Removed.
+        * platform/chromium-win/fast/block/positioning/016-expected.png: Renamed from LayoutTests/platform/chromium-linux/fast/block/positioning/016-expected.png.
+        * platform/chromium-win/fast/block/positioning/025-expected.png: Renamed from LayoutTests/platform/chromium-linux/fast/block/positioning/025-expected.png.
+        * platform/chromium-win/fast/block/positioning/fixed-position-stacking-context-expected.png: Renamed from LayoutTests/platform/chromium-linux/fast/block/positioning/fixed-position-stacking-context-expected.png.
+        * platform/chromium/compositing/geometry/fixed-position-composited-switch-expected.txt: Renamed from LayoutTests/platform/chromium-linux-x86/compositing/geometry/fixed-position-composited-switch-expected.txt.
+        * platform/chromium/fast/block/positioning/016-expected.txt: Renamed from LayoutTests/platform/chromium-linux/fast/block/positioning/016-expected.txt.
+        * platform/chromium/fast/block/positioning/025-expected.txt: Renamed from LayoutTests/platform/chromium-linux/fast/block/positioning/025-expected.txt.
+        * platform/chromium/fast/block/positioning/fixed-position-stacking-context-expected.txt: Renamed from LayoutTests/platform/chromium-linux-x86/fast/block/positioning/fixed-position-stacking-context-expected.txt.
+        * platform/efl/fast/block/positioning/016-expected.txt: Removed.
+        * platform/efl/fast/block/positioning/025-expected.txt: Removed.
+        * platform/gtk/fast/block/positioning/016-expected.txt: Removed.
+        * platform/gtk/fast/block/positioning/025-expected.txt: Removed.
+        * platform/qt/fast/block/positioning/016-expected.txt: Removed.
+        * platform/qt/fast/block/positioning/025-expected.txt: Removed.
+
+2012-09-14  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Revert r127457 and following fixes due to several hit-testing regressions
+        https://bugs.webkit.org/show_bug.cgi?id=96830
+
+        Reviewed by Antonio Gomes.
+
+        This change reverts r127457, r127863 and r128505. As the tests relies on the extended API
+        after r127457, we cannot keep them.
+
+        * fast/dom/nodesFromRect/nodesFromRect-child-frame-content-expected.txt: Removed.
+        * fast/dom/nodesFromRect/nodesFromRect-child-frame-content.html: Removed.
+        * fast/dom/nodesFromRect/resources/child-frame.html: Removed.
+        * fast/dom/nodesFromRect/resources/nodesFromRect.js:
+        (check):
+        (checkShadowContent):
+        * touchadjustment/iframe-boundary-expected.txt: Removed.
+        * touchadjustment/iframe-boundary.html: Removed.
+        * touchadjustment/resources/inner-content-page.html: Removed.
+        * touchadjustment/resources/inner-navigation-frame.html: Removed.
+
+2012-09-14  Bo Liu  <boliu@chromium.org>
+
+        Skip image load tests that requires queueReload in WebKit2
+        https://bugs.webkit.org/show_bug.cgi?id=96832
+
+        Tests added in reivison 128645.
+
+        Reviewed by Adam Barth.
+
+        * platform/wk2/Skipped:
+
+2012-09-14  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: Calling close() during upgradeneeded handler should fire error at open request
+        https://bugs.webkit.org/show_bug.cgi?id=96807
+
+        Reviewed by Tony Chang.
+
+        Update the test to match the spec behavior.
+
+        * storage/indexeddb/intversion-close-in-upgradeneeded-expected.txt:
+        * storage/indexeddb/resources/intversion-close-in-upgradeneeded.js:
+        (deleteSuccess):
+        (upgradeNeeded.transaction.oncomplete):
+        (upgradeNeeded):
+        (openError):
+
+2012-09-14  Ojan Vafai  <ojan@chromium.org>
+
+        Mark svg/carto.net/selectionlist.svg as flaky because it depends on svg/carto.net/button.svg
+        running first in order to pass.
+        * platform/chromium/TestExpectations:
+
+2012-09-14  Ojan Vafai  <ojan@chromium.org>
+
+        The cr-linux-ews thinks http/tests/cache/post-redirect-get.php and http/tests/cache/post-with-cached-subresources.php are MISSING results
+        https://bugs.webkit.org/show_bug.cgi?id=95215
+
+        Reviewed by Adam Barth.
+
+        Apparently, marking these as missing did not fix the EWS problem,
+        so remove them from TestExpectations.
+
+        * platform/chromium/TestExpectations:
+
+2012-09-14  Mike West  <mkwst@chromium.org>
+
+        JSC should throw a more descriptive exception when blocking 'eval' via CSP.
+        https://bugs.webkit.org/show_bug.cgi?id=94331
+
+        Reviewed by Geoffrey Garen.
+
+        * http/tests/security/contentSecurityPolicy/eval-blocked-expected.txt:
+        * http/tests/security/contentSecurityPolicy/eval-blocked-in-about-blank-iframe-expected.txt:
+        * http/tests/security/contentSecurityPolicy/function-constructor-blocked-expected.txt:
+
+2012-09-14  Ojan Vafai  <ojan@chromium.org>
+
+        Mark compositing/geometry/fixed-position-transform-composited-page-scale.html flaky
+        as it's flaky on all the Chromium bots.
+        * platform/chromium/TestExpectations:
+
+2012-09-14  Ojan Vafai  <ojan@chromium.org>
+
+        Add expectations for tests that depend on other tests running before them.
+        Filed a bug for each with information on which test it depends on.
+
+        * platform/chromium/TestExpectations:
+
+2012-09-14  Michelangelo De Simone  <michelangelo@webkit.org>
+
+        [CSS Shaders] u_textureSize uniform should be set to the size of the texture.
+        https://bugs.webkit.org/show_bug.cgi?id=95914
+
+        Reviewed by Dean Jackson.
+
+        Tests for the following uniform variables:
+            uniform vec2 u_textureSize
+            uniform vec4 u_meshBox
+            uniform vec2 u_tileSize
+            uniform vec2 u_meshSize
+
+        The relevant section of the specification is:
+        http://dvcs.w3.org/hg/FXTF/raw-file/tip/filters/index.html#shader-uniform-variables
+
+        * css3/filters/custom/custom-filter-u-mesh-box-expected.html: Added.
+        * css3/filters/custom/custom-filter-u-mesh-box.html: Added.
+        * css3/filters/custom/custom-filter-u-mesh-size-expected.html: Added.
+        * css3/filters/custom/custom-filter-u-mesh-size.html: Added.
+        * css3/filters/custom/custom-filter-u-texture-size-expected.html: Added.
+        * css3/filters/custom/custom-filter-u-texture-size.html: Added.
+        * css3/filters/custom/custom-filter-u-tile-size-expected.html: Added.
+        * css3/filters/custom/custom-filter-u-tile-size.html: Added.
+        * css3/filters/resources/u-mesh-box-is-unit-square.fs: Added.
+        * css3/filters/resources/u-mesh-size.fs: Added.
+        * css3/filters/resources/u-texture-size.fs: Added.
+        * css3/filters/resources/u-tile-size.fs: Added.
+
+2012-09-14  Alexey Proskuryakov  <ap@apple.com>
+
+        Unreviewed.
+        
+        A small improvement to this flaky test: use a correct URL, so that the test fails
+        quickly and understandably instead of timing out. This code path didn't use to be
+        taken before, so the URL was always wrong.
+
+        * fast/loader/resources/submit-form-while-parsing-subframe.html:
+
+2012-09-14  Stephanie Lewis  <slewis@apple.com>
+
+        new fast/loader tests from r128645 fail on Mac-wk2.
+        https://bugs.webkit.org/show_bug.cgi?id=96832.
+
+        Unreviewed.
+
+        Update TestExpectations
+
+        * platform/mac-wk2/TestExpectations:
+
+2012-09-14  Ojan Vafai  <ojan@chromium.org>
+
+        Add expectations for tests that depend on other tests running before them.
+        Filed a bug for each with information on which test it depends on.
+
+        * platform/chromium/TestExpectations:
+
+2012-09-14  James Robinson  <jamesr@chromium.org>
+
+        Unreviewed gardening.
+
+        Update fixpos layout test results. Chromium currently doesn't set the fixpos-forms-stacking-context setting in
+        DumpRenderTree.
+
+        * fast/block/positioning/016-expected.png: Copied from LayoutTests/platform/efl/fast/block/positioning/016-expected.png.
+        * fast/block/positioning/025-expected.png: Renamed from LayoutTests/platform/efl/fast/block/positioning/025-expected.png.
+        * platform/chromium-linux-x86/compositing/geometry/fixed-position-composited-switch-expected.txt: Added.
+        * platform/chromium-linux-x86/fast/block/positioning/016-expected.txt: Added.
+        * platform/chromium-linux-x86/fast/block/positioning/025-expected.txt: Added.
+        * platform/chromium-linux-x86/fast/block/positioning/fixed-position-stacking-context-expected.txt: Added.
+        * platform/chromium-linux/compositing/geometry/fixed-position-composited-switch-expected.txt: Added.
+        * platform/chromium-linux/fast/block/positioning/016-expected.png: Renamed from LayoutTests/platform/gtk/fast/block/positioning/016-expected.png.
+        * platform/chromium-linux/fast/block/positioning/016-expected.txt: Added.
+        * platform/chromium-linux/fast/block/positioning/025-expected.png: Renamed from LayoutTests/platform/gtk/fast/block/positioning/025-expected.png.
+        * platform/chromium-linux/fast/block/positioning/025-expected.txt: Added.
+        * platform/chromium-linux/fast/block/positioning/fixed-position-stacking-context-expected.png: Renamed from LayoutTests/platform/efl/fast/block/positioning/016-expected.png.
+        * platform/chromium-linux/fast/block/positioning/fixed-position-stacking-context-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/compositing/geometry/fixed-position-composited-switch-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/fast/block/positioning/016-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/fast/block/positioning/025-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/fast/block/positioning/fixed-position-stacking-context-expected.txt: Added.
+        * platform/chromium-mac/compositing/geometry/fixed-position-composited-switch-expected.txt: Added.
+        * platform/chromium-mac/fast/block/positioning/016-expected.png: Added.
+        * platform/chromium-mac/fast/block/positioning/016-expected.txt: Added.
+        * platform/chromium-mac/fast/block/positioning/025-expected.png: Added.
+        * platform/chromium-mac/fast/block/positioning/025-expected.txt: Added.
+        * platform/chromium-mac/fast/block/positioning/fixed-position-stacking-context-expected.png: Added.
+        * platform/chromium-mac/fast/block/positioning/fixed-position-stacking-context-expected.txt: Added.
+
+2012-09-14  Adam Barth  <abarth@webkit.org>
+
+        Remove webkitPostMessage
+        https://bugs.webkit.org/show_bug.cgi?id=96577
+
+        Reviewed by Ojan Vafai.
+
+        Update tests to rely only upon the unprefixed API.
+
+        * fast/canvas/webgl/script-tests/arraybuffer-transfer-of-control.js:
+        (wrapSend):
+        (wrapFailSend):
+        * fast/dom/Window/post-message-crash.html:
+        * fast/dom/Window/window-postmessage-args-expected.txt:
+        * fast/dom/Window/window-postmessage-args.html:
+        * fast/events/message-port.html:
+        * fast/events/resources/message-port-multi.js:
+        * fast/workers/resources/worker-call.js:
+        * fast/workers/worker-call-expected.txt:
+
+2012-09-14  Simon Fraser  <simon.fraser@apple.com>
+
+        REGRESSION: transition doesn’t always override transition-property
+        https://bugs.webkit.org/show_bug.cgi?id=96658
+
+        Reviewed by Dean Jackson.
+
+        Test with longhand transition-property rule, followed by shorthand
+        with missing property value. This test should pass, and not assert.
+
+        * transitions/longhand-vs-shorthand-initial-expected.txt: Added.
+        * transitions/longhand-vs-shorthand-initial.html: Added.
+
+2012-09-14  Tom Sepez  <tsepez@chromium.org>
+
+        ImageLoader can't be cleared when video element poster attribute removed.
+        https://bugs.webkit.org/show_bug.cgi?id=96301
+
+        Reviewed by Abhishek Arya.
+
+        Added test case.
+
+        * fast/dom/beforeload/clear-video-poster-in-beforeload-listener-expected.txt: Added.
+        * fast/dom/beforeload/clear-video-poster-in-beforeload-listener.html: Added.
+
+2012-09-14  Jeffrey Pfau  <jpfau@apple.com>
+
+        Allow third-party storage blocking setting to change while a page is loaded
+        https://bugs.webkit.org/show_bug.cgi?id=95790
+
+        Reviewed by Brady Eidson.
+
+        Tested combinations of loosening and strengthening the storage blocking policy on various types of storage.
+
+        * http/tests/security/resources/iframe-for-storage-blocking-changed-local-storage.html: Added.
+        * http/tests/security/resources/iframe-for-storage-blocking-changed-shared-worker.html: Added.
+        * http/tests/security/resources/iframe-for-storage-blocking-changed-websql.html: Added.
+        * http/tests/security/storage-blocking-loosened-local-storage-expected.txt: Added.
+        * http/tests/security/storage-blocking-loosened-local-storage.html: Added.
+        * http/tests/security/storage-blocking-loosened-plugin-expected.txt: Added.
+        * http/tests/security/storage-blocking-loosened-plugin.html: Added.
+        * http/tests/security/storage-blocking-loosened-private-browsing-plugin-expected.txt: Added.
+        * http/tests/security/storage-blocking-loosened-private-browsing-plugin.html: Added.
+        * http/tests/security/storage-blocking-loosened-shared-worker-expected.txt: Added.
+        * http/tests/security/storage-blocking-loosened-shared-worker.html: Added.
+        * http/tests/security/storage-blocking-loosened-websql-expected.txt: Added.
+        * http/tests/security/storage-blocking-loosened-websql.html: Added.
+        * http/tests/security/storage-blocking-strengthened-local-storage-expected.txt: Added.
+        * http/tests/security/storage-blocking-strengthened-local-storage.html: Added.
+        * http/tests/security/storage-blocking-strengthened-plugin-expected.txt: Added.
+        * http/tests/security/storage-blocking-strengthened-plugin.html: Added.
+        * http/tests/security/storage-blocking-strengthened-private-browsing-plugin-expected.txt: Added.
+        * http/tests/security/storage-blocking-strengthened-private-browsing-plugin.html: Added.
+        * http/tests/security/storage-blocking-strengthened-shared-worker-expected.txt: Added.
+        * http/tests/security/storage-blocking-strengthened-shared-worker.html: Added.
+        * http/tests/security/storage-blocking-strengthened-websql-expected.txt: Added.
+        * http/tests/security/storage-blocking-strengthened-websql.html: Added.
+        * platform/chromium/TestExpectations: Skip shared worker and plugin tests.
+        * platform/mac-wk2/http/tests/security/storage-blocking-strengthened-plugin-expected.txt: Added.
+        * platform/mac-wk2/http/tests/security/storage-blocking-strengthened-private-browsing-plugin-expected.txt: Added.
+
+2012-09-14  Beth Dakin  <bdakin@apple.com>
+
+        https://bugs.webkit.org/show_bug.cgi?id=96688
+        Put position:fixed elements in their own layers and allow them to 
+        create a stacking context
+        -and corresponding-
+        <rdar://problem/11467961>
+
+        Reviewed by Simon Fraser.
+
+        A few test result differences. These first three tests actually
+        render differently now.
+        * platform/mac/fast/block/positioning/016-expected.png:
+        * platform/mac/fast/block/positioning/016-expected.txt:
+        * platform/mac/fast/block/positioning/025-expected.png:
+        * platform/mac/fast/block/positioning/025-expected.txt:
+        * platform/mac/fast/block/positioning/fixed-position-stacking-context-expected.png: Added.
+        * platform/mac/fast/block/positioning/fixed-position-stacking-context-expected.txt: Added.
+
+        These tests just have different layer trees. 
+        * platform/mac/compositing/geometry/fixed-position-composited-switch-expected.txt: Added.
+        * platform/mac/compositing/rtl: Added.
+        * platform/mac/compositing/rtl/rtl-fixed-expected.txt: Added.
+        * platform/mac/compositing/rtl/rtl-fixed-overflow-expected.txt: Added.
+
+2012-09-14  Bo Liu  <boliu@chromium.org>
+
+        Add in-place reload behavior to ImagesEnabled setting
+        https://bugs.webkit.org/show_bug.cgi?id=95478
+
+        Add tests to check autoLoadImages and imagesEnabled can block
+        images and can reload them in place when setting is set to unblock.
+
+        image-permissions tests are updated to reflect that onerror will no
+        longer be called when images are blocked.
+
+        Reviewed by Adam Barth.
+
+        * fast/loader/display-image-unset-can-block-image-and-can-reload-in-place-expected.txt: Added.
+        * fast/loader/display-image-unset-can-block-image-and-can-reload-in-place.html: Added.
+        * fast/loader/images-enabled-unset-can-block-image-and-can-reload-in-place-expected.txt: Added.
+        * fast/loader/images-enabled-unset-can-block-image-and-can-reload-in-place.html: Added.
+        * platform/chromium/http/tests/permissionclient/image-permissions-expected.txt:
+        * platform/chromium/permissionclient/image-permissions-expected.txt:
+        * platform/chromium/permissionclient/image-permissions.html:
+        * platform/chromium/permissionclient/resources/image.html:
+
+2012-09-14  Emil A Eklund  <eae@chromium.org>
+
+        https://bugs.webkit.org/show_bug.cgi?id=96226
+        REGRESSION (r128006): Three spatial navigation tests are failing
+
+        Reviewed by Ryosuke Niwa.
+
+        Remove spatial navigation tests from Skipped list.
+
+        * platform/mac/Skipped:
+
+2012-09-14  James Robinson  <jamesr@chromium.org>
+
+        Unreviewed, rolling out r128627.
+        http://trac.webkit.org/changeset/128627
+        https://bugs.webkit.org/show_bug.cgi?id=96575
+
+        Breaks indexeddb content_browsertests in chromium
+
+        * http/tests/inspector/indexeddb/database-data-expected.txt:
+        * http/tests/inspector/indexeddb/database-structure-expected.txt:
+        * http/tests/inspector/indexeddb/resources-panel-expected.txt:
+        * storage/indexeddb/create-and-remove-object-store-expected.txt:
+        * storage/indexeddb/create-object-store-options-expected.txt:
+        * storage/indexeddb/createObjectStore-name-argument-required-expected.txt:
+        * storage/indexeddb/createObjectStore-null-name-expected.txt:
+        * storage/indexeddb/cursor-added-bug-expected.txt:
+        * storage/indexeddb/cursor-advance-expected.txt:
+        * storage/indexeddb/cursor-continue-dir-expected.txt:
+        * storage/indexeddb/cursor-continue-expected.txt:
+        * storage/indexeddb/cursor-continue-validity-expected.txt:
+        * storage/indexeddb/cursor-delete-expected.txt:
+        * storage/indexeddb/cursor-inconsistency-expected.txt:
+        * storage/indexeddb/cursor-index-delete-expected.txt:
+        * storage/indexeddb/cursor-key-order-expected.txt:
+        * storage/indexeddb/cursor-overloads-expected.txt:
+        * storage/indexeddb/cursor-prev-no-duplicate-expected.txt:
+        * storage/indexeddb/cursor-primary-key-order-expected.txt:
+        * storage/indexeddb/cursor-reverse-bug-expected.txt:
+        * storage/indexeddb/cursor-skip-deleted-expected.txt:
+        * storage/indexeddb/cursor-update-expected.txt:
+        * storage/indexeddb/cursor-update-value-argument-required-expected.txt:
+        * storage/indexeddb/cursor-value-expected.txt:
+        * storage/indexeddb/data-corruption-expected.txt:
+        * storage/indexeddb/database-basics-expected.txt:
+        * storage/indexeddb/database-close-expected.txt:
+        * storage/indexeddb/database-closepending-flag-expected.txt:
+        * storage/indexeddb/database-deletepending-flag-expected.txt:
+        * storage/indexeddb/delete-closed-database-object-expected.txt:
+        * storage/indexeddb/delete-range-expected.txt:
+        * storage/indexeddb/deleteIndex-expected.txt:
+        * storage/indexeddb/deleteObjectStore-name-argument-required-expected.txt:
+        * storage/indexeddb/deleteObjectStore-null-name-expected.txt:
+        * storage/indexeddb/deleted-objects-expected.txt:
+        * storage/indexeddb/deletedatabase-transaction-expected.txt:
+        * storage/indexeddb/duplicates-expected.txt:
+        * storage/indexeddb/error-causes-abort-by-default-expected.txt:
+        * storage/indexeddb/exception-in-event-aborts-expected.txt:
+        * storage/indexeddb/exceptions-expected.txt:
+        * storage/indexeddb/factory-deletedatabase-expected.txt:
+        * storage/indexeddb/factory-deletedatabase-interactions-expected.txt:
+        * storage/indexeddb/get-keyrange-expected.txt:
+        * storage/indexeddb/index-basics-expected.txt:
+        * storage/indexeddb/index-basics-workers-expected.txt:
+        * storage/indexeddb/index-count-expected.txt:
+        * storage/indexeddb/index-cursor-expected.txt:
+        * storage/indexeddb/index-duplicate-keypaths-expected.txt:
+        * storage/indexeddb/index-get-key-argument-required-expected.txt:
+        * storage/indexeddb/index-multientry-expected.txt:
+        * storage/indexeddb/index-population-expected.txt:
+        * storage/indexeddb/index-unique-expected.txt:
+        * storage/indexeddb/intversion-and-setversion-expected.txt:
+        * storage/indexeddb/intversion-invalid-setversion-has-no-side-effects-expected.txt:
+        * storage/indexeddb/intversion-long-queue-expected.txt:
+        * storage/indexeddb/invalid-keys-expected.txt:
+        * storage/indexeddb/key-generator-expected.txt:
+        * storage/indexeddb/key-sort-order-across-types-expected.txt:
+        * storage/indexeddb/key-sort-order-date-expected.txt:
+        * storage/indexeddb/key-type-array-expected.txt:
+        * storage/indexeddb/key-type-infinity-expected.txt:
+        * storage/indexeddb/keypath-arrays-expected.txt:
+        * storage/indexeddb/keypath-basics-expected.txt:
+        * storage/indexeddb/keypath-edges-expected.txt:
+        * storage/indexeddb/keypath-fetch-key-expected.txt:
+        * storage/indexeddb/keypath-intrinsic-properties-expected.txt:
+        * storage/indexeddb/lazy-index-population-expected.txt:
+        * storage/indexeddb/legacy-constants-expected.txt:
+        * storage/indexeddb/list-ordering-expected.txt:
+        * storage/indexeddb/metadata-expected.txt:
+        * storage/indexeddb/mozilla/add-twice-failure-expected.txt:
+        * storage/indexeddb/mozilla/autoincrement-indexes-expected.txt:
+        * storage/indexeddb/mozilla/bad-keypath-expected.txt:
+        * storage/indexeddb/mozilla/clear-expected.txt:
+        * storage/indexeddb/mozilla/create-index-unique-expected.txt:
+        * storage/indexeddb/mozilla/create-index-with-integer-keys-expected.txt:
+        * storage/indexeddb/mozilla/create-objectstore-basics-expected.txt:
+        * storage/indexeddb/mozilla/create-objectstore-null-name-expected.txt:
+        * storage/indexeddb/mozilla/cursor-mutation-expected.txt:
+        * storage/indexeddb/mozilla/cursor-mutation-objectstore-only-expected.txt:
+        * storage/indexeddb/mozilla/cursor-update-updates-indexes-expected.txt:
+        * storage/indexeddb/mozilla/cursors-expected.txt:
+        * storage/indexeddb/mozilla/delete-result-expected.txt:
+        * storage/indexeddb/mozilla/event-source-expected.txt:
+        * storage/indexeddb/mozilla/global-data-expected.txt:
+        * storage/indexeddb/mozilla/index-prev-no-duplicate-expected.txt:
+        * storage/indexeddb/mozilla/indexes-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-delete-null-key-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-inline-and-passed-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-put-no-key-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-put-null-key-expected.txt:
+        * storage/indexeddb/mozilla/object-cursors-expected.txt:
+        * storage/indexeddb/mozilla/object-identity-expected.txt:
+        * storage/indexeddb/mozilla/object-store-inline-autoincrement-key-added-on-put-expected.txt:
+        * storage/indexeddb/mozilla/object-store-remove-values-expected.txt:
+        * storage/indexeddb/mozilla/objectstorenames-expected.txt:
+        * storage/indexeddb/mozilla/odd-result-order-expected.txt:
+        * storage/indexeddb/mozilla/put-get-values-expected.txt:
+        * storage/indexeddb/mozilla/readonly-transactions-expected.txt:
+        * storage/indexeddb/mozilla/readwrite-transactions-expected.txt:
+        * storage/indexeddb/mozilla/readyState-expected.txt:
+        * storage/indexeddb/mozilla/remove-index-expected.txt:
+        * storage/indexeddb/mozilla/remove-objectstore-expected.txt:
+        * storage/indexeddb/mozilla/versionchange-abort-expected.txt:
+        * storage/indexeddb/mozilla/versionchange-expected.txt:
+        * storage/indexeddb/mutating-cursor-expected.txt:
+        * storage/indexeddb/noblobs-expected.txt:
+        * storage/indexeddb/objectStore-required-arguments-expected.txt:
+        * storage/indexeddb/objectstore-autoincrement-expected.txt:
+        * storage/indexeddb/objectstore-basics-expected.txt:
+        * storage/indexeddb/objectstore-basics-workers-expected.txt:
+        * storage/indexeddb/objectstore-clear-expected.txt:
+        * storage/indexeddb/objectstore-count-expected.txt:
+        * storage/indexeddb/objectstore-cursor-expected.txt:
+        * storage/indexeddb/objectstore-removeobjectstore-expected.txt:
+        * storage/indexeddb/odd-strings-expected.txt:
+        * storage/indexeddb/open-close-version-expected.txt:
+        * storage/indexeddb/open-cursor-expected.txt:
+        * storage/indexeddb/open-during-transaction-expected.txt:
+        * storage/indexeddb/opencursor-key-expected.txt:
+        * storage/indexeddb/pending-activity-expected.txt:
+        * storage/indexeddb/pending-activity-workers-expected.txt:
+        * storage/indexeddb/pending-version-change-on-exit-expected.txt:
+        * storage/indexeddb/persistence-expected.txt:
+        * storage/indexeddb/prefetch-bugfix-108071-expected.txt:
+        * storage/indexeddb/queued-commands-expected.txt:
+        * storage/indexeddb/readonly-expected.txt:
+        * storage/indexeddb/readonly-properties-expected.txt:
+        * storage/indexeddb/request-continue-abort-expected.txt:
+        * storage/indexeddb/request-event-propagation-expected.txt:
+        * storage/indexeddb/setVersion-null-expected.txt:
+        * storage/indexeddb/set_version_blocked-expected.txt:
+        * storage/indexeddb/set_version_queue-expected.txt:
+        * storage/indexeddb/structured-clone-expected.txt:
+        * storage/indexeddb/three-setversion-calls-expected.txt:
+        * storage/indexeddb/transaction-abort-expected.txt:
+        * storage/indexeddb/transaction-active-flag-expected.txt:
+        * storage/indexeddb/transaction-after-close-expected.txt:
+        * storage/indexeddb/transaction-and-objectstore-calls-expected.txt:
+        * storage/indexeddb/transaction-basics-expected.txt:
+        * storage/indexeddb/transaction-complete-with-js-recursion-cross-frame-expected.txt:
+        * storage/indexeddb/transaction-complete-with-js-recursion-expected.txt:
+        * storage/indexeddb/transaction-complete-workers-expected.txt:
+        * storage/indexeddb/transaction-crash-on-abort-expected.txt:
+        * storage/indexeddb/transaction-error-expected.txt:
+        * storage/indexeddb/transaction-event-propagation-expected.txt:
+        * storage/indexeddb/transaction-read-only-expected.txt:
+        * storage/indexeddb/transaction-rollback-expected.txt:
+        * storage/indexeddb/transaction-storeNames-required-expected.txt:
+        * storage/indexeddb/tutorial-expected.txt:
+        * storage/indexeddb/two-version-changes-expected.txt:
+        * storage/indexeddb/value-undefined-expected.txt:
+        * storage/indexeddb/values-odd-types-expected.txt:
+        * storage/indexeddb/version-change-abort-expected.txt:
+        * storage/indexeddb/version-change-exclusive-expected.txt:
+        * storage/indexeddb/versionchangerequest-activedomobject-expected.txt:
+
+2012-09-14  Ojan Vafai  <ojan@chromium.org>
+
+        Comment out bug URL. This fixes a lint warning.
+        * platform/qt/Skipped:
+
+2012-09-14  Ojan Vafai  <ojan@chromium.org>
+
+        Update all the MISSING lines in chromium's TestExpectations.
+        If the test always passed, removed the line. In some cases, they just needed
+        obvious rebaselines. In others, they haven't reported MISSING in the past
+        500 runs on the bots, so removed that expectation.
+
+        * platform/chromium-linux-x86/fast/overflow/paged-x-div-with-column-gap-expected.txt: Added.
+        * platform/chromium-linux-x86/fast/overflow/paged-x-with-column-gap-expected.txt: Added.
+        * platform/chromium-linux/css3/masking/clip-path-circle-expected.png: Added.
+        * platform/chromium-linux/css3/masking/clip-path-circle-filter-expected.png: Added.
+        * platform/chromium-linux/css3/masking/clip-path-circle-overflow-expected.png: Added.
+        * platform/chromium-linux/css3/masking/clip-path-circle-overflow-hidden-expected.png: Added.
+        * platform/chromium-linux/css3/masking/clip-path-circle-relative-overflow-expected.png: Added.
+        * platform/chromium-linux/css3/masking/clip-path-ellipse-expected.png: Added.
+        * platform/chromium-linux/css3/masking/clip-path-polygon-evenodd-expected.png: Added.
+        * platform/chromium-linux/css3/masking/clip-path-polygon-expected.png: Added.
+        * platform/chromium-linux/css3/masking/clip-path-polygon-nonzero-expected.png: Added.
+        * platform/chromium-linux/css3/masking/clip-path-rectangle-expected.png: Added.
+        * platform/chromium-linux/fast/overflow/paged-x-div-with-column-gap-expected.png: Added.
+        * platform/chromium-linux/fast/overflow/paged-x-div-with-column-gap-expected.txt: Added.
+        * platform/chromium-linux/fast/overflow/paged-x-with-column-gap-expected.png: Added.
+        * platform/chromium-linux/fast/overflow/paged-x-with-column-gap-expected.txt: Added.
+        * platform/chromium-linux/fast/sub-pixel/selection/selection-rect-in-sub-pixel-table-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/frames/iframe-scaling-with-scroll-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/overflow/paged-x-div-with-column-gap-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/overflow/paged-x-with-column-gap-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/sub-pixel/selection/selection-rect-in-sub-pixel-table-expected.png: Added.
+        * platform/chromium-mac/css3/masking/clip-path-circle-expected.png: Added.
+        * platform/chromium-mac/css3/masking/clip-path-circle-filter-expected.png: Added.
+        * platform/chromium-mac/css3/masking/clip-path-circle-overflow-expected.png: Added.
+        * platform/chromium-mac/css3/masking/clip-path-circle-overflow-hidden-expected.png: Added.
+        * platform/chromium-mac/css3/masking/clip-path-circle-relative-overflow-expected.png: Added.
+        * platform/chromium-mac/css3/masking/clip-path-ellipse-expected.png: Added.
+        * platform/chromium-mac/css3/masking/clip-path-polygon-evenodd-expected.png: Added.
+        * platform/chromium-mac/css3/masking/clip-path-polygon-expected.png: Added.
+        * platform/chromium-mac/css3/masking/clip-path-polygon-nonzero-expected.png: Added.
+        * platform/chromium-mac/css3/masking/clip-path-rectangle-expected.png: Added.
+        * platform/chromium-mac/fast/frames/iframe-scaling-with-scroll-expected.png: Added.
+        * platform/chromium-mac/fast/overflow/paged-x-div-with-column-gap-expected.png: Added.
+        * platform/chromium-mac/fast/overflow/paged-x-with-column-gap-expected.png: Added.
+        * platform/chromium-win-xp/fast/overflow/paged-x-div-with-column-gap-expected.txt: Added.
+        * platform/chromium-win-xp/fast/overflow/paged-x-with-column-gap-expected.txt: Added.
+        * platform/chromium-win/css3/masking/clip-path-circle-expected.png: Added.
+        * platform/chromium-win/css3/masking/clip-path-circle-filter-expected.png: Added.
+        * platform/chromium-win/css3/masking/clip-path-circle-overflow-expected.png: Added.
+        * platform/chromium-win/css3/masking/clip-path-circle-overflow-hidden-expected.png: Added.
+        * platform/chromium-win/css3/masking/clip-path-circle-relative-overflow-expected.png: Added.
+        * platform/chromium-win/css3/masking/clip-path-ellipse-expected.png: Added.
+        * platform/chromium-win/css3/masking/clip-path-polygon-evenodd-expected.png: Added.
+        * platform/chromium-win/css3/masking/clip-path-polygon-expected.png: Added.
+        * platform/chromium-win/css3/masking/clip-path-polygon-nonzero-expected.png: Added.
+        * platform/chromium-win/css3/masking/clip-path-rectangle-expected.png: Added.
+        * platform/chromium-win/fast/frames/iframe-scaling-with-scroll-expected.png: Added.
+        * platform/chromium-win/fast/overflow/paged-x-div-with-column-gap-expected.png: Added.
+        * platform/chromium-win/fast/overflow/paged-x-div-with-column-gap-expected.txt: Added.
+        * platform/chromium-win/fast/overflow/paged-x-with-column-gap-expected.png: Added.
+        * platform/chromium-win/fast/overflow/paged-x-with-column-gap-expected.txt: Added.
+        * platform/chromium-win/fast/sub-pixel/selection/selection-rect-in-sub-pixel-table-expected.png: Added.
+        * platform/chromium-win/fast/sub-pixel/selection/selection-rect-in-sub-pixel-table-expected.txt: Added.
+        * platform/chromium/TestExpectations:
+        * platform/chromium/perf/nested-combined-selectors-expected.txt: Added.
+
+2012-09-14  Ojan Vafai  <ojan@chromium.org>
+
+        Complete forgotten rebaseline. See https://bugs.webkit.org/show_bug.cgi?id=96751.
+        The results all look like they pass.
+
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-localization-expected.txt: Copied from LayoutTests/platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-localization-expected.txt.
+        * platform/chromium-win-xp/fast/forms/time-multiple-fields/time-multiple-fields-localization-expected.txt: Copied from LayoutTests/platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-localization-expected.txt.
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-localization-expected.txt: Copied from LayoutTests/platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-localization-expected.txt.
+        * platform/chromium/TestExpectations:
+        * platform/chromium/fast/forms/time-multiple-fields/time-multiple-fields-localization-expected.txt: Renamed from LayoutTests/platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-localization-expected.txt.
+
+2012-09-14  Ojan Vafai  <ojan@chromium.org>
+
+        Complete some forgotten rebaselines. See https://bugs.webkit.org/show_bug.cgi?id=94916.
+        All the differences were anti-aliasing/form-controls.
+
+        * platform/chromium-linux/fast/forms/datalist/input-appearance-range-with-datalist-zoomed-expected.png:
+        * platform/chromium-linux/fast/forms/datalist/input-appearance-range-with-padding-with-datalist-expected.png: Added.
+        * platform/chromium-linux/fast/forms/datalist/input-appearance-range-with-transform-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/forms/datalist/input-appearance-range-with-padding-with-datalist-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/forms/datalist/input-appearance-range-with-transform-expected.png: Added.
+        * platform/chromium-win-xp/fast/forms/datalist/input-appearance-range-with-datalist-zoomed-expected.png: Removed.
+        * platform/chromium-win/fast/forms/datalist/input-appearance-range-with-datalist-zoomed-expected.png:
+        * platform/chromium-win/fast/forms/datalist/input-appearance-range-with-padding-with-datalist-expected.png: Added.
+        * platform/chromium-win/fast/forms/datalist/input-appearance-range-with-transform-expected.png: Added.
+        * platform/chromium/TestExpectations:
+
+2012-09-14  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: Print console warning about setVersion
+        https://bugs.webkit.org/show_bug.cgi?id=96575
+
+        Reviewed by Tony Chang.
+
+        * http/tests/inspector/indexeddb/database-data-expected.txt:
+        * http/tests/inspector/indexeddb/database-structure-expected.txt:
+        * http/tests/inspector/indexeddb/resources-panel-expected.txt:
+        * storage/indexeddb/create-and-remove-object-store-expected.txt:
+        * storage/indexeddb/create-object-store-options-expected.txt:
+        * storage/indexeddb/createObjectStore-name-argument-required-expected.txt:
+        * storage/indexeddb/createObjectStore-null-name-expected.txt:
+        * storage/indexeddb/cursor-added-bug-expected.txt:
+        * storage/indexeddb/cursor-advance-expected.txt:
+        * storage/indexeddb/cursor-continue-dir-expected.txt:
+        * storage/indexeddb/cursor-continue-expected.txt:
+        * storage/indexeddb/cursor-continue-validity-expected.txt:
+        * storage/indexeddb/cursor-delete-expected.txt:
+        * storage/indexeddb/cursor-inconsistency-expected.txt:
+        * storage/indexeddb/cursor-index-delete-expected.txt:
+        * storage/indexeddb/cursor-key-order-expected.txt:
+        * storage/indexeddb/cursor-overloads-expected.txt:
+        * storage/indexeddb/cursor-prev-no-duplicate-expected.txt:
+        * storage/indexeddb/cursor-primary-key-order-expected.txt:
+        * storage/indexeddb/cursor-reverse-bug-expected.txt:
+        * storage/indexeddb/cursor-skip-deleted-expected.txt:
+        * storage/indexeddb/cursor-update-expected.txt:
+        * storage/indexeddb/cursor-update-value-argument-required-expected.txt:
+        * storage/indexeddb/cursor-value-expected.txt:
+        * storage/indexeddb/data-corruption-expected.txt:
+        * storage/indexeddb/database-basics-expected.txt:
+        * storage/indexeddb/database-close-expected.txt:
+        * storage/indexeddb/database-closepending-flag-expected.txt:
+        * storage/indexeddb/database-deletepending-flag-expected.txt:
+        * storage/indexeddb/delete-closed-database-object-expected.txt:
+        * storage/indexeddb/delete-range-expected.txt:
+        * storage/indexeddb/deleteIndex-expected.txt:
+        * storage/indexeddb/deleteObjectStore-name-argument-required-expected.txt:
+        * storage/indexeddb/deleteObjectStore-null-name-expected.txt:
+        * storage/indexeddb/deleted-objects-expected.txt:
+        * storage/indexeddb/deletedatabase-transaction-expected.txt:
+        * storage/indexeddb/duplicates-expected.txt:
+        * storage/indexeddb/error-causes-abort-by-default-expected.txt:
+        * storage/indexeddb/exception-in-event-aborts-expected.txt:
+        * storage/indexeddb/exceptions-expected.txt:
+        * storage/indexeddb/factory-deletedatabase-expected.txt:
+        * storage/indexeddb/factory-deletedatabase-interactions-expected.txt:
+        * storage/indexeddb/get-keyrange-expected.txt:
+        * storage/indexeddb/index-basics-expected.txt:
+        * storage/indexeddb/index-basics-workers-expected.txt:
+        * storage/indexeddb/index-count-expected.txt:
+        * storage/indexeddb/index-cursor-expected.txt:
+        * storage/indexeddb/index-duplicate-keypaths-expected.txt:
+        * storage/indexeddb/index-get-key-argument-required-expected.txt:
+        * storage/indexeddb/index-multientry-expected.txt:
+        * storage/indexeddb/index-population-expected.txt:
+        * storage/indexeddb/index-unique-expected.txt:
+        * storage/indexeddb/intversion-and-setversion-expected.txt:
+        * storage/indexeddb/intversion-invalid-setversion-has-no-side-effects-expected.txt:
+        * storage/indexeddb/intversion-long-queue-expected.txt:
+        * storage/indexeddb/invalid-keys-expected.txt:
+        * storage/indexeddb/key-generator-expected.txt:
+        * storage/indexeddb/key-sort-order-across-types-expected.txt:
+        * storage/indexeddb/key-sort-order-date-expected.txt:
+        * storage/indexeddb/key-type-array-expected.txt:
+        * storage/indexeddb/key-type-infinity-expected.txt:
+        * storage/indexeddb/keypath-arrays-expected.txt:
+        * storage/indexeddb/keypath-basics-expected.txt:
+        * storage/indexeddb/keypath-edges-expected.txt:
+        * storage/indexeddb/keypath-fetch-key-expected.txt:
+        * storage/indexeddb/keypath-intrinsic-properties-expected.txt:
+        * storage/indexeddb/lazy-index-population-expected.txt:
+        * storage/indexeddb/legacy-constants-expected.txt:
+        * storage/indexeddb/list-ordering-expected.txt:
+        * storage/indexeddb/metadata-expected.txt:
+        * storage/indexeddb/mozilla/add-twice-failure-expected.txt:
+        * storage/indexeddb/mozilla/autoincrement-indexes-expected.txt:
+        * storage/indexeddb/mozilla/bad-keypath-expected.txt:
+        * storage/indexeddb/mozilla/clear-expected.txt:
+        * storage/indexeddb/mozilla/create-index-unique-expected.txt:
+        * storage/indexeddb/mozilla/create-index-with-integer-keys-expected.txt:
+        * storage/indexeddb/mozilla/create-objectstore-basics-expected.txt:
+        * storage/indexeddb/mozilla/create-objectstore-null-name-expected.txt:
+        * storage/indexeddb/mozilla/cursor-mutation-expected.txt:
+        * storage/indexeddb/mozilla/cursor-mutation-objectstore-only-expected.txt:
+        * storage/indexeddb/mozilla/cursor-update-updates-indexes-expected.txt:
+        * storage/indexeddb/mozilla/cursors-expected.txt:
+        * storage/indexeddb/mozilla/delete-result-expected.txt:
+        * storage/indexeddb/mozilla/event-source-expected.txt:
+        * storage/indexeddb/mozilla/global-data-expected.txt:
+        * storage/indexeddb/mozilla/index-prev-no-duplicate-expected.txt:
+        * storage/indexeddb/mozilla/indexes-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-delete-null-key-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-inline-and-passed-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-put-no-key-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-put-null-key-expected.txt:
+        * storage/indexeddb/mozilla/object-cursors-expected.txt:
+        * storage/indexeddb/mozilla/object-identity-expected.txt:
+        * storage/indexeddb/mozilla/object-store-inline-autoincrement-key-added-on-put-expected.txt:
+        * storage/indexeddb/mozilla/object-store-remove-values-expected.txt:
+        * storage/indexeddb/mozilla/objectstorenames-expected.txt:
+        * storage/indexeddb/mozilla/odd-result-order-expected.txt:
+        * storage/indexeddb/mozilla/put-get-values-expected.txt:
+        * storage/indexeddb/mozilla/readonly-transactions-expected.txt:
+        * storage/indexeddb/mozilla/readwrite-transactions-expected.txt:
+        * storage/indexeddb/mozilla/readyState-expected.txt:
+        * storage/indexeddb/mozilla/remove-index-expected.txt:
+        * storage/indexeddb/mozilla/remove-objectstore-expected.txt:
+        * storage/indexeddb/mozilla/versionchange-abort-expected.txt:
+        * storage/indexeddb/mozilla/versionchange-expected.txt:
+        * storage/indexeddb/mutating-cursor-expected.txt:
+        * storage/indexeddb/noblobs-expected.txt:
+        * storage/indexeddb/objectStore-required-arguments-expected.txt:
+        * storage/indexeddb/objectstore-autoincrement-expected.txt:
+        * storage/indexeddb/objectstore-basics-expected.txt:
+        * storage/indexeddb/objectstore-basics-workers-expected.txt:
+        * storage/indexeddb/objectstore-clear-expected.txt:
+        * storage/indexeddb/objectstore-count-expected.txt:
+        * storage/indexeddb/objectstore-cursor-expected.txt:
+        * storage/indexeddb/objectstore-removeobjectstore-expected.txt:
+        * storage/indexeddb/odd-strings-expected.txt:
+        * storage/indexeddb/open-close-version-expected.txt:
+        * storage/indexeddb/open-cursor-expected.txt:
+        * storage/indexeddb/open-during-transaction-expected.txt:
+        * storage/indexeddb/opencursor-key-expected.txt:
+        * storage/indexeddb/pending-activity-expected.txt:
+        * storage/indexeddb/pending-activity-workers-expected.txt:
+        * storage/indexeddb/pending-version-change-on-exit-expected.txt:
+        * storage/indexeddb/persistence-expected.txt:
+        * storage/indexeddb/prefetch-bugfix-108071-expected.txt:
+        * storage/indexeddb/queued-commands-expected.txt:
+        * storage/indexeddb/readonly-expected.txt:
+        * storage/indexeddb/readonly-properties-expected.txt:
+        * storage/indexeddb/request-continue-abort-expected.txt:
+        * storage/indexeddb/request-event-propagation-expected.txt:
+        * storage/indexeddb/setVersion-null-expected.txt:
+        * storage/indexeddb/set_version_blocked-expected.txt:
+        * storage/indexeddb/set_version_queue-expected.txt:
+        * storage/indexeddb/structured-clone-expected.txt:
+        * storage/indexeddb/three-setversion-calls-expected.txt:
+        * storage/indexeddb/transaction-abort-expected.txt:
+        * storage/indexeddb/transaction-active-flag-expected.txt:
+        * storage/indexeddb/transaction-after-close-expected.txt:
+        * storage/indexeddb/transaction-and-objectstore-calls-expected.txt:
+        * storage/indexeddb/transaction-basics-expected.txt:
+        * storage/indexeddb/transaction-complete-with-js-recursion-cross-frame-expected.txt:
+        * storage/indexeddb/transaction-complete-with-js-recursion-expected.txt:
+        * storage/indexeddb/transaction-complete-workers-expected.txt:
+        * storage/indexeddb/transaction-crash-on-abort-expected.txt:
+        * storage/indexeddb/transaction-error-expected.txt:
+        * storage/indexeddb/transaction-event-propagation-expected.txt:
+        * storage/indexeddb/transaction-read-only-expected.txt:
+        * storage/indexeddb/transaction-rollback-expected.txt:
+        * storage/indexeddb/transaction-storeNames-required-expected.txt:
+        * storage/indexeddb/tutorial-expected.txt:
+        * storage/indexeddb/two-version-changes-expected.txt:
+        * storage/indexeddb/value-undefined-expected.txt:
+        * storage/indexeddb/values-odd-types-expected.txt:
+        * storage/indexeddb/version-change-abort-expected.txt:
+        * storage/indexeddb/version-change-exclusive-expected.txt:
+        * storage/indexeddb/versionchangerequest-activedomobject-expected.txt:
+
+2012-09-14  Michelangelo De Simone  <michelangelo@webkit.org>
+
+        Use arrays in shaders
+        https://bugs.webkit.org/show_bug.cgi?id=95223
+
+        Reviewed by Dean Jackson.
+
+        New tests have been added for checking the correctness of array()
+        within shaders.
+
+        * css3/filters/custom/custom-filter-array-expected.html: Added.
+        * css3/filters/custom/custom-filter-array.html: Added.
+        * css3/filters/custom/custom-filter-property-computed-style-expected.txt:
+        * css3/filters/custom/custom-filter-property-parsing-invalid-expected.txt:
+        * css3/filters/resources/fragment-color.fs: Added.
+        * css3/filters/script-tests/custom-filter-property-computed-style.js:
+        * css3/filters/script-tests/custom-filter-property-parsing-invalid.js:
+        * platform/chromium/css3/filters/custom/custom-filter-property-computed-style-expected.txt:
+
+2012-09-14  Christophe Dumez  <christophe.dumez@intel.com>
+
+        WebKitTestRunner needs layoutTestController.dumpDatabaseCallbacks
+        https://bugs.webkit.org/show_bug.cgi?id=57570
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskip several test cases which require implementation of
+        testRunner.dumpDatabaseCallbacks in WebKitTestRunner.
+
+        * platform/wk2/Skipped:
+
+2012-09-14  Sudarsana Nagineni  <sudarsana.nagineni@linux.intel.com>
+
+        [EFL] Gardening of the WK2 Debug Bot failing tests
+        https://bugs.webkit.org/show_bug.cgi?id=96795
+
+        Unreviewed EFL gardening.
+
+        * platform/efl-wk2/TestExpectations:
+
 2012-09-14  Sergio Villar Senin  <svillar@igalia.com>
 
         [GTK] [WK2] Unreviewed gardening.

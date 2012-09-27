@@ -1030,8 +1030,11 @@ void QWebPagePrivate::dropEvent(T *ev)
 #endif
 }
 
+#include <QDebug>
+
 void QWebPagePrivate::leaveEvent(QEvent*)
 {
+    qDebug() << Q_FUNC_INFO;
     // Fake a mouse move event just outside of the widget, since all
     // the interesting mouse-out behavior like invalidating scrollbars
     // is handled by the WebKit event handler's mouseMoved function.

@@ -42,7 +42,6 @@
 #include "PropertyNameArray.h"
 #include "Reject.h"
 #include "SlotVisitorInlineMethods.h"
-#include "SparseArrayValueMapInlineMethods.h"
 #include <math.h>
 #include <wtf/Assertions.h>
 
@@ -50,7 +49,8 @@ namespace JSC {
 
 // We keep track of the size of the last array after it was grown. We use this
 // as a simple heuristic for as the value to grow the next array from size 0.
-// This value is capped by the constant FIRST_VECTOR_GROW defined above.
+// This value is capped by the constant FIRST_VECTOR_GROW defined in
+// ArrayConventions.h.
 static unsigned lastArraySize = 0;
 
 JSCell* getCallableObjectSlow(JSCell* cell)
@@ -347,7 +347,7 @@ void JSObject::putByIndex(JSCell* cell, ExecState* exec, unsigned propertyName, 
     JSObject* thisObject = jsCast<JSObject*>(cell);
     thisObject->checkIndexingConsistency();
     
-    if (UNLIKELY(propertyName > MAX_ARRAY_INDEX)) {
+    if (propertyName > MAX_ARRAY_INDEX) {
         PutPropertySlot slot(shouldThrow);
         thisObject->methodTable()->put(thisObject, exec, Identifier::from(exec, propertyName), value, slot);
         return;
@@ -980,7 +980,7 @@ void JSObject::putIndexedDescriptor(ExecState* exec, SparseArrayEntry* entryInMa
 // Defined in ES5.1 8.12.9
 bool JSObject::defineOwnIndexedProperty(ExecState* exec, unsigned index, PropertyDescriptor& descriptor, bool throwException)
 {
-    ASSERT(index != 0xFFFFFFFF);
+    ASSERT(index <= MAX_ARRAY_INDEX);
 
     if (!inSparseIndexingMode()) {
         // Fast case: we're putting a regular property to a regular array

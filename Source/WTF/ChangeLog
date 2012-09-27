@@ -1,3 +1,78 @@
+2012-09-15  Benjamin Poulain  <benjamin@webkit.org>
+
+        Fix the build with WTF URL
+        https://bugs.webkit.org/show_bug.cgi?id=96875
+
+        Reviewed by Adam Barth.
+
+        Add support for MemoryInstrumentation to WTF's URL classes.
+
+        * wtf/url/api/ParsedURL.cpp:
+        (WTF::ParsedURL::reportMemoryUsage):
+        * wtf/url/api/ParsedURL.h:
+        (ParsedURL):
+        * wtf/url/api/URLString.cpp:
+        (WTF::URLString::reportMemoryUsage):
+        * wtf/url/api/URLString.h:
+        (URLString):
+
+2012-09-15  Raphael Kubo da Costa  <rakuco@FreeBSD.org>
+
+        llint: Implement LOCAL_LABEL_STRING for the BSD platforms.
+        https://bugs.webkit.org/show_bug.cgi?id=96870
+
+        Reviewed by Filip Pizlo.
+
+        * wtf/InlineASM.h: Extend the definition of LOCAL_LABEL_STRING
+        currently used for OS(LINUX) to the BSDs, since they also normally
+        use GNU as, and clang/llvm seems to parse that syntax just fine as
+        well.
+
+2012-09-14  Alexey Proskuryakov  <ap@apple.com>
+
+        Minimize collisions when hashing pairs
+        https://bugs.webkit.org/show_bug.cgi?id=96022
+
+        Build fix (with newer clang?)
+
+        * wtf/HashFunctions.h: (WTF::pairIntHash): Be explicit about casting from
+        64 bit to 32 bit.
+
+2012-09-14  Dana Jansens  <danakj@chromium.org>
+
+        Minimize collisions when hashing pairs
+        https://bugs.webkit.org/show_bug.cgi?id=96022
+
+        Reviewed by Adrienne Walker.
+
+        The current hash function for pairs has poor performance as it does a
+        nice hash function on 64 bits, but then just drops the top 32 bits. The
+        hash method for pairs tries to use Thomas Wang's 64 bit Mix Function,
+        but this requires not dropping any bits in order to retain the
+        characteristics mentioned by Thomas.
+
+        A better method of hashing sets of 32-bit integers is to use
+        multiplication in 64 bits with random integers. This method is a
+        provably almost-universal hash function. Testing shows that this
+        method decreases the time required, when compared with the current
+        method, by more than 20% due to better hashing characteristics.
+
+        * wtf/HashFunctions.h:
+        (WTF):
+        (WTF::pairIntHash):
+        Implments the hashing method for a pair of unsigned integers.
+
+        (WTF::PairHash::hash):
+        Use pairIntHash() on the hash results of each object in the pair.
+
+        (WTF::IntPairHash::hash):
+        Implement an integer-specific PairHash class that does not need to
+        hash each object in the pair. It uses pairIntHash on the two
+        integers in the pair directly.
+
+        (WTF::IntPairHash::equal):
+        (IntPairHash):
+
 2012-09-14  Tor Arne Vestbø  <tor.arne.vestbo@nokia.com>
 
         [Qt] Make force_static_libs_as_shared work on Mac OS

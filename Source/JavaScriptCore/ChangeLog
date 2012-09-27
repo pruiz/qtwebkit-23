@@ -1,3 +1,184 @@
+2012-09-16  Filip Pizlo  <fpizlo@apple.com>
+
+        JSObject.cpp and JSArray.cpp have inconsistent tests for the invalid array index case
+        https://bugs.webkit.org/show_bug.cgi?id=96878
+
+        Reviewed by Sam Weinig.
+
+        Removed the uses of UNLIKELY() because I don't believe they are buying us anything,
+        since we're already on the slow path. Also found other places where we're testing for
+        the invalid array index case using unusual predicates rather than just using
+        MAX_ARRAY_INDEX. With this change, I believe that all of our tests for invalid
+        array indices (i.e. indices that should be treated as non-indexed properties)
+        uniformly use MAX_ARRAY_INDEX and PropertyName::NotAnIndex.
+
+        * runtime/JSArray.cpp:
+        (JSC::JSArray::push):
+        * runtime/JSObject.cpp:
+        (JSC::JSObject::putByIndex):
+        (JSC::JSObject::defineOwnIndexedProperty):
+
+2012-09-15  Filip Pizlo  <fpizlo@apple.com>
+
+        Following the Butterfly refactoring, the comment for lastArraySize was not updated
+        https://bugs.webkit.org/show_bug.cgi?id=96877
+
+        Reviewed by Sam Weinig.
+
+        * runtime/JSObject.cpp:
+        (JSC):
+
+2012-09-15  Mark Lam  <mark.lam@apple.com>
+
+        Fixed JSLock to use the platform abstraction for Mutex instead of
+        depending on pthreads.
+        https://bugs.webkit.org/show_bug.cgi?id=96858.
+
+        Reviewed by Filip Pizlo.
+
+        This fixes a synchronization problem on the Windows port and makes
+        it more reliable when running the layout tests.
+
+        * runtime/InitializeThreading.cpp:
+        (JSC::initializeThreadingOnce):
+        * runtime/JSLock.cpp:
+        (JSC):
+        (JSC::GlobalJSLock::GlobalJSLock):
+        (JSC::GlobalJSLock::~GlobalJSLock):
+        (JSC::GlobalJSLock::initialize):
+        * runtime/JSLock.h:
+        (GlobalJSLock):
+        (JSLock):
+
+2012-09-15  Filip Pizlo  <fpizlo@apple.com>
+
+        Structure check hoisting fails to consider the possibility of conflicting checks on the source of the first assignment to the hoisted variable
+        https://bugs.webkit.org/show_bug.cgi?id=96872
+
+        Reviewed by Oliver Hunt.
+
+        This does a few related things:
+        
+        - It turns off the use of ForceOSRExit for sure-to-fail CheckStructures, because
+          I noticed that this would sometimes happen for a ForwardCheckStructure. The
+          problem is that ForceOSRExit exits backwards, not forwards. Since the code that
+          led to those ForceOSRExit's being inserted was written out of paranoia rather
+          than need, I removed it. Specifically, I removed the m_isValid = false code
+          for CheckStructure/StructureTransitionWatchpoint in AbstractState.
+        
+        - If a structure check causes a structure set to go empty, we don't want a
+          PutStructure to revive the set. It should instead be smart enough to realize 
+          that an empty set implies that the code can't execute. This was the only "bug"
+          that the use of m_isValid = false was preventing.
+        
+        - Finally, the main change: structure check hoisting looks at the source of the
+          SetLocals on structure-check-hoistable variables and ensures that the source
+          is not checked with a conflicting structure. This is O(n^2) but it does not
+          show up at all in performance tests.
+        
+        The first two parts of this change were auxiliary bugs that were revealed by
+        the structure check hoister doing bad things.
+
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::initialize):
+        (JSC::DFG::AbstractState::execute):
+        * dfg/DFGStructureCheckHoistingPhase.cpp:
+        (JSC::DFG::StructureCheckHoistingPhase::run):
+
+2012-09-14  Filip Pizlo  <fpizlo@apple.com>
+
+        All of the things in SparseArrayValueMap should be out-of-line
+        https://bugs.webkit.org/show_bug.cgi?id=96854
+
+        Reviewed by Andy Estes.
+
+        Those inline methods were buying us nothing.
+
+        * GNUmakefile.list.am:
+        * JavaScriptCore.vcproj/JavaScriptCore/JavaScriptCore.vcproj:
+        * JavaScriptCore.xcodeproj/project.pbxproj:
+        * runtime/JSArray.cpp:
+        * runtime/JSGlobalData.cpp:
+        * runtime/JSObject.cpp:
+        * runtime/RegExpMatchesArray.cpp:
+        * runtime/SparseArrayValueMap.cpp:
+        (JSC::SparseArrayValueMap::SparseArrayValueMap):
+        (JSC):
+        (JSC::SparseArrayValueMap::~SparseArrayValueMap):
+        (JSC::SparseArrayValueMap::finishCreation):
+        (JSC::SparseArrayValueMap::create):
+        (JSC::SparseArrayValueMap::destroy):
+        (JSC::SparseArrayValueMap::createStructure):
+        (JSC::SparseArrayValueMap::add):
+        (JSC::SparseArrayValueMap::putEntry):
+        (JSC::SparseArrayValueMap::putDirect):
+        (JSC::SparseArrayEntry::get):
+        (JSC::SparseArrayEntry::getNonSparseMode):
+        (JSC::SparseArrayValueMap::visitChildren):
+        * runtime/SparseArrayValueMapInlineMethods.h: Removed.
+
+2012-09-14  Mike West  <mkwst@chromium.org>
+
+        JSC should throw a more descriptive exception when blocking 'eval' via CSP.
+        https://bugs.webkit.org/show_bug.cgi?id=94331
+
+        Reviewed by Geoffrey Garen.
+
+        Unless explicitly whitelisted, the 'script-src' Content Security Policy
+        directive blocks 'eval' and 'eval'-like constructs such as
+        'new Function()'. When 'eval' is encountered in code, an 'EvalError' is
+        thrown, but the associated message is poor: "Eval is disabled" doesn't
+        give developers enough information about why their code isn't behaving
+        as expected.
+
+        This patch adds an 'errorMessage' parameter to the JavaScriptCore method
+        used to disable 'eval'; ContentSecurityPolicy has the opportunity to
+        pass in a more detailed and descriptive error that contains more context
+        for the developer.
+
+        * runtime/Executable.cpp:
+        (JSC::EvalExecutable::compileInternal):
+            Drop the hard-coded "Eval is disabled" error message in favor of
+            reading the error message off the global object.
+        * runtime/FunctionConstructor.cpp:
+        (JSC::FunctionConstructor::getCallData):
+            Drop the hard-coded "Function constructor is disabled" error message
+            in favor of reading the error message off the global object.
+        * runtime/JSGlobalObject.h:
+        (JSGlobalObject):
+        (JSC::JSGlobalObject::evalEnabled):
+            Making this accessor method const.
+        (JSC::JSGlobalObject::evalDisabledErrorMessage):
+            Accessor for the error message set via 'setEvalDisabled'.
+        (JSC::JSGlobalObject::setEvalEnabled):
+            Adding an 'errorMessage' parameter which is stored on the global
+            object, and used when exceptions are thrown.
+
+2012-09-14  Filip Pizlo  <fpizlo@apple.com>
+
+        bbc homepage crashes immediately
+        https://bugs.webkit.org/show_bug.cgi?id=96812
+        <rdar://problem/12081386>
+
+        Reviewed by Oliver Hunt.
+
+        If you use the old storage pointer to write to space you thought was newly allocated,
+        you're going to have a bad time.
+
+        * runtime/JSArray.cpp:
+        (JSC::JSArray::unshiftCount):
+
+2012-09-14  Adam Barth  <abarth@webkit.org>
+
+        Remove webkitPostMessage
+        https://bugs.webkit.org/show_bug.cgi?id=96577
+
+        Reviewed by Ojan Vafai.
+
+        Add ENABLE_LEGACY_VENDOR_PREFIXES flag.
+
+        * Configurations/FeatureDefines.xcconfig:
+
 2012-09-14  Tor Arne Vestbø  <tor.arne.vestbo@nokia.com>
 
         [Qt] Make force_static_libs_as_shared work on Mac OS

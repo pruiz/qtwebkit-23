@@ -1,3 +1,165 @@
+2012-09-14  Dirk Pranke  <dpranke@chromium.org>
+
+        nrwt: --additional-platform-dir is broken on chromium ports
+        https://bugs.webkit.org/show_bug.cgi?id=96840
+
+        Reviewed by Ojan Vafai.
+
+        Looks like I broke this when cleaning things up as part of
+        adding ML support. Fixing and adding a test.
+
+        * Scripts/webkitpy/layout_tests/port/chromium.py:
+        (ChromiumPort.default_baseline_search_path):
+        * Scripts/webkitpy/layout_tests/port/chromium_android.py:
+        (ChromiumAndroidPort.default_baseline_search_path):
+        * Scripts/webkitpy/layout_tests/port/chromium_linux.py:
+        (ChromiumLinuxPort.default_baseline_search_path):
+        * Scripts/webkitpy/layout_tests/port/chromium_mac.py:
+        (ChromiumMacPort.__init__):
+        * Scripts/webkitpy/layout_tests/port/chromium_win.py:
+        (ChromiumWinPort.setup_environ_for_server):
+        * Scripts/webkitpy/layout_tests/port/port_testcase.py:
+        (test_check_build):
+        (test_additional_platform_directory):
+
+2012-09-13  Stephanie Lewis  <slewis@apple.com>
+
+        mac-future ignores previous platform TestExpectations.
+        https://bugs.webkit.org/show_bug.cgi?id=96718.
+
+        Reviewed by Dirk Pranke.
+
+        TestExpectations match an expectation's configuraton against a list of configurations that are 
+        valid for that port.  That list does not contain mac-future so none of the expectations can be
+        applied.
+
+        * Scripts/webkitpy/layout_tests/port/apple.py:
+        (ApplePort._generate_all_test_configurations):
+
+2012-09-14  Adam Barth  <abarth@webkit.org>
+
+        Remove webkitPostMessage
+        https://bugs.webkit.org/show_bug.cgi?id=96577
+
+        Reviewed by Ojan Vafai.
+
+        Add ENABLE_LEGACY_VENDOR_PREFIXES flag.
+
+        * Scripts/webkitperl/FeatureList.pm:
+        * qmake/mkspecs/features/features.pri:
+
+2012-09-14  Alexey Proskuryakov  <ap@apple.com>
+
+        [WK2] webarchive/loading/javascript-url-iframe-crash.html fails
+        https://bugs.webkit.org/show_bug.cgi?id=96817
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        * WebKitTestRunner/InjectedBundle/InjectedBundlePage.cpp:
+        (WTR::InjectedBundlePage::didFailProvisionalLoadWithErrorForFrame): This callback
+        got overlooked when adding logging elsewhere.
+
+2012-09-14  Peter Beverloo  <peter@chromium.org>
+
+        [Chromium] Build fix for DumpRenderTree following r128628
+        https://bugs.webkit.org/show_bug.cgi?id=96808
+
+        Reviewed by Tony Chang.
+
+        When building DumpRenderTree from the Chromium project, a compile error
+        shows up because including the header ForwardIOStreamsAndroid.h cannot
+        be located. TestWebKitAPI does this correctly.
+
+        * DumpRenderTree/DumpRenderTree.gyp/DumpRenderTree.gyp:
+
+2012-09-14  Dana Jansens  <danakj@chromium.org>
+
+        Change cc-bugs@google.com watchlist to cc-bugs@chromium.org
+        https://bugs.webkit.org/show_bug.cgi?id=96805
+
+        Reviewed by Dirk Pranke.
+
+        * Scripts/webkitpy/common/config/committers.py:
+        * Scripts/webkitpy/common/config/watchlist:
+
+2012-09-14  Peter Beverloo  <peter@chromium.org>
+
+        [Chromium] Support the --{in,out,err}-fifo arguments on TestWebKitAPI and webkit_unit_tests
+        https://bugs.webkit.org/show_bug.cgi?id=96687
+
+        Reviewed by Tony Chang.
+
+        Android's DumpRenderTree currently supports these arguments, implemented
+        as part of TestShellAndroid:
+        http://trac.webkit.org/browser/trunk/Tools/DumpRenderTree/chromium/TestShellAndroid.cpp?rev=128496
+
+        They're used by the layout test runner to get the STDOUT and STDERR while
+        a layout test run is in process, which is a safer alternative to parsing
+        all the logcat output manually. The implementation can be seen here:
+        http://trac.webkit.org/browser/trunk/Tools/Scripts/webkitpy/layout_tests/port/chromium_android.py?rev=128496#L590
+
+        This patch generalizes parsing of and applying the effects of these arguments
+        so that they can be used for TestWebKitAPI and webkit_unit_tests as well.
+        After this patch, this will make it possible to pull out the output-reading
+        code from Android's layout test port and generalize it so it can be re-used
+        in the new test-runner for the other two test suites.
+
+        This has no effect when compiling and running these tests as part of Chromium
+        code, which has a much more advanced test-runner that does parse complete log
+        output, but also directly depends on code licensed under Apache 2.
+
+        * DumpRenderTree/DumpRenderTree.gyp/DumpRenderTree.gyp:
+        * DumpRenderTree/chromium/TestShellAndroid.cpp:
+        (platformInit):
+        * TestWebKitAPI/TestWebKitAPI.gyp/TestWebKitAPI.gyp:
+
+2012-09-14  Zoltan Horvath  <zoltan@webkit.org>
+
+        check-webkit-style should not warn in case of NONCOPYABLE and FAST_ALLOCATED macros
+        https://bugs.webkit.org/show_bug.cgi?id=96656
+
+        Reviewed by Adam Barth.
+
+        We should allow to use WTF_MAKE_NONCOPYABLE(ClassName) and WTF_MAKE_FAST_ALLOCATED
+        macros in 1 line.
+
+        * Scripts/webkitpy/style/checkers/cpp.py:
+        (check_style.definitions):
+        (check_style): Add rule.
+        * Scripts/webkitpy/style/checkers/cpp_unittest.py:
+        (WebKitStyleTest.test_line_breaking): Add unittest.
+
+2012-09-14  Christophe Dumez  <christophe.dumez@intel.com>
+
+        WebKitTestRunner needs layoutTestController.dumpDatabaseCallbacks
+        https://bugs.webkit.org/show_bug.cgi?id=57570
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Implement testRunner.dumpDatabaseCallbacks in WebKitTestRunner
+        and dump the information expected by the test cases.
+
+        * WebKitTestRunner/InjectedBundle/Bindings/TestRunner.idl:
+        * WebKitTestRunner/InjectedBundle/InjectedBundle.cpp:
+        (WTR::InjectedBundle::beginTesting): Explicitly set the default
+        database quota.
+        * WebKitTestRunner/InjectedBundle/InjectedBundlePage.cpp:
+        (WTR::securityOriginToStr): New convenience function to convert
+        a security origin to the string expected in test results.
+        (WTR):
+        (WTR::InjectedBundlePage::InjectedBundlePage):
+        (WTR::InjectedBundlePage::didExceedDatabaseQuota):
+        (WTR::InjectedBundlePage::didReachApplicationCacheOriginQuota): Minor
+        refactoring to share code with didExceedDatabaseQuota.
+        * WebKitTestRunner/InjectedBundle/InjectedBundlePage.h:
+        (InjectedBundlePage):
+        * WebKitTestRunner/InjectedBundle/TestRunner.cpp:
+        (WTR::TestRunner::TestRunner):
+        * WebKitTestRunner/InjectedBundle/TestRunner.h:
+        (WTR::TestRunner::dumpDatabaseCallbacks):
+        (WTR::TestRunner::shouldDumpDatabaseCallbacks):
+        (TestRunner):
+
 2012-09-14  Tor Arne Vestbø  <tor.arne.vestbo@nokia.com>
 
         [Qt] Make force_static_libs_as_shared work on Mac OS

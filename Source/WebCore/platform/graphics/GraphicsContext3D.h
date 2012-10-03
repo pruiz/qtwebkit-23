@@ -1032,7 +1032,6 @@ public:
     friend class GraphicsContext3DPrivate;
     OwnPtr<GraphicsContext3DPrivate> m_private;
 #endif
-    bool systemAllowsMultisamplingOnATICards() const;
 };
 
 } // namespace WebCore

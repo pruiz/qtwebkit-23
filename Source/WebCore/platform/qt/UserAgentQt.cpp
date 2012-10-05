@@ -66,8 +66,12 @@ String UserAgentQt::standardUserAgent(const String &applicationNameForUserAgent,
             "Macintosh; "
 #elif OS(WINDOWS)
             ""
-#else
+#elif HAVE(QT5)
             (QGuiApplication::platformName() == QLatin1String("xcb")) ? "X11; " : "Unknown; "
+#elif OS(UNIX)
+            "X11; "
+#else
+            "Unknown; "
 #endif
         ));
 

@@ -101,25 +101,14 @@ public:
 #endif
 #if OS(DARWIN)
     static bool loadFont(NSFont* srcFont, CGFontRef*, uint32_t* fontID);
-#elif OS(UNIX)
-    struct FontFamily {
-        String name;
-        bool isBold;
-        bool isItalic;
-    };
-    static void getFontFamilyForCharacters(const UChar*, size_t numCharacters, const char* preferredLocale, FontFamily*);
 #endif
 
     // IndexedDB ----------------------------------------------------------
     static PassRefPtr<IDBFactoryBackendInterface> idbFactory();
 
-    // JavaScript ---------------------------------------------------------
-    static void notifyJSOutOfMemory(Frame*);
-
     // Plugin -------------------------------------------------------------
     static bool plugins(bool refresh, Vector<PluginInfo>*);
     static NPObject* pluginScriptableObject(Widget*);
-    static bool popupsAllowed(NPP);
 
     // Screen -------------------------------------------------------------
     static int screenHorizontalDPI(Widget*);

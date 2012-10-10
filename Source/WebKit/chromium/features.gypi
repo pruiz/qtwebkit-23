@@ -77,7 +77,8 @@
       'ENABLE_JAVASCRIPT_DEBUGGER=1',
       'ENABLE_LEGACY_CSS_VENDOR_PREFIXES=0',
       'ENABLE_LEGACY_VIEWPORT_ADAPTION=1',
-      'ENABLE_LEGACY_VENDOR_PREFIXES=1',
+      'ENABLE_LEGACY_VENDOR_PREFIXES=0',
+      'ENABLE_LEGACY_WEB_AUDIO=1',
       'ENABLE_LEGACY_WEBKIT_BLOB_BUILDER=1',
       'ENABLE_LINK_PREFETCH=1',
       'ENABLE_LINK_PRERENDER=1',
@@ -119,6 +120,7 @@
       'ENABLE_WORKERS=1',
       'ENABLE_XHR_RESPONSE_BLOB=1',
       'ENABLE_XSLT=1',
+      'SK_SUPPORT_HINTING_SCALE_FACTOR',
       'WTF_USE_LEVELDB=1',
       'WTF_USE_BUILTIN_UTF8_CODEC=1',
       # WTF_USE_DYNAMIC_ANNOTATIONS=1 may be defined in build/common.gypi
@@ -201,7 +203,7 @@
           'WTF_USE_WEBAUDIO_FFMPEG=1',
         ],
       }],
-      ['OS=="win"', {
+      ['OS=="win" or use_x11==1', {
         'feature_defines': [
           'ENABLE_OPENTYPE_VERTICAL=1',
         ],

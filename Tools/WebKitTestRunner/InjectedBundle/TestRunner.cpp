@@ -393,11 +393,6 @@ void TestRunner::setPluginsEnabled(bool enabled)
     WKBundleSetPluginsEnabled(InjectedBundle::shared().bundle(), InjectedBundle::shared().pageGroup(), enabled);
 }
 
-void TestRunner::setGeolocationPermission(bool enabled)
-{
-    WKBundleSetGeolocationPermission(InjectedBundle::shared().bundle(), InjectedBundle::shared().pageGroup(), enabled);
-}
-
 void TestRunner::setJavaScriptCanAccessClipboard(bool enabled)
 {
      WKBundleSetJavaScriptCanAccessClipboard(InjectedBundle::shared().bundle(), InjectedBundle::shared().pageGroup(), enabled);
@@ -691,9 +686,14 @@ void TestRunner::deliverWebIntent(JSStringRef action, JSStringRef type, JSString
     WKRetainPtr<WKSerializedScriptValueRef> dataWK(AdoptWK, WKSerializedScriptValueCreate(context, JSValueMakeString(context, data), 0));
 
     WKRetainPtr<WKMutableDictionaryRef> intentInitDict(AdoptWK, WKMutableDictionaryCreate());
-    WKDictionaryAddItem(intentInitDict.get(), WKStringCreateWithUTF8CString("action"), actionWK.get());
-    WKDictionaryAddItem(intentInitDict.get(), WKStringCreateWithUTF8CString("type"), typeWK.get());
-    WKDictionaryAddItem(intentInitDict.get(), WKStringCreateWithUTF8CString("data"), dataWK.get());
+    WKRetainPtr<WKStringRef> actionKey(AdoptWK, WKStringCreateWithUTF8CString("action"));
+    WKDictionaryAddItem(intentInitDict.get(), actionKey.get(), actionWK.get());
+
+    WKRetainPtr<WKStringRef> typeKey(AdoptWK, WKStringCreateWithUTF8CString("type"));
+    WKDictionaryAddItem(intentInitDict.get(), typeKey.get(), typeWK.get());
+
+    WKRetainPtr<WKStringRef> dataKey(AdoptWK, WKStringCreateWithUTF8CString("data"));
+    WKDictionaryAddItem(intentInitDict.get(), dataKey.get(), dataWK.get());
 
     WKRetainPtr<WKBundleIntentRef> wkIntent(AdoptWK, WKBundleIntentCreate(intentInitDict.get()));
     WKBundlePageDeliverIntentToFrame(InjectedBundle::shared().page()->page(), mainFrame, wkIntent.get());
@@ -765,6 +765,17 @@ void TestRunner::simulateWebNotificationClick(JSValueRef notification)
     JSContextRef context = WKBundleFrameGetJavaScriptContext(mainFrame);
     uint64_t notificationID = WKBundleGetWebNotificationID(InjectedBundle::shared().bundle(), context, notification);
     InjectedBundle::shared().postSimulateWebNotificationClick(notificationID);
+}
+
+void TestRunner::setGeolocationPermission(bool enabled)
+{
+    // FIXME: this should be done by frame.
+    InjectedBundle::shared().setGeolocationPermission(enabled);
+}
+
+void TestRunner::setMockGeolocationPosition(double latitude, double longitude, double accuracy)
+{
+    InjectedBundle::shared().setMockGeolocationPosition(latitude, longitude, accuracy);
 }
 
 bool TestRunner::callShouldCloseOnWebView()

@@ -841,6 +841,7 @@ bool AbstractState::execute(unsigned indexInBlock)
         node.setCanExit(true);
         switch (node.arrayMode()) {
         case Array::Undecided:
+        case Array::Unprofiled:
             ASSERT_NOT_REACHED();
             break;
         case Array::ForceExit:
@@ -863,6 +864,7 @@ bool AbstractState::execute(unsigned indexInBlock)
             forNode(nodeIndex).makeTop();
             break;
         case OUT_OF_BOUNDS_ARRAY_STORAGE_MODES:
+        case ALL_EFFECTFUL_ARRAY_STORAGE_MODES:
             forNode(node.child2()).filter(SpecInt32);
             clobberWorld(node.codeOrigin, indexInBlock);
             forNode(nodeIndex).makeTop();
@@ -926,6 +928,7 @@ bool AbstractState::execute(unsigned indexInBlock)
             forNode(child2).filter(SpecInt32);
             break;
         case OUT_OF_BOUNDS_ARRAY_STORAGE_MODES:
+        case ALL_EFFECTFUL_ARRAY_STORAGE_MODES:
             forNode(child2).filter(SpecInt32);
             clobberWorld(node.codeOrigin, indexInBlock);
             break;
@@ -1397,6 +1400,20 @@ bool AbstractState::execute(unsigned indexInBlock)
         }
         break;
     }
+    case Arrayify: {
+        switch (node.arrayMode()) {
+        case EFFECTFUL_NON_ARRAY_ARRAY_STORAGE_MODES:
+            node.setCanExit(true);
+            forNode(node.child1()).filter(SpecCell);
+            forNode(nodeIndex).clear();
+            clobberStructures(indexInBlock);
+            break;
+        default:
+            ASSERT_NOT_REACHED();
+            break;
+        }
+        break;
+    }
     case GetIndexedPropertyStorage: {
         switch (node.arrayMode()) {
         case Array::String:
@@ -1460,7 +1477,7 @@ bool AbstractState::execute(unsigned indexInBlock)
         // Again, sadly, we don't propagate the fact that we've done InstanceOf
         if (!(m_graph[node.child1()].prediction() & ~SpecCell) && !(forNode(node.child1()).m_type & ~SpecCell))
             forNode(node.child1()).filter(SpecCell);
-        forNode(node.child3()).filter(SpecCell);
+        forNode(node.child2()).filter(SpecCell);
         forNode(nodeIndex).set(SpecBoolean);
         break;
             

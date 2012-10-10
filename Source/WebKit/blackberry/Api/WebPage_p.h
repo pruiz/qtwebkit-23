@@ -179,6 +179,7 @@ public:
     WebCore::IntSize absoluteVisibleOverflowSize() const;
 
     // Virtual functions inherited from PageClientBlackBerry.
+    virtual int playerID() const;
     virtual void setCursor(WebCore::PlatformCursor);
     virtual Platform::NetworkStreamFactory* networkStreamFactory();
     virtual Platform::Graphics::Window* platformWindow() const;
@@ -200,7 +201,7 @@ public:
     virtual int showAlertDialog(WebPageClient::AlertType atype);
     virtual bool isActive() const;
     virtual bool isVisible() const { return m_visible; }
-    virtual void authenticationChallenge(const WebCore::KURL&, const WebCore::ProtectionSpace&, const WebCore::Credential&, WebCore::AuthenticationChallengeClient*);
+    virtual void authenticationChallenge(const WebCore::KURL&, const WebCore::ProtectionSpace&, const WebCore::Credential&);
     virtual SaveCredentialType notifyShouldSaveCredential(bool);
     virtual void syncProxyCredential(const WebCore::Credential&);
 
@@ -405,9 +406,6 @@ public:
     void setRootLayerWebKitThread(WebCore::Frame*, WebCore::LayerWebKitThread*);
     void setNeedsOneShotDrawingSynchronization();
     void scheduleRootLayerCommit();
-
-    // Thread safe.
-    void resetCompositingSurface();
 
     // Compositing thread.
     void setRootLayerCompositingThread(WebCore::LayerCompositingThread*);

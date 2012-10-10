@@ -552,8 +552,17 @@ inline void JIT::emitArrayProfilingSiteForBytecodeIndex(RegisterID structureAndI
 #if ENABLE(VALUE_PROFILER)
     emitArrayProfilingSite(structureAndIndexingType, scratch, m_codeBlock->getOrAddArrayProfile(bytecodeIndex));
 #else
+    UNUSED_PARAM(bytecodeIndex);
     emitArrayProfilingSite(structureAndIndexingType, scratch, 0);
 #endif
+}
+
+inline void JIT::emitArrayProfileStoreToHoleSpecialCase(ArrayProfile* arrayProfile)
+{
+    if (!canBeOptimized())
+        return;
+    
+    store8(TrustedImm32(1), arrayProfile->addressOfMayStoreToHole());
 }
 
 #if USE(JSVALUE32_64)

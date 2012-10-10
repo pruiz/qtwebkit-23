@@ -171,6 +171,9 @@ fast/regions/style-scoped-in-flow-override-region-styling-multiple-regions.html
 fast/regions/style-scoped-in-flow-override-region-styling.html
 fast/regions/style-scoped-in-flow.html
 
+# Accelerated compositing is disabled for elements in a RenderFlowThread webkit.org/b/84900
+compositing/regions/webkit-flow-renderer-layer-compositing.html
+
 # ENABLE(SHADOW_DOM) is disabled.
 editing/shadow
 fast/dom/shadow/access-key.html
@@ -310,12 +313,6 @@ fast/sub-pixel/table-rows-no-gaps.html
 fast/sub-pixel/sub-pixel-accumulates-to-layers.html
 fast/sub-pixel/selection/selection-rect-in-sub-pixel-table.html
 
-# CSS Regions support not yet enabled. http://webkit.org/b/57312
-fast/regions
-
-# CSS Exclusions support not yet enabled. http://webkit.org/b/57311
-fast/exclusions
-
 # USE(V8)
 
 # v8 i18n extension.
@@ -400,6 +397,7 @@ inspector/styles/media-queries.html
 fast/dom/MicroData
 
 # ENABLE(MUTATION_OBSERVERS) is disabled
+fast/mutation/added-out-of-order.html
 fast/mutation/callback-arguments.html
 fast/mutation/clear-transient-without-delivery.html
 fast/mutation/create-during-delivery.html
@@ -417,6 +415,7 @@ fast/mutation/observe-characterdata.html
 fast/mutation/observe-childList.html
 fast/mutation/observe-exceptions.html
 fast/mutation/observe-subtree.html
+fast/mutation/removed-out-of-order.html
 fast/mutation/shadow-dom.html
 fast/mutation/takeRecords.html
 fast/mutation/transient-gc-crash.html
@@ -424,6 +423,10 @@ fast/mutation/transient-gc-crash.html
 # Disable private names by default in WebCore
 # https://bugs.webkit.org/show_bug.cgi?id=87088
 fast/js/names.html
+
+# Don't have GestureLongPress, GestureTapCancel event types
+touchadjustment/touch-links-longpress.html
+touchadjustment/touch-links-active.html
 
 # =========================================================================== #
 #       Feature not yet supported.                                            #
@@ -704,17 +707,6 @@ http/tests/xmlhttprequest/remember-bad-password.html
 
 # BlodBuilder is not enabled
 http/tests/local/blob/send-data-blob.html
-
-# [Qt] XML Viewer fails due to specifics in the parser implementation
-# https://bugs.webkit.org/show_bug.cgi?id=55302
-xmlviewer/extensions-api.html
-http/tests/xmlviewer/dumpAsText/svg.xml
-http/tests/xmlviewer/dumpAsText/xlink.xml
-http/tests/xmlviewer/dumpAsText/xmlviewer-charset-cp1251.xml
-http/tests/xmlviewer/dumpAsText/xmlviewer-charset-utf8.xml
-http/tests/xmlviewer/dumpAsText/xmlviewer.xml
-http/tests/xmlviewer/dumpAsText/xsl-stylesheet.xml
-http/tests/xmlviewer/dumpAsText/xul.xml
 
 # new test introduced in r94828, but fails on Qt.
 # https://bugs.webkit.org/show_bug.cgi?id=66588
@@ -1233,6 +1225,7 @@ fast/autoresize
 # Needs layoutTestController.setBackingScaleFactor()
 fast/canvas/2d.backingStorePixelRatio.html
 fast/canvas/2d.imageDataHD.html
+svg/as-image/svg-as-image-canvas.html
 
 # This requires didClearWindowObjectForFrameInIsolatedWorld foo in FrameLoaderClient
 http/tests/security/isolatedWorld/didClearWindowObject.html
@@ -1327,11 +1320,6 @@ css3/filters/custom/effect-custom-parameters.html
 css3/filters/custom/filter-repaint-custom-clipped.html
 css3/filters/custom/filter-repaint-custom-rotated.html
 css3/filters/custom/filter-repaint-custom.html
-
-# ERROR: TestRunner::overridePreference() does not support the 'WebKitDisplayImagesKey' preference
-fast/loader/display-image-unset-allows-cached-image-load.html
-fast/loader/display-image-unset-can-block-image-and-can-reload-in-place.html
-fast/loader/images-enabled-unset-can-block-image-and-can-reload-in-place.html
 
 # ReferenceError: Can't find variable: MediaKeyError
 # http://trac.webkit.org/changeset/114067
@@ -2054,10 +2042,6 @@ fast/block/positioning/002.html
 # https://bugs.webkit.org/show_bug.cgi?id=92733
 fast/block/positioning/056.html
 
-# REGRESSION(128400): It broke fast/js/primitive-property-access-edge-cases.html.
-# https://bugs.webkit.org/show_bug.cgi?id=96596
-fast/js/primitive-property-access-edge-cases.html
-
 # ============================================================================= #
 # failing fonts tests
 # ============================================================================= #
@@ -2419,9 +2403,6 @@ fast/events/remove-target-in-mouseup.html
 fast/events/selectstart-by-double-triple-clicks.html
 fast/events/selectstart-by-drag.html
 
-# [Qt] Add eventSender.gestureTap
-# https://bugs.webkit.org/show_bug.cgi?id=66173
-fast/events/touch/gesture/gesture-click.html
 # New tests introduced in https://bugs.webkit.org/show_bug.cgi?id=66272. Needs
 # Qt implementation.
 fast/events/touch/gesture/gesture-dblclick.html
@@ -2601,6 +2582,9 @@ svg/custom/anchor-on-use.svg
 svg/animations/animateTransform-rotate-around-point.svg
 svg/animations/animateMotion-additive-1.svg
 svg/transforms/transformed-text-fill-gradient.html
+fast/regions/floats-basic-in-variable-width-regions.html
+fast/regions/positioned-objects-block-static-spanning-regions-rtl.html
+fast/regions/region-style-rule-position.html
 
 # Failing fast/css/sticky/ tests with minor pixel differences
 # https://bugs.webkit.org/show_bug.cgi?id=92080
@@ -2742,9 +2726,6 @@ css3/flexbox/flex-rounding.html
 # ENABLE(WIDGET_REGION) is disabled
 fast/css/widget-region-parser.html
 
-# https://bugs.webkit.org/show_bug.cgi?id=92914
-touchadjustment/touch-links-longpress.html
-
 # [Qt][GTK] REGRESSION(r125251): It made svg/custom/use-instanceRoot-as-event-target.xhtml assert and flakey
 # https://bugs.webkit.org/show_bug.cgi?id=93812
 svg/custom/use-instanceRoot-as-event-target.xhtml
@@ -2807,12 +2788,10 @@ fast/js/dfg-inline-arguments-use-from-all-the-places.html
 # https://bugs.webkit.org/show_bug.cgi?id=96931
 http/tests/inspector/network/network-xhr-replay.html
 
-# REGRESSION(r128802): It made some JS tests crash
-# https://bugs.webkit.org/show_bug.cgi?id=97001
-storage/websql/execute-sql-args.html
-fast/js/object-bad-time.html
-fast/js/array-slow-put.html
-fast/js/Object-defineProperty.html
-ietestcenter/Javascript/15.4.4.14-9-b-i-6.html
-ietestcenter/Javascript/15.4.4.15-8-b-i-6.html
-fast/js/array-bad-time.html
+# [Qt] REGRESSION(r128910): inspector/extensions/extensions-panel.html fails
+# https://bugs.webkit.org/show_bug.cgi?id=97084
+inspector/extensions/extensions-panel.html
+
+# [Qt] fast/regions/overflow-size-change-with-stacking-context.html fails
+# https://bugs.webkit.org/show_bug.cgi?id=97199
+fast/regions/overflow-size-change-with-stacking-context.html

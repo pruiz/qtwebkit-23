@@ -981,6 +981,11 @@ void InjectedBundlePage::didFailLoadWithErrorForFrame(WKBundleFrameRef frame, WK
     if (!InjectedBundle::shared().isTestRunning())
         return;
 
+    if (InjectedBundle::shared().testRunner()->shouldDumpFrameLoadCallbacks()) {
+        dumpFrameDescriptionSuitableForTestResult(frame);
+        InjectedBundle::shared().stringBuilder()->appendLiteral(" - didFailLoadWithError\n");
+    }
+
     if (frame != InjectedBundle::shared().topLoadingFrame())
         return;
     InjectedBundle::shared().setTopLoadingFrame(0);
@@ -1006,9 +1011,9 @@ void InjectedBundlePage::didReceiveTitleForFrame(WKStringRef title, WKBundleFram
     if (!InjectedBundle::shared().testRunner()->shouldDumpTitleChanges())
         return;
 
-    InjectedBundle::shared().stringBuilder()->appendLiteral("TITLE CHANGED: ");
+    InjectedBundle::shared().stringBuilder()->appendLiteral("TITLE CHANGED: '");
     InjectedBundle::shared().stringBuilder()->append(toWTFString(title));
-    InjectedBundle::shared().stringBuilder()->append('\n');
+    InjectedBundle::shared().stringBuilder()->appendLiteral("'\n");
 }
 
 void InjectedBundlePage::didClearWindowForFrame(WKBundleFrameRef frame, WKBundleScriptWorldRef world)

@@ -1493,9 +1493,6 @@ sub setUpGuardMallocIfNeeded
 
     if ($shouldUseGuardMalloc) {
         appendToEnvironmentVariableList("DYLD_INSERT_LIBRARIES", "/usr/lib/libgmalloc.dylib");
-        if (shouldUseXPCServiceForWebProcess()) {
-            appendToEnvironmentVariableList("__XPC_DYLD_INSERT_LIBRARIES", "/usr/lib/libgmalloc.dylib");
-        }
     }
 }
 
@@ -2626,8 +2623,6 @@ sub runMacWebKitApp($;$)
     setUpGuardMallocIfNeeded();
 
     if (shouldUseXPCServiceForWebProcess()) {
-        $ENV{__XPC_DYLD_FRAMEWORK_PATH} = $productDir;
-        appendToEnvironmentVariableList("__XPC_DYLD_INSERT_LIBRARIES", File::Spec->catfile($productDir, "WebProcessShim.dylib"));
         $ENV{WEBKIT_USE_XPC_SERVICE_FOR_WEB_PROCESS} = "YES";
     }
 
@@ -2669,8 +2664,6 @@ sub execMacWebKitAppForDebugging($)
     my @architectureFlags = ($architectureSwitch, architecture());
     if (!shouldTargetWebProcess()) {
         if (shouldUseXPCServiceForWebProcess()) {
-            $ENV{__XPC_DYLD_FRAMEWORK_PATH} = $productDir;
-            appendToEnvironmentVariableList("__XPC_DYLD_INSERT_LIBRARIES", File::Spec->catfile($productDir, "WebProcessShim.dylib"));
             $ENV{WEBKIT_USE_XPC_SERVICE_FOR_WEB_PROCESS} = "YES";
         }
         print "Starting @{[basename($appPath)]} under $debugger with DYLD_FRAMEWORK_PATH set to point to built WebKit in $productDir.\n";

@@ -43,6 +43,10 @@ public:
         LegacyNotifications,
         LegacyBlobBuilder,
         PrefixedIndexedDB,
+        WorkerStart,
+        SharedWorkerStart,
+        LegacyWebAudioNoteOn,
+        WebAudioStart,
         // Add new features above this line.
         NumberOfFeatures, // This enum value must be last.
     };

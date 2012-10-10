@@ -19,6 +19,7 @@
 #include "config.h"
 #include "NetworkJob.h"
 
+#include "AuthenticationChallengeManager.h"
 #include "Chrome.h"
 #include "ChromeClient.h"
 #include "CookieManager.h"
@@ -84,7 +85,14 @@ NetworkJob::NetworkJob()
     , m_deferredData(*this)
     , m_deferLoadingCount(0)
     , m_frame(0)
+    , m_isAuthenticationChallenging(false)
 {
+}
+
+NetworkJob::~NetworkJob()
+{
+    if (m_isAuthenticationChallenging)
+        AuthenticationChallengeManager::instance()->cancelAuthenticationChallenge(this);
 }
 
 bool NetworkJob::initialize(int playerId,
@@ -203,10 +211,8 @@ void NetworkJob::handleNotifyStatusReceived(int status, const String& message)
 
     m_response.setHTTPStatusText(message);
 
-    if (isUnauthorized(m_extendedStatusCode)) {
+    if (isUnauthorized(m_extendedStatusCode))
         purgeCredentials();
-        BlackBerry::Platform::log(BlackBerry::Platform::LogLevelCritical, "Authentication failed, purge the stored credentials for this site.");
-    }
 }
 
 void NetworkJob::notifyHeadersReceived(BlackBerry::Platform::NetworkRequest::HeaderList& headers)
@@ -294,9 +300,10 @@ void NetworkJob::notifyAuthReceived(BlackBerry::Platform::NetworkRequest::AuthTy
         }
         storeCredentials();
         return;
-    } else if (serverType != ProtectionSpaceProxyHTTP)
-        // If a wifi proxy auth failed, there is no point of trying anymore because the credentials are wrong.
+    } else {
+        purgeCredentials();
         m_newJobWithCredentialsStarted = sendRequestWithCredentials(serverType, scheme, realm, requireCredentials);
+    }
 }
 
 void NetworkJob::notifyStringHeaderReceived(const String& key, const String& value)
@@ -483,6 +490,7 @@ void NetworkJob::handleNotifyClose(int status)
 #ifndef NDEBUG
     m_isRunning = false;
 #endif
+
     if (!m_cancelled) {
         if (!m_statusReceived) {
             // Connection failed before sending notifyStatusReceived: use generic NetworkError.
@@ -494,6 +502,7 @@ void NetworkJob::handleNotifyClose(int status)
                 m_extendedStatusCode = BlackBerry::Platform::FilterStream::StatusTooManyRedirects;
 
             sendResponseIfNeeded();
+
             if (isClientAvailable()) {
                 if (isError(status))
                     m_extendedStatusCode = status;
@@ -766,7 +775,15 @@ bool NetworkJob::sendRequestWithCredentials(ProtectionSpaceServerType type, Prot
                 return false;
 
             m_handle->getInternal()->m_currentWebChallenge = AuthenticationChallenge();
-            m_frame->page()->chrome()->client()->platformPageClient()->authenticationChallenge(newURL, protectionSpace, Credential(), this);
+
+            m_isAuthenticationChallenging = true;
+            updateDeferLoadingCount(1);
+
+            AuthenticationChallengeManager::instance()->authenticationChallenge(newURL,
+                                                                                protectionSpace,
+                                                                                Credential(),
+                                                                                this,
+                                                                                m_frame->page()->chrome()->client()->platformPageClient());
             return true;
         }
 
@@ -827,10 +844,16 @@ void NetworkJob::fireDeleteJobTimer(Timer<NetworkJob>*)
 
 void NetworkJob::notifyChallengeResult(const KURL& url, const ProtectionSpace& protectionSpace, AuthenticationChallengeResult result, const Credential& credential)
 {
+    m_isAuthenticationChallenging = false;
+
     if (result != AuthenticationChallengeSuccess || protectionSpace.host().isEmpty() || !url.isValid()) {
         m_newJobWithCredentialsStarted = false;
+        updateDeferLoadingCount(-1);
         return;
     }
+
+    cancelJob();
+    updateDeferLoadingCount(-1);
 
     if (m_handle->getInternal()->m_currentWebChallenge.isNull())
         m_handle->getInternal()->m_currentWebChallenge = AuthenticationChallenge(protectionSpace, credential, 0, m_response, ResourceError());

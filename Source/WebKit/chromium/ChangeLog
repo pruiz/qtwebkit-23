@@ -1,3 +1,626 @@
+2012-09-21  Kenichi Ishibashi  <bashi@chromium.org>
+
+        [Chromium] Use OpenTypeVerticalData on Linux
+        https://bugs.webkit.org/show_bug.cgi?id=97277
+
+        Reviewed by Tony Chang.
+
+        * features.gypi: Enable OPENTYPE_VERTICAL on linux and android.
+
+2012-09-21  Dirk Pranke  <dpranke@chromium.org>
+
+        Roll Chromium DEPS to r158095 to pick up typo fix in test_expectations.txt
+
+        Unreviewed, rolled DEPS.
+
+        * DEPS:
+
+2012-09-21  Dirk Pranke  <dpranke@chromium.org>
+
+        Roll Chromium DEPS to r158060
+
+        Unreviewed, rolled DEPS.
+
+        * DEPS:
+
+2012-09-21  Chris Rogers  <crogers@google.com>
+
+        Add Web Audio support for deprecated/legacy APIs
+        https://bugs.webkit.org/show_bug.cgi?id=97050
+
+        Reviewed by Eric Carlson.
+
+        * features.gypi:
+
+2012-09-21  Mark Pilgrim  <pilgrim@chromium.org>
+
+        [Chromium] remove getFontFamilyForCharacters from PlatformSupport
+        https://bugs.webkit.org/show_bug.cgi?id=96282
+
+        Reviewed by Tony Chang.
+
+        Migrating away from PlatformSupport. getFontFamilyForCharacters is
+        moved to FontCache.h and overridden by the two platforms that
+        need it (Chromium Linux and Blackberry). New files for the overrides.
+        Part of a larger refactoring series. See tracking bug 82948.
+
+        * src/PlatformSupport.cpp:
+        (WebCore):
+
+2012-09-21  Dana Jansens  <danakj@chromium.org>
+
+        [chromium] Add setters to WebFilterOperation for IPC pickling
+        https://bugs.webkit.org/show_bug.cgi?id=97147
+
+        Reviewed by James Robinson.
+
+        * tests/FilterOperationsTest.cpp:
+        (WebKit):
+        (WebKit::TEST):
+
+2012-09-21  Tony Chang  <tony@chromium.org>
+
+        [chromium] Unreviewed, remove duplicate section of WebKit.gyp pointed out by Nico.
+
+        * WebKit.gyp:
+
+2012-09-21  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-09-21  Sami Kyostila  <skyostil@chromium.org>
+
+        [chromium] Add test for ScrollingCoordinatorChromium
+        https://bugs.webkit.org/show_bug.cgi?id=96657
+
+        Reviewed by James Robinson.
+
+        Add tests for ScrollingCoordinatorChromium. These tests mainly verify that
+        fast (non-main thread) scrolling is enabled when necessary and that a proper
+        compositing layer structure is created for fixed position and accelerated
+        scrolling layers.
+
+        Tests: ScrollingCoordinatorChromiumTest.fastScrollingByDefault
+               ScrollingCoordinatorChromiumTest.fastScrollingForFixedPosition
+               ScrollingCoordinatorChromiumTest.nonFastScrollableRegion
+               ScrollingCoordinatorChromiumTest.wheelEventHandler
+               ScrollingCoordinatorChromiumTest.touchOverflowScrolling
+
+        * WebKit.gypi:
+        * tests/ScrollingCoordinatorChromiumTest.cpp: Added.
+        (WebKit):
+        (MockWebViewClient):
+        (ScrollingCoordinatorChromiumTest):
+        (WebKit::ScrollingCoordinatorChromiumTest::ScrollingCoordinatorChromiumTest):
+        (WebKit::ScrollingCoordinatorChromiumTest::createCompositedWebViewImpl):
+        (WebKit::ScrollingCoordinatorChromiumTest::registerMockedHttpURLLoad):
+        (WebKit::ScrollingCoordinatorChromiumTest::getRootScrollLayer):
+        (WebKit::TEST_F):
+        * tests/data/fixed_position.html: Added.
+        * tests/data/non_fast_scrollable.html: Added.
+        * tests/data/touch_overflow_scrolling.html: Added.
+        * tests/data/wheel_event_handler.html: Added.
+
+2012-09-20  Peter Beverloo  <peter@chromium.org>
+
+        Leverage Chromium's code to set up FIFOs for Chromium Android layout tests
+        https://bugs.webkit.org/show_bug.cgi?id=97227
+
+        Reviewed by Tony Chang.
+
+        Remove all fifo-related code together with the io_stream_forwarder_android
+        target defined in WebKitUnitTests.gyp.
+
+        * WebKitUnitTests.gyp:
+        * tests/ForwardIOStreamsAndroid.cpp: Removed.
+        * tests/ForwardIOStreamsAndroid.h: Removed.
+        * tests/RunAllTests.cpp:
+        (main):
+
+2012-09-21  Peter Beverloo  <peter@chromium.org>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-09-21  Keishi Hattori  <keishi@webkit.org>
+
+        Add datalist suggestions into DateTimeChooserParameters
+        https://bugs.webkit.org/show_bug.cgi?id=97292
+
+        Reviewed by Kent Tamura.
+
+        * src/DateTimeChooserImpl.cpp:
+        (WebKit::DateTimeChooserImpl::writeDocument): Add the necessary parameters for SuggestionPicker.
+
+2012-09-20  Tony Chang  <tony@chromium.org>
+
+        [chromium] Unreviewed build fix. webkit_unit_tests have global constructors.
+
+        * WebKitUnitTests.gyp: Remove -Wglobal-constructors.
+
+2012-09-20  Tony Chang  <tony@chromium.org>
+
+        [chromium] Enable more clang warnings
+        https://bugs.webkit.org/show_bug.cgi?id=97257
+
+        Reviewed by James Robinson.
+
+        * WebKit.gyp: Add -Wglobal-constructors. Don't add -Wunused-parameter because many of our API interfaces have named parameters with empty implementations.
+        * WebKitUnitTests.gyp: Add -Wglobal-constructors and -Wunused-parameter.
+
+2012-09-20  David Grogan  <dgrogan@chromium.org>
+
+        Fix IndexedDB unit tests
+        https://bugs.webkit.org/show_bug.cgi?id=97149
+
+        Reviewed by Tony Chang.
+
+        * tests/IDBDatabaseBackendTest.cpp:
+        Specify a desired version of -1 so that no version change transaction
+        is run.
+
+2012-09-20  Dirk Pranke  <dpranke@chromium.org>
+
+        roll Chromium to r157829.
+
+        Unreviewed, deps change.
+
+        * DEPS:
+
+2012-09-20  Nate Chapin  <japhet@chromium.org>
+
+        Unreviewed, chromium win build fix.
+        Remove spurious reference to the non-existent
+        tests/LayerPainterChromium.h in WebKit.gypi.
+
+        * WebKit.gypi:
+
+2012-09-20  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Remove unused copy of chromium compositor implementation files
+        https://bugs.webkit.org/show_bug.cgi?id=97255
+
+        Reviewed by Adam Barth.
+
+        * WebKit.gyp:
+        * WebKit.gypi:
+        * WebKitUnitTests.gyp:
+        * src/WebAnimationCurveCommon.cpp: Removed.
+        * src/WebAnimationCurveCommon.h: Removed.
+        * src/WebAnimationImpl.cpp: Removed.
+        * src/WebAnimationImpl.h: Removed.
+        * src/WebContentLayerImpl.cpp: Removed.
+        * src/WebContentLayerImpl.h: Removed.
+        * src/WebExternalTextureLayerImpl.cpp: Removed.
+        * src/WebExternalTextureLayerImpl.h: Removed.
+        * src/WebFloatAnimationCurveImpl.cpp: Removed.
+        * src/WebFloatAnimationCurveImpl.h: Removed.
+        * src/WebIOSurfaceLayerImpl.cpp: Removed.
+        * src/WebIOSurfaceLayerImpl.h: Removed.
+        * src/WebImageLayerImpl.cpp: Removed.
+        * src/WebImageLayerImpl.h: Removed.
+        * src/WebLayerImpl.cpp: Removed.
+        * src/WebLayerImpl.h: Removed.
+        * src/WebLayerTreeViewImpl.cpp: Removed.
+        * src/WebLayerTreeViewImpl.h: Removed.
+        * src/WebScrollbarLayerImpl.cpp: Removed.
+        * src/WebScrollbarLayerImpl.h: Removed.
+        * src/WebSolidColorLayerImpl.cpp: Removed.
+        * src/WebSolidColorLayerImpl.h: Removed.
+        * src/WebToCCInputHandlerAdapter.cpp: Removed.
+        * src/WebToCCInputHandlerAdapter.h: Removed.
+        * src/WebTransformAnimationCurveImpl.cpp: Removed.
+        * src/WebTransformAnimationCurveImpl.h: Removed.
+        * src/WebVideoLayerImpl.cpp: Removed.
+        * src/WebVideoLayerImpl.h: Removed.
+        * tests/CCActiveAnimationTest.cpp: Removed.
+        * tests/CCAnimationTestCommon.cpp: Removed.
+        * tests/CCAnimationTestCommon.h: Removed.
+        * tests/CCDamageTrackerTest.cpp: Removed.
+        * tests/CCDelayBasedTimeSourceTest.cpp: Removed.
+        * tests/CCDrawQuadTest.cpp: Removed.
+        * tests/CCFrameRateControllerTest.cpp: Removed.
+        * tests/CCGeometryTestUtils.cpp: Removed.
+        * tests/CCGeometryTestUtils.h: Removed.
+        * tests/CCHeadsUpDisplayTest.cpp: Removed.
+        * tests/CCKeyframedAnimationCurveTest.cpp: Removed.
+        * tests/CCLayerAnimationControllerTest.cpp: Removed.
+        * tests/CCLayerImplTest.cpp: Removed.
+        * tests/CCLayerIteratorTest.cpp: Removed.
+        * tests/CCLayerQuadTest.cpp: Removed.
+        * tests/CCLayerSorterTest.cpp: Removed.
+        * tests/CCLayerTestCommon.cpp: Removed.
+        * tests/CCLayerTestCommon.h: Removed.
+        * tests/CCLayerTreeHostCommonTest.cpp: Removed.
+        * tests/CCLayerTreeHostImplTest.cpp: Removed.
+        * tests/CCLayerTreeHostTest.cpp: Removed.
+        * tests/CCMathUtilTest.cpp: Removed.
+        * tests/CCOcclusionTrackerTest.cpp: Removed.
+        * tests/CCOcclusionTrackerTestCommon.h: Removed.
+        * tests/CCPrioritizedTextureTest.cpp: Removed.
+        * tests/CCQuadCullerTest.cpp: Removed.
+        * tests/CCRenderPassTest.cpp: Removed.
+        * tests/CCRenderSurfaceFiltersTest.cpp: Removed.
+        * tests/CCRenderSurfaceTest.cpp: Removed.
+        * tests/CCRendererGLTest.cpp: Removed.
+        * tests/CCResourceProviderTest.cpp: Removed.
+        * tests/CCSchedulerStateMachineTest.cpp: Removed.
+        * tests/CCSchedulerTest.cpp: Removed.
+        * tests/CCSchedulerTestCommon.h: Removed.
+        * tests/CCScopedTextureTest.cpp: Removed.
+        * tests/CCScrollbarAnimationControllerLinearFadeTest.cpp: Removed.
+        * tests/CCSolidColorLayerImplTest.cpp: Removed.
+        * tests/CCTestCommon.h: Removed.
+        * tests/CCTextureUpdateControllerTest.cpp: Removed.
+        * tests/CCThreadTaskTest.cpp: Removed.
+        * tests/CCThreadedTest.cpp: Removed.
+        * tests/CCThreadedTest.h: Removed.
+        * tests/CCTiledLayerImplTest.cpp: Removed.
+        * tests/CCTiledLayerTestCommon.cpp: Removed.
+        * tests/CCTiledLayerTestCommon.h: Removed.
+        * tests/CCTimerTest.cpp: Removed.
+        * tests/ContentLayerChromiumTest.cpp: Removed.
+        * tests/FakeCCLayerTreeHostClient.h: Removed.
+        * tests/FakeGraphicsContext3DTest.cpp: Removed.
+        * tests/FakeWebScrollbarThemeGeometry.h: Removed.
+        * tests/FloatQuadTest.cpp: Removed.
+        * tests/GraphicsLayerChromiumTest.cpp:
+        * tests/ImageLayerChromiumTest.cpp:
+        * tests/LayerChromiumTest.cpp: Removed.
+        * tests/MockCCQuadCuller.h: Removed.
+        * tests/ScrollbarLayerChromiumTest.cpp: Removed.
+        * tests/TextureCopierTest.cpp: Removed.
+        * tests/TextureLayerChromiumTest.cpp: Removed.
+        * tests/ThrottledTextureUploaderTest.cpp: Removed.
+        * tests/TiledLayerChromiumTest.cpp: Removed.
+        * tests/TreeSynchronizerTest.cpp: Removed.
+        * tests/WebAnimationTest.cpp: Removed.
+        * tests/WebFloatAnimationCurveTest.cpp: Removed.
+        * tests/WebLayerTest.cpp: Removed.
+        * tests/WebLayerTreeViewTest.cpp: Removed.
+        * tests/WebTransformAnimationCurveTest.cpp: Removed.
+        * tests/WebTransformOperationsTest.cpp: Removed.
+        * tests/WebTransformationMatrixTest.cpp: Removed.
+
+2012-09-20  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Extend UserMediaRequest with a ownerDocument method
+        https://bugs.webkit.org/show_bug.cgi?id=97095
+
+        Reviewed by Adam Barth.
+
+        Chromium need to know exactly which frame called getUserMedia so that it can clean
+        away the stream when the frame goes away.
+        Since that information is available in webkit add an accessor method.
+
+        Also taking the opportunity to remove an unused deprecated method,
+        and adding asserts in case the object is empty.
+
+        * public/WebUserMediaRequest.h:
+        (WebKit):
+        (WebUserMediaRequest):
+        * src/WebUserMediaRequest.cpp:
+        (WebKit::WebUserMediaRequest::ownerDocument):
+
+2012-09-20  Mike West  <mkwst@google.com>
+
+        [chromium] Adding the 'google_apis' directory to .gitignore.
+        https://bugs.webkit.org/show_bug.cgi?id=97187
+
+        Reviewed by Jochen Eisinger.
+
+        'chromium/google_apis' should be ignored, as it's not in the git repo.
+
+        * .gitignore:
+
+2012-09-19  Adam Barth  <abarth@webkit.org>
+
+        Remove webkitPostMessage
+        https://bugs.webkit.org/show_bug.cgi?id=96577
+
+        Reviewed by Ojan Vafai.
+
+        Actually disable webkitPostMessage. See
+        http://trac.webkit.org/changeset/128658 for more information.
+
+        * features.gypi:
+
+2012-09-19  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: Remove "current transaction" concept from backing store
+        https://bugs.webkit.org/show_bug.cgi?id=96663
+
+        Reviewed by Tony Chang.
+
+        Update fake class with new method signatures.
+
+        * tests/IDBFakeBackingStore.h:
+
+2012-09-19  Terry Anderson  <tdanderson@chromium.org>
+
+        [chromium] Store the contents scale factor in PlatformContextSkia on initialization
+        https://bugs.webkit.org/show_bug.cgi?id=96137
+
+        Reviewed by Stephen White.
+
+        Define SK_SUPPORT_HINTING_SCALE_FACTOR by default. This is also used
+        for the skia patch here: https://codereview.appspot.com/6506099/.
+        Also added two new unit tests.
+
+        * features.gypi:
+        * tests/OpaqueRectTrackingContentLayerDelegateTest.cpp:
+        (WebCore):
+        (WebCore::HintingScaleCallback::HintingScaleCallback):
+        (HintingScaleCallback):
+        (WebCore::HintingScaleCallback::operator()):
+        (WebCore::TEST_F):
+        * tests/PlatformContextSkiaTest.cpp:
+        (WebCore):
+        (WebCore::TEST):
+
+2012-09-19  David Grogan  <dgrogan@chromium.org>
+
+        Disable some failing IDB tests
+        https://bugs.webkit.org/show_bug.cgi?id=97135
+
+        Reviewed by Nate Chapin.
+
+        They were broken in r129037.
+
+        * tests/IDBDatabaseBackendTest.cpp:
+
+2012-09-19  Alpha Lam  <hclam@chromium.org>
+
+        [chromium] Unreviewed. Build fix.
+
+        Not building WebImageTest.cpp for component build.
+
+        * WebKit.gyp:
+
+2012-09-19  Alpha Lam  <hclam@chromium.org>
+
+        [chromium] WebImage should use ImageDecoder directly
+        https://bugs.webkit.org/show_bug.cgi?id=96135
+
+        Reviewed by Adam Barth.
+
+        This patch is for preparation of deferred image decoding.
+        ImageSource will be used as a portal to access deferred image decoder
+        by BitmapImage, it should not be accessible through WebKit APIs.
+
+        WebImage now calls ImageDecoder directly which is the actual
+        implementation of an image decoder.
+
+        Tests: WebImageTest.PNGImage
+               WebImageTest.ICOImage
+               WebImageTest.BadImage
+
+        * WebKit.gypi:
+        * src/WebImageSkia.cpp:
+        (WebKit::WebImage::fromData):
+        (WebKit::WebImage::framesFromData):
+        * tests/WebImageTest.cpp: Added.
+        (WebKit):
+        (WebKit::readFile):
+        (WebKit::TEST):
+        * tests/data/black-and-white.ico: Added.
+        * tests/data/white-1x1.png: Added.
+
+2012-09-19  Oli Lan  <olilan@chromium.org>
+
+        [chromium] Add a method didHandleGestureEvent to WebViewClient, called from WebViewImpl::handleGestureEvent.
+        https://bugs.webkit.org/show_bug.cgi?id=96112
+
+        Reviewed by Adam Barth.
+
+        Adds a new method didHandleGestureEvent to WebViewClient, called from WebViewImpl::handleGestureEvent.
+
+        This will be used by the Android port to implement platform-specific gesture behaviour.
+
+        This is tested by the new test WebViewTest.ClientTapHandlers.
+
+        * public/WebViewClient.h:
+        (WebViewClient):
+        (WebKit::WebViewClient::didHandleGestureEvent):
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::handleGestureEvent):
+        * tests/WebViewTest.cpp:
+
+2012-09-19  Robert Flack  <flackr@chromium.org>
+
+        [chromium] Support high DPI scroll bar on top level web frame.
+        https://bugs.webkit.org/show_bug.cgi?id=95134
+
+        Reviewed by Adrienne Walker.
+
+        Calls setAppliesPageScale(true) on root scrollbar layers as these are not scaled.
+
+        * src/NonCompositedContentHost.cpp:
+        (WebKit::setScrollbarBoundsContainPageScale):
+        (WebKit):
+        (WebKit::NonCompositedContentHost::setViewport):
+
+2012-09-19  Mark Pilgrim  <pilgrim@chromium.org>
+
+        [Chromium] Move notifyJSOutOfMemory out of PlatformSupport
+        https://bugs.webkit.org/show_bug.cgi?id=97116
+
+        Reviewed by Adam Barth.
+
+        Part of a refactoring series. See tracking bug 82948.
+        
+        * src/FrameLoaderClientImpl.cpp:
+        (WebKit::FrameLoaderClientImpl::didExhaustMemoryAvailableForScript):
+        (WebKit):
+        * src/FrameLoaderClientImpl.h:
+        (FrameLoaderClientImpl):
+        * src/PlatformSupport.cpp:
+        (WebCore):
+
+2012-09-19  Mark Pilgrim  <pilgrim@chromium.org>
+
+        [Chromium] Remove unused popupsAllowed function from PlatformSupport
+        https://bugs.webkit.org/show_bug.cgi?id=96521
+
+        Reviewed by Eric Seidel.
+
+        Part of a refactoring series. See tracking bug 82948.
+
+        * src/PlatformSupport.cpp:
+        (WebCore):
+
+2012-09-19  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Fix crash in WebFrameImpl::loadHistoryItem
+        https://bugs.webkit.org/show_bug.cgi?id=96352
+
+        Reviewed by Adam Barth.
+
+        We have some crash reports with the following stack:
+          - HistoryItem::shouldDoSameDocumentNavigationTo.
+          - WebFrameImpl::loadHistoryItem
+          ...
+
+        We don't have reproducible steps, and not sure what's the root
+        cause. Anyway we should check nullness of currentItem because
+        HistoryController::m_currentItem can be 0.
+
+        * src/WebFrameImpl.cpp:
+        (WebKit::WebFrameImpl::loadHistoryItem):
+        Check nullness of currentItem.
+
+2012-09-18  Sailesh Agrawal  <sail@chromium.org>
+
+        Chromium: Scrollbar with tickmarks doesn't respond to clicks
+        https://bugs.webkit.org/show_bug.cgi?id=96049
+
+        Reviewed by Beth Dakin.
+
+        Pipe isAlphaLocked and setIsAlphaLocked.
+
+        * src/WebPluginScrollbarImpl.cpp:
+        (WebKit::WebPluginScrollbarImpl::isAlphaLocked):
+        (WebKit):
+        (WebKit::WebPluginScrollbarImpl::setIsAlphaLocked):
+        * src/WebPluginScrollbarImpl.h:
+        (WebPluginScrollbarImpl):
+        * src/WebScrollbarThemeClientImpl.cpp:
+        (WebKit::WebScrollbarThemeClientImpl::isAlphaLocked):
+        (WebKit):
+        (WebKit::WebScrollbarThemeClientImpl::setIsAlphaLocked):
+        * src/WebScrollbarThemeClientImpl.h:
+        (WebScrollbarThemeClientImpl):
+        * tests/ScrollbarLayerChromiumTest.cpp:
+
+2012-09-18  Alpha Lam  <hclam@chromium.org>
+
+        Unreviewed, rolling out r128939.
+        http://trac.webkit.org/changeset/128939
+        https://bugs.webkit.org/show_bug.cgi?id=96135
+
+        Failing test_shell_tests.
+
+        * WebKit.gypi:
+        * src/WebImageSkia.cpp:
+        (WebKit::WebImage::fromData):
+        (WebKit::WebImage::framesFromData):
+        * tests/WebImageTest.cpp: Removed.
+        * tests/data/black-and-white.ico: Removed.
+        * tests/data/white-1x1.png: Removed.
+
+2012-09-18  Alpha Lam  <hclam@chromium.org>
+
+        [chromium] WebImage should use ImageDecoder directly
+        https://bugs.webkit.org/show_bug.cgi?id=96135
+
+        Reviewed by Adam Barth.
+
+        This patch is for preparation of deferred image decoding.
+        ImageSource will be used as a portal to access deferred image decoder
+        by BitmapImage, it should not be accessible through WebKit APIs.
+
+        WebImage now calls ImageDecoder directly which is the actual
+        implementation of an image decoder.
+
+        Tests: WebImageTest.PNGImage
+               WebImageTest.ICOImage
+
+        * WebKit.gypi:
+        * src/WebImageSkia.cpp:
+        (WebKit::WebImage::fromData):
+        (WebKit::WebImage::framesFromData):
+        * tests/WebImageTest.cpp: Added.
+        (WebKit):
+        (WebKit::readFile):
+        (WebKit::TEST):
+        * tests/data/black-and-white.ico: Added.
+        * tests/data/white-1x1.png: Added.
+
+2012-09-18  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Create a flag to enable PeerConnection00
+        https://bugs.webkit.org/show_bug.cgi?id=96989
+
+        Reviewed by Adam Barth.
+
+        Adding the functionality to separately enable/disable PeerConnection00.
+        For now it is enabled by default.
+
+        * public/WebRuntimeFeatures.h:
+        (WebRuntimeFeatures):
+        * src/WebRuntimeFeatures.cpp:
+        (WebKit::WebRuntimeFeatures::enableDeprecatedPeerConnection):
+        (WebKit):
+        (WebKit::WebRuntimeFeatures::isDeprecatedPeerConnectionEnabled):
+
+2012-09-18  Iain Merrick  <husky@google.com>
+
+        [Chromium] Merge moveSelectionStart, moveSelectionEnd, and moveCaret into selectRange
+        https://bugs.webkit.org/show_bug.cgi?id=96508
+
+        Reviewed by Ryosuke Niwa.
+
+        These methods had "start" and "end" parameters, but this is incorrect.
+        selectRange() actually takes base and extent (where the user actually
+        touched), and selectionBounds() returns anchor and focus (base and extent
+        expanded to account for the selection granularity).
+
+        This patch fixes the parameter names, and updates selectRange, its test
+        and its documentation to reflect the correct usage. It also removes
+        moveSelectionStart/moveSelectionEnd/moveCaret (which aren't being used
+        yet), and updates WebFrameTest to show how these can be implemented via
+        selectRange.
+
+        * public/WebFrame.h:
+        (WebFrame):
+        * public/WebWidget.h:
+        (WebWidget):
+        (WebKit::WebWidget::selectionBounds):
+        * src/WebFrameImpl.cpp:
+        (WebKit::WebFrameImpl::selectRange):
+        * src/WebFrameImpl.h:
+        (WebFrameImpl):
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::selectionBounds):
+        * src/WebViewImpl.h:
+        (WebViewImpl):
+        * tests/WebFrameTest.cpp:
+
+2012-09-18  Terry Anderson  <tdanderson@chromium.org>
+
+        Roll chromium DEPS to r157342
+        https://bugs.webkit.org/show_bug.cgi?id=96963
+
+        Reviewed by Stephen White.
+
+        Roll chromium DEPS to r157342. Also include the top-level directory 
+        google_apis as a dependency, which was required for r157130.
+
+        * DEPS:
+
 2012-09-17  Brian Anderson  <brianderson@chromium.org>
 
         [chromium] Add rendering commit statistics

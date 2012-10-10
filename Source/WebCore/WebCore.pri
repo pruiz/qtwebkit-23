@@ -131,7 +131,7 @@ contains(DEFINES, ENABLE_NETSCAPE_PLUGIN_API=1) {
             # Note: XP_MACOSX is defined in npapi.h
         } else {
             xlibAvailable() {
-                CONFIG += x11
+                CONFIG *= x11
                 LIBS += -lXrender
                 DEFINES += MOZ_X11
             }
@@ -178,7 +178,7 @@ contains(DEFINES, ENABLE_GAMEPAD=1) {
 
 contains(DEFINES, WTF_USE_GSTREAMER=1) {
     DEFINES += ENABLE_GLIB_SUPPORT=1
-    PKGCONFIG += glib-2.0 gio-2.0 gstreamer-0.10 gstreamer-app-0.10 gstreamer-base-0.10 gstreamer-interfaces-0.10 gstreamer-pbutils-0.10 gstreamer-plugins-base-0.10
+    PKGCONFIG += glib-2.0 gio-2.0 gstreamer-0.10 gstreamer-app-0.10 gstreamer-base-0.10 gstreamer-interfaces-0.10 gstreamer-pbutils-0.10 gstreamer-plugins-base-0.10 gstreamer-video-0.10
 }
 
 contains(DEFINES, ENABLE_VIDEO=1) {
@@ -204,7 +204,6 @@ contains(DEFINES, ENABLE_VIDEO=1) {
         }
     } else:contains(DEFINES, WTF_USE_GSTREAMER=1) {
         INCLUDEPATH += $$SOURCE_DIR/platform/graphics/gstreamer
-        PKGCONFIG += gstreamer-video-0.10
     } else:contains(DEFINES, WTF_USE_QT_MULTIMEDIA=1) {
         CONFIG   *= mobility
         MOBILITY *= multimedia
@@ -222,7 +221,10 @@ contains(DEFINES, ENABLE_WEB_AUDIO=1) {
 contains(DEFINES, WTF_USE_3D_GRAPHICS=1) {
     contains(QT_CONFIG, opengles2):!win32: LIBS += -lEGL
     mac: LIBS += -framework IOSurface -framework CoreFoundation
-    linux-*:contains(DEFINES, HAVE_XCOMPOSITE=1): LIBS += -lXcomposite
+    linux-*: {
+        LIBS += -lXcomposite -lXrender
+        CONFIG *= x11
+    }
     haveQt(4): QT *= opengl
 }
 

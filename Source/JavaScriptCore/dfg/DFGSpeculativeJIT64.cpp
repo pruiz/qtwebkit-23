@@ -2119,9 +2119,6 @@ void SpeculativeJIT::compile(Node& node)
         break;
 
     case PhantomArguments:
-        // This should never be must-generate.
-        ASSERT_NOT_REACHED();
-        // But as a release-mode fall-back make it the empty value.
         initConstantInfo(m_compileIndex);
         break;
 
@@ -2280,6 +2277,15 @@ void SpeculativeJIT::compile(Node& node)
         noResult(m_compileIndex);
 
         recordSetLocal(node.local(), ValueSource(ValueInRegisterFile));
+
+        // If we're storing an arguments object that has been optimized away,
+        // our variable event stream for OSR exit now reflects the optimized
+        // value (JSValue()). On the slow path, we want an arguments object
+        // instead. We add an additional move hint to show OSR exit that it
+        // needs to reconstruct the arguments object.
+        if (at(node.child1()).op() == PhantomArguments)
+            compileMovHint(node);
+
         break;
     }
 
@@ -2563,6 +2569,11 @@ void SpeculativeJIT::compile(Node& node)
         checkArray(node);
         break;
     }
+        
+    case Arrayify: {
+        arrayify(node);
+        break;
+    }
 
     case GetByVal: {
         switch (node.arrayMode()) {
@@ -2603,7 +2614,8 @@ void SpeculativeJIT::compile(Node& node)
             jsValueResult(result.gpr(), m_compileIndex);
             break;
         }
-        case OUT_OF_BOUNDS_ARRAY_STORAGE_MODES: {
+        case OUT_OF_BOUNDS_ARRAY_STORAGE_MODES:
+        case ALL_EFFECTFUL_ARRAY_STORAGE_MODES: {
             SpeculateCellOperand base(this, node.child1());
             SpeculateStrictInt32Operand property(this, node.child2());
             StorageOperand storage(this, node.child3());
@@ -2723,7 +2735,8 @@ void SpeculativeJIT::compile(Node& node)
         GPRReg propertyReg = property.gpr();
 
         switch (arrayMode) {
-        case ALL_ARRAY_STORAGE_MODES: {
+        case ALL_ARRAY_STORAGE_MODES:
+        case ALL_EFFECTFUL_ARRAY_STORAGE_MODES: {
             JSValueOperand value(this, child3);
 
             GPRReg valueReg = value.gpr();
@@ -2753,31 +2766,40 @@ void SpeculativeJIT::compile(Node& node)
             if (isInBoundsAccess(arrayMode))
                 speculationCheck(OutOfBounds, JSValueRegs(), NoNode, beyondArrayBounds);
 
+            // Check if we're writing to a hole; if so increment m_numValuesInVector.
+            MacroAssembler::Jump isHoleValue;
+            if (!mayStoreToHole(arrayMode)) {
+                // This is uncountable because if we take this exit, then the baseline JIT
+                // will immediately count the hole store. So there is no need for exit
+                // profiling.
+                speculationCheck(
+                    Uncountable, JSValueRegs(), NoNode,
+                    m_jit.branchTestPtr(MacroAssembler::Zero, MacroAssembler::BaseIndex(storageReg, propertyReg, MacroAssembler::ScalePtr, OBJECT_OFFSETOF(ArrayStorage, m_vector[0]))));
+            } else {
+                MacroAssembler::Jump notHoleValue = m_jit.branchTestPtr(MacroAssembler::NonZero, MacroAssembler::BaseIndex(storageReg, propertyReg, MacroAssembler::ScalePtr, OBJECT_OFFSETOF(ArrayStorage, m_vector[0])));
+                if (isSlowPutAccess(arrayMode)) {
+                    // This is sort of strange. If we wanted to optimize this code path, we would invert
+                    // the above branch. But it's simply not worth it since this only happens if we're
+                    // already having a bad time.
+                    isHoleValue = m_jit.jump();
+                } else {
+                    m_jit.add32(TrustedImm32(1), MacroAssembler::Address(storageReg, OBJECT_OFFSETOF(ArrayStorage, m_numValuesInVector)));
+                
+                    // If we're writing to a hole we might be growing the array; 
+                    MacroAssembler::Jump lengthDoesNotNeedUpdate = m_jit.branch32(MacroAssembler::Below, propertyReg, MacroAssembler::Address(storageReg, ArrayStorage::lengthOffset()));
+                    m_jit.add32(TrustedImm32(1), propertyReg);
+                    m_jit.store32(propertyReg, MacroAssembler::Address(storageReg, ArrayStorage::lengthOffset()));
+                    m_jit.sub32(TrustedImm32(1), propertyReg);
+                
+                    lengthDoesNotNeedUpdate.link(&m_jit);
+                }
+                notHoleValue.link(&m_jit);
+            }
+            
             base.use();
             property.use();
             value.use();
             storage.use();
-        
-            // Check if we're writing to a hole; if so increment m_numValuesInVector.
-            MacroAssembler::Jump notHoleValue = m_jit.branchTestPtr(MacroAssembler::NonZero, MacroAssembler::BaseIndex(storageReg, propertyReg, MacroAssembler::ScalePtr, OBJECT_OFFSETOF(ArrayStorage, m_vector[0])));
-            MacroAssembler::Jump isHoleValue;
-            if (isSlowPutAccess(arrayMode)) {
-                // This is sort of strange. If we wanted to optimize this code path, we would invert
-                // the above branch. But it's simply not worth it since this only happens if we're
-                // already having a bad time.
-                isHoleValue = m_jit.jump();
-            } else {
-                m_jit.add32(TrustedImm32(1), MacroAssembler::Address(storageReg, OBJECT_OFFSETOF(ArrayStorage, m_numValuesInVector)));
-                
-                // If we're writing to a hole we might be growing the array; 
-                MacroAssembler::Jump lengthDoesNotNeedUpdate = m_jit.branch32(MacroAssembler::Below, propertyReg, MacroAssembler::Address(storageReg, ArrayStorage::lengthOffset()));
-                m_jit.add32(TrustedImm32(1), propertyReg);
-                m_jit.store32(propertyReg, MacroAssembler::Address(storageReg, ArrayStorage::lengthOffset()));
-                m_jit.sub32(TrustedImm32(1), propertyReg);
-                
-                lengthDoesNotNeedUpdate.link(&m_jit);
-            }
-            notHoleValue.link(&m_jit);
 
             // Store the value to the array.
             m_jit.storePtr(valueReg, MacroAssembler::BaseIndex(storageReg, propertyReg, MacroAssembler::ScalePtr, OBJECT_OFFSETOF(ArrayStorage, m_vector[0])));
@@ -4100,7 +4122,7 @@ void SpeculativeJIT::compile(Node& node)
         GPRTemporary result(this);
         GPRReg indexGPR = index.gpr();
         GPRReg resultGPR = result.gpr();
-        
+
         if (!isEmptySpeculation(
                 m_state.variables().operand(
                     m_jit.graph().argumentsRegisterFor(node.codeOrigin)).m_type)) {
@@ -4128,18 +4150,40 @@ void SpeculativeJIT::compile(Node& node)
                     resultGPR,
                     JITCompiler::payloadFor(RegisterFile::ArgumentCount)));
         }
-            
+
+        JITCompiler::JumpList slowArgument;
+        JITCompiler::JumpList slowArgumentOutOfBounds;
+        if (const SlowArgument* slowArguments = m_jit.symbolTableFor(node.codeOrigin)->slowArguments()) {
+            slowArgumentOutOfBounds.append(
+                m_jit.branch32(
+                    JITCompiler::AboveOrEqual, indexGPR,
+                    Imm32(m_jit.symbolTableFor(node.codeOrigin)->parameterCount())));
+
+            COMPILE_ASSERT(sizeof(SlowArgument) == 8, SlowArgument_size_is_eight_bytes);
+            m_jit.move(ImmPtr(slowArguments), resultGPR);
+            m_jit.load32(
+                JITCompiler::BaseIndex(
+                    resultGPR, indexGPR, JITCompiler::TimesEight, 
+                    OBJECT_OFFSETOF(SlowArgument, index)), 
+                resultGPR);
+            m_jit.signExtend32ToPtr(resultGPR, resultGPR);
+            m_jit.loadPtr(
+                JITCompiler::BaseIndex(
+                    GPRInfo::callFrameRegister, resultGPR, JITCompiler::TimesEight, m_jit.offsetOfLocals(node.codeOrigin)),
+                resultGPR);
+            slowArgument.append(m_jit.jump());
+        }
+        slowArgumentOutOfBounds.link(&m_jit);
+
         m_jit.neg32(resultGPR);
         m_jit.signExtend32ToPtr(resultGPR, resultGPR);
             
         m_jit.loadPtr(
             JITCompiler::BaseIndex(
-                GPRInfo::callFrameRegister, resultGPR, JITCompiler::TimesEight,
-                ((node.codeOrigin.inlineCallFrame
-                  ? node.codeOrigin.inlineCallFrame->stackOffset
-                  : 0) + CallFrame::argumentOffsetIncludingThis(0)) * sizeof(Register)),
+                GPRInfo::callFrameRegister, resultGPR, JITCompiler::TimesEight, m_jit.offsetOfArgumentsIncludingThis(node.codeOrigin)),
             resultGPR);
 
+        slowArgument.link(&m_jit);
         jsValueResult(resultGPR, m_compileIndex);
         break;
     }
@@ -4172,15 +4216,36 @@ void SpeculativeJIT::compile(Node& node)
                     JITCompiler::payloadFor(RegisterFile::ArgumentCount)));
         }
         
+        JITCompiler::JumpList slowArgument;
+        JITCompiler::JumpList slowArgumentOutOfBounds;
+        if (const SlowArgument* slowArguments = m_jit.symbolTableFor(node.codeOrigin)->slowArguments()) {
+            slowArgumentOutOfBounds.append(
+                m_jit.branch32(
+                    JITCompiler::AboveOrEqual, indexGPR,
+                    Imm32(m_jit.symbolTableFor(node.codeOrigin)->parameterCount())));
+
+            COMPILE_ASSERT(sizeof(SlowArgument) == 8, SlowArgument_size_is_eight_bytes);
+            m_jit.move(ImmPtr(slowArguments), resultGPR);
+            m_jit.load32(
+                JITCompiler::BaseIndex(
+                    resultGPR, indexGPR, JITCompiler::TimesEight, 
+                    OBJECT_OFFSETOF(SlowArgument, index)), 
+                resultGPR);
+            m_jit.signExtend32ToPtr(resultGPR, resultGPR);
+            m_jit.loadPtr(
+                JITCompiler::BaseIndex(
+                    GPRInfo::callFrameRegister, resultGPR, JITCompiler::TimesEight, m_jit.offsetOfLocals(node.codeOrigin)),
+                resultGPR);
+            slowArgument.append(m_jit.jump());
+        }
+        slowArgumentOutOfBounds.link(&m_jit);
+
         m_jit.neg32(resultGPR);
         m_jit.signExtend32ToPtr(resultGPR, resultGPR);
         
         m_jit.loadPtr(
             JITCompiler::BaseIndex(
-                GPRInfo::callFrameRegister, resultGPR, JITCompiler::TimesEight,
-                ((node.codeOrigin.inlineCallFrame
-                  ? node.codeOrigin.inlineCallFrame->stackOffset
-                  : 0) + CallFrame::argumentOffsetIncludingThis(0)) * sizeof(Register)),
+                GPRInfo::callFrameRegister, resultGPR, JITCompiler::TimesEight, m_jit.offsetOfArgumentsIncludingThis(node.codeOrigin)),
             resultGPR);
         
         if (node.codeOrigin.inlineCallFrame) {
@@ -4198,6 +4263,7 @@ void SpeculativeJIT::compile(Node& node)
                     indexGPR));
         }
         
+        slowArgument.link(&m_jit);
         jsValueResult(resultGPR, m_compileIndex);
         break;
     }

@@ -223,6 +223,7 @@ SET (EWebKit2_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_navigation_policy_decision.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_popup_menu_item.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_settings.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_touch.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_url_request.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_url_response.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_url_scheme_request.h"
@@ -261,6 +262,7 @@ ENDIF()
 
 SET(WEBKIT2_EFL_TEST_DIR "${WEBKIT2_DIR}/UIProcess/API/efl/tests")
 SET(TEST_RESOURCES_DIR ${WEBKIT2_EFL_TEST_DIR}/resources)
+SET(TEST_INJECTED_BUNDLE_DIR ${WEBKIT2_EFL_TEST_DIR}/InjectedBundle)
 
 ADD_DEFINITIONS(-DTEST_RESOURCES_DIR=\"${TEST_RESOURCES_DIR}\"
     -DTEST_THEME_DIR=\"${THEME_BINARY_DIR}\"
@@ -300,6 +302,9 @@ IF (ENABLE_API_TESTS)
         SET_TESTS_PROPERTIES(${testName} PROPERTIES TIMEOUT 60)
         TARGET_LINK_LIBRARIES(${testName} ${EWK2UnitTests_LIBRARIES} ewk2UnitTestUtils)
     ENDFOREACH ()
+
+    ADD_LIBRARY(ewk2UnitTestInjectedBundleSample SHARED ${TEST_INJECTED_BUNDLE_DIR}/injected_bundle_sample.cpp)
+    SET_TARGET_PROPERTIES(ewk2UnitTestInjectedBundleSample PROPERTIES LIBRARY_OUTPUT_DIRECTORY "${TEST_RESOURCES_DIR}")
 ENDIF ()
 
 IF (ENABLE_INSPECTOR)

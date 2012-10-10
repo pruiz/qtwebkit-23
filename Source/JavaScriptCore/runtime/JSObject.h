@@ -259,39 +259,9 @@ namespace JSC {
             switch (structure()->indexingType()) {
             case ALL_ARRAY_STORAGE_INDEXING_TYPES: {
                 ArrayStorage* storage = m_butterfly->arrayStorage();
-#if CHECK_ARRAY_CONSISTENCY
-                ASSERT(storage->m_inCompactInitialization);
-                // Check that we are initializing the next index in sequence.
-                ASSERT(i == storage->m_initializationIndex);
-                // tryCreateUninitialized set m_numValuesInVector to the initialLength,
-                // check we do not try to initialize more than this number of properties.
-                ASSERT(storage->m_initializationIndex < storage->m_numValuesInVector);
-                storage->m_initializationIndex++;
-#endif
                 ASSERT(i < storage->length());
                 ASSERT(i < storage->m_numValuesInVector);
                 storage->m_vector[i].set(globalData, this, v);
-                break;
-            }
-            default:
-                ASSERT_NOT_REACHED();
-            }
-        }
-        
-        void completeInitialization(unsigned newLength)
-        {
-            switch (structure()->indexingType()) {
-            case ALL_ARRAY_STORAGE_INDEXING_TYPES: {
-                ArrayStorage* storage = m_butterfly->arrayStorage();
-                // Check that we have initialized as meny properties as we think we have.
-                UNUSED_PARAM(storage);
-                ASSERT_UNUSED(newLength, newLength == storage->length());
-#if CHECK_ARRAY_CONSISTENCY
-                // Check that the number of propreties initialized matches the initialLength.
-                ASSERT(storage->m_initializationIndex == m_storage->m_numValuesInVector);
-                ASSERT(storage->m_inCompactInitialization);
-                storage->m_inCompactInitialization = false;
-#endif
                 break;
             }
             default:
@@ -336,7 +306,8 @@ namespace JSC {
 
         JS_EXPORT_PRIVATE static JSValue defaultValue(const JSObject*, ExecState*, PreferredPrimitiveType);
 
-        JS_EXPORT_PRIVATE static bool hasInstance(JSObject*, ExecState*, JSValue, JSValue prototypeProperty);
+        bool hasInstance(ExecState*, JSValue);
+        static bool defaultHasInstance(ExecState*, JSValue, JSValue prototypeProperty);
 
         JS_EXPORT_PRIVATE static void getOwnPropertyNames(JSObject*, ExecState*, PropertyNameArray&, EnumerationMode);
         JS_EXPORT_PRIVATE static void getOwnNonIndexPropertyNames(JSObject*, ExecState*, PropertyNameArray&, EnumerationMode);
@@ -505,6 +476,25 @@ namespace JSC {
         // foo->attemptToInterceptPutByIndexOnHole(...);
         bool attemptToInterceptPutByIndexOnHoleForPrototype(ExecState*, JSValue thisValue, unsigned propertyName, JSValue, bool shouldThrow);
         
+        // Ensure that the object is in a mode where it has array storage. Use
+        // this if you're about to perform actions that would have required the
+        // object to be converted to have array storage, if it didn't have it
+        // already.
+        ArrayStorage* ensureArrayStorage(JSGlobalData& globalData)
+        {
+            switch (structure()->indexingType()) {
+            case ALL_ARRAY_STORAGE_INDEXING_TYPES:
+                return m_butterfly->arrayStorage();
+                
+            case ALL_BLANK_INDEXING_TYPES:
+                return createInitialArrayStorage(globalData);
+                
+            default:
+                ASSERT_NOT_REACHED();
+                return 0;
+            }
+        }
+        
         static size_t offsetOfInlineStorage();
         
         static ptrdiff_t butterflyOffset()
@@ -565,25 +555,6 @@ namespace JSC {
             }
         }
 
-        // Ensure that the object is in a mode where it has array storage. Use
-        // this if you're about to perform actions that would have required the
-        // object to be converted to have array storage, if it didn't have it
-        // already.
-        ArrayStorage* ensureArrayStorage(JSGlobalData& globalData)
-        {
-            switch (structure()->indexingType()) {
-            case ALL_ARRAY_STORAGE_INDEXING_TYPES:
-                return m_butterfly->arrayStorage();
-                
-            case ALL_BLANK_INDEXING_TYPES:
-                return createInitialArrayStorage(globalData);
-                
-            default:
-                ASSERT_NOT_REACHED();
-                return 0;
-            }
-        }
-        
         ArrayStorage* createArrayStorage(JSGlobalData&, unsigned length, unsigned vectorLength);
         ArrayStorage* createInitialArrayStorage(JSGlobalData&);
         
@@ -591,13 +562,6 @@ namespace JSC {
         
         bool defineOwnNonIndexProperty(ExecState*, PropertyName, PropertyDescriptor&, bool throwException);
 
-        enum ConsistencyCheckType { NormalConsistencyCheck, DestructorConsistencyCheck, SortConsistencyCheck };
-#if !CHECK_ARRAY_CONSISTENCY
-        void checkIndexingConsistency(ConsistencyCheckType = NormalConsistencyCheck) { }
-#else
-        void checkIndexingConsistency(ConsistencyCheckType = NormalConsistencyCheck);
-#endif
-        
         void putByIndexBeyondVectorLengthWithArrayStorage(ExecState*, unsigned propertyName, JSValue, bool shouldThrow, ArrayStorage*);
 
         bool increaseVectorLength(JSGlobalData&, unsigned newLength);

@@ -222,7 +222,8 @@ contains(DEFINES, WTF_USE_3D_GRAPHICS=1) {
     contains(QT_CONFIG, opengles2):!win32: LIBS += -lEGL
     mac: LIBS += -framework IOSurface -framework CoreFoundation
     linux-*: {
-        LIBS += -lXcomposite -lXrender
+        contains(DEFINES, HAVE_XCOMPOSITE=1): LIBS += -lXcomposite
+        LIBS += -lXrender
         CONFIG *= x11
     }
     haveQt(4): QT *= opengl

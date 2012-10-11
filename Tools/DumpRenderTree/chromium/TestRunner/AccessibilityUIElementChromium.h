@@ -71,6 +71,7 @@ private:
     void intValueGetterCallback(CppVariant*);
     void minValueGetterCallback(CppVariant*);
     void maxValueGetterCallback(CppVariant*);
+    void valueDescriptionGetterCallback(CppVariant*);
     void childrenCountGetterCallback(CppVariant*);
     void insertionPointLineNumberGetterCallback(CppVariant*);
     void selectedTextRangeGetterCallback(CppVariant*);
@@ -89,6 +90,7 @@ private:
     void isCollapsedGetterCallback(CppVariant*);
     void hasPopupGetterCallback(CppVariant*);
     void isValidGetterCallback(CppVariant*);
+    void isReadOnlyGetterCallback(CppVariant*);
     void orientationGetterCallback(CppVariant*);
 
     // Bound methods.

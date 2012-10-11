@@ -38,3 +38,7 @@ qnx {
     # required for timegm
     LIBS += -lnbutil
 }
+
+mac {
+    LIBS += -framework AppKit
+}

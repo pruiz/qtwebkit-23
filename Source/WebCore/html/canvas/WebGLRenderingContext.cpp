@@ -375,6 +375,7 @@ private:
 };
 
 class WebGLRenderingContextLostCallback : public GraphicsContext3D::ContextLostCallback {
+    WTF_MAKE_FAST_ALLOCATED;
 public:
     explicit WebGLRenderingContextLostCallback(WebGLRenderingContext* cb) : m_context(cb) { }
     virtual void onContextLost() { m_context->forceLostContext(WebGLRenderingContext::RealLostContext); }
@@ -384,6 +385,7 @@ private:
 };
 
 class WebGLRenderingContextErrorMessageCallback : public GraphicsContext3D::ErrorMessageCallback {
+    WTF_MAKE_FAST_ALLOCATED;
 public:
     explicit WebGLRenderingContextErrorMessageCallback(WebGLRenderingContext* cb) : m_context(cb) { }
     virtual void onErrorMessage(const String& message, GC3Dint) { m_context->printGLErrorToConsole(message); }
@@ -1542,22 +1544,8 @@ void WebGLRenderingContext::deleteBuffer(WebGLBuffer* buffer)
         return;
     if (m_boundArrayBuffer == buffer)
         m_boundArrayBuffer = 0;
-    RefPtr<WebGLBuffer> elementArrayBuffer = m_boundVertexArrayObject->getElementArrayBuffer();
-    if (elementArrayBuffer == buffer)
-        m_boundVertexArrayObject->setElementArrayBuffer(0);
-    if (!isGLES2Compliant()) {
-        WebGLVertexArrayObjectOES::VertexAttribState& state = m_boundVertexArrayObject->getVertexAttribState(0);
-        if (buffer == state.bufferBinding) {
-            state.bufferBinding = m_vertexAttrib0Buffer;
-            state.bytesPerElement = 0;
-            state.size = 4;
-            state.type = GraphicsContext3D::FLOAT;
-            state.normalized = false;
-            state.stride = 16;
-            state.originalStride = 0;
-            state.offset = 0;
-        }
-    }
+
+    m_boundVertexArrayObject->unbindBuffer(buffer);
 }
 
 void WebGLRenderingContext::deleteFramebuffer(WebGLFramebuffer* framebuffer)
@@ -4381,17 +4369,7 @@ void WebGLRenderingContext::vertexAttribPointer(GC3Duint index, GC3Dint size, GC
     }
     GC3Dsizei bytesPerElement = size * typeSize;
 
-    GC3Dsizei validatedStride = stride ? stride : bytesPerElement;
-
-    WebGLVertexArrayObjectOES::VertexAttribState& state = m_boundVertexArrayObject->getVertexAttribState(index);
-    state.bufferBinding = m_boundArrayBuffer;
-    state.bytesPerElement = bytesPerElement;
-    state.size = size;
-    state.type = type;
-    state.normalized = normalized;
-    state.stride = validatedStride;
-    state.originalStride = stride;
-    state.offset = static_cast<GC3Dintptr>(offset);
+    m_boundVertexArrayObject->setVertexAttribState(index, bytesPerElement, size, type, normalized, stride, static_cast<GC3Dintptr>(offset), m_boundArrayBuffer);
     m_context->vertexAttribPointer(index, size, type, normalized, stride, static_cast<GC3Dintptr>(offset));
     cleanupAfterGraphicsCall(false);
 }
@@ -5562,7 +5540,20 @@ void WebGLRenderingContext::maybeRestoreContext(Timer<WebGLRenderingContext>*)
         break;
     }
 
-    RefPtr<GraphicsContext3D> context(GraphicsContext3D::create(m_attributes, canvas()->document()->view()->root()->hostWindow()));
+    Document* document = canvas()->document();
+    if (!document)
+        return;
+    FrameView* view = document->view();
+    if (!view)
+        return;
+    ScrollView* root = view->root();
+    if (!root)
+        return;
+    HostWindow* hostWindow = root->hostWindow();
+    if (!hostWindow)
+        return;
+
+    RefPtr<GraphicsContext3D> context(GraphicsContext3D::create(m_attributes, hostWindow));
     if (!context) {
         if (m_contextLostMode == RealLostContext)
             m_restoreTimer.startOneShot(secondsBetweenRestoreAttempts);

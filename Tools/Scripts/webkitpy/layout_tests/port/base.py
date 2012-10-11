@@ -156,7 +156,7 @@ class Port(object):
         if self.get_option('webkit_test_runner'):
             # Add some more time to WebKitTestRunner because it needs to syncronise the state
             # with the web process and we want to detect if there is a problem with that in the driver.
-            return 50 * 1000
+            return 80 * 1000
         return 35 * 1000
 
     def driver_stop_timeout(self):
@@ -786,17 +786,20 @@ class Port(object):
         return self._filesystem.join(self._webkit_baseline_path(port_name), 'TestExpectations')
 
     def relative_test_filename(self, filename):
-        """Returns a test_name a realtive unix-style path for a filename under the LayoutTests
-        directory. Filenames outside the LayoutTests directory should raise
-        an error."""
+        """Returns a test_name a relative unix-style path for a filename under the LayoutTests
+        directory. Ports may legitimately return abspaths here if no relpath makes sense."""
         # Ports that run on windows need to override this method to deal with
         # filenames with backslashes in them.
-        assert filename.startswith(self.layout_tests_dir()), "%s did not start with %s" % (filename, self.layout_tests_dir())
-        return filename[len(self.layout_tests_dir()) + 1:]
+        if filename.startswith(self.layout_tests_dir()):
+            return self.host.filesystem.relpath(filename, self.layout_tests_dir())
+        else:
+            return self.host.filesystem.abspath(filename)
 
     def relative_perf_test_filename(self, filename):
-        assert filename.startswith(self.perf_tests_dir()), "%s did not start with %s" % (filename, self.perf_tests_dir())
-        return filename[len(self.perf_tests_dir()) + 1:]
+        if filename.startswith(self.perf_tests_dir()):
+            return self.host.filesystem.relpath(filename, self.perf_tests_dir())
+        else:
+            return self.host.filesystem.abspath(filename)
 
     @memoized
     def abspath_for_test(self, test_name):
@@ -1006,7 +1009,8 @@ class Port(object):
         expectations = OrderedDict()
 
         for path in self.expectations_files():
-            expectations[path] = self._filesystem.read_text_file(path)
+            if self._filesystem.exists(path):
+                expectations[path] = self._filesystem.read_text_file(path)
 
         for path in self.get_option('additional_expectations', []):
             expanded_path = self._filesystem.expanduser(path)

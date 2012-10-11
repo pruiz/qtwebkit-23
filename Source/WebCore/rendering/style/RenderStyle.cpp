@@ -28,7 +28,6 @@
 #include "CSSPropertyNames.h"
 #include "Font.h"
 #include "FontSelector.h"
-#include "MemoryInstrumentation.h"
 #include "QuotesData.h"
 #include "RenderArena.h"
 #include "RenderObject.h"
@@ -40,6 +39,7 @@
 #if ENABLE(TOUCH_EVENTS)
 #include "RenderTheme.h"
 #endif
+#include "WebCoreMemoryInstrumentation.h"
 #include <wtf/StdLibExtras.h>
 #include <algorithm>
 
@@ -1611,8 +1611,8 @@ void RenderStyle::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     info.addMember(m_background);
     // FIXME: surrond contains some fields e.g. BorderData that might need to be instrumented.
     info.addMember(surround);
-    info.addInstrumentedMember(rareNonInheritedData);
-    info.addInstrumentedMember(rareInheritedData);
+    info.addMember(rareNonInheritedData);
+    info.addMember(rareInheritedData);
     // FIXME: inherited contains StyleImage and Font fields that might need to be instrumented.
     info.addMember(inherited);
     if (m_cachedPseudoStyles)

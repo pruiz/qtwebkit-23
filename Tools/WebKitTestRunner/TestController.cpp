@@ -55,10 +55,10 @@
 
 namespace WTR {
 
-// defaultLongTimeout + defaultShortTimeout should be less than 50,
+// defaultLongTimeout + defaultShortTimeout should be less than 80,
 // the default timeout value of the test harness so we can detect an
 // unresponsive web process.
-static const double defaultLongTimeout = 30;
+static const double defaultLongTimeout = 60;
 static const double defaultShortTimeout = 15;
 static const double defaultNoTimeout = -1;
 
@@ -91,6 +91,7 @@ TestController::TestController(int argc, const char* argv[])
     , m_didPrintWebProcessCrashedMessage(false)
     , m_shouldExitWhenWebProcessCrashes(true)
     , m_beforeUnloadReturnValue(true)
+    , m_isGeolocationPermissionAllowed(false)
 #if PLATFORM(MAC) || PLATFORM(QT) || PLATFORM(GTK) || PLATFORM(EFL)
     , m_eventSenderProxy(new EventSenderProxy(this))
 #endif
@@ -170,6 +171,15 @@ static void unfocus(WKPageRef page, const void* clientInfo)
     view->setWindowIsKey(false);
 }
 
+static void decidePolicyForGeolocationPermissionRequest(WKPageRef, WKFrameRef, WKSecurityOriginRef, WKGeolocationPermissionRequestRef permissionRequest, const void* clientInfo)
+{
+    TestController* testController = static_cast<TestController*>(const_cast<void*>(clientInfo));
+    if (testController->isGeolocationPermissionAllowed())
+        WKGeolocationPermissionRequestAllow(permissionRequest);
+    else
+        WKGeolocationPermissionRequestDeny(permissionRequest);
+}
+
 WKPageRef TestController::createOtherPage(WKPageRef oldPage, WKURLRequestRef, WKDictionaryRef, WKEventModifiers, WKEventMouseButton, const void*)
 {
     PlatformWebView* view = new PlatformWebView(WKPageGetContext(oldPage), WKPageGetPageGroup(oldPage));
@@ -209,7 +219,7 @@ WKPageRef TestController::createOtherPage(WKPageRef oldPage, WKURLRequestRef, WK
         0, // pageDidScroll
         exceededDatabaseQuota,
         0, // runOpenPanel
-        0, // decidePolicyForGeolocationPermissionRequest
+        decidePolicyForGeolocationPermissionRequest,
         0, // headerHeight
         0, // footerHeight
         0, // drawHeader
@@ -223,6 +233,8 @@ WKPageRef TestController::createOtherPage(WKPageRef oldPage, WKURLRequestRef, WK
         0, // mouseDidMoveOverElement
         0, // decidePolicyForNotificationPermissionRequest
         0, // unavailablePluginButtonClicked
+        0, // showColorPicker
+        0, // hideColorPicker
     };
     WKPageSetPageUIClient(newPage, &otherPageUIClient);
 
@@ -316,6 +328,7 @@ void TestController::initialize(int argc, const char* argv[])
     m_pageGroup.adopt(WKPageGroupCreateWithIdentifier(pageGroupIdentifier.get()));
 
     m_context.adopt(WKContextCreateWithInjectedBundlePath(injectedBundlePath()));
+    m_geolocationProvider = adoptPtr(new GeolocationProviderMock(m_context.get()));
 
     const char* path = libraryPathForTesting();
     if (path) {
@@ -377,7 +390,7 @@ void TestController::initialize(int argc, const char* argv[])
         0, // pageDidScroll
         exceededDatabaseQuota,
         0, // runOpenPanel
-        0, // decidePolicyForGeolocationPermissionRequest
+        decidePolicyForGeolocationPermissionRequest,
         0, // headerHeight
         0, // footerHeight
         0, // drawHeader
@@ -391,6 +404,8 @@ void TestController::initialize(int argc, const char* argv[])
         0, // mouseDidMoveOverElement
         decidePolicyForNotificationPermissionRequest, // decidePolicyForNotificationPermissionRequest
         0, // unavailablePluginButtonClicked
+        0, // showColorPicker
+        0, // hideColorPicker
     };
     WKPageSetPageUIClient(m_mainWebView->page(), &pageUIClient);
 
@@ -475,6 +490,8 @@ bool TestController::resetStateToConsistentValues()
     WKPreferencesSetAsynchronousPluginInitializationEnabled(preferences, false);
     WKPreferencesSetAsynchronousPluginInitializationEnabledForAllPlugins(preferences, false);
     WKPreferencesSetArtificialPluginInitializationDelayEnabled(preferences, false);
+    WKPreferencesSetTabToLinksEnabled(preferences, false);
+    WKPreferencesSetInteractiveFormValidationEnabled(preferences, true);
 
 // [Qt][WK2]REGRESSION(r104881):It broke hundreds of tests
 // FIXME: https://bugs.webkit.org/show_bug.cgi?id=76247
@@ -685,8 +702,37 @@ void TestController::didReceiveSynchronousMessageFromInjectedBundle(WKContextRef
 
 void TestController::didReceiveMessageFromInjectedBundle(WKStringRef messageName, WKTypeRef messageBody)
 {
+#if PLATFORM(MAC) || PLATFORM(QT) || PLATFORM(GTK) || PLATFORM(EFL)
+    if (WKStringIsEqualToUTF8CString(messageName, "EventSender")) {
+        ASSERT(WKGetTypeID(messageBody) == WKDictionaryGetTypeID());
+        WKDictionaryRef messageBodyDictionary = static_cast<WKDictionaryRef>(messageBody);
+
+        WKRetainPtr<WKStringRef> subMessageKey(AdoptWK, WKStringCreateWithUTF8CString("SubMessage"));
+        WKStringRef subMessageName = static_cast<WKStringRef>(WKDictionaryGetItemForKey(messageBodyDictionary, subMessageKey.get()));
+
+        if (WKStringIsEqualToUTF8CString(subMessageName, "MouseDown") || WKStringIsEqualToUTF8CString(subMessageName, "MouseUp")) {
+            WKRetainPtr<WKStringRef> buttonKey = adoptWK(WKStringCreateWithUTF8CString("Button"));
+            unsigned button = static_cast<unsigned>(WKUInt64GetValue(static_cast<WKUInt64Ref>(WKDictionaryGetItemForKey(messageBodyDictionary, buttonKey.get()))));
+
+            WKRetainPtr<WKStringRef> modifiersKey = adoptWK(WKStringCreateWithUTF8CString("Modifiers"));
+            WKEventModifiers modifiers = static_cast<WKEventModifiers>(WKUInt64GetValue(static_cast<WKUInt64Ref>(WKDictionaryGetItemForKey(messageBodyDictionary, modifiersKey.get()))));
+
+            // Forward to WebProcess
+            WKPageSetShouldSendEventsSynchronously(mainWebView()->page(), false);
+            if (WKStringIsEqualToUTF8CString(subMessageName, "MouseDown"))
+                m_eventSenderProxy->mouseDown(button, modifiers);
+            else
+                m_eventSenderProxy->mouseUp(button, modifiers);
+
+            return;
+        }
+        ASSERT_NOT_REACHED();
+    }
+#endif
+
     if (!m_currentInvocation)
         return;
+
     m_currentInvocation->didReceiveMessageFromInjectedBundle(messageName, messageBody);
 }
 
@@ -951,6 +997,11 @@ void TestController::processDidCrash()
 void TestController::simulateWebNotificationClick(uint64_t notificationID)
 {
     m_webNotificationProvider.simulateWebNotificationClick(notificationID);
+}
+
+void TestController::setMockGeolocationPosition(double latitude, double longitude, double accuracy)
+{
+    m_geolocationProvider->setMockGeolocationPosition(latitude, longitude, accuracy);
 }
 
 void TestController::decidePolicyForNotificationPermissionRequest(WKPageRef page, WKSecurityOriginRef origin, WKNotificationPermissionRequestRef request, const void* clientInfo)

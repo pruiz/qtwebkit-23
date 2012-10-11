@@ -33,10 +33,10 @@
 #include "CachedImage.h"
 #include "CachedResourceLoader.h"
 #include "Document.h"
-#include "MemoryInstrumentation.h"
 #include "Page.h"
 #include "StyleCachedImageSet.h"
 #include "StylePendingImage.h"
+#include "WebCoreMemoryInstrumentation.h"
 
 namespace WebCore {
 
@@ -174,7 +174,7 @@ void CSSImageSetValue::reportDescendantMemoryUsage(MemoryObjectInfo* memoryObjec
 void CSSImageSetValue::ImageWithScale::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CSS);
-    info.addInstrumentedMember(imageURL);
+    info.addMember(imageURL);
 }
 
 } // namespace WebCore

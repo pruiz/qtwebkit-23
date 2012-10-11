@@ -46,8 +46,6 @@
     # binary and increasing the speed of gdb.
     'enable_svg%': 1,
 
-    'use_libcc_for_compositor%': 0,
-
     'enable_wexit_time_destructors': 1,
 
     'use_harfbuzz_ng%': 0,
@@ -361,9 +359,9 @@
     }],  # condition OS == "mac"
     ['clang==1', {
       'target_defaults': {
-        'cflags': ['-Wglobal-constructors'],
+        'cflags': ['-Wglobal-constructors', '-Wunused-parameter'],
         'xcode_settings': {
-          'WARNING_CFLAGS': ['-Wglobal-constructors'],
+          'WARNING_CFLAGS': ['-Wglobal-constructors', '-Wunused-parameter'],
         },
       },
     }],
@@ -461,6 +459,30 @@
       ]
     },
     {
+      'target_name': 'injected_canvas_script_source',
+      'type': 'none',
+      'actions': [
+        {
+          'action_name': 'generateInjectedScriptCanvasModuleSource',
+          'inputs': [
+            '../inspector/InjectedScriptCanvasModuleSource.js',
+          ],
+          'outputs': [
+            '<(SHARED_INTERMEDIATE_DIR)/webkit/InjectedScriptCanvasModuleSource.h',
+          ],
+          'msvs_cygwin_shell': 0,
+          'action': [
+            '<(perl_exe)',
+            '../inspector/xxd.pl',
+            'InjectedScriptCanvasModuleSource_js',
+            '<@(_inputs)',
+            '<@(_outputs)'
+          ],
+          'message': 'Generating InjectedScriptCanvasModuleSource.h from InjectedScriptCanvasModuleSource.js',
+        },
+      ]
+    },
+    {
       'target_name': 'injected_script_source',
       'type': 'none',
       'actions': [
@@ -481,30 +503,6 @@
             '<@(_outputs)'
           ],
           'message': 'Generating InjectedScriptSource.h from InjectedScriptSource.js',
-        },
-      ]
-    },
-    {
-      'target_name': 'injected_webgl_script_source',
-      'type': 'none',
-      'actions': [
-        {
-          'action_name': 'generateInjectedScriptWebGLModuleSource',
-          'inputs': [
-            '../inspector/InjectedScriptWebGLModuleSource.js',
-          ],
-          'outputs': [
-            '<(SHARED_INTERMEDIATE_DIR)/webkit/InjectedScriptWebGLModuleSource.h',
-          ],
-          'msvs_cygwin_shell': 0,
-          'action': [
-            '<(perl_exe)',
-            '../inspector/xxd.pl',
-            'InjectedScriptWebGLModuleSource_js',
-            '<@(_inputs)',
-            '<@(_outputs)'
-          ],
-          'message': 'Generating InjectedScriptWebGLModuleSource.h from InjectedScriptWebGLModuleSource.js',
         },
       ]
     },
@@ -1200,8 +1198,8 @@
         'webcore_bindings_sources',
         'inspector_overlay_page',
         'inspector_protocol_sources',
+        'injected_canvas_script_source',
         'injected_script_source',
-        'injected_webgl_script_source',
         'debugger_script_source',
         '../../JavaScriptCore/JavaScriptCore.gyp/JavaScriptCore.gyp:yarr',
         '../../WTF/WTF.gyp/WTF.gyp:wtf',
@@ -1327,15 +1325,14 @@
       'type': 'none',
       'dependencies': [
         'debugger_script_source',
+        'injected_canvas_script_source',
         'injected_script_source',
-        'injected_webgl_script_source',
         'inspector_overlay_page',
         'inspector_protocol_sources',
         'webcore_bindings_sources',
         '../../ThirdParty/glu/glu.gyp:libtess',
         '../../JavaScriptCore/JavaScriptCore.gyp/JavaScriptCore.gyp:yarr',
         '../../WTF/WTF.gyp/WTF.gyp:wtf',
-        '../../Platform/Platform.gyp/Platform.gyp:webkit_platform',
         '<(chromium_src_dir)/build/temp_gyp/googleurl.gyp:googleurl',
         '<(chromium_src_dir)/skia/skia.gyp:skia',
         '<(chromium_src_dir)/third_party/iccjpeg/iccjpeg.gyp:iccjpeg',
@@ -1355,7 +1352,6 @@
       'export_dependent_settings': [
         '../../JavaScriptCore/JavaScriptCore.gyp/JavaScriptCore.gyp:yarr',
         '../../WTF/WTF.gyp/WTF.gyp:wtf',
-        '../../Platform/Platform.gyp/Platform.gyp:webkit_platform',
         '<(chromium_src_dir)/build/temp_gyp/googleurl.gyp:googleurl',
         '<(chromium_src_dir)/skia/skia.gyp:skia',
         '<(chromium_src_dir)/third_party/iccjpeg/iccjpeg.gyp:iccjpeg',
@@ -1380,6 +1376,7 @@
           'WEBCORE_NAVIGATOR_VENDOR="Google Inc."',
         ],
         'include_dirs': [
+          '../../Platform/chromium',
           '<(INTERMEDIATE_DIR)',
           '<@(webcore_include_dirs)',
           '<(chromium_src_dir)/gpu',
@@ -1475,6 +1472,7 @@
               # com.google.Chrome[] objc[]: Class ScrollbarPrefsObserver is implemented in both .../Google Chrome.app/Contents/Versions/.../Google Chrome Helper.app/Contents/MacOS/../../../Google Chrome Framework.framework/Google Chrome Framework and /System/Library/Frameworks/WebKit.framework/Versions/A/Frameworks/WebCore.framework/Versions/A/WebCore. One of the two will be used. Which one is undefined.
               'WebCascadeList=ChromiumWebCoreObjCWebCascadeList',
               'WebCoreFlippedView=ChromiumWebCoreObjCWebCoreFlippedView',
+              'WebCoreTextFieldCell=ChromiumWebCoreObjCWebCoreTextFieldCell',
               'WebScrollbarPrefsObserver=ChromiumWebCoreObjCWebScrollbarPrefsObserver',
               'WebCoreRenderThemeNotificationObserver=ChromiumWebCoreObjCWebCoreRenderThemeNotificationObserver',
               'WebFontCache=ChromiumWebCoreObjCWebFontCache',
@@ -1493,7 +1491,7 @@
                 'postbuild_name': 'Check Objective-C Rename',
                 'variables': {
                   'class_whitelist_regex':
-                      'ChromiumWebCoreObjC|TCMVisibleView|RTCMFlippedView|WebCoreTextFieldCell',
+                      'ChromiumWebCoreObjC|TCMVisibleView|RTCMFlippedView',
                   'category_whitelist_regex':
                       'TCMInterposing|ScrollAnimatorChromiumMacExt',
                 },
@@ -1669,6 +1667,8 @@
             ['include', 'platform/graphics/harfbuzz/FontPlatformDataHarfBuzz\\.cpp$'],
             ['include', 'platform/graphics/harfbuzz/HarfBuzzSkia\\.cpp$'],
             ['include', 'platform/graphics/harfbuzz/HarfBuzzShaperBase\\.(cpp|h)$'],
+            ['include', 'platform/graphics/opentype/OpenTypeTypes\\.h$'],
+            ['include', 'platform/graphics/opentype/OpenTypeVerticalData\\.(cpp|h)$'],
             ['include', 'platform/graphics/skia/SimpleFontDataSkia\\.cpp$'],
           ],
         }, { # use_x11==0
@@ -1887,6 +1887,8 @@
             ['include', 'platform/graphics/harfbuzz/FontPlatformDataHarfBuzz\\.cpp$'],
             ['include', 'platform/graphics/harfbuzz/HarfBuzzSkia\\.cpp$'],
             ['include', 'platform/graphics/harfbuzz/HarfBuzzShaperBase\\.cpp$'],
+            ['include', 'platform/graphics/opentype/OpenTypeTypes\\.h$'],
+            ['include', 'platform/graphics/opentype/OpenTypeVerticalData\\.(cpp|h)$'],
             ['exclude', 'platform/graphics/skia/FontCacheSkia\\.cpp$'],
             ['include', 'platform/graphics/skia/SimpleFontDataSkia\\.cpp$'],
           ],
@@ -1908,19 +1910,6 @@
       ],
       'sources': [
         '<@(webcore_platform_geometry_files)',
-      ],
-    },
-    {
-      'target_name': 'webcore_chromium_compositor',
-      'type': 'static_library',
-      'dependencies': [
-        'webcore_prerequisites',
-      ],
-      'defines': [
-        'WEBKIT_IMPLEMENTATION=1',
-      ],
-      'sources': [
-        '<@(webcore_chromium_compositor_files)',
       ],
     },
     # The *NEON.cpp files fail to compile when -mthumb is passed. Force
@@ -2146,7 +2135,6 @@
         'webcore_rendering',
         # Exported.
         'webcore_bindings',
-        '../../Platform/Platform.gyp/Platform.gyp:webkit_platform',
         '../../WTF/WTF.gyp/WTF.gyp:wtf',
         '<(chromium_src_dir)/build/temp_gyp/googleurl.gyp:googleurl',
         '<(chromium_src_dir)/skia/skia.gyp:skia',
@@ -2156,7 +2144,6 @@
       ],
       'export_dependent_settings': [
         'webcore_bindings',
-        '../../Platform/Platform.gyp/Platform.gyp:webkit_platform',
         '../../WTF/WTF.gyp/WTF.gyp:wtf',
         '<(chromium_src_dir)/build/temp_gyp/googleurl.gyp:googleurl',
         '<(chromium_src_dir)/skia/skia.gyp:skia',
@@ -2212,11 +2199,6 @@
             'webcore_svg',
           ],
         }],
-        ['use_libcc_for_compositor==0', {
-          'dependencies': [
-            'webcore_chromium_compositor'
-          ],
-        }]
       ],
     },
     {

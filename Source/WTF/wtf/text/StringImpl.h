@@ -60,6 +60,7 @@ template<typename CharacterType> struct HashAndCharactersTranslator;
 struct HashAndUTF8CharactersTranslator;
 struct LCharBufferTranslator;
 struct CharBufferFromLiteralDataTranslator;
+class MemoryObjectInfo;
 struct SubstringTranslator;
 struct UCharBufferTranslator;
 
@@ -714,6 +715,9 @@ public:
 #ifdef STRING_STATS
     ALWAYS_INLINE static StringStats& stringStats() { return m_stringStats; }
 #endif
+
+    WTF_EXPORT_STRING_API void reportMemoryUsage(MemoryObjectInfo*) const;
+
 private:
     // This number must be at least 2 to avoid sharing empty, null as well as 1 character strings from SmallStrings.
     static const unsigned s_copyCharsInlineCutOff = 20;
@@ -942,6 +946,11 @@ inline bool equalIgnoringCase(const UChar* a, const char* b, unsigned length) { 
 inline bool equalIgnoringCase(const LChar* a, const UChar* b, unsigned length) { return equalIgnoringCase(b, a, length); }
 inline bool equalIgnoringCase(const char* a, const UChar* b, unsigned length) { return equalIgnoringCase(b, reinterpret_cast<const LChar*>(a), length); }
 inline bool equalIgnoringCase(const char* a, const LChar* b, unsigned length) { return equalIgnoringCase(b, reinterpret_cast<const LChar*>(a), length); }
+inline bool equalIgnoringCase(const UChar* a, const UChar* b, int length)
+{
+    ASSERT(length >= 0);
+    return !Unicode::umemcasecmp(a, b, length);
+}
 
 WTF_EXPORT_STRING_API bool equalIgnoringNullity(StringImpl*, StringImpl*);
 

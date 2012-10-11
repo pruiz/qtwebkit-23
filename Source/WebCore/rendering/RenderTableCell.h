@@ -76,7 +76,7 @@ public:
 
     virtual void computePreferredLogicalWidths();
 
-    void updateLogicalWidth(LayoutUnit);
+    void setCellLogicalWidth(LayoutUnit);
 
     virtual int borderLeft() const;
     virtual int borderRight() const;
@@ -144,7 +144,7 @@ public:
     const BorderValue& borderAdjoiningTableStart() const
     {
         ASSERT(isFirstOrLastCellInRow());
-        if (section()->hasSameDirectionAsTable())
+        if (section()->hasSameDirectionAs(table()))
             return style()->borderStart();
 
         return style()->borderEnd();
@@ -153,10 +153,24 @@ public:
     const BorderValue& borderAdjoiningTableEnd() const
     {
         ASSERT(isFirstOrLastCellInRow());
-        if (section()->hasSameDirectionAsTable())
+        if (section()->hasSameDirectionAs(table()))
             return style()->borderEnd();
 
         return style()->borderStart();
+    }
+
+    const BorderValue& borderAdjoiningCellBefore(const RenderTableCell* cell)
+    {
+        ASSERT_UNUSED(cell, table()->cellAfter(cell) == this);
+        // FIXME: https://webkit.org/b/79272 - Add support for mixed directionality at the cell level.
+        return style()->borderStart();
+    }
+
+    const BorderValue& borderAdjoiningCellAfter(const RenderTableCell* cell)
+    {
+        ASSERT_UNUSED(cell, table()->cellBefore(cell) == this);
+        // FIXME: https://webkit.org/b/79272 - Add support for mixed directionality at the cell level.
+        return style()->borderEnd();
     }
 
 #ifndef NDEBUG
@@ -175,7 +189,7 @@ private:
 
     virtual void willBeRemovedFromTree() OVERRIDE;
 
-    virtual void computeLogicalWidth();
+    virtual void updateLogicalWidth() OVERRIDE;
 
     virtual void paintBoxDecorations(PaintInfo&, const LayoutPoint&);
     virtual void paintMask(PaintInfo&, const LayoutPoint&);

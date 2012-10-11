@@ -103,6 +103,7 @@ struct RuleMatchingStats {
 };
 
 class SelectorProfile {
+    WTF_MAKE_FAST_ALLOCATED;
 public:
     SelectorProfile()
         : m_totalMatchingTimeMs(0.0)
@@ -230,7 +231,8 @@ class UpdateRegionLayoutTask {
 public:
     UpdateRegionLayoutTask(InspectorCSSAgent*);
     void scheduleFor(WebKitNamedFlow*, int documentNodeId);
-    void reset() { m_timer.stop(); }
+    void unschedule(WebKitNamedFlow*);
+    void reset();
     void onTimer(Timer<UpdateRegionLayoutTask>*);
 
 private:
@@ -253,13 +255,37 @@ void UpdateRegionLayoutTask::scheduleFor(WebKitNamedFlow* namedFlow, int documen
         m_timer.startOneShot(0);
 }
 
+void UpdateRegionLayoutTask::unschedule(WebKitNamedFlow* namedFlow)
+{
+    m_namedFlows.remove(namedFlow);
+}
+
+void UpdateRegionLayoutTask::reset()
+{
+    m_timer.stop();
+    m_namedFlows.clear();
+}
+
 void UpdateRegionLayoutTask::onTimer(Timer<UpdateRegionLayoutTask>*)
 {
     // The timer is stopped on m_cssAgent destruction, so this method will never be called after m_cssAgent has been destroyed.
-    for (HashMap<WebKitNamedFlow*, int>::iterator it = m_namedFlows.begin(), end = m_namedFlows.end(); it != end; ++it)
-        m_cssAgent->regionLayoutUpdated(it->first, it->second);
+    Vector<std::pair<WebKitNamedFlow*, int> > namedFlows;
 
-    m_namedFlows.clear();
+    for (HashMap<WebKitNamedFlow*, int>::iterator it = m_namedFlows.begin(), end = m_namedFlows.end(); it != end; ++it)
+        namedFlows.append(std::make_pair(it->first, it->second));
+
+    for (unsigned i = 0, size = namedFlows.size(); i < size; ++i) {
+        WebKitNamedFlow* namedFlow = namedFlows.at(i).first;
+        int documentNodeId = namedFlows.at(i).second;
+
+        if (m_namedFlows.contains(namedFlow)) {
+            m_cssAgent->regionLayoutUpdated(namedFlow, documentNodeId);
+            m_namedFlows.remove(namedFlow);
+        }
+    }
+
+    if (!m_namedFlows.isEmpty() && !m_timer.isActive())
+        m_timer.startOneShot(0);
 }
 
 class InspectorCSSAgent::StyleSheetAction : public InspectorHistory::Action {
@@ -516,15 +542,13 @@ void InspectorCSSAgent::setFrontend(InspectorFrontend* frontend)
 {
     ASSERT(!m_frontend);
     m_frontend = frontend->css();
-    m_instrumentingAgents->setInspectorCSSAgent(this);
 }
 
 void InspectorCSSAgent::clearFrontend()
 {
     ASSERT(m_frontend);
     m_frontend = 0;
-    m_instrumentingAgents->setInspectorCSSAgent(0);
-    resetPseudoStates();
+    resetNonPersistentData();
     String errorString;
     stopSelectorProfilerImpl(&errorString, false);
 }
@@ -553,6 +577,11 @@ void InspectorCSSAgent::reset()
     m_cssStyleSheetToInspectorStyleSheet.clear();
     m_nodeToInspectorStyleSheet.clear();
     m_documentToInspectorStyleSheet.clear();
+    resetNonPersistentData();
+}
+
+void InspectorCSSAgent::resetNonPersistentData()
+{
     m_namedFlowCollectionsRequested.clear();
     if (m_updateRegionLayoutTask)
         m_updateRegionLayoutTask->reset();
@@ -562,10 +591,12 @@ void InspectorCSSAgent::reset()
 void InspectorCSSAgent::enable(ErrorString*)
 {
     m_state->setBoolean(CSSAgentState::cssAgentEnabled, true);
+    m_instrumentingAgents->setInspectorCSSAgent(this);
 }
 
 void InspectorCSSAgent::disable(ErrorString*)
 {
+    m_instrumentingAgents->setInspectorCSSAgent(0);
     m_state->setBoolean(CSSAgentState::cssAgentEnabled, false);
 }
 
@@ -591,6 +622,9 @@ void InspectorCSSAgent::willRemoveNamedFlow(Document* document, WebKitNamedFlow*
     if (!documentNodeId)
         return;
 
+    if (m_updateRegionLayoutTask)
+        m_updateRegionLayoutTask->unschedule(namedFlow);
+
     m_frontend->namedFlowRemoved(documentNodeId, namedFlow->name().string());
 }
 
@@ -611,6 +645,8 @@ void InspectorCSSAgent::regionLayoutUpdated(WebKitNamedFlow* namedFlow, int docu
         return;
 
     ErrorString errorString;
+    RefPtr<WebKitNamedFlow> protector(namedFlow);
+
     m_frontend->regionLayoutUpdated(buildObjectForNamedFlow(&errorString, namedFlow, documentNodeId));
 }
 

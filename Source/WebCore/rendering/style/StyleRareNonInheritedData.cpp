@@ -23,7 +23,6 @@
 #include "StyleRareNonInheritedData.h"
 
 #include "ContentData.h"
-#include "MemoryInstrumentation.h"
 #include "RenderCounter.h"
 #include "RenderStyle.h"
 #include "ShadowData.h"
@@ -31,6 +30,7 @@
 #include "StyleTransformData.h"
 #include "StyleImage.h"
 #include "StyleResolver.h"
+#include "WebCoreMemoryInstrumentation.h"
 
 namespace WebCore {
 
@@ -327,8 +327,8 @@ void StyleRareNonInheritedData::reportMemoryUsage(MemoryObjectInfo* memoryObject
     info.addMember(m_wrapShapeInside);
     info.addMember(m_wrapShapeOutside);
     info.addMember(m_clipPath);
-    info.addInstrumentedMember(m_flowThread);
-    info.addInstrumentedMember(m_regionThread);
+    info.addMember(m_flowThread);
+    info.addMember(m_regionThread);
 }
 
 } // namespace WebCore

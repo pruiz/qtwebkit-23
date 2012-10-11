@@ -55,17 +55,18 @@ function test()
                 WebInspector.cssModel.getNamedFlowCollectionAsync(document.id, namedFlowCallback);
             }
 
-            function namedFlowCallback(namedFlowMap)
+            function namedFlowCallback(namedFlowCollection)
             {
                 InspectorTest.addResult("=== CSS Named Flows in main document ===");
 
-                if (!namedFlowMap) {
+                if (!namedFlowCollection) {
                     InspectorTest.addResult("[!] Failed to get Named Flows");
                     InspectorTest.completeTest();
                     return;
                 }
 
-                namedFlows = [];
+                var namedFlowMap = namedFlowCollection.namedFlowMap;
+                var namedFlows = [];
                 for (var flowName in namedFlowMap)
                     namedFlows.push(namedFlowMap[flowName]);
 
@@ -94,11 +95,11 @@ function test()
                 WebInspector.cssModel.getNamedFlowCollectionAsync(nodeId, namedFlowCallback);
             }
 
-            function namedFlowCallback(namedFlowMap)
+            function namedFlowCallback(namedFlowCollection)
             {
                 InspectorTest.addResult("=== CSS Named Flows in #fake-document ===");
 
-                if (namedFlowMap) {
+                if (namedFlowCollection) {
                     InspectorTest.addResult("[!] Failed");
                     InspectorTest.completeTest();
                     return;
@@ -178,7 +179,7 @@ function test()
         function testRegionLayoutUpdated(next)
         {
             WebInspector.cssModel.addEventListener(WebInspector.CSSStyleModel.Events.RegionLayoutUpdated, callback, this);
-            InspectorTest.evaluateInPage("document.getElementById(\"region3\").style[\"width\"] = \"200px\"");
+            InspectorTest.evaluateInPage("window.document.getElementById(\"region3\").style[\"width\"] = \"200px\"");
 
             function callback(event)
             {

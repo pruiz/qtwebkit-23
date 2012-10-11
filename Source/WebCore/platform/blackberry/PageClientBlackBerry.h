@@ -19,7 +19,6 @@
 #ifndef PageClientBlackBerry_h
 #define PageClientBlackBerry_h
 
-#include "Credential.h"
 #include "Cursor.h"
 #include "WebPageClient.h"
 
@@ -33,6 +32,8 @@ namespace BlackBerry {
 }
 
 namespace WebCore {
+    class AuthenticationChallengeClient;
+    class Credential;
     class IntRect;
     class IntSize;
     class KURL;
@@ -48,6 +49,7 @@ public:
         SaveCredentialYes
     };
 
+    virtual int playerID() const = 0;
     virtual void setCursor(WebCore::PlatformCursor) = 0;
     virtual BlackBerry::Platform::NetworkStreamFactory* networkStreamFactory() = 0;
     virtual BlackBerry::Platform::Graphics::Window* platformWindow() const = 0;
@@ -70,7 +72,7 @@ public:
     virtual int showAlertDialog(BlackBerry::WebKit::WebPageClient::AlertType) = 0;
     virtual bool isActive() const = 0;
     virtual bool isVisible() const = 0;
-    virtual bool authenticationChallenge(const WebCore::KURL&, const WebCore::ProtectionSpace&, WebCore::Credential&) = 0;
+    virtual void authenticationChallenge(const WebCore::KURL&, const WebCore::ProtectionSpace&, const WebCore::Credential&) = 0;
     virtual SaveCredentialType notifyShouldSaveCredential(bool) = 0;
     virtual void syncProxyCredential(const WebCore::Credential&) = 0;
 };

@@ -31,6 +31,7 @@
 #include "HandlerInfo.h"
 #include "JSFunction.h"
 #include "Interpreter.h"
+#include "JSGlobalObject.h"
 #include "LLIntCLoop.h"
 #include "Nodes.h"
 #include "SamplingTool.h"
@@ -691,7 +692,6 @@ namespace JSC {
         const Identifier& inferredName() { return m_inferredName; }
         JSString* nameValue() const { return m_nameValue.get(); }
         size_t parameterCount() const { return m_parameters->size(); } // Excluding 'this'!
-        unsigned capturedVariableCount() const { return m_numCapturedVariables; }
         String paramString() const;
         SharedSymbolTable* symbolTable() const { return m_symbolTable.get(); }
 
@@ -712,7 +712,7 @@ namespace JSC {
         void finishCreation(JSGlobalData& globalData)
         {
             Base::finishCreation(globalData);
-            m_nameValue.set(globalData, this, jsString(&globalData, name().ustring()));
+            m_nameValue.set(globalData, this, jsString(&globalData, name().string()));
         }
 
     private:
@@ -741,8 +741,7 @@ namespace JSC {
         }
 
         static const unsigned StructureFlags = OverridesVisitChildren | ScriptExecutable::StructureFlags;
-        unsigned m_numCapturedVariables : 31;
-        bool m_forceUsesArguments : 1;
+        bool m_forceUsesArguments;
 
         RefPtr<FunctionParameters> m_parameters;
         OwnPtr<FunctionCodeBlock> m_codeBlockForCall;
@@ -753,6 +752,13 @@ namespace JSC {
         WriteBarrier<JSString> m_nameValue;
         WriteBarrier<SharedSymbolTable> m_symbolTable;
     };
+
+    inline JSFunction::JSFunction(JSGlobalData& globalData, FunctionExecutable* executable, JSScope* scope)
+        : Base(globalData, scope->globalObject()->functionStructure())
+        , m_executable(globalData, this, executable)
+        , m_scope(globalData, this, scope)
+    {
+    }
 
     inline FunctionExecutable* JSFunction::jsExecutable() const
     {

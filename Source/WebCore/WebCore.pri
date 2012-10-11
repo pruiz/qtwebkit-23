@@ -131,7 +131,7 @@ contains(DEFINES, ENABLE_NETSCAPE_PLUGIN_API=1) {
             # Note: XP_MACOSX is defined in npapi.h
         } else {
             xlibAvailable() {
-                CONFIG += x11
+                CONFIG *= x11
                 LIBS += -lXrender
                 DEFINES += MOZ_X11
             }
@@ -178,7 +178,7 @@ contains(DEFINES, ENABLE_GAMEPAD=1) {
 
 contains(DEFINES, WTF_USE_GSTREAMER=1) {
     DEFINES += ENABLE_GLIB_SUPPORT=1
-    PKGCONFIG += glib-2.0 gio-2.0 gstreamer-0.10 gstreamer-app-0.10 gstreamer-base-0.10 gstreamer-interfaces-0.10 gstreamer-pbutils-0.10 gstreamer-plugins-base-0.10
+    PKGCONFIG += glib-2.0 gio-2.0 gstreamer-0.10 gstreamer-app-0.10 gstreamer-base-0.10 gstreamer-interfaces-0.10 gstreamer-pbutils-0.10 gstreamer-plugins-base-0.10 gstreamer-video-0.10
 }
 
 contains(DEFINES, ENABLE_VIDEO=1) {
@@ -187,11 +187,23 @@ contains(DEFINES, ENABLE_VIDEO=1) {
 
         LIBS += -framework AppKit -framework AudioUnit \
                 -framework AudioToolbox -framework CoreAudio \
-                -framework QuartzCore -framework QTKit
+                -framework QuartzCore -framework QTKit \
+                -framework Security -framework IOKit
 
+        # We can know the Mac OS version by using the Darwin major version
+        DARWIN_VERSION = $$split(QMAKE_HOST.version, ".")
+        DARWIN_MAJOR_VERSION = $$first(DARWIN_VERSION)
+        equals(DARWIN_MAJOR_VERSION, "12") {
+            LIBS += $${ROOT_WEBKIT_DIR}/WebKitLibraries/libWebKitSystemInterfaceMountainLion.a
+        } else:equals(DARWIN_MAJOR_VERSION, "11") {
+            LIBS += $${ROOT_WEBKIT_DIR}/WebKitLibraries/libWebKitSystemInterfaceLion.a
+        } else:equals(DARWIN_MAJOR_VERSION, "10") {
+            LIBS += $${ROOT_WEBKIT_DIR}/WebKitLibraries/libWebKitSystemInterfaceSnowLeopard.a
+        } else:equals(DARWIN_MAJOR_VERSION, "9") {
+            LIBS += $${ROOT_WEBKIT_DIR}/WebKitLibraries/libWebKitSystemInterfaceLeopard.a
+        }
     } else:contains(DEFINES, WTF_USE_GSTREAMER=1) {
         INCLUDEPATH += $$SOURCE_DIR/platform/graphics/gstreamer
-        PKGCONFIG += gstreamer-video-0.10
     } else:contains(DEFINES, WTF_USE_QT_MULTIMEDIA=1) {
         CONFIG   *= mobility
         MOBILITY *= multimedia
@@ -207,9 +219,13 @@ contains(DEFINES, ENABLE_WEB_AUDIO=1) {
 }
 
 contains(DEFINES, WTF_USE_3D_GRAPHICS=1) {
-    contains(QT_CONFIG, opengles2): LIBS += -lEGL
+    contains(QT_CONFIG, opengles2):!win32: LIBS += -lEGL
     mac: LIBS += -framework IOSurface -framework CoreFoundation
-    linux-*:contains(DEFINES, HAVE_XCOMPOSITE=1): LIBS += -lXcomposite
+    linux-*: {
+        contains(DEFINES, HAVE_XCOMPOSITE=1): LIBS += -lXcomposite
+        LIBS += -lXrender
+        CONFIG *= x11
+    }
     haveQt(4): QT *= opengl
 }
 
@@ -247,14 +263,24 @@ haveQt(5) {
 }
 
 mac {
-    LIBS += -framework Carbon -framework AppKit
+    LIBS += -framework Carbon -framework AppKit -framework IOKit
 }
 
-win32-* {
+win32 {
     INCLUDEPATH += $$SOURCE_DIR/platform/win
-    LIBS += -lgdi32
-    LIBS += -lole32
-    LIBS += -luser32
+
+    wince* {
+        # see https://bugs.webkit.org/show_bug.cgi?id=43442
+        DEFINES += HAVE_LOCALTIME_S=0
+
+        LIBS += -lmmtimer
+        LIBS += -lole32
+    }
+    else {
+        LIBS += -lgdi32
+        LIBS += -lole32
+        LIBS += -luser32
+    }
 }
 
 # Remove whole program optimizations due to miscompilations
@@ -269,12 +295,6 @@ win32-msvc2005|win32-msvc2008|win32-msvc2010|wince*:{
     equals(ARCH, x86):{
         isEmpty(WOW64ARCH): QMAKE_LFLAGS_DEBUG += /INCREMENTAL:NO
     }
-}
-
-wince* {
-    DEFINES += HAVE_LOCALTIME_S=0
-    LIBS += -lmmtimer
-    LIBS += -lole32
 }
 
 mac {

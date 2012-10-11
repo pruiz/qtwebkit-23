@@ -29,12 +29,13 @@
 #if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
 #include "DateTimeFieldElement.h"
 #include "SpinButtonElement.h"
+#include "StepRange.h"
 
 namespace WebCore {
 
-class DateComponents;
-class DateTimeEditLayouter;
+class DateTimeFieldsState;
 class KeyboardEvent;
+class Localizer;
 class MouseEvent;
 class StepRange;
 
@@ -58,6 +59,21 @@ public:
         virtual bool isEditControlOwnerReadOnly() const = 0;
     };
 
+    struct LayoutParameters {
+        String dateTimeFormat;
+        String fallbackDateTimeFormat;
+        Localizer& localizer;
+        const StepRange& stepRange;
+
+        LayoutParameters(Localizer& localizer, const StepRange& stepRange)
+            : localizer(localizer)
+            , stepRange(stepRange)
+        {
+        }
+
+        bool shouldHaveSecondField() const;
+    };
+
     static PassRefPtr<DateTimeEditElement> create(Document*, EditControlOwner&);
 
     virtual ~DateTimeEditElement();
@@ -68,9 +84,11 @@ public:
     void focusByOwner();
     void readOnlyStateChanged();
     void removeEditControlOwner() { m_editControlOwner = 0; }
-    void resetLayout();
-    void setEmptyValue(const StepRange&, const DateComponents&  dateForReadOnlyField);
-    void setValueAsDate(const StepRange&, const DateComponents&);
+    void resetFields();
+    void setEmptyValue(const LayoutParameters&, const DateComponents& dateForReadOnlyField);
+    void setValueAsDate(const LayoutParameters&, const DateComponents&);
+    void setValueAsDateTimeFieldsState(const DateTimeFieldsState&, const DateComponents& dateForReadOnlyField);
+    DateTimeFieldsState valueAsDateTimeFieldsState() const;
     double valueAsDouble() const;
 
 private:
@@ -95,7 +113,7 @@ private:
     size_t focusedFieldIndex() const;
     bool isDisabled() const;
     bool isReadOnly() const;
-    void layout(const StepRange&, const DateComponents&);
+    void layout(const LayoutParameters&, const DateComponents&);
     void updateUIState();
 
     // DateTimeFieldElement::FieldOwner functions.

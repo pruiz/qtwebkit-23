@@ -135,7 +135,6 @@ const ClassInfo FunctionExecutable::s_info = { "FunctionExecutable", &ScriptExec
 
 FunctionExecutable::FunctionExecutable(JSGlobalData& globalData, FunctionBodyNode* node)
     : ScriptExecutable(globalData.functionExecutableStructure.get(), globalData, node->source(), node->isStrictMode())
-    , m_numCapturedVariables(0)
     , m_forceUsesArguments(node->usesArguments())
     , m_parameters(node->parameters())
     , m_name(node->ident())
@@ -202,7 +201,7 @@ JSObject* EvalExecutable::compileInternal(ExecState* exec, JSScope* scope, JITCo
         m_evalCodeBlock = newCodeBlock.release();
     } else {
         if (!lexicalGlobalObject->evalEnabled())
-            return throwError(exec, createEvalError(exec, ASCIILiteral("Eval is disabled")));
+            return throwError(exec, createEvalError(exec, lexicalGlobalObject->evalDisabledErrorMessage()));
         RefPtr<EvalNode> evalNode = parse<EvalNode>(globalData, lexicalGlobalObject, m_source, 0, Identifier(), isStrictMode() ? JSParseStrict : JSParseNormal, EvalNode::isFunctionNode ? JSParseFunctionCode : JSParseProgramCode, lexicalGlobalObject->debugger(), exec, &exception);
         if (!evalNode) {
             ASSERT(exception);
@@ -527,7 +526,6 @@ JSObject* FunctionExecutable::compileForCallInternal(ExecState* exec, JSScope* s
     
     m_numParametersForCall = m_codeBlockForCall->numParameters();
     ASSERT(m_numParametersForCall);
-    m_numCapturedVariables = m_codeBlockForCall->m_numCapturedVars;
     m_symbolTable.set(exec->globalData(), this, m_codeBlockForCall->symbolTable());
 
 #if ENABLE(JIT)
@@ -570,7 +568,6 @@ JSObject* FunctionExecutable::compileForConstructInternal(ExecState* exec, JSSco
     
     m_numParametersForConstruct = m_codeBlockForConstruct->numParameters();
     ASSERT(m_numParametersForConstruct);
-    m_numCapturedVariables = m_codeBlockForConstruct->m_numCapturedVars;
     m_symbolTable.set(exec->globalData(), this, m_codeBlockForConstruct->symbolTable());
 
 #if ENABLE(JIT)
@@ -672,7 +669,7 @@ FunctionExecutable* FunctionExecutable::fromGlobalCode(const Identifier& name, E
     ASSERT(body->ident().isNull());
 
     FunctionExecutable* functionExecutable = FunctionExecutable::create(exec->globalData(), body);
-    functionExecutable->m_nameValue.set(exec->globalData(), functionExecutable, jsString(&exec->globalData(), name.ustring()));
+    functionExecutable->m_nameValue.set(exec->globalData(), functionExecutable, jsString(&exec->globalData(), name.string()));
     return functionExecutable;
 }
 
@@ -683,7 +680,7 @@ String FunctionExecutable::paramString() const
     for (size_t pos = 0; pos < parameters.size(); ++pos) {
         if (!builder.isEmpty())
             builder.appendLiteral(", ");
-        builder.append(parameters[pos].ustring());
+        builder.append(parameters[pos].string());
     }
     return builder.toString();
 }

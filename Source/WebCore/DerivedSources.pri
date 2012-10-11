@@ -61,7 +61,7 @@ INSPECTOR_OVERLAY_PAGE = $$PWD/inspector/InspectorOverlayPage.html
 
 INJECTED_SCRIPT_SOURCE = $$PWD/inspector/InjectedScriptSource.js
 
-INJECTED_SCRIPT_WEBGL_MODULE_SOURCE = $$PWD/inspector/InjectedScriptWebGLModuleSource.js
+INJECTED_SCRIPT_CANVAS_MODULE_SOURCE = $$PWD/inspector/InjectedScriptCanvasModuleSource.js
 
 DEBUGGER_SCRIPT_SOURCE = $$PWD/bindings/v8/DebuggerScript.js
 
@@ -719,38 +719,44 @@ preprocessIdls.add_output_to_sources = false
 preprocessIdls.depends = $$PWD/bindings/scripts/IDLParser.pm $$IDL_BINDINGS
 GENERATORS += preprocessIdls
 
+win32 {
+    env_export = set
+} else {
+    env_export = export
+}
+
 # GENERATOR 1: Generate .h and .cpp from IDLs
 generateBindings.input = IDL_BINDINGS
 generateBindings.script = $$PWD/bindings/scripts/generate-bindings.pl
-generateBindings.commands = perl -I$$PWD/bindings/scripts $$generateBindings.script \
+generateBindings.commands = $$env_export \"SOURCE_ROOT=$$toSystemPath($$PWD)\" && perl -I$$PWD/bindings/scripts $$generateBindings.script \
                             --defines \"$${FEATURE_DEFINES_JAVASCRIPT}\" \
                             --generator JS \
-                            --include $$PWD/Modules/filesystem \
-                            --include $$PWD/Modules/geolocation \
-                            --include $$PWD/Modules/indexeddb \
-                            --include $$PWD/Modules/mediasource \
-                            --include $$PWD/Modules/notifications \
-                            --include $$PWD/Modules/quota \
-                            --include $$PWD/Modules/webaudio \
-                            --include $$PWD/Modules/webdatabase \
-                            --include $$PWD/Modules/websockets \
-                            --include $$PWD/css \
-                            --include $$PWD/dom \
-                            --include $$PWD/editing \
-                            --include $$PWD/fileapi \
-                            --include $$PWD/html \
-                            --include $$PWD/html/canvas \
-                            --include $$PWD/html/shadow \
-                            --include $$PWD/html/track \
-                            --include $$PWD/inspector \
-                            --include $$PWD/loader/appcache \
-                            --include $$PWD/page \
-                            --include $$PWD/plugins \
-                            --include $$PWD/storage \
-                            --include $$PWD/svg \
-                            --include $$PWD/testing \
-                            --include $$PWD/workers \
-                            --include $$PWD/xml \
+                            --include Modules/filesystem \
+                            --include Modules/geolocation \
+                            --include Modules/indexeddb \
+                            --include Modules/mediasource \
+                            --include Modules/notifications \
+                            --include Modules/quota \
+                            --include Modules/webaudio \
+                            --include Modules/webdatabase \
+                            --include Modules/websockets \
+                            --include css \
+                            --include dom \
+                            --include editing \
+                            --include fileapi \
+                            --include html \
+                            --include html/canvas \
+                            --include html/shadow \
+                            --include html/track \
+                            --include inspector \
+                            --include loader/appcache \
+                            --include page \
+                            --include plugins \
+                            --include storage \
+                            --include svg \
+                            --include testing \
+                            --include workers \
+                            --include xml \
                             --outputDir ${QMAKE_FUNC_FILE_OUT_PATH} \
                             --supplementalDependencyFile ${QMAKE_FUNC_FILE_OUT_PATH}/$$SUPPLEMENTAL_DEPENDENCY_FILE \
                             --preprocessor \"$${QMAKE_MOC} -E\" ${QMAKE_FILE_NAME}
@@ -792,19 +798,19 @@ inspectorOverlayPage.commands = perl $$PWD/inspector/xxd.pl InspectorOverlayPage
 inspectorOverlayPage.add_output_to_sources = false
 GENERATORS += inspectorOverlayPage
 
-# GENERATOR 2-a: inspector injected script source compiler
+# GENERATOR 2: inspector injected script source compiler
 injectedScriptSource.output = InjectedScriptSource.h
 injectedScriptSource.input = INJECTED_SCRIPT_SOURCE
 injectedScriptSource.commands = perl $$PWD/inspector/xxd.pl InjectedScriptSource_js ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
 injectedScriptSource.add_output_to_sources = false
 GENERATORS += injectedScriptSource
 
-# GENERATOR 2-b: inspector webgl injected script source compiler
-InjectedScriptWebGLModuleSource.output = InjectedScriptWebGLModuleSource.h
-InjectedScriptWebGLModuleSource.input = INJECTED_SCRIPT_WEBGL_MODULE_SOURCE
-InjectedScriptWebGLModuleSource.commands = perl $$PWD/inspector/xxd.pl InjectedScriptWebGLModuleSource_js ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
-InjectedScriptWebGLModuleSource.add_output_to_sources = false
-GENERATORS += InjectedScriptWebGLModuleSource
+# GENERATOR 3: inspector canvas injected script source compiler
+InjectedScriptCanvasModuleSource.output = InjectedScriptCanvasModuleSource.h
+InjectedScriptCanvasModuleSource.input = INJECTED_SCRIPT_CANVAS_MODULE_SOURCE
+InjectedScriptCanvasModuleSource.commands = perl $$PWD/inspector/xxd.pl InjectedScriptCanvasModuleSource_js ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
+InjectedScriptCanvasModuleSource.add_output_to_sources = false
+GENERATORS += InjectedScriptCanvasModuleSource
 
 # GENERATOR 2-c: inspector debugger script source compiler
 debuggerScriptSource.output = DebuggerScriptSource.h

@@ -49,6 +49,7 @@ struct ColorSpaceData;
 class LayerTreeHost;
 class WebPage;
 struct WebPageCreationParameters;
+struct WebPreferencesStore;
 
 #if PLATFORM(WIN)
 struct WindowGeometry;
@@ -69,7 +70,7 @@ public:
     // FIXME: These should be pure virtual.
     virtual void pageBackgroundTransparencyChanged() { }
     virtual void forceRepaint() { }
-    virtual bool forceRepaintAsync(uint64_t callbackID) { return false; }
+    virtual bool forceRepaintAsync(uint64_t /*callbackID*/) { return false; }
     virtual void setLayerTreeStateIsFrozen(bool) { }
     virtual bool layerTreeStateIsFrozen() const { return false; }
     virtual LayerTreeHost* layerTreeHost() const { return 0; }
@@ -83,7 +84,7 @@ public:
     virtual void pageCustomRepresentationChanged() { }
 
     virtual void setPaintingEnabled(bool) { }
-    virtual void updatePreferences() { }
+    virtual void updatePreferences(const WebPreferencesStore&) { }
 
 #if USE(ACCELERATED_COMPOSITING)
     virtual void setRootCompositingLayer(WebCore::GraphicsLayer*) = 0;
@@ -109,7 +110,8 @@ protected:
 private:
     // CoreIPC message handlers.
     // FIXME: These should be pure virtual.
-    virtual void updateBackingStoreState(uint64_t backingStoreStateID, bool respondImmediately, float deviceScaleFactor, const WebCore::IntSize& size, const WebCore::IntSize& scrollOffset) { }
+    virtual void updateBackingStoreState(uint64_t /*backingStoreStateID*/, bool /*respondImmediately*/, float /*deviceScaleFactor*/, const WebCore::IntSize& /*size*/, 
+                                         const WebCore::IntSize& /*scrollOffset*/) { }
     virtual void didUpdate() { }
     virtual void suspendPainting() { }
     virtual void resumePainting() { }

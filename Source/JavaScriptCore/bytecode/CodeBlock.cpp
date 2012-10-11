@@ -45,6 +45,7 @@
 #include "LowLevelInterpreter.h"
 #include "MethodCallLinkStatus.h"
 #include "RepatchBuffer.h"
+#include "SlotVisitorInlineMethods.h"
 #include <stdio.h>
 #include <wtf/StringExtras.h>
 #include <wtf/UnusedParam.h>
@@ -90,7 +91,7 @@ static CString constantName(ExecState* exec, int k, JSValue value)
 
 static CString idName(int id0, const Identifier& ident)
 {
-    return makeString(ident.ustring(), "(@id", String::number(id0), ")").utf8();
+    return makeString(ident.string(), "(@id", String::number(id0), ")").utf8();
 }
 
 void CodeBlock::dumpBytecodeCommentAndNewLine(int location)
@@ -290,10 +291,14 @@ void CodeBlock::printGetByIdCacheStatus(ExecState* exec, int location)
     UNUSED_PARAM(ident); // tell the compiler to shut up in certain platform configurations.
     
 #if ENABLE(LLINT)
-    Structure* structure = instruction[4].u.structure.get();
-    dataLog(" llint(");
-    dumpStructure("struct", exec, structure, ident);
-    dataLog(")");
+    if (exec->interpreter()->getOpcodeID(instruction[0].u.opcode) == op_get_array_length)
+        dataLog(" llint(array_length)");
+    else {
+        Structure* structure = instruction[4].u.structure.get();
+        dataLog(" llint(");
+        dumpStructure("struct", exec, structure, ident);
+        dataLog(")");
+    }
 #endif
 
 #if ENABLE(JIT)
@@ -527,8 +532,8 @@ void CodeBlock::dump(ExecState* exec)
         static_cast<unsigned long>(instructions().size() * sizeof(Instruction)),
         this, codeTypeToString(codeType()), m_numParameters, m_numCalleeRegisters,
         m_numVars);
-    if (m_numCapturedVars)
-        dataLog("; %d captured var(s)", m_numCapturedVars);
+    if (m_symbolTable->captureCount())
+        dataLog("; %d captured var(s)", m_symbolTable->captureCount());
     if (usesArguments()) {
         dataLog(
             "; uses arguments, in r%d, r%d",
@@ -548,7 +553,7 @@ void CodeBlock::dump(ExecState* exec)
         dataLog("\nIdentifiers:\n");
         size_t i = 0;
         do {
-            dataLog("  id%u = %s\n", static_cast<unsigned>(i), m_identifiers[i].ustring().utf8().data());
+            dataLog("  id%u = %s\n", static_cast<unsigned>(i), m_identifiers[i].string().utf8().data());
             ++i;
         } while (i != m_identifiers.size());
     }
@@ -868,8 +873,11 @@ void CodeBlock::dump(ExecState* exec, const Vector<Instruction>::const_iterator&
             break;
         }
         case op_check_has_instance: {
-            int base = (++it)->u.operand;
-            dataLog("[%4d] check_has_instance\t\t %s", location, registerName(exec, base).data());
+            int r0 = (++it)->u.operand;
+            int r1 = (++it)->u.operand;
+            int r2 = (++it)->u.operand;
+            int offset = (++it)->u.operand;
+            dataLog("[%4d] check_has_instance\t\t %s, %s, %s, %d(->%d)", location, registerName(exec, r0).data(), registerName(exec, r1).data(), registerName(exec, r2).data(), offset, location + offset);
             dumpBytecodeCommentAndNewLine(location);
             break;
         }
@@ -877,8 +885,7 @@ void CodeBlock::dump(ExecState* exec, const Vector<Instruction>::const_iterator&
             int r0 = (++it)->u.operand;
             int r1 = (++it)->u.operand;
             int r2 = (++it)->u.operand;
-            int r3 = (++it)->u.operand;
-            dataLog("[%4d] instanceof\t\t %s, %s, %s, %s", location, registerName(exec, r0).data(), registerName(exec, r1).data(), registerName(exec, r2).data(), registerName(exec, r3).data());
+            dataLog("[%4d] instanceof\t\t %s, %s, %s", location, registerName(exec, r0).data(), registerName(exec, r1).data(), registerName(exec, r2).data());
             dumpBytecodeCommentAndNewLine(location);
             break;
         }
@@ -995,6 +1002,22 @@ void CodeBlock::dump(ExecState* exec, const Vector<Instruction>::const_iterator&
             WriteBarrier<Unknown>* registerPointer = (++it)->u.registerPointer;
             int r0 = (++it)->u.operand;
             dataLog("[%4d] put_global_var_check\t g%d(%p), %s", location, m_globalObject->findRegisterIndex(registerPointer), registerPointer, registerName(exec, r0).data());
+            dumpBytecodeCommentAndNewLine(location);
+            it++;
+            it++;
+            break;
+        }
+        case op_init_global_const: {
+            WriteBarrier<Unknown>* registerPointer = (++it)->u.registerPointer;
+            int r0 = (++it)->u.operand;
+            dataLog("[%4d] init_global_const\t g%d(%p), %s", location, m_globalObject->findRegisterIndex(registerPointer), registerPointer, registerName(exec, r0).data());
+            dumpBytecodeCommentAndNewLine(location);
+            break;
+        }
+        case op_init_global_const_check: {
+            WriteBarrier<Unknown>* registerPointer = (++it)->u.registerPointer;
+            int r0 = (++it)->u.operand;
+            dataLog("[%4d] init_global_const_check\t g%d(%p), %s", location, m_globalObject->findRegisterIndex(registerPointer), registerPointer, registerName(exec, r0).data());
             dumpBytecodeCommentAndNewLine(location);
             it++;
             it++;
@@ -1406,14 +1429,14 @@ void CodeBlock::dump(ExecState* exec, const Vector<Instruction>::const_iterator&
         }
         case op_tear_off_activation: {
             int r0 = (++it)->u.operand;
-            int r1 = (++it)->u.operand;
-            dataLog("[%4d] tear_off_activation\t %s, %s", location, registerName(exec, r0).data(), registerName(exec, r1).data());
+            dataLog("[%4d] tear_off_activation\t %s", location, registerName(exec, r0).data());
             dumpBytecodeCommentAndNewLine(location);
             break;
         }
         case op_tear_off_arguments: {
             int r0 = (++it)->u.operand;
-            dataLog("[%4d] tear_off_arguments %s", location, registerName(exec, r0).data());
+            int r1 = (++it)->u.operand;
+            dataLog("[%4d] tear_off_arguments %s, %s", location, registerName(exec, r0).data(), registerName(exec, r1).data());
             dumpBytecodeCommentAndNewLine(location);
             break;
         }
@@ -1686,7 +1709,6 @@ CodeBlock::CodeBlock(CopyParsedBlockTag, CodeBlock& other)
     , m_heap(other.m_heap)
     , m_numCalleeRegisters(other.m_numCalleeRegisters)
     , m_numVars(other.m_numVars)
-    , m_numCapturedVars(other.m_numCapturedVars)
     , m_isConstructor(other.m_isConstructor)
     , m_ownerExecutable(*other.m_globalData, other.m_ownerExecutable.get(), other.m_ownerExecutable.get())
     , m_globalData(other.m_globalData)
@@ -1752,7 +1774,6 @@ CodeBlock::CodeBlock(ScriptExecutable* ownerExecutable, CodeType codeType, JSGlo
     , m_heap(&m_globalObject->globalData().heap)
     , m_numCalleeRegisters(0)
     , m_numVars(0)
-    , m_numCapturedVars(0)
     , m_isConstructor(isConstructor)
     , m_numParameters(0)
     , m_ownerExecutable(globalObject->globalData(), ownerExecutable, ownerExecutable)
@@ -2079,6 +2100,8 @@ void CodeBlock::finalizeUnconditionally()
                 curInstruction[6].u.structure.clear();
                 curInstruction[7].u.structureChain.clear();
                 curInstruction[0].u.opcode = interpreter->getOpcode(op_put_by_id);
+                break;
+            case op_get_array_length:
                 break;
             default:
                 ASSERT_NOT_REACHED();

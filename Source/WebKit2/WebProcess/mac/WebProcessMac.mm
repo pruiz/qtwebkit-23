@@ -180,8 +180,10 @@ static void appendReadwriteSandboxDirectory(Vector<const char*>& vector, const c
 
 #endif
 
-static void initializeSandbox(const WebProcessCreationParameters& parameters)
+void WebProcess::initializeSandbox(const String& clientIdentifier)
 {
+    [[NSFileManager defaultManager] changeCurrentDirectoryPath:[[NSBundle mainBundle] bundlePath]];
+
 #if ENABLE(WEB_PROCESS_SANDBOX)
 
 #if DEBUG_BYPASS_SANDBOX
@@ -191,7 +193,7 @@ static void initializeSandbox(const WebProcessCreationParameters& parameters)
 
 #if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1080
     // Use private temporary and cache directories.
-    String systemDirectorySuffix = "com.apple.WebProcess+" + parameters.uiProcessBundleIdentifier;
+    String systemDirectorySuffix = "com.apple.WebProcess+" + clientIdentifier;
     setenv("DIRHELPER_USER_DIR_SUFFIX", fileSystemRepresentation(systemDirectorySuffix).data(), 0);
     char temporaryDirectory[PATH_MAX];
     if (!confstr(_CS_DARWIN_USER_TEMP_DIR, temporaryDirectory, sizeof(temporaryDirectory))) {
@@ -201,10 +203,12 @@ static void initializeSandbox(const WebProcessCreationParameters& parameters)
     setenv("TMPDIR", temporaryDirectory, 1);
 #endif
 
+    NSBundle *webkit2Bundle = [NSBundle bundleForClass:NSClassFromString(@"WKView")];
+
     Vector<const char*> sandboxParameters;
 
     // These are read-only.
-    appendReadonlySandboxDirectory(sandboxParameters, "WEBKIT2_FRAMEWORK_DIR", [[[NSBundle bundleForClass:NSClassFromString(@"WKView")] bundlePath] stringByDeletingLastPathComponent]);
+    appendReadonlySandboxDirectory(sandboxParameters, "WEBKIT2_FRAMEWORK_DIR", [[webkit2Bundle bundlePath] stringByDeletingLastPathComponent]);
 
     // These are read-write getconf paths.
     appendReadwriteConfDirectory(sandboxParameters, "DARWIN_USER_TEMP_DIR", _CS_DARWIN_USER_TEMP_DIR);
@@ -215,7 +219,7 @@ static void initializeSandbox(const WebProcessCreationParameters& parameters)
 
     sandboxParameters.append(static_cast<const char*>(0));
 
-    const char* profilePath = [[[NSBundle mainBundle] pathForResource:@"com.apple.WebProcess" ofType:@"sb"] fileSystemRepresentation];
+    const char* profilePath = [[webkit2Bundle pathForResource:@"com.apple.WebProcess" ofType:@"sb"] fileSystemRepresentation];
 
     char* errorBuf;
     if (sandbox_init_with_parameters(profilePath, SANDBOX_NAMED_EXTERNAL, sandboxParameters.data(), &errorBuf)) {
@@ -248,10 +252,6 @@ static id NSApplicationAccessibilityFocusedUIElement(NSApplication*, SEL)
     
 void WebProcess::platformInitializeWebProcess(const WebProcessCreationParameters& parameters, CoreIPC::ArgumentDecoder*)
 {
-    [[NSFileManager defaultManager] changeCurrentDirectoryPath:[[NSBundle mainBundle] bundlePath]];
-
-    initializeSandbox(parameters);
-
     SandboxExtension::consumePermanently(parameters.uiProcessBundleResourcePathExtensionHandle);
     SandboxExtension::consumePermanently(parameters.localStorageDirectoryExtensionHandle);
     SandboxExtension::consumePermanently(parameters.databaseDirectoryExtensionHandle);

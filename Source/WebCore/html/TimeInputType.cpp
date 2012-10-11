@@ -34,6 +34,7 @@
 #include "DateComponents.h"
 #include "HTMLInputElement.h"
 #include "HTMLNames.h"
+#include "InputTypeNames.h"
 #include <wtf/CurrentTime.h>
 #include <wtf/DateMath.h>
 #include <wtf/MathExtras.h>
@@ -41,8 +42,11 @@
 
 #if ENABLE(INPUT_TYPE_TIME)
 #if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
+#include "DateTimeFieldsState.h"
 #include "ElementShadow.h"
+#include "FormController.h"
 #include "KeyboardEvent.h"
+#include "Localizer.h"
 #include "ShadowRoot.h"
 #endif
 
@@ -149,6 +153,7 @@ void TimeInputType::DateTimeEditControlOwnerImpl::editControlValueChanged()
     input->setNeedsStyleRecalc();
     input->dispatchFormControlInputEvent();
     input->dispatchFormControlChangeEvent();
+    input->notifyFormStateChanged();
 }
 
 bool TimeInputType::hasCustomFocusLogic() const
@@ -258,6 +263,25 @@ bool TimeInputType::isTextField() const
     return false;
 }
 
+void TimeInputType::restoreFormControlState(const FormControlState& state)
+{
+    if (!m_dateTimeEditElement)
+        return;
+    DateComponents date;
+    setMillisecondToDateComponents(createStepRange(AnyIsDefaultStep).minimum().toDouble(), &date);
+    DateTimeFieldsState dateTimeFieldsState = DateTimeFieldsState::restoreFormControlState(state);
+    m_dateTimeEditElement->setValueAsDateTimeFieldsState(dateTimeFieldsState, date);
+    element()->setValueInternal(serialize(Decimal::fromDouble(m_dateTimeEditElement->valueAsDouble())), DispatchNoEvent);
+}
+
+FormControlState TimeInputType::saveFormControlState() const
+{
+    if (!m_dateTimeEditElement)
+        return FormControlState();
+
+    return m_dateTimeEditElement->valueAsDateTimeFieldsState().saveFormControlState();
+}
+
 void TimeInputType::setValue(const String& sanitizedValue, bool valueChanged, TextFieldEventBehavior eventBehavior)
 {
     InputType::setValue(sanitizedValue, valueChanged, eventBehavior);
@@ -280,14 +304,26 @@ void TimeInputType::updateInnerTextValue()
     if (!m_dateTimeEditElement)
         return;
 
-    const StepRange stepRange(createStepRange(AnyIsDefaultStep));
+    Localizer& localizer = element()->document()->getLocalizer(element()->computeInheritedLanguage());
+    DateTimeEditElement::LayoutParameters layoutParameters(localizer, createStepRange(AnyIsDefaultStep));
+
     DateComponents date;
-    if (parseToDateComponents(element()->value(), &date))
-        m_dateTimeEditElement->setValueAsDate(stepRange, date);
-    else {
-        setMillisecondToDateComponents(stepRange.minimum().toDouble(), &date);
-        m_dateTimeEditElement->setEmptyValue(stepRange, date);
+    const bool hasValue = parseToDateComponents(element()->value(), &date);
+    if (!hasValue)
+        setMillisecondToDateComponents(layoutParameters.stepRange.minimum().toDouble(), &date);
+
+    if (date.second() || layoutParameters.shouldHaveSecondField()) {
+        layoutParameters.dateTimeFormat = localizer.timeFormat();
+        layoutParameters.fallbackDateTimeFormat = "HH:mm:ss";
+    } else {
+        layoutParameters.dateTimeFormat = localizer.shortTimeFormat();
+        layoutParameters.fallbackDateTimeFormat = "HH:mm";
     }
+
+    if (hasValue)
+        m_dateTimeEditElement->setValueAsDate(layoutParameters, date);
+    else
+        m_dateTimeEditElement->setEmptyValue(layoutParameters, date);
 }
 #else
 TimeInputType::TimeInputType(HTMLInputElement* element)

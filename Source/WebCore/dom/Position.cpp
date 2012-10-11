@@ -718,6 +718,7 @@ Position Position::upstream(EditingBoundaryCrossingRule rule) const
 // and upstream() will return the left one.
 // Also, downstream() will return the last position in the last atomic node in boundary for all of the positions
 // in boundary after the last candidate, where endsOfNodeAreVisuallyDistinctPositions(boundary).
+// FIXME: This function should never be called when the line box tree is dirty. See https://bugs.webkit.org/show_bug.cgi?id=97264
 Position Position::downstream(EditingBoundaryCrossingRule rule) const
 {
     Node* startNode = deprecatedNode();
@@ -1321,7 +1322,7 @@ void Position::formatForDebugger(char* buffer, unsigned length) const
     else {
         char s[1024];
         result.appendLiteral("offset ");
-        result.append(String::number(m_offset));
+        result.appendNumber(m_offset);
         result.appendLiteral(" of ");
         deprecatedNode()->formatForDebugger(s, sizeof(s));
         result.append(s);

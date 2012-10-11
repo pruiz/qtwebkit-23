@@ -26,7 +26,7 @@
 #include "ExceptionCode.h"
 #include "MediaQuery.h"
 #include "MediaQueryExp.h"
-#include "MemoryInstrumentation.h"
+#include "WebCoreMemoryInstrumentation.h"
 #include <wtf/text/StringBuilder.h>
 
 namespace WebCore {
@@ -293,7 +293,7 @@ void MediaList::reattach(MediaQuerySet* mediaQueries)
 void MediaList::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CSS);
-    info.addInstrumentedMember(m_mediaQueries);
+    info.addMember(m_mediaQueries);
 }
 
 }

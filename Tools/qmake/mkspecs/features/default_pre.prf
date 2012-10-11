@@ -19,7 +19,7 @@ isEmpty(pro_file): CONFIG += recursive_include
 # Resolve root directories for source and build
 ROOT_WEBKIT_DIR = $$replace(PWD, /Tools/qmake/mkspecs/features$,)
 WEBKIT_SUBDIR = $$replace(_PRO_FILE_PWD_, $${ROOT_WEBKIT_DIR},)
-ROOT_BUILD_DIR = $$replace(OUT_PWD, $${WEBKIT_SUBDIR}$,)
+ROOT_BUILD_DIR = $$toSystemPath($$replace(OUT_PWD, $${WEBKIT_SUBDIR}$,))
 
 # We want the QtWebKit API forwarding includes to live in the root build dir.
 MODULE_BASE_DIR = $$ROOT_WEBKIT_DIR
@@ -41,12 +41,12 @@ equals(OUT_PWD, $${ROOT_BUILD_DIR}) {
     !recursive_include:CONFIG += root_project_file
     BUILD_ROOT_RELATIVE_TO_OUT_PWD = .
 } else {
-    subdir_parts = $$replace(OUT_PWD, ^$${ROOT_BUILD_DIR}$${QMAKE_DIR_SEP},)
-    subdir_parts = $$split(subdir_parts, $${QMAKE_DIR_SEP})
+    subdir_parts = $$replace(OUT_PWD, ^$${ROOT_BUILD_DIR}/,)
+    subdir_parts = $$split(subdir_parts, /)
     for(subdir, subdir_parts) {
         BUILD_ROOT_RELATIVE_TO_OUT_PWD += ..
     }
-    BUILD_ROOT_RELATIVE_TO_OUT_PWD = $$join(BUILD_ROOT_RELATIVE_TO_OUT_PWD, $${QMAKE_DIR_SEP})
+    BUILD_ROOT_RELATIVE_TO_OUT_PWD = $$join(BUILD_ROOT_RELATIVE_TO_OUT_PWD, /)
 }
 
 # Try to detect if we're running under Windows cmd.exe or not
@@ -137,3 +137,8 @@ for(define, DEFINES) {
 # what features.prf introduced and what was already there.
 BASE_CONFIG = $$CONFIG
 BASE_DEFINES = $$DEFINES
+
+# A newer version of flex is required on Windows. At the moment the only
+# one that appears to provide binaries and is not cygwin is winflex.
+FLEX = flex
+win32: FLEX = win_flex

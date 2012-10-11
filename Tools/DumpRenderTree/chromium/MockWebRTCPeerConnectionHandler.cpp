@@ -35,7 +35,7 @@
 
 #include <public/WebMediaConstraints.h>
 #include <public/WebRTCPeerConnectionHandlerClient.h>
-#include <public/WebRTCSessionDescriptionDescriptor.h>
+#include <public/WebRTCSessionDescription.h>
 #include <public/WebRTCSessionDescriptionRequest.h>
 #include <public/WebRTCVoidRequest.h>
 #include <public/WebString.h>
@@ -45,7 +45,7 @@ using namespace WebKit;
 
 class RTCSessionDescriptionRequestSuccededTask : public MethodTask<MockWebRTCPeerConnectionHandler> {
 public:
-    RTCSessionDescriptionRequestSuccededTask(MockWebRTCPeerConnectionHandler* object, const WebKit::WebRTCSessionDescriptionRequest& request, const WebKit::WebRTCSessionDescriptionDescriptor& result)
+    RTCSessionDescriptionRequestSuccededTask(MockWebRTCPeerConnectionHandler* object, const WebKit::WebRTCSessionDescriptionRequest& request, const WebKit::WebRTCSessionDescription& result)
         : MethodTask<MockWebRTCPeerConnectionHandler>(object)
         , m_request(request)
         , m_result(result)
@@ -59,7 +59,7 @@ public:
 
 private:
     WebKit::WebRTCSessionDescriptionRequest m_request;
-    WebKit::WebRTCSessionDescriptionDescriptor m_result;
+    WebKit::WebRTCSessionDescription m_result;
 };
 
 class RTCSessionDescriptionRequestFailedTask : public MethodTask<MockWebRTCPeerConnectionHandler> {
@@ -153,37 +153,47 @@ void MockWebRTCPeerConnectionHandler::createOffer(const WebRTCSessionDescription
 {
     WebString shouldSucceed;
     if (constraints.getMandatoryConstraintValue("succeed", shouldSucceed) && shouldSucceed == "true") {
-        WebRTCSessionDescriptionDescriptor sessionDescription;
-        sessionDescription.initialize("offer", "Some SDP here");
+        WebRTCSessionDescription sessionDescription;
+        sessionDescription.initialize("offer", "local");
         postTask(new RTCSessionDescriptionRequestSuccededTask(this, request, sessionDescription));
     } else
         postTask(new RTCSessionDescriptionRequestFailedTask(this, request));
 }
 
-void MockWebRTCPeerConnectionHandler::setLocalDescription(const WebRTCVoidRequest& request, const WebRTCSessionDescriptionDescriptor& localDescription)
+void MockWebRTCPeerConnectionHandler::createAnswer(const WebRTCSessionDescriptionRequest& request, const WebMediaConstraints&)
 {
-    if (!localDescription.isNull() && localDescription.type() == "offer") {
+    if (!m_remoteDescription.isNull()) {
+        WebRTCSessionDescription sessionDescription;
+        sessionDescription.initialize("answer", "local");
+        postTask(new RTCSessionDescriptionRequestSuccededTask(this, request, sessionDescription));
+    } else
+        postTask(new RTCSessionDescriptionRequestFailedTask(this, request));
+}
+
+void MockWebRTCPeerConnectionHandler::setLocalDescription(const WebRTCVoidRequest& request, const WebRTCSessionDescription& localDescription)
+{
+    if (!localDescription.isNull() && localDescription.sdp() == "local") {
         m_localDescription = localDescription;
         postTask(new RTCVoidRequestTask(this, request, true));
     } else
         postTask(new RTCVoidRequestTask(this, request, false));
 }
 
-void MockWebRTCPeerConnectionHandler::setRemoteDescription(const WebRTCVoidRequest& request, const WebRTCSessionDescriptionDescriptor& remoteDescription)
+void MockWebRTCPeerConnectionHandler::setRemoteDescription(const WebRTCVoidRequest& request, const WebRTCSessionDescription& remoteDescription)
 {
-    if (!remoteDescription.isNull() && remoteDescription.type() == "answer") {
+    if (!remoteDescription.isNull() && remoteDescription.sdp() == "remote") {
         m_remoteDescription = remoteDescription;
         postTask(new RTCVoidRequestTask(this, request, true));
     } else
         postTask(new RTCVoidRequestTask(this, request, false));
 }
 
-WebRTCSessionDescriptionDescriptor MockWebRTCPeerConnectionHandler::localDescription()
+WebRTCSessionDescription MockWebRTCPeerConnectionHandler::localDescription()
 {
     return m_localDescription;
 }
 
-WebRTCSessionDescriptionDescriptor MockWebRTCPeerConnectionHandler::remoteDescription()
+WebRTCSessionDescription MockWebRTCPeerConnectionHandler::remoteDescription()
 {
     return m_remoteDescription;
 }
@@ -194,7 +204,7 @@ bool MockWebRTCPeerConnectionHandler::updateICE(const WebRTCConfiguration&, cons
     return true;
 }
 
-bool MockWebRTCPeerConnectionHandler::addICECandidate(const WebRTCICECandidateDescriptor& iceCandidate)
+bool MockWebRTCPeerConnectionHandler::addICECandidate(const WebRTCICECandidate& iceCandidate)
 {
     m_client->didGenerateICECandidate(iceCandidate);
     return true;
@@ -203,12 +213,14 @@ bool MockWebRTCPeerConnectionHandler::addICECandidate(const WebRTCICECandidateDe
 bool MockWebRTCPeerConnectionHandler::addStream(const WebMediaStreamDescriptor& stream, const WebMediaConstraints&)
 {
     m_client->didAddRemoteStream(stream);
+    m_client->negotiationNeeded();
     return true;
 }
 
 void MockWebRTCPeerConnectionHandler::removeStream(const WebMediaStreamDescriptor& stream)
 {
     m_client->didRemoveRemoteStream(stream);
+    m_client->negotiationNeeded();
 }
 
 void MockWebRTCPeerConnectionHandler::stop()

@@ -36,9 +36,9 @@
 #include "CachedResourceLoader.h"
 #include "FontPlatformData.h"
 #include "MemoryCache.h"
-#include "MemoryInstrumentation.h"
 #include "SharedBuffer.h"
 #include "TextResourceDecoder.h"
+#include "WebCoreMemoryInstrumentation.h"
 #include <wtf/Vector.h>
 
 #ifdef STORE_FONT_CUSTOM_PLATFORM_DATA
@@ -203,7 +203,7 @@ void CachedFont::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CachedResourceFont);
     CachedResource::reportMemoryUsage(memoryObjectInfo);
 #if ENABLE(SVG_FONTS)
-    info.addInstrumentedMember(m_externalSVGDocument);
+    info.addMember(m_externalSVGDocument);
 #endif
 #ifdef STORE_FONT_CUSTOM_PLATFORM_DATA
     info.addMember(m_fontData);

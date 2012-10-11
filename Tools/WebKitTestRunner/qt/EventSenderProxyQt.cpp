@@ -131,7 +131,7 @@ void EventSenderProxy::keyDown(WKStringRef keyRef, WKEventModifiers modifiersRef
             code = Qt::Key_Tab;
             if (modifiers == Qt::ShiftModifier)
                 code = Qt::Key_Backtab;
-            keyText = QString();
+            keyText = QStringLiteral("\t");
         } else if (code == KEYCODE_DEL || code == KEYCODE_BACKSPACE) {
             code = Qt::Key_Backspace;
             if (modifiers == Qt::AltModifier)
@@ -188,10 +188,6 @@ void EventSenderProxy::keyDown(WKStringRef keyRef, WKEventModifiers modifiersRef
                 code = Qt::Key_PageDown;
                 modifiers &= ~Qt::MetaModifier;
             }
-        } else if (code == 'a' && modifiers == Qt::ControlModifier) {
-            keyText = QString();
-            code = Qt::Key_Home;
-            modifiers = 0;
         } else
             code = key.unicode()->toUpper().unicode();
     } else {

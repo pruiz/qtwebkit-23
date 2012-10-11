@@ -173,6 +173,18 @@ void RenderListBox::selectionChanged()
 void RenderListBox::layout()
 {
     RenderBlock::layout();
+
+    if (m_vBar) {
+        bool enabled = numVisibleItems() < numItems();
+        m_vBar->setEnabled(enabled);
+        m_vBar->setSteps(1, max(1, numVisibleItems() - 1), itemHeight());
+        m_vBar->setProportion(numVisibleItems(), numItems());
+        if (!enabled) {
+            scrollToOffsetWithoutAnimation(VerticalScrollbar, 0);
+            m_indexOffset = 0;
+        }
+    }
+
     if (m_scrollToRevealSelectionAfterLayout) {
         LayoutStateDisabler layoutStateDisabler(view());
         scrollToRevealSelection();
@@ -198,7 +210,7 @@ void RenderListBox::computePreferredLogicalWidths()
     m_maxPreferredLogicalWidth = 0;
 
     if (style()->width().isFixed() && style()->width().value() > 0)
-        m_minPreferredLogicalWidth = m_maxPreferredLogicalWidth = computeContentBoxLogicalWidth(style()->width().value());
+        m_minPreferredLogicalWidth = m_maxPreferredLogicalWidth = adjustContentBoxLogicalWidthForBoxSizing(style()->width().value());
     else {
         m_maxPreferredLogicalWidth = m_optionsWidth + 2 * optionsSpacingHorizontal;
         if (m_vBar)
@@ -206,16 +218,16 @@ void RenderListBox::computePreferredLogicalWidths()
     }
 
     if (style()->minWidth().isFixed() && style()->minWidth().value() > 0) {
-        m_maxPreferredLogicalWidth = max(m_maxPreferredLogicalWidth, computeContentBoxLogicalWidth(style()->minWidth().value()));
-        m_minPreferredLogicalWidth = max(m_minPreferredLogicalWidth, computeContentBoxLogicalWidth(style()->minWidth().value()));
+        m_maxPreferredLogicalWidth = max(m_maxPreferredLogicalWidth, adjustContentBoxLogicalWidthForBoxSizing(style()->minWidth().value()));
+        m_minPreferredLogicalWidth = max(m_minPreferredLogicalWidth, adjustContentBoxLogicalWidthForBoxSizing(style()->minWidth().value()));
     } else if (style()->width().isPercent() || (style()->width().isAuto() && style()->height().isPercent()))
         m_minPreferredLogicalWidth = 0;
     else
         m_minPreferredLogicalWidth = m_maxPreferredLogicalWidth;
 
     if (style()->maxWidth().isFixed()) {
-        m_maxPreferredLogicalWidth = min(m_maxPreferredLogicalWidth, computeContentBoxLogicalWidth(style()->maxWidth().value()));
-        m_minPreferredLogicalWidth = min(m_minPreferredLogicalWidth, computeContentBoxLogicalWidth(style()->maxWidth().value()));
+        m_maxPreferredLogicalWidth = min(m_maxPreferredLogicalWidth, adjustContentBoxLogicalWidthForBoxSizing(style()->maxWidth().value()));
+        m_minPreferredLogicalWidth = min(m_minPreferredLogicalWidth, adjustContentBoxLogicalWidthForBoxSizing(style()->maxWidth().value()));
     }
 
     LayoutUnit toAdd = borderAndPaddingWidth();
@@ -250,25 +262,10 @@ LayoutUnit RenderListBox::listHeight() const
     return itemHeight() * numItems() - rowSpacing;
 }
 
-void RenderListBox::computeLogicalHeight()
+void RenderListBox::computeLogicalHeight(LayoutUnit, LayoutUnit logicalTop, LogicalExtentComputedValues& computedValues) const
 {
-    int toAdd = borderAndPaddingHeight();
- 
-    int itemHeight = RenderListBox::itemHeight();
-    setHeight(itemHeight * size() - rowSpacing + toAdd);
-    
-    RenderBlock::computeLogicalHeight();
-    
-    if (m_vBar) {
-        bool enabled = numVisibleItems() < numItems();
-        m_vBar->setEnabled(enabled);
-        m_vBar->setSteps(1, max(1, numVisibleItems() - 1), itemHeight);
-        m_vBar->setProportion(numVisibleItems(), numItems());
-        if (!enabled) {
-            scrollToOffsetWithoutAnimation(VerticalScrollbar, 0);
-            m_indexOffset = 0;
-        }
-    }
+    LayoutUnit height = itemHeight() * size() - rowSpacing + borderAndPaddingHeight();
+    RenderBox::computeLogicalHeight(height, logicalTop, computedValues);
 }
 
 LayoutUnit RenderListBox::baselinePosition(FontBaseline baselineType, bool firstLine, LineDirectionMode lineDirection, LinePositionMode linePositionMode) const
@@ -821,9 +818,12 @@ bool RenderListBox::shouldSuspendScrollAnimations() const
     return view->frameView()->shouldSuspendScrollAnimations();
 }
 
-bool RenderListBox::isOnActivePage() const
+bool RenderListBox::scrollbarsCanBeActive() const
 {
-    return !document()->inPageCache();
+    RenderView* view = this->view();
+    if (!view)
+        return false;
+    return view->frameView()->scrollbarsCanBeActive();
 }
 
 ScrollableArea* RenderListBox::enclosingScrollableArea() const

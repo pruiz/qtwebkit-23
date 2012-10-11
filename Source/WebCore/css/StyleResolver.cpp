@@ -82,7 +82,6 @@
 #include "MatrixTransformOperation.h"
 #include "MediaList.h"
 #include "MediaQueryEvaluator.h"
-#include "MemoryInstrumentation.h"
 #include "NodeRenderStyle.h"
 #include "NodeRenderingContext.h"
 #include "Page.h"
@@ -119,6 +118,7 @@
 #include "TransformationMatrix.h"
 #include "TranslateTransformOperation.h"
 #include "UserAgentStyleSheets.h"
+#include "WebCoreMemoryInstrumentation.h"
 #include "WebKitCSSKeyframeRule.h"
 #include "WebKitCSSKeyframesRule.h"
 #include "WebKitCSSRegionRule.h"
@@ -147,6 +147,7 @@
 #endif
 
 #if ENABLE(CSS_SHADERS)
+#include "CustomFilterArrayParameter.h"
 #include "CustomFilterNumberParameter.h"
 #include "CustomFilterOperation.h"
 #include "CustomFilterParameter.h"
@@ -167,6 +168,7 @@
 #if PLATFORM(BLACKBERRY)
 #define FIXED_POSITION_CREATES_STACKING_CONTEXT 1
 #endif
+
 
 using namespace std;
 
@@ -251,7 +253,7 @@ struct SameSizeAsRuleData {
 COMPILE_ASSERT(sizeof(RuleData) == sizeof(SameSizeAsRuleData), RuleData_should_stay_small);
 
 class RuleSet {
-    WTF_MAKE_NONCOPYABLE(RuleSet);
+    WTF_MAKE_NONCOPYABLE(RuleSet); WTF_MAKE_FAST_ALLOCATED;
 public:
     static PassOwnPtr<RuleSet> create() { return adoptPtr(new RuleSet); }
 
@@ -379,6 +381,7 @@ StyleResolver::StyleResolver(Document* document, bool matchAuthorAndUserStyles)
     , m_matchAuthorAndUserStyles(matchAuthorAndUserStyles)
     , m_sameOriginOnly(false)
     , m_distributedToInsertionPoint(false)
+    , m_hasUnknownPseudoElements(false)
     , m_fontSelector(CSSFontSelector::create(document))
     , m_applyPropertyToRegularStyle(true)
     , m_applyPropertyToVisitedLinkStyle(false)
@@ -1071,6 +1074,9 @@ void StyleResolver::collectMatchingRulesForList(const Vector<RuleData>* rules, i
 {
     if (!rules)
         return;
+
+    TreeScope* treeScope = m_element->treeScope();
+
     // In some cases we may end up looking up style for random elements in the middle of a recursive tree resolve.
     // Ancestor identifier filter won't be up-to-date in that case and we can't use the fast path.
     bool canUseFastReject = m_checker.parentStackIsConsistent(m_parentNode);
@@ -1093,13 +1099,12 @@ void StyleResolver::collectMatchingRulesForList(const Vector<RuleData>* rules, i
             // b) the tree scope allows author rules
             // c) the rules comes from a scoped style sheet within the same tree scope
             // d) the rule contains shadow-ID pseudo elements
-            TreeScope* treeScope = m_element->treeScope();
             if (!MatchingUARulesScope::isMatchingUARules()
                 && !treeScope->applyAuthorStyles()
 #if ENABLE(STYLE_SCOPED)
                 && (!options.scope || options.scope->treeScope() != treeScope)
 #endif
-                && !m_checker.hasUnknownPseudoElements()) {
+                && !m_hasUnknownPseudoElements) {
 
                 InspectorInstrumentation::didMatchRule(cookie, false);
                 continue;
@@ -1117,7 +1122,7 @@ void StyleResolver::collectMatchingRulesForList(const Vector<RuleData>* rules, i
             }
             // If we're matching normal rules, set a pseudo bit if
             // we really just matched a pseudo-element.
-            if (m_dynamicPseudo != NOPSEUDO && m_checker.pseudoStyle() == NOPSEUDO) {
+            if (m_dynamicPseudo != NOPSEUDO && m_pseudoStyle == NOPSEUDO) {
                 if (m_checker.mode() == SelectorChecker::CollectingRules) {
                     InspectorInstrumentation::didMatchRule(cookie, false);
                     continue;
@@ -1214,7 +1219,7 @@ inline void StyleResolver::initElement(Element* e)
 
 inline void StyleResolver::initForStyleResolve(Element* e, RenderStyle* parentStyle, PseudoId pseudoID)
 {
-    m_checker.setPseudoStyle(pseudoID);
+    m_pseudoStyle = pseudoID;
 
     if (e) {
         NodeRenderingContext context(e);
@@ -1707,9 +1712,9 @@ PassRefPtr<RenderStyle> StyleResolver::styleForDocument(Document* document, CSSF
         return documentStyle.release();
 
     FontDescription fontDescription;
-    fontDescription.setUsePrinterFont(document->printing());
     fontDescription.setScript(localeToScriptCodeForFontSelection(documentStyle->locale()));
     if (Settings* settings = document->settings()) {
+        fontDescription.setUsePrinterFont(document->printing() || !settings->screenFontSubstitutionEnabled());
         fontDescription.setRenderingMode(settings->fontRenderingMode());
         const AtomicString& standardFont = settings->standardFontFamily(fontDescription.script());
         if (!standardFont.isEmpty()) {
@@ -1722,7 +1727,8 @@ PassRefPtr<RenderStyle> StyleResolver::styleForDocument(Document* document, CSSF
         fontDescription.setSpecifiedSize(size);
         bool useSVGZoomRules = document->isSVGDocument();
         fontDescription.setComputedSize(StyleResolver::getComputedSizeFromSpecifiedSize(document, documentStyle.get(), fontDescription.isAbsoluteSize(), size, useSVGZoomRules));
-    }
+    } else
+        fontDescription.setUsePrinterFont(document->printing());
 
     documentStyle->setFontDescription(fontDescription);
     documentStyle->font().update(fontSelector);
@@ -2187,6 +2193,7 @@ void StyleResolver::adjustRenderStyle(RenderStyle* style, RenderStyle* parentSty
         || style->opacity() < 1.0f
         || style->hasTransformRelatedProperty()
         || style->hasMask()
+        || style->clipPath()
         || style->boxReflect()
         || style->hasFilter()
         || style->hasBlendMode()
@@ -2196,7 +2203,7 @@ void StyleResolver::adjustRenderStyle(RenderStyle* style, RenderStyle* parentSty
 #else
         || (style->position() == FixedPosition && e && e->document()->page() && e->document()->page()->settings()->fixedPositionCreatesStackingContext())
 #endif
-#if ENABLE(OVERFLOW_SCROLLING)
+#if ENABLE(ACCELERATED_OVERFLOW_SCROLLING)
         // Touch overflow scrolling creates a stacking context.
         || ((style->overflowX() != OHIDDEN || style->overflowY() != OHIDDEN) && style->useTouchOverflowScrolling())
 #endif
@@ -2397,11 +2404,11 @@ PassRefPtr<CSSRuleList> StyleResolver::pseudoStyleRulesForElement(Element* e, Ps
 inline bool StyleResolver::checkSelector(const RuleData& ruleData, const ContainerNode* scope)
 {
     m_dynamicPseudo = NOPSEUDO;
-    m_checker.clearHasUnknownPseudoElements();
+    m_hasUnknownPseudoElements = false;
 
     if (ruleData.hasFastCheckableSelector()) {
         // We know this selector does not include any pseudo elements.
-        if (m_checker.pseudoStyle() != NOPSEUDO)
+        if (m_pseudoStyle != NOPSEUDO)
             return false;
         // We know a sufficiently simple single part selector matches simply because we found it from the rule hash.
         // This is limited to HTML only so we don't need to check the namespace.
@@ -2420,10 +2427,11 @@ inline bool StyleResolver::checkSelector(const RuleData& ruleData, const Contain
     context.elementStyle = style();
     context.elementParentStyle = m_parentNode ? m_parentNode->renderStyle() : 0;
     context.scope = scope;
-    SelectorChecker::SelectorMatch match = m_checker.checkSelector(context, m_dynamicPseudo);
+    context.pseudoStyle = m_pseudoStyle;
+    SelectorChecker::SelectorMatch match = m_checker.checkSelector(context, m_dynamicPseudo, m_hasUnknownPseudoElements);
     if (match != SelectorChecker::SelectorMatches)
         return false;
-    if (m_checker.pseudoStyle() != NOPSEUDO && m_checker.pseudoStyle() != m_dynamicPseudo)
+    if (m_pseudoStyle != NOPSEUDO && m_pseudoStyle != m_dynamicPseudo)
         return false;
     return true;
 }
@@ -2433,8 +2441,8 @@ bool StyleResolver::checkRegionSelector(CSSSelector* regionSelector, Element* re
     if (!regionSelector || !regionElement)
         return false;
 
-    m_checker.clearHasUnknownPseudoElements();
-    m_checker.setPseudoStyle(NOPSEUDO);
+    m_hasUnknownPseudoElements = false;
+    m_pseudoStyle = NOPSEUDO;
 
     for (CSSSelector* s = regionSelector; s; s = CSSSelectorList::next(s))
         if (m_checker.checkSelector(s, regionElement))
@@ -2580,7 +2588,7 @@ void RuleSet::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 void RuleSet::RuleSetSelectorPair::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CSS);
-    info.addInstrumentedMember(ruleSet);
+    info.addMember(ruleSet);
 }
 
 static inline void collectFeaturesFromSelector(StyleResolver::Features& features, const CSSSelector* selector)
@@ -3433,11 +3441,11 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
     const PropertyHandler& handler = m_styleBuilder.propertyHandler(id);
     if (handler.isValid()) {
         if (isInherit)
-            handler.applyInheritValue(this);
+            handler.applyInheritValue(id, this);
         else if (isInitial)
-            handler.applyInitialValue(this);
+            handler.applyInitialValue(id, this);
         else
-            handler.applyValue(this, value);
+            handler.applyValue(id, this, value);
         return;
     }
 
@@ -3722,7 +3730,7 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
                 if (!settings)
                     return;
                 fontDescription.setRenderingMode(settings->fontRenderingMode());
-                fontDescription.setUsePrinterFont(m_checker.document()->printing());
+                fontDescription.setUsePrinterFont(m_checker.document()->printing() || !settings->screenFontSubstitutionEnabled());
 
                 // Handle the zoom factor.
                 fontDescription.setComputedSize(getComputedSizeFromSpecifiedSize(m_checker.document(), m_style.get(), fontDescription.isAbsoluteSize(), fontDescription.specifiedSize(), useSVGZoomRules()));
@@ -4043,7 +4051,7 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
         return;
     }
 #endif
-#if ENABLE(OVERFLOW_SCROLLING)
+#if ENABLE(ACCELERATED_OVERFLOW_SCROLLING)
     case CSSPropertyWebkitOverflowScrolling: {
         HANDLE_INHERIT_AND_INITIAL(useTouchOverflowScrolling, UseTouchOverflowScrolling);
         if (!primitiveValue)
@@ -4603,7 +4611,7 @@ void StyleResolver::initializeFontStyle(Settings* settings)
     FontDescription fontDescription;
     fontDescription.setGenericFamily(FontDescription::StandardFamily);
     fontDescription.setRenderingMode(settings->fontRenderingMode());
-    fontDescription.setUsePrinterFont(m_checker.document()->printing());
+    fontDescription.setUsePrinterFont(m_checker.document()->printing() || !settings->screenFontSubstitutionEnabled());
     const AtomicString& standardFontFamily = documentSettings()->standardFontFamily();
     if (!standardFontFamily.isEmpty()) {
         fontDescription.firstFamily().setFamily(standardFontFamily);
@@ -5184,7 +5192,7 @@ void StyleResolver::loadPendingSVGDocuments()
         if (filterOperation->getOperationType() == FilterOperation::REFERENCE) {
             ReferenceFilterOperation* referenceFilter = static_cast<ReferenceFilterOperation*>(filterOperation.get());
 
-            WebKitCSSSVGDocumentValue* value = m_pendingSVGDocuments.get(referenceFilter);
+            WebKitCSSSVGDocumentValue* value = m_pendingSVGDocuments.get(referenceFilter).get();
             if (!value)
                 continue;
             CachedSVGDocument* cachedDocument = value->load(cachedResourceLoader);
@@ -5247,6 +5255,21 @@ static bool sortParametersByNameComparator(const RefPtr<CustomFilterParameter>& 
     return codePointCompareLessThan(a->name(), b->name());
 }
 
+PassRefPtr<CustomFilterParameter> StyleResolver::parseCustomFilterArrayParameter(const String& name, CSSValueList* values)
+{
+    RefPtr<CustomFilterArrayParameter> arrayParameter = CustomFilterArrayParameter::create(name);
+    for (unsigned i = 0, length = values->length(); i < length; ++i) {
+        CSSValue* value = values->itemWithoutBoundsCheck(i);
+        if (!value->isPrimitiveValue())
+            return 0;
+        CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
+        if (primitiveValue->primitiveType() != CSSPrimitiveValue::CSS_NUMBER)
+            return 0;
+        arrayParameter->addValue(primitiveValue->getDoubleValue());
+    }
+    return arrayParameter.release();
+}
+
 PassRefPtr<CustomFilterParameter> StyleResolver::parseCustomFilterNumberParameter(const String& name, CSSValueList* values)
 {
     RefPtr<CustomFilterNumberParameter> numberParameter = CustomFilterNumberParameter::create(name);
@@ -5277,6 +5300,8 @@ PassRefPtr<CustomFilterParameter> StyleResolver::parseCustomFilterParameter(cons
     // booleans: https://bugs.webkit.org/show_bug.cgi?id=76438
     // textures: https://bugs.webkit.org/show_bug.cgi?id=71442
     // mat2, mat3, mat4: https://bugs.webkit.org/show_bug.cgi?id=71444
+    // Number parameters are wrapped inside a CSSValueList and all
+    // the other functions values inherit from CSSValueList.
     if (!parameterValue->isValueList())
         return 0;
 
@@ -5284,9 +5309,16 @@ PassRefPtr<CustomFilterParameter> StyleResolver::parseCustomFilterParameter(cons
     if (!values->length())
         return 0;
 
+    if (parameterValue->isWebKitCSSArrayFunctionValue())
+        return parseCustomFilterArrayParameter(name, values);
+
+    // If the first value of the list is a transform function,
+    // then we could safely assume that all the remaining items
+    // are transforms. parseCustomFilterTransformParameter will
+    // return 0 if that assumption is incorrect.
     if (values->itemWithoutBoundsCheck(0)->isWebKitCSSTransformValue())
         return parseCustomFilterTransformParameter(name, values);
-    
+
     // We can have only arrays of booleans or numbers, so use the first value to choose between those two.
     // We need up to 4 values (all booleans or all numbers).
     if (!values->itemWithoutBoundsCheck(0)->isPrimitiveValue() || values->length() > 4)
@@ -5729,7 +5761,7 @@ void StyleResolver::loadPendingResources()
 void StyleResolver::MatchedProperties::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CSS);
-    info.addInstrumentedMember(properties);
+    info.addMember(properties);
 }
 
 void StyleResolver::MatchedPropertiesCacheItem::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
@@ -5741,26 +5773,26 @@ void StyleResolver::MatchedPropertiesCacheItem::reportMemoryUsage(MemoryObjectIn
 void MediaQueryResult::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CSS);
-    info.addInstrumentedMember(m_expression);
+    info.addMember(m_expression);
 }
 
 void StyleResolver::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CSS);
     info.addMember(m_style);
-    info.addInstrumentedMember(m_authorStyle);
-    info.addInstrumentedMember(m_userStyle);
-    info.addInstrumentedMember(m_siblingRuleSet);
-    info.addInstrumentedMember(m_uncommonAttributeRuleSet);
+    info.addMember(m_authorStyle);
+    info.addMember(m_userStyle);
+    info.addMember(m_siblingRuleSet);
+    info.addMember(m_uncommonAttributeRuleSet);
     info.addHashMap(m_keyframesRuleMap);
     info.addHashMap(m_matchedPropertiesCache);
     info.addInstrumentedMapValues(m_matchedPropertiesCache);
     info.addVector(m_matchedRules);
 
-    info.addInstrumentedMember(m_ruleList);
+    info.addMember(m_ruleList);
     info.addHashMap(m_pendingImageProperties);
     info.addInstrumentedMapValues(m_pendingImageProperties);
-    info.addInstrumentedMember(m_lineHeightValue);
+    info.addMember(m_lineHeightValue);
     info.addInstrumentedVector(m_viewportDependentMediaQueryResults);
     info.addHashMap(m_styleRuleToCSSOMWrapperMap);
     info.addInstrumentedMapEntries(m_styleRuleToCSSOMWrapperMap);
@@ -5775,10 +5807,10 @@ void StyleResolver::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 #endif
 
     // FIXME: move this to a place where it would be called only once?
-    info.addInstrumentedMember(defaultStyle);
-    info.addInstrumentedMember(defaultQuirksStyle);
-    info.addInstrumentedMember(defaultPrintStyle);
-    info.addInstrumentedMember(defaultViewSourceStyle);
+    info.addMember(defaultStyle);
+    info.addMember(defaultQuirksStyle);
+    info.addMember(defaultPrintStyle);
+    info.addMember(defaultViewSourceStyle);
 }
 
 } // namespace WebCore

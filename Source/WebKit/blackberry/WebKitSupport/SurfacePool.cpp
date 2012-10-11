@@ -21,10 +21,6 @@
 
 #include "PlatformContextSkia.h"
 
-#if USE(ACCELERATED_COMPOSITING)
-#include "BackingStoreCompositingSurface.h"
-#endif
-
 #include <BlackBerryPlatformGraphics.h>
 #include <BlackBerryPlatformLog.h>
 #include <BlackBerryPlatformMisc.h>
@@ -48,14 +44,6 @@ static PFNEGLDESTROYSYNCKHRPROC eglDestroySyncKHR;
 static PFNEGLCLIENTWAITSYNCKHRPROC eglClientWaitSyncKHR;
 #endif
 
-#if USE(ACCELERATED_COMPOSITING) && ENABLE_COMPOSITING_SURFACE
-static PassRefPtr<BackingStoreCompositingSurface> createCompositingSurface()
-{
-    BlackBerry::Platform::IntSize screenSize = BlackBerry::Platform::Graphics::Screen::primaryScreen()->size();
-    return BackingStoreCompositingSurface::create(screenSize, false /*doubleBuffered*/);
-}
-#endif
-
 SurfacePool* SurfacePool::globalSurfacePool()
 {
     static SurfacePool* s_instance = 0;
@@ -66,9 +54,6 @@ SurfacePool* SurfacePool::globalSurfacePool()
 
 SurfacePool::SurfacePool()
     : m_visibleTileBuffer(0)
-#if USE(ACCELERATED_COMPOSITING)
-    , m_compositingSurface(0)
-#endif
     , m_tileRenderingSurface(0)
     , m_backBuffer(0)
     , m_initialized(false)
@@ -97,10 +82,6 @@ void SurfacePool::initialize(const BlackBerry::Platform::IntSize& tileSize)
 
     m_tileRenderingSurface = BlackBerry::Platform::Graphics::drawingSurface();
 
-#if USE(ACCELERATED_COMPOSITING) && ENABLE_COMPOSITING_SURFACE
-    m_compositingSurface = createCompositingSurface();
-#endif
-
     if (!numberOfTiles)
         return; // we only use direct rendering when 0 tiles are specified.
 
@@ -123,7 +104,13 @@ void SurfacePool::initialize(const BlackBerry::Platform::IntSize& tileSize)
     }
 #endif
 
-    pthread_mutex_init(&m_mutex, 0);
+    // m_mutex must be recursive because destroyPlatformSync may be called indirectly
+    // from notifyBuffersComposited
+    pthread_mutexattr_t attr;
+    pthread_mutexattr_init(&attr);
+    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutex_init(&m_mutex, &attr);
+    pthread_mutexattr_destroy(&attr);
 }
 
 PlatformGraphicsContext* SurfacePool::createPlatformGraphicsContext(BlackBerry::Platform::Graphics::Drawable* drawable) const
@@ -160,21 +147,6 @@ TileBuffer* SurfacePool::backBuffer() const
 {
     ASSERT(m_backBuffer);
     return reinterpret_cast<TileBuffer*>(m_backBuffer);
-}
-
-#if USE(ACCELERATED_COMPOSITING)
-BackingStoreCompositingSurface* SurfacePool::compositingSurface() const
-{
-    return m_compositingSurface.get();
-}
-#endif
-
-void SurfacePool::notifyScreenRotated()
-{
-#if USE(ACCELERATED_COMPOSITING) && ENABLE_COMPOSITING_SURFACE
-    // Recreate compositing surface at new screen resolution.
-    m_compositingSurface = createCompositingSurface();
-#endif
 }
 
 std::string SurfacePool::sharedPixmapGroup() const
@@ -280,12 +252,16 @@ void SurfacePool::notifyBuffersComposited(const Vector<TileBuffer*>& tileBuffers
     // fence that may be active among these tiles and add its sync object to the garbage set
     // for later destruction to make sure it doesn't leak.
     RefPtr<Fence> fence = Fence::create(eglCreateSyncKHR(display, EGL_SYNC_FENCE_KHR, 0));
-    for (unsigned int i = 0; i < tileBuffers.size(); ++i) {
-        if (EGLSyncKHR platformSync = tileBuffers[i]->fence()->takePlatformSync())
-            m_garbage.insert(platformSync);
-
+    for (unsigned int i = 0; i < tileBuffers.size(); ++i)
         tileBuffers[i]->setFence(fence);
-    }
+#endif
+}
+
+void SurfacePool::destroyPlatformSync(void* platformSync)
+{
+#if BLACKBERRY_PLATFORM_GRAPHICS_EGL && USE(SKIA)
+    Platform::MutexLocker locker(&m_mutex);
+    m_garbage.insert(platformSync);
 #endif
 }
 

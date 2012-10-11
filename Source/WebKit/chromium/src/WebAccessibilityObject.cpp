@@ -459,6 +459,14 @@ WebRect WebAccessibilityObject::boundingBoxRect() const
     return m_private->pixelSnappedBoundingBoxRect();
 }
 
+bool WebAccessibilityObject::canvasHasFallbackContent() const
+{
+    if (isDetached())
+        return false;
+
+    return m_private->canvasHasFallbackContent();
+}
+
 double WebAccessibilityObject::estimatedLoadingProgress() const
 {
     if (isDetached())
@@ -608,6 +616,14 @@ WebURL WebAccessibilityObject::url() const
         return WebURL();
     
     return m_private->url();
+}
+
+bool WebAccessibilityObject::supportsRangeValue() const
+{
+    if (isDetached())
+        return false;
+
+    return m_private->supportsRangeValue();
 }
 
 WebString WebAccessibilityObject::valueDescription() const

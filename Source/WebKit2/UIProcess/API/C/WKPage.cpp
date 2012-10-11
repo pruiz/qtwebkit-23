@@ -340,6 +340,16 @@ bool WKPageHasVerticalScrollbar(WKPageRef pageRef)
     return toImpl(pageRef)->hasVerticalScrollbar();
 }
 
+void WKPageSetSuppressScrollbarAnimations(WKPageRef pageRef, bool suppressAnimations)
+{
+    toImpl(pageRef)->setSuppressScrollbarAnimations(suppressAnimations);
+}
+
+bool WKPageAreScrollbarAnimationsSuppressed(WKPageRef pageRef)
+{
+    return toImpl(pageRef)->areScrollbarAnimationsSuppressed();
+}
+
 bool WKPageIsPinnedToLeftSide(WKPageRef pageRef)
 {
     return toImpl(pageRef)->isPinnedToLeftSide();
@@ -586,6 +596,11 @@ void WKPageGetContentsAsMHTMLData(WKPageRef pageRef, bool useBinaryEncoding, voi
 {
 #if ENABLE(MHTML)
     toImpl(pageRef)->getContentsAsMHTMLData(DataCallback::create(context, callback), useBinaryEncoding);
+#else
+    UNUSED_PARAM(pageRef);
+    UNUSED_PARAM(useBinaryEncoding);
+    UNUSED_PARAM(context);
+    UNUSED_PARAM(callback);
 #endif
 }
 

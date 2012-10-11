@@ -1252,7 +1252,7 @@ void FrameView::layout(bool allowSubtree)
         m_actionScheduler->resume();
     }
 
-    InspectorInstrumentation::didLayout(cookie);
+    InspectorInstrumentation::didLayout(cookie, root);
 
     m_nestedLayoutCount--;
     if (m_nestedLayoutCount)
@@ -1743,7 +1743,7 @@ void FrameView::scrollElementToRect(Element* element, const IntRect& rect)
 {
     m_frame->document()->updateLayoutIgnorePendingStylesheets();
 
-    LayoutRect bounds = element->getRect();
+    LayoutRect bounds = element->boundingBox();
     int centeringOffsetX = (rect.width() - bounds.width()) / 2;
     int centeringOffsetY = (rect.height() - bounds.height()) / 2;
     setScrollPosition(IntPoint(bounds.x() - centeringOffsetX - rect.x(), bounds.y() - centeringOffsetY - rect.y()));
@@ -2341,7 +2341,7 @@ void FrameView::scrollToAnchor()
 
     LayoutRect rect;
     if (anchorNode != m_frame->document())
-        rect = anchorNode->getRect();
+        rect = anchorNode->boundingBox();
 
     // Scroll nested layers and frames to reveal the anchor.
     // Align to the top and to the closest side (this matches other browsers).
@@ -2745,14 +2745,22 @@ void FrameView::setVisibleScrollerThumbRect(const IntRect& scrollerThumb)
     page->chrome()->client()->notifyScrollerThumbIsVisibleInRect(scrollerThumb);
 }
 
-bool FrameView::isOnActivePage() const
+bool FrameView::scrollbarsCanBeActive() const
 {
     if (!m_frame)
         return false;
+
     if (m_frame->view() != this)
         return false;
+
+    if (Page* page = m_frame->page()) {
+        if (page->shouldSuppressScrollbarAnimations())
+            return false;
+    }
+
     if (Document* document = m_frame->document())
         return !document->inPageCache();
+
     return false;
 }
 
@@ -2838,7 +2846,7 @@ void FrameView::setAnimatorsAreActive()
     for (HashSet<ScrollableArea*>::const_iterator it = m_scrollableAreas->begin(), end = m_scrollableAreas->end(); it != end; ++it) {
         ScrollableArea* scrollableArea = *it;
 
-        ASSERT(scrollableArea->isOnActivePage());
+        ASSERT(scrollableArea->scrollbarsCanBeActive());
         scrollableArea->scrollAnimator()->setIsActive();
     }
 }
@@ -2857,7 +2865,7 @@ void FrameView::notifyPageThatContentAreaWillPaint() const
     for (HashSet<ScrollableArea*>::const_iterator it = m_scrollableAreas->begin(), end = m_scrollableAreas->end(); it != end; ++it) {
         ScrollableArea* scrollableArea = *it;
 
-        if (!scrollableArea->isOnActivePage())
+        if (!scrollableArea->scrollbarsCanBeActive())
             continue;
 
         scrollableArea->contentAreaWillPaint();
@@ -3702,6 +3710,8 @@ void FrameView::setScrollingPerformanceLoggingEnabled(bool flag)
 #if USE(ACCELERATED_COMPOSITING)
     if (TiledBacking* tiledBacking = this->tiledBacking())
         tiledBacking->setScrollingPerformanceLoggingEnabled(flag);
+#else
+    UNUSED_PARAM(flag);
 #endif
 }
 

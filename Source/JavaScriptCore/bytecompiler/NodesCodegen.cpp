@@ -125,7 +125,7 @@ RegisterID* RegExpNode::emitBytecode(BytecodeGenerator& generator, RegisterID* d
 {
     if (dst == generator.ignoredResult())
         return 0;
-    return generator.emitNewRegExp(generator.finalDestination(dst), RegExp::create(*generator.globalData(), m_pattern.ustring(), regExpFlags(m_flags.ustring())));
+    return generator.emitNewRegExp(generator.finalDestination(dst), RegExp::create(*generator.globalData(), m_pattern.string(), regExpFlags(m_flags.string())));
 }
 
 // ------------------------------ ThisNode -------------------------------------
@@ -320,7 +320,9 @@ RegisterID* PropertyListNode::emitBytecode(BytecodeGenerator& generator, Registe
 
 RegisterID* BracketAccessorNode::emitBytecode(BytecodeGenerator& generator, RegisterID* dst)
 {
-    if (m_base->isResolveNode() && generator.willResolveToArguments(static_cast<ResolveNode*>(m_base)->identifier())) {
+    if (m_base->isResolveNode() 
+        && generator.willResolveToArguments(static_cast<ResolveNode*>(m_base)->identifier())
+        && !generator.symbolTable().slowArguments()) {
         RegisterID* property = generator.emitNode(m_subscript);
         generator.emitExpressionInfo(divot(), startOffset(), endOffset());    
         return generator.emitGetArgumentByVal(generator.finalDestination(dst), generator.uncheckedRegisterForArguments(), property);
@@ -1086,15 +1088,20 @@ RegisterID* InstanceOfNode::emitBytecode(BytecodeGenerator& generator, RegisterI
 {
     RefPtr<RegisterID> src1 = generator.emitNodeForLeftHandSide(m_expr1, m_rightHasAssignments, m_expr2->isPure(generator));
     RefPtr<RegisterID> src2 = generator.emitNode(m_expr2);
+    RefPtr<RegisterID> prototype = generator.newTemporary();
+    RefPtr<RegisterID> dstReg = generator.finalDestination(dst, src1.get());
+    RefPtr<Label> target = generator.newLabel();
 
     generator.emitExpressionInfo(divot(), startOffset(), endOffset());
-    generator.emitCheckHasInstance(src2.get());
+    generator.emitCheckHasInstance(dstReg.get(), src1.get(), src2.get(), target.get());
 
     generator.emitExpressionInfo(divot(), startOffset(), endOffset());
-    RegisterID* src2Prototype = generator.emitGetById(generator.newTemporary(), src2.get(), generator.globalData()->propertyNames->prototype);
+    generator.emitGetById(prototype.get(), src2.get(), generator.globalData()->propertyNames->prototype);
 
     generator.emitExpressionInfo(divot(), startOffset(), endOffset());
-    return generator.emitInstanceOf(generator.finalDestination(dst, src1.get()), src1.get(), src2.get(), src2Prototype);
+    RegisterID* result = generator.emitInstanceOf(dstReg.get(), src1.get(), prototype.get());
+    generator.emitLabel(target.get());
+    return result;
 }
 
 // ------------------------------ LogicalOpNode ----------------------------
@@ -1387,9 +1394,11 @@ RegisterID* ConstDeclNode::emitCodeSingle(BytecodeGenerator& generator)
 
     RefPtr<RegisterID> value = m_init ? generator.emitNode(m_init) : generator.emitLoad(0, jsUndefined());
 
-    if (resolveResult.isStatic())
+    if (resolveResult.isStatic()) {
+        if (generator.codeType() == GlobalCode)
+            return generator.emitInitGlobalConst(resolveResult, m_ident, value.get());
         return generator.emitPutStaticVar(resolveResult, m_ident, value.get());
-    
+    }
     if (generator.codeType() != EvalCode)
         return value.get();
 
@@ -1831,7 +1840,7 @@ static void processClauseList(ClauseListNode* list, Vector<ExpressionNode*, 8>& 
                 typeForTable = SwitchNeither;
                 break;
             }
-            const String& value = static_cast<StringNode*>(clauseExpression)->value().ustring();
+            const String& value = static_cast<StringNode*>(clauseExpression)->value().string();
             if (singleCharacterSwitch &= value.length() == 1) {
                 int32_t intVal = value[0];
                 if (intVal < min_num)

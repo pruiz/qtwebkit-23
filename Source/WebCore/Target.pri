@@ -412,7 +412,6 @@ SOURCES += \
     dom/IdTargetObserver.cpp \
     dom/IdTargetObserverRegistry.cpp \
     dom/KeyboardEvent.cpp \
-    dom/MemoryInstrumentation.cpp \
     dom/MessageChannel.cpp \
     dom/MessageEvent.cpp \
     dom/MessagePort.cpp \
@@ -478,6 +477,7 @@ SOURCES += \
     dom/UserGestureIndicator.cpp \
     dom/UserTypingGestureIndicator.cpp \
     dom/ViewportArguments.cpp \
+    dom/WebCoreMemoryInstrumentation.cpp \
     dom/WebKitAnimationEvent.cpp \
     dom/WebKitTransitionEvent.cpp \
     dom/WheelEvent.cpp \
@@ -670,6 +670,7 @@ SOURCES += \
     html/ImageDocument.cpp \
     html/ImageInputType.cpp \
     html/InputType.cpp \
+    html/InputTypeNames.cpp \
     html/LabelableElement.cpp \
     html/LabelsNodeList.cpp \
     html/LinkRelAttribute.cpp \
@@ -741,14 +742,15 @@ SOURCES += \
     inspector/IdentifiersFactory.cpp \
     inspector/InjectedScript.cpp \
     inspector/InjectedScriptBase.cpp \
+    inspector/InjectedScriptCanvasModule.cpp \
     inspector/InjectedScriptHost.cpp \
     inspector/InjectedScriptManager.cpp \
     inspector/InjectedScriptModule.cpp \
-    inspector/InjectedScriptWebGLModule.cpp \
     inspector/InspectorAgent.cpp \
     inspector/InspectorApplicationCacheAgent.cpp \
     inspector/InspectorBaseAgent.cpp \
     inspector/InspectorCSSAgent.cpp \
+    inspector/InspectorCanvasAgent.cpp \
     inspector/InspectorClient.cpp \
     inspector/InspectorConsoleAgent.cpp \
     inspector/InspectorController.cpp \
@@ -775,7 +777,6 @@ SOURCES += \
     inspector/InspectorStyleTextEditor.cpp \
     inspector/InspectorTimelineAgent.cpp \
     inspector/InspectorValues.cpp \
-    inspector/InspectorWebGLAgent.cpp \
     inspector/InspectorWorkerAgent.cpp \
     inspector/InstrumentingAgents.cpp \
     inspector/MemoryInstrumentationImpl.cpp \
@@ -874,6 +875,7 @@ SOURCES += \
     page/DragController.cpp \
     page/EventHandler.cpp \
     page/EventSource.cpp \
+    page/FeatureObserver.cpp \
     page/FocusController.cpp \
     page/Frame.cpp \
     page/FrameActionScheduler.cpp \
@@ -925,9 +927,11 @@ SOURCES += \
     platform/text/BidiContext.cpp \
     platform/text/DateTimeFormat.cpp \
     platform/text/Hyphenation.cpp \
+    platform/text/LocaleNone.cpp \
     platform/text/LocaleToScriptMappingDefault.cpp \
     platform/text/LocalizedDateNone.cpp \
     platform/text/LocalizedNumberNone.cpp \
+    platform/text/Localizer.cpp \
     platform/text/QuotedPrintable.cpp \
     platform/CalculationValue.cpp \
     platform/Clock.cpp \
@@ -1048,6 +1052,7 @@ SOURCES += \
     platform/text/RegularExpression.cpp \
     platform/PlatformEvent.cpp \
     platform/PlatformInstrumentation.cpp \
+    platform/PlatformMemoryInstrumentation.cpp \
     platform/RuntimeApplicationChecks.cpp \
     platform/RunLoop.cpp \
     platform/SchemeRegistry.cpp \
@@ -1099,6 +1104,9 @@ SOURCES += \
     rendering/BidiRun.cpp \
     rendering/CounterNode.cpp \
     rendering/EllipsisBox.cpp \
+    rendering/ExclusionInterval.cpp \
+    rendering/ExclusionRectangle.cpp \
+    rendering/ExclusionShape.cpp \
     rendering/FilterEffectRenderer.cpp \
     rendering/FixedTableLayout.cpp \
     rendering/FlowThreadController.cpp \
@@ -1340,12 +1348,10 @@ HEADERS += \
     bindings/js/ScriptProfileNode.h \
     bindings/js/ScriptProfiler.h \
     bindings/js/ScriptSourceCode.h \
-    bindings/js/ScriptSourceProvider.h \
     bindings/js/ScriptState.h \
     bindings/js/ScriptValue.h \
     bindings/js/ScriptWrappable.h \
     bindings/js/SerializedScriptValue.h \
-    bindings/js/StringSourceProvider.h \
     bindings/js/WebCoreJSClientData.h \
     bindings/js/WorkerScriptController.h \
     bindings/js/WorkerScriptDebugServer.h \
@@ -1555,7 +1561,6 @@ HEADERS += \
     dom/IdTargetObserver.h \
     dom/IdTargetObserverRegistry.h \
     dom/KeyboardEvent.h \
-    dom/MemoryInstrumentation.h \
     dom/MessageChannel.h \
     dom/MessageEvent.h \
     dom/MessagePortChannel.h \
@@ -1615,6 +1620,7 @@ HEADERS += \
     dom/UIEventWithKeyState.h \
     dom/UserGestureIndicator.h \
     dom/ViewportArguments.h \
+    dom/WebCoreMemoryInstrumentation.h \
     dom/WebKitAnimationEvent.h \
     dom/WebKitNamedFlow.h \
     dom/WebKitTransitionEvent.h \
@@ -1856,13 +1862,15 @@ HEADERS += \
     inspector/IdentifiersFactory.h \
     inspector/InjectedScript.h \
     inspector/InjectedScriptBase.h \
+    inspector/InjectedScriptCanvasModule.h \
     inspector/InjectedScriptHost.h \
     inspector/InjectedScriptManager.h \
     inspector/InjectedScriptModule.h \
-    inspector/InjectedScriptWebGLModule.h \
     inspector/InspectorAgent.h \
     inspector/InspectorApplicationCacheAgent.h \
     inspector/InspectorBaseAgent.h \
+    inspector/InspectorCanvasAgent.h \
+    inspector/InspectorCanvasInstrumentation.h \
     inspector/InspectorConsoleAgent.h \
     inspector/InspectorConsoleInstrumentation.h \
     inspector/InspectorController.h \
@@ -1891,8 +1899,6 @@ HEADERS += \
     inspector/InspectorStyleSheet.h \
     inspector/InspectorStyleTextEditor.h \
     inspector/InspectorTimelineAgent.h \
-    inspector/InspectorWebGLAgent.h \
-    inspector/InspectorWebGLInstrumentation.h \
     inspector/InspectorWorkerAgent.h \
     inspector/InstrumentingAgents.h \
     inspector/MemoryInstrumentationImpl.h \
@@ -2011,6 +2017,7 @@ HEADERS += \
     page/SpeechInputResult.h \
     page/SpeechInputResultList.h \
     page/TouchAdjustment.h \
+    page/ValidationMessageClient.h \
     page/WebKitAnimation.h \
     page/WebKitAnimationList.h \
     page/WindowFeatures.h \
@@ -2044,8 +2051,10 @@ HEADERS += \
     platform/graphics/BitmapImage.h \
     platform/graphics/Color.h \
     platform/graphics/CrossfadeGeneratedImage.h \
+    platform/graphics/filters/CustomFilterArrayParameter.h \
     platform/graphics/filters/CustomFilterGlobalContext.h \
     platform/graphics/filters/CustomFilterMesh.h \
+    platform/graphics/filters/CustomFilterMeshGenerator.h \
     platform/graphics/filters/CustomFilterNumberParameter.h \
     platform/graphics/filters/CustomFilterCompiledProgram.h \
     platform/graphics/filters/CustomFilterOperation.h \
@@ -2110,6 +2119,7 @@ HEADERS += \
     platform/graphics/IntPoint.h \
     platform/graphics/IntPointHash.h \
     platform/graphics/IntRect.h \
+    platform/graphics/Latin1TextIterator.h \
     platform/graphics/MediaPlayer.h \
     platform/graphics/NativeImagePtr.h \
     platform/graphics/opentype/OpenTypeVerticalData.h \
@@ -2210,6 +2220,7 @@ HEADERS += \
     platform/network/qt/DnsPrefetchHelper.h \
     platform/network/qt/NetworkStateNotifierPrivate.h \
     platform/PlatformExportMacros.h \
+    platform/PlatformMemoryInstrumentation.h \
     platform/PlatformTouchEvent.h \
     platform/PlatformTouchPoint.h \
     platform/PopupMenu.h \
@@ -2219,6 +2230,7 @@ HEADERS += \
     platform/qt/QWebPageClient.h \
     platform/qt/RenderThemeQt.h \
     platform/qt/RenderThemeQtMobile.h \
+    platform/qt/UserAgentQt.h \
     platform/ScrollableArea.h \
     platform/ScrollAnimator.h \
     platform/Scrollbar.h \
@@ -2277,6 +2289,9 @@ HEADERS += \
     rendering/break_lines.h \
     rendering/CounterNode.h \
     rendering/EllipsisBox.h \
+    rendering/ExclusionInterval.h \
+    rendering/ExclusionRectangle.h \
+    rendering/ExclusionShape.h \
     rendering/FilterEffectRenderer.h \
     rendering/FixedTableLayout.h \
     rendering/HitTestingTransformState.h \
@@ -2774,6 +2789,7 @@ SOURCES += \
     platform/qt/RunLoopQt.cpp \
     platform/qt/SharedBufferQt.cpp \
     platform/qt/ThirdPartyCookiesQt.cpp \
+    platform/qt/UserAgentQt.cpp \
     platform/graphics/qt/FontCacheQt.cpp \
     platform/graphics/qt/FontCustomPlatformDataQt.cpp \
     platform/graphics/qt/GlyphPageTreeNodeQt.cpp \
@@ -3456,6 +3472,7 @@ contains(DEFINES, ENABLE_FILTERS=1) {
         platform/graphics/filters/CustomFilterProgram.cpp \
         platform/graphics/filters/CustomFilterCompiledProgram.cpp \
         platform/graphics/filters/CustomFilterMesh.cpp \
+        platform/graphics/filters/CustomFilterMeshGenerator.cpp \
         platform/graphics/filters/CustomFilterValidatedProgram.cpp \
         platform/graphics/filters/DistantLightSource.cpp \
         platform/graphics/filters/FEBlend.cpp \
@@ -4050,6 +4067,7 @@ ALL_IN_ONE_SOURCES += \
     accessibility/AccessibilityAllInOne.cpp \
     inspector/InspectorAllInOne.cpp \
     loader/appcache/ApplicationCacheAllInOne.cpp \
+    platform/text/TextAllInOne.cpp \
     rendering/style/StyleAllInOne.cpp
 
 contains(DEFINES, ENABLE_XSLT=1):contains(DEFINES, WTF_USE_LIBXML2=1) {

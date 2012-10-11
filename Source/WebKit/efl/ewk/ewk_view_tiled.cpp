@@ -29,7 +29,7 @@
 
 static Ewk_View_Smart_Class _parent_sc = EWK_VIEW_SMART_CLASS_INIT_NULL;
 
-static Eina_Bool _ewk_view_tiled_render_cb(void* data, Ewk_Tile* tile, const Eina_Rectangle* area)
+static bool _ewk_view_tiled_render_cb(void* data, Ewk_Tile* tile, const Eina_Rectangle* area)
 {
     Ewk_View_Private_Data* priv = static_cast<Ewk_View_Private_Data*>(data);
     Eina_Rectangle rect = {area->x + tile->x, area->y + tile->y, area->w, area->h};
@@ -38,7 +38,7 @@ static Eina_Bool _ewk_view_tiled_render_cb(void* data, Ewk_Tile* tile, const Ein
     Ewk_Paint_Context* context = ewk_paint_context_from_image_data_new(pixels, tile->width, tile->height, tile->cspace);
 
     ewk_paint_context_translate(context, -tile->x, -tile->y);
-    Eina_Bool result = ewk_view_paint_contents(priv, context, &rect);
+    bool result = ewk_view_paint_contents(priv, context, &rect);
     ewk_paint_context_free(context);
 
     evas_object_image_data_set(tile->image, pixels);
@@ -46,7 +46,7 @@ static Eina_Bool _ewk_view_tiled_render_cb(void* data, Ewk_Tile* tile, const Ein
     return result;
 }
 
-static void* _ewk_view_tiled_updates_process_pre(void* data, Evas_Object* ewkView)
+static void* _ewk_view_tiled_updates_process_pre(void* data, Evas_Object*)
 {
     Ewk_View_Private_Data* priv = static_cast<Ewk_View_Private_Data*>(data);
     ewk_view_layout_if_needed_recursive(priv);
@@ -56,15 +56,14 @@ static void* _ewk_view_tiled_updates_process_pre(void* data, Evas_Object* ewkVie
 static Evas_Object* _ewk_view_tiled_smart_backing_store_add(Ewk_View_Smart_Data* smartData)
 {
     Evas_Object* backingStore = ewk_tiled_backing_store_add(smartData->base.evas);
-    ewk_tiled_backing_store_render_cb_set
-        (backingStore, _ewk_view_tiled_render_cb, smartData->_priv);
+    ewk_tiled_backing_store_render_cb_set(backingStore, _ewk_view_tiled_render_cb, smartData->_priv);
     ewk_tiled_backing_store_updates_process_pre_set
         (backingStore, _ewk_view_tiled_updates_process_pre, smartData->_priv);
     return backingStore;
 }
 
 static void
-_ewk_view_tiled_contents_size_changed_cb(void* data, Evas_Object* ewkView, void* eventInfo)
+_ewk_view_tiled_contents_size_changed_cb(void* data, Evas_Object*, void* eventInfo)
 {
     Evas_Coord* size = static_cast<Evas_Coord*>(eventInfo);
     Ewk_View_Smart_Data* smartData = static_cast<Ewk_View_Smart_Data*>(data);
@@ -164,7 +163,7 @@ static void _ewk_view_tiled_smart_zoom_weak_smooth_scale_set(Ewk_View_Smart_Data
     ewk_tiled_backing_store_zoom_weak_smooth_scale_set(smartData->backing_store, smoothScale);
 }
 
-static void _ewk_view_tiled_smart_bg_color_set(Ewk_View_Smart_Data* smartData, unsigned char red, unsigned char green, unsigned char blue, unsigned char alpha)
+static void _ewk_view_tiled_smart_bg_color_set(Ewk_View_Smart_Data* smartData, unsigned char /*red*/, unsigned char /*green*/, unsigned char /*blue*/, unsigned char alpha)
 {
     ewk_tiled_backing_store_alpha_set(smartData->backing_store, alpha < 255);
 }

@@ -57,6 +57,9 @@
 #include "ProgressTracker.h"
 #include "ProtectionSpace.h"
 #include "ScopePointer.h"
+#if ENABLE(BLACKBERRY_CREDENTIAL_PERSIST)
+#include "Settings.h"
+#endif
 #include "SharedBuffer.h"
 #include "SkData.h"
 #include "SkImageEncoder.h"
@@ -109,7 +112,6 @@ FrameLoaderClientBlackBerry::FrameLoaderClientBlackBerry()
     , m_hasSentResponseToPlugin(false)
     , m_cancelLoadOnNextData(false)
     , m_wasProvisionalLoadTriggeredByUserGesture(true) // To avoid affecting the first load.
-    , m_shouldRestoreViewState(true)
 {
 }
 
@@ -119,9 +121,7 @@ FrameLoaderClientBlackBerry::~FrameLoaderClientBlackBerry()
 
 int FrameLoaderClientBlackBerry::playerId() const
 {
-    if (m_webPagePrivate && m_webPagePrivate->m_client)
-        return m_webPagePrivate->m_client->getInstanceId();
-    return 0;
+    return m_webPagePrivate ? m_webPagePrivate->playerID() : 0;
 }
 
 bool FrameLoaderClientBlackBerry::cookiesEnabled() const
@@ -1015,6 +1015,17 @@ void FrameLoaderClientBlackBerry::dispatchWillSendRequest(DocumentLoader* docLoa
     }
 }
 
+bool FrameLoaderClientBlackBerry::shouldUseCredentialStorage(DocumentLoader* loader, long unsigned identifier)
+{
+#if ENABLE(BLACKBERRY_CREDENTIAL_PERSIST)
+    if (m_frame->page()->settings()->privateBrowsingEnabled())
+        return false;
+    return true;
+#else
+    return false;
+#endif
+}
+
 void FrameLoaderClientBlackBerry::loadIconExternally(const String& originalPageUrl, const String& finalPageUrl, const String& iconUrl)
 {
     m_webPagePrivate->m_client->setIconForUrl(originalPageUrl.utf8().data(), finalPageUrl.utf8().data(), iconUrl.utf8().data());
@@ -1027,8 +1038,7 @@ void FrameLoaderClientBlackBerry::saveViewStateToItem(HistoryItem* item)
 
     ASSERT(item);
     HistoryItemViewState& viewState = item->viewState();
-    m_shouldRestoreViewState = viewState.shouldSaveViewState;
-    if (m_shouldRestoreViewState) {
+    if (viewState.shouldSaveViewState) {
         viewState.orientation = m_webPagePrivate->mainFrame()->orientation();
         viewState.isZoomToFitScale = m_webPagePrivate->currentScale() == m_webPagePrivate->zoomToFitScale();
         viewState.scale = m_webPagePrivate->currentScale();
@@ -1041,8 +1051,6 @@ void FrameLoaderClientBlackBerry::saveViewStateToItem(HistoryItem* item)
 
 void FrameLoaderClientBlackBerry::restoreViewState()
 {
-    if (!m_shouldRestoreViewState)
-        return;
     if (!isMainFrame())
         return;
 
@@ -1052,6 +1060,9 @@ void FrameLoaderClientBlackBerry::restoreViewState()
     if (!currentItem)
         return;
 
+    HistoryItemViewState& viewState = currentItem->viewState();
+    if (!viewState.shouldSaveViewState)
+        return;
     // WebPagePrivate is messing up FrameView::wasScrolledByUser() by sending
     // scroll events that look like they were user generated all the time.
     //
@@ -1070,7 +1081,6 @@ void FrameLoaderClientBlackBerry::restoreViewState()
 
     // We need to reset this variable after the view state has been restored.
     m_webPagePrivate->m_didRestoreFromPageCache = false;
-    HistoryItemViewState& viewState = currentItem->viewState();
 
     // Restore the meta first.
     m_webPagePrivate->m_minimumScale = viewState.minimumScale;

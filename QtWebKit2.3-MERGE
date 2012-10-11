@@ -1,0 +1,127 @@
+This file contains a log of merges from WebKit trunk to the QtWebKit 2.3 branch.
+
+1. First find a build-version of trunk where the bot is green.
+You can do this by looking at http://build.webkit.sed.hu/builders/x86-64 Linux Qt Release/
+or browsing older build version by version number http://build.webkit.sed.hu/builders/x86-64 Linux Qt Release/builds/43099.
+
+2. Once you find a good build version, find the SVN version and look that up that commit in the git log on gitorius, and
+copy the header and footer of the commit to this file.
+Personally I also keep a local branch called backstage that I reset to this commit. This can be used to make diffs against 
+and thereby monitor the differences between the trees.
+
+3. Merge in one of the following two ways.
+
+3.1 git merge <git-version> -Xpatience
+This is usually recommended, fix any merge errors, revert commits that shouldn't have been merged, and ensure everything builds before pushing.
+
+3.2 git cherry-pick <former git-version>..<new git-version>
+This cherry-picks an entire range of commits one commit at a time. If there is a lot of conflicts in the merge, this can help by making it 
+possible to merge one commit at a time, or skip entire commits. Unfortunately it is prone to memory-leaks and will crash with out of memory
+errors if merging more than a 100 commits at a time. So only cherry-pick a few days of commits. 
+Since cherry-pick does not update the merge point, you need to follow this up with a git merge -sours <git-version> commmit, which performs
+a virtual merge without changing anything. If you don't do this later merging will fail in ugly ways.
+
+4. Wait for bots to report the tree green before merging qtwebkit-2.3-staging to qtwebkit-2.3. Also do not update qtwebkit-2.3 more than once
+every few weeks, it is supposed to be more stable for other parties to build and test against.
+
+>>>>> backstage
+commit b1485d3e8b871eb5c9edd04de7f621d6e457b537
+Author: commit-queue <commit-queue@webkit.org>
+Date:   Tue Sep 25 14:56:51 2012 +0000
+
+    git-svn-id: http://svn.webkit.org/repository/webkit/trunk@129507 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+>>>>> qtwebkit-2.3-staging
+>>>>> build #42     Failed 7 failures 1 flakes
+>>>>> build #41     Failed 14 failures 1 new passes
+>>>>> build #40     Failed 17 failures 11 new passes 1 flakes 18 missing results
+>>>>> build #39     Failed 26 failures 12 new passes 1 flakes 18 missing results
+commit ed593956c3f0a2e141af8d58c87da833a1cbd222
+Author: Csaba Osztrogonác <ossy@webkit.org>
+Date:   Sat Sep 22 12:10:50 2012 +0000
+
+    git-svn-id: http://svn.webkit.org/repository/webkit/trunk@129307 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+>>>>> build #34    Failed 6 failures 1 new passes 1 flakes 18 missing results
+commit e1b303fa2dc099967284be187d4e09a1145376fd
+Author: commit-queue <commit-queue@webkit.org>
+Date:   Tue Sep 18 13:23:07 2012 +0000
+
+    git-svn-id: http://svn.webkit.org/repository/webkit/trunk@128883 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+>>>>> build #25    Failed 5 failures 1 new passes 1 flakes 18 missing results
+commit 5dccac6e9dfa7aff6cba40988d1f2bcd7018f278
+Author: commit-queue <commit-queue@webkit.org>
+Date:   Mon Sep 17 07:13:00 2012 +0000
+
+    git-svn-id: http://svn.webkit.org/repository/webkit/trunk@128720 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+>>>>> build #22    Failed 4 failures 1 new passes 2 flakes 18 missing results
+commit 7861c13eac75b6769bb489ad384f6ca8ec30eb26
+Author: Sergio Villar Senin <svillar@igalia.com>
+Date:   Fri Sep 14 16:30:27 2012 +0000
+    
+    git-svn-id: http://svn.webkit.org/repository/webkit/trunk@128620 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+>>>>> build failure
+commit 6ec4319ca273f0e60cffc9deb68bd3a337bcbd8c
+Author: Csaba Osztrogonác <ossy@webkit.org>
+Date:   Fri Sep 14 09:37:27 2012 +0000
+
+    git-svn-id: http://svn.webkit.org/repository/webkit/trunk@128574 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+>>>>> build #9      Failed 4 failures 1 new passes 2 flakes 18 missing results
+commit 1a513b2d62d7ff272dee4b544734aa3e56ac64f1
+Author: commit-queue <commit-queue@webkit.org>
+Date:   Thu Sep 13 18:16:59 2012 +0000
+
+    git-svn-id: http://svn.webkit.org/repository/webkit/trunk@128484 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+>>>>> build #1      Failed 5 failures 1 new passes 1 flakes 18 missing results
+commit fcf96c8406082a7de5ce6060cb8385c0bab63a4a
+Author: commit-queue <commit-queue@webkit.org>
+Date:   Tue Sep 11 11:21:52 2012 +0000
+
+    git-svn-id: http://svn.webkit.org/repository/webkit/trunk@128169 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+>>>>> qtwebkit-2.3
+>>>>> build #78 - Failed 3 failures 1 new passes 2 flakes 18 missing results
+commit fc2863115e3401a2dea66a2bb9702fad581099bf
+Author: Gyuyoung Kim <gyuyoung.kim@samsung.com>
+Date:   Fri Sep 7 09:59:59 2012 +0000
+
+    git-svn-id: http://svn.webkit.org/repository/webkit/trunk@127848 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+>>>>> build #73 - Failed 1 failures 1 new passes 2 flakes 8 missing results
+commit 5ef92035b430fd57f3889050a8e32e7161bde0f6
+Author: commit-queue <commit-queue@webkit.org>
+Date:   Wed Sep 5 10:56:12 2012 +0000
+
+    git-svn-id: http://svn.webkit.org/repository/webkit/trunk@127572 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+commit c9b7ec10de92b43ef9ce7594db2e4b4faf54db16
+Author: Balazs Kelemen <kbalazs@webkit.org>
+Date:   Fri Aug 31 17:08:41 2012 +0000
+
+    git-svn-id: http://svn.webkit.org/repository/webkit/trunk@127275 268f45cc-cd09-0410-ab3c-d52691b4dbfc
+
+commit 8c642a6b267d806faf9911c265f239d90e782c2d
+Author: commit-queue <commit-queue@webkit.org>
+Date:   Mon Aug 27 09:45:36 2012 +0000
+
+commit 24d8a9bf0506b1057a328ed6faf8c1c8ef213020
+Author: commit-queue <commit-queue@webkit.org>
+Date:   Fri Aug 24 22:30:16 2012 +0000
+
+commit ce0e0a17f2a8c3fd00347fa7a58047fe222030a6
+Author: MORITA Hajime <morrita@google.com>
+Date:   Thu Aug 23 09:42:53 2012 +0000
+
+commit b85d33aee8f7a437815d6fa4ff928f2fe2a3669f
+Author: Csaba Osztrogonác <ossy@webkit.org>
+Date:   Tue Aug 21 09:50:12 2012 +0000
+
+commit cc31751ea3c52bd8fd3d102a7a1862b345ba61fe
+Author: Dan Bernstein <mitz@webkit.org>
+Date:   Sun Aug 19 19:12:28 2012 +0000
+

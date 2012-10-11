@@ -288,6 +288,16 @@ uint32_t WKPreferencesGetMinimumFontSize(WKPreferencesRef preferencesRef)
     return toImpl(preferencesRef)->minimumFontSize();
 }
 
+void WKPreferencesSetScreenFontSubstitutionEnabled(WKPreferencesRef preferencesRef, bool enabled)
+{
+    toImpl(preferencesRef)->setScreenFontSubstitutionEnabled(enabled);
+}
+
+bool WKPreferencesGetScreenFontSubstitutionEnabled(WKPreferencesRef preferencesRef)
+{
+    return toImpl(preferencesRef)->screenFontSubstitutionEnabled();
+}
+
 void WKPreferencesSetEditableLinkBehavior(WKPreferencesRef preferencesRef, WKEditableLinkBehavior wkBehavior)
 {
     toImpl(preferencesRef)->setEditableLinkBehavior(toEditableLinkBehavior(wkBehavior));
@@ -648,11 +658,11 @@ bool WKPreferencesGetFileAccessFromFileURLsAllowed(WKPreferencesRef preferencesR
     return toImpl(preferencesRef)->allowFileAccessFromFileURLs();
 }
 
-void WKPreferencesSetHixie76WebSocketProtocolEnabled(WKPreferencesRef preferencesRef, bool enabled)
+void WKPreferencesSetHixie76WebSocketProtocolEnabled(WKPreferencesRef, bool /*enabled*/)
 {
 }
 
-bool WKPreferencesGetHixie76WebSocketProtocolEnabled(WKPreferencesRef preferencesRef)
+bool WKPreferencesGetHixie76WebSocketProtocolEnabled(WKPreferencesRef)
 {
     return false;
 }
@@ -817,14 +827,14 @@ bool WKPreferencesGetRequestAnimationFrameEnabled(WKPreferencesRef preferencesRe
     return toImpl(preferencesRef)->requestAnimationFrameEnabled();
 }
 
-void WKPreferencesSetThirdPartyStorageBlockingEnabled(WKPreferencesRef preferencesRef, bool flag)
+void WKPreferencesSetStorageBlockingPolicy(WKPreferencesRef preferencesRef, WKStorageBlockingPolicy policy)
 {
-    toImpl(preferencesRef)->setThirdPartyStorageBlockingEnabled(flag);
+    toImpl(preferencesRef)->setStorageBlockingPolicy(toStorageBlockingPolicy(policy));
 }
 
-bool WKPreferencesGetThirdPartyStorageBlockingEnabled(WKPreferencesRef preferencesRef)
+WKStorageBlockingPolicy WKPreferencesGetStorageBlockingPolicy(WKPreferencesRef preferencesRef)
 {
-    return toImpl(preferencesRef)->thirdPartyStorageBlockingEnabled();
+    return toAPI(static_cast<WebCore::SecurityOrigin::StorageBlockingPolicy>(toImpl(preferencesRef)->storageBlockingPolicy()));
 }
 
 void WKPreferencesResetTestRunnerOverrides(WKPreferencesRef preferencesRef)
@@ -872,6 +882,26 @@ void WKPreferencesSetArtificialPluginInitializationDelayEnabled(WKPreferencesRef
 bool WKPreferencesGetArtificialPluginInitializationDelayEnabled(WKPreferencesRef preferencesRef)
 {
     return toImpl(preferencesRef)->artificialPluginInitializationDelayEnabled();
+}
+
+void WKPreferencesSetTabToLinksEnabled(WKPreferencesRef preferencesRef, bool enabled)
+{
+    toImpl(preferencesRef)->setTabToLinksEnabled(enabled);
+}
+
+bool WKPreferencesGetTabToLinksEnabled(WKPreferencesRef preferencesRef)
+{
+    return toImpl(preferencesRef)->tabToLinksEnabled();
+}
+
+void WKPreferencesSetInteractiveFormValidationEnabled(WKPreferencesRef preferencesRef, bool enabled)
+{
+    toImpl(preferencesRef)->setInteractiveFormValidationEnabled(enabled);
+}
+
+bool WKPreferencesGetInteractiveFormValidationEnabled(WKPreferencesRef preferencesRef)
+{
+    return toImpl(preferencesRef)->interactiveFormValidationEnabled();
 }
 
 void WKPreferencesSetScrollingPerformanceLoggingEnabled(WKPreferencesRef preferencesRef, bool enabled)

@@ -5,6 +5,7 @@ FILE(MAKE_DIRECTORY ${DERIVED_SOURCES_DIR}/InjectedBundle)
 
 SET(WebKitTestRunner_SOURCES
     ${WEBKIT_TESTRUNNER_DIR}/CyclicRedundancyCheck.cpp
+    ${WEBKIT_TESTRUNNER_DIR}/GeolocationProviderMock.cpp
     ${WEBKIT_TESTRUNNER_DIR}/PixelDumpSupport.cpp
     ${WEBKIT_TESTRUNNER_DIR}/TestController.cpp
     ${WEBKIT_TESTRUNNER_DIR}/TestInvocation.cpp
@@ -68,7 +69,7 @@ GENERATE_BINDINGS(WebKitTestRunnerInjectedBundle_SOURCES
     "${WebKitTestRunnerInjectedBundle_IDL_FILES}"
     "${WEBKIT_TESTRUNNER_INJECTEDBUNDLE_DIR}/Bindings"
     "--include=${WEBKIT_TESTRUNNER_INJECTEDBUNDLE_DIR}/Bindings"
-    ""
+    "${FEATURE_DEFINES_WITH_SPACE_SEPARATOR}"
     ${DERIVED_SOURCES_DIR}/InjectedBundle JS TestRunner
     )
 
@@ -81,10 +82,6 @@ TARGET_LINK_LIBRARIES(TestRunnerInjectedBundle ${WebKitTestRunner_LIBRARIES})
 
 ADD_EXECUTABLE(WebKitTestRunner ${WebKitTestRunner_SOURCES})
 TARGET_LINK_LIBRARIES(WebKitTestRunner ${WebKitTestRunner_LIBRARIES})
-
-IF (WebKitTestRunner_LINK_FLAGS)
-    ADD_TARGET_PROPERTIES(WebKitTestRunner LINK_FLAGS ${WebKitTestRunner_LINK_FLAGS})
-ENDIF ()
 
 ADD_DEPENDENCIES(${WebKit2_LIBRARY_NAME} ${ForwardingHeadersForWebKitTestRunner_NAME})
 ADD_DEPENDENCIES(${WebKit2_LIBRARY_NAME} ${ForwardingNetworkHeadersForWebKitTestRunner_NAME})

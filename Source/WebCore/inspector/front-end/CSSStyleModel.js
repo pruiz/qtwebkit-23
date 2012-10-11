@@ -174,21 +174,21 @@ WebInspector.CSSStyleModel.prototype = {
     },
 
     /**
-     * @param {DOMAgent.NodeId} nodeId
-     * @param {function(Object)} userCallback
+     * @param {DOMAgent.NodeId} documentNodeId
+     * @param {function(?WebInspector.NamedFlowCollection)} userCallback
      */
     getNamedFlowCollectionAsync: function(documentNodeId, userCallback)
     {
         var namedFlowCollection = this._namedFlowCollections[documentNodeId];
         if (namedFlowCollection) {
-            userCallback(namedFlowCollection.namedFlowMap);
+            userCallback(namedFlowCollection);
             return;
         }
 
         /**
-         * @param {function(?Array.<WebInspector.NamedFlow>)} userCallback
+         * @param {function(?WebInspector.NamedFlowCollection)} userCallback
          * @param {?Protocol.Error} error
-         * @param {?Array.<CSSAgent.NamedFlow>=} namedFlowPayload
+         * @param {?Array.<CSSAgent.NamedFlow>} namedFlowPayload
          */
         function callback(userCallback, error, namedFlowPayload)
         {
@@ -197,7 +197,7 @@ WebInspector.CSSStyleModel.prototype = {
             else {
                 var namedFlowCollection = new WebInspector.NamedFlowCollection(namedFlowPayload);
                 this._namedFlowCollections[documentNodeId] = namedFlowCollection;
-                userCallback(namedFlowCollection.namedFlowMap);
+                userCallback(namedFlowCollection);
             }
         }
 
@@ -205,7 +205,7 @@ WebInspector.CSSStyleModel.prototype = {
     },
 
     /**
-     * @param {DOMAgent.NodeId} nodeId
+     * @param {DOMAgent.NodeId} documentNodeId
      * @param {string} flowName
      * @param {function(?WebInspector.NamedFlow)} userCallback
      */
@@ -219,14 +219,14 @@ WebInspector.CSSStyleModel.prototype = {
 
         /**
          * @param {function(?WebInspector.NamedFlow)} userCallback
-         * @param {?CSSAgent.NamedFlow=} namedFlowMap
+         * @param {?WebInspector.NamedFlowCollection} namedFlowCollection
          */
-        function callback(userCallback, namedFlowMap)
+        function callback(userCallback, namedFlowCollection)
         {
-            if (!namedFlowMap)
+            if (!namedFlowCollection)
                 userCallback(null);
             else
-                userCallback(this._namedFlowCollections[documentNodeId].flowByName(flowName));
+                userCallback(namedFlowCollection.flowByName(flowName));
         }
 
         this.getNamedFlowCollectionAsync(documentNodeId, callback.bind(this, userCallback));
@@ -377,7 +377,7 @@ WebInspector.CSSStyleModel.prototype = {
         if (!namedFlowCollection)
             return;
 
-        namedFlowCollection.appendNamedFlow(namedFlow);
+        namedFlowCollection._appendNamedFlow(namedFlow);
         this.dispatchEventToListeners(WebInspector.CSSStyleModel.Events.NamedFlowCreated, namedFlow);
     },
 
@@ -392,7 +392,7 @@ WebInspector.CSSStyleModel.prototype = {
         if (!namedFlowCollection)
             return;
 
-        namedFlowCollection.removeNamedFlow(flowName);
+        namedFlowCollection._removeNamedFlow(flowName);
         this.dispatchEventToListeners(WebInspector.CSSStyleModel.Events.NamedFlowRemoved, { documentNodeId: documentNodeId, flowName: flowName });
     },
 
@@ -407,7 +407,7 @@ WebInspector.CSSStyleModel.prototype = {
         if (!namedFlowCollection)
             return;
 
-        namedFlowCollection.appendNamedFlow(namedFlow);
+        namedFlowCollection._appendNamedFlow(namedFlow);
         this.dispatchEventToListeners(WebInspector.CSSStyleModel.Events.RegionLayoutUpdated, namedFlow);
     },
 
@@ -1398,6 +1398,7 @@ WebInspector.NamedFlow.parsePayload = function(payload)
  */
 WebInspector.NamedFlowCollection = function(payload)
 {
+    /** @type {Object.<string, WebInspector.NamedFlow>} */
     this.namedFlowMap = {};
 
     for (var i = 0; i < payload.length; ++i) {
@@ -1410,7 +1411,7 @@ WebInspector.NamedFlowCollection.prototype = {
     /**
      * @param {WebInspector.NamedFlow} namedFlow
      */
-    appendNamedFlow: function(namedFlow)
+    _appendNamedFlow: function(namedFlow)
     {
         this.namedFlowMap[namedFlow.name] = namedFlow;
     },
@@ -1418,7 +1419,7 @@ WebInspector.NamedFlowCollection.prototype = {
     /**
      * @param {string} flowName
      */
-    removeNamedFlow: function(flowName)
+    _removeNamedFlow: function(flowName)
     {
         delete this.namedFlowMap[flowName];
     },

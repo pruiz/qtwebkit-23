@@ -108,7 +108,8 @@ public:
 
 #if USE(3D_GRAPHICS)
     virtual void createPlatformGraphicsContext3D(PlatformGraphicsContext3D*,
-                                                 PlatformGraphicsSurface3D*) = 0;
+                                                 PlatformGraphicsSurface3D*,
+                                                 QObject** = 0) = 0;
 #endif
 #if HAVE(QT5)
     virtual QWindow* ownerWindow() const;

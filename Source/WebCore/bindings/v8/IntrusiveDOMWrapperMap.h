@@ -32,8 +32,8 @@
 #define IntrusiveDOMWrapperMap_h
 
 #include "DOMDataStore.h"
-#include "MemoryInstrumentation.h"
 #include "V8Node.h"
+#include "WebCoreMemoryInstrumentation.h"
 
 namespace WebCore {
 
@@ -187,7 +187,7 @@ public:
     virtual void reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const OVERRIDE
     {
         MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::Binding);
-        info.addInstrumentedMember(m_table);
+        info.addMember(m_table);
     }
 
 private:

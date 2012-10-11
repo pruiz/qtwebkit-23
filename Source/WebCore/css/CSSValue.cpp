@@ -52,10 +52,10 @@
 #endif
 #include "FontValue.h"
 #include "FontFeatureValue.h"
-#include "MemoryInstrumentation.h"
 #include "ShadowValue.h"
 #include "SVGColor.h"
 #include "SVGPaint.h"
+#include "WebCoreMemoryInstrumentation.h"
 #include "WebKitCSSArrayFunctionValue.h"
 #include "WebKitCSSFilterValue.h"
 #include "WebKitCSSMixFunctionValue.h"
@@ -83,7 +83,7 @@ public:
     void reportDescendantMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     {
         MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CSS);
-        info.addInstrumentedMember(m_cssText);
+        info.addMember(m_cssText);
     }
 
 private:

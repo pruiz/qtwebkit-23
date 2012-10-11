@@ -178,6 +178,11 @@ void JSCell::getOwnPropertyNames(JSObject*, ExecState*, PropertyNameArray&, Enum
     ASSERT_NOT_REACHED();
 }
 
+void JSCell::getOwnNonIndexPropertyNames(JSObject*, ExecState*, PropertyNameArray&, EnumerationMode)
+{
+    ASSERT_NOT_REACHED();
+}
+
 String JSCell::className(const JSObject*)
 {
     ASSERT_NOT_REACHED();
@@ -194,7 +199,7 @@ void JSCell::getPropertyNames(JSObject*, ExecState*, PropertyNameArray&, Enumera
     ASSERT_NOT_REACHED();
 }
 
-bool JSCell::hasInstance(JSObject*, ExecState*, JSValue, JSValue)
+bool JSCell::customHasInstance(JSObject*, ExecState*, JSValue)
 {
     ASSERT_NOT_REACHED();
     return false;

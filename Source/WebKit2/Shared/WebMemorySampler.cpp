@@ -167,7 +167,7 @@ void WebMemorySampler::stopTimerFired(Timer<WebMemorySampler>*)
     stop();
 }
 
-void WebMemorySampler::appendCurrentMemoryUsageToFile(PlatformFileHandle& file)
+void WebMemorySampler::appendCurrentMemoryUsageToFile(PlatformFileHandle&)
 {
     // Collect statistics from allocators and get RSIZE metric
     StringBuilder statString;
@@ -177,7 +177,7 @@ void WebMemorySampler::appendCurrentMemoryUsageToFile(PlatformFileHandle& file)
         statString.append(separator);
         for (size_t i = 0; i < memoryStats.values.size(); ++i) {
             statString.append(separator);
-            statString.append(String::number(memoryStats.values[i]));
+            statString.appendNumber(memoryStats.values[i]);
         }
     }
     statString.append('\n');

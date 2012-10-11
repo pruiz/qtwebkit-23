@@ -409,7 +409,7 @@ static KeyEventInfo* keyPadNameFromJSValue(JSStringRef character, unsigned modif
     if (equals(character, "delete"))
         return new KeyEventInfo("KP_Delete", modifiers);
 
-    return new KeyEventInfo(character->ustring().utf8(), modifiers, character->ustring().utf8());
+    return new KeyEventInfo(character->string().utf8(), modifiers, character->string().utf8());
 }
 
 static KeyEventInfo* keyNameFromJSValue(JSStringRef character, unsigned modifiers)
@@ -490,7 +490,7 @@ static KeyEventInfo* keyNameFromJSValue(JSStringRef character, unsigned modifier
     if ((character->length() == 1) && (charCode >= 'A' && charCode <= 'Z'))
         modifiers |= EvasKeyModifierShift;
 
-    return new KeyEventInfo(character->ustring().utf8(), modifiers, character->ustring().utf8());
+    return new KeyEventInfo(character->string().utf8(), modifiers, character->string().utf8());
 }
 
 static KeyEventInfo* createKeyEventInfo(JSContextRef context, size_t argumentCount, const JSValueRef arguments[], JSValueRef* exception)
@@ -529,9 +529,24 @@ static void sendKeyDown(Evas* evas, KeyEventInfo* keyEventInfo)
     DumpRenderTreeSupportEfl::layoutFrame(browser->mainFrame());
 
     ASSERT(evas);
+
+    int eventIndex = 0;
+    // Mimic the emacs ctrl-o binding by inserting a paragraph
+    // separator and then putting the cursor back to its original
+    // position. Allows us to pass emacs-ctrl-o.html
+    if ((modifiers & EvasKeyModifierControl) && !strcmp(keyName, "o")) {
+        setEvasModifiers(evas, EvasKeyModifierNone);
+        evas_event_feed_key_down(evas, "Return", "Return", "\r", 0, eventIndex++, 0);
+        evas_event_feed_key_up(evas, "Return", "Return", "\r", 0, eventIndex++, 0);
+
+        modifiers = EvasKeyModifierNone;
+        keyName = "Left";
+        keyString = 0;
+    }
+
     setEvasModifiers(evas, modifiers);
-    evas_event_feed_key_down(evas, keyName, keyName, keyString, 0, 0, 0);
-    evas_event_feed_key_up(evas, keyName, keyName, keyString, 0, 1, 0);
+    evas_event_feed_key_down(evas, keyName, keyName, keyString, 0, eventIndex++, 0);
+    evas_event_feed_key_up(evas, keyName, keyName, keyString, 0, eventIndex++, 0);
     setEvasModifiers(evas, EvasKeyModifierNone);
 
     DumpRenderTreeSupportEfl::deliverAllMutationsIfNecessary();

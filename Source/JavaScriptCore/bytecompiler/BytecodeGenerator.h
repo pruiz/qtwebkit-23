@@ -261,9 +261,9 @@ namespace JSC {
         JS_EXPORT_PRIVATE static void setDumpsGeneratedCode(bool dumpsGeneratedCode);
         static bool dumpsGeneratedCode();
 
-        BytecodeGenerator(ProgramNode*, JSScope*, SymbolTable*, ProgramCodeBlock*, CompilationKind);
-        BytecodeGenerator(FunctionBodyNode*, JSScope*, SymbolTable*, CodeBlock*, CompilationKind);
-        BytecodeGenerator(EvalNode*, JSScope*, SymbolTable*, EvalCodeBlock*, CompilationKind);
+        BytecodeGenerator(ProgramNode*, JSScope*, SharedSymbolTable*, ProgramCodeBlock*, CompilationKind);
+        BytecodeGenerator(FunctionBodyNode*, JSScope*, SharedSymbolTable*, CodeBlock*, CompilationKind);
+        BytecodeGenerator(EvalNode*, JSScope*, SharedSymbolTable*, EvalCodeBlock*, CompilationKind);
 
         ~BytecodeGenerator();
         
@@ -455,13 +455,14 @@ namespace JSC {
         RegisterID* emitPostInc(RegisterID* dst, RegisterID* srcDst);
         RegisterID* emitPostDec(RegisterID* dst, RegisterID* srcDst);
 
-        void emitCheckHasInstance(RegisterID* base);
-        RegisterID* emitInstanceOf(RegisterID* dst, RegisterID* value, RegisterID* base, RegisterID* basePrototype);
+        void emitCheckHasInstance(RegisterID* dst, RegisterID* value, RegisterID* base, Label* target);
+        RegisterID* emitInstanceOf(RegisterID* dst, RegisterID* value, RegisterID* basePrototype);
         RegisterID* emitTypeOf(RegisterID* dst, RegisterID* src) { return emitUnaryOp(op_typeof, dst, src); }
         RegisterID* emitIn(RegisterID* dst, RegisterID* property, RegisterID* base) { return emitBinaryOp(op_in, dst, property, base, OperandTypes()); }
 
         RegisterID* emitGetStaticVar(RegisterID* dst, const ResolveResult&, const Identifier&);
         RegisterID* emitPutStaticVar(const ResolveResult&, const Identifier&, RegisterID* value);
+        RegisterID* emitInitGlobalConst(const ResolveResult&, const Identifier&, RegisterID* value);
 
         RegisterID* emitResolve(RegisterID* dst, const ResolveResult&, const Identifier& property);
         RegisterID* emitResolveBase(RegisterID* dst, const ResolveResult&, const Identifier& property);
@@ -637,6 +638,7 @@ namespace JSC {
 
         unsigned addConstant(const Identifier&);
         RegisterID* addConstantValue(JSValue);
+        RegisterID* addConstantEmptyValue();
         unsigned addRegExp(RegExp*);
 
         unsigned addConstantBuffer(unsigned length);
@@ -653,7 +655,7 @@ namespace JSC {
     public:
         Vector<Instruction>& instructions() { return m_instructions; }
 
-        SymbolTable& symbolTable() { return *m_symbolTable; }
+        SharedSymbolTable& symbolTable() { return *m_symbolTable; }
 #if ENABLE(BYTECODE_COMMENTS)
         Vector<Comment>& comments() { return m_comments; }
 #endif
@@ -696,7 +698,7 @@ namespace JSC {
         bool m_shouldEmitRichSourceInfo;
 
         Strong<JSScope> m_scope;
-        SymbolTable* m_symbolTable;
+        SharedSymbolTable* m_symbolTable;
 
 #if ENABLE(BYTECODE_COMMENTS)
         Vector<Comment> m_comments;
@@ -713,6 +715,7 @@ namespace JSC {
         RegisterID m_thisRegister;
         RegisterID m_calleeRegister;
         RegisterID* m_activationRegister;
+        RegisterID* m_emptyValueRegister;
         SegmentedVector<RegisterID, 32> m_constantPoolRegisters;
         SegmentedVector<RegisterID, 32> m_calleeRegisters;
         SegmentedVector<RegisterID, 32> m_parameters;

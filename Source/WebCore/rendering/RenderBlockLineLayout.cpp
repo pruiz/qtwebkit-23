@@ -1232,7 +1232,7 @@ void RenderBlock::layoutRunsAndFloats(LineLayoutState& layoutState, bool hasInli
             // that the block really needed a full layout, we missed our chance to repaint the layer
             // before layout started.  Luckily the layer has cached the repaint rect for its original
             // position and size, and so we can use that to make a repaint happen now.
-            repaintUsingContainer(containerForRepaint(), layer()->repaintRect());
+            repaintUsingContainer(containerForRepaint(), pixelSnappedIntRect(layer()->repaintRect()));
         }
     }
 
@@ -1275,6 +1275,7 @@ void RenderBlock::layoutRunsAndFloats(LineLayoutState& layoutState, bool hasInli
 
 RenderBlock::RenderTextInfo::RenderTextInfo()
     : m_text(0)
+    , m_font(0)
 {
 }
 
@@ -1297,8 +1298,8 @@ void RenderBlock::layoutRunsAndFloatsInRange(LineLayoutState& layoutState, Inlin
 #if ENABLE(CSS_EXCLUSIONS)
     WrapShapeInfo* wrapShapeInfo = this->wrapShapeInfo();
     // Move to the top of the shape inside to begin layout
-    if (wrapShapeInfo && logicalHeight() < wrapShapeInfo->shapeTop())
-        setLogicalHeight(wrapShapeInfo->shapeTop());
+    if (wrapShapeInfo && logicalHeight() < wrapShapeInfo->shapeLogicalTop())
+        setLogicalHeight(wrapShapeInfo->shapeLogicalTop());
 #endif
 
     while (!end.atEnd()) {
@@ -2413,10 +2414,6 @@ InlineIterator RenderBlock::LineBreaker::nextLineBreak(InlineBidiResolver& resol
             float wordSpacing = currentStyle->wordSpacing();
             float lastSpaceWordSpacing = 0;
 
-            // Non-zero only when kerning is enabled, in which case we measure words with their trailing
-            // space, then subtract its width.
-            float wordTrailingSpaceWidth = f.typesettingFeatures() & Kerning ? f.width(constructTextRun(t, f, &space, 1, style)) + wordSpacing : 0;
-
             float wrapW = width.uncommittedWidth() + inlineLogicalWidth(current.m_obj, !appliedStartWidth, true);
             float charWidth = 0;
             bool breakNBSP = autoWrap && currentStyle->nbspMode() == SPACE;
@@ -2436,10 +2433,19 @@ InlineIterator RenderBlock::LineBreaker::nextLineBreak(InlineBidiResolver& resol
             if (renderTextInfo.m_text != t) {
                 t->updateTextIfNeeded();
                 renderTextInfo.m_text = t;
+                renderTextInfo.m_font = &f;
                 renderTextInfo.m_layout = f.createLayout(t, width.currentWidth(), collapseWhiteSpace);
                 renderTextInfo.m_lineBreakIterator.reset(t->characters(), t->textLength(), style->locale());
+            } else if (renderTextInfo.m_layout && renderTextInfo.m_font != &f) {
+                renderTextInfo.m_font = &f;
+                renderTextInfo.m_layout = f.createLayout(t, width.currentWidth(), collapseWhiteSpace);
             }
+
             TextLayout* textLayout = renderTextInfo.m_layout.get();
+
+            // Non-zero only when kerning is enabled and TextLayout isn't used, in which case we measure
+            // words with their trailing space, then subtract its width.
+            float wordTrailingSpaceWidth = (f.typesettingFeatures() & Kerning) && !textLayout ? f.width(constructTextRun(t, f, &space, 1, style)) + wordSpacing : 0;
 
             for (; current.m_pos < t->textLength(); current.fastIncrementInTextNode()) {
                 bool previousCharacterIsSpace = currentCharacterIsSpace;

@@ -29,6 +29,7 @@
 #include "config.h"
 #include "EventSenderQt.h"
 
+#include <QGestureEvent>
 #include <QGraphicsSceneMouseEvent>
 #include <QtTest/QtTest>
 #if HAVE(QT5)
@@ -61,6 +62,9 @@ static unsigned startOfQueue;
 
 EventSender::EventSender(QWebPage* parent)
     : QObject(parent)
+#ifndef QT_NO_GESTURES
+    , m_tapGesture(parent)
+#endif
 {
     m_page = parent;
     m_mouseButtonPressed = false;
@@ -538,6 +542,17 @@ void EventSender::sendTouchEvent(QEvent::Type type)
         }
     }
 }
+
+#ifndef QT_NO_GESTURES
+void EventSender::gestureTap(int x, int y)
+{
+    m_tapGesture.setPosition(QPointF(x, y));
+    m_gestures.clear();
+    m_gestures.append(&m_tapGesture);
+    QGestureEvent event(m_gestures);
+    sendEvent(m_page, &event);
+}
+#endif
 
 void EventSender::zoomPageIn()
 {

@@ -142,7 +142,8 @@ public:
 #if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
     void addToJavaScriptWindowObject(const QString &name, QObject *object, ValueOwnership ownership = QtOwnership);
 #else
-    void addToJavaScriptWindowObject(const QString &name, QObject *object, QScriptEngine::ValueOwnership ownership = QScriptEngine::QtOwnership);
+    void addToJavaScriptWindowObject(const QString &name, QObject *object);
+    void addToJavaScriptWindowObject(const QString &name, QObject *object, QScriptEngine::ValueOwnership ownership);
 #endif
     QString toHtml() const;
     QString toPlainText() const;

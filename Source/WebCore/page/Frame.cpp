@@ -675,8 +675,8 @@ void Frame::dispatchVisibilityStateChangeEvent()
 void Frame::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::DOM);
-    info.addInstrumentedMember(m_doc.get());
-    info.addInstrumentedMember(m_loader);
+    info.addMember(m_doc.get());
+    info.addMember(m_loader);
 }
 
 void Frame::willDetachPage()
@@ -886,6 +886,7 @@ String Frame::layerTreeAsText(bool showDebugInfo) const
 
     return contentRenderer()->compositor()->layerTreeAsText(showDebugInfo);
 #else
+    UNUSED_PARAM(showDebugInfo);
     return String();
 #endif
 }

@@ -45,6 +45,7 @@
 #include "WebPreferencesStore.h"
 #include "WebProcess.h"
 #include "WebSearchPopupMenu.h"
+#include "WebSecurityOrigin.h"
 #include <WebCore/AXObjectCache.h>
 #include <WebCore/ColorChooser.h>
 #include <WebCore/DatabaseTracker.h>
@@ -262,7 +263,7 @@ void WebChromeClient::setResizable(bool resizable)
     m_page->send(Messages::WebPageProxy::SetIsResizable(resizable));
 }
 
-void WebChromeClient::addMessageToConsole(MessageSource, MessageType, MessageLevel, const String& message, unsigned int lineNumber, const String& sourceID)
+void WebChromeClient::addMessageToConsole(MessageSource, MessageType, MessageLevel, const String& message, unsigned int lineNumber, const String& /*sourceID*/)
 {
     // Notify the bundle client.
     m_page->injectedBundleUIClient().willAddMessageToConsole(m_page, message, lineNumber);
@@ -427,7 +428,7 @@ PlatformPageClient WebChromeClient::platformPageClient() const
     return 0;
 }
 
-void WebChromeClient::contentsSizeChanged(Frame* frame, const IntSize& size) const
+void WebChromeClient::contentsSizeChanged(Frame* frame, const IntSize& /*size*/) const
 {
     if (!m_page->corePage()->settings()->frameFlatteningEnabled()) {
         WebFrame* largestFrame = findLargestFrameInFrameSet(m_page);
@@ -535,9 +536,14 @@ void WebChromeClient::exceededDatabaseQuota(Frame* frame, const String& database
     uint64_t currentQuota = DatabaseTracker::tracker().quotaForOrigin(origin);
     uint64_t currentOriginUsage = DatabaseTracker::tracker().usageForOrigin(origin);
     uint64_t newQuota = 0;
-    WebProcess::shared().connection()->sendSync(
-        Messages::WebPageProxy::ExceededDatabaseQuota(webFrame->frameID(), origin->databaseIdentifier(), databaseName, details.displayName(), currentQuota, currentOriginUsage, details.currentUsage(), details.expectedUsage()),
-        Messages::WebPageProxy::ExceededDatabaseQuota::Reply(newQuota), m_page->pageID());
+    RefPtr<WebSecurityOrigin> webSecurityOrigin = WebSecurityOrigin::createFromDatabaseIdentifier(origin->databaseIdentifier());
+    newQuota = m_page->injectedBundleUIClient().didExceedDatabaseQuota(m_page, webSecurityOrigin.get(), databaseName, details.displayName(), currentQuota, currentOriginUsage, details.currentUsage(), details.expectedUsage());
+
+    if (!newQuota) {
+        WebProcess::shared().connection()->sendSync(
+            Messages::WebPageProxy::ExceededDatabaseQuota(webFrame->frameID(), origin->databaseIdentifier(), databaseName, details.displayName(), currentQuota, currentOriginUsage, details.currentUsage(), details.expectedUsage()),
+            Messages::WebPageProxy::ExceededDatabaseQuota::Reply(newQuota), m_page->pageID());
+    }
 
     DatabaseTracker::tracker().setQuota(origin, newQuota);
 }
@@ -549,9 +555,10 @@ void WebChromeClient::reachedMaxAppCacheSize(int64_t)
     notImplemented();
 }
 
-void WebChromeClient::reachedApplicationCacheOriginQuota(SecurityOrigin*, int64_t)
+void WebChromeClient::reachedApplicationCacheOriginQuota(SecurityOrigin* origin, int64_t totalBytesNeeded)
 {
-    notImplemented();
+    RefPtr<WebSecurityOrigin> webSecurityOrigin = WebSecurityOrigin::createFromString(origin->toString());
+    m_page->injectedBundleUIClient().didReachApplicationCacheOriginQuota(m_page, webSecurityOrigin.get(), totalBytesNeeded);
 }
 
 #if ENABLE(DASHBOARD_SUPPORT)
@@ -565,14 +572,14 @@ void WebChromeClient::populateVisitedLinks()
 {
 }
 
-FloatRect WebChromeClient::customHighlightRect(Node*, const AtomicString& type, const FloatRect& lineRect)
+FloatRect WebChromeClient::customHighlightRect(Node*, const AtomicString& /*type*/, const FloatRect& /*lineRect*/)
 {
     notImplemented();
     return FloatRect();
 }
 
-void WebChromeClient::paintCustomHighlight(Node*, const AtomicString& type, const FloatRect& boxRect, const FloatRect& lineRect,
-                                  bool behindText, bool entireLine)
+void WebChromeClient::paintCustomHighlight(Node*, const AtomicString& /*type*/, const FloatRect& /*boxRect*/, const FloatRect& /*lineRect*/, 
+                                           bool /*behindText*/, bool /*entireLine*/)
 {
     notImplemented();
 }
@@ -651,7 +658,7 @@ void WebChromeClient::formStateDidChange(const Node*)
 
 bool WebChromeClient::selectItemWritingDirectionIsNatural()
 {
-#if PLATFORM(WIN)
+#if PLATFORM(WIN) || PLATFORM(EFL)
     return true;
 #else
     return false;
@@ -728,7 +735,7 @@ void WebChromeClient::setLastSetCursorToCurrentCursor()
 #endif
 
 #if ENABLE(FULLSCREEN_API)
-bool WebChromeClient::supportsFullScreenForElement(const WebCore::Element* element, bool withKeyboard)
+bool WebChromeClient::supportsFullScreenForElement(const WebCore::Element*, bool withKeyboard)
 {
     return m_page->fullScreenManager()->supportsFullScreen(withKeyboard);
 }

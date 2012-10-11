@@ -32,6 +32,7 @@ OTHER_FILES = \
     qmake/README \
     qmake/configure.* \
     qmake/qt_webkit.pri \
+    qmake/dump-features.pl \
     qmake/config.tests/README \
     qmake/config.tests/fontconfig/* \
     qmake/config.tests/gccdepends/* \

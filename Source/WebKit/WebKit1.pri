@@ -12,6 +12,10 @@ INCLUDEPATH += \
     $$SOURCE_DIR/qt/WebCoreSupport \
     $$ROOT_WEBKIT_DIR/Source/WTF/wtf/qt
 
+!haveQt(5) {
+    INCLUDEPATH += $$ROOT_WEBKIT_DIR/Source/WTF/wtf/qt/compat
+}
+
 contains(DEFINES, ENABLE_VIDEO=1):contains(DEFINES, WTF_USE_QTKIT=1) {
     LIBS += -framework Security -framework IOKit
 

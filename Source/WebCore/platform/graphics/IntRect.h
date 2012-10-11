@@ -80,6 +80,7 @@ class FloatRect;
 class FractionalLayoutRect;
 
 class IntRect {
+    WTF_MAKE_FAST_ALLOCATED;
 public:
     IntRect() { }
     IntRect(const IntPoint& location, const IntSize& size)
@@ -189,9 +190,7 @@ public:
     void scale(float s);
 
     IntSize differenceToPoint(const IntPoint&) const;
-    IntSize differenceFromCenterLineToPoint(const IntPoint&) const;
     int distanceSquaredToPoint(const IntPoint& p) const { return differenceToPoint(p).diagonalLengthSquared(); }
-    int distanceSquaredFromCenterLineToPoint(const IntPoint& p) const { return differenceFromCenterLineToPoint(p).diagonalLengthSquared(); }
 
     IntRect transposedRect() const { return IntRect(m_location.transposedPoint(), m_size.transposedSize()); }
 
@@ -231,8 +230,9 @@ public:
     operator SkIRect() const;
 #endif
 
-#if (PLATFORM(MAC) && !defined(NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES)) \
-        || (PLATFORM(CHROMIUM) && OS(DARWIN))  || (PLATFORM(QT) && USE(QTKIT))
+#if (PLATFORM(MAC) || (PLATFORM(CHROMIUM) && OS(DARWIN))) \
+        && !defined(NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES) \
+        || (PLATFORM(QT) && USE(QTKIT))
     operator NSRect() const;
 #endif
 

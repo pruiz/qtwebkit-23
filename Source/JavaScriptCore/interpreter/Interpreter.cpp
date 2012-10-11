@@ -131,14 +131,6 @@ static NEVER_INLINE bool isInvalidParamForIn(CallFrame* callFrame, JSValue value
     exceptionData = createInvalidParamError(callFrame, "in" , value);
     return true;
 }
-
-static NEVER_INLINE bool isInvalidParamForInstanceOf(CallFrame* callFrame, JSValue value, JSValue& exceptionData)
-{
-    if (value.isObject() && asObject(value)->structure()->typeInfo().implementsHasInstance())
-        return false;
-    exceptionData = createInvalidParamError(callFrame, "instanceof" , value);
-    return true;
-}
 #endif
 
 JSValue eval(CallFrame* callFrame)
@@ -202,7 +194,7 @@ CallFrame* loadVarargs(CallFrame* callFrame, RegisterFile* registerFile, JSValue
         newCallFrame->setArgumentCountIncludingThis(argumentCountIncludingThis);
         newCallFrame->setThisValue(thisValue);
         for (size_t i = 0; i < callFrame->argumentCount(); ++i)
-            newCallFrame->setArgument(i, callFrame->argument(i));
+            newCallFrame->setArgument(i, callFrame->argumentAfterCapture(i));
         return newCallFrame;
     }
 
@@ -463,23 +455,20 @@ NEVER_INLINE bool Interpreter::unwindCallFrame(CallFrame*& callFrame, JSValue ex
             debugger->didExecuteProgram(debuggerCallFrame, codeBlock->ownerExecutable()->sourceID(), codeBlock->ownerExecutable()->lastLine(), 0);
     }
 
-    // If this call frame created an activation or an 'arguments' object, tear it off.
-    if (oldCodeBlock->codeType() == FunctionCode && oldCodeBlock->needsFullScopeChain()) {
-        if (!callFrame->uncheckedR(oldCodeBlock->activationRegister()).jsValue()) {
-            oldCodeBlock->createActivation(callFrame);
-            scope = callFrame->scope();
-        }
-        while (!scope->inherits(&JSActivation::s_info))
-            scope = scope->next();
+    JSValue activation;
+    if (oldCodeBlock->codeType() == FunctionCode && oldCodeBlock->needsActivation()) {
+        activation = callFrame->uncheckedR(oldCodeBlock->activationRegister()).jsValue();
+        if (activation)
+            jsCast<JSActivation*>(activation)->tearOff(*scope->globalData());
+    }
 
-        callFrame->setScope(scope);
-        JSActivation* activation = asActivation(scope);
-        activation->tearOff(*scope->globalData());
-        if (JSValue arguments = callFrame->uncheckedR(unmodifiedArgumentsRegister(oldCodeBlock->argumentsRegister())).jsValue())
-            asArguments(arguments)->didTearOffActivation(callFrame->globalData(), activation);
-    } else if (oldCodeBlock->usesArguments() && !oldCodeBlock->isStrictMode()) {
-        if (JSValue arguments = callFrame->uncheckedR(unmodifiedArgumentsRegister(oldCodeBlock->argumentsRegister())).jsValue())
-            asArguments(arguments)->tearOff(callFrame);
+    if (oldCodeBlock->codeType() == FunctionCode && oldCodeBlock->usesArguments()) {
+        if (JSValue arguments = callFrame->uncheckedR(unmodifiedArgumentsRegister(oldCodeBlock->argumentsRegister())).jsValue()) {
+            if (activation)
+                jsCast<Arguments*>(arguments)->didTearOffActivation(callFrame, jsCast<JSActivation*>(activation));
+            else
+                jsCast<Arguments*>(arguments)->tearOff(callFrame);
+        }
     }
 
     CallFrame* callerFrame = callFrame->callerFrame();
@@ -528,7 +517,8 @@ static void appendSourceToError(CallFrame* callFrame, ErrorInstance* exception, 
     int expressionStart = divotPoint - startOffset;
     int expressionStop = divotPoint + endOffset;
 
-    if (!expressionStop || expressionStart > codeBlock->source()->length())
+    const String& sourceString = codeBlock->source()->source();
+    if (!expressionStop || expressionStart > static_cast<int>(sourceString.length()))
         return;
 
     JSGlobalData* globalData = &callFrame->globalData();
@@ -542,8 +532,8 @@ static void appendSourceToError(CallFrame* callFrame, ErrorInstance* exception, 
         message =  makeString(message, " (evaluating '", codeBlock->source()->getRange(expressionStart, expressionStop), "')");
     else {
         // No range information, so give a few characters of context
-        const StringImpl* data = codeBlock->source()->data();
-        int dataLength = codeBlock->source()->length();
+        const StringImpl* data = sourceString.impl();
+        int dataLength = sourceString.length();
         int start = expressionStart;
         int stop = expressionStart;
         // Get up to 20 characters of context to the left and right of the divot, clamping to the line.
@@ -2403,14 +2393,32 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
            JSC API*). Raises an exception if register constructor is not
            an valid parameter for instanceof.
         */
-        int base = vPC[1].u.operand;
+        int dst = vPC[1].u.operand;
+        int value = vPC[2].u.operand;
+        int base = vPC[3].u.operand;
+        int target = vPC[4].u.operand;
+
         JSValue baseVal = callFrame->r(base).jsValue();
 
-        if (isInvalidParamForInstanceOf(callFrame, baseVal, exceptionValue))
-            goto vm_throw;
+        if (baseVal.isObject()) {
+            TypeInfo info = asObject(baseVal)->structure()->typeInfo();
+            if (info.implementsDefaultHasInstance()) {
+                vPC += OPCODE_LENGTH(op_check_has_instance);
+                NEXT_INSTRUCTION();
+            }
+            if (info.implementsHasInstance()) {
+                JSValue baseVal = callFrame->r(base).jsValue();
+                bool result = asObject(baseVal)->methodTable()->customHasInstance(asObject(baseVal), callFrame, callFrame->r(value).jsValue());
+                CHECK_FOR_EXCEPTION();
+                callFrame->uncheckedR(dst) = jsBoolean(result);
 
-        vPC += OPCODE_LENGTH(op_check_has_instance);
-        NEXT_INSTRUCTION();
+                vPC += target;
+                NEXT_INSTRUCTION();
+            }
+        }
+
+        exceptionValue = createInvalidParamError(callFrame, "instanceof" , baseVal);
+        goto vm_throw;
     }
     DEFINE_OPCODE(op_instanceof) {
         /* instanceof dst(r) value(r) constructor(r) constructorProto(r)
@@ -2427,14 +2435,9 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         */
         int dst = vPC[1].u.operand;
         int value = vPC[2].u.operand;
-        int base = vPC[3].u.operand;
-        int baseProto = vPC[4].u.operand;
+        int baseProto = vPC[3].u.operand;
 
-        JSValue baseVal = callFrame->r(base).jsValue();
-
-        ASSERT(!isInvalidParamForInstanceOf(callFrame, baseVal, exceptionValue));
-
-        bool result = asObject(baseVal)->methodTable()->hasInstance(asObject(baseVal), callFrame, callFrame->r(value).jsValue(), callFrame->r(baseProto).jsValue());
+        bool result = JSObject::defaultHasInstance(callFrame, callFrame->r(value).jsValue(), callFrame->r(baseProto).jsValue());
         CHECK_FOR_EXCEPTION();
         callFrame->uncheckedR(dst) = jsBoolean(result);
 
@@ -2683,6 +2686,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_get_global_var_watchable);
         NEXT_INSTRUCTION();
     }
+    DEFINE_OPCODE(op_init_global_const)
     DEFINE_OPCODE(op_put_global_var) {
         /* put_global_var globalObject(c) registerPointer(n) value(r)
          
@@ -2697,6 +2701,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         vPC += OPCODE_LENGTH(op_put_global_var);
         NEXT_INSTRUCTION();
     }
+    DEFINE_OPCODE(op_init_global_const_check)
     DEFINE_OPCODE(op_put_global_var_check) {
         /* put_global_var_check globalObject(c) registerPointer(n) value(r)
          
@@ -2810,7 +2815,7 @@ JSValue Interpreter::privateExecute(ExecutionFlag flag, RegisterFile* registerFi
         JSObject* baseObject = asObject(baseVal);
         PropertySlot slot(baseVal);
         if (!baseObject->getPropertySlot(callFrame, ident, slot)) {
-            exceptionValue = createErrorForInvalidGlobalAssignment(callFrame, ident.ustring());
+            exceptionValue = createErrorForInvalidGlobalAssignment(callFrame, ident.string());
             goto vm_throw;
         }
 
@@ -3610,8 +3615,8 @@ skip_id_custom_self:
             uint32_t i = subscript.asUInt32();
             if (isJSArray(baseValue)) {
                 JSArray* jsArray = asArray(baseValue);
-                if (jsArray->canGetIndex(i))
-                    result = jsArray->getIndex(i);
+                if (jsArray->canGetIndexQuickly(i))
+                    result = jsArray->getIndexQuickly(i);
                 else
                     result = jsArray->JSArray::get(callFrame, i);
             } else if (isJSString(baseValue) && asString(baseValue)->canGetIndex(i))
@@ -3652,8 +3657,8 @@ skip_id_custom_self:
             uint32_t i = subscript.asUInt32();
             if (isJSArray(baseValue)) {
                 JSArray* jsArray = asArray(baseValue);
-                if (jsArray->canSetIndex(i))
-                    jsArray->setIndex(*globalData, i, callFrame->r(value).jsValue());
+                if (jsArray->canSetIndexQuickly(i))
+                    jsArray->setIndexQuickly(*globalData, i, callFrame->r(value).jsValue());
                 else
                     jsArray->JSArray::putByIndex(jsArray, callFrame, i, callFrame->r(value).jsValue(), codeBlock->isStrictMode());
             } else
@@ -4475,50 +4480,43 @@ skip_id_custom_self:
         goto vm_throw;
     }
     DEFINE_OPCODE(op_tear_off_activation) {
-        /* tear_off_activation activation(r) arguments(r)
+        /* tear_off_activation activation(r)
 
            Copy locals and named parameters from the register file to the heap.
-           Point the bindings in 'activation' and 'arguments' to this new backing
-           store. (Note that 'arguments' may not have been created. If created,
-           'arguments' already holds a copy of any extra / unnamed parameters.)
+           Point the bindings in 'activation' to this new backing store.
 
            This opcode appears before op_ret in functions that require full scope chains.
         */
 
         int activation = vPC[1].u.operand;
-        int arguments = vPC[2].u.operand;
         ASSERT(codeBlock->needsFullScopeChain());
         JSValue activationValue = callFrame->r(activation).jsValue();
-        if (activationValue) {
+        if (activationValue)
             asActivation(activationValue)->tearOff(*globalData);
-
-            if (JSValue argumentsValue = callFrame->r(unmodifiedArgumentsRegister(arguments)).jsValue())
-                asArguments(argumentsValue)->didTearOffActivation(*globalData, asActivation(activationValue));
-        } else if (JSValue argumentsValue = callFrame->r(unmodifiedArgumentsRegister(arguments)).jsValue()) {
-            if (!codeBlock->isStrictMode())
-                asArguments(argumentsValue)->tearOff(callFrame);
-        }
 
         vPC += OPCODE_LENGTH(op_tear_off_activation);
         NEXT_INSTRUCTION();
     }
     DEFINE_OPCODE(op_tear_off_arguments) {
-        /* tear_off_arguments arguments(r)
+        /* tear_off_arguments arguments(r) activation(r)
 
            Copy named parameters from the register file to the heap. Point the
-           bindings in 'arguments' to this new backing store. (Note that
-           'arguments' may not have been created. If created, 'arguments' already
-           holds a copy of any extra / unnamed parameters.)
+           bindings in 'arguments' to this new backing store. (If 'activation'
+           was also copied to the heap, 'arguments' will point to its storage.)
 
            This opcode appears before op_ret in functions that don't require full
            scope chains, but do use 'arguments'.
         */
 
-        int src1 = vPC[1].u.operand;
-        ASSERT(!codeBlock->needsFullScopeChain() && codeBlock->ownerExecutable()->usesArguments());
-
-        if (JSValue arguments = callFrame->r(unmodifiedArgumentsRegister(src1)).jsValue())
-            asArguments(arguments)->tearOff(callFrame);
+        int arguments = vPC[1].u.operand;
+        int activation = vPC[2].u.operand;
+        ASSERT(codeBlock->usesArguments());
+        if (JSValue argumentsValue = callFrame->r(unmodifiedArgumentsRegister(arguments)).jsValue()) {
+            if (JSValue activationValue = callFrame->r(activation).jsValue())
+                asArguments(argumentsValue)->didTearOffActivation(callFrame, asActivation(activationValue));
+            else
+                asArguments(argumentsValue)->tearOff(callFrame);
+        }
 
         vPC += OPCODE_LENGTH(op_tear_off_arguments);
         NEXT_INSTRUCTION();
@@ -5019,7 +5017,7 @@ skip_id_custom_self:
             accessor->setGetter(callFrame->globalData(), asObject(getter));
         if (!setter.isUndefined())
             accessor->setSetter(callFrame->globalData(), asObject(setter));
-        baseObj->putDirectAccessor(callFrame->globalData(), ident, accessor, Accessor);
+        baseObj->putDirectAccessor(callFrame, ident, accessor, Accessor);
 
         vPC += OPCODE_LENGTH(op_put_getter_setter);
         NEXT_INSTRUCTION();
@@ -5111,19 +5109,6 @@ JSValue Interpreter::retrieveArgumentsFromVMCode(CallFrame* callFrame, JSFunctio
     CallFrame* functionCallFrame = findFunctionCallFrameFromVMCode(callFrame, function);
     if (!functionCallFrame)
         return jsNull();
-
-    CodeBlock* codeBlock = functionCallFrame->someCodeBlockForPossiblyInlinedCode();
-    if (codeBlock->usesArguments()) {
-        ASSERT(codeBlock->codeType() == FunctionCode);
-        int argumentsRegister = codeBlock->argumentsRegister();
-        int realArgumentsRegister = unmodifiedArgumentsRegister(argumentsRegister);
-        if (JSValue arguments = functionCallFrame->uncheckedR(argumentsRegister).jsValue())
-            return arguments;
-        JSValue arguments = JSValue(Arguments::create(callFrame->globalData(), functionCallFrame));
-        functionCallFrame->r(argumentsRegister) = arguments;
-        functionCallFrame->r(realArgumentsRegister) = arguments;
-        return arguments;
-    }
 
     Arguments* arguments = Arguments::create(functionCallFrame->globalData(), functionCallFrame);
     arguments->tearOff(functionCallFrame);

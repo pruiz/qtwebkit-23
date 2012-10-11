@@ -724,7 +724,7 @@ public:
     // Build an array of quads in absolute coords for line boxes
     virtual void absoluteQuads(Vector<FloatQuad>&, bool* /*wasFixed*/ = 0) const { }
 
-    void absoluteFocusRingQuads(Vector<FloatQuad>&);
+    virtual void absoluteFocusRingQuads(Vector<FloatQuad>&);
 
     static FloatRect absoluteBoundingBoxRectForRange(const Range*);
 
@@ -756,7 +756,7 @@ public:
     RenderBoxModelObject* containerForRepaint() const;
     // Actually do the repaint of rect r for this object which has been computed in the coordinate space
     // of repaintContainer. If repaintContainer is 0, repaint via the view.
-    void repaintUsingContainer(RenderBoxModelObject* repaintContainer, const LayoutRect&, bool immediate = false) const;
+    void repaintUsingContainer(RenderBoxModelObject* repaintContainer, const IntRect&, bool immediate = false) const;
     
     // Repaint the entire object.  Called when, e.g., the color of a border changes, or when a border
     // style changes.

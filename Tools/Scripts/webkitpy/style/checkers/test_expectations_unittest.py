@@ -79,6 +79,9 @@ class TestExpectationsTestCase(unittest.TestCase):
         self._expect_port_for_expectations_path('chromium', 'LayoutTests/platform/chromium/TestExpectations')
         self._expect_port_for_expectations_path(None, '/mock-checkout/LayoutTests/platform/win/TestExpectations')
         self._expect_port_for_expectations_path('win', 'LayoutTests/platform/win/TestExpectations')
+        self._expect_port_for_expectations_path('efl', 'LayoutTests/platform/efl/TestExpectations')
+        self._expect_port_for_expectations_path('efl', 'LayoutTests/platform/efl-wk1/TestExpectations')
+        self._expect_port_for_expectations_path('efl', 'LayoutTests/platform/efl-wk2/TestExpectations')
 
     def assert_lines_lint(self, lines, should_pass, expected_output=None):
         self._error_collector.reset_errors()
@@ -93,8 +96,7 @@ class TestExpectationsTestCase(unittest.TestCase):
         # Now use a test port so we can check the lines.
         checker._port_obj = host.port_factory.get('test-mac-leopard')
         checker.check_test_expectations(expectations_str='\n'.join(lines),
-                                        tests=[self._test_file],
-                                        overrides=None)
+                                        tests=[self._test_file])
         checker.check_tabs(lines)
         if should_pass:
             self.assertEqual('', self._error_collector.get_errors())
@@ -105,10 +107,10 @@ class TestExpectationsTestCase(unittest.TestCase):
         self.assertTrue(self._error_collector.turned_off_filtering)
 
     def test_valid_expectations(self):
-        self.assert_lines_lint(["BUGCR1234 MAC : passes/text.html = PASS TEXT"], should_pass=True)
+        self.assert_lines_lint(["crbug.com/1234 [ Mac ] passes/text.html [ Pass Failure ]"], should_pass=True)
 
     def test_invalid_expectations(self):
-        self.assert_lines_lint(["BUG1234 : passes/text.html = GIVE UP"], should_pass=False)
+        self.assert_lines_lint(["Bug(me) passes/text.html [ Give Up]"], should_pass=False)
 
     def test_tab(self):
-        self.assert_lines_lint(["\tBUGWK1 : passes/text.html = PASS"], should_pass=False, expected_output="Line contains tab character.  [whitespace/tab] [5]")
+        self.assert_lines_lint(["\twebkit.org/b/1 passes/text.html [ Pass ]"], should_pass=False, expected_output="Line contains tab character.  [whitespace/tab] [5]")

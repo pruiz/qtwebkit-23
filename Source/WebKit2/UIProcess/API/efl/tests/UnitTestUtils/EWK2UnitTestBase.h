@@ -29,6 +29,8 @@ namespace EWK2UnitTest {
 
 class EWK2UnitTestBase : public ::testing::Test {
 public:
+    Ecore_Evas* backingStore() { return m_ecoreEvas; }
+    Evas* canvas() { return ecore_evas_get(m_ecoreEvas); }
     Evas_Object* webView() { return m_webView; }
     Ewk_View_Smart_Class* ewkViewClass() { return &m_ewkViewClass; }
 
@@ -39,8 +41,12 @@ protected:
     virtual void TearDown();
 
     void loadUrlSync(const char* url);
-    void waitUntilLoadFinished();
-    void waitUntilTitleChangedTo(const char* expectedTitle);
+
+    static const double defaultTimeoutSeconds = 10.0;
+    bool waitUntilLoadFinished(double timeoutSeconds = defaultTimeoutSeconds);
+    bool waitUntilTitleChangedTo(const char* expectedTitle, double timeoutSeconds = defaultTimeoutSeconds);
+    bool waitUntilURIChangedTo(const char* expectedURI, double timeoutSeconds = defaultTimeoutSeconds);
+
     void mouseClick(int x, int y);
 
 private:

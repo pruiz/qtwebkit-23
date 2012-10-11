@@ -46,8 +46,6 @@
                 'chromium_src_dir': '../../../../..',
             }],
         ],
-
-        'use_libcc_for_compositor%': 0,
     },
     'targets': [
         {
@@ -104,11 +102,6 @@
                             'chromium_code': 1,
                             },
                         }],
-                        ['use_libcc_for_compositor==0', {
-                            'sources': [
-                                '<@(webkit_compositor_unittest_files)',
-                            ],
-                        }],
                     ],
                 }],
                 ['inside_chromium_build==1 and OS=="win" and component!="shared_library"', {
@@ -145,13 +138,15 @@
                 'target_name': 'webkit_unit_tests_apk',
                 'type': 'none',
                 'dependencies': [
-                    '<(chromium_src_dir)/base/base.gyp:base_java',
+                    '<(chromium_src_dir)/base/base.gyp:base',
+                    '<(chromium_src_dir)/net/net.gyp:net',
                     'webkit_unit_tests',
                 ],
                 'variables': {
                     'input_shlib_path': '<(SHARED_LIB_DIR)/<(SHARED_LIB_PREFIX)webkit_unit_tests<(SHARED_LIB_SUFFIX)',
                     'input_jars_paths': [
                         '<(PRODUCT_DIR)/lib.java/chromium_base.jar',
+                        '<(PRODUCT_DIR)/lib.java/chromium_net.jar',
                     ],
                     'conditions': [
                         ['inside_chromium_build==1', {
@@ -171,7 +166,7 @@
                         '<(chromium_src_dir)/testing/android/AndroidManifest.xml',
                         '<(chromium_src_dir)/testing/android/generate_native_test.py',
                         '<(input_shlib_path)',
-                        '<@(input_jars_paths)',
+                        '>@(input_jars_paths)',
                     ],
                     'outputs': [
                         '<(PRODUCT_DIR)/webkit_unit_tests_apk/webkit_unit_tests-debug.apk',
@@ -181,7 +176,7 @@
                         '--native_library',
                         '<(input_shlib_path)',
                         '--jars',
-                        '"<@(input_jars_paths)"',
+                        '">@(input_jars_paths)"',
                         '--output',
                         '<(PRODUCT_DIR)/webkit_unit_tests_apk',
                         '--strip-binary=<(android_strip)',
@@ -207,6 +202,14 @@
                     ],
                 }],
             }],
+        }],
+        ['clang==1', {
+            'target_defaults': {
+                'cflags': ['-Wunused-parameter'],
+                'xcode_settings': {
+                    'WARNING_CFLAGS': ['-Wunused-parameter'],
+                },
+            },
         }],
     ],
 }

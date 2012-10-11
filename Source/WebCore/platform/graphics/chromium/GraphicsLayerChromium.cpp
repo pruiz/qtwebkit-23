@@ -46,7 +46,6 @@
 #include "GraphicsLayerChromium.h"
 
 #include "AnimationTranslationUtil.h"
-#include "ContentLayerChromium.h"
 #include "FloatConversion.h"
 #include "FloatRect.h"
 #include "GraphicsContext.h"
@@ -70,6 +69,7 @@
 #include <wtf/HashSet.h>
 #include <wtf/StringExtras.h>
 #include <wtf/text/CString.h>
+#include <wtf/text/StringHash.h>
 #include <wtf/text/WTFString.h>
 
 using namespace std;
@@ -93,12 +93,7 @@ GraphicsLayerChromium::GraphicsLayerChromium(GraphicsLayerClient* client)
     , m_scrollableArea(0)
 {
     m_opaqueRectTrackingContentLayerDelegate = adoptPtr(new OpaqueRectTrackingContentLayerDelegate(this));
-
-    if (WebCompositorSupport* compositorSupport = Platform::current()->compositorSupport())
-        m_layer = adoptPtr(compositorSupport->createContentLayer(m_opaqueRectTrackingContentLayerDelegate.get()));
-    else
-        m_layer = adoptPtr(WebContentLayer::create(m_opaqueRectTrackingContentLayerDelegate.get()));
-
+    m_layer = adoptPtr(Platform::current()->compositorSupport()->createContentLayer(m_opaqueRectTrackingContentLayerDelegate.get()));
     m_layer->layer()->setDrawsContent(m_drawsContent && m_contentsVisible);
     m_layer->layer()->setScrollClient(this);
     updateDebugIndicators();
@@ -466,10 +461,7 @@ void GraphicsLayerChromium::setContentsToImage(Image* image)
     bool childrenChanged = false;
     if (image) {
         if (m_contentsLayerPurpose != ContentsLayerForImage) {
-            if (WebCompositorSupport* compositorSupport = Platform::current()->compositorSupport())
-                m_imageLayer = adoptPtr(compositorSupport->createImageLayer());
-            else
-                m_imageLayer = adoptPtr(WebImageLayer::create());
+            m_imageLayer = adoptPtr(Platform::current()->compositorSupport()->createImageLayer());
             registerContentsLayer(m_imageLayer->layer());
 
             setupContentsLayer(m_imageLayer->layer());
@@ -722,11 +714,7 @@ void GraphicsLayerChromium::updateMasksToBounds()
 void GraphicsLayerChromium::updateLayerPreserves3D()
 {
     if (m_preserves3D && !m_transformLayer) {
-        if (WebCompositorSupport* compositorSupport = Platform::current()->compositorSupport())
-            m_transformLayer = adoptPtr(compositorSupport->createLayer());
-        else
-            m_transformLayer = adoptPtr(WebLayer::create());
-
+        m_transformLayer = adoptPtr(Platform::current()->compositorSupport()->createLayer());
         m_transformLayer->setPreserves3D(true);
         m_transformLayer->setAnimationDelegate(this);
         m_layer->layer()->transferAnimationsTo(m_transformLayer.get());
@@ -752,8 +740,8 @@ void GraphicsLayerChromium::updateLayerPreserves3D()
         m_transformLayer->addChild(m_layer->layer());
 
         updateChildList();
-    } else if (m_preserves3D && !m_transformLayer) {
-        // Relace the transformLayer in the parent with this layer.
+    } else if (!m_preserves3D && m_transformLayer) {
+        // Replace the transformLayer in the parent with this layer.
         m_layer->layer()->removeFromParent();
         if (parent())
             parent()->platformLayer()->replaceChild(m_transformLayer.get(), m_layer->layer());

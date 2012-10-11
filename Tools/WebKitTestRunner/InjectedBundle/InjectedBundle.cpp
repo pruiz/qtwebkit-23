@@ -209,9 +209,9 @@ bool InjectedBundle::booleanForKey(WKDictionaryRef dictionary, const char* key)
     WKRetainPtr<WKStringRef> wkKey(AdoptWK, WKStringCreateWithUTF8CString(key));
     WKTypeRef value = WKDictionaryGetItemForKey(dictionary, wkKey.get());
     if (WKGetTypeID(value) != WKBooleanGetTypeID()) {
-        stringBuilder()->append("Boolean value for key \"");
+        stringBuilder()->appendLiteral("Boolean value for key \"");
         stringBuilder()->append(key);
-        stringBuilder()->append("\" not found in dictionary\n");
+        stringBuilder()->appendLiteral("\" not found in dictionary\n");
         return false;
     }
     return WKBooleanGetValue(static_cast<WKBooleanRef>(value));
@@ -239,16 +239,28 @@ void InjectedBundle::beginTesting(WKDictionaryRef settings)
     WKBundleSwitchNetworkLoaderToNewTestingSession(m_bundle);
     WKBundleSetAuthorAndUserStylesEnabled(m_bundle, m_pageGroup, true);
     WKBundleSetFrameFlatteningEnabled(m_bundle, m_pageGroup, false);
+    WKBundleSetMinimumLogicalFontSize(m_bundle, m_pageGroup, 9);
+    WKBundleSetMinimumTimerInterval(m_bundle, m_pageGroup, 0.010); // 10 milliseconds (DOMTimer::s_minDefaultTimerInterval)
+    WKBundleSetSpatialNavigationEnabled(m_bundle, m_pageGroup, false);
+    WKBundleSetAllowFileAccessFromFileURLs(m_bundle, m_pageGroup, true);
+    WKBundleSetPluginsEnabled(m_bundle, m_pageGroup, true);
+    WKBundleSetPopupBlockingEnabled(m_bundle, m_pageGroup, false);
 
     WKBundleRemoveAllUserContent(m_bundle, m_pageGroup);
 
     m_testRunner->setShouldDumpFrameLoadCallbacks(booleanForKey(settings, "DumpFrameLoadDelegates"));
+    m_testRunner->setUserStyleSheetEnabled(false);
+    m_testRunner->setXSSAuditorEnabled(false);
+    m_testRunner->setCloseRemainingWindowsWhenComplete(false);
+    m_testRunner->setAcceptsEditing(true);
+    m_testRunner->setTabKeyCyclesThroughElements(true);
 
     page()->prepare();
 
     WKBundleClearAllDatabases(m_bundle);
     WKBundleClearApplicationCache(m_bundle);
     WKBundleResetOriginAccessWhitelists(m_bundle);
+    WKBundleSetDatabaseQuota(m_bundle, 5 * 1024 * 1024);
 }
 
 void InjectedBundle::done()
@@ -343,6 +355,34 @@ void InjectedBundle::postSimulateWebNotificationClick(uint64_t notificationID)
 {
     WKRetainPtr<WKStringRef> messageName(AdoptWK, WKStringCreateWithUTF8CString("SimulateWebNotificationClick"));
     WKRetainPtr<WKUInt64Ref> messageBody(AdoptWK, WKUInt64Create(notificationID));
+    WKBundlePostMessage(m_bundle, messageName.get(), messageBody.get());
+}
+
+void InjectedBundle::setGeolocationPermission(bool enabled)
+{
+    WKRetainPtr<WKStringRef> messageName(AdoptWK, WKStringCreateWithUTF8CString("SetGeolocationPermission"));
+    WKRetainPtr<WKBooleanRef> messageBody(AdoptWK, WKBooleanCreate(enabled));
+    WKBundlePostMessage(m_bundle, messageName.get(), messageBody.get());
+}
+
+void InjectedBundle::setMockGeolocationPosition(double latitude, double longitude, double accuracy)
+{
+    WKRetainPtr<WKStringRef> messageName(AdoptWK, WKStringCreateWithUTF8CString("SetMockGeolocationPosition"));
+
+    WKRetainPtr<WKMutableDictionaryRef> messageBody(AdoptWK, WKMutableDictionaryCreate());
+
+    WKRetainPtr<WKStringRef> latitudeKeyWK(AdoptWK, WKStringCreateWithUTF8CString("latitude"));
+    WKRetainPtr<WKDoubleRef> latitudeWK(AdoptWK, WKDoubleCreate(latitude));
+    WKDictionaryAddItem(messageBody.get(), latitudeKeyWK.get(), latitudeWK.get());
+
+    WKRetainPtr<WKStringRef> longitudeKeyWK(AdoptWK, WKStringCreateWithUTF8CString("longitude"));
+    WKRetainPtr<WKDoubleRef> longitudeWK(AdoptWK, WKDoubleCreate(longitude));
+    WKDictionaryAddItem(messageBody.get(), longitudeKeyWK.get(), longitudeWK.get());
+
+    WKRetainPtr<WKStringRef> accuracyKeyWK(AdoptWK, WKStringCreateWithUTF8CString("accuracy"));
+    WKRetainPtr<WKDoubleRef> accuracyWK(AdoptWK, WKDoubleCreate(accuracy));
+    WKDictionaryAddItem(messageBody.get(), accuracyKeyWK.get(), accuracyWK.get());
+
     WKBundlePostMessage(m_bundle, messageName.get(), messageBody.get());
 }
 

@@ -96,6 +96,9 @@ private:
                 break;
 
             Node& otherNode = m_graph[index];
+            if (!otherNode.shouldGenerate())
+                continue;
+            
             if (node.op() != otherNode.op())
                 continue;
             
@@ -157,38 +160,34 @@ private:
         return NoNode;
     }
     
-    NodeIndex impureCSE(Node& node)
+    NodeIndex getArrayLengthElimination(NodeIndex array)
     {
-        NodeIndex child1 = canonicalize(node.child1());
-        NodeIndex child2 = canonicalize(node.child2());
-        NodeIndex child3 = canonicalize(node.child3());
-        
         for (unsigned i = m_indexInBlock; i--;) {
             NodeIndex index = m_currentBlock->at(i);
-            if (index == child1 || index == child2 || index == child3)
-                break;
-
-            Node& otherNode = m_graph[index];
-            if (node.op() == otherNode.op()
-                && node.arithNodeFlags() == otherNode.arithNodeFlags()) {
-                NodeIndex otherChild = canonicalize(otherNode.child1());
-                if (otherChild == NoNode)
+            Node& node = m_graph[index];
+            if (!node.shouldGenerate())
+                continue;
+            switch (node.op()) {
+            case GetArrayLength:
+                if (node.child1() == array)
                     return index;
-                if (otherChild == child1) {
-                    otherChild = canonicalize(otherNode.child2());
-                    if (otherChild == NoNode)
-                        return index;
-                    if (otherChild == child2) {
-                        otherChild = canonicalize(otherNode.child3());
-                        if (otherChild == NoNode)
-                            return index;
-                        if (otherChild == child3)
-                            return index;
-                    }
-                }
-            }
-            if (m_graph.clobbersWorld(index))
                 break;
+                
+            case PutByVal:
+                if (!m_graph.byValIsPure(node))
+                    return NoNode;
+                switch (node.arrayMode()) {
+                case ARRAY_STORAGE_TO_HOLE_MODES:
+                    return NoNode;
+                default:
+                    break;
+                }
+                break;
+                
+            default:
+                if (m_graph.clobbersWorld(index))
+                    return NoNode;
+            }
         }
         return NoNode;
     }
@@ -437,7 +436,7 @@ private:
                 break;
             Node& node = m_graph[index];
             if (!node.shouldGenerate())
-                break;
+                continue;
             switch (node.op()) {
             case CheckStructure:
             case ForwardCheckStructure:
@@ -582,14 +581,17 @@ private:
                 break;
 
             Node& node = m_graph[index];
+            if (!node.shouldGenerate())
+                continue;
             switch (node.op()) {
-            case GetPropertyStorage:
+            case GetButterfly:
                 if (node.child1() == child1)
                     return index;
                 break;
 
             case AllocatePropertyStorage:
             case ReallocatePropertyStorage:
+            case Arrayify:
                 // If we can cheaply prove this is a change to our object's storage, we
                 // can optimize and use its result.
                 if (node.child1() == child1)
@@ -632,6 +634,8 @@ private:
                 break;
 
             Node& node = m_graph[index];
+            if (!node.shouldGenerate())
+                continue;
             switch (node.op()) {
             case PutByOffset:
             case PutStructure:
@@ -661,6 +665,8 @@ private:
                 break;
 
             Node& node = m_graph[index];
+            if (!node.shouldGenerate())
+                continue;
             switch (node.op()) {
             case GetIndexedPropertyStorage: {
                 if (node.child1() == child1 && node.arrayMode() == arrayMode)
@@ -688,6 +694,8 @@ private:
         for (unsigned i = endIndexForPureCSE(); i--;) {
             NodeIndex index = m_currentBlock->at(i);
             Node& node = m_graph[index];
+            if (!node.shouldGenerate())
+                continue;
             if (node.op() == GetScopeChain
                 && node.scopeChainDepth() == depth)
                 return index;
@@ -702,6 +710,8 @@ private:
         for (unsigned i = m_indexInBlock; i--;) {
             NodeIndex index = m_currentBlock->at(i);
             Node& node = m_graph[index];
+            if (!node.shouldGenerate())
+                continue;
             switch (node.op()) {
             case GetLocal:
                 if (node.local() == local) {
@@ -1067,7 +1077,7 @@ private:
             break;
             
         case GetArrayLength:
-            setReplacement(impureCSE(node));
+            setReplacement(getArrayLengthElimination(node.child1().index()));
             break;
             
         case GetScopeChain:
@@ -1160,7 +1170,7 @@ private:
             break;
         }
 
-        case GetPropertyStorage:
+        case GetButterfly:
             setReplacement(getPropertyStorageLoadElimination(node.child1().index()));
             break;
 

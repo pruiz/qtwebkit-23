@@ -37,7 +37,9 @@
 #include "ChromeClient.h"
 #include "Event.h"
 #include "FrameView.h"
+#include "HTMLDataListElement.h"
 #include "HTMLInputElement.h"
+#include "HTMLOptionElement.h"
 #include "Page.h"
 #include "RenderDetailsMarker.h"
 
@@ -138,9 +140,18 @@ void CalendarPickerElement::openPopup()
         parameters.step = 1.0;
     else
         parameters.step = step.toDouble();
-    parameters.anchorRectInRootView = document()->view()->contentsToRootView(hostInput()->getPixelSnappedRect());
+    parameters.anchorRectInRootView = document()->view()->contentsToRootView(hostInput()->pixelSnappedBoundingBox());
     parameters.currentValue = input->value();
-    // FIXME: parameters.suggestionValues and suggestionLabels will be used when we support datalist.
+    if (HTMLDataListElement* dataList = input->dataList()) {
+        RefPtr<HTMLCollection> options = dataList->options();
+        for (unsigned i = 0; HTMLOptionElement* option = toHTMLOptionElement(options->item(i)); ++i) {
+            if (!input->isValidValue(option->value()))
+                continue;
+            parameters.suggestionValues.append(input->sanitizeValue(option->value()));
+            parameters.localizedSuggestionValues.append(input->localizeValue(option->value()));
+            parameters.suggestionLabels.append(option->value() == option->label() ? String() : option->label());
+        }
+    }
     m_chooser = chrome->client()->openDateTimeChooser(this, parameters);
 }
 

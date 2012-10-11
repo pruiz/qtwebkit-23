@@ -23,6 +23,7 @@
 
 #include "WebPageProxy.h"
 #include <Evas.h>
+#include <WKEinaSharedString.h>
 #include <WebCore/TextDirection.h>
 #include <WebKit2/WKBase.h>
 #include <wtf/Vector.h>
@@ -59,6 +60,10 @@ void ewk_view_download_job_failed(Evas_Object* ewkView, Ewk_Download_Job*, Ewk_W
 void ewk_view_download_job_finished(Evas_Object* ewkView, Ewk_Download_Job*);
 void ewk_view_download_job_requested(Evas_Object* ewkView, Ewk_Download_Job*);
 void ewk_view_form_submission_request_new(Evas_Object* ewkView, Ewk_Form_Submission_Request*);
+#if ENABLE(FULLSCREEN_API)
+void ewk_view_full_screen_enter(Evas_Object* ewkView);
+void ewk_view_full_screen_exit(Evas_Object* ewkView);
+#endif
 void ewk_view_image_data_set(Evas_Object* ewkView, void* imageData, const WebCore::IntSize& size);
 void ewk_view_load_error(Evas_Object* ewkView, const Ewk_Web_Error* error);
 void ewk_view_load_finished(Evas_Object* ewkView);
@@ -77,6 +82,7 @@ void ewk_view_resource_load_initiated(Evas_Object* ewkView, uint64_t resourceIde
 void ewk_view_resource_load_response(Evas_Object* ewkView, uint64_t resourceIdentifier, Ewk_Url_Response* response);
 void ewk_view_resource_request_sent(Evas_Object* ewkView, uint64_t resourceIdentifier, Ewk_Url_Request* request, Ewk_Url_Response* redirectResponse);
 void ewk_view_text_found(Evas_Object* ewkView, unsigned int matchCount);
+void ewk_view_uri_update(Evas_Object* ewkView);
 void ewk_view_contents_size_changed(const Evas_Object* ewkView, const WebCore::IntSize&);
 
 Evas_Object* ewk_view_base_add(Evas* canvas, WKContextRef, WKPageGroupRef);
@@ -97,5 +103,15 @@ bool ewk_view_accelerated_compositing_mode_exit(const Evas_Object* ewkView);
 #endif
 
 void ewk_view_popup_menu_request(Evas_Object* ewkView, WebKit::WebPopupMenuProxyEfl* popupMenu, const WebCore::IntRect&, WebCore::TextDirection, double pageScaleFactor, const Vector<WebKit::WebPopupItem>& items, int32_t selectedIndex);
+void ewk_view_webprocess_crashed(Evas_Object* ewkView);
+
+void ewk_view_run_javascript_alert(Evas_Object* ewkView, const WKEinaSharedString& message);
+bool ewk_view_run_javascript_confirm(Evas_Object* ewkView, const WKEinaSharedString& message);
+WKEinaSharedString ewk_view_run_javascript_prompt(Evas_Object* ewkView, const WKEinaSharedString& message, const WKEinaSharedString& defaultValue);
+
+#if ENABLE(INPUT_TYPE_COLOR)
+void ewk_view_color_picker_request(Evas_Object* ewkView, int r, int g, int b, int a, WKColorPickerResultListenerRef listener);
+void ewk_view_color_picker_dismiss(Evas_Object* ewkView);
+#endif
 
 #endif // ewk_view_private_h

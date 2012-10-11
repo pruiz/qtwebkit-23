@@ -60,6 +60,8 @@ public:
 
     void createOffer(PassRefPtr<RTCSessionDescriptionCallback>, PassRefPtr<RTCErrorCallback>, const Dictionary& mediaConstraints, ExceptionCode&);
 
+    void createAnswer(PassRefPtr<RTCSessionDescriptionCallback>, PassRefPtr<RTCErrorCallback>, const Dictionary& mediaConstraints, ExceptionCode&);
+
     void setLocalDescription(PassRefPtr<RTCSessionDescription>, PassRefPtr<VoidCallback>, PassRefPtr<RTCErrorCallback>, ExceptionCode&);
     PassRefPtr<RTCSessionDescription> localDescription(ExceptionCode&);
 
@@ -84,6 +86,7 @@ public:
 
     void close(ExceptionCode&);
 
+    DEFINE_ATTRIBUTE_EVENT_LISTENER(negotationneeded);
     DEFINE_ATTRIBUTE_EVENT_LISTENER(icecandidate);
     DEFINE_ATTRIBUTE_EVENT_LISTENER(open);
     DEFINE_ATTRIBUTE_EVENT_LISTENER(statechange);
@@ -92,6 +95,7 @@ public:
     DEFINE_ATTRIBUTE_EVENT_LISTENER(icechange);
 
     // RTCPeerConnectionHandlerClient
+    virtual void negotiationNeeded() OVERRIDE;
     virtual void didGenerateIceCandidate(PassRefPtr<RTCIceCandidateDescriptor>) OVERRIDE;
     virtual void didChangeReadyState(ReadyState) OVERRIDE;
     virtual void didChangeIceState(IceState) OVERRIDE;

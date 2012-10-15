@@ -268,13 +268,18 @@ CalendarPicker.validateConfig = function(config) {
  */
 function initialize(args) {
     var errorString = CalendarPicker.validateConfig(args);
+    if (args.suggestionValues)
+        errorString = errorString || SuggestionPicker.validateConfig(args)
     if (errorString) {
         var main = $("main");
         main.textContent = "Internal error: " + errorString;
         resizeWindow(main.offsetWidth, main.offsetHeight);
     } else {
         global.params = args;
-        openCalendarPicker();
+        if (global.params.suggestionValues && global.params.suggestionValues.length)
+            openSuggestionPicker();
+        else
+            openCalendarPicker();
     }
 }
 
@@ -284,6 +289,11 @@ function closePicker() {
     var main = $("main");
     main.innerHTML = "";
     main.className = "";
+};
+
+function openSuggestionPicker() {
+    closePicker();
+    global.picker = new SuggestionPicker($("main"), global.params);
 };
 
 function openCalendarPicker() {
@@ -469,7 +479,7 @@ YearMonthController.prototype.attachTo = function(element) {
     }
     this._month.style.minWidth = maxWidth + 'px';
 
-    global.firstFocusableControl = this._left2; // FIXME: Should it be this.month?
+    this.picker.firstFocusableControl = this._left2; // FIXME: Should it be this.month?
 };
 
 YearMonthController.addTenYearsButtons = false;
@@ -1168,11 +1178,11 @@ CalendarPicker.prototype._handleBodyKeyDown = function(event) {
     this.maybeUpdateFocusStyle();
     var key = event.keyIdentifier;
     if (key == "U+0009") {
-        if (!event.shiftKey && document.activeElement == global.lastFocusableControl) {
+        if (!event.shiftKey && document.activeElement == this.lastFocusableControl) {
             event.stopPropagation();
             event.preventDefault();
             this.firstFocusableControl.focus();
-        } else if (event.shiftKey && document.activeElement == global.firstFocusableControl) {
+        } else if (event.shiftKey && document.activeElement == this.firstFocusableControl) {
             event.stopPropagation();
             event.preventDefault();
             this.lastFocusableControl.focus();

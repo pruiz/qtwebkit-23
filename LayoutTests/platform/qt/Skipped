@@ -243,6 +243,7 @@ fast/dom/shadow/shadow-element-rendering-single.html
 fast/dom/shadow/shadow-element-rendering-multiple.html
 fast/dom/shadow/shadow-nested-pseudo-id.html
 fast/dom/shadow/shadow-on-image.html
+fast/dom/shadow/shadow-removechild-and-blur-event.html
 fast/dom/shadow/shadow-root-activeElement.html
 fast/dom/shadow/shadow-root-append.html
 fast/dom/shadow/shadow-root-applyAuthorStyles.html
@@ -312,6 +313,7 @@ fast/sub-pixel/size-of-box-with-zoom.html
 fast/sub-pixel/table-rows-no-gaps.html
 fast/sub-pixel/sub-pixel-accumulates-to-layers.html
 fast/sub-pixel/selection/selection-rect-in-sub-pixel-table.html
+fast/sub-pixel/snap-negative-location.html
 
 # USE(V8)
 
@@ -1320,6 +1322,12 @@ css3/filters/custom/effect-custom-parameters.html
 css3/filters/custom/filter-repaint-custom-clipped.html
 css3/filters/custom/filter-repaint-custom-rotated.html
 css3/filters/custom/filter-repaint-custom.html
+
+# ERROR: TestRunner::overridePreference() does not support the 'WebKitDisplayImagesKey' preference
+# http://trac.webkit.org/changeset/129462
+fast/loader/display-image-unset-allows-cached-image-load.html
+fast/loader/display-image-unset-can-block-image-and-can-reload-in-place.html
+fast/loader/images-enabled-unset-can-block-image-and-can-reload-in-place.html
 
 # ReferenceError: Can't find variable: MediaKeyError
 # http://trac.webkit.org/changeset/114067
@@ -2795,3 +2803,11 @@ inspector/extensions/extensions-panel.html
 # [Qt] fast/regions/overflow-size-change-with-stacking-context.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=97199
 fast/regions/overflow-size-change-with-stacking-context.html
+
+# [Qt] New test introduced in r129346 inspector-protocol/css-getSupportedCSSProperties.html fails
+# https://bugs.webkit.org/show_bug.cgi?id=97451
+inspector-protocol/css-getSupportedCSSProperties.html
+
+# REGRESSION (r129456): http/tests/security/xss-eval.html is failing on JSC platforms
+# https://bugs.webkit.org/show_bug.cgi?id=97529
+http/tests/security/xss-eval.html

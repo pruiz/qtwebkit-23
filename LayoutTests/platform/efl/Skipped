@@ -2,77 +2,8 @@
 # Tests which depend on features which have not been implemented yet
 # --------------------------------------------------------------------
 
-# EFL's EventSender does not implement dumpFilenameBeingDragged
-fast/events/drag-image-filename.html
-
-# EFL's EventSender does not implement continuousMouseScrollBy yet
-fast/events/continuous-platform-wheelevent-in-scrolling-div.html
-fast/events/wheelevent-direction-inverted-from-device.html
-fast/events/wheelevent-in-horizontal-scrollbar-in-rtl.html
-fast/events/wheelevent-in-vertical-scrollbar-in-rtl.html
-
-# EFL has not fully implemented about some SVG attributes
-svg/custom
-svg/dom/altGlyph-dom.xhtml
-svg/text
-svg/W3C-SVG-1.1
-svg/W3C-SVG-1.1-SE
-svg/zoom/page/zoom-zoom-coords.xhtml
-
-# EFL's EventSender does not implement gesture-related callbacks
-fast/events/touch/gesture
-fast/events/touch/page-scaled-touch-gesture-click.html
-
-# EFL's port requires implementation of ClipboardEfl and DragClientEfl classes in order to suppport drag n drop functionality
-fast/block/positioning/hittest-on-relative-positioned-children.html
-fast/events/5056619.html
-fast/events/bogus-dropEffect-effectAllowed.html
-fast/events/click-count.html
-fast/events/content-changed-during-drop.html
-fast/events/crash-on-mutate-during-drop.html
-fast/events/drag-and-drop-dataTransfer-types-nocrash.html
-fast/events/drag-and-drop-fire-drag-dragover.html
-fast/events/drag-and-drop.html
-fast/events/drag-customData.html
-fast/events/drag-dataTransferItemList.html
-fast/events/drag-selects-image.html
-fast/events/dropzone-001.html
-fast/events/dropzone-002.html
-fast/events/dropzone-003.html
-fast/events/dropzone-005.html
-fast/events/ondragenter.html
-fast/events/ondrop-text-html.html
-fast/events/selectstart-by-double-triple-clicks.html
-fast/events/selectstart-by-drag.html
-fast/events/standalone-image-drag-to-editable.html
-fast/forms/drag-into-textarea.html
-fast/forms/drag-out-of-textarea.html
-fast/forms/focus-change-on-keypress.html
-fast/forms/search-cancel-button-mouseup.html
-fast/forms/search-disabled-readonly.html
-fast/forms/textfield-drag-into-disabled.html
-fast/lists/drag-into-marker.html
-fast/table/click-near-anonymous-table.html
-fast/text/offsetForPosition-complex-fallback.html
-http/tests/local/drag-over-remote-content.html
-http/tests/misc/bubble-drag-events.html
-http/tests/misc/drag-over-iframe-invalid-source-crash.html
-http/tests/security/dataTransfer-set-data-file-url.html
-http/tests/security/drag-drop-different-origin.html
-http/tests/security/drag-over-remote-content-iframe.html
-
-# EFL's LayoutTestController does not implement setMediaType
-fast/media/print-restores-previous-mediatype.html
-
 # EFL's LayoutTestController does not implement keepWebHistory
-fast/history/visited-link-background-color.html
 fast/history/window-open.html
-
-# EFL's LayoutTestController does not implement setScrollbarPolicy
-fast/overflow/scrollbar-restored-and-then-locked.html
-
-# EFL's LayoutTestController does not implement enableAutoResizeMode
-fast/autoresize
 
 # EFL's LayoutTestController does not implement setWindowIsKey
 fast/dom/Window/window-onFocus.html
@@ -86,9 +17,6 @@ editing/selection
 editing/spelling
 editing/style
 
-# EFL's LayoutTestController overridePreference does not implement WebKitUsePreHTML5ParserQuirks preference
-fast/parser/pre-html5-parser-quirks.html
-
 # EFL's LayoutTestController does not implement shadowPseudoId
 media/video-volume-slider.html
 
@@ -100,9 +28,6 @@ fast/history/back-forward-reset-after-error-handling.html
 
 # Relies on WebKit API [WebView _loadBackForwardListFromOtherView:]
 fast/loader/crash-copying-backforwardlist.html
-
-# This port doesn't support v8 i18n extension.
-fast/js/i18n-bindings-locale.html
 
 # BUG: Captions support needed in the media engine (via GTK+)
 media/media-captions.html
@@ -118,19 +43,9 @@ http/tests/misc/authentication-redirect-3/authentication-sent-to-redirect-same-o
 fast/frames/location-redirect-user-gesture.html
 fast/frames/meta-refresh-user-gesture.html
 
-# The EFL port has no support for loading a PDF as an image
-fast/images/pdf-as-background.html
-fast/images/pdf-as-image-landscape.html
-fast/images/pdf-as-image.html
-fast/images/pdf-as-tiled-background.html
-fast/replaced/pdf-as-image.html
-
 # The EFL port has no support for detecting slow unload handlers
 fast/dom/Window/slow-unload-handler.html
 fast/dom/Window/slow-unload-handler-only-frame-is-stopped.html
-
-# No CORS support for media elements is implemented yet.
-http/tests/security/video-cross-origin-readback.html
 
 # ----------------------------------------
 # Tests which also fail in other platforms
@@ -175,9 +90,6 @@ canvas/philip/tests/2d.path.rect.selfintersect.html
 # rectangle has zero height.
 canvas/philip/tests/2d.path.rect.zero.6.html
 
-# BUG: Bug in the test itself, as the input box can be big enough for the given coordinates to be inside it.
-fast/forms/input-text-click-outside.html
-
 # Rendering of multipart images is broken: this test times out
 # https://bugs.webkit.org/show_bug.cgi?id=54251
 http/tests/multipart/invalid-image-data-standalone.html
@@ -186,18 +98,19 @@ http/tests/multipart/invalid-image-data-standalone.html
 # https://bugs.webkit.org/show_bug.cgi?id=47060
 http/tests/multipart/stop-crash.html
 http/tests/multipart/load-last-non-html-frame.php
+http/tests/multipart/policy-ignore-crash.php
 
 # Failing on non-Chromium bots
 # https://bugs.webkit.org/show_bug.cgi?id=68278
 http/tests/history/back-with-fragment-change.php
 
+# Incomplete policy delegate dumping
+http/tests/misc/redirect-to-external-url.html
+
 # Failing http tests (via GTK+)
 http/tests/loading/bad-scheme-subframe.html
 http/tests/media/video-play-stall-seek.html
 http/tests/media/video-play-stall.html
-http/tests/misc/policy-delegate-called-twice.html
-http/tests/misc/redirect-to-external-url.html
-http/tests/multipart/policy-ignore-crash.php
 http/tests/security/feed-urls-from-remote.html
 
 # Test times out (via GTK+)
@@ -228,10 +141,6 @@ fast/events/attempt-scroll-with-no-scrollbars.html
 
 # BUG: no mouseout event being sent
 fast/events/mouseout-on-window.html
-
-# BUG: <canvas>'s toDataURL has problems with non-image/png mimetypes
-fast/canvas/canvas-toDataURL-case-insensitive-mimetype.html
-fast/canvas/toDataURL-supportedTypes.html
 
 # BUG: wrong test results that need investigation
 compositing/checkerboard.html
@@ -291,50 +200,26 @@ fast/block/float/overhanging-tall-block.html
 # BUG: <select> form elements do not respect some properties when being rendered (probably a problem in the theme).
 fast/forms/basic-selects.html
 
-# BUG: <textarea>s have some rendering with the proper size
-fast/forms/basic-textareas-quirks.html
-fast/forms/basic-textareas.html
-
 # BUG: text field renders badly when the height is too small
 fast/forms/textfield-overflow.html
 
 # BUG: rendering problems
 fast/forms/color/input-appearance-color.html
 
-# BUG: text opacity not being interpreted correctly
-fast/text/complex-text-opacity.html
-
 # BUG: international characters not being rendered correctly. they probably need a proper font.
-fast/overflow/scroll-div-hide-show.html
 fast/text/international/arabic-justify.html
-fast/text/international/bidi-AN-after-L.html
-fast/text/international/bidi-AN-after-empty-run.html
-fast/text/international/bidi-CS-after-AN.html
-fast/text/international/bidi-control-chars-treated-as-ZWS.html
 fast/text/international/bidi-linebreak-001.html
 fast/text/international/bidi-linebreak-002.html
 fast/text/international/bidi-linebreak-003.html
-fast/text/international/bidi-listbox-atsui.html
-fast/text/international/bidi-mirror-he-ar.html
-fast/text/international/bidi-neutral-run.html
 fast/text/international/bold-bengali.html
 fast/text/international/complex-character-based-fallback.html
 fast/text/international/danda-space.html
-fast/text/international/hebrew-vowels.html
 fast/text/international/hindi-spacing.html
 fast/text/international/hindi-whitespace.html
 fast/text/international/khmer-selection.html
 fast/text/international/plane2.html
-fast/text/international/text-combine-image-test.html
 fast/text/international/thai-baht-space.html
 fast/text/international/thai-line-breaks.html
-fast/text/international/vertical-text-glyph-test.html
-fast/text/justify-ideograph-complex.html
-fast/text/large-text-composed-char.html
-fast/writing-mode/japanese-rl-selection.html
-fast/writing-mode/japanese-rl-text-with-broken-font.html
-fast/writing-mode/japanese-rl-text.html
-fast/writing-mode/japanese-ruby-vertical-rl.html
 
 # BUG: form widgets do not respect RTL settings
 fast/forms/range/input-appearance-range-rtl.html
@@ -365,22 +250,6 @@ fast/forms/input-readonly-autoscroll.html
 # Needs investigation: this test passes when run alone
 fast/forms/submit-to-blank-multiple-times.html
 
-# Flaky test. https://bugs.webkit.org/show_bug.cgi?id=68536
-media/media-blocked-by-beforeload.html
-
-# Flaky test. https://bugs.webkit.org/show_bug.cgi?id=68878
-media/video-playing-and-pause.html
-
-# Flaky test. https://bugs.webkit.org/show_bug.cgi?id=44199
-perf/typing-at-end-of-line.html
-
-# BUG: "|" is shown as a dotted line, not a straight one.
-mathml/presentation/mo.xhtml
-mathml/presentation/row.xhtml
-
-# BUG: Integral symbol is drawn almost like a straight line.
-mathml/presentation/over.xhtml
-
 # Flaky tests (text diff mismatch)
 http/tests/navigation/document-location-mouseover.html
 
@@ -401,8 +270,10 @@ http/tests/websocket/tests/hybi/
 
 # Hits Cairo assertion
 fast/repaint/moving-shadow-on-container.html
+svg/css/composite-shadow-example.html
+svg/css/composite-shadow-with-opacity.html
 
-# Needs a rebaseline
+# Unclassified failures
 fast/events/platform-wheelevent-paging-x-in-non-scrolling-div.html
 fast/events/platform-wheelevent-paging-x-in-non-scrolling-page.html
 fast/events/platform-wheelevent-paging-x-in-scrolling-div.html
@@ -418,136 +289,27 @@ fast/forms/select/listbox-in-multi-column.html
 fast/inline/continuation-outlines-with-layers.html
 fast/invalid/residual-style.html
 fast/js/constructor-length.html
-fast/table/prepend-in-anonymous-table.html
-fast/text/basic/011.html
-fast/text/basic/013.html
-fast/text/bidi-embedding-pop-and-push-same.html
-fast/text/capitalize-boundaries.html
-fast/text/cg-fallback-bolding.html
-fast/text/drawBidiText.html
-fast/text/emphasis-vertical.html
-fast/text/fallback-traits-fixup.html
-fast/text/firstline/001.html
-fast/text/firstline/002.html
-fast/text/firstline/003.html
-fast/text/format-control.html
-fast/text/hyphens.html
-fast/text/international/002.html
-fast/text/international/bidi-LDB-2-CSS.html
-fast/text/international/bidi-LDB-2-HTML.html
-fast/text/international/bidi-LDB-2-formatting-characters.html
-fast/text/international/wrap-CJK-001.html
-fast/text/in-rendered-text-rtl.html
-fast/text/international/001.html
-fast/text/international/003.html
-fast/text/international/bidi-L2-run-reordering.html
-fast/text/international/bidi-european-terminators.html
-fast/text/international/bidi-explicit-embedding.html
-fast/text/international/bidi-ignored-for-first-child-inline.html
-fast/text/international/bidi-innertext.html
-fast/text/international/bidi-layout-across-linebreak.html
-fast/text/international/bidi-listbox.html
-fast/text/international/bidi-neutral-directionality-paragraph-start.html
-fast/text/international/bidi-override.html
-fast/text/international/rtl-caret.html
-fast/text/international/rtl-white-space-pre-wrap.html
-fast/text/international/unicode-bidi-plaintext-in-textarea.html
+
+# The black text is not overlapping with the red one
 fast/text/line-initial-and-final-swashes.html
-fast/text/midword-break-hang.html
-fast/text/trailing-white-space-2.html
-fast/text/trailing-white-space.html
-fast/text/whitespace/024.html
+
+# Fails, test times out in testLoadErrorGC()
 fast/workers/shared-worker-load-error.html
-fast/writing-mode/Kusa-Makura-background-canvas.html
-fast/writing-mode/border-vertical-lr.html
-fast/writing-mode/fallback-orientation.html
+
+# Fails, the div does not scroll
 scrollbars/scroll-rtl-or-bt-layer.html
+
+# Fails, seems like a rounding problem
 svg/animations/animate-text-nested-transforms.html
-svg/as-border-image/svg-as-border-image-2.html
-svg/as-border-image/svg-as-border-image.html
-svg/as-image/animated-svg-as-image.html
-svg/as-image/animated-svg-as-image-no-fixed-intrinsic-size.html
-svg/as-image/animated-svg-as-image-same-image.html
-svg/as-image/img-preserveAspectRatio-support-1.html
-svg/as-image/img-preserveAspectRatio-support-2.html
-svg/as-image/same-image-two-instances.html
-svg/as-image/svg-image-change-content-size.xhtml
-svg/batik/masking/maskRegions.svg
-svg/clip-path/deep-nested-clip-in-mask-different-unitTypes.svg
-svg/css/composite-shadow-example.html
-svg/css/composite-shadow-with-opacity.html
-svg/css/getComputedStyle-basic.xhtml
-svg/css/path-gradient-stroke-shadow.svg
-svg/dom/css-transforms.xhtml
+
+# Failing, the 2 bars are not identical
 svg/hixie/data-types/002.xhtml
-svg/hixie/error/012.xml
-svg/hixie/error/013.xml
-svg/hixie/mixed/003.xml
-svg/hixie/mixed/004.xml
-svg/hixie/mixed/005.xml
-svg/hixie/mixed/006.xml
-svg/hixie/mixed/007.xml
-svg/hixie/mixed/008.xml
-svg/hixie/mixed/009.xml
-svg/hixie/mixed/010.xml
-svg/hixie/mixed/011.xml
-svg/hixie/perf/007.xml
-svg/hixie/processing-model/003.xml
-svg/hixie/processing-model/004.xml
-svg/hixie/rendering-model/003.xhtml
-svg/hixie/rendering-model/004.xhtml
-svg/hixie/text/003.html
-svg/in-html/by-reference.html
-svg/in-html/circle.html
-svg/overflow/overflow-on-inner-svg-element.svg
-svg/overflow/overflow-on-outermost-svg-element-in-xhtml-auto.xhtml
-svg/overflow/overflow-on-outermost-svg-element-in-xhtml-defaults.xhtml
-svg/overflow/overflow-on-outermost-svg-element-in-xhtml-hidden.xhtml
-svg/overflow/overflow-on-outermost-svg-element-in-xhtml-scroll.xhtml
-svg/overflow/overflow-on-outermost-svg-element-in-xhtml-visible.xhtml
-svg/repaint/inner-svg-change-viewPort-relative.svg
-svg/transforms/animated-path-inside-transformed-html.xhtml
-svg/transforms/svg-css-transforms-clip-path.xhtml
-svg/transforms/svg-css-transforms.xhtml
-svg/transforms/text-with-pattern-inside-transformed-html.xhtml
-svg/transforms/text-with-pattern-with-svg-transform.svg
-svg/wicd/rightsizing-grid.xhtml
-svg/wicd/test-rightsizing-a.xhtml
-svg/wicd/test-rightsizing-b.xhtml
-svg/wicd/test-scalable-background-image1.xhtml
-svg/wicd/test-scalable-background-image2.xhtml
-svg/zoom/page/zoom-img-preserveAspectRatio-support-1.html
-svg/zoom/page/zoom-mask-with-percentages.svg
-svg/zoom/page/zoom-replaced-intrinsic-ratio-001.htm
-svg/zoom/text/zoom-coords-viewattr-01-b.svg
-svg/zoom/text/zoom-hixie-mixed-008.xml
+
+# Failing, text size is not the same
 svg/zoom/text/zoom-hixie-mixed-009.xml
-svg/zoom/text/zoom-hixie-rendering-model-004.xhtml
-svg/zoom/text/zoom-svg-float-border-padding.xml
-svg/W3C-I18N/g-dirRTL-ubNone.svg
-svg/W3C-I18N/g-dirRTL-ubOverride.svg
-svg/W3C-I18N/text-anchor-dirLTR-anchorEnd.svg
-svg/W3C-I18N/text-anchor-dirLTR-anchorMiddle.svg
-svg/W3C-I18N/text-anchor-dirLTR-anchorStart.svg
-svg/W3C-I18N/text-anchor-dirNone-anchorEnd.svg
-svg/W3C-I18N/text-anchor-dirNone-anchorMiddle.svg
-svg/W3C-I18N/text-anchor-dirNone-anchorStart.svg
-svg/W3C-I18N/text-anchor-dirRTL-anchorEnd.svg
-svg/W3C-I18N/text-anchor-dirRTL-anchorMiddle.svg
-svg/W3C-I18N/text-anchor-dirRTL-anchorStart.svg
-svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorEnd.svg
-svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorMiddle.svg
-svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorStart.svg
-svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorEnd.svg
-svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorMiddle.svg
-svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorStart.svg
-svg/W3C-I18N/text-anchor-no-markup.svg
+
+# Failing, last gradiant rectangle is blank
 svg/batik/paints/gradientLimit.svg
-svg/batik/text/textOnPath.svg
-svg/batik/text/textProperties2.svg
-svg/hixie/perf/004.xml
-svg/hixie/perf/005.xml
-svg/hixie/perf/006.xml
 
 # EFL DRT doesn't fully support http tests yet. These tests make timeout error.
 fast/overflow/overflow-height-float-not-removed-crash3.html
@@ -580,7 +342,6 @@ http/tests/security/drag-drop-same-unique-origin.html
 http/tests/security/frameNavigation/not-opener.html
 http/tests/security/no-referrer.html
 http/tests/security/originHeader/origin-header-for-empty.html
-http/tests/security/originHeader/origin-header-for-https.html
 http/tests/security/redirect-BLOCKED-to-localURL.html
 http/tests/security/referrer-policy-redirect-link.html
 http/tests/security/xss-DENIED-xsl-document-redirect.xml
@@ -636,22 +397,11 @@ fast/profiler/stop-profiling-after-setTimeout.html
 fast/profiler/dead-time.html
 
 # following tests started failing on EFL afrer r122952.
-http/tests/inspector/inspect-element.html
-http/tests/inspector/network/network-initiator.html
-http/tests/inspector/network/network-content-replacement-embed.html
-http/tests/inspector/network/network-embed.html
-http/tests/inspector/network/network-size-chunked.html
-http/tests/inspector/network/network-size-sync.html
-http/tests/inspector/network/network-size.html
 http/tests/inspector/resource-har-conversion.html
-http/tests/inspector/console-cd-completions.html
 http/tests/inspector/console-cross-origin-iframe-logging.html
 http/tests/inspector/resource-parameters.html
-http/tests/inspector/console-cd.html
-http/tests/inspector/extensions-useragent.html
 http/tests/inspector/compiler-source-mapping-debug.html
 http/tests/inspector/console-websocket-error.html
-inspector/styles/variables/css-variables.html
 inspector/styles/svg-style.xhtml
 inspector/styles/override-screen-size.html
 inspector/console/console-long-eval-crash.html
@@ -663,10 +413,6 @@ inspector/debugger/debugger-compile-and-run.html
 inspector/debugger/dom-breakpoints.html
 inspector/timeline/timeline-paint.html
 inspector/timeline/timeline-receive-response-event.html
-inspector/extensions/extensions-api.html
-inspector/extensions/extensions-audits-content-script.html
-inspector/extensions/extensions-audits.html
-inspector/extensions/extensions-eval-content-script.html
 
 # ENABLE(WIDGET_REGION) is disabled
 fast/css/widget-region-parser.html

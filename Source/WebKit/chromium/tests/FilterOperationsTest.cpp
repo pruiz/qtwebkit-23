@@ -186,7 +186,7 @@ TEST(WebFilterOperationsTest, saveAndRestore)
     SAVE_RESTORE_AMOUNT(Blur, 0.6f);
     SAVE_RESTORE_OFFSET_AMOUNT_COLOR(DropShadow, WebPoint(3, 4), 0.4f, 0xffffff00);
 
-    SkScalar matrix[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19 };
+    SkScalar matrix[20] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
     SAVE_RESTORE_MATRIX(ColorMatrix, matrix);
 
     SAVE_RESTORE_ZOOMRECT_AMOUNT(Zoom, WebRect(20, 19, 18, 17), 32);

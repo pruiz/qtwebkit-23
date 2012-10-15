@@ -39,9 +39,17 @@ Bug(EFL) fast/dom/unregister-protocol-handler.html [ Crash ]
 Bug(EFL) fast/dom/HTMLAnchorElement/anchor-download.html [ Crash ]
 Bug(EFL) fast/dom/HTMLAnchorElement/anchor-nodownload-set.html [ Crash ]
 
+webkit.org/b/97565 fast/loader/reload-zero-byte-plugin.html [ Crash ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # FLAKY TESTS
 #////////////////////////////////////////////////////////////////////////////////////////
+
+webkit.org/b/97560 http/tests/inspector/extensions-useragent.html [ Failure Pass ]
+webkit.org/b/97560 inspector/extensions/extensions-api.html [ Failure Pass ]
+webkit.org/b/97560 inspector/extensions/extensions-audits-content-script.html [ Failure Pass ]
+webkit.org/b/97560 inspector/extensions/extensions-audits.html [ Failure Pass ]
+webkit.org/b/97560 inspector/extensions/extensions-eval-content-script.html [ Failure Pass ]
 
 Bug(EFL) http/tests/security/contentSecurityPolicy/connect-src-websocket-blocked.html [ Crash Pass ]
 Bug(EFL) inspector/styles/styles-add-new-rule.html [ Failure Pass ]
@@ -142,6 +150,9 @@ webkit.org/b/35220 inspector/debugger/script-extract-outline.html [ Crash Failur
 # Test is flaky and needs to be fixed
 webkit.org/b/56985 http/tests/loading/bad-server-subframe.html [ Crash Pass ]
 
+# Sometimes times out of the build bot
+webkit.org/b/90207 fast/forms/select/select-state-restore.html [ Failure Pass ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # FAILING TESTS
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -156,21 +167,8 @@ webkit.org/b/42674 http/tests/navigation/response204.html [ Failure ]
 webkit.org/b/93470 fast/dom/title-directionality-removeChild.html [ Failure ]
 webkit.org/b/93470 fast/dom/title-directionality.html [ Failure ]
 
-# WebKitTestRunner eventSender needs touch events support
-webkit.org/b/96465 fast/events/touch/basic-multi-touch-events-limited.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/basic-multi-touch-events.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/basic-single-touch-events.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/multi-touch-grouped-targets.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/send-oncancel-event.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/tap-highlight-color.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/touch-active-state.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/touch-coords-in-zoom-and-scroll.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/touch-inside-iframe.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/touch-inside-iframe-scrolled.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/touch-slider.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/touch-stale-node-crash.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/touch-target-limited.html [ Failure ]
-webkit.org/b/96465 fast/events/touch/touch-target.html [ Failure ]
+# WebKitTestRunner setTouchPointRadius() is not supported
+Bug(EFL) fast/events/touch/basic-single-touch-events.html [ Failure ]
 
 # WebKitTestRunner needs an implementation for testRunner.setViewModeMediaFeature
 Bug(EFL) fast/media/media-query-list-02.html [ Failure ]
@@ -190,14 +188,19 @@ webkit.org/b/93980 http/tests/appcache/load-from-appcache-defer-resume-crash.htm
 # WebKitTestRunner needs an implementation for testRunner.setStorageDatabaseIdleInterval
 webkit.org/b/93982 storage/domstorage/storage-close-database-on-idle.html [ Failure ]
 
+# Visited link color is incorrect
+Bug(EFL) fast/block/float/float-in-float-hit-testing.html [ Failure ]
+webkit.org/b/81797 fast/history/visited-link-background-color.html [ Failure ]
+
 # Unclassified failures
 Bug(EFL) fast/block/float/float-in-float-hit-testing.html [ Failure ]
 Bug(EFL) fast/dom/Window/mozilla-focus-blur.html [ Failure ]
 Bug(EFL) fast/replaced/no-focus-ring-embed.html [ Failure ]
 Bug(EFL) fast/replaced/no-focus-ring-object.html [ Failure ]
 Bug(EFL) http/tests/inspector/network/network-sidebar-width.html [ Failure ]
-Bug(EFL) inspector/extensions/extensions-panel.html [ Failure ]
 
 # Fails after r128056.
 webkit.org/b/96794 inspector/console/alert-toString-exception.html [ Failure ]
 
+# Fails after it was unskipped in r129372.
+webkit.org/b/97545 inspector/styles/variables/css-variables.html [ Failure ]

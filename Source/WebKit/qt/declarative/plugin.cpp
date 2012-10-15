@@ -65,6 +65,15 @@ public:
     virtual void registerTypes(const char* uri)
     {
         Q_ASSERT(QLatin1String(uri) == QLatin1String("QtWebKit"));
+#if defined(HAVE_QQUICK1)
+        qmlRegisterType<QDeclarativeWebSettings>();
+        qmlRegisterType<QDeclarativeWebView>(uri, 1, 0, "WebView");
+#ifdef Q_REVISION
+        qmlRegisterType<QDeclarativeWebView>(uri, 1, 1, "WebView");
+        qmlRegisterRevision<QDeclarativeWebView, 0>("QtWebKit", 1, 0);
+        qmlRegisterRevision<QDeclarativeWebView, 1>("QtWebKit", 1, 1);
+#endif
+#endif
 
 #if defined(HAVE_WEBKIT2)
         qmlRegisterType<QQuickWebView>(uri, 3, 0, "WebView");

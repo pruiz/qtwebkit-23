@@ -56,11 +56,11 @@
 #include "MouseEvent.h"
 #include "NotImplemented.h"
 #include "Page.h"
-#include "PlatformMouseEvent.h"
 #include "PlatformKeyboardEvent.h"
+#include "PlatformMouseEvent.h"
 #include "PluginDebug.h"
-#include "PluginPackage.h"
 #include "PluginMainThreadScheduler.h"
+#include "PluginPackage.h"
 #include "QWebPageClient.h"
 #include "RenderObject.h"
 #include "Settings.h"
@@ -82,8 +82,8 @@
 #if HAVE(QT5)
 #include "QtX11ImageConversion.h"
 #include <QGuiApplication>
-#include <qpa/qplatformnativeinterface.h>
 #include <QWindow>
+#include <qpa/qplatformnativeinterface.h>
 #else
 #include "PluginContainerQt.h"
 #include <QApplication>

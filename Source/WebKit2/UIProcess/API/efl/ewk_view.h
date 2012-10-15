@@ -127,13 +127,17 @@ struct _Ewk_View_Smart_Class {
     //   - Shows and hides color picker.
     Eina_Bool (*input_picker_color_request)(Ewk_View_Smart_Data *sd, int r, int g, int b, int a);
     Eina_Bool (*input_picker_color_dismiss)(Ewk_View_Smart_Data *sd);
+
+    // storage:
+    //   - Web database.
+    unsigned long long (*exceeded_database_quota)(Ewk_View_Smart_Data *sd, const char *databaseName, const char *displayName, unsigned long long currentQuota, unsigned long long currentOriginUsage, unsigned long long currentDatabaseUsage, unsigned long long expectedUsage);
 };
 
 /**
  * The version you have to put into the version field
  * in the @a Ewk_View_Smart_Class structure.
  */
-#define EWK_VIEW_SMART_CLASS_VERSION 5UL
+#define EWK_VIEW_SMART_CLASS_VERSION 6UL
 
 /**
  * Initializer for whole Ewk_View_Smart_Class structure.
@@ -145,7 +149,7 @@ struct _Ewk_View_Smart_Class {
  * @see EWK_VIEW_SMART_CLASS_INIT_VERSION
  * @see EWK_VIEW_SMART_CLASS_INIT_NAME_VERSION
  */
-#define EWK_VIEW_SMART_CLASS_INIT(smart_class_init) {smart_class_init, EWK_VIEW_SMART_CLASS_VERSION, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
+#define EWK_VIEW_SMART_CLASS_INIT(smart_class_init) {smart_class_init, EWK_VIEW_SMART_CLASS_VERSION, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}
 
 /**
  * Initializer to zero a whole Ewk_View_Smart_Class structure.
@@ -622,7 +626,7 @@ EAPI Eina_Bool    ewk_view_setting_encoding_custom_set(Evas_Object *o, const cha
 *
 * @return @c EINA_TRUE on success, @c EINA_FALSE on errors
 */
-EAPI Eina_Bool ewk_view_text_find(Evas_Object *o, const char *text, Ewk_Find_Options options, unsigned int max_match_count);
+EAPI Eina_Bool ewk_view_text_find(Evas_Object *o, const char *text, Ewk_Find_Options options, unsigned max_match_count);
 
 /**
 * Clears the highlight of searched text.
@@ -707,6 +711,28 @@ EAPI Eina_Bool ewk_view_color_picker_color_set(Evas_Object *o, int r, int g, int
  * @return @c EINA_TRUE on success or @c EINA_FALSE on failure
  */
 EAPI Eina_Bool ewk_view_feed_touch_event(Evas_Object *o, Ewk_Touch_Event_Type type, const Eina_List *points, const Evas_Modifier *modifiers);
+
+/**
+ * Sets whether the ewk_view supports the touch events or not.
+ *
+ * The ewk_view will support the touch events if @c EINA_TRUE or not support the
+ * touch events otherwise. The default value is @c EINA_FALSE.
+ *
+ * @param o view object to enable/disable the touch events
+ * @param enabled a state to set
+ *
+ * @return @c EINA_TRUE on success or @c EINA_FALSE on failure
+ */
+EAPI Eina_Bool ewk_view_touch_events_enabled_set(Evas_Object *o, Eina_Bool enabled);
+
+/**
+ * Queries if the ewk_view supports the touch events.
+ *
+ * @param o view object to query if the touch events are enabled
+ *
+ * @return @c EINA_TRUE if the touch events are enabled or @c EINA_FALSE otherwise
+ */
+EAPI Eina_Bool ewk_view_touch_events_enabled_get(const Evas_Object *o);
 
 #ifdef __cplusplus
 }

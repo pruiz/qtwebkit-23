@@ -1,3 +1,479 @@
+2012-09-28  Filip Pizlo  <fpizlo@apple.com>
+
+        ASSERTION in m_graph[tailNodeIndex].op() == Flush || m_graph[tailNodeIndex].op() == SetLocal on plus.google.com
+        https://bugs.webkit.org/show_bug.cgi?id=97656
+
+        Reviewed by Mark Hahnenberg.
+
+        There were two bugs here:
+        
+        1) In case of multiple GetLocals to the same captured variable, the bytecode parser would linke the first,
+           rather than the last, of the GetLocals into the vars-at-tail table.
+        
+        2) The constant folding phase was asserting that any GetLocal it eliminates must be linked into the
+           vars-at-tail table, when for captured variables only the last of those should be.
+
+        * dfg/DFGByteCodeParser.cpp:
+        (JSC::DFG::ByteCodeParser::getLocal):
+        * dfg/DFGConstantFoldingPhase.cpp:
+        (JSC::DFG::ConstantFoldingPhase::foldConstants):
+
+2012-09-28  Filip Pizlo  <fpizlo@apple.com>
+
+        DFGStructureHoistingPhase SetLocal assumes StructureTransitionWatchpoint has a structure set
+        https://bugs.webkit.org/show_bug.cgi?id=97810
+
+        Reviewed by Mark Hahnenberg.
+
+        No tests because this can't happen in ToT: the structure check hoisting phase runs before any
+        CFA or folding, so the only StructureTransitionWatchpoints it will see are the ones inserted
+        by the parser. But the parser will only insert StructureTransitinWatchpoints on constants, which
+        will not be subject to SetLocals.
+        
+        Still, it would be good to fix this in case things changed.
+
+        * dfg/DFGStructureCheckHoistingPhase.cpp:
+        (JSC::DFG::StructureCheckHoistingPhase::run):
+
+2012-09-27  Mark Lam  <mark.lam@apple.com>
+
+        Put initializeHostCallReturnValue() behind #if ENABLE(JIT).
+        Fixes non JIT builds.
+        https://bugs.webkit.org/show_bug.cgi?id=97838.
+
+        Reviewed by John Sullivan.
+
+        * runtime/JSGlobalData.cpp:
+        (JSC::JSGlobalData::JSGlobalData):
+
+2012-09-27  Mark Lam  <mark.lam@apple.com>
+
+        Fixed CallFrameClosure::resetCallFrame() to use the valid
+        range of argument index values.
+        https://bugs.webkit.org/show_bug.cgi?id=97836.
+
+        Reviewed by Gavin Barraclough.
+
+        * interpreter/CallFrame.h:
+        (ExecState):
+        * interpreter/CallFrameClosure.h:
+        (JSC::CallFrameClosure::resetCallFrame):
+
+2012-09-27  Patrick Gansterer  <paroga@webkit.org>
+
+        Fix usage of COMPILER() macros
+        https://bugs.webkit.org/show_bug.cgi?id=97642
+
+        Reviewed by Geoffrey Garen.
+
+        Add COMPILER(GCC) around compiler specific code and remove it from generic code.
+        This allows us to implement the DFG code for other compilers to in a next step.
+
+        * dfg/DFGOperations.cpp:
+        * jit/HostCallReturnValue.h:
+
+2012-09-27  Andreas Kling  <kling@webkit.org>
+
+        3.20MB below FunctionParameters::create() on Membuster3.
+        <http://webkit.org/b/97730>
+
+        Reviewed by Anders Carlsson.
+
+        Figure out the exact space needed for parameter identifiers and use reserveInitialCapacity().
+        Reduces memory consumption on Membuster3 by ~1.60 MB.
+
+        * parser/Nodes.cpp:
+        (JSC::FunctionParameters::FunctionParameters):
+
+2012-09-27  Csaba Osztrogonác  <ossy@webkit.org>, Tor Arne Vestbø  <vestbo@webkit.org>
+
+        [Qt] Enable the LLInt on Linux
+        https://bugs.webkit.org/show_bug.cgi?id=95749
+
+        Reviewed by Simon Hausmann.
+
+        * DerivedSources.pri:
+        * JavaScriptCore.pro:
+        * LLIntOffsetsExtractor.pro: Added.
+        * Target.pri:
+
+2012-09-27  Patrick Gansterer  <paroga@webkit.org>
+
+        [CMake] Fix build with static JavaScriptCore library
+
+        * shell/CMakeLists.txt: Define STATICALLY_LINKED_WITH_JavaScriptCore if
+                                JavaScriptCore_LIBRARY_TYPE is set to STATIC.
+
+2012-09-26  Gavin Barraclough  <barraclough@apple.com>
+
+        Proxy the global this in JSC
+        https://bugs.webkit.org/show_bug.cgi?id=97734
+
+        Reviewed by Filip Pizlo.
+
+        Eeep – fix a bug - was leaving the global this proxy's structure's globalObject as 0,
+        and setting the proxy's prototype as the global object, rather than its prototype.
+
+        * jsc.cpp:
+        (GlobalObject::create):
+        * runtime/JSProxy.h:
+        (JSC::JSProxy::createStructure):
+
+2012-09-26  Gavin Barraclough  <barraclough@apple.com>
+
+        Speculative Windows build fix.
+
+        * JavaScriptCore.vcproj/JavaScriptCore/JavaScriptCore.def:
+
+2012-09-26  Filip Pizlo  <fpizlo@apple.com>
+
+        Unreviewed, 32-bit build fix.
+
+        * llint/LowLevelInterpreter32_64.asm:
+
+2012-09-26  Filip Pizlo  <fpizlo@apple.com>
+
+        jneq_ptr shouldn't have a pointer
+        https://bugs.webkit.org/show_bug.cgi?id=97739
+
+        Reviewed by Oliver Hunt.
+
+        Slamming pointers directly into bytecode is sometimes cool, but in this case it's
+        unwieldy and confusing. Switched the instruction to use an enum instead. This has
+        zero effect on code gen behavior in the JITs. In the LLInt, there is now more
+        indirection, but that doesn't affect benchmarks.
+
+        * CMakeLists.txt:
+        * GNUmakefile.list.am:
+        * JavaScriptCore.vcproj/JavaScriptCore/JavaScriptCore.vcproj:
+        * JavaScriptCore.xcodeproj/project.pbxproj:
+        * Target.pri:
+        * bytecode/Instruction.h:
+        (JSC::Instruction::Instruction):
+        (Instruction):
+        * bytecode/SpecialPointer.cpp: Added.
+        (JSC):
+        (JSC::actualPointerFor):
+        * bytecode/SpecialPointer.h: Added.
+        (JSC):
+        (JSC::pointerIsFunction):
+        (JSC::pointerIsCell):
+        * bytecompiler/BytecodeGenerator.cpp:
+        (JSC::BytecodeGenerator::emitJumpIfNotFunctionCall):
+        (JSC::BytecodeGenerator::emitJumpIfNotFunctionApply):
+        * dfg/DFGByteCodeParser.cpp:
+        (JSC::DFG::ByteCodeParser::parseBlock):
+        * jit/JITOpcodes.cpp:
+        (JSC::JIT::emit_op_jneq_ptr):
+        * jit/JITOpcodes32_64.cpp:
+        (JSC::JIT::emit_op_jneq_ptr):
+        * llint/LowLevelInterpreter32_64.asm:
+        * llint/LowLevelInterpreter64.asm:
+        * runtime/JSGlobalObject.cpp:
+        (JSC::JSGlobalObject::reset):
+        (JSC):
+        * runtime/JSGlobalObject.h:
+        (JSGlobalObject):
+        (JSC::JSGlobalObject::actualPointerFor):
+
+2012-09-26  Gavin Barraclough  <barraclough@apple.com>
+
+        REGRESSION (r129456): http/tests/security/xss-eval.html is failing on JSC platforms
+        https://bugs.webkit.org/show_bug.cgi?id=97529
+
+        Reviewed by Filip Pizlo.
+
+        A recent patch changed JSC's EvalError behaviour; bring this more into line with other browsers.
+
+        JSC currently throws an EvalError if you try to call eval with a this object that doesn't
+        match the given eval function. This does not match other browsers, which generally just
+        ignore the this value that was passed, and eval the string in the eval function's environment.
+
+        * runtime/JSGlobalObjectFunctions.cpp:
+        (JSC::globalFuncEval):
+            - Remove EvalError, ignore passed this value.
+
+2012-09-26  Gavin Barraclough  <barraclough@apple.com>
+
+        Proxy the global this in JSC
+        https://bugs.webkit.org/show_bug.cgi?id=97734
+
+        Reviewed by Oliver Hunt.
+
+        Having jsc diverge from WebCore here is not beneficial; it potentially masks bugs and/or performance
+        problems from command line testing.
+
+        * jsc.cpp:
+        (GlobalObject::create):
+            - Create a this value proxy for the global object.
+        * runtime/JSGlobalObject.h:
+        (JSGlobalObject):
+            - Make setGlobalThis protected.
+        * runtime/JSProxy.h:
+        (JSC::JSProxy::create):
+        (JSC::JSProxy::target):
+        (JSC::JSProxy::finishCreation):
+        (JSProxy):
+            - Allow proxy target to be a JSObject, add target to create method.
+
+2012-09-26  Gavin Barraclough  <barraclough@apple.com>
+
+        Speculative Windows build fix.
+
+        * JavaScriptCore.vcproj/JavaScriptCore/JavaScriptCore.def:
+
+2012-09-26  Filip Pizlo  <fpizlo@apple.com>
+
+        JSObject::ensureArrayStorage() ignores the possibility that extensions have been prevented
+        https://bugs.webkit.org/show_bug.cgi?id=97719
+
+        Reviewed by Gavin Barraclough.
+
+        * runtime/JSObject.cpp:
+        (JSC::JSObject::ensureArrayStorageSlow):
+        (JSC):
+        * runtime/JSObject.h:
+        (JSC::JSObject::ensureArrayStorage):
+        (JSObject):
+
+2012-09-26  Gavin Barraclough  <barraclough@apple.com>
+
+        Generalize JSGlobalThis as JSProxy
+        https://bugs.webkit.org/show_bug.cgi?id=97716
+
+        Reviewed by Oliver Hunt.
+
+        Generalize JSGlobalThis as JSProxy and move proxying functionality up from the window shell into JSProxy.
+
+        * CMakeLists.txt:
+        * GNUmakefile.list.am:
+        * JavaScriptCore.vcproj/JavaScriptCore/JavaScriptCore.def:
+        * JavaScriptCore.vcproj/JavaScriptCore/JavaScriptCore.vcproj:
+        * JavaScriptCore.xcodeproj/project.pbxproj:
+        * Target.pri:
+        * runtime/JSGlobalObject.cpp:
+        (JSC::JSGlobalObject::toThisObject):
+            - Hoist toThisObject from WebCore.
+        (JSC):
+        * runtime/JSGlobalObject.h:
+            - removed include.
+        (JSC::JSGlobalObject::finishCreation):
+            - JSGlobalThis -> JSObject
+        (JSGlobalObject):
+            - Hoist toThisObject from WebCore.
+        * runtime/JSGlobalThis.cpp: Removed.
+        * runtime/JSGlobalThis.h: Removed.
+        * runtime/JSObject.cpp:
+            - removed include.
+        * runtime/JSObject.h:
+        (JSObject):
+        (JSC::JSObject::isProxy):
+            - isGlobalThis -> isProxy
+            - GlobalThisType -> ProxyType
+        * runtime/JSProxy.cpp: Copied from Source/JavaScriptCore/runtime/JSGlobalThis.cpp.
+        (JSC):
+        (JSC::JSProxy::visitChildren):
+        (JSC::JSProxy::setTarget):
+        (JSC::JSProxy::className):
+        (JSC::JSProxy::getOwnPropertySlot):
+        (JSC::JSProxy::getOwnPropertySlotByIndex):
+        (JSC::JSProxy::getOwnPropertyDescriptor):
+        (JSC::JSProxy::put):
+        (JSC::JSProxy::putByIndex):
+        (JSC::JSProxy::putDirectVirtual):
+        (JSC::JSProxy::defineOwnProperty):
+        (JSC::JSProxy::deleteProperty):
+        (JSC::JSProxy::deletePropertyByIndex):
+        (JSC::JSProxy::getPropertyNames):
+        (JSC::JSProxy::getOwnPropertyNames):
+            - Class cretaed from JSGlobalThis, JSDOMWindowShell.
+        * runtime/JSProxy.h: Copied from Source/JavaScriptCore/runtime/JSGlobalThis.h.
+        (JSC::JSProxy::create):
+        (JSC::JSProxy::createStructure):
+        (JSProxy):
+        (JSC::JSProxy::target):
+        (JSC::JSProxy::JSProxy):
+            - Class cretaed from JSGlobalThis, JSDOMWindowShell.
+        * runtime/JSType.h:
+            - GlobalThisType -> ProxyType
+
+2012-09-26  Michael Saboff  <msaboff@apple.com>
+
+        Add ability for JSArray::unshiftCount to unshift in middle of an array
+        https://bugs.webkit.org/show_bug.cgi?id=97691
+
+        Reviewed by Filip Pizlo.
+
+        Changed JSArray::unshiftCount and unshiftCountSlowCase to handle unshifting from the middle of an
+        array.  Depending on where the unshift point is, either the front part of the array will be moved
+        "left" or the back part will be moved right.  Given that unshiftCount only works on contiguous
+        arrays it is safe to use memmove for the moves.
+
+        This change is worth 25% performance improvement on pdfjs.  It doesn't seem to have any impact on
+        any other benchmarks.
+
+        * runtime/ArrayPrototype.cpp:
+        (JSC::unshift):
+        * runtime/JSArray.cpp:
+        (JSC::JSArray::unshiftCountSlowCase):
+        (JSC::JSArray::unshiftCount):
+        * runtime/JSArray.h:
+        (JSArray):
+
+2012-09-26  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r129592.
+        http://trac.webkit.org/changeset/129592
+        https://bugs.webkit.org/show_bug.cgi?id=97670
+
+        Failures in Chromium security tests (Requested by schenney on
+        #webkit).
+
+        * runtime/JSGlobalObjectFunctions.cpp:
+        (JSC::globalFuncEval):
+
+2012-09-25  Gavin Barraclough  <barraclough@apple.com>
+
+        REGRESSION (r129456): http/tests/security/xss-eval.html is failing on JSC platforms
+        https://bugs.webkit.org/show_bug.cgi?id=97529
+
+        Reviewed by Filip Pizlo.
+
+        A recent patch changed JSC's EvalError behaviour; bring this more into line with other browsers.
+
+        JSC currently throws an EvalError if you try to call eval with a this object that doesn't
+        match the given eval function. This does not match other browsers, which generally just
+        ignore the this value that was passed, and eval the string in the eval function's environment.
+
+        * runtime/JSGlobalObjectFunctions.cpp:
+        (JSC::globalFuncEval):
+            - Remove EvalError, ignore passed this value.
+
+2012-09-25  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG ArrayPush, ArrayPop don't handle clobbering or having a bad time correctly
+        https://bugs.webkit.org/show_bug.cgi?id=97535
+
+        Reviewed by Oliver Hunt.
+
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::execute):
+        * dfg/DFGByteCodeParser.cpp:
+        (JSC::DFG::ByteCodeParser::handleIntrinsic):
+        * dfg/DFGStructureCheckHoistingPhase.cpp:
+        (JSC::DFG::StructureCheckHoistingPhase::run):
+
+2012-09-25  Geoffrey Garen  <ggaren@apple.com>
+
+        JSC should dump object size inference statistics
+        https://bugs.webkit.org/show_bug.cgi?id=97618
+
+        Reviewed by Filip Pizlo.
+
+        Added an option to dump object size inference statistics.
+
+        To see statistics on live objects:
+
+            jsc --showHeapStatistics=1
+
+        To see cumulative statistics on all objects ever allocated:
+
+            jsc --showHeapStatistics=1 --objectsAreImmortal=1
+
+            (This is useful for showing GC churn caused by over-allocation.)
+
+        To support this second mode, I refactored Zombies to separate out their
+        immortality feature so I could reuse it.
+
+        * heap/Heap.cpp:
+        (JSC::MarkObject): Helper for making things immortal. We have to checked
+        for being zapped because blocks start out in this state.
+
+        (JSC::StorageStatistics): Gather statistics by walking the heap. Ignore
+        arrays and hash tables for now because they're not our focus. (We'll
+        remove these exceptions in future.)
+
+        (JSC::Heap::collect): Moved zombify to the end so it wouldn't interfere
+        with statistics gathering.
+
+        (JSC::Heap::showStatistics):
+        (JSC::Heap::markAllObjects): Factored out helper, so statistics could
+        take advantage of immortal objects.
+
+        (Zombify): Don't mark immortal objects -- that's another class's job now.
+
+        (JSC::Zombify::operator()):
+        (JSC::Heap::zombifyDeadObjects): Take advantage of forEachDeadCell instead
+        of rolling our own.
+
+        * heap/Heap.h:
+        (Heap):
+        * heap/MarkedSpace.h:
+        (MarkedSpace):
+        (JSC::MarkedSpace::forEachDeadCell): Added, so clients don't have to do
+        the iteration logic themselves.
+
+        * runtime/Options.cpp:
+        (JSC::Options::initialize):
+        * runtime/Options.h: New options, listed above. Make sure to initialize
+        based on environment variable first, so we can override with specific settings.
+
+2012-09-25  Filip Pizlo  <fpizlo@apple.com>
+
+        We shouldn't use the optimized versions of shift/unshift if the user is doing crazy things to the array
+        https://bugs.webkit.org/show_bug.cgi?id=97603
+        <rdar://problem/12370864>
+
+        Reviewed by Gavin Barraclough.
+
+        You changed the length behind our backs? No optimizations for you then!
+
+        * runtime/ArrayPrototype.cpp:
+        (JSC::shift):
+        (JSC::unshift):
+        * runtime/JSArray.cpp:
+        (JSC::JSArray::shiftCount):
+
+2012-09-25  Filip Pizlo  <fpizlo@apple.com>
+
+        JSC bindings appear to sometimes ignore the possibility of arrays being in sparse mode
+        https://bugs.webkit.org/show_bug.cgi?id=95610
+
+        Reviewed by Oliver Hunt.
+
+        Add better support for quickly accessing the indexed storage from bindings.
+
+        * runtime/JSObject.h:
+        (JSC::JSObject::tryGetIndexQuickly):
+        (JSObject):
+        (JSC::JSObject::getDirectIndex):
+        (JSC::JSObject::getIndex):
+
+2012-09-25  Filip Pizlo  <fpizlo@apple.com>
+
+        Structure check hoisting phase doesn't know about the side-effecting nature of Arrayify
+        https://bugs.webkit.org/show_bug.cgi?id=97537
+
+        Reviewed by Mark Hahnenberg.
+
+        No tests because if we use Arrayify then we also use PutByVal(BlankToXYZ), and the latter is
+        already known to be side-effecting. So this bug shouldn't have had any symptoms, as far as I
+        can tell.
+
+        * dfg/DFGStructureCheckHoistingPhase.cpp:
+        (JSC::DFG::StructureCheckHoistingPhase::run):
+
+2012-09-25  Gavin Barraclough  <barraclough@apple.com>
+
+        Regression: put beyond vector length prefers prototype setters to sparse properties
+        https://bugs.webkit.org/show_bug.cgi?id=97593
+
+        Reviewed by Geoff Garen & Filip Pizlo.
+
+        * runtime/JSObject.cpp:
+        (JSC::JSObject::putByIndexBeyondVectorLength):
+            - Check for self properties in the sparse map - if present, don't examine the protochain.
+
 2012-09-24  Gavin Barraclough  <barraclough@apple.com>
 
         https://bugs.webkit.org/show_bug.cgi?id=97530

@@ -22,6 +22,7 @@
 #include "ewk_context.h"
 
 #include "BatteryProvider.h"
+#include "NetworkInfoProvider.h"
 #include "VibrationProvider.h"
 #include "WKAPICast.h"
 #include "WKContextSoup.h"
@@ -67,6 +68,9 @@ struct _Ewk_Context {
 #if ENABLE(BATTERY_STATUS)
     RefPtr<BatteryProvider> batteryProvider;
 #endif
+#if ENABLE(NETWORK_INFO)
+    RefPtr<NetworkInfoProvider> networkInfoProvider;
+#endif
 #if ENABLE(VIBRATION)
     RefPtr<VibrationProvider> vibrationProvider;
 #endif
@@ -82,13 +86,15 @@ struct _Ewk_Context {
         , requestManager(WKContextGetSoupRequestManager(contextRef.get()))
     {
 #if ENABLE(BATTERY_STATUS)
-        WKBatteryManagerRef wkBatteryManager = WKContextGetBatteryManager(contextRef.get());
-        batteryProvider = BatteryProvider::create(wkBatteryManager);
+        batteryProvider = BatteryProvider::create(context.get());
+#endif
+
+#if ENABLE(NETWORK_INFO)
+        networkInfoProvider = NetworkInfoProvider::create(context.get());
 #endif
 
 #if ENABLE(VIBRATION)
-        WKVibrationRef wkVibrationRef = WKContextGetVibration(contextRef.get());
-        vibrationProvider = VibrationProvider::create(wkVibrationRef);
+        vibrationProvider = VibrationProvider::create(context.get());
 #endif
 
 #if ENABLE(MEMORY_SAMPLER)

@@ -720,7 +720,7 @@ bool NetworkJob::sendRequestWithCredentials(ProtectionSpaceServerType type, Prot
     String host;
     int port;
     if (type == ProtectionSpaceProxyHTTP) {
-        String proxyAddress = BlackBerry::Platform::Client::get()->getProxyAddress(newURL.string().ascii().data()).c_str();
+        String proxyAddress = String(BlackBerry::Platform::Settings::instance()->proxyAddress(newURL.string().ascii().data()).c_str());
         KURL proxyURL(KURL(), proxyAddress);
         host = proxyURL.host();
         port = proxyURL.port();
@@ -755,28 +755,30 @@ bool NetworkJob::sendRequestWithCredentials(ProtectionSpaceServerType type, Prot
         String password;
 
         if (type == ProtectionSpaceProxyHTTP) {
-            username = BlackBerry::Platform::Client::get()->getProxyUsername().c_str();
-            password = BlackBerry::Platform::Client::get()->getProxyPassword().c_str();
+            username = String(BlackBerry::Platform::Settings::instance()->proxyUsername().c_str());
+            password = String(BlackBerry::Platform::Settings::instance()->proxyPassword().c_str());
+        } else {
+            username = m_handle->getInternal()->m_user;
+            password = m_handle->getInternal()->m_pass;
         }
 
-        if (username.isEmpty() || password.isEmpty()) {
-            // Before asking the user for credentials, we check if the URL contains that.
-            if (!m_handle->getInternal()->m_user.isEmpty() && !m_handle->getInternal()->m_pass.isEmpty()) {
-                username = m_handle->getInternal()->m_user;
-                password = m_handle->getInternal()->m_pass;
-
-                // Prevent them from been used again if they are wrong.
-                // If they are correct, they will the put into CredentialStorage.
+        // Before asking the user for credentials, we check if the URL contains that.
+        if (!username.isEmpty() || !password.isEmpty()) {
+            // Prevent them from been used again if they are wrong.
+            // If they are correct, they will the put into CredentialStorage.
+            if (type == ProtectionSpaceProxyHTTP)
+                BlackBerry::Platform::Settings::instance()->setProxyCredential("", "");
+            else {
                 m_handle->getInternal()->m_user = "";
                 m_handle->getInternal()->m_pass = "";
-            } else {
-                if (m_handle->firstRequest().targetType() != ResourceRequest::TargetIsMainFrame && BlackBerry::Platform::Settings::instance()->isChromeProcess())
-                    return false;
-
-                m_handle->getInternal()->m_currentWebChallenge = AuthenticationChallenge();
-                m_frame->page()->chrome()->client()->platformPageClient()->authenticationChallenge(newURL, protectionSpace, Credential(), this);
-                return true;
             }
+        } else {
+            if (m_handle->firstRequest().targetType() != ResourceRequest::TargetIsMainFrame && BlackBerry::Platform::Settings::instance()->isChromeProcess())
+                return false;
+
+            m_handle->getInternal()->m_currentWebChallenge = AuthenticationChallenge();
+            m_frame->page()->chrome()->client()->platformPageClient()->authenticationChallenge(newURL, protectionSpace, Credential(), this);
+            return true;
         }
 
         credential = Credential(username, password, CredentialPersistenceForSession);

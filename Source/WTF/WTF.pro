@@ -87,6 +87,8 @@ HEADERS += \
     MD5.h \
     MediaTime.h \
     MemoryInstrumentation.h \
+    MemoryInstrumentationArrayBufferView.h \
+    MemoryInstrumentationHashSet.h \
     MemoryInstrumentationVector.h \
     MessageQueue.h \
     MetaAllocator.h \

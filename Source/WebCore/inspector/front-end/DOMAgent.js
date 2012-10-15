@@ -76,7 +76,7 @@ WebInspector.DOMNode = function(domAgent, doc, isInShadowTree, payload) {
         this._renumber();
     }
 
-    if (payload.shadowRoots && WebInspector.experimentsSettings.showShadowDOM.isEnabled()) {
+    if (payload.shadowRoots && WebInspector.settings.showShadowDOM.get()) {
         for (var i = 0; i < payload.shadowRoots.length; ++i) {
             var root = payload.shadowRoots[i];
             var node = new WebInspector.DOMNode(this._domAgent, this.ownerDocument, true, root);
@@ -764,7 +764,8 @@ WebInspector.DOMDocument = function(domAgent, payload)
 {
     WebInspector.DOMNode.call(this, domAgent, this, false, payload);
     this.documentURL = payload.documentURL || "";
-    this.baseURL = payload.baseURL;
+    this.baseURL = /** @type {string} */ payload.baseURL;
+    console.assert(this.baseURL);
     this.xmlVersion = payload.xmlVersion;
     this._listeners = {};
 }

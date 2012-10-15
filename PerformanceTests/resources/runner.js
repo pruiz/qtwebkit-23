@@ -43,10 +43,6 @@ PerfTestRunner.log = function (text) {
     window.scrollTo(0, document.body.height);
 }
 
-PerfTestRunner.info = function (text) {
-    this.log("Info: " + text);
-}
-
 PerfTestRunner.logInfo = function (text) {
     if (!window.testRunner)
         this.log(text);
@@ -109,66 +105,6 @@ PerfTestRunner.printStatistics = function (statistics, title) {
     this.log("max " + statistics.max + " " + statistics.unit);
 }
 
-PerfTestRunner.gc = function () {
-    if (window.GCController)
-        window.GCController.collect();
-    else {
-        function gcRec(n) {
-            if (n < 1)
-                return {};
-            var temp = {i: "ab" + i + (i / 100000)};
-            temp += "foo";
-            gcRec(n-1);
-        }
-        for (var i = 0; i < 1000; i++)
-            gcRec(10);
-    }
-}
-
-PerfTestRunner._runLoop = function () {
-    if (this._completedRuns < this._runCount) {
-        this.gc();
-        window.setTimeout(function () { PerfTestRunner._runner(); }, 0);
-    } else {
-        if (this._description)
-            this.log("Description: " + this._description);
-        this.logStatistics(this._results, this.unit, "Time:");
-        if (this._jsHeapResults.length) {
-            this.logStatistics(this._jsHeapResults, "bytes", "JS Heap:");
-            this.logStatistics(this._mallocHeapResults, "bytes", "Malloc:");
-        }
-        if (this._logLines) {
-            var logLines = this._logLines;
-            this._logLines = null;
-            var self = this;
-            logLines.forEach(function(text) { self.log(text); });
-        }
-        this._doneFunction();
-        if (window.testRunner)
-            testRunner.notifyDone();
-    }
-}
-
-PerfTestRunner._runner = function () {
-    var start = this.now();
-    var totalTime = 0;
-
-    for (var i = 0; i < this._loopsPerRun; ++i) {
-        var returnValue = this._runFunction.call(window);
-        if (returnValue - 0 === returnValue) {
-            if (returnValue <= 0)
-                this.log("runFunction returned a non-positive value: " + returnValue);
-            totalTime += returnValue;
-        }
-    }
-
-    // Assume totalTime can never be zero when _runFunction returns a number.
-    var time = totalTime ? totalTime : this.now() - start;
-
-    this.ignoreWarmUpAndLog(time);
-    this._runLoop();
-}
-
 PerfTestRunner.storeHeapResults = function() {
     if (!window.internals)
         return;
@@ -195,6 +131,65 @@ PerfTestRunner.getAndPrintMemoryStatistics = function() {
     PerfTestRunner.printStatistics(mallocMemoryStats, "Malloc:");
 }
 
+PerfTestRunner.gc = function () {
+    if (window.GCController)
+        window.GCController.collect();
+    else {
+        function gcRec(n) {
+            if (n < 1)
+                return {};
+            var temp = {i: "ab" + i + (i / 100000)};
+            temp += "foo";
+            gcRec(n-1);
+        }
+        for (var i = 0; i < 1000; i++)
+            gcRec(10);
+    }
+}
+
+PerfTestRunner._scheduleNextMeasurementOrNotifyDone = function () {
+    if (this._completedRuns < this._runCount) {
+        this.gc();
+        window.setTimeout(function () {
+            var measuredValue = PerfTestRunner._runner();
+            PerfTestRunner.ignoreWarmUpAndLog(measuredValue);
+            PerfTestRunner._scheduleNextMeasurementOrNotifyDone();
+        }, 0);
+    } else {
+        if (this._description)
+            this.log("Description: " + this._description);
+        this.logStatistics(this._results, this.unit, "Time:");
+        if (this._jsHeapResults.length) {
+            this.logStatistics(this._jsHeapResults, "bytes", "JS Heap:");
+            this.logStatistics(this._mallocHeapResults, "bytes", "Malloc:");
+        }
+        if (this._logLines) {
+            var logLines = this._logLines;
+            this._logLines = null;
+            var self = this;
+            logLines.forEach(function(text) { self.log(text); });
+        }
+        if (this._test.done)
+            this._test.done();
+        if (window.testRunner)
+            testRunner.notifyDone();
+    }
+}
+
+PerfTestRunner._measureTimeOnce = function () {
+    var start = this.now();
+    var returnValue = this._test.run.call(window);
+    var end = this.now();
+
+    if (returnValue - 0 === returnValue) {
+        if (returnValue <= 0)
+            this.log("runFunction returned a non-positive value: " + returnValue);
+        return returnValue;
+    }
+
+    return end - start;
+}
+
 PerfTestRunner.ignoreWarmUpAndLog = function (result) {
     this._completedRuns++;
 
@@ -208,40 +203,36 @@ PerfTestRunner.ignoreWarmUpAndLog = function (result) {
     }
 }
 
-PerfTestRunner.initAndStartLoop = function() {
+PerfTestRunner._start = function(test) {
+    this._description = test.description || "";
     this._completedRuns = -1;
-    this.customRunFunction = null;
+    this._callsPerIteration = 1;
+    this._test = test;
+
     this._results = [];
     this._jsHeapResults = [];
     this._mallocHeapResults = [];
+
     this._logLines = window.testRunner ? [] : null;
     this.log("Running " + this._runCount + " times");
-    this._runLoop();
+    this._scheduleNextMeasurementOrNotifyDone();
 }
 
-PerfTestRunner.run = function (runFunction, loopsPerRun, runCount, doneFunction, description) {
-    this._runFunction = runFunction;
-    this._loopsPerRun = loopsPerRun || 10;
-    this._runCount = runCount || 20;
-    this._doneFunction = doneFunction || function () {};
-    this._description = description || "";
+PerfTestRunner.measureTime = function (test) {
+    this._runCount = test.runCount || 20;
     this.unit = 'ms';
-    this.initAndStartLoop();
+    this._runner = this._measureTimeOnce;
+    this._start(test);
 }
 
 PerfTestRunner.runPerSecond = function (test) {
-    this._doneFunction = function () { if (test.done) test.done(); };
-    this._description = test.description || "";
-    this._runCount = test.runCount || 20;
-    this._callsPerIteration = 1;
+    this._runCount = test.runCount || 20; // Only used by tests in fast/harness/perftests
     this.unit = 'runs/s';
-
-    this._test = test;
-    this._runner = this._perSecondRunner;
-    this.initAndStartLoop();
+    this._runner = this._measureRunsPerSecondOnce;
+    this._start(test);
 }
 
-PerfTestRunner._perSecondRunner = function () {
+PerfTestRunner._measureRunsPerSecondOnce = function () {
     var timeToRun = this._test.timeToRun || 750;
     var totalTime = 0;
     var i = 0;
@@ -258,14 +249,13 @@ PerfTestRunner._perSecondRunner = function () {
     }
     this._callsPerIteration = callsPerIteration;
 
-    this.ignoreWarmUpAndLog(i * 1000 / totalTime);
-    this._runLoop();
+    return i * 1000 / totalTime;
 }
 
 PerfTestRunner._perSecondRunnerIterator = function (callsPerIteration) {
     var startTime = this.now();
     for (var i = 0; i < callsPerIteration; i++)
-        this._test.run();
+        this._test.run.call(window);
     return this.now() - startTime;
 }
 

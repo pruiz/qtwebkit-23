@@ -102,6 +102,7 @@
 #include "WindowFeatures.h"
 #include "XMLDocumentParser.h"
 #include <wtf/CurrentTime.h>
+#include <wtf/MemoryInstrumentationHashSet.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/text/CString.h>
 #include <wtf/text/WTFString.h>
@@ -2285,6 +2286,11 @@ void FrameLoader::setOriginalURLForDownloadRequest(ResourceRequest& request)
     }
 }
 
+void FrameLoader::didLayout(LayoutMilestones milestones)
+{
+    m_client->dispatchDidLayout(milestones);
+}
+
 void FrameLoader::didFirstLayout()
 {
     if (m_frame->page() && isBackForwardLoadType(m_loadType))
@@ -2292,18 +2298,6 @@ void FrameLoader::didFirstLayout()
 
     if (m_stateMachine.committedFirstRealDocumentLoad() && !m_stateMachine.isDisplayingInitialEmptyDocument() && !m_stateMachine.firstLayoutDone())
         m_stateMachine.advanceTo(FrameLoaderStateMachine::FirstLayoutDone);
-
-    m_client->dispatchDidFirstLayout();
-}
-
-void FrameLoader::didFirstVisuallyNonEmptyLayout()
-{
-    m_client->dispatchDidFirstVisuallyNonEmptyLayout();
-}
-
-void FrameLoader::didNewFirstVisuallyNonEmptyLayout()
-{
-    m_client->dispatchDidNewFirstVisuallyNonEmptyLayout();
 }
 
 void FrameLoader::frameLoadCompleted()
@@ -2338,7 +2332,7 @@ void FrameLoader::closeAndRemoveChild(Frame* child)
 
     child->setView(0);
     if (child->ownerElement() && child->page())
-        child->page()->decrementFrameCount();
+        child->page()->decrementSubframeCount();
     child->willDetachPage();
     child->detachFromPage();
 
@@ -3286,7 +3280,7 @@ void FrameLoader::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     info.addMember(m_provisionalDocumentLoader);
     info.addMember(m_policyDocumentLoader);
     info.addMember(m_outgoingReferrer);
-    info.addInstrumentedHashSet(m_openedFrames);
+    info.addMember(m_openedFrames);
 }
 
 bool FrameLoaderClient::hasHTMLView() const

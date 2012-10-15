@@ -328,7 +328,8 @@ InjectedBundlePage::InjectedBundlePage(WKBundlePageRef page)
         didFinishProgress, // didFinishProgress
         0, // shouldForceUniversalAccessFromLocalURL
         didReceiveIntentForFrame, // didReceiveIntentForFrame
-        registerIntentServiceForFrame // registerIntentServiceForFrame
+        registerIntentServiceForFrame, // registerIntentServiceForFrame
+        0, // didLayout
     };
     WKBundlePageSetPageLoaderClient(m_page, &loaderClient);
 
@@ -741,6 +742,8 @@ void InjectedBundlePage::didStartProvisionalLoadForFrame(WKBundleFrameRef frame)
 {
     if (!InjectedBundle::shared().isTestRunning())
         return;
+
+    platformDidStartProvisionalLoadForFrame(frame);
 
     if (InjectedBundle::shared().testRunner()->shouldDumpFrameLoadCallbacks()) {
         dumpFrameDescriptionSuitableForTestResult(frame);
@@ -1327,6 +1330,13 @@ WKBundlePagePolicyAction InjectedBundlePage::decidePolicyForNewWindowAction(WKBu
 
 WKBundlePagePolicyAction InjectedBundlePage::decidePolicyForResponse(WKBundlePageRef page, WKBundleFrameRef, WKURLResponseRef response, WKURLRequestRef, WKTypeRef*)
 {
+    if (WKURLResponseIsAttachment(response)) {
+        WKRetainPtr<WKStringRef> filename = adoptWK(WKURLResponseCopySuggestedFilename(response));
+        InjectedBundle::shared().stringBuilder()->appendLiteral("Policy delegate: resource is an attachment, suggested file name \'");
+        InjectedBundle::shared().stringBuilder()->append(toWTFString(filename));
+        InjectedBundle::shared().stringBuilder()->appendLiteral("\'\n");
+    }
+
     WKRetainPtr<WKStringRef> mimeType = adoptWK(WKURLResponseCopyMIMEType(response));
     return WKBundlePageCanShowMIMEType(page, mimeType.get()) ? WKBundlePagePolicyActionUse : WKBundlePagePolicyActionPassThrough;
 }
@@ -1868,5 +1878,11 @@ void InjectedBundlePage::dumpBackForwardList()
 
     InjectedBundle::shared().stringBuilder()->appendLiteral("===============================================\n");
 }
+
+#if !PLATFORM(MAC)
+void InjectedBundlePage::platformDidStartProvisionalLoadForFrame(WKBundleFrameRef)
+{
+}
+#endif
 
 } // namespace WTR

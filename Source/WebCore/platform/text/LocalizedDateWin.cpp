@@ -40,55 +40,18 @@ namespace WebCore {
 
 double parseLocalizedDate(const String& input, DateComponents::Type type)
 {
-    switch (type) {
-    case DateComponents::Date:
-        return LocaleWin::currentLocale()->parseDate(input);
-    case DateComponents::DateTime:
-    case DateComponents::DateTimeLocal:
-    case DateComponents::Month:
-    case DateComponents::Time:
-    case DateComponents::Week:
-    case DateComponents::Invalid:
-        break;
-    }
-    return numeric_limits<double>::quiet_NaN();
+    return LocaleWin::currentLocale()->parseDateTime(input, type);
 }
 
 String formatLocalizedDate(const DateComponents& dateComponents)
 {
-    switch (dateComponents.type()) {
-    case DateComponents::Date:
-        return LocaleWin::currentLocale()->formatDate(dateComponents);
-    case DateComponents::DateTime:
-    case DateComponents::DateTimeLocal:
-    case DateComponents::Month:
-    case DateComponents::Time:
-    case DateComponents::Week:
-    case DateComponents::Invalid:
-        break;
-    }
-    return String();
+    return LocaleWin::currentLocale()->formatDateTime(dateComponents);
 }
 
 #if ENABLE(CALENDAR_PICKER)
 String localizedDateFormatText()
 {
     return LocaleWin::currentLocale()->dateFormatText();
-}
-
-const Vector<String>& monthLabels()
-{
-    return LocaleWin::currentLocale()->monthLabels();
-}
-
-const Vector<String>& weekDayShortLabels()
-{
-    return LocaleWin::currentLocale()->weekDayShortLabels();
-}
-
-unsigned firstDayOfWeek()
-{
-    return LocaleWin::currentLocale()->firstDayOfWeek();
 }
 #endif
 

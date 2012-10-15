@@ -65,13 +65,13 @@ protected:
     String formatDate(const String& localeString, int year, int month, int day)
     {
         OwnPtr<LocaleMac> locale = LocaleMac::create(localeString);
-        return locale->formatDate(dateComponents(year, month, day));
+        return locale->formatDateTime(dateComponents(year, month, day));
     }
 
     double parseDate(const String& localeString, const String& dateString)
     {
         OwnPtr<LocaleMac> locale = LocaleMac::create(localeString);
-        return locale->parseDate(dateString);
+        return locale->parseDateTime(dateString, DateComponents::Date);
     }
 
 #if ENABLE(CALENDAR_PICKER)
@@ -100,7 +100,7 @@ protected:
     }
 #endif
 
-#if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
+#if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
     String timeFormat(const String& localeString)
     {
         OwnPtr<LocaleMac> locale = LocaleMac::create(localeString);
@@ -187,7 +187,7 @@ TEST_F(LocaleMacTest, weekDayShortLabels)
 }
 #endif
 
-#if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
+#if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
 TEST_F(LocaleMacTest, timeFormat)
 {
     EXPECT_STREQ("h:mm:ss a", timeFormat("en_US").utf8().data());

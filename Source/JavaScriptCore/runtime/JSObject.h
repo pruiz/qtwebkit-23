@@ -226,6 +226,42 @@ namespace JSC {
             }
         }
         
+        JSValue tryGetIndexQuickly(unsigned i)
+        {
+            switch (structure()->indexingType()) {
+            case ALL_BLANK_INDEXING_TYPES:
+                break;
+            case ALL_ARRAY_STORAGE_INDEXING_TYPES:
+                if (i < m_butterfly->arrayStorage()->vectorLength()) {
+                    JSValue v = m_butterfly->arrayStorage()->m_vector[i].get();
+                    if (v)
+                        return v;
+                }
+                break;
+            default:
+                ASSERT_NOT_REACHED();
+                break;
+            }
+            return JSValue();
+        }
+        
+        JSValue getDirectIndex(ExecState* exec, unsigned i)
+        {
+            if (JSValue result = tryGetIndexQuickly(i))
+                return result;
+            PropertySlot slot(this);
+            if (methodTable()->getOwnPropertySlotByIndex(this, exec, i, slot))
+                return slot.getValue(exec, i);
+            return JSValue();
+        }
+        
+        JSValue getIndex(ExecState* exec, unsigned i)
+        {
+            if (JSValue result = tryGetIndexQuickly(i))
+                return result;
+            return get(exec, i);
+        }
+        
         bool canSetIndexQuickly(unsigned i)
         {
             switch (structure()->indexingType()) {
@@ -445,7 +481,7 @@ namespace JSC {
         bool isNameScopeObject() const;
         bool isActivationObject() const;
         bool isErrorInstance() const;
-        bool isGlobalThis() const;
+        bool isProxy() const;
 
         void seal(JSGlobalData&);
         void freeze(JSGlobalData&);
@@ -498,17 +534,10 @@ namespace JSC {
         // already.
         ArrayStorage* ensureArrayStorage(JSGlobalData& globalData)
         {
-            switch (structure()->indexingType()) {
-            case ALL_ARRAY_STORAGE_INDEXING_TYPES:
+            if (LIKELY(hasArrayStorage(structure()->indexingType())))
                 return m_butterfly->arrayStorage();
-                
-            case ALL_BLANK_INDEXING_TYPES:
-                return createInitialArrayStorage(globalData);
-                
-            default:
-                ASSERT_NOT_REACHED();
-                return 0;
-            }
+            
+            return ensureArrayStorageSlow(globalData);
         }
         
         static size_t offsetOfInlineStorage();
@@ -621,6 +650,8 @@ namespace JSC {
         unsigned getNewVectorLength(unsigned desiredLength);
 
         JS_EXPORT_PRIVATE bool getOwnPropertySlotSlow(ExecState*, PropertyName, PropertySlot&);
+        
+        ArrayStorage* ensureArrayStorageSlow(JSGlobalData&);
         
     protected:
         Butterfly* m_butterfly;
@@ -756,9 +787,9 @@ inline bool JSObject::isErrorInstance() const
     return structure()->typeInfo().type() == ErrorInstanceType;
 }
 
-inline bool JSObject::isGlobalThis() const
+inline bool JSObject::isProxy() const
 {
-    return structure()->typeInfo().type() == GlobalThisType;
+    return structure()->typeInfo().type() == ProxyType;
 }
 
 inline void JSObject::setButterfly(JSGlobalData& globalData, Butterfly* butterfly, Structure* structure)

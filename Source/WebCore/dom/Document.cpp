@@ -109,6 +109,7 @@
 #include "Language.h"
 #include "Localizer.h"
 #include "Logging.h"
+#include "MediaCanStartListener.h"
 #include "MediaQueryList.h"
 #include "MediaQueryMatcher.h"
 #include "MouseEventWithHitTestResults.h"
@@ -174,6 +175,7 @@
 #include <wtf/CurrentTime.h>
 #include <wtf/HashFunctions.h>
 #include <wtf/MainThread.h>
+#include <wtf/MemoryInstrumentationHashSet.h>
 #include <wtf/MemoryInstrumentationVector.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/StdLibExtras.h>
@@ -1773,9 +1775,14 @@ void Document::unscheduleStyleRecalc()
     m_pendingStyleRecalcShouldForce = false;
 }
 
-bool Document::isPendingStyleRecalc() const
+bool Document::hasPendingStyleRecalc() const
 {
     return m_styleRecalcTimer.isActive() && !m_inStyleRecalc;
+}
+
+bool Document::hasPendingForcedStyleRecalc() const
+{
+    return m_styleRecalcTimer.isActive() && m_pendingStyleRecalcShouldForce;
 }
 
 void Document::styleRecalcTimerFired(Timer<Document>*)
@@ -3767,8 +3774,6 @@ void Document::addListenerTypeIfNeeded(const AtomicString& eventType)
         addMutationEventListenerTypeIfEnabled(DOMNODEREMOVEDFROMDOCUMENT_LISTENER);
     else if (eventType == eventNames().DOMNodeInsertedIntoDocumentEvent)
         addMutationEventListenerTypeIfEnabled(DOMNODEINSERTEDINTODOCUMENT_LISTENER);
-    else if (eventType == eventNames().DOMAttrModifiedEvent)
-        addMutationEventListenerTypeIfEnabled(DOMATTRMODIFIED_LISTENER);
     else if (eventType == eventNames().DOMCharacterDataModifiedEvent)
         addMutationEventListenerTypeIfEnabled(DOMCHARACTERDATAMODIFIED_LISTENER);
     else if (eventType == eventNames().overflowchangedEvent)
@@ -5867,8 +5872,8 @@ void Document::updateHoverActiveState(const HitTestRequest& request, HitTestResu
 void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::DOM);
-    info.addMember(m_styleResolver);
     ContainerNode::reportMemoryUsage(memoryObjectInfo);
+    info.addMember(m_styleResolver);
     info.addMember(m_customFonts);
     info.addMember(m_url);
     info.addMember(m_baseURL);
@@ -5878,12 +5883,16 @@ void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     info.addMember(m_firstPartyForCookies);
     info.addMember(m_documentURI);
     info.addMember(m_baseTarget);
+    info.addMember(m_docType);
+    info.addMember(m_implementation);
+    info.addMember(m_elemSheet);
     info.addMember(m_frame);
     info.addMember(m_cachedResourceLoader);
-    info.addMember(m_elemSheet);
     info.addMember(m_styleSheetCollection);
-    info.addHashSet(m_nodeIterators);
-    info.addHashSet(m_ranges);
+    info.addMember(m_styleSheetList);
+    info.addMember(m_formController);
+    info.addMember(m_nodeIterators);
+    info.addMember(m_ranges);
     info.addMember(m_title.string());
     info.addMember(m_rawTitle.string());
     info.addMember(m_xmlEncoding);
@@ -5896,12 +5905,12 @@ void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 #endif
     info.addHashMap(m_cssCanvasElements);
     info.addMember(m_iconURLs);
-    info.addHashSet(m_documentSuspensionCallbackElements);
-    info.addHashSet(m_mediaVolumeCallbackElements);
-    info.addHashSet(m_privateBrowsingStateChangedElements);
+    info.addMember(m_documentSuspensionCallbackElements);
+    info.addMember(m_mediaVolumeCallbackElements);
+    info.addMember(m_privateBrowsingStateChangedElements);
     info.addHashMap(m_elementsByAccessKey);
     info.addMember(m_eventQueue);
-    info.addHashSet(m_mediaCanStartListeners);
+    info.addMember(m_mediaCanStartListeners);
     info.addMember(m_pendingTasks);
 }
 
@@ -5983,7 +5992,7 @@ bool Document::haveStylesheetsLoaded() const
     return !m_styleSheetCollection->hasPendingSheets() || m_ignorePendingStylesheets;
 }
 
-Localizer& Document::getLocalizer(const AtomicString& locale)
+Localizer& Document::getCachedLocalizer(const AtomicString& locale)
 {
     AtomicString localeKey = locale;
     if (locale.isEmpty() || !RuntimeEnabledFeatures::langAttributeAwareFormControlUIEnabled())

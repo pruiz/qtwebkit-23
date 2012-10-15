@@ -159,7 +159,8 @@ public:
     void setEffectiveZoom(float f) { m_fontDirty |= style()->setEffectiveZoom(f); }
     void setTextSizeAdjust(bool b) { m_fontDirty |= style()->setTextSizeAdjust(b); }
     bool hasParentNode() const { return m_parentNode; }
-    
+
+    void resetAuthorStyle();
     void appendAuthorStylesheets(unsigned firstNew, const Vector<RefPtr<StyleSheet> >&);
     
     // Find the ids or classes the selectors on a stylesheet are scoped to. The selectors only apply to elements in subtrees where the root element matches the scope.
@@ -231,7 +232,7 @@ public:
     CSSFontSelector* fontSelector() const { return m_fontSelector.get(); }
 
     void addViewportDependentMediaQueryResult(const MediaQueryExp*, bool result);
-
+    bool hasViewportDependentMediaQueries() const { return !m_viewportDependentMediaQueryResults.isEmpty(); }
     bool affectedByViewportChange() const;
 
     void allVisitedStateChanged() { m_checker.allVisitedStateChanged(); }

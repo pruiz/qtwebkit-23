@@ -39,14 +39,15 @@
 #include "DateTimeChooserClient.h"
 #include "InputTypeNames.h"
 #include "Language.h"
-#include "LocalizedDate.h"
+#include "Localizer.h"
 #include "NotImplemented.h"
 #include "PickerCommon.h"
 #include "RenderTheme.h"
-#include "platform/WebKitPlatformSupport.h"
+#include <public/Platform.h>
 #include <public/WebLocalizedString.h>
 
 using namespace WTF::Unicode;
+using namespace WebCore;
 
 namespace WebKit {
 
@@ -55,6 +56,7 @@ DateTimeChooserImpl::DateTimeChooserImpl(ChromeClientImpl* chromeClient, WebCore
     , m_client(client)
     , m_popup(0)
     , m_parameters(parameters)
+    , m_localizer(WebCore::Localizer::createDefault())
 {
     ASSERT(m_chromeClient);
     ASSERT(m_client);
@@ -85,6 +87,7 @@ void DateTimeChooserImpl::writeDocument(WebCore::DocumentWriter& writer)
     date.setMillisecondsSinceEpochForDate(m_parameters.maximum);
     String maxString = date.toString();
     String stepString = String::number(m_parameters.step);
+    OwnPtr<Localizer> localizer = Localizer::create(nullAtom);
 
     addString("<!DOCTYPE html><head><meta charset='UTF-8'><style>\n", writer);
     writer.addData(WebCore::pickerCommonCss, sizeof(WebCore::pickerCommonCss));
@@ -103,11 +106,12 @@ void DateTimeChooserImpl::writeDocument(WebCore::DocumentWriter& writer)
     addProperty("locale", WebCore::defaultLanguage(), writer);
     addProperty("todayLabel", Platform::current()->queryLocalizedString(WebLocalizedString::CalendarToday), writer);
     addProperty("clearLabel", Platform::current()->queryLocalizedString(WebLocalizedString::CalendarClear), writer);
-    addProperty("weekStartDay", WebCore::firstDayOfWeek(), writer);
-    addProperty("monthLabels", WebCore::monthLabels(), writer);
-    addProperty("dayLabels", WebCore::weekDayShortLabels(), writer);
-    Direction dir = direction(WebCore::monthLabels()[0][0]);
-    addProperty("isRTL", dir == RightToLeft || dir == RightToLeftArabic, writer);
+    addProperty("weekStartDay", localizer->firstDayOfWeek(), writer);
+    addProperty("monthLabels", localizer->monthLabels(), writer);
+    addProperty("dayLabels", localizer->weekDayShortLabels(), writer);
+    Direction dir = direction(localizer->monthLabels()[0][0]);
+    addProperty("isCalendarRTL", dir == RightToLeft || dir == RightToLeftArabic, writer);
+    addProperty("isRTL", m_parameters.isAnchorElementRTL, writer);
     if (m_parameters.suggestionValues.size()) {
         addProperty("inputWidth", static_cast<unsigned>(m_parameters.anchorRectInRootView.width()), writer);
         addProperty("suggestionValues", m_parameters.suggestionValues, writer);
@@ -124,6 +128,11 @@ void DateTimeChooserImpl::writeDocument(WebCore::DocumentWriter& writer)
     writer.addData(WebCore::suggestionPickerJs, sizeof(WebCore::suggestionPickerJs));
     writer.addData(WebCore::calendarPickerJs, sizeof(WebCore::calendarPickerJs));
     addString("</script></body>\n", writer);
+}
+
+WebCore::Localizer& DateTimeChooserImpl::localizer()
+{
+    return *m_localizer;
 }
 
 void DateTimeChooserImpl::setValueAndClosePopup(int numValue, const String& stringValue)

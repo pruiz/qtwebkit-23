@@ -126,6 +126,7 @@
 #include "WebKitCSSTransformValue.h"
 #include "WebKitFontFamilyNames.h"
 #include "XMLNames.h"
+#include <wtf/MemoryInstrumentationHashSet.h>
 #include <wtf/MemoryInstrumentationVector.h>
 #include <wtf/StdLibExtras.h>
 #include <wtf/Vector.h>
@@ -424,11 +425,7 @@ StyleResolver::StyleResolver(Document* document, bool matchAuthorAndUserStyles)
     if (m_rootDefaultStyle && view)
         m_medium = adoptPtr(new MediaQueryEvaluator(view->mediaType(), view->frame(), m_rootDefaultStyle.get()));
 
-    m_authorStyle = RuleSet::create();
-    // Adding rules from multiple sheets, shrink at the end.
-    // Adding global rules from multiple sheets, shrink at the end.
-    // Note that there usually is only 1 sheet for scoped rules, so auto-shrink-to-fit is fine.
-    m_authorStyle->disableAutoShrinkToFit();
+    resetAuthorStyle();
 
     DocumentStyleSheetCollection* styleSheetCollection = document->styleSheetCollection();
     // FIXME: This sucks! The user sheet is reparsed every time!
@@ -545,6 +542,12 @@ inline RuleSet* StyleResolver::ruleSetForScope(const ContainerNode* scope) const
     return it != m_scopedAuthorStyles.end() ? it->second.get() : 0; 
 }
 #endif
+
+void StyleResolver::resetAuthorStyle()
+{
+    m_authorStyle = RuleSet::create();
+    m_authorStyle->disableAutoShrinkToFit();
+}
 
 void StyleResolver::appendAuthorStylesheets(unsigned firstNew, const Vector<RefPtr<StyleSheet> >& stylesheets)
 {
@@ -745,8 +748,8 @@ void StyleResolver::Features::clear()
 void StyleResolver::Features::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::CSS);
-    info.addHashSet(idsInRules);
-    info.addHashSet(attrsInRules);
+    info.addMember(idsInRules);
+    info.addMember(attrsInRules);
     info.addMember(siblingRules);
     info.addMember(uncommonAttributeRules);
 }
@@ -1480,7 +1483,7 @@ bool StyleResolver::canShareStyleWithElement(StyledElement* element) const
 #if USE(ACCELERATED_COMPOSITING)
     // Turn off style sharing for elements that can gain layers for reasons outside of the style system.
     // See comments in RenderObject::setStyle().
-    if (element->hasTagName(iframeTag) || element->hasTagName(frameTag) || element->hasTagName(embedTag) || element->hasTagName(objectTag) || element->hasTagName(appletTag)
+    if (element->hasTagName(iframeTag) || element->hasTagName(frameTag) || element->hasTagName(embedTag) || element->hasTagName(objectTag) || element->hasTagName(appletTag) || element->hasTagName(canvasTag)
 #if ENABLE(PLUGIN_PROXY_FOR_VIDEO)
         // With proxying, the media elements are backed by a RenderEmbeddedObject.
         || element->hasTagName(videoTag) || element->hasTagName(audioTag)
@@ -3359,9 +3362,7 @@ static bool hasVariableReference(CSSValue* value)
 {
     if (value->isPrimitiveValue()) {
         CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(value);
-        if (CSSCalcValue* calcValue = primitiveValue->cssCalcValue())
-            return calcValue->hasVariableReference();
-        return primitiveValue->isVariableName();
+        return primitiveValue->hasVariableReference();
     }
 
     if (value->isCalculationValue())
@@ -5792,7 +5793,7 @@ void StyleResolver::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     info.addMember(m_viewportDependentMediaQueryResults);
     info.addHashMap(m_styleRuleToCSSOMWrapperMap);
     info.addInstrumentedMapEntries(m_styleRuleToCSSOMWrapperMap);
-    info.addInstrumentedHashSet(m_styleSheetCSSOMWrapperSet);
+    info.addMember(m_styleSheetCSSOMWrapperSet);
 #if ENABLE(CSS_FILTERS) && ENABLE(SVG)
     info.addHashMap(m_pendingSVGDocuments);
 #endif

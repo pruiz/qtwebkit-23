@@ -87,8 +87,8 @@ WebInspector.CSSStyleModel.prototype = {
         /**
          * @param {function(?*)} userCallback
          * @param {?Protocol.Error} error
-         * @param {Array.<CSSAgent.CSSRule>=} matchedPayload
-         * @param {Array.<CSSAgent.PseudoIdRules>=} pseudoPayload
+         * @param {Array.<CSSAgent.RuleMatch>=} matchedPayload
+         * @param {Array.<CSSAgent.PseudoIdMatches>=} pseudoPayload
          * @param {Array.<CSSAgent.InheritedStyleEntry>=} inheritedPayload
          */
         function callback(userCallback, error, matchedPayload, pseudoPayload, inheritedPayload)
@@ -1118,7 +1118,7 @@ WebInspector.CSSStyleModelResourceBinding.prototype = {
      */
     setStyleContent: function(styleSource, content, majorChange, userCallback)
     {
-        var resource = styleSource.resource();
+        var resource = WebInspector.resourceForURL(styleSource.url);
         if (this._styleSheetIdForResource(resource)) {
             this._innerSetContent(resource, content, majorChange, userCallback, null);
             return;

@@ -29,24 +29,16 @@
 /**
  * @constructor
  * @extends {WebInspector.UISourceCode}
- * @param {WebInspector.Resource} resource
+ * @param {WebInspector.ContentProvider} contentProvider
  */
-WebInspector.StyleSource = function(resource)
+WebInspector.StyleSource = function(contentProvider)
 {
-    WebInspector.UISourceCode.call(this, resource.url, resource, resource);
+    WebInspector.UISourceCode.call(this, contentProvider.contentURL(), contentProvider, true);
 }
 
 WebInspector.StyleSource.updateTimeout = 200;
 
 WebInspector.StyleSource.prototype = {
-    /**
-     * @return {boolean}
-     */
-    isEditable: function()
-    {
-        return true;
-    },
-
     /**
      * @param {function(?string)} callback
      */

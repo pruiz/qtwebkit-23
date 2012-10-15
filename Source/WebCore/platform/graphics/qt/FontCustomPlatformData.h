@@ -29,6 +29,7 @@
 #include <wtf/FastAllocBase.h>
 #include <wtf/Forward.h>
 #include <wtf/Noncopyable.h>
+
 #if HAVE(QRAWFONT)
 #include <QRawFont>
 #endif

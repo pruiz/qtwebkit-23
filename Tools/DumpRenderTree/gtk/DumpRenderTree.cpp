@@ -516,7 +516,9 @@ static void resetDefaultsToConsistentValues()
 
     DumpRenderTreeSupportGtk::setCSSGridLayoutEnabled(webView, false);
     DumpRenderTreeSupportGtk::setCSSRegionsEnabled(webView, true);
+    DumpRenderTreeSupportGtk::setCSSCustomFilterEnabled(webView, false);
     DumpRenderTreeSupportGtk::setShadowDOMEnabled(true);
+    DumpRenderTreeSupportGtk::setStyleScopedEnabled(true);
 }
 
 static bool useLongRunningServerMode(int argc, char *argv[])
@@ -925,6 +927,7 @@ static gboolean webViewConsoleMessage(WebKitWebView* view, const gchar* message,
 static gboolean webViewScriptAlert(WebKitWebView* view, WebKitWebFrame* frame, const gchar* message, gpointer data)
 {
     fprintf(stdout, "ALERT: %s\n", message);
+    fflush(stdout);
     return TRUE;
 }
 

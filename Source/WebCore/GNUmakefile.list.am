@@ -639,6 +639,14 @@ webcore_built_sources += \
 	DerivedSources/WebCore/JSRTCSessionDescription.h \
 	DerivedSources/WebCore/JSRTCSessionDescriptionCallback.cpp \
 	DerivedSources/WebCore/JSRTCSessionDescriptionCallback.h \
+	DerivedSources/WebCore/JSRTCStatsCallback.cpp \
+	DerivedSources/WebCore/JSRTCStatsCallback.h \
+	DerivedSources/WebCore/JSRTCStatsElement.cpp \
+	DerivedSources/WebCore/JSRTCStatsElement.h \
+	DerivedSources/WebCore/JSRTCStatsReport.cpp \
+	DerivedSources/WebCore/JSRTCStatsReport.h \
+	DerivedSources/WebCore/JSRTCStatsResponse.cpp \
+	DerivedSources/WebCore/JSRTCStatsResponse.h \
 	DerivedSources/WebCore/JSScreen.cpp \
 	DerivedSources/WebCore/JSScreen.h \
 	DerivedSources/WebCore/JSScriptProfile.cpp \
@@ -1236,6 +1244,10 @@ dom_binding_idls += \
 	$(WebCore)/Modules/mediastream/RTCPeerConnection.idl \
 	$(WebCore)/Modules/mediastream/RTCSessionDescription.idl \
 	$(WebCore)/Modules/mediastream/RTCSessionDescriptionCallback.idl \
+	$(WebCore)/Modules/mediastream/RTCStatsCallback.idl \
+	$(WebCore)/Modules/mediastream/RTCStatsElement.idl \
+	$(WebCore)/Modules/mediastream/RTCStatsReport.idl \
+	$(WebCore)/Modules/mediastream/RTCStatsResponse.idl \
 	$(WebCore)/Modules/mediastream/SessionDescription.idl \
 	$(WebCore)/Modules/navigatorcontentutils/NavigatorContentUtils.idl \
 	$(WebCore)/Modules/notifications/Notification.idl \
@@ -3992,6 +4004,7 @@ webcore_sources += \
 	Source/WebCore/page/GroupSettings.h \
 	Source/WebCore/page/History.cpp \
 	Source/WebCore/page/History.h \
+    Source/WebCore/page/LayoutMilestones.h \
 	Source/WebCore/page/Location.cpp \
 	Source/WebCore/page/Location.h \
 	Source/WebCore/page/MediaCanStartListener.h \
@@ -4780,8 +4793,6 @@ webcore_sources += \
 	Source/WebCore/platform/text/LocaleToScriptMappingDefault.cpp \
 	Source/WebCore/platform/text/LocalizedDate.h \
 	Source/WebCore/platform/text/LocalizedDateNone.cpp \
-	Source/WebCore/platform/text/LocalizedNumber.h \
-	Source/WebCore/platform/text/LocalizedNumberNone.cpp \
 	Source/WebCore/platform/text/Localizer.cpp \
 	Source/WebCore/platform/text/Localizer.h \
 	Source/WebCore/platform/text/ParserUtilities.h \
@@ -4892,6 +4903,8 @@ webcore_sources += \
 	Source/WebCore/rendering/ExclusionRectangle.h \
 	Source/WebCore/rendering/ExclusionShape.cpp \
 	Source/WebCore/rendering/ExclusionShape.h \
+	Source/WebCore/rendering/ExclusionShapeInsideInfo.cpp \
+	Source/WebCore/rendering/ExclusionShapeInsideInfo.h \
 	Source/WebCore/rendering/FilterEffectRenderer.cpp \
 	Source/WebCore/rendering/FilterEffectRenderer.h \
 	Source/WebCore/rendering/FixedTableLayout.cpp \
@@ -5095,8 +5108,6 @@ webcore_sources += \
 	Source/WebCore/rendering/ScrollBehavior.cpp \
 	Source/WebCore/rendering/ScrollBehavior.h \
 	Source/WebCore/rendering/VerticalPositionCache.h \
-	Source/WebCore/rendering/WrapShapeInfo.cpp \
-	Source/WebCore/rendering/WrapShapeInfo.h \
 	Source/WebCore/rendering/mathml/RenderMathMLBlock.cpp \
 	Source/WebCore/rendering/mathml/RenderMathMLBlock.h \
 	Source/WebCore/rendering/mathml/RenderMathMLFenced.cpp \

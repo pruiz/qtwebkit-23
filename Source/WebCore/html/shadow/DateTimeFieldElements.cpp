@@ -24,12 +24,14 @@
  */
 
 #include "config.h"
-#if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
+#if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
 #include "DateTimeFieldElements.h"
 
 #include "DateComponents.h"
 #include "DateTimeFieldsState.h"
 #include "LocalizedStrings.h"
+#include <wtf/CurrentTime.h>
+#include <wtf/DateMath.h>
 
 namespace WebCore {
 
@@ -70,7 +72,7 @@ void DateTimeAMPMFieldElement::setValueAsDateTimeFieldsState(const DateTimeField
 // ----------------------------
 
 DateTimeHourFieldElement::DateTimeHourFieldElement(Document* document, FieldOwner& fieldOwner, int minimum, int maximum)
-    : DateTimeNumericFieldElement(document, fieldOwner, minimum, maximum)
+    : DateTimeNumericFieldElement(document, fieldOwner, minimum, maximum, "--")
     , m_alignment(maximum + maximum % 2)
 {
     ASSERT((!minimum && (maximum == 11 || maximum == 23)) || (minimum == 1 && (maximum == 12 || maximum == 24)));
@@ -175,7 +177,7 @@ int DateTimeHourFieldElement::valueAsInteger() const
 // ----------------------------
 
 DateTimeMillisecondFieldElement::DateTimeMillisecondFieldElement(Document* document, FieldOwner& fieldOwner)
-    : DateTimeNumericFieldElement(document, fieldOwner, 0, 999)
+    : DateTimeNumericFieldElement(document, fieldOwner, 0, 999, "---")
 {
 }
 
@@ -216,7 +218,7 @@ void DateTimeMillisecondFieldElement::setValueAsDateTimeFieldsState(const DateTi
 // ----------------------------
 
 DateTimeMinuteFieldElement::DateTimeMinuteFieldElement(Document* document, FieldOwner& fieldOwner)
-    : DateTimeNumericFieldElement(document, fieldOwner, 0, 59)
+    : DateTimeNumericFieldElement(document, fieldOwner, 0, 59, "--")
 {
 }
 
@@ -256,8 +258,49 @@ void DateTimeMinuteFieldElement::setValueAsDateTimeFieldsState(const DateTimeFie
 
 // ----------------------------
 
+DateTimeMonthFieldElement::DateTimeMonthFieldElement(Document* document, FieldOwner& fieldOwner, const String& placeholder)
+    : DateTimeNumericFieldElement(document, fieldOwner, 1, 12, placeholder)
+{
+}
+
+PassRefPtr<DateTimeMonthFieldElement> DateTimeMonthFieldElement::create(Document* document, FieldOwner& fieldOwner, const String& placeholder)
+{
+    DEFINE_STATIC_LOCAL(AtomicString, monthPsuedoId, ("-webkit-datetime-edit-month-field"));
+    RefPtr<DateTimeMonthFieldElement> field = adoptRef(new DateTimeMonthFieldElement(document, fieldOwner, placeholder));
+    field->initialize(monthPsuedoId, AXMonthFieldText());
+    return field.release();
+}
+
+void DateTimeMonthFieldElement::populateDateTimeFieldsState(DateTimeFieldsState& dateTimeFieldsState)
+{
+    dateTimeFieldsState.setMonth(hasValue() ? valueAsInteger() : DateTimeFieldsState::emptyValue);
+}
+
+void DateTimeMonthFieldElement::setValueAsDate(const DateComponents& date)
+{
+    setValueAsInteger(date.month() + 1);
+}
+
+void DateTimeMonthFieldElement::setValueAsDateTimeFieldsState(const DateTimeFieldsState& dateTimeFieldsState, const DateComponents& dateForReadOnlyField)
+{
+    if (!dateTimeFieldsState.hasMonth()) {
+        setEmptyValue(dateForReadOnlyField);
+        return;
+    }
+
+    const unsigned value = dateTimeFieldsState.month();
+    if (range().isInRange(static_cast<int>(value))) {
+        setValueAsInteger(value);
+        return;
+    }
+
+    setEmptyValue(dateForReadOnlyField);
+}
+
+// ----------------------------
+
 DateTimeSecondFieldElement::DateTimeSecondFieldElement(Document* document, FieldOwner& fieldOwner)
-    : DateTimeNumericFieldElement(document, fieldOwner, 0, 59)
+    : DateTimeNumericFieldElement(document, fieldOwner, 0, 59, "--")
 {
 }
 
@@ -293,6 +336,72 @@ void DateTimeSecondFieldElement::setValueAsDateTimeFieldsState(const DateTimeFie
     }
 
     setValueAsInteger(value);
+}
+
+// ----------------------------
+
+// HTML5 uses ISO-8601 format with year >= 1. Gregorian calendar started in
+// 1582. However, we need to support 0001-01-01 in Gregorian calendar rule.
+static const int minimumYear = 1;
+// Date in ECMAScript can't represent dates later than 275760-09-13T00:00Z.
+// So, we have the same upper limit in HTML5 dates.
+static const int maximumYear = 275760;
+
+DateTimeYearFieldElement::DateTimeYearFieldElement(Document* document, FieldOwner& fieldOwner, const String& placeholder)
+    : DateTimeNumericFieldElement(document, fieldOwner, minimumYear, maximumYear, placeholder)
+{
+}
+
+PassRefPtr<DateTimeYearFieldElement> DateTimeYearFieldElement::create(Document* document, FieldOwner& fieldOwner, const String& placeholder)
+{
+    DEFINE_STATIC_LOCAL(AtomicString, yearPsuedoId, ("-webkit-datetime-edit-year-field"));
+    RefPtr<DateTimeYearFieldElement> field = adoptRef(new DateTimeYearFieldElement(document, fieldOwner, placeholder));
+    field->initialize(yearPsuedoId, AXYearFieldText());
+    return field.release();
+}
+
+int DateTimeYearFieldElement::defaultValueForStepDown() const
+{
+    double current = currentTimeMS();
+    double utcOffset = calculateUTCOffset();
+    double dstOffset = calculateDSTOffset(current, utcOffset);
+    int offset = static_cast<int>((utcOffset + dstOffset) / msPerMinute);
+    current += offset * msPerMinute;
+
+    DateComponents date;
+    date.setMillisecondsSinceEpochForMonth(current);
+    return date.fullYear();
+}
+
+int DateTimeYearFieldElement::defaultValueForStepUp() const
+{
+    return defaultValueForStepDown();
+}
+
+void DateTimeYearFieldElement::populateDateTimeFieldsState(DateTimeFieldsState& dateTimeFieldsState)
+{
+    dateTimeFieldsState.setYear(hasValue() ? valueAsInteger() : DateTimeFieldsState::emptyValue);
+}
+
+void DateTimeYearFieldElement::setValueAsDate(const DateComponents& date)
+{
+    setValueAsInteger(date.fullYear());
+}
+
+void DateTimeYearFieldElement::setValueAsDateTimeFieldsState(const DateTimeFieldsState& dateTimeFieldsState, const DateComponents& dateForReadOnlyField)
+{
+    if (!dateTimeFieldsState.hasYear()) {
+        setEmptyValue(dateForReadOnlyField);
+        return;
+    }
+
+    const unsigned value = dateTimeFieldsState.year();
+    if (range().isInRange(static_cast<int>(value))) {
+        setValueAsInteger(value);
+        return;
+    }
+
+    setEmptyValue(dateForReadOnlyField);
 }
 
 } // namespace WebCore

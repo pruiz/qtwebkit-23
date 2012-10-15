@@ -1,3 +1,264 @@
+2012-09-28  Anders Carlsson  <andersca@apple.com>
+
+        Remove Java bridge
+        https://bugs.webkit.org/show_bug.cgi?id=97954
+
+        Reviewed by Sam Weinig.
+
+        The Java bridge is not used by any port; Mac now has a NPAPI Java plug-in.
+
+        * wtf/Platform.h:
+
+2012-09-28  Kai Koehne  <kai.koehne@digia.com>
+
+        Disable YARR_JIT for Windows 64 bit
+        https://bugs.webkit.org/show_bug.cgi?id=97772
+
+        Reviewed by Simon Hausmann.
+
+        Using YARR_JIT requires ASSEMBLER, which in turn enables the
+        executable fixed allocator, which is mmap based (not available on
+        Windows).
+
+        * wtf/Platform.h:
+
+2012-09-28  Yury Semikhatsky  <yurys@chromium.org>
+
+        Web Inspector: make HashSet memory instrumentation non-intrusive
+        https://bugs.webkit.org/show_bug.cgi?id=97879
+
+        Reviewed by Vsevolod Vlasov.
+
+        Removed reportMemoryUsage declarations as a friend of HashSet and HashTable. Also
+        removed MemoryInstrumentationHashTable which is not needed if we don't have
+        access to HashSet's guts.
+
+        * GNUmakefile.list.am:
+        * WTF.gypi:
+        * WTF.pro:
+        * WTF.vcproj/WTF.vcproj:
+        * WTF.xcodeproj/project.pbxproj:
+        * wtf/HashSet.h:
+        (WTF):
+        (HashSet):
+        * wtf/HashTable.h:
+        (HashTable):
+        * wtf/MemoryInstrumentation.h:
+        (WTF::MemoryClassInfo::addPrivateBuffer):
+        * wtf/MemoryInstrumentationHashSet.h:
+        (WTF::reportMemoryUsage):
+        * wtf/MemoryInstrumentationHashTable.h: Removed.
+
+2012-09-27  Anders Carlsson  <andersca@apple.com>
+
+        Remove the clang pragmas to disable warnings in Noncopyable.h
+        https://bugs.webkit.org/show_bug.cgi?id=97826
+
+        Reviewed by Beth Dakin.
+
+        Warnings about C++11 extensions are already disabled project-wide now so there's no need
+        to keep these pragmas.
+
+        * wtf/Noncopyable.h:
+
+2012-09-26  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        Clean up HasTrivialConstructor/Destructor
+        https://bugs.webkit.org/show_bug.cgi?id=97754
+
+        Reviewed by Darin Adler.
+
+        Cleaned up HasTrivialConstructor and HasTrivialDestructor by defining them in terms of 
+        other type traits we have. Also moved some ifdefs and comments to make things more clear.
+
+        * wtf/TypeTraits.h:
+
+2012-09-27  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: NMI: move visited and countObjectSize methods implementation into separate class.
+        https://bugs.webkit.org/show_bug.cgi?id=97461
+
+        Reviewed by Yury Semikhatsky.
+
+        These methods and the data collected by them need to be used in the instrumentation code for other components.
+        As example when we are visiting bitmaps we need to visit platform specific objects.
+        These objects will be instrumented with help of component's own instrumentation code
+        but we have to keep the single set of visited objects and the map of counters.
+
+        * wtf/MemoryInstrumentation.h:
+        (MemoryInstrumentationClient):
+        (WTF::MemoryInstrumentationClient::~MemoryInstrumentationClient):
+        (WTF):
+        (WTF::MemoryInstrumentation::MemoryInstrumentation):
+        (MemoryInstrumentation):
+        (WTF::MemoryInstrumentation::countObjectSize):
+        (WTF::MemoryInstrumentation::visited):
+
+2012-09-27  Csaba Osztrogonác  <ossy@webkit.org>, Tor Arne Vestbø  <vestbo@webkit.org>
+
+        [Qt] Enable the LLInt on Linux
+        https://bugs.webkit.org/show_bug.cgi?id=95749
+
+        Reviewed by Simon Hausmann.
+
+        * wtf/Platform.h:
+
+2012-09-26  Cosmin Truta  <ctruta@rim.com>
+
+        [BlackBerry] Allow denormal floats in ARM VFP
+        https://bugs.webkit.org/show_bug.cgi?id=97008
+
+        Reviewed by Filip Pizlo.
+        Reviewed internally by Yong Li.
+
+        Cleared the Flush-to-Zero flag in the ARM FPSCR register on QNX.
+
+        * wtf/ThreadingPthreads.cpp:
+        (WTF::enableIEEE754Denormal): Added.
+        (WTF::initializeThreading):
+        (WTF::initializeCurrentThreadInternal):
+
+2012-09-26  Michael Saboff  <msaboff@apple.com>
+
+        Update ComplexTextController for 8 bit TextRun changes
+        https://bugs.webkit.org/show_bug.cgi?id=97378
+
+        Reviewed by Geoffrey Garen.
+
+        Add a new create method to make a 16 bit string from 8 bit source data.  This is used in 
+        ComplexTextController when we have LChar* + length text data, but we really want 16 bit
+        data for the complex text rendering code.
+
+        * wtf/text/WTFString.cpp:
+        (WTF::String::make16BitFrom8BitSource):
+        (WTF):
+        * wtf/text/WTFString.h:
+        (String):
+
+2012-09-26  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: NMI: replace manual JS external resources counting with MemoryInstrumentation
+        https://bugs.webkit.org/show_bug.cgi?id=97662
+
+        Reviewed by Yury Semikhatsky.
+
+        Old schema uses sizeInBytes method on StringImpl. This method works incorrect for substrings.
+        Also we'd like to know exact pointers to strings and buffers for verification purposes.
+
+        * GNUmakefile.list.am:
+        * WTF.gypi:
+        * WTF.pro:
+        * WTF.vcproj/WTF.vcproj:
+        * WTF.xcodeproj/project.pbxproj:
+        * wtf/MemoryInstrumentationArrayBufferView.h:
+        (WTF):
+        (WTF::reportMemoryUsage):
+
+2012-09-25  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: extract HashSet instrumentation from core NMI code and put it into MemoryInstrumentationHashSet.h
+        https://bugs.webkit.org/show_bug.cgi?id=97198
+
+        Reviewed by Yury Semikhatsky.
+
+        Current implementation has overloads for HashSet.
+        This prevents us from instrumenting complex cases like Vector<HashSet<...> >.
+
+        * GNUmakefile.list.am:
+        * WTF.gypi:
+        * WTF.pro:
+        * WTF.vcproj/WTF.vcproj:
+        * WTF.xcodeproj/project.pbxproj:
+        * wtf/HashSet.h:
+        (WTF):
+        (HashSet):
+        * wtf/HashTable.h:
+        (WTF):
+        (HashTable):
+        * wtf/MemoryInstrumentation.h:
+        (WTF::MemoryClassInfo::addCollectionElements):
+        (WTF::MemoryClassInfo::addHashCountedSet):
+        * wtf/MemoryInstrumentationHashSet.h: Added.
+        (WTF):
+        (WTF::reportMemoryUsage):
+        * wtf/MemoryInstrumentationHashTable.h: Added.
+        (WTF):
+        (WTF::reportMemoryUsage):
+
+2012-09-26  Yury Semikhatsky  <yurys@chromium.org>
+
+        Web Inspector: compare objects counted by the memory instrumentation with those allocated in the heap
+        https://bugs.webkit.org/show_bug.cgi?id=97641
+
+        Reviewed by Pavel Feldman.
+
+        Added a method for checking if reported object was actually allocated in the heap.
+
+        * wtf/MemoryInstrumentation.h:
+        (MemoryInstrumentation):
+        (WTF::MemoryInstrumentation::addObjectImpl):
+
+2012-09-26  Gavin Barraclough  <barraclough@apple.com>
+
+        String.localeCompare should normalize input
+        https://bugs.webkit.org/show_bug.cgi?id=97639
+
+        Reviewed by Filip Pizlo.
+
+        From the spec: "It is strongly recommended that this function treat Strings that are
+        canonically equivalent according to the Unicode standard as identical (in other words,
+        compare the Strings as if they had both been converted to Normalised Form C or D first).
+        It is also recommended that this function not honour Unicode compatibility equivalences
+        or decompositions."
+
+        * wtf/unicode/icu/CollatorICU.cpp:
+        (WTF::Collator::createCollator):
+            - Enable normalization.
+
+2012-09-25  Cosmin Truta  <ctruta@rim.com>
+
+        [BlackBerry] Enable LLInt
+        https://bugs.webkit.org/show_bug.cgi?id=97604
+
+        Reviewed by Yong Li.
+
+        Set the prefix of LOCAL_LABEL_STRING to ".L" on QNX.
+
+        * wtf/InlineASM.h:
+
+2012-09-25  Patrick Gansterer  <paroga@webkit.org>
+
+        Do not enable DFG JIT for COMPILER(MSVC).
+
+        The current code does not support MSVC inline assembler, so disable it for now.
+
+        * wtf/Platform.h:
+
+2012-09-25  Pratik Solanki  <psolanki@apple.com>
+
+        Remove HAVE_SBRK since we never set use_sbrk to true
+        https://bugs.webkit.org/show_bug.cgi?id=97525
+        <rdar://problem/12363601>
+
+        Reviewed by Geoffrey Garen.
+
+        The code under HAVE(SBRK) has not been used since 2005. We use mmap not sbrk for FastMalloc
+        not sbrk. We can just remove the define and move all of this code inside #ifndef
+        WTF_CHANGES.
+
+        * wtf/Platform.h:
+        * wtf/TCSystemAlloc.cpp:
+        (TCMalloc_SystemAlloc):
+
+2012-09-25  Mark Lam  <mark.lam@apple.com>
+
+        #undef some symbols before redefining them.
+        https://bugs.webkit.org/show_bug.cgi?id=97568.
+
+        Reviewed by Michael Saboff.
+
+        * wtf/Platform.h:
+
 2012-09-21  Ilya Tikhonovsky  <loislo@chromium.org>
 
         Web Inspector: extract Vector instrumentation from core NMI code into MemoryInstrumentationVector.h header.

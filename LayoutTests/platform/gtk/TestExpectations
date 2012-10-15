@@ -41,6 +41,7 @@
 # Tests that require new results.
 #////////////////////////////////////////////////////////////////////////////////////////
 
+webkit.org/b/97401 mathml/presentation/tables.xhtml [ Failure ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # Expected failures
@@ -299,28 +300,19 @@ Bug(GTK) http/tests/security/webgl-remote-read-remote-image-allowed.html [ Skip 
 Bug(GTK) http/tests/security/webgl-remote-read-remote-image-allowed-with-credentials.html [ Skip ]
 Bug(GTK) http/tests/security/webgl-remote-read-remote-image-blocked-no-crossorigin.html [ Skip ]
 
-# <style scoped> is not yet enabled.
-webkit.org/b/49142 fast/css/style-scoped [ Failure ]
-
-# CSS Regions tests for region styling and scoped styles
-Bug(GTK) fast/regions/style-scoped-in-flow-override-container-style.html [ ImageOnlyFailure ]
-Bug(GTK) fast/regions/style-scoped-in-flow-override-region-styling-multiple-regions.html [ ImageOnlyFailure ]
-Bug(GTK) fast/regions/style-scoped-in-flow-override-region-styling.html [ ImageOnlyFailure ]
-Bug(GTK) fast/regions/style-scoped-in-flow.html [ ImageOnlyFailure ]
-
 # CSS Filters is disabled
 Bug(GTK) css3/filters [ Skip ]
 
 # Needs rebaseline after bug 97217 is fixed
 webkit.org/b/97325 css3/masking/clip-path-circle-relative-overflow.html [ ImageOnlyFailure Pass ]
 
+# Needs results
+webkit.org/b/97409 svg/custom/clip-mask-negative-scale.svg [ Missing Pass ]
+
 # CSS image-set support not yet enabled (needs ENABLE_CSS_IMAGE_SET).
 Bug(GTK) fast/css/image-set-parsing.html [ Skip ]
 Bug(GTK) fast/css/image-set-parsing-invalid.html [ Skip ]
 Bug(GTK) fast/css/image-set-setting.html [ Skip ]
-
-# CSS Sticky Position is not yet enabled
-Bug(GTK) fast/css/sticky [ Skip ]
 
 # For now, Web Audio API is disabled
 Bug(GTK) webaudio [ Skip ]
@@ -377,12 +369,14 @@ webkit.org/b/85532 fast/sub-pixel/block-preferred-widths-with-sub-pixel-floats.h
 webkit.org/b/85532 fast/sub-pixel/column-clipping.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/file-upload-control-at-fractional-offset.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/float-containing-block-with-margin.html [ Pass ]
+webkit.org/b/85532 fast/sub-pixel/float-precision.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/float-with-margin-in-container.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/float-with-right-margin-zoom.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/float-wrap-with-subpixel-top.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/inline-block-should-not-wrap.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/inline-block-with-margin.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/size-of-span-with-different-positions.html [ Pass ]
+webkit.org/b/85532 fast/sub-pixel/table-cells-have-stable-width.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/table-cells-with-padding-do-not-wrap.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/table-rows-have-stable-height.html [ Skip ]
 webkit.org/b/85532 fast/sub-pixel/table-rows-no-gaps.html [ Pass ]
@@ -401,9 +395,6 @@ webkit.org/b/85262 fast/css/image-resolution [ Skip ]
 
 # CSS image-orientation is not yet enabled.
 webkit.org/b/89052 fast/css/image-orientation
-
-# CSS3 Text Decoration support is not yet enabled (needs ENABLE_CSS3_TEXT_DECORATION).
-webkit.org/b/58491 fast/css3-text-decoration
 
 # No CORS support for media elements is implemented yet.
 Bug(GTK) http/tests/security/video-cross-origin-readback.html [ Skip ]
@@ -559,6 +550,11 @@ webkit.org/b/93812 [ Release ] svg/custom/use-instanceRoot-as-event-target.xhtml
 webkit.org/b/95430 fast/layers/scroll-no-visible-content-but-visible-descendant.html [ ImageOnlyFailure Pass ]
 
 webkit.org/b/97390 mathml/presentation/subsup.xhtml [ Failure Pass ]
+webkit.org/b/97390 mathml/presentation/msubsup-base-changed.xhtml [ ImageOnlyFailure Pass ]
+
+webkit.org/b/73409 fast/forms/textarea-placeholder-set-attribute.html [ ImageOnlyFailure Pass ]
+
+webkit.org/b/78819 fast/workers/shared-worker-load-error.html [ Timeout Pass ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Flaky tests
@@ -640,8 +636,6 @@ webkit.org/b/72698 media/audio-garbage-collect.html [ Timeout ]
 webkit.org/b/61826 fast/events/drag-image-filename.html [ Timeout ]
 
 Bug(GTK) accessibility/aria-invalid.html [ Timeout ]
-
-webkit.org/b/78819 fast/workers/shared-worker-load-error.html [ Timeout ]
 
 webkit.org/b/73003 [ Release ] editing/spelling/spellcheck-async.html [ Timeout ]
 webkit.org/b/73003 [ Release ] editing/spelling/spellcheck-paste.html [ Timeout ]
@@ -853,9 +847,6 @@ Bug(GTK) http/tests/misc/will-send-request-returns-null-on-redirect.html [ Failu
 
 # Requires willPerformClientRedirectToURL
 webkit.org/b/58526 http/tests/loading/onload-vs-immediate-refresh.pl [ Failure ]
-
-# New failure after http://trac.webkit.org/changeset/53758
-Bug(GTK) scrollbars/scrollbar-middleclick-nopaste.html [ Failure ]
 
 # Needs platform specific API implemented in DRT, maybe not relevant for non-Mac and non-Windows ports
 Bug(GTK) fast/loader/api-test-new-window-data-load-base-url.html [ Failure ]
@@ -1158,7 +1149,6 @@ webkit.org/b/62204 svg/W3C-SVG-1.1/animate-elem-04-t.svg [ Failure ]
 
 webkit.org/b/78673 svg/animations/animate-text-nested-transforms.html [ Failure ]
 
-webkit.org/b/73409 fast/forms/textarea-placeholder-set-attribute.html [ ImageOnlyFailure ]
 webkit.org/b/73409 fast/forms/textarea/textarea-placeholder-paint-order.html [ ImageOnlyFailure ]
 webkit.org/b/73409 fast/forms/input-placeholder-paint-order.html [ ImageOnlyFailure ]
 
@@ -1209,22 +1199,18 @@ webkit.org/b/84694 fast/events/selectstart-by-double-triple-clicks.html [ Failur
 webkit.org/b/84692 fast/events/attempt-scroll-with-no-scrollbars.html [ Failure ]
 
 webkit.org/b/84701 fast/block/line-layout/selection-highlight-overlap.html [ ImageOnlyFailure ]
+webkit.org/b/84701 fast/css/sticky/inline-sticky-abspos-child.html [ ImageOnlyFailure ]
+webkit.org/b/84701 fast/css/sticky/inline-sticky.html [ ImageOnlyFailure ]
 
 webkit.org/b/85376 fullscreen/video-controls-drag.html [ Failure ]
 
 webkit.org/b/84759 ietestcenter/css3/multicolumn/column-containing-block-001.htm [ ImageOnlyFailure ]
 webkit.org/b/84760 ietestcenter/css3/multicolumn/column-containing-block-002.htm [ ImageOnlyFailure ]
 webkit.org/b/84761 ietestcenter/css3/multicolumn/column-filling-001.htm [ ImageOnlyFailure ]
-webkit.org/b/84764 ietestcenter/css3/multicolumn/column-width-applies-to-001.htm [ ImageOnlyFailure ]
-webkit.org/b/84767 ietestcenter/css3/multicolumn/column-width-applies-to-002.htm [ ImageOnlyFailure ]
-webkit.org/b/84768 ietestcenter/css3/multicolumn/column-width-applies-to-003.htm [ ImageOnlyFailure ]
-webkit.org/b/84769 ietestcenter/css3/multicolumn/column-width-applies-to-004.htm [ ImageOnlyFailure ]
 webkit.org/b/84770 ietestcenter/css3/multicolumn/column-width-applies-to-007.htm [ ImageOnlyFailure ]
 webkit.org/b/84771 ietestcenter/css3/multicolumn/column-width-applies-to-009.htm [ ImageOnlyFailure ]
 webkit.org/b/84772 ietestcenter/css3/multicolumn/column-width-applies-to-010.htm [ ImageOnlyFailure ]
 webkit.org/b/84773 ietestcenter/css3/multicolumn/column-width-applies-to-012.htm [ ImageOnlyFailure ]
-webkit.org/b/84775 ietestcenter/css3/multicolumn/column-width-applies-to-013.htm [ ImageOnlyFailure ]
-webkit.org/b/84776 ietestcenter/css3/multicolumn/column-width-applies-to-014.htm [ ImageOnlyFailure ]
 webkit.org/b/84777 ietestcenter/css3/multicolumn/column-width-applies-to-015.htm [ ImageOnlyFailure ]
 webkit.org/b/84778 ietestcenter/css3/multicolumn/column-width-negative-001.htm [ ImageOnlyFailure ]
 
@@ -1297,9 +1283,6 @@ webkit.org/b/90007 http/tests/security/mixedContent/insecure-audio-video-in-main
 
 webkit.org/b/74219 fast/regions/positioned-objects-block-static-spanning-regions-rtl.html [ ImageOnlyFailure ]
 
-# Accelerated compositing is disabled for elements in a RenderFlowThread
-webkit.org/b/84900 compositing/regions/webkit-flow-renderer-layer-compositing.html [ ImageOnlyFailure ]
-
 webkit.org/b/89231 fast/js/global-constructors.html [ Failure ]
 
 webkit.org/b/91009 [ Debug ] fast/xsl/xslt-missing-namespace-in-xslt.xml [ Failure ]
@@ -1312,9 +1295,6 @@ webkit.org/b/88684 fast/text/descent-clip-in-scaled-page.html [ ImageOnlyFailure
 # This failure appears to be GTK-specific
 webkit.org/b/91319 css2.1/20110323/vertical-align-boxes-001.htm [ ImageOnlyFailure ]
 
-# Failing after r123379 on EFL and GTK.
-webkit.org/b/92063 fast/css/sticky/parsing-position-sticky.html [ Failure ]
-
 webkit.org/b/92100 accessibility/canvas-accessibilitynodeobject.html [ Failure ]
 
 # These tests depend on subpixel layout.
@@ -1323,7 +1303,6 @@ webkit.org/b/92352 css3/flexbox/flex-rounding.html [ Failure ]
 webkit.org/b/93976 fast/css-generated-content/quotes-lang.html [ ImageOnlyFailure ]
 
 # Tests added by https://bugs.webkit.org/show_bug.cgi?id=89826
-webkit.org/b/94008 fast/css/word-spacing-characters.html [ ImageOnlyFailure ]
 webkit.org/b/94003 fast/css/word-spacing-characters-complex-text.html [ ImageOnlyFailure ]
 # This has always failed on Gtk/Efl - exposed by bug 89826
 webkit.org/b/94009 css2.1/20110323/c541-word-sp-000.htm [ ImageOnlyFailure ]
@@ -1352,8 +1331,6 @@ webkit.org/b/95428 media/video-controls-captions.html [ Failure ]
 
 webkit.org/b/95429 svg/custom/clamped-masking-clipping.svg [ ImageOnlyFailure ]
 
-webkit.org/b/88238 editing/pasteboard/paste-global-selection.html [ Failure ]
-
 webkit.org/b/73003 [ Debug ] editing/spelling/spellcheck-async.html [ Failure ]
 webkit.org/b/73003 [ Debug ] editing/spelling/spellcheck-paste.html [ Pass ]
 webkit.org/b/50740 [ Debug ] editing/spelling/spellcheck-queue.html [ Failure ]
@@ -1367,10 +1344,8 @@ webkit.org/b/90775 fast/dom/shadow/focus-navigation.html [ Failure ]
 webkit.org/b/97468 fast/dom/shadow/shadowdom-for-textarea-complex-shadow.html [ ImageOnlyFailure ]
 webkit.org/b/97468 fast/dom/shadow/shadowdom-for-textarea-with-placeholder.html [ ImageOnlyFailure ]
 webkit.org/b/97468 fast/dom/shadow/shadowdom-for-textarea-without-shadow.html [ ImageOnlyFailure ]
-webkit.org/b/97469 fast/dom/shadow/shadowdom-dynamic-styling.html [ Failure ]
 
 webkit.org/b/90860 fast/dom/shadow/shadowdom-for-object-complex-shadow.html [ ImageOnlyFailure ]
-webkit.org/b/90860 fast/dom/shadow/shadowdom-for-object-only-shadow.html [ ImageOnlyFailure ]
 webkit.org/b/90860 fast/dom/shadow/shadowdom-for-object-without-shadow.html [ ImageOnlyFailure ]
 webkit.org/b/91487 fast/dom/shadow/shadowdom-for-select-complex-shadow.html [ ImageOnlyFailure ]
 webkit.org/b/91487 fast/dom/shadow/shadowdom-for-select-without-shadow.html [ ImageOnlyFailure ]
@@ -1378,7 +1353,7 @@ webkit.org/b/91488 fast/dom/shadow/shadowdom-for-output-only-shadow.html [ Image
 webkit.org/b/91489 fast/dom/shadow/shadowdom-for-fieldset-complex-shadow.html [ ImageOnlyFailure ]
 webkit.org/b/91489 fast/dom/shadow/shadowdom-for-fieldset-only-shadow.html [ ImageOnlyFailure ]
 
-webkit.org/b/97529 http/tests/security/xss-eval.html [ Failure ]
+webkit.org/b/49142 fast/regions/style-scoped-in-flow-override-region-styling-multiple-regions.html [ ImageOnlyFailure ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Tests failing

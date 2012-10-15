@@ -83,8 +83,17 @@ private:
 
 template<typename T> void reportMemoryUsage(const T* const&, MemoryObjectInfo*);
 
+class MemoryInstrumentationClient {
+public:
+    virtual ~MemoryInstrumentationClient() { }
+    virtual void countObjectSize(MemoryObjectType, size_t) = 0;
+    virtual bool visited(const void*) = 0;
+    virtual void checkCountedObject(const void*) = 0;
+};
+
 class MemoryInstrumentation {
 public:
+    explicit MemoryInstrumentation(MemoryInstrumentationClient* client) : m_client(client) { }
     virtual ~MemoryInstrumentation() { }
 
     template <typename T> void addRootObject(const T& t)
@@ -103,9 +112,11 @@ protected:
     };
 
 private:
-    virtual void countObjectSize(MemoryObjectType, size_t) = 0;
+    void countObjectSize(MemoryObjectType objectType, size_t size) { m_client->countObjectSize(objectType, size); }
+    bool visited(const void* pointer) { return m_client->visited(pointer); }
+    void checkCountedObject(const void* pointer) { return m_client->checkCountedObject(pointer); }
+
     virtual void deferInstrumentedPointer(PassOwnPtr<InstrumentedPointerBase>) = 0;
-    virtual bool visited(const void*) = 0;
     virtual void processDeferredInstrumentedPointers() = 0;
 
     friend class MemoryClassInfo;
@@ -146,7 +157,6 @@ private:
 
     template<typename T> void addObject(const T& t, MemoryObjectType ownerObjectType) { OwningTraits<T>::addObject(this, t, ownerObjectType); }
     template<typename HashMapType> void addHashMap(const HashMapType&, MemoryObjectType, bool contentOnly = false);
-    template<typename HashSetType> void addHashSet(const HashSetType&, MemoryObjectType, bool contentOnly = false);
     template<typename CollectionType> void addInstrumentedCollection(const CollectionType&, MemoryObjectType, bool contentOnly = false);
     template<typename MapType> void addInstrumentedMapEntries(const MapType&, MemoryObjectType);
     template<typename MapType> void addInstrumentedMapValues(const MapType&, MemoryObjectType);
@@ -177,6 +187,8 @@ private:
     template<typename T> void addObjectImpl(const T* const&, MemoryObjectType, MemoryOwningType);
     template<typename T> void addObjectImpl(const OwnPtr<T>* const&, MemoryObjectType, MemoryOwningType);
     template<typename T> void addObjectImpl(const RefPtr<T>* const&, MemoryObjectType, MemoryOwningType);
+
+    MemoryInstrumentationClient* m_client;
 };
 
 class MemoryClassInfo {
@@ -191,15 +203,24 @@ public:
     }
 
     template<typename M> void addMember(const M& member) { m_memoryInstrumentation->addObject(member, m_objectType); }
+    template<typename I> void addCollectionElements(I iterator, I end)
+    {
+        while (iterator != end) {
+            addMember(*iterator);
+            ++iterator;
+        }
+    }
+    void addCollectionElements(char* const*, char* const*) { }
+    void addCollectionElements(const char*, const char*) { }
+    void addCollectionElements(const int*, const int*) { }
 
     template<typename HashMapType> void addHashMap(const HashMapType& map) { m_memoryInstrumentation->addHashMap(map, m_objectType, true); }
-    template<typename HashSetType> void addHashSet(const HashSetType& set) { m_memoryInstrumentation->addHashSet(set, m_objectType, true); }
-    template<typename HashSetType> void addHashCountedSet(const HashSetType& set) { m_memoryInstrumentation->addHashSet(set, m_objectType, true); }
-    template<typename HashSetType> void addInstrumentedHashSet(const HashSetType& set) { m_memoryInstrumentation->addInstrumentedCollection(set, m_objectType, true); }
+    template<typename HashSetType> void addHashCountedSet(const HashSetType& set) { m_memoryInstrumentation->addHashMap(set, m_objectType, true); }
     template<typename MapType> void addInstrumentedMapEntries(const MapType& map) { m_memoryInstrumentation->addInstrumentedMapEntries(map, m_objectType); }
     template<typename MapType> void addInstrumentedMapValues(const MapType& map) { m_memoryInstrumentation->addInstrumentedMapValues(map, m_objectType); }
     template<typename ListHashSetType> void addListHashSet(const ListHashSetType& set) { m_memoryInstrumentation->addListHashSet(set, m_objectType, true); }
     void addRawBuffer(const void* const& buffer, size_t size) { m_memoryInstrumentation->addRawBuffer(buffer, m_objectType, size); }
+    void addPrivateBuffer(size_t size) { m_memoryInstrumentation->countObjectSize(m_objectType, size); }
 
     void addWeakPointer(void*) { }
 
@@ -224,6 +245,7 @@ void MemoryInstrumentation::addObjectImpl(const T* const& object, MemoryObjectTy
     } else {
         if (!object || visited(object))
             return;
+        checkCountedObject(object);
         deferInstrumentedPointer(adoptPtr(new InstrumentedPointer<T>(object, ownerObjectType)));
     }
 }
@@ -231,16 +253,20 @@ void MemoryInstrumentation::addObjectImpl(const T* const& object, MemoryObjectTy
 template<typename T>
 void MemoryInstrumentation::addObjectImpl(const OwnPtr<T>* const& object, MemoryObjectType ownerObjectType, MemoryOwningType owningType)
 {
-    if (owningType == byPointer && !visited(object))
+    if (owningType == byPointer && !visited(object)) {
         countObjectSize(ownerObjectType, sizeof(*object));
+        checkCountedObject(object);
+    }
     addObjectImpl(object->get(), ownerObjectType, byPointer);
 }
 
 template<typename T>
 void MemoryInstrumentation::addObjectImpl(const RefPtr<T>* const& object, MemoryObjectType ownerObjectType, MemoryOwningType owningType)
 {
-    if (owningType == byPointer && !visited(object))
+    if (owningType == byPointer && !visited(object)) {
         countObjectSize(ownerObjectType, sizeof(*object));
+        checkCountedObject(object);
+    }
     addObjectImpl(object->get(), ownerObjectType, byPointer);
 }
 
@@ -250,14 +276,6 @@ void MemoryInstrumentation::addHashMap(const HashMapType& hashMap, MemoryObjectT
     if (visited(&hashMap))
         return;
     countObjectSize(ownerObjectType, calculateContainerSize(hashMap, contentOnly));
-}
-
-template<typename HashSetType>
-void MemoryInstrumentation::addHashSet(const HashSetType& hashSet, MemoryObjectType ownerObjectType, bool contentOnly)
-{
-    if (visited(&hashSet))
-        return;
-    countObjectSize(ownerObjectType, calculateContainerSize(hashSet, contentOnly));
 }
 
 template<typename CollectionType>

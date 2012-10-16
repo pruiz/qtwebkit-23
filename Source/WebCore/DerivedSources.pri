@@ -24,7 +24,7 @@ SVG_NAMES = $$PWD/svg/svgtags.in
 
 XLINK_NAMES = $$PWD/svg/xlinkattrs.in
 
-CSSBISON = $$PWD/css/CSSGrammar.y
+CSSBISON = $$PWD/css/CSSGrammar.y.in
 
 contains(DEFINES, ENABLE_XSLT=1) {
     XMLVIEWER_CSS = $$PWD/xml/XMLViewer.css
@@ -828,7 +828,7 @@ GENERATORS += arrayBufferViewCustomScript
 cssbison.output = ${QMAKE_FILE_BASE}.cpp
 cssbison.input = CSSBISON
 cssbison.script = $$PWD/css/makegrammar.pl
-cssbison.commands = perl $$cssbison.script ${QMAKE_FILE_NAME} ${QMAKE_FUNC_FILE_OUT_PATH}/${QMAKE_FILE_BASE}
+cssbison.commands = perl -I $$PWD/bindings/scripts $$cssbison.script --outputDir ${QMAKE_FUNC_FILE_OUT_PATH} --extraDefines \"$${DEFINES} $$configDefines()\" --preprocessor \"$${QMAKE_MOC} -E\" --symbolsPrefix cssyy ${QMAKE_FILE_NAME}
 cssbison.depends = ${QMAKE_FILE_NAME}
 GENERATORS += cssbison
 

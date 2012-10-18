@@ -29,8 +29,6 @@
 # PASSING TESTS
 #////////////////////////////////////////////////////////////////////////////////////////
 
-fast/history/multiple-classes-visited.html [ Pass ]
-
 #////////////////////////////////////////////////////////////////////////////////////////
 # TESTS EXPECTED TO FAIL
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -39,8 +37,8 @@ fast/history/multiple-classes-visited.html [ Pass ]
 # CRASHES
 #////////////////////////////////////////////////////////////////////////////////////////
 
-Bug(EFL) fast/dom/register-protocol-handler.html [ Crash ]
-Bug(EFL) fast/dom/unregister-protocol-handler.html [ Crash ]
+webkit.org/b/92726 fast/dom/register-protocol-handler.html [ Crash ]
+webkit.org/b/92726 fast/dom/unregister-protocol-handler.html [ Crash ]
 
 # WebKitTestRunner needs an implementation for download attribute feature
 # The implementation for DumpRenderTree is on https://bugs.webkit.org/show_bug.cgi?id=96462
@@ -192,6 +190,10 @@ Bug(EFL) fast/media/media-query-list-06.html [ Failure ]
 Bug(EFL) fast/media/media-query-list-07.html [ Failure ]
 Bug(EFL) fast/media/view-mode-media-feature.html [ Failure ]
 
+# Require that X is running on the build bots (pass locally)
+Bug(EFL) fast/replaced/no-focus-ring-embed.html [ Failure ]
+Bug(EFL) fast/replaced/no-focus-ring-object.html [ Failure ]
+
 # WebKitTestRunner needs an implementation for eventSender.scheduleAsynchronousKeyDown
 webkit.org/b/93979 fast/mutation/end-of-task-delivery.html [ Failure ]
 
@@ -203,8 +205,6 @@ webkit.org/b/93982 storage/domstorage/storage-close-database-on-idle.html [ Fail
 
 # Unclassified failures
 Bug(EFL) fast/dom/Window/mozilla-focus-blur.html [ Failure ]
-Bug(EFL) fast/replaced/no-focus-ring-embed.html [ Failure ]
-Bug(EFL) fast/replaced/no-focus-ring-object.html [ Failure ]
 Bug(EFL) http/tests/inspector/network/network-sidebar-width.html [ Failure ]
 
 # Fails after r128056.

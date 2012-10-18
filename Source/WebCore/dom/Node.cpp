@@ -410,6 +410,9 @@ Node::~Node()
     if (hasRareData())
         clearRareData();
 
+    if (hasEventTargetData())
+        clearEventTargetData();
+
     if (renderer())
         detach();
 
@@ -2409,14 +2412,32 @@ bool Node::removeEventListener(const AtomicString& eventType, EventListener* lis
     return tryRemoveEventListener(this, eventType, listener, useCapture);
 }
 
+typedef HashMap<Node*, OwnPtr<EventTargetData> > EventTargetDataMap;
+
+static EventTargetDataMap& eventTargetDataMap()
+{
+    DEFINE_STATIC_LOCAL(EventTargetDataMap, map, ());
+    return map;
+}
+
 EventTargetData* Node::eventTargetData()
 {
-    return hasRareData() ? rareData()->eventTargetData() : 0;
+    return hasEventTargetData() ? eventTargetDataMap().get(this) : 0;
 }
 
 EventTargetData* Node::ensureEventTargetData()
 {
-    return ensureRareData()->ensureEventTargetData();
+    if (hasEventTargetData())
+        return eventTargetDataMap().get(this);
+    setHasEventTargetData(true);
+    EventTargetData* data = new EventTargetData;
+    eventTargetDataMap().set(this, adoptPtr(data));
+    return data;
+}
+
+void Node::clearEventTargetData()
+{
+    eventTargetDataMap().remove(this);
 }
 
 #if ENABLE(MUTATION_OBSERVERS)
@@ -2457,16 +2478,23 @@ void Node::getRegisteredMutationObserversOfType(HashMap<MutationObserver*, Mutat
     }
 }
 
-MutationObserverRegistration* Node::registerMutationObserver(MutationObserver* observer)
+void Node::registerMutationObserver(MutationObserver* observer, MutationObserverOptions options, const HashSet<AtomicString>& attributeFilter)
 {
+    MutationObserverRegistration* registration = 0;
     Vector<OwnPtr<MutationObserverRegistration> >* registry = ensureRareData()->ensureMutationObserverRegistry();
     for (size_t i = 0; i < registry->size(); ++i) {
-        if (registry->at(i)->observer() == observer)
-            return registry->at(i).get();
+        if (registry->at(i)->observer() == observer) {
+            registration = registry->at(i).get();
+            registration->resetObservation(options, attributeFilter);
+        }
     }
 
-    registry->append(MutationObserverRegistration::create(observer, this));
-    return registry->last().get();
+    if (!registration) {
+        registry->append(MutationObserverRegistration::create(observer, this, options, attributeFilter));
+        registration = registry->last().get();
+    }
+
+    document()->addMutationObserverTypes(registration->mutationTypes());
 }
 
 void Node::unregisterMutationObserver(MutationObserverRegistration* registration)
@@ -2522,7 +2550,7 @@ void Node::notifyMutationObserversNodeWillDetach()
 
 void Node::handleLocalEvents(Event* event)
 {
-    if (!hasRareData() || !rareData()->eventTargetData())
+    if (!hasEventTargetData())
         return;
 
     if (disabled() && event->isMouseEvent())
@@ -2551,7 +2579,7 @@ void Node::dispatchSubtreeModifiedEvent()
     if (isInShadowTree())
         return;
 
-    ASSERT(!eventDispatchForbidden());
+    ASSERT(!NoEventDispatchAssertion::isEventDispatchForbidden());
 
     if (!document()->hasListenerType(Document::DOMSUBTREEMODIFIED_LISTENER))
         return;
@@ -2561,21 +2589,21 @@ void Node::dispatchSubtreeModifiedEvent()
 
 void Node::dispatchFocusInEvent(const AtomicString& eventType, PassRefPtr<Node> oldFocusedNode)
 {
-    ASSERT(!eventDispatchForbidden());
+    ASSERT(!NoEventDispatchAssertion::isEventDispatchForbidden());
     ASSERT(eventType == eventNames().focusinEvent || eventType == eventNames().DOMFocusInEvent);
     dispatchScopedEventDispatchMediator(FocusInEventDispatchMediator::create(UIEvent::create(eventType, true, false, document()->defaultView(), 0), oldFocusedNode));
 }
 
 void Node::dispatchFocusOutEvent(const AtomicString& eventType, PassRefPtr<Node> newFocusedNode)
 {
-    ASSERT(!eventDispatchForbidden());
+    ASSERT(!NoEventDispatchAssertion::isEventDispatchForbidden());
     ASSERT(eventType == eventNames().focusoutEvent || eventType == eventNames().DOMFocusOutEvent);
     dispatchScopedEventDispatchMediator(FocusOutEventDispatchMediator::create(UIEvent::create(eventType, true, false, document()->defaultView(), 0), newFocusedNode));
 }
 
 bool Node::dispatchDOMActivateEvent(int detail, PassRefPtr<Event> underlyingEvent)
 {
-    ASSERT(!eventDispatchForbidden());
+    ASSERT(!NoEventDispatchAssertion::isEventDispatchForbidden());
     RefPtr<UIEvent> event = UIEvent::create(eventNames().DOMActivateEvent, true, true, document()->defaultView(), detail);
     event->setUnderlyingEvent(underlyingEvent);
     dispatchScopedEvent(event);

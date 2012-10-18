@@ -113,19 +113,16 @@ namespace WebCore {
         {
             ASSERT(isMainThread());
             if (LIKELY(!DOMWrapperWorld::isolatedWorldsExist())) {
-                v8::Persistent<v8::Object>* wrapper = node->wrapper();
-                if (LIKELY(!!wrapper))
-                    return *wrapper;
+                v8::Persistent<v8::Object> wrapper = node->wrapper();
+                if (LIKELY(!wrapper.IsEmpty()))
+                    return wrapper;
             }
 
-            V8DOMWindowShell::IsolatedContextData* isolatedData = V8DOMWindowShell::enteredIsolatedContextData();
-            if (LIKELY(!isolatedData)) {
-                v8::Persistent<v8::Object>* wrapper = node->wrapper();
-                if (!wrapper)
-                    return v8::Handle<v8::Object>();
-                return *wrapper;
-            }
-            DOMDataStore* store = isolatedData->world()->domDataStore();
+            V8DOMWindowShell* context = V8DOMWindowShell::getEntered();
+            if (LIKELY(!context))
+                return node->wrapper();
+
+            DOMDataStore* store = context->world()->domDataStore();
             DOMNodeMapping& domNodeMap = node->isActiveNode() ? store->activeDomNodeMap() : store->domNodeMap();
             return domNodeMap.get(node);
         }

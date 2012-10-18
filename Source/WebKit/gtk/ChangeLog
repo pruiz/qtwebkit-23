@@ -1,3 +1,75 @@
+2012-10-02  Adrian Perez de Castro  <aperez@igalia.com>
+
+        [GTK] Value not returned warning with geolocation disabled
+        https://bugs.webkit.org/show_bug.cgi?id=98148
+
+        Reviewed by Xan Lopez.
+
+        With geolocation disabled in the build, return a sensible value from
+        DumpRenderTreeSupportGtk::numberOfPendingGeolocationPermissionRequests.
+        This also avoids a compiler warning.
+
+        * WebCoreSupport/DumpRenderTreeSupportGtk.cpp:
+        (DumpRenderTreeSupportGtk::numberOfPendingGeolocationPermissionRequests):
+
+2012-10-01  Brady Eidson  <beidson@apple.com>
+
+        Remove the Safari 2 -> Safari 3 icon database import code.
+        https://bugs.webkit.org/show_bug.cgi?id=98113
+
+        Reviewed by Maciej Stachowiak.
+
+        Nuke the performImport() IconDatabaseClient method.
+
+        * webkit/webkitfavicondatabase.cpp:
+        (IconDatabaseClientGtk):
+
+2012-10-01  Arnaud Renevier  <a.renevier@sisa.samsung.com>
+
+        [Gtk] crash when accelerated composition is turned off
+        https://bugs.webkit.org/show_bug.cgi?id=98099
+
+        Reviewed by Martin Robinson.
+
+        frame->view()->updateLayoutAndStyleIfNeededRecursive() may reset root
+        compositing layer in flushAndRenderLayers. So, we check if compositing
+        is enabled afterwards, and return if it is not.
+
+        This bug is handled by LayoutTests/compositing/toggle-compositing.html
+
+        * WebCoreSupport/AcceleratedCompositingContextGL.cpp:
+        (WebKit::AcceleratedCompositingContext::flushAndRenderLayers):
+
+2012-10-01  Claudio Saavedra  <csaavedra@igalia.com>
+
+        [GTK] Save original uri for downloaded files
+        https://bugs.webkit.org/show_bug.cgi?id=95188
+
+        Reviewed by Carlos Garcia Campos.
+
+        gvfs stores metadata locally, and this information can later be
+        used by file management applications. Based on a patch by
+        Alexander Larsson <alexl@redhat.com>.
+
+        * webkit/webkitdownload.cpp:
+        (webkit_download_open_stream_for_uri): Save the download-uri as
+        file metadata.
+
+2012-10-01  Claudio Saavedra  <csaavedra@igalia.com>
+
+        [GTK] WebKitDownload: use more of GOwnPtr/GRefPtr
+        https://bugs.webkit.org/show_bug.cgi?id=98009
+
+        Reviewed by Carlos Garcia Campos.
+
+        Use more GOwnPtr/GRefPtr in WebKitDownload
+
+        * webkit/webkitdownload.cpp:
+        (webkit_download_open_stream_for_uri): Use GRefPtr
+        for a GFile and GOwnPtr for GError.
+        (webkit_download_set_destination_uri): Ditto.
+        (webkit_download_received_data): Use GOwnPtr for GError.
+
 2012-09-28  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
 
         Code inside FrameLoaderClient::canShowMIMEType() implementations can be shared among different WK ports

@@ -1,3 +1,204 @@
+2012-09-29  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: NMI make String* instrumentation non intrusive
+        https://bugs.webkit.org/show_bug.cgi?id=97964
+
+        Reviewed by Yury Semikhatsky.
+
+        MemoryInstrumentationString.h was added.
+        Intrusive instrumentation was removed.
+
+        * GNUmakefile.list.am:
+        * WTF.gypi:
+        * WTF.pro:
+        * WTF.vcproj/WTF.vcproj:
+        * WTF.xcodeproj/project.pbxproj:
+        * wtf/MemoryInstrumentation.h:
+        (WTF):
+        * wtf/MemoryInstrumentationString.h: Added.
+        (WTF):
+        (WTF::reportMemoryUsage):
+        * wtf/text/AtomicString.cpp:
+        (WTF):
+        * wtf/text/AtomicString.h:
+        (AtomicString):
+        * wtf/text/CString.h:
+        (WTF::CStringBuffer::length):
+        * wtf/text/StringImpl.cpp:
+        * wtf/text/StringImpl.h:
+        (WTF::StringImpl::usesInternalBuffer):
+        (WTF::StringImpl::baseString):
+        (StringImpl):
+
+2012-10-02  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r130129.
+        http://trac.webkit.org/changeset/130129
+        https://bugs.webkit.org/show_bug.cgi?id=98125
+
+        broke 4 webkit_unit_tests
+        (MemoryInstrumentationTest.hashMapWith*) (Requested by caseq
+        on #webkit).
+
+        * GNUmakefile.list.am:
+        * WTF.gypi:
+        * WTF.pro:
+        * WTF.vcproj/WTF.vcproj:
+        * WTF.xcodeproj/project.pbxproj:
+        * wtf/MemoryInstrumentation.h:
+        (WTF):
+        * wtf/MemoryInstrumentationString.h: Removed.
+        * wtf/text/AtomicString.cpp:
+        (WTF::AtomicString::reportMemoryUsage):
+        (WTF):
+        * wtf/text/AtomicString.h:
+        (AtomicString):
+        * wtf/text/CString.h:
+        (WTF::CStringBuffer::length):
+        (CStringBuffer):
+        (WTF::CStringBuffer::reportMemoryUsage):
+        (CString):
+        (WTF::CString::reportMemoryUsage):
+        * wtf/text/StringImpl.cpp:
+        (WTF::StringImpl::reportMemoryUsage):
+        (WTF):
+        * wtf/text/StringImpl.h:
+        (StringImpl):
+        * wtf/text/WTFString.cpp:
+        (WTF::String::reportMemoryUsage):
+        (WTF):
+        * wtf/text/WTFString.h:
+        (String):
+
+2012-09-29  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: NMI make String* instrumentation non intrusive
+        https://bugs.webkit.org/show_bug.cgi?id=97964
+
+        Reviewed by Yury Semikhatsky.
+
+        MemoryInstrumentationString.h was added.
+        Intrusive instrumentation was removed.
+
+        * GNUmakefile.list.am:
+        * WTF.gypi:
+        * WTF.pro:
+        * WTF.vcproj/WTF.vcproj:
+        * WTF.xcodeproj/project.pbxproj:
+        * wtf/MemoryInstrumentation.h:
+        (WTF):
+        * wtf/MemoryInstrumentationString.h: Added.
+        (WTF):
+        (WTF::reportMemoryUsage):
+        * wtf/text/AtomicString.cpp:
+        (WTF):
+        * wtf/text/AtomicString.h:
+        (AtomicString):
+        * wtf/text/CString.h:
+        (WTF::CStringBuffer::length):
+        * wtf/text/StringImpl.cpp:
+        * wtf/text/StringImpl.h:
+        (WTF::StringImpl::usesInternalBuffer):
+        (WTF::StringImpl::baseString):
+        (StringImpl):
+
+2012-10-01  Daniel Drake  <dsd@laptop.org>
+
+        Another SIGILL in JavaScriptCore on a Geode processor
+        https://bugs.webkit.org/show_bug.cgi?id=96286
+
+        Reviewed by Filip Pizlo.
+
+        Disable LLint for the GTK build where the build target does not
+        support SSE2 instructions. Restores support for non-SSE2 processors
+        such as the AMD Geode.
+
+        * wtf/Platform.h:
+
+2012-10-01  Yury Semikhatsky  <yurys@chromium.org>
+
+        Web Inspector: provide memory instrumentation for HashMap
+        https://bugs.webkit.org/show_bug.cgi?id=98005
+
+        Reviewed by Pavel Feldman.
+
+        Extracted HashMap memory instrumentation into its own file. The map's content
+        elements will be automatically traversed if their types are supported
+        by the memory instrumentation. No need to call special method for hash map
+        fields any more.
+
+        * GNUmakefile.list.am:
+        * WTF.gypi:
+        * WTF.pro:
+        * WTF.vcproj/WTF.vcproj:
+        * wtf/MemoryInstrumentation.h:
+        (MemoryInstrumentation):
+        (WTF):
+        * wtf/MemoryInstrumentationHashMap.h: Added.
+        (WTF):
+        (WTF::SequenceMemoryInstrumentationTraits::reportMemoryUsage):
+        (WTF::reportMemoryUsage):
+
+2012-10-01  Alberto Garcia  <agarcia@igalia.com>
+
+        Check that __cplusplus is defined before comparing its value
+        https://bugs.webkit.org/show_bug.cgi?id=98015
+
+        Reviewed by Xan Lopez.
+
+        If __cplusplus is not defined is interpreted as having the value
+        0, but it produces a compilation warning with -Wundef.
+
+        This is the case with some API tests that are written in C
+        (JSNode.c, JSNodeList.c, minidom.c).
+
+        * wtf/Compiler.h:
+
+2012-10-01  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        Unreviewed. Fix make distcheck.
+
+        * GNUmakefile.list.am: Add missing header files to compilation.
+
+2012-09-30  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        Clean up HasTrivialConstructor/Destructor
+        https://bugs.webkit.org/show_bug.cgi?id=97754
+
+        Reviewed by Sam Weinig.
+
+        Mixed up the HasTrivialDestructor/Constructor case for VS2010 and later in the previous patch.
+
+        * wtf/TypeTraits.h:
+
+2012-09-29  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r129982.
+        http://trac.webkit.org/changeset/129982
+        https://bugs.webkit.org/show_bug.cgi?id=97971
+
+        hit assert in fast/overflow/overflow-height-float-not-removed-
+        crash3.html (Requested by eae on #webkit).
+
+        * wtf/Platform.h:
+
+2012-09-29  Emil A Eklund  <eae@chromium.org>
+
+        Enable SATURATED_LAYOUT_ARITHMETIC for chromium
+        https://bugs.webkit.org/show_bug.cgi?id=95053
+
+        Reviewed by Abhishek Arya.
+
+        Enable the SATURATED_LAYOUT_ARITHMETIC flag for the chromium port.
+        This changes the behavior of FractionalLayoutUnit to clamp to the
+        max or min value instead of overflowing.
+
+        This may very well impact performance so the current plan is to enable
+        it for a couple of hours to a day to collect performance data and then
+        disable it again until we've had a chance to review the perf data.
+
+        * wtf/Platform.h:
+
 2012-09-28  Anders Carlsson  <andersca@apple.com>
 
         Remove Java bridge

@@ -1949,6 +1949,15 @@ webcore_modules_sources += \
 	Source/WebCore/Modules/mediastream/RTCSessionDescriptionCallback.h \
 	Source/WebCore/Modules/mediastream/RTCSessionDescriptionRequestImpl.cpp \
 	Source/WebCore/Modules/mediastream/RTCSessionDescriptionRequestImpl.h \
+	Source/WebCore/Modules/mediastream/RTCStatsCallback.h \
+	Source/WebCore/Modules/mediastream/RTCStatsElement.cpp \
+	Source/WebCore/Modules/mediastream/RTCStatsElement.h \
+	Source/WebCore/Modules/mediastream/RTCStatsReport.cpp \
+	Source/WebCore/Modules/mediastream/RTCStatsReport.h \
+	Source/WebCore/Modules/mediastream/RTCStatsRequestImpl.cpp \
+	Source/WebCore/Modules/mediastream/RTCStatsRequestImpl.h \
+	Source/WebCore/Modules/mediastream/RTCStatsResponse.cpp \
+	Source/WebCore/Modules/mediastream/RTCStatsResponse.h \
 	Source/WebCore/Modules/mediastream/RTCVoidRequestImpl.cpp \
 	Source/WebCore/Modules/mediastream/RTCVoidRequestImpl.h \
 	Source/WebCore/Modules/mediastream/SessionDescription.cpp \
@@ -2456,15 +2465,6 @@ webcore_sources += \
 	Source/WebCore/bridge/c/c_utility.h \
 	Source/WebCore/bridge/IdentifierRep.cpp \
 	Source/WebCore/bridge/IdentifierRep.h \
-	Source/WebCore/bridge/jni/JNIUtility.h \
-	Source/WebCore/bridge/jni/JavaType.h \
-	Source/WebCore/bridge/jni/jni_jsobject.h \
-	Source/WebCore/bridge/jni/jsc/JavaArrayJSC.h \
-	Source/WebCore/bridge/jni/jsc/JavaClassJSC.h \
-	Source/WebCore/bridge/jni/jsc/JavaFieldJSC.h \
-	Source/WebCore/bridge/jni/jsc/JavaInstanceJSC.h \
-	Source/WebCore/bridge/jni/jsc/JavaMethodJSC.cpp \
-	Source/WebCore/bridge/jni/jsc/JavaMethodJSC.h \
 	Source/WebCore/bridge/jsc/BridgeJSC.cpp \
 	Source/WebCore/bridge/jsc/BridgeJSC.h \
 	Source/WebCore/bridge/NP_jsobject.cpp \
@@ -3150,6 +3150,8 @@ webcore_sources += \
 	Source/WebCore/html/BaseClickableWithKeyInputType.h \
 	Source/WebCore/html/BaseDateAndTimeInputType.cpp \
 	Source/WebCore/html/BaseDateAndTimeInputType.h \
+	Source/WebCore/html/BaseMultipleFieldsDateAndTimeInputType.cpp \
+	Source/WebCore/html/BaseMultipleFieldsDateAndTimeInputType.h \
 	Source/WebCore/html/BaseTextInputType.cpp \
 	Source/WebCore/html/BaseTextInputType.h \
 	Source/WebCore/html/ButtonInputType.cpp \
@@ -3515,12 +3517,22 @@ webcore_sources += \
 	Source/WebCore/html/parser/TextViewSourceParser.h \
 	Source/WebCore/html/parser/XSSAuditor.cpp \
 	Source/WebCore/html/parser/XSSAuditor.h \
-	Source/WebCore/html/shadow/CalendarPickerElement.cpp \
-	Source/WebCore/html/shadow/CalendarPickerElement.h \
+	Source/WebCore/html/shadow/PickerIndicatorElement.cpp \
+	Source/WebCore/html/shadow/PickerIndicatorElement.h \
 	Source/WebCore/html/shadow/ContentDistributor.cpp \
 	Source/WebCore/html/shadow/ContentDistributor.h \
 	Source/WebCore/html/shadow/ContentSelectorQuery.cpp \
 	Source/WebCore/html/shadow/ContentSelectorQuery.h \
+	Source/WebCore/html/shadow/DateTimeEditElement.cpp \
+	Source/WebCore/html/shadow/DateTimeEditElement.h \
+	Source/WebCore/html/shadow/DateTimeFieldElement.cpp \
+	Source/WebCore/html/shadow/DateTimeFieldElement.h \
+	Source/WebCore/html/shadow/DateTimeFieldElements.cpp \
+	Source/WebCore/html/shadow/DateTimeFieldElements.h \
+	Source/WebCore/html/shadow/DateTimeNumericFieldElement.cpp \
+	Source/WebCore/html/shadow/DateTimeNumericFieldElement.h \
+	Source/WebCore/html/shadow/DateTimeSymbolicFieldElement.cpp \
+	Source/WebCore/html/shadow/DateTimeSymbolicFieldElement.h \
 	Source/WebCore/html/shadow/DetailsMarkerControl.cpp \
 	Source/WebCore/html/shadow/DetailsMarkerControl.h \
 	Source/WebCore/html/shadow/HTMLContentElement.cpp \
@@ -4054,8 +4066,12 @@ webcore_sources += \
 	Source/WebCore/page/scrolling/ScrollingCoordinator.cpp \
 	Source/WebCore/page/scrolling/ScrollingCoordinator.h \
 	Source/WebCore/page/scrolling/ScrollingCoordinatorNone.cpp \
-	Source/WebCore/page/scrolling/ScrollingTreeState.cpp \
-	Source/WebCore/page/scrolling/ScrollingTreeState.h \
+	Source/WebCore/page/scrolling/ScrollingStateNode.cpp \
+	Source/WebCore/page/scrolling/ScrollingStateNode.h \
+	Source/WebCore/page/scrolling/ScrollingStateScrollingNode.cpp \
+	Source/WebCore/page/scrolling/ScrollingStateScrollingNode.h \
+	Source/WebCore/page/scrolling/ScrollingStateTree.cpp \
+	Source/WebCore/page/scrolling/ScrollingStateTree.h \
 	Source/WebCore/page/SecurityOrigin.cpp \
 	Source/WebCore/page/SecurityOrigin.h \
 	Source/WebCore/page/SecurityOriginHash.h \
@@ -4602,6 +4618,7 @@ webcore_sources += \
 	Source/WebCore/platform/mediastream/RTCSessionDescriptionRequest.h \
 	Source/WebCore/platform/mediastream/RTCSessionDescriptionDescriptor.cpp \
 	Source/WebCore/platform/mediastream/RTCSessionDescriptionDescriptor.h \
+	Source/WebCore/platform/mediastream/RTCStatsRequest.h \
 	Source/WebCore/platform/mediastream/RTCVoidRequest.h \
 	Source/WebCore/platform/mediastream/SessionDescriptionDescriptor.cpp \
 	Source/WebCore/platform/mediastream/SessionDescriptionDescriptor.h \
@@ -4791,8 +4808,6 @@ webcore_sources += \
 	Source/WebCore/platform/text/LocaleNone.cpp \
 	Source/WebCore/platform/text/LocaleToScriptMapping.h \
 	Source/WebCore/platform/text/LocaleToScriptMappingDefault.cpp \
-	Source/WebCore/platform/text/LocalizedDate.h \
-	Source/WebCore/platform/text/LocalizedDateNone.cpp \
 	Source/WebCore/platform/text/Localizer.cpp \
 	Source/WebCore/platform/text/Localizer.h \
 	Source/WebCore/platform/text/ParserUtilities.h \
@@ -4892,6 +4907,7 @@ webcore_sources += \
 	Source/WebCore/rendering/BidiRun.h \
 	Source/WebCore/rendering/break_lines.cpp \
 	Source/WebCore/rendering/break_lines.h \
+	Source/WebCore/rendering/ClipPathOperation.h \
 	Source/WebCore/rendering/ColumnInfo.h \
 	Source/WebCore/rendering/CounterNode.cpp \
 	Source/WebCore/rendering/CounterNode.h \
@@ -5004,6 +5020,8 @@ webcore_sources += \
 	Source/WebCore/rendering/RenderLayerCompositor.h \
 	Source/WebCore/rendering/RenderLayerFilterInfo.cpp \
 	Source/WebCore/rendering/RenderLayerFilterInfo.h \
+	Source/WebCore/rendering/RenderLayerModelObject.cpp \
+	Source/WebCore/rendering/RenderLayerModelObject.h \
 	Source/WebCore/rendering/RenderLineBoxList.cpp \
 	Source/WebCore/rendering/RenderLineBoxList.h \
 	Source/WebCore/rendering/RenderListBox.cpp \
@@ -5132,7 +5150,6 @@ webcore_sources += \
 	Source/WebCore/rendering/style/BasicShapes.h \
 	Source/WebCore/rendering/style/BorderData.h \
 	Source/WebCore/rendering/style/BorderValue.h \
-	Source/WebCore/rendering/style/ClipPathOperation.h \
 	Source/WebCore/rendering/style/CollapsedBorderValue.h \
 	Source/WebCore/rendering/style/ContentData.cpp \
 	Source/WebCore/rendering/style/ContentData.h \

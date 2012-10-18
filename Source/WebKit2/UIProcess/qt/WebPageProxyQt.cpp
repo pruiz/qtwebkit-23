@@ -60,6 +60,14 @@ void WebPageProxy::loadRecentSearches(const String&, Vector<String>&)
     notImplemented();
 }
 
+void WebPageProxy::commitPageTransitionViewport()
+{
+    if (!isValid())
+        return;
+
+    process()->send(Messages::WebPage::CommitPageTransitionViewport(), m_pageID);
+}
+
 void WebPageProxy::setComposition(const String& text, Vector<CompositionUnderline> underlines, uint64_t selectionStart, uint64_t selectionEnd, uint64_t replacementRangeStart, uint64_t replacementRangeEnd)
 {
     // FIXME: We need to find out how to proper handle the crashes case.
@@ -83,6 +91,11 @@ void WebPageProxy::cancelComposition()
         return;
 
     process()->send(Messages::WebPage::CancelComposition(), m_pageID);
+}
+
+void WebPageProxy::didRenderFrame(const WebCore::IntSize& contentsSize, const WebCore::IntRect& coveredRect)
+{
+    m_pageClient->didRenderFrame(contentsSize, coveredRect);
 }
 
 void WebPageProxy::registerApplicationScheme(const String& scheme)
@@ -114,6 +127,44 @@ void WebPageProxy::sendApplicationSchemeReply(const QQuickNetworkReply* reply)
 void WebPageProxy::setUserScripts(const Vector<String>& scripts)
 {
     process()->send(Messages::WebPage::SetUserScripts(scripts), m_pageID);
+}
+
+void WebPageProxy::pageTransitionViewportReady()
+{
+    m_pageClient->pageTransitionViewportReady();
+}
+
+void WebPageProxy::didFindZoomableArea(const IntPoint& target, const IntRect& area)
+{
+    m_pageClient->didFindZoomableArea(target, area);
+}
+
+void WebPageProxy::findZoomableAreaForPoint(const IntPoint& point, const IntSize& area)
+{
+    if (!isValid())
+        return;
+
+    m_process->send(Messages::WebPage::FindZoomableAreaForPoint(point, area), m_pageID);
+}
+
+void WebPageProxy::didReceiveMessageFromNavigatorQtObject(const String& contents)
+{
+    m_pageClient->didReceiveMessageFromNavigatorQtObject(contents);
+}
+
+void WebPageProxy::authenticationRequiredRequest(const String& hostname, const String& realm, const String& prefilledUsername, String& username, String& password)
+{
+    m_pageClient->handleAuthenticationRequiredRequest(hostname, realm, prefilledUsername, username, password);
+}
+
+void WebPageProxy::proxyAuthenticationRequiredRequest(const String& hostname, uint16_t port, const String& prefilledUsername, String& username, String& password)
+{
+    m_pageClient->handleProxyAuthenticationRequiredRequest(hostname, port, prefilledUsername, username, password);
+}
+
+void WebPageProxy::certificateVerificationRequest(const String& hostname, bool& ignoreErrors)
+{
+    m_pageClient->handleCertificateVerificationRequest(hostname, ignoreErrors);
 }
 
 #if PLUGIN_ARCHITECTURE(X11)

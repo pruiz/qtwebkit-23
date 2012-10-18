@@ -57,9 +57,14 @@ public:
     // Returns localized decimal separator, e.g. "." for English, "," for French.
     String localizedDecimalSeparator();
 
+    // Returns date format in Unicode TR35 LDML[1] containing day of month,
+    // month, and year, e.g. "dd/mm/yyyy"
+    // [1] LDML http://unicode.org/reports/tr35/#Date_Format_Patterns
+    virtual String dateFormat() = 0;
+
     // Returns time format in Unicode TR35 LDML[1] containing hour, minute, and
     // second with optional period(AM/PM), e.g. "h:mm:ss a"
-    // [1] LDML http://unicode.org/reports/tr35/tr35-6.html#Date_Format_Patterns
+    // [1] LDML http://unicode.org/reports/tr35/#Date_Format_Patterns
     virtual String timeFormat();
 
     // Returns time format in Unicode TR35 LDML containing hour, and minute
@@ -88,7 +93,17 @@ public:
     virtual String dateFormatText() = 0;
 #endif
 
+    // Parses a string representation of a date/time string localized
+    // for this Localizer locale. If the input string is not valid or
+    // an implementation doesn't support localized dates, this
+    // function returns NaN. If the input string is valid this
+    // function returns the number of milliseconds since 1970-01-01
+    // 00:00:00.000 UTC.
     virtual double parseDateTime(const String&, DateComponents::Type) = 0;
+
+    // Serializes the specified date into a formatted date string to
+    // display to the user. If an implementation doesn't support
+    // localized dates the function should return an empty string.
     virtual String formatDateTime(const DateComponents&) = 0;
 
     virtual ~Localizer();

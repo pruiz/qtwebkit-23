@@ -1,3 +1,125 @@
+2012-09-29  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: NMI make String* instrumentation non intrusive
+        https://bugs.webkit.org/show_bug.cgi?id=97964
+
+        Reviewed by Yury Semikhatsky.
+
+        The expectations were fixed because old instrumentation had wrong detector for BufferInternal type of storage.
+
+        * tests/MemoryInstrumentationTest.cpp:
+        (WebCore::TEST):
+
+2012-10-02  Jochen Eisinger  <jochen@chromium.org>
+
+        Use correct gtest macros for tests for true/false
+
+        Unreviewed build-fix.
+
+        Using EXPECT_EQ(true, ...) makes clang trip when it tries to convert
+        true to a pointer. Tests should use EXPECT_TRUE instead.
+
+        * tests/WebFrameTest.cpp:
+
+2012-10-02  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r130129.
+        http://trac.webkit.org/changeset/130129
+        https://bugs.webkit.org/show_bug.cgi?id=98125
+
+        broke 4 webkit_unit_tests
+        (MemoryInstrumentationTest.hashMapWith*) (Requested by caseq
+        on #webkit).
+
+        * tests/MemoryInstrumentationTest.cpp:
+
+2012-09-29  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: NMI make String* instrumentation non intrusive
+        https://bugs.webkit.org/show_bug.cgi?id=97964
+
+        Reviewed by Yury Semikhatsky.
+
+        The expectations were fixed because old instrumentation had wrong detector for BufferInternal type of storage.
+
+        * tests/MemoryInstrumentationTest.cpp:
+        (WebCore::TEST):
+
+2012-10-01  Yoshifumi Inoue  <yosin@chromium.org>
+
+        REGRESSION(r130116): Need to update DateTimeFormatTest
+        https://bugs.webkit.org/show_bug.cgi?id=98120
+
+        Reviewed by Kent Tamura.
+
+        This patch updates test cases for week of month and week of year type
+        specifiers in DateTimeFormat class. This tests should be updated
+        within r130116.
+
+        * tests/DateTimeFormatTest.cpp:
+        (TEST_F): Changed test cases for changes of enum field value changes.
+
+2012-10-01  Keishi Hattori  <keishi@webkit.org>
+
+        Calendar picker should use zero as default step base
+        https://bugs.webkit.org/show_bug.cgi?id=97976
+
+        Reviewed by Kent Tamura.
+
+        * src/DateTimeChooserImpl.cpp:
+        (WebKit::DateTimeChooserImpl::writeDocument): stepBase needs 11 digits of precision when setting maximum possible date.
+
+2012-10-01  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: Move onSuccess(IDBDatabaseBackendInterface) to IDBOpenDBRequest
+        https://bugs.webkit.org/show_bug.cgi?id=94757
+
+        Reviewed by Tony Chang.
+
+        * tests/IDBRequestTest.cpp: Ensure IDBRequest can handle Error after abort.
+        (WebCore::TEST): Added AbortAfter
+
+2012-10-01  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Unreviewed single line compilation fix for Canary Debug Mac.
+
+        * tests/MemoryInstrumentationTest.cpp:
+
+2012-10-01  Yury Semikhatsky  <yurys@chromium.org>
+
+        Web Inspector: provide memory instrumentation for HashMap
+        https://bugs.webkit.org/show_bug.cgi?id=98005
+
+        Reviewed by Pavel Feldman.
+
+        Added unit tests for HashMap memory instrumentation.
+
+        * tests/MemoryInstrumentationTest.cpp:
+        (WTF):
+
+2012-10-01  Alexander Pavlov  <apavlov@chromium.org>
+
+        Web Inspector: [Device Metrics] Remove the gutter overlay moving its functionality into the InspectorOverlay
+        https://bugs.webkit.org/show_bug.cgi?id=97799
+
+        Reviewed by Pavel Feldman.
+
+        - Dispatch the webViewResized() event on InspectorController, which is necessary to update the InspectorOverlay.
+        - Remove the gutter overlay painting code.
+
+        * src/WebDevToolsAgentImpl.cpp:
+        (WebKit::DeviceMetricsSupport::DeviceMetricsSupport):
+        (WebKit::DeviceMetricsSupport::~DeviceMetricsSupport):
+        (WebKit::WebDevToolsAgentImpl::attach):
+        (WebKit::WebDevToolsAgentImpl::webViewResized):
+        (WebKit::WebDevToolsAgentImpl::overrideDeviceMetrics):
+        * src/WebDevToolsAgentImpl.h:
+        (WebDevToolsAgentImpl):
+        * src/WebDevToolsAgentPrivate.h:
+        (WebDevToolsAgentPrivate):
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::resize):
+
 2012-09-28  Jian Li  <jianli@chromium.org>
 
         Add draggable property to WebDraggableRegion.

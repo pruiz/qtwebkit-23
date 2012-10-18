@@ -83,6 +83,7 @@ WebInspector.ScriptSnippetModel.prototype = {
     _addScriptSnippet: function(snippet)
     {
         var snippetJavaScriptSource = new WebInspector.SnippetJavaScriptSource(snippet.name, new WebInspector.SnippetContentProvider(snippet), this);
+        snippetJavaScriptSource.hasDivergedFromVM = true;
         this._snippetIdForJavaScriptSource.put(snippetJavaScriptSource, snippet.id);
         snippetJavaScriptSource.setSourceMapping(this._snippetScriptMapping); 
         this._snippetJavaScriptSourceForSnippetId[snippet.id] = snippetJavaScriptSource;
@@ -212,8 +213,43 @@ WebInspector.ScriptSnippetModel.prototype = {
             var breakpointLocations = this._removeBreakpoints(snippetJavaScriptSource);
             this._restoreBreakpoints(snippetJavaScriptSource, breakpointLocations);
 
-            WebInspector.consoleView.runScript(scriptId);
+            this._runScript(scriptId);
         }
+    },
+
+    /**
+     * @param {DebuggerAgent.ScriptId} scriptId
+     */
+    _runScript: function(scriptId)
+    {
+        var currentExecutionContext = WebInspector.runtimeModel.currentExecutionContext();
+        DebuggerAgent.runScript(scriptId, currentExecutionContext ? currentExecutionContext.id : undefined, "console", false, runCallback.bind(this));
+
+        /**
+         * @param {?string} error
+         * @param {?RuntimeAgent.RemoteObject} result
+         * @param {boolean=} wasThrown
+         */
+        function runCallback(error, result, wasThrown)
+        {
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            this._printRunScriptResult(result, wasThrown);
+        }
+    },
+
+    /**
+     * @param {?RuntimeAgent.RemoteObject} result
+     * @param {boolean=} wasThrown
+     */
+    _printRunScriptResult: function(result, wasThrown)
+    {
+        var level = (wasThrown ? WebInspector.ConsoleMessage.MessageLevel.Error : WebInspector.ConsoleMessage.MessageLevel.Log);
+        var message = WebInspector.ConsoleMessage.create(WebInspector.ConsoleMessage.MessageSource.JS, level, "", undefined, undefined, undefined, undefined, [result]);
+        WebInspector.console.addMessage(message)
     },
 
     /**
@@ -271,6 +307,7 @@ WebInspector.ScriptSnippetModel.prototype = {
         console.assert(!this._scriptForUISourceCode.get(snippetJavaScriptSource));
         this._uiSourceCodeForScriptId[script.scriptId] = snippetJavaScriptSource;
         this._scriptForUISourceCode.put(snippetJavaScriptSource, script);
+        delete snippetJavaScriptSource.hasDivergedFromVM;
         script.setSourceMapping(this._snippetScriptMapping);
     },
 
@@ -321,6 +358,7 @@ WebInspector.ScriptSnippetModel.prototype = {
         if (!script)
             return;
 
+        snippetJavaScriptSource.hasDivergedFromVM = true;
         delete this._uiSourceCodeForScriptId[script.scriptId];
         this._scriptForUISourceCode.remove(snippetJavaScriptSource);
         delete snippetJavaScriptSource._evaluationIndex;
@@ -365,10 +403,10 @@ WebInspector.ScriptSnippetModel.prototype = {
     _projectDidReset: function()
     {
         this._loadSnippets();
-    }
-}
+    },
 
-WebInspector.ScriptSnippetModel.prototype.__proto__ = WebInspector.Object.prototype;
+    __proto__: WebInspector.Object.prototype
+}
 
 /**
  * @constructor
@@ -397,10 +435,10 @@ WebInspector.SnippetJavaScriptSource.prototype = {
     workingCopyChanged: function()
     {  
         this._scriptSnippetModel._scriptSnippetEdited(this);
-    }
-}
+    },
 
-WebInspector.SnippetJavaScriptSource.prototype.__proto__ = WebInspector.JavaScriptSource.prototype;
+    __proto__: WebInspector.JavaScriptSource.prototype
+}
 
 /**
  * @constructor
@@ -462,7 +500,9 @@ WebInspector.SnippetContentProvider = function(snippet)
     WebInspector.StaticContentProvider.call(this, WebInspector.resourceTypes.Script, snippet.content);
 }
 
-WebInspector.SnippetContentProvider.prototype.__proto__ = WebInspector.StaticContentProvider.prototype;
+WebInspector.SnippetContentProvider.prototype = {
+    __proto__: WebInspector.StaticContentProvider.prototype
+}
 
 /**
  * @type {?WebInspector.ScriptSnippetModel}

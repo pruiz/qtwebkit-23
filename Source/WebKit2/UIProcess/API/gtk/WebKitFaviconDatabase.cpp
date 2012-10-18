@@ -51,13 +51,6 @@ struct _WebKitFaviconDatabasePrivate {
 
 G_DEFINE_TYPE(WebKitFaviconDatabase, webkit_favicon_database, G_TYPE_OBJECT)
 
-static void closeIconDatabaseIfNeeded(WebKitFaviconDatabase* database)
-{
-    WebKitFaviconDatabasePrivate* priv = database->priv;
-    if (priv->iconDatabase->isOpen())
-        priv->iconDatabase->close();
-}
-
 static void webkit_favicon_database_init(WebKitFaviconDatabase* manager)
 {
     WebKitFaviconDatabasePrivate* priv = G_TYPE_INSTANCE_GET_PRIVATE(manager, WEBKIT_TYPE_FAVICON_DATABASE, WebKitFaviconDatabasePrivate);
@@ -65,19 +58,28 @@ static void webkit_favicon_database_init(WebKitFaviconDatabase* manager)
     new (priv) WebKitFaviconDatabasePrivate();
 }
 
-static void webkitFaviconDatabaseFinalize(GObject* object)
+static void webkitFaviconDatabaseDispose(GObject* object)
 {
     WebKitFaviconDatabase* database = WEBKIT_FAVICON_DATABASE(object);
 
-    closeIconDatabaseIfNeeded(database);
-    database->priv->~WebKitFaviconDatabasePrivate();
+    WebKitFaviconDatabasePrivate* priv = database->priv;
+    if (priv->iconDatabase->isOpen())
+        priv->iconDatabase->close();
 
+    G_OBJECT_CLASS(webkit_favicon_database_parent_class)->dispose(object);
+}
+
+static void webkitFaviconDatabaseFinalize(GObject* object)
+{
+    WebKitFaviconDatabase* database = WEBKIT_FAVICON_DATABASE(object);
+    database->priv->~WebKitFaviconDatabasePrivate();
     G_OBJECT_CLASS(webkit_favicon_database_parent_class)->finalize(object);
 }
 
 static void webkit_favicon_database_class_init(WebKitFaviconDatabaseClass* faviconDatabaseClass)
 {
     GObjectClass* gObjectClass = G_OBJECT_CLASS(faviconDatabaseClass);
+    gObjectClass->dispose = webkitFaviconDatabaseDispose;
     gObjectClass->finalize = webkitFaviconDatabaseFinalize;
 
     /**
@@ -179,6 +181,18 @@ WebKitFaviconDatabase* webkitFaviconDatabaseCreate(WebIconDatabase* iconDatabase
     };
     WKIconDatabaseSetIconDatabaseClient(toAPI(iconDatabase), &wkIconDatabaseClient);
     return faviconDatabase;
+}
+
+cairo_surface_t* webkitFaviconDatabaseGetFavicon(WebKitFaviconDatabase* database, const CString& pageURL)
+{
+    ASSERT(WEBKIT_IS_FAVICON_DATABASE(database));
+    ASSERT(!pageURL.isNull());
+
+    cairo_surface_t* iconSurface = getIconSurfaceSynchronously(database, String::fromUTF8(pageURL.data()));
+    if (!iconSurface)
+        return 0;
+
+    return cairo_surface_reference(iconSurface);
 }
 
 static PendingIconRequestVector* getOrCreatePendingIconRequests(WebKitFaviconDatabase* database, const String& pageURL)

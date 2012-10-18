@@ -88,7 +88,9 @@ HEADERS += \
     MediaTime.h \
     MemoryInstrumentation.h \
     MemoryInstrumentationArrayBufferView.h \
+    MemoryInstrumentationHashMap.h \
     MemoryInstrumentationHashSet.h \
+    MemoryInstrumentationString.h \
     MemoryInstrumentationVector.h \
     MessageQueue.h \
     MetaAllocator.h \

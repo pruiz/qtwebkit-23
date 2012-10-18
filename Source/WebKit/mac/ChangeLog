@@ -1,3 +1,39 @@
+2012-10-01  Brady Eidson  <beidson@apple.com>
+
+        Remove the Safari 2 -> Safari 3 icon database import code.
+        https://bugs.webkit.org/show_bug.cgi?id=98113
+
+        Reviewed by Maciej Stachowiak.
+
+        Nuke the performImport() IconDatabaseClient method, as well as the supporting methods.
+
+        * Misc/WebIconDatabase.mm:
+        * Misc/WebIconDatabaseInternal.h:
+        * Misc/WebIconDatabasePrivate.h:
+        * WebCoreSupport/WebIconDatabaseClient.h:
+        * WebCoreSupport/WebIconDatabaseClient.mm:
+        * WebKit.exp:
+
+2012-09-28  Anders Carlsson  <andersca@apple.com>
+
+        Remove support for method overloading from bridge code
+        https://bugs.webkit.org/show_bug.cgi?id=97959
+
+        Reviewed by Dan Bernstein.
+
+        Update for WebCore changes; MethodList has been replaced with a single Method* everywhere.
+
+        * Plugins/Hosted/ProxyInstance.h:
+        (ProxyInstance):
+        * Plugins/Hosted/ProxyInstance.mm:
+        (ProxyClass):
+        (WebKit::ProxyClass::methodNamed):
+        (WebKit::ProxyRuntimeMethod::create):
+        (WebKit::ProxyRuntimeMethod::ProxyRuntimeMethod):
+        (WebKit::ProxyInstance::getMethod):
+        (WebKit::ProxyInstance::invokeMethod):
+        (WebKit::ProxyInstance::methodNamed):
+
 2012-09-28  Anders Carlsson  <andersca@apple.com>
 
         Remove Java bridge

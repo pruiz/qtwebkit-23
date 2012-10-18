@@ -34,7 +34,6 @@
 #import <Foundation/NSDateFormatter.h>
 #import <Foundation/NSLocale.h>
 #include "Language.h"
-#include "LocalizedDate.h"
 #include "LocalizedStrings.h"
 #include <wtf/DateMath.h>
 #include <wtf/PassOwnPtr.h>
@@ -251,6 +250,12 @@ NSDateFormatter* LocaleMac::createTimeFormatter()
 NSDateFormatter* LocaleMac::createShortTimeFormatter()
 {
     return createDateTimeFormatter(m_locale.get(), NSDateFormatterNoStyle, NSDateFormatterShortStyle);
+}
+
+String LocaleMac::dateFormat()
+{
+    // FIXME: We should have real implementation of LocaleMac::dateFormat().
+    return emptyString();
 }
 
 String LocaleMac::timeFormat()

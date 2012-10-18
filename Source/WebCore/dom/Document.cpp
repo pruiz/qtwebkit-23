@@ -175,6 +175,7 @@
 #include <wtf/CurrentTime.h>
 #include <wtf/HashFunctions.h>
 #include <wtf/MainThread.h>
+#include <wtf/MemoryInstrumentationHashMap.h>
 #include <wtf/MemoryInstrumentationHashSet.h>
 #include <wtf/MemoryInstrumentationVector.h>
 #include <wtf/PassRefPtr.h>
@@ -1142,17 +1143,6 @@ bool Document::cssGridLayoutEnabled() const
 
 #if ENABLE(CSS_REGIONS)
 
-PassRefPtr<WebKitNamedFlow> Document::webkitGetFlowByName(const String& flowName)
-{
-    if (!cssRegionsEnabled() || !renderer())
-        return 0;
-
-    // It's possible to have pending styles not applied that affect the existing flows.
-    updateStyleIfNeeded();
-
-    return namedFlows()->flowByName(flowName);
-}
-
 PassRefPtr<DOMNamedFlowCollection> Document::webkitGetNamedFlows()
 {
     if (!cssRegionsEnabled() || !renderer())
@@ -1984,7 +1974,7 @@ PassRefPtr<RenderStyle> Document::styleForPage(int pageIndex)
     return style.release();
 }
 
-void Document::registerCustomFont(PassOwnPtr<FontData> fontData)
+void Document::registerCustomFont(PassRefPtr<FontData> fontData)
 {
     m_customFonts.append(fontData);
 }
@@ -3717,7 +3707,7 @@ EventListener* Document::getWindowAttributeEventListener(const AtomicString& eve
 
 void Document::dispatchWindowEvent(PassRefPtr<Event> event,  PassRefPtr<EventTarget> target)
 {
-    ASSERT(!eventDispatchForbidden());
+    ASSERT(!NoEventDispatchAssertion::isEventDispatchForbidden());
     DOMWindow* domWindow = this->domWindow();
     if (!domWindow)
         return;
@@ -3726,7 +3716,7 @@ void Document::dispatchWindowEvent(PassRefPtr<Event> event,  PassRefPtr<EventTar
 
 void Document::dispatchWindowLoadEvent()
 {
-    ASSERT(!eventDispatchForbidden());
+    ASSERT(!NoEventDispatchAssertion::isEventDispatchForbidden());
     DOMWindow* domWindow = this->domWindow();
     if (!domWindow)
         return;
@@ -5898,17 +5888,17 @@ void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     info.addMember(m_xmlEncoding);
     info.addMember(m_xmlVersion);
     info.addMember(m_contentLanguage);
-    info.addHashMap(m_documentNamedItemCollections);
-    info.addHashMap(m_windowNamedItemCollections);
+    info.addMember(m_documentNamedItemCollections);
+    info.addMember(m_windowNamedItemCollections);
 #if ENABLE(DASHBOARD_SUPPORT)
     info.addMember(m_dashboardRegions);
 #endif
-    info.addHashMap(m_cssCanvasElements);
+    info.addMember(m_cssCanvasElements);
     info.addMember(m_iconURLs);
     info.addMember(m_documentSuspensionCallbackElements);
     info.addMember(m_mediaVolumeCallbackElements);
     info.addMember(m_privateBrowsingStateChangedElements);
-    info.addHashMap(m_elementsByAccessKey);
+    info.addMember(m_elementsByAccessKey);
     info.addMember(m_eventQueue);
     info.addMember(m_mediaCanStartListeners);
     info.addMember(m_pendingTasks);

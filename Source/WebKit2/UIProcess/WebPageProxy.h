@@ -356,6 +356,7 @@ public:
     bool maintainsInactiveSelection() const { return m_maintainsInactiveSelection; }
     void setMaintainsInactiveSelection(bool);
 #if PLATFORM(QT)
+    void didRenderFrame(const WebCore::IntSize& contentsSize, const WebCore::IntRect& coveredRect);
     void registerApplicationScheme(const String& scheme);
     void resolveApplicationSchemeRequest(QtNetworkRequestData);
     void sendApplicationSchemeReply(const QQuickNetworkReply*);
@@ -418,6 +419,7 @@ public:
 #endif
 #if USE(TILED_BACKING_STORE)
     void setViewportSize(const WebCore::IntSize&);
+    void commitPageTransitionViewport();
 #endif
 
     void handleMouseEvent(const NativeWebMouseEvent&);
@@ -849,6 +851,7 @@ private:
 #endif
 
 #if PLATFORM(QT)
+    void pageTransitionViewportReady();
     void didFindZoomableArea(const WebCore::IntPoint&, const WebCore::IntRect&);
 #endif
 

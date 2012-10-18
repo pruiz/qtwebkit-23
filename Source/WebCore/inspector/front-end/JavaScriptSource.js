@@ -46,10 +46,22 @@ WebInspector.JavaScriptSource.prototype = {
      */
     workingCopyCommitted: function(callback)
     {
+        /**
+         * @param {?string} error
+         */
+        function innerCallback(error)
+        {
+            if (error)
+                this.hasDivergedFromVM = true;
+            else
+                delete this.hasDivergedFromVM;
+
+            callback(error);
+        }
         var rawLocation = /** @type {WebInspector.DebuggerModel.Location} */ this.uiLocationToRawLocation(0, 0);
         var script = WebInspector.debuggerModel.scriptForId(rawLocation.scriptId);
-        WebInspector.debuggerModel.setScriptSource(script.scriptId, this.workingCopy(), callback);
-    }
-}
+        WebInspector.debuggerModel.setScriptSource(script.scriptId, this.workingCopy(), innerCallback);
+    },
 
-WebInspector.JavaScriptSource.prototype.__proto__ = WebInspector.UISourceCode.prototype;
+    __proto__: WebInspector.UISourceCode.prototype
+}

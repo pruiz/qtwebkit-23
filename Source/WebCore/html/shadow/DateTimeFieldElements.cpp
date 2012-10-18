@@ -71,6 +71,47 @@ void DateTimeAMPMFieldElement::setValueAsDateTimeFieldsState(const DateTimeField
 
 // ----------------------------
 
+DateTimeDayFieldElement::DateTimeDayFieldElement(Document* document, FieldOwner& fieldOwner, const String& placeholder)
+    : DateTimeNumericFieldElement(document, fieldOwner, 1, 31, placeholder)
+{
+}
+
+PassRefPtr<DateTimeDayFieldElement> DateTimeDayFieldElement::create(Document* document, FieldOwner& fieldOwner, const String& placeholder)
+{
+    DEFINE_STATIC_LOCAL(AtomicString, dayPsuedoId, ("-webkit-datetime-edit-day-field"));
+    RefPtr<DateTimeDayFieldElement> field = adoptRef(new DateTimeDayFieldElement(document, fieldOwner, placeholder));
+    field->initialize(dayPsuedoId, AXDayOfMonthFieldText());
+    return field.release();
+}
+
+void DateTimeDayFieldElement::populateDateTimeFieldsState(DateTimeFieldsState& dateTimeFieldsState)
+{
+    dateTimeFieldsState.setDayOfMonth(hasValue() ? valueAsInteger() : DateTimeFieldsState::emptyValue);
+}
+
+void DateTimeDayFieldElement::setValueAsDate(const DateComponents& date)
+{
+    setValueAsInteger(date.monthDay());
+}
+
+void DateTimeDayFieldElement::setValueAsDateTimeFieldsState(const DateTimeFieldsState& dateTimeFieldsState, const DateComponents& dateForReadOnlyField)
+{
+    if (!dateTimeFieldsState.hasDayOfMonth()) {
+        setEmptyValue(dateForReadOnlyField);
+        return;
+    }
+
+    const unsigned value = dateTimeFieldsState.dayOfMonth();
+    if (range().isInRange(static_cast<int>(value))) {
+        setValueAsInteger(value);
+        return;
+    }
+
+    setEmptyValue(dateForReadOnlyField);
+}
+
+// ----------------------------
+
 DateTimeHourFieldElement::DateTimeHourFieldElement(Document* document, FieldOwner& fieldOwner, int minimum, int maximum)
     : DateTimeNumericFieldElement(document, fieldOwner, minimum, maximum, "--")
     , m_alignment(maximum + maximum % 2)
@@ -336,6 +377,47 @@ void DateTimeSecondFieldElement::setValueAsDateTimeFieldsState(const DateTimeFie
     }
 
     setValueAsInteger(value);
+}
+
+// ----------------------------
+
+DateTimeWeekFieldElement::DateTimeWeekFieldElement(Document* document, FieldOwner& fieldOwner)
+    : DateTimeNumericFieldElement(document, fieldOwner, DateComponents::minimumWeekNumber, DateComponents::maximumWeekNumber, "--")
+{
+}
+
+PassRefPtr<DateTimeWeekFieldElement> DateTimeWeekFieldElement::create(Document* document, FieldOwner& fieldOwner)
+{
+    DEFINE_STATIC_LOCAL(AtomicString, weekPsuedoId, ("-webkit-datetime-edit-week-field"));
+    RefPtr<DateTimeWeekFieldElement> field = adoptRef(new DateTimeWeekFieldElement(document, fieldOwner));
+    field->initialize(weekPsuedoId, AXWeekOfYearFieldText());
+    return field.release();
+}
+
+void DateTimeWeekFieldElement::populateDateTimeFieldsState(DateTimeFieldsState& dateTimeFieldsState)
+{
+    dateTimeFieldsState.setWeekOfYear(hasValue() ? valueAsInteger() : DateTimeFieldsState::emptyValue);
+}
+
+void DateTimeWeekFieldElement::setValueAsDate(const DateComponents& date)
+{
+    setValueAsInteger(date.week());
+}
+
+void DateTimeWeekFieldElement::setValueAsDateTimeFieldsState(const DateTimeFieldsState& dateTimeFieldsState, const DateComponents& dateForReadOnlyField)
+{
+    if (!dateTimeFieldsState.hasWeekOfYear()) {
+        setEmptyValue(dateForReadOnlyField);
+        return;
+    }
+
+    const unsigned value = dateTimeFieldsState.weekOfYear();
+    if (range().isInRange(static_cast<int>(value))) {
+        setValueAsInteger(value);
+        return;
+    }
+
+    setEmptyValue(dateForReadOnlyField);
 }
 
 // ----------------------------

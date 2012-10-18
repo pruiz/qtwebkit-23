@@ -71,7 +71,7 @@ WebInspector.StyleSource.prototype = {
     _commitIncrementalEdit: function(majorChange, callback)
     {
         this._clearIncrementalUpdateTimer();
-        WebInspector.cssModel.resourceBinding().setStyleContent(this, this.workingCopy(), majorChange, callback);
+        WebInspector.styleContentBinding.setStyleContent(this, this.workingCopy(), majorChange, callback);
     },
 
     _clearIncrementalUpdateTimer: function()
@@ -79,7 +79,7 @@ WebInspector.StyleSource.prototype = {
         if (this._incrementalUpdateTimer)
             clearTimeout(this._incrementalUpdateTimer);
         delete this._incrementalUpdateTimer;
-    }
-}
+    },
 
-WebInspector.StyleSource.prototype.__proto__ = WebInspector.UISourceCode.prototype;
+    __proto__: WebInspector.UISourceCode.prototype
+}

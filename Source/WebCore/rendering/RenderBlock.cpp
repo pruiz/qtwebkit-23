@@ -1355,6 +1355,15 @@ void RenderBlock::finishDelayUpdateScrollInfo()
 void RenderBlock::updateScrollInfoAfterLayout()
 {
     if (hasOverflowClip()) {
+        if (style()->isFlippedBlocksWritingMode()) {
+            // FIXME: https://bugs.webkit.org/show_bug.cgi?id=97937
+            // Workaround for now. We cannot delay the scroll info for overflow
+            // for items with opposite writing directions, as the contents needs
+            // to overflow in that direction
+            layer()->updateScrollInfoAfterLayout();
+            return;
+        }
+
         if (gDelayUpdateScrollInfo)
             gDelayedUpdateScrollInfoSet->add(this);
         else
@@ -3249,7 +3258,7 @@ bool RenderBlock::isSelectionRoot() const
     return false;
 }
 
-GapRects RenderBlock::selectionGapRectsForRepaint(RenderBoxModelObject* repaintContainer)
+GapRects RenderBlock::selectionGapRectsForRepaint(RenderLayerModelObject* repaintContainer)
 {
     ASSERT(!needsLayout());
 
@@ -5784,6 +5793,7 @@ void RenderBlock::computeInlinePreferredLogicalWidths()
     bool addedTextIndent = false; // Only gets added in once.
     LayoutUnit textIndent = minimumValueForLength(styleToUse->textIndent(), cw, view());
     RenderObject* prevFloat = 0;
+    bool isPrevChildInlineFlow = false;
     while (RenderObject* child = childIterator.next()) {
         autoWrap = child->isReplaced() ? child->parent()->style()->autoWrap() : 
             child->style()->autoWrap();
@@ -5872,7 +5882,7 @@ void RenderBlock::computeInlinePreferredLogicalWidths()
                     clearPreviousFloat = false;
 
                 bool canBreakReplacedElement = !child->isImage() || allowImagesToBreak;
-                if ((canBreakReplacedElement && (autoWrap || oldAutoWrap)) || clearPreviousFloat) {
+                if ((canBreakReplacedElement && (autoWrap || oldAutoWrap) && !isPrevChildInlineFlow) || clearPreviousFloat) {
                     updatePreferredWidth(m_minPreferredLogicalWidth, inlineMin);
                     inlineMin = 0;
                 }
@@ -5899,7 +5909,7 @@ void RenderBlock::computeInlinePreferredLogicalWidths()
                 // Add our width to the max.
                 inlineMax += max<float>(0, childMax);
 
-                if (!autoWrap || !canBreakReplacedElement) {
+                if (!autoWrap || !canBreakReplacedElement || isPrevChildInlineFlow) {
                     if (child->isFloating())
                         updatePreferredWidth(m_minPreferredLogicalWidth, childMin);
                     else
@@ -6025,6 +6035,11 @@ void RenderBlock::computeInlinePreferredLogicalWidths()
             trailingSpaceChild = 0;
             addedTextIndent = true;
         }
+
+        if (!child->isText() && child->isRenderInline())
+            isPrevChildInlineFlow = true;
+        else
+            isPrevChildInlineFlow = false;
 
         oldAutoWrap = autoWrap;
     }
@@ -6769,7 +6784,7 @@ void RenderBlock::absoluteQuads(Vector<FloatQuad>& quads, bool* wasFixed) const
         quads.append(RenderBox::localToAbsoluteQuad(FloatRect(0, 0, width(), height()), false, wasFixed));
 }
 
-LayoutRect RenderBlock::rectWithOutlineForRepaint(RenderBoxModelObject* repaintContainer, LayoutUnit outlineWidth) const
+LayoutRect RenderBlock::rectWithOutlineForRepaint(RenderLayerModelObject* repaintContainer, LayoutUnit outlineWidth) const
 {
     LayoutRect r(RenderBox::rectWithOutlineForRepaint(repaintContainer, outlineWidth));
     if (isAnonymousBlockContinuation())

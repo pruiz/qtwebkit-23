@@ -258,6 +258,8 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren, LayoutUnit)
 
     m_overflow.clear();
 
+    RenderBlock::startDelayUpdateScrollInfo();
+
     WTF::Vector<LineContext> lineContexts;
     OrderHashSet orderValues;
     computeMainAxisPreferredSizes(relayoutChildren, orderValues);
@@ -267,6 +269,8 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren, LayoutUnit)
     LayoutUnit oldClientAfterEdge = clientLogicalBottom();
     updateLogicalHeight();
     repositionLogicalHeightDependentFlexItems(*m_orderIterator, lineContexts, oldClientAfterEdge);
+
+    RenderBlock::finishDelayUpdateScrollInfo();
 
     if (size() != previousSize)
         relayoutChildren = true;
@@ -283,8 +287,7 @@ void RenderFlexibleBox::layoutBlock(bool relayoutChildren, LayoutUnit)
 
     // Update our scroll information if we're overflow:auto/scroll/hidden now that we know if
     // we overflow or not.
-    if (hasOverflowClip())
-        layer()->updateScrollInfoAfterLayout();
+    updateScrollInfoAfterLayout();
 
     repainter.repaintAfterLayout();
 
@@ -943,13 +946,16 @@ void RenderFlexibleBox::prepareChildForPositionedLayout(RenderBox* child, Layout
     }
 }
 
-static EAlignItems alignmentForChild(RenderBox* child)
+EAlignItems RenderFlexibleBox::alignmentForChild(RenderBox* child) const
 {
     EAlignItems align = child->style()->alignSelf();
     if (align == AlignAuto)
-        align = child->parent()->style()->alignItems();
+        align = style()->alignItems();
 
-    if (child->parent()->style()->flexWrap() == FlexWrapReverse) {
+    if (align == AlignBaseline && hasOrthogonalFlow(child))
+        align = AlignFlexStart;
+
+    if (style()->flexWrap() == FlexWrapReverse) {
         if (align == AlignFlexStart)
             align = AlignFlexEnd;
         else if (align == AlignFlexEnd)
@@ -1189,6 +1195,8 @@ void RenderFlexibleBox::alignChildren(OrderIterator& iterator, const WTF::Vector
                 adjustAlignmentForChild(child, availableAlignmentSpaceForChild(lineCrossAxisExtent, child) / 2);
                 break;
             case AlignBaseline: {
+                // FIXME: If we get here in columns, we want the use the descent, except we currently can't get the ascent/descent of orthogonal children.
+                // https://bugs.webkit.org/show_bug.cgi?id=98076
                 LayoutUnit ascent = marginBoxAscentForChild(child);
                 LayoutUnit startOffset = maxAscent - ascent;
                 adjustAlignmentForChild(child, startOffset);

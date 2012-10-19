@@ -774,6 +774,7 @@ webkit.org/b/91379 http/tests/security/contentSecurityPolicy/object-src-none-all
 http/tests/security/contentSecurityPolicy/object-src-url-allowed.html [ Failure Pass ]
 svg/custom/use-instanceRoot-event-listeners.xhtml [ Skip ]
 svg/dom/SVGScriptElement/script-change-externalResourcesRequired-while-loading.svg [ Skip ]
+fast/loader/javascript-url-in-embed.html [ Failure Pass ]
 
 # Needs rebaseline after https://bugs.webkit.org/show_bug.cgi?id=80219
 webkit.org/b/80219 compositing/overflow/clip-descendents.html [ Failure ]
@@ -827,24 +828,10 @@ http/tests/navigation/slowmetaredirect-basic.html  [ Slow Pass ]
 http/tests/xmlhttprequest/small-chunks-response-text.html [ Slow Pass ]
 
 # Tests missing baselines, needs to be investigated
-css3/masking/clip-path-circle-filter.html [ Missing ]
-css3/masking/clip-path-circle-overflow-hidden.html [ Missing ]
-css3/masking/clip-path-circle-overflow.html [ Missing ]
-css3/masking/clip-path-circle-relative-overflow.html [ Missing ]
-css3/masking/clip-path-circle.html [ Missing ]
-css3/masking/clip-path-ellipse.html [ Missing ]
-css3/masking/clip-path-polygon-evenodd.html [ Missing ]
-css3/masking/clip-path-polygon-nonzero.html [ Missing ]
-css3/masking/clip-path-polygon.html [ Missing ]
-css3/masking/clip-path-rectangle.html [ Missing ]
-fast/overflow/paged-x-div-with-column-gap.html [ Missing ]
-fast/overflow/paged-x-div.html [ Missing ]
-fast/overflow/paged-x-on-root.html [ Missing ]
-fast/overflow/paged-x-with-column-gap.html [ Missing ]
-fast/overflow/paged-y-div.html [ Missing ]
-fast/overflow/paged-y-on-root.html [ Missing ]
 svg/clip-path/deep-nested-clip-in-mask-panning.svg [ Missing ]
 svg/clip-path/deep-nested-clip-in-mask.svg [ Missing ]
+svg/custom/radialGradient-focal-radius.svg [ Missing ]
+fast/repaint/box-shadow-inset-repaint.html [ Missing ]
 
 # [Qt4] editing/selection/5354455-1.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=99013
@@ -866,3 +853,35 @@ http/tests/security/cross-origin-local-storage-wk1.html
 
 # [Qt][WK1] ERROR:  TestRunner::overridePreference() does not support the 'WebKitPageCacheSupportsPluginsPreferenceKey' preference
 plugins/frameset-with-plugin-frame.html
+
+# [Qt4] Editing differences after r130411
+# https://bugs.webkit.org/show_bug.cgi?id=99841
+# Tests now different between QtWebKit trunk and QtWebKit2.3 after r130411
+webkit.org/b/99841 editing/execCommand/find-after-replace.html [ Failure ]
+webkit.org/b/99841 editing/execCommand/paste-1.html [ Failure ]
+webkit.org/b/99841 editing/execCommand/paste-2.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/5028447.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/5032095.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/5521237.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/insert-div-text-into-text.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/merge-after-delete.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/merge-end-5.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/paste-before-tab-span.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/paste-into-blockquote-with-document-font-color.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/paste-into-table-cell-2.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/paste-into-table-cell.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/paste-match-style-001.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/paste-text-001.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/paste-text-004.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/paste-text-005.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/paste-text-010.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/paste-text-at-tabspan-001.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/pasting-word-in-div-extra-line.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/smart-paste-001.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/smart-paste-003.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/smart-paste-004.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/smart-paste-005.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/smart-paste-006.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/smart-paste-007.html [ Failure ]
+webkit.org/b/99841 editing/pasteboard/smart-paste-008.html [ Failure ]
+webkit.org/b/99841 editing/selection/replace-selection-crash.html [ Failure ]

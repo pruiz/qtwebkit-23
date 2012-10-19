@@ -260,7 +260,10 @@ void InjectedBundle::beginTesting(WKDictionaryRef settings)
     WKBundleClearAllDatabases(m_bundle);
     WKBundleClearApplicationCache(m_bundle);
     WKBundleResetOriginAccessWhitelists(m_bundle);
-    WKBundleSetDatabaseQuota(m_bundle, 5 * 1024 * 1024);
+
+    // [WK2] REGRESSION(r128623): It made layout tests extremely slow
+    // https://bugs.webkit.org/show_bug.cgi?id=96862
+    // WKBundleSetDatabaseQuota(m_bundle, 5 * 1024 * 1024);
 }
 
 void InjectedBundle::done()
@@ -384,6 +387,12 @@ void InjectedBundle::setMockGeolocationPosition(double latitude, double longitud
     WKDictionaryAddItem(messageBody.get(), accuracyKeyWK.get(), accuracyWK.get());
 
     WKBundlePostMessage(m_bundle, messageName.get(), messageBody.get());
+}
+
+void InjectedBundle::setMockGeolocationPositionUnavailableError(WKStringRef errorMessage)
+{
+    WKRetainPtr<WKStringRef> messageName(AdoptWK, WKStringCreateWithUTF8CString("SetMockGeolocationPositionUnavailableError"));
+    WKBundlePostMessage(m_bundle, messageName.get(), errorMessage);
 }
 
 } // namespace WTR

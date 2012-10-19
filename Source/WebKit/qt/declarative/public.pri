@@ -33,6 +33,11 @@ contains(DEFINES, HAVE_QQUICK1=1) {
     HEADERS += qdeclarativewebview_p.h
 }
 
+have?(QQUICK1) {
+    SOURCES += qdeclarativewebview.cpp
+    HEADERS += qdeclarativewebview_p.h
+}
+
 WEBKIT += wtf
 
 DESTDIR = $${ROOT_BUILD_DIR}/imports/$${TARGET.module_name}

@@ -138,7 +138,7 @@ class PerfTest(object):
             score = self._score_regex.match(line)
             if score:
                 key = score.group('key')
-                if ', ' in score.group('value'):
+                if key == 'values':
                     value = [float(number) for number in score.group('value').split(', ')]
                 else:
                     value = float(score.group('value'))
@@ -218,15 +218,14 @@ class PageLoadingPerfTest(PerfTest):
 
         sorted_test_times = sorted(test_times)
 
-        # Compute the mean and variance using a numerically stable algorithm.
+        # Compute the mean and variance using Knuth's online algorithm (has good numerical stability).
         squareSum = 0
         mean = 0
-        valueSum = sum(sorted_test_times)
         for i, time in enumerate(sorted_test_times):
             delta = time - mean
             sweep = i + 1.0
             mean += delta / sweep
-            squareSum += delta * delta * (i / sweep)
+            squareSum += delta * (time - mean)
 
         middle = int(len(test_times) / 2)
         results = {'values': test_times,
@@ -234,7 +233,7 @@ class PageLoadingPerfTest(PerfTest):
             'min': sorted_test_times[0],
             'max': sorted_test_times[-1],
             'median': sorted_test_times[middle] if len(sorted_test_times) % 2 else (sorted_test_times[middle - 1] + sorted_test_times[middle]) / 2,
-            'stdev': math.sqrt(squareSum),
+            'stdev': math.sqrt(squareSum / (len(sorted_test_times) - 1)),
             'unit': 'ms'}
         self.output_statistics(self.test_name(), results, '')
         return {self.test_name(): results}

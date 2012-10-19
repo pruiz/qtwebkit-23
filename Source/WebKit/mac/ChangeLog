@@ -1,3 +1,261 @@
+2012-10-02  Anders Carlsson  <andersca@apple.com>
+
+        Build fixes.
+
+        * Plugins/Hosted/NetscapePluginHostManager.mm:
+        (WebKit::NetscapePluginHostManager::spawnPluginHost):
+        (WebKit::NetscapePluginHostManager::didCreateWindow):
+        * Plugins/Hosted/NetscapePluginHostProxy.h:
+        (NetscapePluginHostProxy):
+        * Plugins/Hosted/NetscapePluginHostProxy.mm:
+        (WebKit::NetscapePluginHostProxy::didEnterFullscreen):
+        (WebKit::NetscapePluginHostProxy::didExitFullscreen):
+        (WebKit::NetscapePluginHostProxy::applicationDidBecomeActive):
+        (WebKit::NetscapePluginHostProxy::endModal):
+        (WebKit):
+        (WebKit::NetscapePluginHostProxy::makeCurrentProcessFrontProcess):
+        (WebKit::NetscapePluginHostProxy::makePluginHostProcessFrontProcess):
+        (WebKit::NetscapePluginHostProxy::isPluginHostProcessFrontProcess):
+
+2012-10-01  Brady Eidson  <beidson@apple.com>
+
+        Remove the Safari 2 -> Safari 3 icon database import code.
+        https://bugs.webkit.org/show_bug.cgi?id=98113
+
+        Reviewed by Maciej Stachowiak.
+
+        Nuke the performImport() IconDatabaseClient method, as well as the supporting methods.
+
+        * Misc/WebIconDatabase.mm:
+        * Misc/WebIconDatabaseInternal.h:
+        * Misc/WebIconDatabasePrivate.h:
+        * WebCoreSupport/WebIconDatabaseClient.h:
+        * WebCoreSupport/WebIconDatabaseClient.mm:
+        * WebKit.exp:
+
+2012-09-28  Anders Carlsson  <andersca@apple.com>
+
+        Remove support for method overloading from bridge code
+        https://bugs.webkit.org/show_bug.cgi?id=97959
+
+        Reviewed by Dan Bernstein.
+
+        Update for WebCore changes; MethodList has been replaced with a single Method* everywhere.
+
+        * Plugins/Hosted/ProxyInstance.h:
+        (ProxyInstance):
+        * Plugins/Hosted/ProxyInstance.mm:
+        (ProxyClass):
+        (WebKit::ProxyClass::methodNamed):
+        (WebKit::ProxyRuntimeMethod::create):
+        (WebKit::ProxyRuntimeMethod::ProxyRuntimeMethod):
+        (WebKit::ProxyInstance::getMethod):
+        (WebKit::ProxyInstance::invokeMethod):
+        (WebKit::ProxyInstance::methodNamed):
+
+2012-09-28  Anders Carlsson  <andersca@apple.com>
+
+        Remove Java bridge
+        https://bugs.webkit.org/show_bug.cgi?id=97954
+
+        Reviewed by Sam Weinig.
+
+        The Java bridge is not used by any port; Mac now has a NPAPI Java plug-in.
+
+        * WebCoreSupport/WebFrameLoaderClient.h:
+        * WebCoreSupport/WebFrameLoaderClient.mm:
+        Make sure that we try to load the NPAPI Java plug-in.
+
+2012-09-27  Anders Carlsson  <andersca@apple.com>
+
+        Get rid of more unused WK1 plug-in code
+        https://bugs.webkit.org/show_bug.cgi?id=97835
+
+        Reviewed by Mark Rowe.
+
+        * Plugins/WebBasePluginPackage.mm:
+        Remove JavaCFMPluginFilename #define.
+
+        (-[WebBasePluginPackage initWithPath:]):
+        #ifndef __ppc__ is always true now.
+
+        (-[WebBasePluginPackage isJavaPlugIn]):
+        Remove JavaCFMPluginFilename.
+
+        * Plugins/WebNetscapeDeprecatedFunctions.c: Removed.
+        * Plugins/WebNetscapeDeprecatedFunctions.h: Removed.
+        Remove functions that nobody calls anymore.
+
+        * Plugins/WebNetscapePluginPackage.mm:
+        Remove +initialize call, the earliest version of Shockwave we now support doesn't
+        require us to have a valid CurApRefNum file anymore.
+
+        (-[WebNetscapePluginPackage _tryLoad]):
+        Remove more unused code.
+
+        * Plugins/WebPluginDatabase.h:
+        Remove CFM from a comment.
+
+2012-09-27  Anders Carlsson  <andersca@apple.com>
+
+        Fix 32-bit build.
+
+        * Plugins/WebNetscapePluginPackage.mm:
+        (-[WebNetscapePluginPackage _initWithPath:]):
+        Add back the architecture check that i accidentally.
+
+2012-09-27  Anders Carlsson  <andersca@apple.com>
+
+        Remove support for CFM plug-ins in WebKit1
+        https://bugs.webkit.org/show_bug.cgi?id=97822
+
+        Reviewed by Mark Rowe.
+
+        I'm pretty sure that CFM style plug-ins haven't been used for the last ten years or so,
+        so it's safe to remove them (especially since they're PPC only).
+
+        * Plugins/WebNetscapePluginPackage.h:
+        * Plugins/WebNetscapePluginPackage.mm:
+        (-[WebNetscapePluginPackage openResourceFile]):
+        (-[WebNetscapePluginPackage closeResourceFile:]):
+        (-[WebNetscapePluginPackage _initWithPath:]):
+        (-[WebNetscapePluginPackage _tryLoad]):
+        (-[WebNetscapePluginPackage _unloadWithShutdown:]):
+        * Plugins/WebPluginDatabase.mm:
+        (PluginPackageCandidates::PluginPackageCandidates):
+        (PluginPackageCandidates::update):
+        (PluginPackageCandidates::bestCandidate):
+        (PluginPackageCandidates):
+
+2012-09-26  Anders Carlsson  <andersca@apple.com>
+
+        Stop using kCFURLHFSPathStyle
+        https://bugs.webkit.org/show_bug.cgi?id=97731
+        <rdar://problem/12378980>
+
+        Reviewed by Tim Horton.
+
+        Stop passing Carbon style paths to the plug-in. Both WebKitPluginHost, WebKit2 and Firefox
+        pass POSIX style paths which makes more sense.
+
+        * Plugins/WebNetscapePluginStream.mm:
+        (WebNetscapePluginStream::destroyStream):
+
+2012-09-25  Dan Bernstein  <mitz@apple.com>
+
+        WebKit/mac part of <rdar://problem/11455228> [mac] Stop using screen fonts
+        https://bugs.webkit.org/show_bug.cgi?id=97620
+
+        Reviewed by John Sullivan.
+
+        * WebView/WebPreferences.mm:
+        (+[WebPreferences initialize]): Changed the default value of the screenFontSubstitutionEnabled
+        preference to NO.
+        * WebView/WebView.mm:
+        (-[WebView _preferencesChanged:]):  Changed to enable screen font substitution also if
+        the value of the NSFontDefaultScreenFontSubstitutionEnabled user defaults key is YES.
+
+2012-09-21  Jeffrey Pfau  <jpfau@apple.com>
+
+        Add WebKit1 SPI for storage blocking preference
+        https://bugs.webkit.org/show_bug.cgi?id=97356
+
+        Reviewed by Brady Eidson.
+
+        * WebView/WebPreferenceKeysPrivate.h:
+        * WebView/WebPreferences.mm:
+        (+[WebPreferences initialize]):
+        (-[WebPreferences setStorageBlockingPolicy:]):
+        (-[WebPreferences storageBlockingPolicy]):
+        * WebView/WebPreferencesPrivate.h:
+        * WebView/WebView.mm:
+        (-[WebView _preferencesChanged:]):
+
+2012-09-24  Simon Fraser  <simon.fraser@apple.com>
+
+        <rdar://problem/12351906> Have DumpRenderTree and WebKitTestRunner crash logs show which test crashed
+
+        Reviewed by Mark Rowe.
+
+        Use a new WebKitSytemInterface function to add data to crash logs about which 
+        test was running when the crash happened.
+
+        * WebCoreSupport/WebSystemInterface.mm:
+        (InitWebCoreSystemInterface): Hook up the function pointer for [wk|WK]SetCrashReportApplicationSpecificInformation.
+
+2012-09-25  Beth Dakin  <bdakin@apple.com>
+
+        https://bugs.webkit.org/show_bug.cgi?id=95397
+        Need to merge didFirstVisuallyNonEmptyLayout and 
+        didNewFirstVisuallyNonEmptyLayout
+        -and corresponding-
+        <rdar://problem/10791680>
+
+        Reviewed by Sam Weinig.
+
+        The new API has two parts. First, the client has to opt into which 
+        layout milestones they are interested in hearing about using 
+        [WebView _layoutMilestones]. Then, WebKit will call 
+        the WebFrameLoader delegate's didLayout(WebLayoutMilestones) 
+        callback when the specified layout milestones have fired. 
+        didLayout takes the WebLayoutMilestones bit mask, which will 
+        indicate which milestones have fired since it is possible for two 
+        to fire at the same time.
+
+        Remove dispatchDidFirstLayout, 
+        dispatchDidFirstVisuallyNonEmptyLayout, and 
+        dispatchDidNewFirstVisuallyNonEmptyLayout. They are now replaced 
+        by dispatchDidLayout(LayoutMilestones)
+        * WebCoreSupport/WebFrameLoaderClient.h:
+        (WebFrameLoaderClient):
+        * WebCoreSupport/WebFrameLoaderClient.mm:
+        (WebFrameLoaderClient::dispatchDidLayout):
+
+        Add new function to the delegate for didLayout.
+        * WebView/WebDelegateImplementationCaching.h:
+        (WebFrameLoadDelegateImplementationCache):
+
+        We need a delegate template that takes an NSUInteger.
+        * WebView/WebDelegateImplementationCaching.mm:
+        (CallDelegate):
+        (CallFrameLoadDelegate):
+
+        Convert between WebCore and WebKit versions of the bit mask.
+        * WebView/WebView.mm:
+        (coreLayoutMilestones):
+        (kitLayoutMilestones):
+
+        Add new delegate, and set the appropriate layout milestones in 
+        WebCore based on old delegates having implementations.
+        (-[WebView _cacheFrameLoadDelegateImplementations]):
+
+        Call into WebCore.
+        (-[WebView _listenForLayoutMilestones:]):
+        (-[WebView _layoutMilestones]):
+        * WebView/WebViewInternal.h:
+        * WebView/WebViewPrivate.h:
+
+2012-09-24  Benjamin Poulain  <bpoulain@apple.com>
+
+        Fix Geolocation error reporting in the test support
+        https://bugs.webkit.org/show_bug.cgi?id=97386
+
+        Reviewed by Sam Weinig.
+
+        * WebView/WebView.mm:
+        (-[WebView _geolocationDidFailWithMessage:]):
+        * WebView/WebViewPrivate.h:
+
+2012-09-24  Ryosuke Niwa  <rniwa@webkit.org>
+
+        suspend/resumeWidgetHierarchyUpdates should be a RAII object
+        https://bugs.webkit.org/show_bug.cgi?id=96706
+
+        Reviewed by Simon Fraser.
+
+        * WebView/WebHTMLView.mm:
+        (-[WebHTMLView _invalidateGStatesForTree]):
+
 2012-09-21  Chris Rogers  <crogers@google.com>
 
         Add Web Audio support for deprecated/legacy APIs

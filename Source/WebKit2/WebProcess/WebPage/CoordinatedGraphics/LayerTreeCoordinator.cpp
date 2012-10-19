@@ -272,7 +272,10 @@ bool LayerTreeCoordinator::flushPendingLayerChanges()
 
     if (m_shouldSyncFrame) {
         didSync = true;
-        m_webPage->send(Messages::LayerTreeCoordinatorProxy::DidRenderFrame());
+
+        IntSize contentsSize = roundedIntSize(m_nonCompositedContentLayer->size());
+        IntRect coveredRect = toCoordinatedGraphicsLayer(m_nonCompositedContentLayer.get())->coverRect();
+        m_webPage->send(Messages::LayerTreeCoordinatorProxy::DidRenderFrame(contentsSize, coveredRect));
         m_waitingForUIProcess = true;
         m_shouldSyncFrame = false;
     }
@@ -454,6 +457,14 @@ int64_t LayerTreeCoordinator::adoptImageBackingStore(Image* image)
         return InvalidWebLayerID;
 
     key = nativeImage->cacheKey();
+#elif USE(CAIRO)
+    NativeImageCairo* nativeImage = image->nativeImageForCurrentFrame();
+    if (!nativeImage)
+        return InvalidWebLayerID;
+    // This can be safely done since we own the reference.
+    // A corresponding cairo_surface_destroy() is ensured in releaseImageBackingStore().
+    cairo_surface_t* cairoSurface = cairo_surface_reference(nativeImage->surface());
+    key = reinterpret_cast<int64_t>(cairoSurface);
 #endif
 
     HashMap<int64_t, int>::iterator it = m_directlyCompositedImageRefCounts.find(key);
@@ -490,6 +501,11 @@ void LayerTreeCoordinator::releaseImageBackingStore(int64_t key)
         return;
 
     m_directlyCompositedImageRefCounts.remove(it);
+#if USE(CAIRO)
+    // Complement the referencing in adoptImageBackingStore().
+    cairo_surface_t* cairoSurface = reinterpret_cast<cairo_surface_t*>(key);
+    cairo_surface_destroy(cairoSurface);
+#endif
     m_webPage->send(Messages::LayerTreeCoordinatorProxy::DestroyDirectlyCompositedImage(key));
 }
 
@@ -525,6 +541,11 @@ bool LayerTreeCoordinator::showDebugBorders(const WebCore::GraphicsLayer*) const
 bool LayerTreeCoordinator::showRepaintCounter(const WebCore::GraphicsLayer*) const
 {
     return m_webPage->corePage()->settings()->showRepaintCounter();
+}
+
+PassOwnPtr<GraphicsLayer> LayerTreeCoordinator::createGraphicsLayer(GraphicsLayerClient* client)
+{
+    return adoptPtr(new CoordinatedGraphicsLayer(client));
 }
 
 bool LayerTreeHost::supportsAcceleratedCompositing()
@@ -594,6 +615,11 @@ void LayerTreeCoordinator::setVisibleContentsRect(const IntRect& rect, float sca
         m_webPage->setFixedVisibleContentRect(rect);
     if (contentsRectDidChange)
         m_shouldSendScrollPositionUpdate = true;
+}
+
+GraphicsLayerFactory* LayerTreeCoordinator::graphicsLayerFactory()
+{
+    return this;
 }
 
 void LayerTreeCoordinator::scheduleAnimation()

@@ -124,6 +124,7 @@
 #include "VibrationClientBlackBerry.h"
 #endif
 #include "VisiblePosition.h"
+#include "WebCookieJar.h"
 #if ENABLE(WEBDOM)
 #include "WebDOMDocument.h"
 #endif
@@ -349,6 +350,7 @@ WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const In
     , m_mainFrame(0) // Initialized by init.
     , m_currentContextNode(0)
     , m_webSettings(0) // Initialized by init.
+    , m_cookieJar(0)
     , m_visible(false)
     , m_activationState(ActivationActive)
     , m_shouldResetTilesWhenShown(false)
@@ -388,7 +390,6 @@ WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const In
 #if ENABLE(FULLSCREEN_API)
 #if ENABLE(VIDEO)
     , m_scaleBeforeFullScreen(-1.0)
-    , m_xScrollOffsetBeforeFullScreen(-1)
 #endif
     , m_isTogglingFullScreenState(false)
 #endif
@@ -427,8 +428,6 @@ WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const In
         BlackBerry::Platform::DeviceInfo::instance();
         defaultUserAgent();
     }
-
-    AuthenticationChallengeManager::instance()->pageCreated(this);
 }
 
 WebPage::WebPage(WebPageClient* client, const WebString& pageGroupName, const Platform::IntRect& rect)
@@ -440,7 +439,6 @@ WebPage::WebPage(WebPageClient* client, const WebString& pageGroupName, const Pl
 
 WebPagePrivate::~WebPagePrivate()
 {
-    AuthenticationChallengeManager::instance()->pageDeleted(this);
     // Hand the backingstore back to another owner if necessary.
     m_webPage->setVisible(false);
     if (BackingStorePrivate::currentBackingStoreOwner() == m_webPage)
@@ -448,6 +446,9 @@ WebPagePrivate::~WebPagePrivate()
 
     delete m_webSettings;
     m_webSettings = 0;
+
+    delete m_cookieJar;
+    m_cookieJar = 0;
 
     delete m_backingStoreClient;
     m_backingStoreClient = 0;
@@ -553,6 +554,8 @@ void WebPagePrivate::init(const WebString& pageGroupName)
     m_webSettings = WebSettings::createFromStandardSettings();
     m_webSettings->setUserAgentString(defaultUserAgent());
     m_page->setDeviceScaleFactor(m_webSettings->devicePixelRatio());
+
+    m_page->addLayoutMilestones(DidFirstVisuallyNonEmptyLayout);
 
 #if USE(ACCELERATED_COMPOSITING)
     m_tapHighlight = DefaultTapHighlight::create(this);
@@ -2213,19 +2216,18 @@ bool WebPagePrivate::isActive() const
     return m_client->isActive();
 }
 
-void WebPagePrivate::authenticationChallenge(const KURL& url, const ProtectionSpace& protectionSpace, const Credential& inputCredential)
+void WebPagePrivate::authenticationChallenge(const KURL& url, const ProtectionSpace& protectionSpace, const Credential& inputCredential, AuthenticationChallengeClient* client)
 {
     WebString username;
     WebString password;
-    AuthenticationChallengeManager* authmgr = AuthenticationChallengeManager::instance();
 
 #if !defined(PUBLIC_BUILD) || !PUBLIC_BUILD
     if (m_dumpRenderTree) {
         Credential credential(inputCredential, inputCredential.persistence());
         if (m_dumpRenderTree->didReceiveAuthenticationChallenge(credential))
-            authmgr->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeSuccess, credential);
+            client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeSuccess, credential);
         else
-            authmgr->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeCancelled, inputCredential);
+            client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeCancelled, inputCredential);
         return;
     }
 #endif
@@ -2246,9 +2248,9 @@ void WebPagePrivate::authenticationChallenge(const KURL& url, const ProtectionSp
 #endif
 
     if (isConfirmed)
-        authmgr->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeSuccess, credential);
+        client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeSuccess, credential);
     else
-        authmgr->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeCancelled, inputCredential);
+        client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeCancelled, inputCredential);
 }
 
 PageClientBlackBerry::SaveCredentialType WebPagePrivate::notifyShouldSaveCredential(bool isNew)
@@ -3191,6 +3193,14 @@ WebSettings* WebPage::settings() const
     return d->m_webSettings;
 }
 
+WebCookieJar* WebPage::cookieJar() const
+{
+    if (!d->m_cookieJar)
+        d->m_cookieJar = new WebCookieJar();
+
+    return d->m_cookieJar;
+}
+
 bool WebPage::isVisible() const
 {
     return d->m_visible;
@@ -3229,6 +3239,11 @@ void WebPagePrivate::setVisible(bool visible)
 {
     m_visible = visible;
 
+    if (visible && m_page->scriptedAnimationsSuspended())
+        m_page->resumeScriptedAnimations();
+    if (!visible && !m_page->scriptedAnimationsSuspended())
+        m_page->suspendScriptedAnimations();
+
 #if ENABLE(PAGE_VISIBILITY_API)
     setPageVisibilityState();
 #endif
@@ -3240,7 +3255,6 @@ void WebPage::setVisible(bool visible)
         return;
 
     d->setVisible(visible);
-    AuthenticationChallengeManager::instance()->pageVisibilityChanged(d, visible);
 
     if (!visible) {
         d->suspendBackingStore();
@@ -3459,6 +3473,7 @@ IntSize WebPagePrivate::recomputeVirtualViewportFromViewportArguments()
     int deviceWidth = Platform::Graphics::Screen::primaryScreen()->width();
     int deviceHeight = Platform::Graphics::Screen::primaryScreen()->height();
     ViewportAttributes result = computeViewportAttributes(m_viewportArguments, desktopWidth, deviceWidth, deviceHeight, m_webSettings->devicePixelRatio(), m_defaultLayoutSize);
+    m_page->setDeviceScaleFactor(result.devicePixelRatio);
 
     setUserScalable(m_webSettings->isUserScalable() && result.userScalable);
     if (result.initialScale > 0)
@@ -3865,6 +3880,22 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
 
 #if ENABLE(FULLSCREEN_API)
     if (m_isTogglingFullScreenState) {
+        if (!m_fullscreenVideoNode) {
+            // When leaving fullscreen mode, we need to restore the scroll position and
+            // zoom level it was at before fullscreen.
+            // FIXME: The cached values might get imprecise if user have rotated the
+            // device while in fullscreen.
+            if (m_scaleBeforeFullScreen > 0) {
+                // Restore the scale when leaving fullscreen. We can't use TransformationMatrix::scale(double) here, as it
+                // will multiply the scale rather than set the scale.
+                // FIXME: We can refactor this into setCurrentScale(double) if it is useful in the future.
+                m_transformationMatrix->setM11(m_scaleBeforeFullScreen);
+                m_transformationMatrix->setM22(m_scaleBeforeFullScreen);
+                m_scaleBeforeFullScreen = -1.0;
+            }
+            m_mainFrame->view()->setScrollPosition(m_scrollOffsetBeforeFullScreen);
+        }
+
         m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
         m_isTogglingFullScreenState = false;
     }
@@ -5943,8 +5974,7 @@ void WebPagePrivate::enterFullScreenForElement(Element* element)
         // When an element goes fullscreen, the viewport size changes and the scroll
         // position might change. So we keep track of it here, in order to restore it
         // once element leaves fullscreen.
-        WebCore::IntPoint scrollPosition = m_mainFrame->view()->scrollPosition();
-        m_xScrollOffsetBeforeFullScreen = scrollPosition.x();
+        m_scrollOffsetBeforeFullScreen = m_mainFrame->view()->scrollPosition();
 
         // The current scale can be clamped to a greater minimum scale when we relayout contents during
         // the change of the viewport size. Cache the current scale so that we can restore it when
@@ -5971,24 +6001,6 @@ void WebPagePrivate::exitFullScreenForElement(Element* element)
         // The Browser chrome has its own fullscreen video widget.
         exitFullscreenForNode(element);
     } else {
-        // When leaving fullscreen mode, we need to restore the 'x' scroll position
-        // before fullscreen.
-        // FIXME: We may need to respect 'y' position as well, because the web page always scrolls to
-        // the top when leaving fullscreen mode.
-        WebCore::IntPoint scrollPosition = m_mainFrame->view()->scrollPosition();
-        m_mainFrame->view()->setScrollPosition(
-            WebCore::IntPoint(m_xScrollOffsetBeforeFullScreen, scrollPosition.y()));
-        m_xScrollOffsetBeforeFullScreen = -1;
-
-        if (m_scaleBeforeFullScreen > 0) {
-            // Restore the scale when leaving fullscreen. We can't use TransformationMatrix::scale(double) here, as it
-            // will multiply the scale rather than set the scale.
-            // FIXME: We can refactor this into setCurrentScale(double) if it is useful in the future.
-            m_transformationMatrix->setM11(m_scaleBeforeFullScreen);
-            m_transformationMatrix->setM22(m_scaleBeforeFullScreen);
-            m_scaleBeforeFullScreen = -1.0;
-        }
-
         // This is where we would restore the browser's chrome
         // if hidden above.
         client()->fullscreenStop();
@@ -6103,6 +6115,8 @@ void WebPagePrivate::didChangeSettings(WebSettings* webSettings)
         Platform::userInterfaceThreadMessageClient()->dispatchMessage(
             createMethodCallMessage(&WebPagePrivate::setCompositorBackgroundColor, this, backgroundColor));
     }
+
+    m_page->setDeviceScaleFactor(webSettings->devicePixelRatio());
 }
 
 WebString WebPage::textHasAttribute(const WebString& query) const

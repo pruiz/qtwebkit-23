@@ -659,7 +659,7 @@ void FrameLoaderClientEfl::dispatchDidReceiveTitle(const StringWithDirection& ti
 void FrameLoaderClientEfl::dispatchDidChangeIcons(WebCore::IconType iconType)
 {
     // Other touch types are apple-specific
-    ASSERT(iconType == WebCore::Favicon);
+    ASSERT_UNUSED(iconType, iconType == WebCore::Favicon);
     ewk_frame_icon_changed(m_frame);
 }
 
@@ -678,14 +678,12 @@ void FrameLoaderClientEfl::dispatchDidFinishDocumentLoad()
     ewk_frame_load_document_finished(m_frame);
 }
 
-void FrameLoaderClientEfl::dispatchDidFirstLayout()
+void FrameLoaderClientEfl::dispatchDidLayout(LayoutMilestones milestones)
 {
-    ewk_frame_load_firstlayout_finished(m_frame);
-}
-
-void FrameLoaderClientEfl::dispatchDidFirstVisuallyNonEmptyLayout()
-{
-    ewk_frame_load_firstlayout_nonempty_finished(m_frame);
+    if (milestones & DidFirstLayout)
+        ewk_frame_load_firstlayout_finished(m_frame);
+    if (milestones & DidFirstVisuallyNonEmptyLayout)
+        ewk_frame_load_firstlayout_nonempty_finished(m_frame);
 }
 
 void FrameLoaderClientEfl::dispatchShow()
@@ -722,9 +720,7 @@ bool FrameLoaderClientEfl::canShowMIMETypeAsHTML(const String& /*MIMEType*/) con
 
 bool FrameLoaderClientEfl::canShowMIMEType(const String& MIMEType) const
 {
-    if (MIMETypeRegistry::isSupportedImageMIMEType(MIMEType)
-        || MIMETypeRegistry::isSupportedNonImageMIMEType(MIMEType)
-        || MIMETypeRegistry::isSupportedMediaMIMEType(MIMEType))
+    if (MIMETypeRegistry::canShowMIMEType(MIMEType))
         return true;
 
 #if 0 // PluginDatabase is disabled until we have Plugin system done.

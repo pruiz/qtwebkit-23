@@ -142,7 +142,11 @@ ComplexTextController::ComplexTextController(const Font* font, const TextRun& ru
         m_expansionPerOpportunity = 0;
     else {
         bool isAfterExpansion = m_afterExpansion;
-        unsigned expansionOpportunityCount = Font::expansionOpportunityCount(m_run.characters16(), m_end, m_run.ltr() ? LTR : RTL, isAfterExpansion);
+        unsigned expansionOpportunityCount;
+        if (m_run.is8Bit())
+            expansionOpportunityCount = Font::expansionOpportunityCount(m_run.characters8(), m_end, m_run.ltr() ? LTR : RTL, isAfterExpansion);
+         else
+             expansionOpportunityCount = Font::expansionOpportunityCount(m_run.characters16(), m_end, m_run.ltr() ? LTR : RTL, isAfterExpansion);
         if (isAfterExpansion && !m_run.allowsTrailingExpansion())
             expansionOpportunityCount--;
 
@@ -284,7 +288,14 @@ void ComplexTextController::collectComplexTextRuns()
         return;
 
     // We break up glyph run generation for the string by FontData.
-    const UChar* cp = m_run.characters16();
+    const UChar* cp;
+
+    if (m_run.is8Bit()) {
+        String stringFor8BitRun = String::make16BitFrom8BitSource(m_run.characters8(), m_run.length());
+        cp = stringFor8BitRun.characters16();
+        m_stringsFor8BitRuns.append(stringFor8BitRun);
+    } else
+        cp = m_run.characters16();
 
     if (m_font.isSmallCaps())
         m_smallCapsBuffer.resize(m_end);
@@ -575,14 +586,8 @@ void ComplexTextController::adjustGlyphsAndAdvances()
                 nextCh = *(m_complexTextRuns[r + 1]->characters() + m_complexTextRuns[r + 1]->indexAt(0));
 
             bool treatAsSpace = Font::treatAsSpace(ch);
-            CGGlyph glyph = glyphs[i];
-            CGSize advance = advances[i];
-            // FIXME: We should find a way to substitute spaces for characters that are treated as spaces
-            // before handing them off to Core Text, so that kerning can be applied as if they were spaces.
-            if (treatAsSpace && ch != ' ') {
-                glyph = fontData->spaceGlyph();
-                advance.width = spaceWidth;
-            }
+            CGGlyph glyph = treatAsSpace ? fontData->spaceGlyph() : glyphs[i];
+            CGSize advance = treatAsSpace ? CGSizeMake(spaceWidth, advances[i].height) : advances[i];
 
             if (ch == '\t' && m_run.allowTabs())
                 advance.width = m_font.tabWidth(*fontData, m_run.tabSize(), m_run.xPos() + m_totalWidth + widthSinceLastCommit);

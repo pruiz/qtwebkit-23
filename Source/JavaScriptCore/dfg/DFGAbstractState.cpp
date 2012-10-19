@@ -1001,11 +1001,13 @@ bool AbstractState::execute(unsigned indexInBlock)
             
     case ArrayPush:
         node.setCanExit(true);
+        clobberWorld(node.codeOrigin, indexInBlock);
         forNode(nodeIndex).set(SpecNumber);
         break;
             
     case ArrayPop:
         node.setCanExit(true);
+        clobberWorld(node.codeOrigin, indexInBlock);
         forNode(nodeIndex).makeTop();
         break;
             
@@ -1262,11 +1264,17 @@ bool AbstractState::execute(unsigned indexInBlock)
         forNode(nodeIndex).set(SpecFunction);
         break;
             
-    case GetScopeChain:
+    case GetScope:
         node.setCanExit(false);
         forNode(nodeIndex).set(SpecCellOther);
         break;
-            
+
+    case GetScopeRegisters:
+        node.setCanExit(false);
+        forNode(node.child1()).filter(SpecCell);
+        forNode(nodeIndex).clear(); // The result is not a JS value.
+        break;
+
     case GetScopedVar:
         node.setCanExit(false);
         forNode(nodeIndex).makeTop();

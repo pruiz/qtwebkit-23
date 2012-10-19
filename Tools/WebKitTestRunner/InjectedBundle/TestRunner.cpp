@@ -87,6 +87,7 @@ TestRunner::TestRunner()
     , m_testRepaint(false)
     , m_testRepaintSweepHorizontally(false)
     , m_willSendRequestReturnsNull(false)
+    , m_willSendRequestReturnsNullOnRedirect(false)
     , m_shouldStopProvisionalFrameLoads(false)
     , m_policyDelegateEnabled(false)
     , m_policyDelegatePermissive(false)
@@ -649,9 +650,15 @@ void TestRunner::callSetBackingScaleFactorCallback()
     callTestRunnerCallback(SetBackingScaleFactorCallbackID);
 }
 
-void TestRunner::overridePreference(JSStringRef preference, bool value)
+static inline bool toBool(JSStringRef value)
 {
-    WKBundleOverrideBoolPreferenceForTestRunner(InjectedBundle::shared().bundle(), InjectedBundle::shared().pageGroup(), toWK(preference).get(), value);
+    return JSStringIsEqualToUTF8CString(value, "true") || JSStringIsEqualToUTF8CString(value, "1");
+}
+
+void TestRunner::overridePreference(JSStringRef preference, JSStringRef value)
+{
+    // FIXME: handle non-boolean preferences.
+    WKBundleOverrideBoolPreferenceForTestRunner(InjectedBundle::shared().bundle(), InjectedBundle::shared().pageGroup(), toWK(preference).get(), toBool(value));
 }
 
 void TestRunner::sendWebIntentResponse(JSStringRef reply)
@@ -776,6 +783,12 @@ void TestRunner::setGeolocationPermission(bool enabled)
 void TestRunner::setMockGeolocationPosition(double latitude, double longitude, double accuracy)
 {
     InjectedBundle::shared().setMockGeolocationPosition(latitude, longitude, accuracy);
+}
+
+void TestRunner::setMockGeolocationPositionUnavailableError(JSStringRef message)
+{
+    WKRetainPtr<WKStringRef> messageWK = toWK(message);
+    InjectedBundle::shared().setMockGeolocationPositionUnavailableError(messageWK.get());
 }
 
 bool TestRunner::callShouldCloseOnWebView()

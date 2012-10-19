@@ -1398,7 +1398,9 @@ _llint_op_put_by_val:
     dispatch(5)
 
 .opPutByValEmpty:
-    storeb 1, ArrayProfile::m_mayStoreToHole[t3]
+    if VALUE_PROFILER
+        storeb 1, ArrayProfile::m_mayStoreToHole[t3]
+    end
     addi 1, ArrayStorage::m_numValuesInVector[t0]
     bib t2, -sizeof IndexingHeader + IndexingHeader::m_publicLength[t0], .opPutByValStoreResult
     addi 1, t2, t1
@@ -1483,7 +1485,10 @@ _llint_op_jneq_ptr:
     traceExecution()
     loadi 4[PC], t0
     loadi 8[PC], t1
+    loadp CodeBlock[cfr], t2
+    loadp CodeBlock::m_globalObject[t2], t2
     bineq TagOffset[cfr, t0, 8], CellTag, .opJneqPtrBranch
+    loadp JSGlobalObject::m_specialPointers[t2, t1, 8], t1
     bpeq PayloadOffset[cfr, t0, 8], t1, .opJneqPtrFallThrough
 .opJneqPtrBranch:
     dispatchBranch(12[PC])

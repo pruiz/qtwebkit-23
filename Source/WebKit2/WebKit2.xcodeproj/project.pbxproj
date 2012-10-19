@@ -12,7 +12,8 @@
 			buildConfigurationList = 1A50DB48110A3C27000D3FE5 /* Build configuration list for PBXAggregateTarget "All" */;
 			buildPhases = (
 				1A50DB70110A3D67000D3FE5 /* CopyFiles */,
-				BCA8D46B15BCE33C009DC1F1 /* CopyFiles */,
+				BCFFCA8A160D6DEA003DF315 /* Add XPCServices symlink */,
+				BCFFCA8B160D6E7B003DF315 /* Copy XPC services for engineering builds */,
 			);
 			dependencies = (
 				1A50DB3C110A3C19000D3FE5 /* PBXTargetDependency */,
@@ -114,6 +115,9 @@
 		1A3DD206125E5A2F004515E6 /* APIClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3DD205125E5A2F004515E6 /* APIClient.h */; };
 		1A3E736111CC2659007BD539 /* WebPlatformStrategies.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3E735F11CC2659007BD539 /* WebPlatformStrategies.h */; };
 		1A3E736211CC2659007BD539 /* WebPlatformStrategies.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A3E736011CC2659007BD539 /* WebPlatformStrategies.cpp */; };
+		1A3EED0E161A535400AEB4F5 /* MessageReceiverMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1A3EED0C161A535300AEB4F5 /* MessageReceiverMap.cpp */; };
+		1A3EED0F161A535400AEB4F5 /* MessageReceiverMap.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3EED0D161A535300AEB4F5 /* MessageReceiverMap.h */; };
+		1A3EED12161A53D600AEB4F5 /* MessageReceiver.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A3EED11161A53D600AEB4F5 /* MessageReceiver.h */; };
 		1A433F0D113C53DD00FACDE9 /* WebErrors.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A433F0C113C53DD00FACDE9 /* WebErrors.h */; };
 		1A4A9AA812B7E796008FE984 /* WKTextInputWindowController.h in Headers */ = {isa = PBXBuildFile; fileRef = 1A4A9AA612B7E796008FE984 /* WKTextInputWindowController.h */; };
 		1A4A9AA912B7E796008FE984 /* WKTextInputWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1A4A9AA712B7E796008FE984 /* WKTextInputWindowController.mm */; };
@@ -728,11 +732,9 @@
 		BCA8C6A911E3BA5F00812FB7 /* InjectedBundlePageLoaderClient.h in Headers */ = {isa = PBXBuildFile; fileRef = BCA8C6A711E3BA5F00812FB7 /* InjectedBundlePageLoaderClient.h */; };
 		BCA8C6AF11E3C08700812FB7 /* InjectedBundlePageUIClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BCA8C6AD11E3C08700812FB7 /* InjectedBundlePageUIClient.cpp */; };
 		BCA8C6B011E3C08700812FB7 /* InjectedBundlePageUIClient.h in Headers */ = {isa = PBXBuildFile; fileRef = BCA8C6AE11E3C08700812FB7 /* InjectedBundlePageUIClient.h */; };
-		BCA8D46C15BCE34B009DC1F1 /* com.apple.WebKit2.WebProcessService.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = BC3DE46615A91763008D26FC /* com.apple.WebKit2.WebProcessService.xpc */; };
 		BCAC111F12C92C1F00B08EEE /* WebDatabaseManagerProxyClient.h in Headers */ = {isa = PBXBuildFile; fileRef = BCAC111D12C92C1F00B08EEE /* WebDatabaseManagerProxyClient.h */; };
 		BCAC112012C92C1F00B08EEE /* WebDatabaseManagerProxyClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = BCAC111E12C92C1F00B08EEE /* WebDatabaseManagerProxyClient.cpp */; };
 		BCAE9DFB160C0AA100A33217 /* com.apple.WebProcess.sb in Resources */ = {isa = PBXBuildFile; fileRef = E1967E37150AB5E200C73169 /* com.apple.WebProcess.sb */; };
-		BCAE9DFE160C0AC500A33217 /* com.apple.WebKit2.WebProcessServiceForWebKitDevelopment.xpc in CopyFiles */ = {isa = PBXBuildFile; fileRef = BCAE9DE9160C097400A33217 /* com.apple.WebKit2.WebProcessServiceForWebKitDevelopment.xpc */; };
 		BCAE9E05160C137800A33217 /* WebProcessServiceForWebKitDevelopmentMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = BCAE9E04160C137800A33217 /* WebProcessServiceForWebKitDevelopmentMain.mm */; };
 		BCAE9E07160C139A00A33217 /* WebProcessServiceMain.mm in Sources */ = {isa = PBXBuildFile; fileRef = BCAE9E06160C139A00A33217 /* WebProcessServiceMain.mm */; };
 		BCAE9E08160C1C0700A33217 /* WebKit2.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DC2EF5B0486A6940098B216 /* WebKit2.framework */; };
@@ -1050,17 +1052,6 @@
 			name = "Copy Message Generation Scripts";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		BCA8D46B15BCE33C009DC1F1 /* CopyFiles */ = {
-			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
-			dstPath = WebKit2.framework/XPCServices;
-			dstSubfolderSpec = 1;
-			files = (
-				BCA8D46C15BCE34B009DC1F1 /* com.apple.WebKit2.WebProcessService.xpc in CopyFiles */,
-				BCAE9DFE160C0AC500A33217 /* com.apple.WebKit2.WebProcessServiceForWebKitDevelopment.xpc in CopyFiles */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 		BCDE093C13272496001259FB /* Copy Plug-in Process Shim */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1161,6 +1152,9 @@
 		1A3DD205125E5A2F004515E6 /* APIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = APIClient.h; sourceTree = "<group>"; };
 		1A3E735F11CC2659007BD539 /* WebPlatformStrategies.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebPlatformStrategies.h; sourceTree = "<group>"; };
 		1A3E736011CC2659007BD539 /* WebPlatformStrategies.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WebPlatformStrategies.cpp; sourceTree = "<group>"; };
+		1A3EED0C161A535300AEB4F5 /* MessageReceiverMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageReceiverMap.cpp; sourceTree = "<group>"; };
+		1A3EED0D161A535300AEB4F5 /* MessageReceiverMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageReceiverMap.h; sourceTree = "<group>"; };
+		1A3EED11161A53D600AEB4F5 /* MessageReceiver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageReceiver.h; sourceTree = "<group>"; };
 		1A433F0C113C53DD00FACDE9 /* WebErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebErrors.h; sourceTree = "<group>"; };
 		1A4A9AA612B7E796008FE984 /* WKTextInputWindowController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WKTextInputWindowController.h; sourceTree = "<group>"; };
 		1A4A9AA712B7E796008FE984 /* WKTextInputWindowController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WKTextInputWindowController.mm; sourceTree = "<group>"; };
@@ -2612,6 +2606,9 @@
 				1A8EFDF91253CAA200F7067F /* DataReference.h */,
 				C0CE72AC1247E78D00BC0EC4 /* HandleMessage.h */,
 				BC032DA410F437D10058C15A /* MessageID.h */,
+				1A3EED11161A53D600AEB4F5 /* MessageReceiver.h */,
+				1A3EED0C161A535300AEB4F5 /* MessageReceiverMap.cpp */,
+				1A3EED0D161A535300AEB4F5 /* MessageReceiverMap.h */,
 				1A119A94127B796200A9ECB1 /* MessageSender.h */,
 			);
 			path = CoreIPC;
@@ -4311,6 +4308,8 @@
 				BC59548915C7868500FD1E3E /* WebKit2.h in Headers */,
 				BCDC308815FD6A8B006B6695 /* WebProcessInitialization.h in Headers */,
 				BCDC308C15FD6CD1006B6695 /* WebProcessServiceEntryPoints.h in Headers */,
+				1A3EED0F161A535400AEB4F5 /* MessageReceiverMap.h in Headers */,
+				1A3EED12161A53D600AEB4F5 /* MessageReceiver.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4637,6 +4636,39 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "if [ \"${ACTION}\" = \"installhdrs\" ]; then\n    exit 0;\nfi\n\nif [ -f ../../Tools/Scripts/check-for-inappropriate-files-in-framework ]; then\n    ../../Tools/Scripts/check-for-inappropriate-files-in-framework || exit $?\nfi\n";
+		};
+		BCFFCA8A160D6DEA003DF315 /* Add XPCServices symlink */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Add XPCServices symlink";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(WRAPPER_NAME)/WebKit2.framework/XPCServices",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "ln -sf Versions/Current/XPCServices \"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/WebKit2.framework/XPCServices\"\n";
+		};
+		BCFFCA8B160D6E7B003DF315 /* Copy XPC services for engineering builds */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/com.apple.WebKit2.WebProcessService.xpc",
+				"$(BUILT_PRODUCTS_DIR)/com.apple.WebKit2.WebProcessServiceForWebKitDevelopment.xpc",
+			);
+			name = "Copy XPC services for engineering builds";
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/${WRAPPER_NAME}/WebKit2.framework/Versions/A/XPCServices/com.apple.WebKit2.WebProcessService.xpc",
+				"$(BUILT_PRODUCTS_DIR)/${WRAPPER_NAME}/WebKit2.framework/Versions/A/XPCServices/com.apple.WebKit2.WebProcessServiceForWebKitDevelopment.xpc",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "if [[ \"${CONFIGURATION}\" == \"Production\" ]]; then\n    exit\nfi\n\nXPC_SERVICES_PATH=\"${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/WebKit2.framework/Versions/A/XPCServices\"\nmkdir -p \"${XPC_SERVICES_PATH}\"\nditto \"${BUILT_PRODUCTS_DIR}/com.apple.WebKit2.WebProcessService.xpc\" \"${XPC_SERVICES_PATH}/com.apple.WebKit2.WebProcessService.xpc\"\nditto \"${BUILT_PRODUCTS_DIR}/com.apple.WebKit2.WebProcessServiceForWebKitDevelopment.xpc\" \"${XPC_SERVICES_PATH}/com.apple.WebKit2.WebProcessServiceForWebKitDevelopment.xpc\"\n";
 		};
 		C0CE72841247E66800BC0EC4 /* Generate Derived Sources */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -5134,6 +5166,7 @@
 				CD67D30E15C08F9A00843ADF /* InjectedBundlePageDiagnosticLoggingClient.cpp in Sources */,
 				BCDC308715FD6A8B006B6695 /* WebProcessInitialization.mm in Sources */,
 				BCDC308B15FD6CD1006B6695 /* WebProcessServiceEntryPoints.mm in Sources */,
+				1A3EED0E161A535400AEB4F5 /* MessageReceiverMap.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -448,7 +448,7 @@ PassOwnPtr<ArgumentDecoder> Connection::waitForSyncReply(uint64_t syncRequestID,
             ASSERT(!m_pendingSyncReplies.isEmpty());
             
             PendingSyncReply& pendingSyncReply = m_pendingSyncReplies.last();
-            ASSERT(pendingSyncReply.syncRequestID == syncRequestID);
+            ASSERT_UNUSED(syncRequestID, pendingSyncReply.syncRequestID == syncRequestID);
             
             // We found the sync reply, or the connection was closed.
             if (pendingSyncReply.didReceiveReply || !m_shouldWaitForSyncReplies)
@@ -668,6 +668,15 @@ void Connection::enqueueIncomingMessage(IncomingMessage& incomingMessage)
     m_clientRunLoop->dispatch(WTF::bind(&Connection::dispatchOneMessage, this));
 }
 
+void Connection::dispatchMessage(MessageID messageID, ArgumentDecoder* argumentDecoder)
+{
+    // Try the message receiver map first.
+    if (m_messageReceiverMap.dispatchMessage(this, messageID, argumentDecoder))
+        return;
+
+    m_client->didReceiveMessage(this, messageID, argumentDecoder);
+}
+
 void Connection::dispatchMessage(IncomingMessage& message)
 {
     OwnPtr<ArgumentDecoder> arguments = message.releaseArguments();
@@ -688,7 +697,7 @@ void Connection::dispatchMessage(IncomingMessage& message)
     if (message.messageID().isSync())
         dispatchSyncMessage(message.messageID(), arguments.get());
     else
-        m_client->didReceiveMessage(this, message.messageID(), arguments.get());
+        dispatchMessage(message.messageID(), arguments.get());
 
     m_didReceiveInvalidMessage |= arguments->isInvalid();
     m_inDispatchMessageCount--;

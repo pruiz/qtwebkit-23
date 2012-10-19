@@ -32,7 +32,7 @@
 #include "LocaleWin.h"
 
 #include "DateComponents.h"
-#if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
+#if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
 #include "DateTimeFormat.h"
 #endif
 #include "Language.h"
@@ -354,8 +354,10 @@ int LocaleWin::parseNumberOrMonth(const String& input, unsigned& index)
     return -1;
 }
 
-double LocaleWin::parseDate(const String& input)
+double LocaleWin::parseDateTime(const String& input, DateComponents::Type type)
 {
+    if (type != DateComponents::Date)
+        return std::numeric_limits<double>::quiet_NaN();
     ensureShortDateTokens();
     return parseDate(m_shortDateTokens, m_baseYear, input);
 }
@@ -478,8 +480,10 @@ void LocaleWin::appendFourDigitsNumber(int value, StringBuilder& buffer)
     buffer.append(convertToLocalizedNumber(numberBuffer.toString()));
 }
 
-String LocaleWin::formatDate(const DateComponents& dateComponents)
+String LocaleWin::formatDateTime(const DateComponents& dateComponents)
 {
+    if (dateComponents.type() != DateComponents::Date)
+        return String();
     ensureShortDateTokens();
     return formatDate(m_shortDateTokens, m_baseYear, dateComponents.fullYear(), dateComponents.month(), dateComponents.monthDay());
 }
@@ -665,9 +669,14 @@ const Vector<String>& LocaleWin::weekDayShortLabels()
     ensureWeekDayShortLabels();
     return m_weekDayShortLabels;
 }
+
+unsigned LocaleWin::firstDayOfWeek()
+{
+    return m_firstDayOfWeek;
+}
 #endif
 
-#if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
+#if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
 static DateTimeFormat::FieldType mapCharacterToDateTimeFieldType(UChar ch)
 {
     switch (ch) {
@@ -718,6 +727,12 @@ static String convertWindowsTimeFormatToLDML(const String& windowsTimeFormat)
         lastFieldType = fieldType;
     }
     return builder.toString();
+}
+
+String LocaleWin::dateFormat()
+{
+    // FIXME: We should have real implementation of LocaleWin::dateFormat().
+    return emptyString();
 }
 
 String LocaleWin::timeFormat()

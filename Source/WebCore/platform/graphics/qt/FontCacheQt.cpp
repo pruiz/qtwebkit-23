@@ -25,9 +25,9 @@
 #include "config.h"
 #include "FontCache.h"
 
+#include "Font.h"
 #include "FontDescription.h"
 #include "FontPlatformData.h"
-#include "Font.h"
 #include <utility>
 #include <wtf/ListHashSet.h>
 #include <wtf/StdLibExtras.h>
@@ -67,7 +67,7 @@ static QRawFont rawFontForCharacters(const QString& string, const QRawFont& font
 }
 #endif // HAVE(QRAWFONT)
 
-const SimpleFontData* FontCache::getFontDataForCharacters(const Font& font, const UChar* characters, int length)
+PassRefPtr<SimpleFontData> FontCache::getFontDataForCharacters(const Font& font, const UChar* characters, int length)
 {
 #if HAVE(QRAWFONT)
     QString qstring = QString::fromRawData(reinterpret_cast<const QChar*>(characters), length);
@@ -84,12 +84,12 @@ const SimpleFontData* FontCache::getFontDataForCharacters(const Font& font, cons
 #endif
 }
 
-SimpleFontData* FontCache::getSimilarFontPlatformData(const Font& font)
+PassRefPtr<SimpleFontData> FontCache::getSimilarFontPlatformData(const Font& font)
 {
     return 0;
 }
 
-SimpleFontData* FontCache::getLastResortFallbackFont(const FontDescription& fontDescription, ShouldRetain shouldRetain)
+PassRefPtr<SimpleFontData> FontCache::getLastResortFallbackFont(const FontDescription& fontDescription, ShouldRetain shouldRetain)
 {
     const AtomicString fallbackFamily = QFont(fontDescription.family().family()).lastResortFamily();
     return getCachedFontData(new FontPlatformData(fontDescription, fallbackFamily), shouldRetain);

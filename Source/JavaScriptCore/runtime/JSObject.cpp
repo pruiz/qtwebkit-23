@@ -32,7 +32,6 @@
 #include "IndexingHeaderInlineMethods.h"
 #include "JSFunction.h"
 #include "JSGlobalObject.h"
-#include "JSGlobalThis.h"
 #include "Lookup.h"
 #include "NativeErrorConstructor.h"
 #include "Nodes.h"
@@ -491,6 +490,20 @@ ArrayStorage* JSObject::createInitialArrayStorage(JSGlobalData& globalData)
     return createArrayStorage(globalData, 0, BASE_VECTOR_LEN);
 }
 
+ArrayStorage* JSObject::ensureArrayStorageSlow(JSGlobalData& globalData)
+{
+    switch (structure()->indexingType()) {
+    case ALL_BLANK_INDEXING_TYPES:
+        if (UNLIKELY(indexingShouldBeSparse()))
+            return ensureArrayStorageExistsAndEnterDictionaryIndexingMode(globalData);
+        return createInitialArrayStorage(globalData);
+        
+    default:
+        CRASH();
+        return 0;
+    }
+}
+
 ArrayStorage* JSObject::ensureArrayStorageExistsAndEnterDictionaryIndexingMode(JSGlobalData& globalData)
 {
     switch (structure()->indexingType()) {
@@ -601,7 +614,7 @@ Structure* JSObject::inheritorID(JSGlobalData& globalData)
 
 bool JSObject::allowsAccessFrom(ExecState* exec)
 {
-    JSGlobalObject* globalObject = unwrappedGlobalObject();
+    JSGlobalObject* globalObject = this->globalObject();
     return globalObject->globalObjectMethodTable()->allowsAccessFrom(globalObject, exec);
 }
 
@@ -924,13 +937,6 @@ JSObject* JSObject::toThisObject(JSCell* cell, ExecState*)
     return jsCast<JSObject*>(cell);
 }
 
-JSObject* JSObject::unwrappedObject()
-{
-    if (isGlobalThis())
-        return jsCast<JSGlobalThis*>(this)->unwrappedObject();
-    return this;
-}
-
 void JSObject::seal(JSGlobalData& globalData)
 {
     if (isSealed(globalData))
@@ -952,13 +958,6 @@ void JSObject::preventExtensions(JSGlobalData& globalData)
     enterDictionaryIndexingMode(globalData);
     if (isExtensible())
         setStructure(globalData, Structure::preventExtensionsTransition(globalData, structure()));
-}
-
-JSGlobalObject* JSObject::unwrappedGlobalObject()
-{
-    if (isGlobalThis())
-        return jsCast<JSGlobalThis*>(this)->unwrappedObject();
-    return structure()->globalObject();
 }
 
 // This presently will flatten to an uncachable dictionary; this is suitable
@@ -1052,7 +1051,7 @@ void JSObject::notifyUsedAsPrototype(JSGlobalData& globalData)
 
 Structure* JSObject::createInheritorID(JSGlobalData& globalData)
 {
-    Structure* inheritorID = createEmptyObjectStructure(globalData, unwrappedGlobalObject(), this);
+    Structure* inheritorID = createEmptyObjectStructure(globalData, globalObject(), this);
     ASSERT(inheritorID->isEmpty());
 
     PutPropertySlot slot;
@@ -1364,10 +1363,13 @@ void JSObject::putByIndexBeyondVectorLength(ExecState* exec, unsigned i, JSValue
     }
         
     case NonArrayWithSlowPutArrayStorage:
-    case ArrayWithSlowPutArrayStorage:
-        if (attemptToInterceptPutByIndexOnHole(exec, i, value, shouldThrow))
+    case ArrayWithSlowPutArrayStorage: {
+        // No own property present in the vector, but there might be in the sparse map!
+        SparseArrayValueMap* map = arrayStorage()->m_sparseMap.get();
+        if (!(map && map->contains(i)) && attemptToInterceptPutByIndexOnHole(exec, i, value, shouldThrow))
             return;
         // Otherwise, fall though.
+    }
 
     case NonArrayWithArrayStorage:
     case ArrayWithArrayStorage:

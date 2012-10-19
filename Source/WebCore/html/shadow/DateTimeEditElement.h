@@ -26,7 +26,7 @@
 #ifndef DateTimeEditElement_h
 #define DateTimeEditElement_h
 
-#if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
+#if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
 #include "DateTimeFieldElement.h"
 #include "SpinButtonElement.h"
 #include "StepRange.h"
@@ -55,15 +55,20 @@ public:
         virtual void didBlurFromControl() = 0;
         virtual void didFocusOnControl() = 0;
         virtual void editControlValueChanged() = 0;
+        virtual String formatDateTimeFieldsState(const DateTimeFieldsState&) const = 0;
         virtual bool isEditControlOwnerDisabled() const = 0;
         virtual bool isEditControlOwnerReadOnly() const = 0;
+        virtual AtomicString localeIdentifier() const = 0;
     };
 
     struct LayoutParameters {
         String dateTimeFormat;
         String fallbackDateTimeFormat;
         Localizer& localizer;
-        const StepRange& stepRange;
+        const StepRange stepRange;
+        String placeholderForDay;
+        String placeholderForMonth;
+        String placeholderForYear;
 
         LayoutParameters(Localizer& localizer, const StepRange& stepRange)
             : localizer(localizer)
@@ -88,8 +93,8 @@ public:
     void setEmptyValue(const LayoutParameters&, const DateComponents& dateForReadOnlyField);
     void setValueAsDate(const LayoutParameters&, const DateComponents&);
     void setValueAsDateTimeFieldsState(const DateTimeFieldsState&, const DateComponents& dateForReadOnlyField);
+    String value() const;
     DateTimeFieldsState valueAsDateTimeFieldsState() const;
-    double valueAsDouble() const;
 
 private:
     static const size_t invalidFieldIndex = static_cast<size_t>(-1);
@@ -122,6 +127,7 @@ private:
     virtual void fieldValueChanged() OVERRIDE FINAL;
     virtual bool focusOnNextField(const DateTimeFieldElement&) OVERRIDE FINAL;
     virtual bool focusOnPreviousField(const DateTimeFieldElement&) OVERRIDE FINAL;
+    virtual AtomicString localeIdentifier() const OVERRIDE FINAL;
 
     // SpinButtonElement::SpinButtonOwner functions.
     virtual void focusAndSelectSpinButtonOwner() OVERRIDE FINAL;

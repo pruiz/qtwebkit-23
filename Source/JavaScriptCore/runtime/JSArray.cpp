@@ -245,8 +245,8 @@ void JSArray::getOwnNonIndexPropertyNames(JSObject* object, ExecState* exec, Pro
     JSObject::getOwnNonIndexPropertyNames(thisObject, exec, propertyNames, mode);
 }
 
-// This method makes room in the vector, but leaves the new space uncleared.
-bool JSArray::unshiftCountSlowCase(JSGlobalData& globalData, unsigned count)
+// This method makes room in the vector, but leaves the new space for count slots uncleared.
+bool JSArray::unshiftCountSlowCase(JSGlobalData& globalData, bool addToFront, unsigned count)
 {
     ArrayStorage* storage = ensureArrayStorage(globalData);
     Butterfly* butterfly = storage->butterfly();
@@ -254,7 +254,7 @@ bool JSArray::unshiftCountSlowCase(JSGlobalData& globalData, unsigned count)
     unsigned propertySize = structure()->outOfLineSize();
 
     // If not, we should have handled this on the fast path.
-    ASSERT(count > storage->m_indexBias);
+    ASSERT(!addToFront || count > storage->m_indexBias);
 
     // Step 1:
     // Gather 4 key metrics:
@@ -278,7 +278,7 @@ bool JSArray::unshiftCountSlowCase(JSGlobalData& globalData, unsigned count)
     unsigned desiredCapacity = min(MAX_STORAGE_VECTOR_LENGTH, max(BASE_VECTOR_LEN, requiredVectorLength) << 1);
 
     // Step 2:
-    // We're either going to choose to allocate a new ArrayStorage, or we're going to reuse the existing on.
+    // We're either going to choose to allocate a new ArrayStorage, or we're going to reuse the existing one.
 
     void* newAllocBase = 0;
     unsigned newStorageCapacity;
@@ -297,28 +297,41 @@ bool JSArray::unshiftCountSlowCase(JSGlobalData& globalData, unsigned count)
     // Work out where we're going to move things to.
 
     // Determine how much of the vector to use as pre-capacity, and how much as post-capacity.
+    // If we're adding to the end, we'll add all the new space to the end.
     // If the vector had no free post-capacity (length >= m_vectorLength), don't give it any.
     // If it did, we calculate the amount that will remain based on an atomic decay - leave the
     // vector with half the post-capacity it had previously.
     unsigned postCapacity = 0;
-    if (length < storage->vectorLength()) {
+    if (!addToFront)
+        postCapacity = max(newStorageCapacity - requiredVectorLength, count);
+    else if (length < storage->vectorLength()) {
         // Atomic decay, + the post-capacity cannot be greater than what is available.
         postCapacity = min((storage->vectorLength() - length) >> 1, newStorageCapacity - requiredVectorLength);
         // If we're moving contents within the same allocation, the post-capacity is being reduced.
         ASSERT(newAllocBase != butterfly->base(structure()) || postCapacity < storage->vectorLength() - length);
     }
-    
+
     unsigned newVectorLength = requiredVectorLength + postCapacity;
     unsigned newIndexBias = newStorageCapacity - newVectorLength;
 
     Butterfly* newButterfly = Butterfly::fromBase(newAllocBase, newIndexBias, propertyCapacity);
-    
-    memmove(newButterfly->arrayStorage()->m_vector + count, storage->m_vector, sizeof(JSValue) * usedVectorLength);
-    memmove(newButterfly->propertyStorage() - propertySize, butterfly->propertyStorage() - propertySize, sizeof(JSValue) * propertySize + sizeof(IndexingHeader) + ArrayStorage::sizeFor(0));
-    
+
+    if (addToFront) {
+        ASSERT(count + usedVectorLength <= newVectorLength);
+        memmove(newButterfly->arrayStorage()->m_vector + count, storage->m_vector, sizeof(JSValue) * usedVectorLength);
+        memmove(newButterfly->propertyStorage() - propertySize, butterfly->propertyStorage() - propertySize, sizeof(JSValue) * propertySize + sizeof(IndexingHeader) + ArrayStorage::sizeFor(0));
+    } else if ((newAllocBase != butterfly->base(structure())) || (newIndexBias != storage->m_indexBias)) {
+        memmove(newButterfly->propertyStorage() - propertySize, butterfly->propertyStorage() - propertySize, sizeof(JSValue) * propertySize + sizeof(IndexingHeader) + ArrayStorage::sizeFor(0));
+        memmove(newButterfly->arrayStorage()->m_vector, storage->m_vector, sizeof(JSValue) * usedVectorLength);
+
+        WriteBarrier<Unknown>* newVector = newButterfly->arrayStorage()->m_vector;
+        for (unsigned i = requiredVectorLength; i < newVectorLength; i++)
+            newVector[i].clear();
+    }
+
     newButterfly->arrayStorage()->setVectorLength(newVectorLength);
     newButterfly->arrayStorage()->m_indexBias = newIndexBias;
-    
+
     m_butterfly = newButterfly;
 
     return true;
@@ -499,6 +512,7 @@ bool JSArray::shiftCount(ExecState* exec, unsigned count)
     ArrayStorage* storage = ensureArrayStorage(exec->globalData());
     
     unsigned oldLength = storage->length();
+    ASSERT(count <= oldLength);
     
     // If the array contains holes or is otherwise in an abnormal state,
     // use the generic algorithm in ArrayPrototype.
@@ -528,22 +542,30 @@ bool JSArray::shiftCount(ExecState* exec, unsigned count)
 }
 
 // Returns true if the unshift can be handled, false to fallback.    
-bool JSArray::unshiftCount(ExecState* exec, unsigned count)
+bool JSArray::unshiftCount(ExecState* exec, unsigned startIndex, unsigned count)
 {
     ArrayStorage* storage = ensureArrayStorage(exec->globalData());
     unsigned length = storage->length();
+
+    ASSERT(startIndex <= length);
 
     // If the array contains holes or is otherwise in an abnormal state,
     // use the generic algorithm in ArrayPrototype.
     if (length != storage->m_numValuesInVector || storage->inSparseMode())
         return false;
 
-    if (storage->m_indexBias >= count) {
+    bool moveFront = !startIndex || startIndex < length / 2;
+
+    unsigned vectorLength = storage->vectorLength();
+
+    if (moveFront && storage->m_indexBias >= count) {
         m_butterfly = storage->butterfly()->unshift(structure(), count);
         storage = m_butterfly->arrayStorage();
         storage->m_indexBias -= count;
-        storage->setVectorLength(storage->vectorLength() + count);
-    } else if (unshiftCountSlowCase(exec->globalData(), count))
+        storage->setVectorLength(vectorLength + count);
+    } else if (!moveFront && vectorLength - length >= count)
+        storage = storage->butterfly()->arrayStorage();
+    else if (unshiftCountSlowCase(exec->globalData(), moveFront, count))
         storage = arrayStorage();
     else {
         throwOutOfMemoryError(exec);
@@ -551,8 +573,16 @@ bool JSArray::unshiftCount(ExecState* exec, unsigned count)
     }
 
     WriteBarrier<Unknown>* vector = storage->m_vector;
+
+    if (startIndex) {
+        if (moveFront)
+            memmove(vector, vector + count, startIndex * sizeof(JSValue));
+        else if (length - startIndex)
+            memmove(vector + startIndex + count, vector + startIndex, (length - startIndex) * sizeof(JSValue));
+    }
+
     for (unsigned i = 0; i < count; i++)
-        vector[i].clear();
+        vector[i + startIndex].clear();
     return true;
 }
 
@@ -579,13 +609,10 @@ void JSArray::sortNumeric(ExecState* exec, JSValue compareFunction, CallType cal
         return;
         
     case ArrayWithArrayStorage: {
-        unsigned lengthNotIncludingUndefined = compactForSorting(exec->globalData());
+        unsigned lengthNotIncludingUndefined = compactForSorting();
         ArrayStorage* storage = m_butterfly->arrayStorage();
-        
-        if (storage->m_sparseMap.get()) {
-            throwOutOfMemoryError(exec);
-            return;
-        }
+
+        ASSERT(!storage->m_sparseMap);
         
         if (!lengthNotIncludingUndefined)
             return;
@@ -624,12 +651,9 @@ void JSArray::sort(ExecState* exec)
         return;
         
     case ArrayWithArrayStorage: {
-        unsigned lengthNotIncludingUndefined = compactForSorting(exec->globalData());
+        unsigned lengthNotIncludingUndefined = compactForSorting();
         ArrayStorage* storage = m_butterfly->arrayStorage();
-        if (storage->m_sparseMap.get()) {
-            throwOutOfMemoryError(exec);
-            return;
-        }
+        ASSERT(!storage->m_sparseMap);
         
         if (!lengthNotIncludingUndefined)
             return;
@@ -789,18 +813,17 @@ void JSArray::sort(ExecState* exec, JSValue compareFunction, CallType callType, 
         return;
         
     case ArrayWithArrayStorage: {
-        ArrayStorage* storage = m_butterfly->arrayStorage();
-        
         // FIXME: This ignores exceptions raised in the compare function or in toNumber.
         
         // The maximum tree depth is compiled in - but the caller is clearly up to no good
         // if a larger array is passed.
-        ASSERT(storage->length() <= static_cast<unsigned>(std::numeric_limits<int>::max()));
-        if (storage->length() > static_cast<unsigned>(std::numeric_limits<int>::max()))
+        ASSERT(arrayStorage()->length() <= static_cast<unsigned>(std::numeric_limits<int>::max()));
+        if (arrayStorage()->length() > static_cast<unsigned>(std::numeric_limits<int>::max()))
             return;
         
-        unsigned usedVectorLength = min(storage->length(), storage->vectorLength());
-        unsigned nodeCount = usedVectorLength + (storage->m_sparseMap ? storage->m_sparseMap->size() : 0);
+        unsigned usedVectorLength = min(arrayStorage()->length(), arrayStorage()->vectorLength());
+        ASSERT(!arrayStorage()->m_sparseMap);
+        unsigned nodeCount = usedVectorLength;
         
         if (!nodeCount)
             return;
@@ -828,14 +851,18 @@ void JSArray::sort(ExecState* exec, JSValue compareFunction, CallType callType, 
         
         // Iterate over the array, ignoring missing values, counting undefined ones, and inserting all other ones into the tree.
         for (; numDefined < usedVectorLength; ++numDefined) {
-            JSValue v = storage->m_vector[numDefined].get();
+            if (numDefined > arrayStorage()->vectorLength())
+                break;
+            JSValue v = arrayStorage()->m_vector[numDefined].get();
             if (!v || v.isUndefined())
                 break;
             tree.abstractor().m_nodes[numDefined].value = v;
             tree.insert(numDefined);
         }
         for (unsigned i = numDefined; i < usedVectorLength; ++i) {
-            JSValue v = storage->m_vector[i].get();
+            if (i > arrayStorage()->vectorLength())
+                break;
+            JSValue v = arrayStorage()->m_vector[i].get();
             if (v) {
                 if (v.isUndefined())
                     ++numUndefined;
@@ -849,51 +876,34 @@ void JSArray::sort(ExecState* exec, JSValue compareFunction, CallType callType, 
         
         unsigned newUsedVectorLength = numDefined + numUndefined;
         
-        if (SparseArrayValueMap* map = storage->m_sparseMap.get()) {
-            newUsedVectorLength += map->size();
-            if (newUsedVectorLength > storage->vectorLength()) {
-                // Check that it is possible to allocate an array large enough to hold all the entries.
-                if ((newUsedVectorLength > MAX_STORAGE_VECTOR_LENGTH) || !increaseVectorLength(exec->globalData(), newUsedVectorLength)) {
-                    throwOutOfMemoryError(exec);
-                    return;
-                }
-                storage = m_butterfly->arrayStorage();
-            }
-            
-            SparseArrayValueMap::const_iterator end = map->end();
-            for (SparseArrayValueMap::const_iterator it = map->begin(); it != end; ++it) {
-                tree.abstractor().m_nodes[numDefined].value = it->second.getNonSparseMode();
-                tree.insert(numDefined);
-                ++numDefined;
-            }
-            
-            deallocateSparseIndexMap();
-        }
+        ASSERT(!arrayStorage()->m_sparseMap);
         
-        ASSERT(tree.abstractor().m_nodes.size() >= numDefined);
+        // The array size may have changed.  Figure out the new bounds.
+        unsigned newestUsedVectorLength = min(arrayStorage()->length(), arrayStorage()->vectorLength());
         
-        // FIXME: If the compare function changed the length of the array, the following might be
-        // modifying the vector incorrectly.
+        unsigned elementsToExtractThreshold = min(min(newestUsedVectorLength, numDefined), static_cast<unsigned>(tree.abstractor().m_nodes.size()));
+        unsigned undefinedElementsThreshold = min(newestUsedVectorLength, newUsedVectorLength);
+        unsigned clearElementsThreshold = min(newestUsedVectorLength, usedVectorLength);
         
         // Copy the values back into m_storage.
         AVLTree<AVLTreeAbstractorForArrayCompare, 44>::Iterator iter;
         iter.start_iter_least(tree);
         JSGlobalData& globalData = exec->globalData();
-        for (unsigned i = 0; i < numDefined; ++i) {
-            storage->m_vector[i].set(globalData, this, tree.abstractor().m_nodes[*iter].value);
+        for (unsigned i = 0; i < elementsToExtractThreshold; ++i) {
+            arrayStorage()->m_vector[i].set(globalData, this, tree.abstractor().m_nodes[*iter].value);
             ++iter;
         }
         
         // Put undefined values back in.
-        for (unsigned i = numDefined; i < newUsedVectorLength; ++i)
-            storage->m_vector[i].setUndefined();
-        
+        for (unsigned i = elementsToExtractThreshold; i < undefinedElementsThreshold; ++i)
+            arrayStorage()->m_vector[i].setUndefined();
+
         // Ensure that unused values in the vector are zeroed out.
-        for (unsigned i = newUsedVectorLength; i < usedVectorLength; ++i)
-            storage->m_vector[i].clear();
+        for (unsigned i = undefinedElementsThreshold; i < clearElementsThreshold; ++i)
+            arrayStorage()->m_vector[i].clear();
         
-        storage->m_numValuesInVector = newUsedVectorLength;
-        
+        arrayStorage()->m_numValuesInVector = undefinedElementsThreshold;
+
         return;
     }
         
@@ -960,7 +970,7 @@ void JSArray::copyToArguments(ExecState* exec, CallFrame* callFrame, uint32_t le
     }
 }
 
-unsigned JSArray::compactForSorting(JSGlobalData& globalData)
+unsigned JSArray::compactForSorting()
 {
     ASSERT(!inSparseIndexingMode());
 
@@ -994,23 +1004,7 @@ unsigned JSArray::compactForSorting(JSGlobalData& globalData)
         
         unsigned newUsedVectorLength = numDefined + numUndefined;
         
-        if (SparseArrayValueMap* map = storage->m_sparseMap.get()) {
-            newUsedVectorLength += map->size();
-            if (newUsedVectorLength > storage->vectorLength()) {
-                // Check that it is possible to allocate an array large enough to hold all the entries - if not,
-                // exception is thrown by caller.
-                if ((newUsedVectorLength > MAX_STORAGE_VECTOR_LENGTH) || !increaseVectorLength(globalData, newUsedVectorLength))
-                    return 0;
-                
-                storage = m_butterfly->arrayStorage();
-            }
-            
-            SparseArrayValueMap::const_iterator end = map->end();
-            for (SparseArrayValueMap::const_iterator it = map->begin(); it != end; ++it)
-                storage->m_vector[numDefined++].setWithoutWriteBarrier(it->second.getNonSparseMode());
-            
-            deallocateSparseIndexMap();
-        }
+        ASSERT(!storage->m_sparseMap);
         
         for (unsigned i = numDefined; i < newUsedVectorLength; ++i)
             storage->m_vector[i].setUndefined();

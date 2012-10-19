@@ -47,16 +47,17 @@ public:
     static PassOwnPtr<LocaleWin> create(LCID);
     static LocaleWin* currentLocale();
     ~LocaleWin();
-    double parseDate(const String&);
-    String formatDate(const DateComponents&);
+    virtual double parseDateTime(const String&, DateComponents::Type) OVERRIDE;
+    virtual String formatDateTime(const DateComponents&) OVERRIDE;
 #if ENABLE(CALENDAR_PICKER)
-    String dateFormatText();
-    const Vector<String>& monthLabels();
-    const Vector<String>& weekDayShortLabels();
-    unsigned firstDayOfWeek() { return m_firstDayOfWeek; }
+    virtual String dateFormatText() OVERRIDE;
+    virtual const Vector<String>& monthLabels() OVERRIDE;
+    virtual const Vector<String>& weekDayShortLabels() OVERRIDE;
+    virtual unsigned firstDayOfWeek() OVERRIDE;
 #endif
 
-#if ENABLE(INPUT_TYPE_TIME_MULTIPLE_FIELDS)
+#if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
+    virtual String dateFormat() OVERRIDE;
     virtual String timeFormat() OVERRIDE;
     virtual String shortTimeFormat() OVERRIDE;
     virtual const Vector<String>& timeAMPMLabels() OVERRIDE;

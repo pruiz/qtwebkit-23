@@ -234,7 +234,8 @@ function handleArgumentsTimeout() {
         cancelLabel : "Cancel",
         currentValue : "",
         weekStartDay : 0,
-        step : 1
+        step : CalendarPicker.DefaultStepScaleFactor,
+        stepBase: CalendarPicker.DefaultStepBase
     };
     initialize(args);
 }
@@ -268,13 +269,18 @@ CalendarPicker.validateConfig = function(config) {
  */
 function initialize(args) {
     var errorString = CalendarPicker.validateConfig(args);
+    if (args.suggestionValues)
+        errorString = errorString || SuggestionPicker.validateConfig(args)
     if (errorString) {
         var main = $("main");
         main.textContent = "Internal error: " + errorString;
         resizeWindow(main.offsetWidth, main.offsetHeight);
     } else {
         global.params = args;
-        openCalendarPicker();
+        if (global.params.suggestionValues && global.params.suggestionValues.length)
+            openSuggestionPicker();
+        else
+            openCalendarPicker();
     }
 }
 
@@ -284,6 +290,11 @@ function closePicker() {
     var main = $("main");
     main.innerHTML = "";
     main.className = "";
+};
+
+function openSuggestionPicker() {
+    closePicker();
+    global.picker = new SuggestionPicker($("main"), global.params);
 };
 
 function openCalendarPicker() {
@@ -303,7 +314,8 @@ function CalendarPicker(element, config) {
     this.minimumDate = (typeof this._config.min !== "undefined") ? parseDateString(this._config.min) : CalendarPicker.MinimumPossibleDate;
     // We assume this._config.max is a valid date.
     this.maximumDate = (typeof this._config.max !== "undefined") ? parseDateString(this._config.max) : CalendarPicker.MaximumPossibleDate;
-    this.step = (typeof this._config.step !== undefined) ? this._config.step * CalendarPicker.BaseStep : CalendarPicker.BaseStep;
+    this.step = (typeof this._config.step !== undefined) ? Number(this._config.step) : CalendarPicker.DefaultStepScaleFactor;
+    this.stepBase = (typeof this._config.stepBase !== "undefined") ? Number(this._config.stepBase) : CalendarPicker.DefaultStepBase;
     this.yearMonthController = new YearMonthController(this);
     this.daysTable = new DaysTable(this);
     this._hadKeyEvent = false;
@@ -324,14 +336,16 @@ CalendarPicker.prototype = Object.create(Picker.prototype);
 CalendarPicker.MinimumPossibleDate = new Date(-62135596800000.0);
 CalendarPicker.MaximumPossibleDate = new Date(8640000000000000.0);
 // See WebCore/html/DateInputType.cpp.
-CalendarPicker.BaseStep = 86400000;
+CalendarPicker.DefaultStepScaleFactor = 86400000;
+CalendarPicker.DefaultStepBase = 0.0;
 
 CalendarPicker.prototype.cleanup = function() {
     document.body.removeEventListener("keydown", this._handleBodyKeyDownBound, false);
 };
 
 CalendarPicker.prototype._layout = function() {
-    this._element.style.direction = global.params.isRTL ? "rtl" : "ltr";
+    if (this._config.isCalendarRTL)
+        this._element.classList.add("rtl");
     this.yearMonthController.attachTo(this._element);
     this.daysTable.attachTo(this._element);
     this._layoutButtons();
@@ -469,7 +483,7 @@ YearMonthController.prototype.attachTo = function(element) {
     }
     this._month.style.minWidth = maxWidth + 'px';
 
-    global.firstFocusableControl = this._left2; // FIXME: Should it be this.month?
+    this.picker.firstFocusableControl = this._left2; // FIXME: Should it be this.month?
 };
 
 YearMonthController.addTenYearsButtons = false;
@@ -853,7 +867,7 @@ DaysTable.prototype.attachTo = function(element) {
  * @return {!boolean}
  */
 CalendarPicker.prototype.stepMismatch = function(time) {
-    return (time - this.minimumDate.getTime()) % this.step != 0;
+    return (time - this.stepBase) % this.step != 0;
 }
 
 /**
@@ -1168,11 +1182,11 @@ CalendarPicker.prototype._handleBodyKeyDown = function(event) {
     this.maybeUpdateFocusStyle();
     var key = event.keyIdentifier;
     if (key == "U+0009") {
-        if (!event.shiftKey && document.activeElement == global.lastFocusableControl) {
+        if (!event.shiftKey && document.activeElement == this.lastFocusableControl) {
             event.stopPropagation();
             event.preventDefault();
             this.firstFocusableControl.focus();
-        } else if (event.shiftKey && document.activeElement == global.firstFocusableControl) {
+        } else if (event.shiftKey && document.activeElement == this.firstFocusableControl) {
             event.stopPropagation();
             event.preventDefault();
             this.lastFocusableControl.focus();

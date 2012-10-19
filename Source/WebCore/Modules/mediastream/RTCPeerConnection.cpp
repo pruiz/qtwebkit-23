@@ -48,6 +48,8 @@
 #include "RTCSessionDescriptionCallback.h"
 #include "RTCSessionDescriptionDescriptor.h"
 #include "RTCSessionDescriptionRequestImpl.h"
+#include "RTCStatsCallback.h"
+#include "RTCStatsRequestImpl.h"
 #include "RTCVoidRequestImpl.h"
 #include "ScriptExecutionContext.h"
 #include "VoidCallback.h"
@@ -379,6 +381,13 @@ MediaStreamList* RTCPeerConnection::remoteStreams() const
     return m_remoteStreams.get();
 }
 
+void RTCPeerConnection::getStats(PassRefPtr<RTCStatsCallback> successCallback, PassRefPtr<MediaStreamTrack> selector)
+{
+    RefPtr<RTCStatsRequestImpl> statsRequest = RTCStatsRequestImpl::create(scriptExecutionContext(), successCallback);
+    // FIXME: Add passing selector as part of the statsRequest.
+    m_peerHandler->getStats(statsRequest.release());
+}
+
 void RTCPeerConnection::close(ExceptionCode& ec)
 {
     if (m_readyState == ReadyStateClosing || m_readyState == ReadyStateClosed) {
@@ -393,7 +402,7 @@ void RTCPeerConnection::close(ExceptionCode& ec)
 
 void RTCPeerConnection::negotiationNeeded()
 {
-    dispatchEvent(Event::create(eventNames().negotationneededEvent, false, false));
+    dispatchEvent(Event::create(eventNames().negotiationneededEvent, false, false));
 }
 
 void RTCPeerConnection::didGenerateIceCandidate(PassRefPtr<RTCIceCandidateDescriptor> iceCandidateDescriptor)

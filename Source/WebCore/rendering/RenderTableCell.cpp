@@ -36,6 +36,11 @@
 #include "StyleInheritedData.h"
 #include "TransformState.h"
 
+#if ENABLE(MATHML)
+#include "MathMLElement.h"
+#include "MathMLNames.h"
+#endif
+
 using namespace std;
 
 namespace WebCore {
@@ -46,7 +51,7 @@ RenderTableCell::RenderTableCell(Node* node)
     : RenderBlock(node)
     , m_column(unsetColumnIndex)
     , m_cellWidthChanged(false)
-    , m_hasAssociatedTableCellElement(node && (node->hasTagName(tdTag) || node->hasTagName(thTag)))
+    , m_hasHTMLTableCellElement(node && (node->hasTagName(tdTag) || node->hasTagName(thTag)))
     , m_intrinsicPaddingBefore(0)
     , m_intrinsicPaddingAfter(0)
 {
@@ -60,27 +65,52 @@ void RenderTableCell::willBeRemovedFromTree()
     section()->removeCachedCollapsedBorders(this);
 }
 
+#if ENABLE(MATHML)
+inline bool isMathMLElement(Node* node)
+{
+    return node && node->isElementNode() && toElement(node)->isMathMLElement();
+}
+#endif
+
 unsigned RenderTableCell::colSpan() const
 {
-    if (UNLIKELY(!m_hasAssociatedTableCellElement))
+    if (UNLIKELY(!m_hasHTMLTableCellElement)) {
+#if ENABLE(MATHML)
+        if (isMathMLElement(node()))
+            return toMathMLElement(node())->colSpan();
+#endif
         return 1;
+    }
 
     return toHTMLTableCellElement(node())->colSpan();
 }
 
 unsigned RenderTableCell::rowSpan() const
 {
-    if (UNLIKELY(!m_hasAssociatedTableCellElement))
+    if (UNLIKELY(!m_hasHTMLTableCellElement)) {
+#if ENABLE(MATHML)
+        if (isMathMLElement(node()))
+            return toMathMLElement(node())->rowSpan();
+#endif
         return 1;
+    }
 
     return toHTMLTableCellElement(node())->rowSpan();
 }
 
 void RenderTableCell::colSpanOrRowSpanChanged()
 {
-    ASSERT(m_hasAssociatedTableCellElement);
+#if ENABLE(MATHML)
+    ASSERT(m_hasHTMLTableCellElement || isMathMLElement(node()));
+#else
+    ASSERT(m_hasHTMLTableCellElement);
+#endif
     ASSERT(node());
+#if ENABLE(MATHML)
+    ASSERT(node()->hasTagName(tdTag) || node()->hasTagName(thTag) || node()->hasTagName(MathMLNames::mtdTag));
+#else
     ASSERT(node()->hasTagName(tdTag) || node()->hasTagName(thTag));
+#endif
 
     setNeedsLayoutAndPrefWidthsRecalc();
     if (parent() && section())
@@ -247,7 +277,7 @@ LayoutSize RenderTableCell::offsetFromContainer(RenderObject* o, const LayoutPoi
     return offset;
 }
 
-LayoutRect RenderTableCell::clippedOverflowRectForRepaint(RenderBoxModelObject* repaintContainer) const
+LayoutRect RenderTableCell::clippedOverflowRectForRepaint(RenderLayerModelObject* repaintContainer) const
 {
     // If the table grid is dirty, we cannot get reliable information about adjoining cells,
     // so we ignore outside borders. This should not be a problem because it means that
@@ -298,7 +328,7 @@ LayoutRect RenderTableCell::clippedOverflowRectForRepaint(RenderBoxModelObject* 
     return r;
 }
 
-void RenderTableCell::computeRectForRepaint(RenderBoxModelObject* repaintContainer, LayoutRect& r, bool fixed) const
+void RenderTableCell::computeRectForRepaint(RenderLayerModelObject* repaintContainer, LayoutRect& r, bool fixed) const
 {
     if (repaintContainer == this)
         return;

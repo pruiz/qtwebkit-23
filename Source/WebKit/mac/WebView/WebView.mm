@@ -1580,6 +1580,8 @@ static bool needsSelfRetainWhileLoadingQuirk()
         break;
     }
 
+    settings->setPlugInSnapshottingEnabled([preferences plugInSnapshottingEnabled]);
+
     // We have enabled this setting in WebKit2 for the sake of some ScrollingCoordinator work.
     // To avoid possible rendering differences, we should enable it for WebKit1 too.
     settings->setFixedPositionCreatesStackingContext(true);
@@ -3113,6 +3115,8 @@ static PassOwnPtr<Vector<String> > toStringVector(NSArray* patterns)
 
     continuousSpellCheckingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:WebContinuousSpellCheckingEnabled];
     grammarCheckingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:WebGrammarCheckingEnabled];
+
+    Font::setDefaultTypesettingFeatures([[NSUserDefaults standardUserDefaults] boolForKey:@"WebKitKerningAndLigaturesEnabledByDefault"] ? Kerning | Ligatures : 0);
 
 #if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1060
     automaticQuoteSubstitutionEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:WebAutomaticQuoteSubstitutionEnabled];
@@ -6297,11 +6301,11 @@ static inline uint64_t roundUpToPowerOf2(uint64_t num)
     _private->needsOneShotDrawingSynchronization = needsSynchronization;
 }
 
-- (BOOL)_syncCompositingChanges
+- (BOOL)_flushCompositingChanges
 {
     Frame* frame = [self _mainCoreFrame];
     if (frame && frame->view())
-        return frame->view()->syncCompositingStateIncludingSubframes();
+        return frame->view()->flushCompositingStateIncludingSubframes();
 
     return YES;
 }
@@ -6329,14 +6333,14 @@ static inline uint64_t roundUpToPowerOf2(uint64_t num)
     
     To fix this, the GraphicsLayerCA code in WebCore does not change the CA
     layer tree during style changes and layout; it stores up all changes and
-    commits them via syncCompositingState(). There are then two situations in
-    which we can call syncCompositingState():
+    commits them via flushCompositingState(). There are then two situations in
+    which we can call flushCompositingState():
     
-    1. When painting. FrameView::paintContents() makes a call to syncCompositingState().
+    1. When painting. FrameView::paintContents() makes a call to flushCompositingState().
     
     2. When style changes/layout have made changes to the layer tree which do not
        result in painting. In this case we need a run loop observer to do a
-       syncCompositingState() at an appropriate time. The observer will keep firing
+       flushCompositingState() at an appropriate time. The observer will keep firing
        until the time is right (essentially when there are no more pending layouts).
     
 */
@@ -6358,7 +6362,7 @@ bool LayerFlushController::flushLayers()
     if (viewsNeedDisplay)
         return false;
 
-    if ([m_webView _syncCompositingChanges]) {
+    if ([m_webView _flushCompositingChanges]) {
         // AppKit may have disabled screen updates, thinking an upcoming window flush will re-enable them.
         // In case setNeedsDisplayInRect() has prevented the window from needing to be flushed, re-enable screen
         // updates here.
@@ -6375,7 +6379,7 @@ bool LayerFlushController::flushLayers()
     return false;
 }
 
-- (void)_scheduleCompositingLayerSync
+- (void)_scheduleCompositingLayerFlush
 {
     if (!_private->layerFlushController)
         _private->layerFlushController = LayerFlushController::create(self);

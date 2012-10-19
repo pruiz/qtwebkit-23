@@ -32,12 +32,12 @@
 
 namespace WebCore {
 
-PassRefPtr<RTCStatsElement> RTCStatsElement::create(long timestamp)
+PassRefPtr<RTCStatsElement> RTCStatsElement::create(double timestamp)
 {
     return adoptRef(new RTCStatsElement(timestamp));
 }
 
-RTCStatsElement::RTCStatsElement(long timestamp)
+RTCStatsElement::RTCStatsElement(double timestamp)
     : m_timestamp(timestamp)
 {
 }
@@ -45,6 +45,11 @@ RTCStatsElement::RTCStatsElement(long timestamp)
 String RTCStatsElement::stat(const String& name) const
 {
     return m_stats.get(name);
+}
+
+void RTCStatsElement::addStatistic(const String& name, const String& value)
+{
+    m_stats.add(name, value);
 }
 
 } // namespace WebCore

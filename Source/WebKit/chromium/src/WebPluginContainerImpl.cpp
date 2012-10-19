@@ -33,6 +33,7 @@
 
 #include "Chrome.h"
 #include "ChromeClientImpl.h"
+#include "ClipboardChromium.h"
 #include "ScrollbarGroup.h"
 #include "WebCursorInfo.h"
 #include "WebDataSourceImpl.h"
@@ -73,6 +74,7 @@
 #include <public/Platform.h>
 #include <public/WebClipboard.h>
 #include <public/WebCompositorSupport.h>
+#include <public/WebDragData.h>
 #include <public/WebExternalTextureLayer.h>
 #include <public/WebRect.h>
 #include <public/WebString.h>
@@ -115,8 +117,13 @@ void WebPluginContainerImpl::paint(GraphicsContext* gc, const IntRect& damageRec
     if (!parent())
         return;
 
+    FloatRect scaledDamageRect = damageRect;
+    float frameScaleFactor = m_element->document()->page()->mainFrame()->frameScaleFactor();
+    scaledDamageRect.scale(frameScaleFactor);
+    scaledDamageRect.move(-frameRect().x() * (frameScaleFactor - 1), -frameRect().y() * (frameScaleFactor - 1));
+
     // Don't paint anything if the plugin doesn't intersect the damage rect.
-    if (!frameRect().intersects(damageRect))
+    if (!frameRect().intersects(enclosingIntRect(scaledDamageRect)))
         return;
 
     gc->save();
@@ -132,7 +139,7 @@ void WebPluginContainerImpl::paint(GraphicsContext* gc, const IntRect& damageRec
     WebCanvas* canvas = gc->platformContext()->canvas();
 
     IntRect windowRect =
-        IntRect(view->contentsToWindow(damageRect.location()), damageRect.size());
+        IntRect(view->contentsToWindow(enclosingIntRect(scaledDamageRect)));
     m_webPlugin->paint(canvas, windowRect);
 
     gc->restore();
@@ -653,6 +660,11 @@ void WebPluginContainerImpl::handleMouseEvent(MouseEvent* event)
 {
     ASSERT(parent()->isFrameView());
 
+    if (event->isDragEvent()) {
+        handleDragEvent(event);
+        return;
+    }
+
     // We cache the parent FrameView here as the plugin widget could be deleted
     // in the call to HandleEvent. See http://b/issue?id=1362948
     FrameView* parentView = static_cast<FrameView*>(parent());
@@ -694,6 +706,30 @@ void WebPluginContainerImpl::handleMouseEvent(MouseEvent* event)
     ChromeClientImpl* chromeClient =
         static_cast<ChromeClientImpl*>(page->chrome()->client());
     chromeClient->setCursorForPlugin(cursorInfo);
+}
+
+void WebPluginContainerImpl::handleDragEvent(MouseEvent* event)
+{
+    ASSERT(event->isDragEvent());
+
+    WebDragStatus dragStatus = WebDragStatusUnknown;
+    if (event->type() == eventNames().dragenterEvent)
+        dragStatus = WebDragStatusEnter;
+    else if (event->type() == eventNames().dragleaveEvent)
+        dragStatus = WebDragStatusLeave;
+    else if (event->type() == eventNames().dragoverEvent)
+        dragStatus = WebDragStatusOver;
+
+    if (dragStatus == WebDragStatusUnknown)
+        return;
+
+    ClipboardChromium* clipboard = static_cast<ClipboardChromium*>(event->dataTransfer());
+    WebDragData dragData = clipboard->dataObject();
+    WebDragOperationsMask dragOperationMask = static_cast<WebDragOperationsMask>(clipboard->sourceOperation());
+    WebPoint dragScreenLocation(event->screenX(), event->screenY());
+    WebPoint dragLocation(event->absoluteLocation().x() - location().x(), event->absoluteLocation().y() - location().y());
+
+    m_webPlugin->handleDragStatusUpdate(dragStatus, dragData, dragOperationMask, dragLocation, dragScreenLocation);
 }
 
 void WebPluginContainerImpl::handleWheelEvent(WheelEvent* event)

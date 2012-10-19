@@ -37,9 +37,11 @@
 #include <gtest/gtest.h>
 
 #include <wtf/ArrayBuffer.h>
+#include <wtf/HashCountedSet.h>
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 #include <wtf/MemoryInstrumentationArrayBufferView.h>
+#include <wtf/MemoryInstrumentationHashCountedSet.h>
 #include <wtf/MemoryInstrumentationHashMap.h>
 #include <wtf/MemoryInstrumentationHashSet.h>
 #include <wtf/MemoryInstrumentationString.h>
@@ -293,7 +295,7 @@ TEST(MemoryInstrumentationTest, visitStrings)
         InstrumentedOwner<String> stringInstrumentedOwner("String");
         stringInstrumentedOwner.m_value.characters();
         helper.addRootObject(stringInstrumentedOwner);
-        EXPECT_EQ(sizeof(StringImpl) + stringInstrumentedOwner.m_value.length() * 3, helper.reportedSizeForAllTypes());
+        EXPECT_EQ(sizeof(StringImpl) + stringInstrumentedOwner.m_value.length() * (sizeof(LChar) + sizeof(UChar)), helper.reportedSizeForAllTypes());
         EXPECT_EQ(2, helper.visitedObjects());
     }
 
@@ -302,7 +304,7 @@ TEST(MemoryInstrumentationTest, visitStrings)
         String string("String");
         InstrumentedOwner<String> stringInstrumentedOwner(String(string.characters(), string.length()));
         helper.addRootObject(stringInstrumentedOwner);
-        EXPECT_EQ(sizeof(StringImpl) + stringInstrumentedOwner.m_value.length() * 2, helper.reportedSizeForAllTypes());
+        EXPECT_EQ(sizeof(StringImpl) + stringInstrumentedOwner.m_value.length() * sizeof(UChar), helper.reportedSizeForAllTypes());
         EXPECT_EQ(1, helper.visitedObjects());
     }
 
@@ -315,13 +317,22 @@ TEST(MemoryInstrumentationTest, visitStrings)
         EXPECT_EQ(1, helper.visitedObjects());
     }
 
+    { // Zero terminated internal buffer.
+        InstrumentationTestHelper helper;
+        InstrumentedOwner<String> stringInstrumentedOwner("string");
+        stringInstrumentedOwner.m_value.charactersWithNullTermination();
+        helper.addRootObject(stringInstrumentedOwner);
+        EXPECT_EQ(sizeof(StringImpl) + (stringInstrumentedOwner.m_value.length() + 1) * (sizeof(LChar) + sizeof(UChar)), helper.reportedSizeForAllTypes());
+        EXPECT_EQ(2, helper.visitedObjects());
+    }
+
     { // Substring
         InstrumentationTestHelper helper;
         String baseString("String");
         baseString.characters(); // Force 16 shadow creation.
         InstrumentedOwner<String> stringInstrumentedOwner(baseString.substringSharingImpl(1, 4));
         helper.addRootObject(stringInstrumentedOwner);
-        EXPECT_EQ(sizeof(StringImpl) * 2 + baseString.length() * 3, helper.reportedSizeForAllTypes());
+        EXPECT_EQ(sizeof(StringImpl) * 2 + baseString.length() * (sizeof(LChar) + sizeof(UChar)), helper.reportedSizeForAllTypes());
         EXPECT_EQ(3, helper.visitedObjects());
     }
 
@@ -339,7 +350,7 @@ TEST(MemoryInstrumentationTest, visitStrings)
         InstrumentedOwner<AtomicString> atomicStringInstrumentedOwner("AtomicString");
         atomicStringInstrumentedOwner.m_value.string().characters(); // Force 16bit shadow creation.
         helper.addRootObject(atomicStringInstrumentedOwner);
-        EXPECT_EQ(sizeof(StringImpl) + atomicStringInstrumentedOwner.m_value.length() * 3, helper.reportedSizeForAllTypes());
+        EXPECT_EQ(sizeof(StringImpl) + atomicStringInstrumentedOwner.m_value.length() * (sizeof(LChar) + sizeof(UChar)), helper.reportedSizeForAllTypes());
         EXPECT_EQ(2, helper.visitedObjects());
     }
 
@@ -629,7 +640,7 @@ TEST(MemoryInstrumentationTest, hashMapWithValuesConvertibleToInt)
     for (int i = 0; i < count; ++i) {
         keysVector.append(adoptPtr(new InstrumentedConvertibleToInt()));
         valuesVector.append(adoptPtr(new NotInstrumented()));
-        value->set(keysVector[i].get(), InstrumentedConvertibleToInt()).iterator->second.m_notInstrumented = valuesVector[i].get();
+        value->set(keysVector[i].get(), InstrumentedConvertibleToInt()).iterator->value.m_notInstrumented = valuesVector[i].get();
     }
     InstrumentedOwner<TestMap* > root(value.get());
     helper.addRootObject(root);
@@ -651,6 +662,25 @@ TEST(MemoryInstrumentationTest, hashMapWithEnumKeysAndInstrumentedValues)
     helper.addRootObject(root);
     EXPECT_EQ(sizeof(EnumToStringMap) + sizeof(EnumToStringMap::ValueType) * value->capacity() + (sizeof(StringImpl) + 1) * value->size(), helper.reportedSizeForAllTypes());
     EXPECT_EQ(count + 1, helper.visitedObjects());
+}
+
+TEST(MemoryInstrumentationTest, hashCountedSetWithInstrumentedValues)
+{
+    InstrumentationTestHelper helper;
+
+    typedef HashCountedSet<Instrumented*> TestSet;
+    OwnPtr<TestSet> set = adoptPtr(new TestSet());
+    Vector<OwnPtr<Instrumented> > keysVector;
+    int count = 10;
+    for (int i = 0; i < count; ++i) {
+        keysVector.append(adoptPtr(new Instrumented()));
+        for (int j = 0; j <= i; j++)
+            set->add(keysVector.last().get());
+    }
+    InstrumentedOwner<TestSet* > root(set.get());
+    helper.addRootObject(root);
+    EXPECT_EQ(sizeof(TestSet) + sizeof(HashMap<Instrumented*, unsigned>::ValueType) * set->capacity() + (sizeof(Instrumented) + sizeof(NotInstrumented))  * set->size(), helper.reportedSizeForAllTypes());
+    EXPECT_EQ(2 * count + 1, helper.visitedObjects());
 }
 
 TEST(MemoryInstrumentationTest, arrayBuffer)

@@ -143,7 +143,12 @@ RenderLayerBacking::~RenderLayerBacking()
 
 PassOwnPtr<GraphicsLayer> RenderLayerBacking::createGraphicsLayer(const String& name)
 {
-    OwnPtr<GraphicsLayer> graphicsLayer = GraphicsLayer::create(this);
+    GraphicsLayerFactory* graphicsLayerFactory = 0;
+    if (Page* page = renderer()->frame()->page())
+        graphicsLayerFactory = page->chrome()->client()->graphicsLayerFactory();
+
+    OwnPtr<GraphicsLayer> graphicsLayer = GraphicsLayer::create(graphicsLayerFactory, this);
+
 #ifndef NDEBUG
     graphicsLayer->setName(name);
 #else
@@ -1671,7 +1676,7 @@ void RenderLayerBacking::notifyAnimationStarted(const GraphicsLayer*, double tim
     renderer()->animation()->notifyAnimationStarted(renderer(), time);
 }
 
-void RenderLayerBacking::notifySyncRequired(const GraphicsLayer*)
+void RenderLayerBacking::notifyFlushRequired(const GraphicsLayer*)
 {
     if (!renderer()->documentBeingDestroyed())
         compositor()->scheduleLayerFlush();

@@ -5,6 +5,7 @@
 #include "CopiedSpace.h"
 #include "CopiedSpaceInlineMethods.h"
 #include "JSArray.h"
+#include "JSDestructibleObject.h"
 #include "JSGlobalData.h"
 #include "JSObject.h"
 #include "JSString.h"
@@ -320,7 +321,7 @@ ALWAYS_INLINE void SlotVisitor::internalAppend(JSValue* slot)
             if (addResult.isNewEntry)
                 string->setHashConstSingleton();
             else {
-                JSValue existingJSValue = addResult.iterator->second;
+                JSValue existingJSValue = addResult.iterator->value;
                 if (value != existingJSValue)
                     jsCast<JSString*>(existingJSValue.asCell())->clearHashConstSingleton();
                 *slot = existingJSValue;

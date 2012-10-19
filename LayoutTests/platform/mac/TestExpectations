@@ -479,10 +479,6 @@ fast/events/platform-wheelevent-paging-y-in-non-scrolling-page.html
 fast/events/platform-wheelevent-paging-y-in-scrolling-div.html
 fast/events/platform-wheelevent-paging-y-in-scrolling-page.html
 
-# https://bugs.webkit.org/show_bug.cgi?id=70989
-fast/canvas/webgl/attrib-location-length-limits.html
-fast/canvas/webgl/uniform-location-length-limits.html
-
 # Web Intents is not yet enabled.
 webintents/
 
@@ -672,9 +668,6 @@ fast/dom/inline-event-attributes-release.html
 fast/profiler/stop-profiling-after-setTimeout.html
 fast/profiler/dead-time.html
 
-# The Mac port does not support the legacy WebKitBlobBuilder class.
-fast/files/blob-builder-crash.html
-
 # [Mac] inspector/debugger/linkifier.html is flakey
 # https://bugs.webkit.org/show_bug.cgi?id=85319
 inspector/debugger/linkifier.html
@@ -700,6 +693,7 @@ fast/sub-pixel/table-rows-no-gaps.html
 fast/sub-pixel/sub-pixel-accumulates-to-layers.html
 fast/sub-pixel/selection/selection-rect-in-sub-pixel-table.html
 fast/sub-pixel/snap-negative-location.html
+fast/sub-pixel/zoomed-image-tiles.html
 
 # No CORS support for media elements is implemented yet.
 http/tests/security/video-cross-origin-readback.html
@@ -809,6 +803,7 @@ platform/mac/plugins/root-object-premature-delete-crash.html
 css3/flexbox/flex-rounding.html
 
 # ENABLE(INPUT_MULTIPLE_FIELDS_UI) is disabled
+fast/forms/date-multiple-fields
 fast/forms/month-multiple-fields
 fast/forms/time-multiple-fields
 fast/forms/week-multiple-fields
@@ -1299,6 +1294,8 @@ webkit.org/b/92464 [ Debug ] fast/events/tabindex-focus-blur-all.html [ Crash Pa
 # Needs results
 webkit.org/b/97409 svg/custom/clip-mask-negative-scale.svg [ Missing Pass ]
 
+webkit.org/b/98564 fast/table/colspanMinWidth-vertical.html [ Missing Failure ]
+
 #Require rebaseline after https://bugs.webkit.org/show_bug.cgi?id=80394
 webkit.org/b/80394 fast/block/float/024.html [ Failure ]
 webkit.org/b/80394 fast/block/margin-collapse/empty-clear-blocks.html [ Failure ]
@@ -1312,3 +1309,9 @@ webkit.org/b/95501 http/tests/security/inactive-document-with-empty-security-ori
 
 # Paints black behind the test image instead of the expected green.
 webkit.org/b/95707 http/tests/images/png-partial-load-no-alpha.html [ ImageOnlyFailure ]
+
+# Requires TestRunner displayInvalidatedRegion() support.
+webkit.org/b/98523 fast/images/repaint-subrect-grid.html [ Failure ]
+
+# Rendering/Layout issue of CJK vertical text with some font.
+webkit.org/b/98560 fast/writing-mode/vertical-subst-font-vert-no-dflt.html [ ImageOnlyFailure ]

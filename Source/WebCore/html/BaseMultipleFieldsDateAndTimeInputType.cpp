@@ -32,14 +32,21 @@
 #if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
 #include "BaseMultipleFieldsDateAndTimeInputType.h"
 
+#include "CSSValueKeywords.h"
 #include "DateComponents.h"
 #include "DateTimeFieldsState.h"
 #include "ElementShadow.h"
 #include "FormController.h"
+#include "HTMLDataListElement.h"
 #include "HTMLInputElement.h"
+#include "HTMLOptionElement.h"
 #include "KeyboardEvent.h"
 #include "Localizer.h"
+#include "Page.h"
+#include "PickerIndicatorElement.h"
+#include "RenderTheme.h"
 #include "ShadowRoot.h"
+#include <wtf/DateMath.h>
 
 namespace WebCore {
 
@@ -89,6 +96,9 @@ bool BaseMultipleFieldsDateAndTimeInputType::isEditControlOwnerReadOnly() const
 BaseMultipleFieldsDateAndTimeInputType::BaseMultipleFieldsDateAndTimeInputType(HTMLInputElement* element)
     : BaseDateAndTimeInputType(element)
     , m_dateTimeEditElement(0)
+    , m_pickerIndicatorElement(0)
+    , m_pickerIndicatorIsVisible(false)
+    , m_pickerIndicatorIsAlwaysVisible(false)
 {
 }
 
@@ -111,12 +121,41 @@ RenderObject* BaseMultipleFieldsDateAndTimeInputType::createRenderer(RenderArena
 
 void BaseMultipleFieldsDateAndTimeInputType::createShadowSubtree()
 {
+    DEFINE_STATIC_LOCAL(AtomicString, dateAndTimeInputContainerPseudoId, ("-webkit-date-and-time-container", AtomicString::ConstructFromLiteral));
+
     ASSERT(element()->shadow());
 
-    RefPtr<DateTimeEditElement> dateTimeEditElement(DateTimeEditElement::create(element()->document(), *this));
+    Document* document = element()->document();
+    RefPtr<HTMLDivElement> container = HTMLDivElement::create(document);
+    element()->userAgentShadowRoot()->appendChild(container);
+    container->setShadowPseudoId(dateAndTimeInputContainerPseudoId);
+
+    RefPtr<DateTimeEditElement> dateTimeEditElement(DateTimeEditElement::create(document, *this));
     m_dateTimeEditElement = dateTimeEditElement.get();
-    element()->userAgentShadowRoot()->appendChild(m_dateTimeEditElement);
+    container->appendChild(m_dateTimeEditElement);
     updateInnerTextValue();
+
+#if ENABLE(DATALIST_ELEMENT) || ENABLE(CALENDAR_PICKER)
+    bool shouldAddPickerIndicator = false;
+#if ENABLE(DATALIST_ELEMENT)
+    if (InputType::themeSupportsDataListUI(this))
+        shouldAddPickerIndicator = true;
+#endif
+#if ENABLE(CALENDAR_PICKER)
+    RefPtr<RenderTheme> theme = document->page() ? document->page()->theme() : RenderTheme::defaultTheme();
+    if (theme->supportsCalendarPicker(formControlType())) {
+        shouldAddPickerIndicator = true;
+        m_pickerIndicatorIsAlwaysVisible = true;
+    }
+#endif
+    if (shouldAddPickerIndicator) {
+        RefPtr<PickerIndicatorElement> pickerElement = PickerIndicatorElement::create(document);
+        m_pickerIndicatorElement = pickerElement.get();
+        container->appendChild(m_pickerIndicatorElement);
+        m_pickerIndicatorIsVisible = true;
+        updatePickerIndicatorVisibility();
+    }
+#endif // ENABLE(DATALIST_ELEMENT) || ENABLE(CALENDAR_PICKER)
 }
 
 void BaseMultipleFieldsDateAndTimeInputType::destroyShadowSubtree()
@@ -148,7 +187,11 @@ void BaseMultipleFieldsDateAndTimeInputType::disabledAttributeChanged()
 
 void BaseMultipleFieldsDateAndTimeInputType::handleKeydownEvent(KeyboardEvent* event)
 {
-    forwardEvent(event);
+    if (m_pickerIndicatorIsVisible && event->keyIdentifier() == "Down" && event->getModifierState("Alt")) {
+        m_pickerIndicatorElement->openPopup();
+        event->setDefaultHandled();
+    } else
+        forwardEvent(event);
 }
 
 bool BaseMultipleFieldsDateAndTimeInputType::isKeyboardFocusable(KeyboardEvent*) const
@@ -236,6 +279,71 @@ void BaseMultipleFieldsDateAndTimeInputType::updateInnerTextValue()
         m_dateTimeEditElement->setValueAsDate(layoutParameters, date);
     else
         m_dateTimeEditElement->setEmptyValue(layoutParameters, date);
+}
+
+#if ENABLE(DATALIST_ELEMENT)
+void BaseMultipleFieldsDateAndTimeInputType::listAttributeTargetChanged()
+{
+    updatePickerIndicatorVisibility();
+}
+#endif
+
+#if ENABLE(DATALIST_ELEMENT) || ENABLE(CALENDAR_PICKER)
+void BaseMultipleFieldsDateAndTimeInputType::updatePickerIndicatorVisibility()
+{
+#if ENABLE(CALENDAR_PICKER)
+    if (m_pickerIndicatorIsAlwaysVisible) {
+        showPickerIndicator();
+        return;
+    }
+#endif
+#if ENABLE(DATALIST_ELEMENT)
+    if (HTMLDataListElement* dataList = element()->dataList()) {
+        RefPtr<HTMLCollection> options = dataList->options();
+        for (unsigned i = 0; HTMLOptionElement* option = toHTMLOptionElement(options->item(i)); ++i) {
+            if (element()->isValidValue(option->value())) {
+                showPickerIndicator();
+                return;
+            }
+        }
+    }
+    hidePickerIndicator();
+#endif
+}
+
+void BaseMultipleFieldsDateAndTimeInputType::hidePickerIndicator()
+{
+    if (!m_pickerIndicatorIsVisible)
+        return;
+    m_pickerIndicatorIsVisible = false;
+    ASSERT(m_pickerIndicatorElement);
+    m_pickerIndicatorElement->setInlineStyleProperty(CSSPropertyDisplay, CSSValueNone);
+}
+
+void BaseMultipleFieldsDateAndTimeInputType::showPickerIndicator()
+{
+    if (m_pickerIndicatorIsVisible)
+        return;
+    m_pickerIndicatorIsVisible = true;
+    ASSERT(m_pickerIndicatorElement);
+    m_pickerIndicatorElement->removeInlineStyleProperty(CSSPropertyDisplay);
+}
+#endif // ENABLE(DATALIST_ELEMENT) || ENABLE(CALENDAR_PICKER)
+
+int BaseMultipleFieldsDateAndTimeInputType::fullYear(const String& source) const
+{
+    DateComponents date;
+    if (!parseToDateComponents(source, &date))
+        return DateTimeEditElement::LayoutParameters::undefinedYear();
+    return date.fullYear();
+}
+
+bool BaseMultipleFieldsDateAndTimeInputType::shouldHaveSecondField(const DateComponents& date) const
+{
+    StepRange stepRange = createStepRange(AnyIsDefaultStep);
+    return date.second()
+        || !stepRange.minimum().remainder(static_cast<int>(msPerMinute)).isZero()
+        || !stepRange.step().remainder(static_cast<int>(msPerMinute)).isZero();
 }
 
 } // namespace WebCore

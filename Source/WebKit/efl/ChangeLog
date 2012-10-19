@@ -1,3 +1,169 @@
+2012-10-07  Caio Marcelo de Oliveira Filho  <caio.oliveira@openbossa.org>
+
+        Rename first/second to key/value in HashMap iterators
+        https://bugs.webkit.org/show_bug.cgi?id=82784
+
+        Reviewed by Eric Seidel.
+
+        * WebCoreSupport/DumpRenderTreeSupportEfl.cpp:
+        (DumpRenderTreeSupportEfl::evaluateScriptInIsolatedWorld):
+        * WebCoreSupport/PlatformStrategiesEfl.cpp:
+        (PlatformStrategiesEfl::getPluginInfo):
+        * ewk/ewk_intent.cpp:
+        (ewk_intent_extra_get):
+
+2012-10-05  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Fix window resizing / moving in WK1 and WKTR
+        https://bugs.webkit.org/show_bug.cgi?id=98486
+
+        Reviewed by Gyuyoung Kim.
+
+        Fix ChromeClientEfl::windowRect() code to use
+        ecore_evas_request_geometry_get() instead of
+        evas_object_geometry_get() and therefore avoid
+        returning incorrect values when the engine has
+        not processed a call to ecore_evas_move_resize()
+        yet. This fixes a couple of layout tests.
+
+        The code was also refactored a bit for
+        consistency with the WebKit2 EFL implementation.
+
+        * WebCoreSupport/ChromeClientEfl.cpp:
+        (WebCore::ChromeClientEfl::windowRect):
+        (WebCore::ChromeClientEfl::setWindowRect):
+
+2012-10-04  Simon Fraser  <simon.fraser@apple.com>
+
+        Final part of "sync" to "flush" renaming
+        https://bugs.webkit.org/show_bug.cgi?id=98430
+
+        Reviewed by Tim Horton.
+
+        Change method names on GraphicsLayer and GraphicsLayerClient that
+        refer to "sync" to use the term "flush" instead, to be consistent
+        with the rest of the code.
+
+        * WebCoreSupport/AcceleratedCompositingContextEfl.cpp:
+        (WebCore::AcceleratedCompositingContext::syncLayersNow):
+        (WebCore::AcceleratedCompositingContext::attachRootGraphicsLayer):
+
+2012-10-04  Simon Fraser  <simon.fraser@apple.com>
+
+        Standardize on "flush" terminology for compositing layer flushing/syncing
+        https://bugs.webkit.org/show_bug.cgi?id=98321
+
+        Reviewed by Simon Fraser.
+
+        Rename compositing-related methods that refer to "syncing" to instead
+        refer to "flushing".
+
+        * WebCoreSupport/ChromeClientEfl.cpp:
+        (WebCore::ChromeClientEfl::scheduleCompositingLayerFlush):
+        * WebCoreSupport/ChromeClientEfl.h:
+        (ChromeClientEfl):
+
+2012-10-04  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] webintents/web-intents-failure.html is failing
+        https://bugs.webkit.org/show_bug.cgi?id=98349
+
+        Reviewed by Gyuyoung Kim.
+
+        After r130344, OpaqueJSString().string() returns
+        an empty string instead of a null one. Therefore,
+        we need to update the check in
+        DumpRenderTreeSupportEfl::sendWebIntentResponse().
+
+        * WebCoreSupport/DumpRenderTreeSupportEfl.cpp:
+        (DumpRenderTreeSupportEfl::sendWebIntentResponse):
+
+2012-10-04  Christophe Dumez  <christophe.dumez@intel.com>
+
+        Regression(r130363): Broke unit tests
+        https://bugs.webkit.org/show_bug.cgi?id=98341
+
+        Reviewed by Gyuyoung Kim.
+
+        Fix WebKitEFL unit tests to use X11 as
+        well.
+
+        * tests/UnitTestUtils/EWKTestBase.cpp:
+        (EWKUnitTests::EWKTestBase::SetUp):
+        * tests/UnitTestUtils/EWKTestEnvironment.h:
+        (EWKTestEnvironment):
+        * tests/UnitTestUtils/EWKTestView.cpp:
+        (EWKUnitTests::EWKTestView::init):
+        * tests/UnitTestUtils/EWKTestView.h:
+        (EWKTestView):
+
+2012-10-03  Ryuan Choi  <ryuan.choi@samsung.com>
+
+        [EFL] Default.edj should be generated although ENABLE_WEBKIT disabled.
+        https://bugs.webkit.org/show_bug.cgi?id=97753
+
+        Reviewed by Laszlo Gombos.
+
+        default.edj is used in both webkit/efl and webkit2/efl.
+        However, it has been generated only when ENABLE_WEBKIT is enabled.
+
+        This patch separates the script which generates default.edj
+        from source/webkit/platformefl.cmake.
+
+        * DefaultTheme/CMakeLists.txt:
+        Extracted from Source/WebKit/PlatformEfl.cmake and sanitized.
+
+2012-10-03  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Enable use of X11 in DumpRenderTree / WebKitTestRunner
+        https://bugs.webkit.org/show_bug.cgi?id=98231
+
+        Reviewed by Gyuyoung Kim.
+
+        Initialize ecore_x library in ewk_main since it is used by
+        WebKitEFL.
+
+        * ewk/ewk_main.cpp:
+        (ewk_init):
+        (ewk_shutdown):
+
+2012-10-03  Kangil Han  <kangil.han@samsung.com>
+
+        Fix unused parameter compile warnings.
+        https://bugs.webkit.org/show_bug.cgi?id=98243
+
+        Reviewed by Alexey Proskuryakov.
+
+        Fixed unused parameter compile warning by removing page parameter name and UNUSED_PARAM usage.
+
+        * WebCoreSupport/PlatformStrategiesEfl.cpp:
+        (PlatformStrategiesEfl::getPluginInfo):
+
+2012-10-03  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL] Change the reversed expected and actual parameter in WebKit1 unit tests
+        https://bugs.webkit.org/show_bug.cgi?id=98276
+
+        Reviewed by Laszlo Gombos.
+
+        Expected value should be at first and actual value be followed in ASSERT_STREQ().
+
+        * tests/test_ewk_view.cpp:
+        (TEST_F):
+
+2012-10-02  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        [GTK] Add API to get the web view that initiated a custom URI request to WebKit2 GTK+
+        https://bugs.webkit.org/show_bug.cgi?id=97895
+
+        Reviewed by Martin Robinson.
+
+        * WebCoreSupport/FrameNetworkingContextEfl.cpp:
+        (WebCore::FrameNetworkingContextEfl::initiatingPageID): Stub
+        implementation.
+        * WebCoreSupport/FrameNetworkingContextEfl.h:
+        (FrameNetworkingContextEfl): Added.
+
 2012-10-02  Krzysztof Czech  <k.czech@samsung.com>
 
         [EFL][UT] Refactoring an implementation of testing framework for wk1.

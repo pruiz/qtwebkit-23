@@ -143,8 +143,10 @@ WebInspector.ScriptSnippetModel.prototype = {
             return;
         
         var breakpointLocations = this._removeBreakpoints(snippetJavaScriptSource);
-        this._releaseSnippetScript(snippetJavaScriptSource);
+        var uiSourceCode = this._releaseSnippetScript(snippetJavaScriptSource);
         this._restoreBreakpoints(snippetJavaScriptSource, breakpointLocations);
+        if (uiSourceCode)
+            this._restoreBreakpoints(uiSourceCode, breakpointLocations);
     },
 
     /**
@@ -313,15 +315,19 @@ WebInspector.ScriptSnippetModel.prototype = {
 
     /**
      * @param {WebInspector.Script} script
+     * @return {WebInspector.UISourceCode} uiSourceCode
      */
     _createUISourceCodeForScript: function(script)
     {
         var uiSourceCode = new WebInspector.JavaScriptSource(script.sourceURL, script, false);
-        uiSourceCode.setSourceMapping(this._snippetScriptMapping); 
+        uiSourceCode.setSourceMapping(this._snippetScriptMapping);
+        // FIXME: Should be added to workspace as temporary.
+        uiSourceCode.isTemporary = true;
         uiSourceCode.isSnippetEvaluation = true;
         this._uiSourceCodeForScriptId[script.scriptId] = uiSourceCode;
         this._scriptForUISourceCode.put(uiSourceCode, script);
         script.setSourceMapping(this._snippetScriptMapping);
+        return uiSourceCode;
     },
 
     /**
@@ -337,32 +343,36 @@ WebInspector.ScriptSnippetModel.prototype = {
     },
 
     /**
-     * @param {WebInspector.SnippetJavaScriptSource} snippetJavaScriptSource
+     * @param {WebInspector.UISourceCode} uiSourceCode
      * @param {Array.<Object>} breakpointLocations
      */
-    _restoreBreakpoints: function(snippetJavaScriptSource, breakpointLocations)
+    _restoreBreakpoints: function(uiSourceCode, breakpointLocations)
     {
         for (var i = 0; i < breakpointLocations.length; ++i) {
             var uiLocation = breakpointLocations[i].uiLocation;
             var breakpoint = breakpointLocations[i].breakpoint;
-            WebInspector.breakpointManager.setBreakpoint(uiLocation.uiSourceCode, uiLocation.lineNumber, breakpoint.condition(), breakpoint.enabled());
+            WebInspector.breakpointManager.setBreakpoint(uiSourceCode, uiLocation.lineNumber, breakpoint.condition(), breakpoint.enabled());
         }
     },
 
     /**
      * @param {WebInspector.SnippetJavaScriptSource} snippetJavaScriptSource
+     * @return {WebInspector.UISourceCode}
      */
     _releaseSnippetScript: function(snippetJavaScriptSource)
     {
         var script = this._scriptForUISourceCode.get(snippetJavaScriptSource);
         if (!script)
-            return;
+            return null;
 
+        snippetJavaScriptSource.isDivergingFromVM = true;
         snippetJavaScriptSource.hasDivergedFromVM = true;
         delete this._uiSourceCodeForScriptId[script.scriptId];
         this._scriptForUISourceCode.remove(snippetJavaScriptSource);
         delete snippetJavaScriptSource._evaluationIndex;
-        this._createUISourceCodeForScript(script);
+        var uiSourceCode = this._createUISourceCodeForScript(script);
+        delete snippetJavaScriptSource.isDivergingFromVM;
+        return uiSourceCode;
     },
 
     /**

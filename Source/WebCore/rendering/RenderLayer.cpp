@@ -80,6 +80,7 @@
 #include "RenderInline.h"
 #include "RenderMarquee.h"
 #include "RenderReplica.h"
+#include "RenderSVGResourceClipper.h"
 #include "RenderScrollbar.h"
 #include "RenderScrollbarPart.h"
 #include "RenderTheme.h"
@@ -109,9 +110,7 @@
 #include "SVGNames.h"
 #endif
 
-#if PLATFORM(CHROMIUM) || PLATFORM(BLACKBERRY)
-// FIXME: border radius clipping triggers too-slow path on Chromium
-// https://bugs.webkit.org/show_bug.cgi?id=69866
+#if PLATFORM(BLACKBERRY)
 #define DISABLE_ROUNDED_CORNER_CLIPPING
 #endif
 
@@ -2891,7 +2890,7 @@ void RenderLayer::paint(GraphicsContext* context, const LayoutRect& damageRect, 
     paintLayer(this, context, enclosingIntRect(damageRect), LayoutSize(), paintBehavior, paintingRoot, region, &overlapTestRequests, paintFlags);
     OverlapTestRequestMap::iterator end = overlapTestRequests.end();
     for (OverlapTestRequestMap::iterator it = overlapTestRequests.begin(); it != end; ++it)
-        it->first->setOverlapTestResult(false);
+        it->key->setOverlapTestResult(false);
 }
 
 void RenderLayer::paintOverlayScrollbars(GraphicsContext* context, const LayoutRect& damageRect, PaintBehavior paintBehavior, RenderObject* paintingRoot)
@@ -2960,11 +2959,11 @@ static void performOverlapTests(OverlapTestRequestMap& overlapTestRequests, cons
     OverlapTestRequestMap::iterator end = overlapTestRequests.end();
     LayoutRect boundingBox = layer->boundingBox(rootLayer);
     for (OverlapTestRequestMap::iterator it = overlapTestRequests.begin(); it != end; ++it) {
-        if (!boundingBox.intersects(it->second))
+        if (!boundingBox.intersects(it->value))
             continue;
 
-        it->first->setOverlapTestResult(true);
-        overlappedRequestClients.append(it->first);
+        it->key->setOverlapTestResult(true);
+        overlappedRequestClients.append(it->key);
     }
     for (size_t i = 0; i < overlappedRequestClients.size(); ++i)
         overlapTestRequests.remove(overlappedRequestClients[i]);
@@ -3141,6 +3140,16 @@ void RenderLayer::paintLayerContents(RenderLayer* rootLayer, GraphicsContext* co
             ShapeClipPathOperation* clipPath = static_cast<ShapeClipPathOperation*>(style->clipPath());
             context->clipPath(clipPath->path(calculateLayerBounds(this, rootLayer, 0)), clipPath->windRule());
         }
+#if ENABLE(SVG)
+        else if (style->clipPath()->getOperationType() == ClipPathOperation::REFERENCE) {
+            ReferenceClipPathOperation* referenceClipPathOperation = static_cast<ReferenceClipPathOperation*>(style->clipPath());
+            Document* document = renderer()->document();
+            // FIXME: It doesn't work with forward or external SVG references (https://bugs.webkit.org/show_bug.cgi?id=90405)
+            Element* clipPath = document ? document->getElementById(referenceClipPathOperation->fragment()) : 0;
+            if (clipPath && clipPath->renderer() && clipPath->renderer()->isSVGResourceContainer())
+                static_cast<RenderSVGResourceClipper*>(clipPath->renderer())->applyClippingToContext(renderer(), calculateLayerBounds(this, rootLayer, 0), paintDirtyRect, context);
+        }
+#endif
     }
 
 #if ENABLE(CSS_FILTERS)
@@ -3178,6 +3187,8 @@ void RenderLayer::paintLayerContents(RenderLayer* rootLayer, GraphicsContext* co
         calculateRects(rootLayer, region, (localPaintFlags & PaintLayerTemporaryClipRects) ? TemporaryClipRects : PaintingClipRects, paintDirtyRect, layerBounds, damageRect, clipRectToApply, outlineRect,
             IgnoreOverlayScrollbarSize, localPaintFlags & PaintLayerPaintingOverflowContents ? IgnoreOverflowClip : RespectOverflowClip);
         paintOffset = toPoint(layerBounds.location() - renderBoxLocation() + subPixelAccumulation);
+        if (this == rootLayer)
+            paintOffset = roundedIntPoint(paintOffset);
     }
 
     bool forceBlackText = paintBehavior & PaintBehaviorForceBlackText;
@@ -4883,10 +4894,6 @@ void RenderLayer::styleChanged(StyleDifference, const RenderStyle* oldStyle)
     updateScrollCornerStyle();
     updateResizerStyle();
 
-#if ENABLE(CSS_FILTERS)
-    bool backingDidCompositeLayers = isComposited() && backing()->canCompositeFilters();
-#endif
-
     updateDescendantDependentFlags();
     updateTransform();
 #if ENABLE(CSS_COMPOSITING)
@@ -4908,11 +4915,14 @@ void RenderLayer::styleChanged(StyleDifference, const RenderStyle* oldStyle)
 
 #if ENABLE(CSS_FILTERS)
     updateOrRemoveFilterEffect();
+#if USE(ACCELERATED_COMPOSITING)
+    bool backingDidCompositeLayers = isComposited() && backing()->canCompositeFilters();
     if (isComposited() && backingDidCompositeLayers && !backing()->canCompositeFilters()) {
         // The filters used to be drawn by platform code, but now the platform cannot draw them anymore.
         // Fallback to drawing them in software.
         setBackingNeedsRepaint();
     }
+#endif
 #endif
 }
 

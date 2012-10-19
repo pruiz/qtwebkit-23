@@ -23,6 +23,7 @@
 #include "config.h"
 #include "ContainerNode.h"
 
+#include "AXObjectCache.h"
 #include "ChildListMutationScope.h"
 #include "ContainerNodeAlgorithms.h"
 #include "DeleteButtonController.h"
@@ -44,6 +45,10 @@
 #include "UndoManager.h"
 #include <wtf/CurrentTime.h>
 #include <wtf/Vector.h>
+
+#if USE(JSC)
+#include "JSNode.h"
+#endif
 
 using namespace std;
 
@@ -119,6 +124,9 @@ void ContainerNode::takeAllChildrenFrom(ContainerNode* oldParent)
 
 ContainerNode::~ContainerNode()
 {
+    if (AXObjectCache::accessibilityEnabled() && documentInternal() && documentInternal()->axObjectCacheExists())
+        documentInternal()->axObjectCache()->remove(this);
+
     removeAllChildren();
 }
 
@@ -973,6 +981,9 @@ static void dispatchChildRemovalEvents(Node* child)
 
     ASSERT(!NoEventDispatchAssertion::isEventDispatchForbidden());
 
+#if USE(JSC)
+    willCreatePossiblyOrphanedTreeByRemoval(child);
+#endif
     InspectorInstrumentation::willRemoveDOMNode(child->document(), child);
 
     RefPtr<Node> c = child;

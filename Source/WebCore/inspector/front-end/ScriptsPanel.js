@@ -503,9 +503,16 @@ WebInspector.ScriptsPanel.prototype = {
 
     _revealExecutionLine: function(uiLocation)
     {
+        var uiSourceCode = uiLocation.uiSourceCode;
         // Some scripts (anonymous and snippets evaluations) are not added to files select by default.
-        this._editorContainer.addUISourceCode(uiLocation.uiSourceCode);
-        var sourceFrame = this._showFile(uiLocation.uiSourceCode);
+        if (uiSourceCode.isTemporary) {
+            if (this._currentUISourceCode && this._currentUISourceCode.isDivergingFromVM)
+                return;
+            this._editorContainer.addUISourceCode(uiSourceCode);
+            if (uiSourceCode.formatted() !== this._toggleFormatSourceButton.toggled)
+                uiSourceCode.setFormatted(this._toggleFormatSourceButton.toggled, this._uiSourceCodeFormatted.bind(this, uiSourceCode));
+        }
+        var sourceFrame = this._showFile(uiSourceCode);
         sourceFrame.revealLine(uiLocation.lineNumber);
         sourceFrame.focus();
     },

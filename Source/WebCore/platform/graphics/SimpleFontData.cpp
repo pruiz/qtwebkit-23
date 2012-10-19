@@ -152,7 +152,9 @@ SimpleFontData::~SimpleFontData()
 #endif
         platformDestroy();
 
-    if (!isCustomFont())
+    if (isCustomFont())
+        GlyphPageTreeNode::pruneTreeCustomFontData(this);
+    else
         GlyphPageTreeNode::pruneTreeFontData(this);
 }
 

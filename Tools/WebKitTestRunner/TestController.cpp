@@ -107,35 +107,22 @@ TestController::~TestController()
 {
 }
 
-static WKRect getWindowFrameMainPage(WKPageRef page, const void* clientInfo)
-{
-    PlatformWebView* view = static_cast<TestController*>(const_cast<void*>(clientInfo))->mainWebView();
-    return view->windowFrame();
-}
-
-static void setWindowFrameMainPage(WKPageRef page, WKRect frame, const void* clientInfo)
-{
-    PlatformWebView* view = static_cast<TestController*>(const_cast<void*>(clientInfo))->mainWebView();
-    view->setWindowFrame(frame);
-}
-
-static WKRect getWindowFrameOtherPage(WKPageRef page, const void* clientInfo)
+static WKRect getWindowFrame(WKPageRef page, const void* clientInfo)
 {
     PlatformWebView* view = static_cast<PlatformWebView*>(const_cast<void*>(clientInfo));
     return view->windowFrame();
 }
 
-static void setWindowFrameOtherPage(WKPageRef page, WKRect frame, const void* clientInfo)
+static void setWindowFrame(WKPageRef page, WKRect frame, const void* clientInfo)
 {
     PlatformWebView* view = static_cast<PlatformWebView*>(const_cast<void*>(clientInfo));
     view->setWindowFrame(frame);
 }
 
-static bool runBeforeUnloadConfirmPanel(WKPageRef page, WKStringRef message, WKFrameRef frame, const void *clientInfo)
+static bool runBeforeUnloadConfirmPanel(WKPageRef page, WKStringRef message, WKFrameRef frame, const void*)
 {
-    TestController* testController = static_cast<TestController*>(const_cast<void*>(clientInfo));
     printf("CONFIRM NAVIGATION: %s\n", toSTD(message).c_str());
-    return testController->beforeUnloadReturnValue();
+    return TestController::shared().beforeUnloadReturnValue();
 }
 
 static unsigned long long exceededDatabaseQuota(WKPageRef, WKFrameRef, WKSecurityOriginRef, WKStringRef, WKStringRef, unsigned long long, unsigned long long, unsigned long long, unsigned long long, const void*)
@@ -163,6 +150,7 @@ static void closeOtherPage(WKPageRef page, const void* clientInfo)
 static void focus(WKPageRef page, const void* clientInfo)
 {
     PlatformWebView* view = static_cast<PlatformWebView*>(const_cast<void*>(clientInfo));
+    view->focus();
     view->setWindowIsKey(true);
 }
 
@@ -174,8 +162,7 @@ static void unfocus(WKPageRef page, const void* clientInfo)
 
 static void decidePolicyForGeolocationPermissionRequest(WKPageRef, WKFrameRef, WKSecurityOriginRef, WKGeolocationPermissionRequestRef permissionRequest, const void* clientInfo)
 {
-    TestController* testController = static_cast<TestController*>(const_cast<void*>(clientInfo));
-    testController->handleGeolocationPermissionRequest(permissionRequest);
+    TestController::shared().handleGeolocationPermissionRequest(permissionRequest);
 }
 
 WKPageRef TestController::createOtherPage(WKPageRef oldPage, WKURLRequestRef, WKDictionaryRef, WKEventModifiers, WKEventMouseButton, const void*)
@@ -210,8 +197,8 @@ WKPageRef TestController::createOtherPage(WKPageRef oldPage, WKURLRequestRef, WK
         0, // setStatusBarIsVisible
         0, // isResizable
         0, // setIsResizable
-        getWindowFrameOtherPage,
-        setWindowFrameOtherPage,
+        getWindowFrame,
+        setWindowFrame,
         runBeforeUnloadConfirmPanel,
         0, // didDraw
         0, // pageDidScroll
@@ -358,13 +345,13 @@ void TestController::initialize(int argc, const char* argv[])
 
     WKPageUIClient pageUIClient = {
         kWKPageUIClientCurrentVersion,
-        this,
+        m_mainWebView.get(),
         0, // createNewPage_deprecatedForUseWithV0
         0, // showPage
         0, // close
         0, // takeFocus
-        0, // focus
-        0, // unfocus
+        focus,
+        unfocus,
         0, // runJavaScriptAlert
         0, // runJavaScriptConfirm
         0, // runJavaScriptPrompt
@@ -381,8 +368,8 @@ void TestController::initialize(int argc, const char* argv[])
         0, // setStatusBarIsVisible
         0, // isResizable
         0, // setIsResizable
-        getWindowFrameMainPage,
-        setWindowFrameMainPage,
+        getWindowFrame,
+        setWindowFrame,
         runBeforeUnloadConfirmPanel,
         0, // didDraw
         0, // pageDidScroll
@@ -491,12 +478,7 @@ bool TestController::resetStateToConsistentValues()
     WKPreferencesSetArtificialPluginInitializationDelayEnabled(preferences, false);
     WKPreferencesSetTabToLinksEnabled(preferences, false);
     WKPreferencesSetInteractiveFormValidationEnabled(preferences, true);
-
-// [Qt][WK2]REGRESSION(r104881):It broke hundreds of tests
-// FIXME: https://bugs.webkit.org/show_bug.cgi?id=76247
-#if !PLATFORM(QT)
     WKPreferencesSetMockScrollbarsEnabled(preferences, true);
-#endif
 
 #if !PLATFORM(QT)
     static WKStringRef standardFontFamily = WKStringCreateWithUTF8CString("Times");
@@ -1011,9 +993,9 @@ void TestController::setGeolocationPermission(bool enabled)
     decidePolicyForGeolocationPermissionRequestIfPossible();
 }
 
-void TestController::setMockGeolocationPosition(double latitude, double longitude, double accuracy)
+void TestController::setMockGeolocationPosition(double latitude, double longitude, double accuracy, bool providesAltitude, double altitude, bool providesAltitudeAccuracy, double altitudeAccuracy, bool providesHeading, double heading, bool providesSpeed, double speed)
 {
-    m_geolocationProvider->setPosition(latitude, longitude, accuracy);
+    m_geolocationProvider->setPosition(latitude, longitude, accuracy, providesAltitude, altitude, providesAltitudeAccuracy, altitudeAccuracy, providesHeading, heading, providesSpeed, speed);
 }
 
 void TestController::setMockGeolocationPositionUnavailableError(WKStringRef errorMessage)
@@ -1033,17 +1015,18 @@ void TestController::decidePolicyForGeolocationPermissionRequestIfPossible()
         return;
 
     for (size_t i = 0; i < m_geolocationPermissionRequests.size(); ++i) {
-        WKGeolocationPermissionRequestRef& permissionRequest = m_geolocationPermissionRequests[i];
+        WKGeolocationPermissionRequestRef permissionRequest = m_geolocationPermissionRequests[i].get();
         if (m_isGeolocationPermissionAllowed)
             WKGeolocationPermissionRequestAllow(permissionRequest);
         else
             WKGeolocationPermissionRequestDeny(permissionRequest);
     }
+    m_geolocationPermissionRequests.clear();
 }
 
-void TestController::decidePolicyForNotificationPermissionRequest(WKPageRef page, WKSecurityOriginRef origin, WKNotificationPermissionRequestRef request, const void* clientInfo)
+void TestController::decidePolicyForNotificationPermissionRequest(WKPageRef page, WKSecurityOriginRef origin, WKNotificationPermissionRequestRef request, const void*)
 {
-    static_cast<TestController*>(const_cast<void*>(clientInfo))->decidePolicyForNotificationPermissionRequest(page, origin, request);
+    TestController::shared().decidePolicyForNotificationPermissionRequest(page, origin, request);
 }
 
 void TestController::decidePolicyForNotificationPermissionRequest(WKPageRef, WKSecurityOriginRef, WKNotificationPermissionRequestRef request)

@@ -27,6 +27,7 @@
 #include "ConservativeRoots.h"
 #include "GCActivityCallback.h"
 #include "HeapRootVisitor.h"
+#include "HeapStatistics.h"
 #include "IncrementalSweeper.h"
 #include "Interpreter.h"
 #include "JSGlobalData.h"
@@ -235,74 +236,6 @@ inline PassOwnPtr<TypeCountSet> RecordType::returnValue()
     return m_typeCountSet.release();
 }
 
-class StorageStatistics : public MarkedBlock::VoidFunctor {
-public:
-    StorageStatistics();
-
-    void operator()(JSCell*);
-
-    size_t objectWithOutOfLineStorageCount();
-    size_t objectCount();
-
-    size_t storageSize();
-    size_t storageCapacity();
-
-private:
-    size_t m_objectWithOutOfLineStorageCount;
-    size_t m_objectCount;
-    size_t m_storageSize;
-    size_t m_storageCapacity;
-};
-
-inline StorageStatistics::StorageStatistics()
-    : m_objectWithOutOfLineStorageCount(0)
-    , m_objectCount(0)
-    , m_storageSize(0)
-    , m_storageCapacity(0)
-{
-}
-
-inline void StorageStatistics::operator()(JSCell* cell)
-{
-    if (!cell->isObject())
-        return;
-
-    JSObject* object = jsCast<JSObject*>(cell);
-    if (hasIndexedProperties(object->structure()->indexingType()))
-        return;
-
-    if (object->structure()->isUncacheableDictionary())
-        return;
-
-    ++m_objectCount;
-    if (!object->hasInlineStorage())
-        ++m_objectWithOutOfLineStorageCount;
-    m_storageSize += object->structure()->totalStorageSize() * sizeof(WriteBarrierBase<Unknown>);
-    m_storageCapacity += object->structure()->totalStorageCapacity() * sizeof(WriteBarrierBase<Unknown>); 
-}
-
-inline size_t StorageStatistics::objectWithOutOfLineStorageCount()
-{
-    return m_objectWithOutOfLineStorageCount;
-}
-
-inline size_t StorageStatistics::objectCount()
-{
-    return m_objectCount;
-}
-
-
-inline size_t StorageStatistics::storageSize()
-{
-    return m_storageSize;
-}
-
-
-inline size_t StorageStatistics::storageCapacity()
-{
-    return m_storageCapacity;
-}
-
 } // anonymous namespace
 
 Heap::Heap(JSGlobalData* globalData, HeapType heapType)
@@ -422,7 +355,7 @@ void Heap::markProtectedObjects(HeapRootVisitor& heapRootVisitor)
 {
     ProtectCountSet::iterator end = m_protectedValues.end();
     for (ProtectCountSet::iterator it = m_protectedValues.begin(); it != end; ++it)
-        heapRootVisitor.visit(&it->first);
+        heapRootVisitor.visit(&it->key);
 }
 
 void Heap::pushTempSortVector(Vector<ValueStringPair>* tempVector)
@@ -831,6 +764,9 @@ void Heap::collect(SweepToggle sweepToggle)
     }
     
     size_t currentHeapSize = size();
+    if (Options::gcMaxHeapSize() && currentHeapSize > Options::gcMaxHeapSize())
+        HeapStatistics::exitWithFailure();
+
     if (fullGC) {
         m_sizeAfterLastCollect = currentHeapSize;
 
@@ -844,6 +780,8 @@ void Heap::collect(SweepToggle sweepToggle)
     double lastGCEndTime = WTF::currentTime();
     m_lastGCLength = lastGCEndTime - lastGCStartTime;
 
+    if (Options::recordGCPauseTimes())
+        HeapStatistics::recordGCPauseTime(lastGCStartTime, lastGCEndTime);
     if (m_operationInProgress != Collection)
         CRASH();
     m_operationInProgress = NoOperation;
@@ -855,31 +793,8 @@ void Heap::collect(SweepToggle sweepToggle)
     if (Options::objectsAreImmortal())
         markDeadObjects();
 
-    if (Options::showHeapStatistics())
-        showStatistics();
-}
-
-void Heap::showStatistics()
-{
-    dataLog("\n=== Heap Statistics: ===\n");
-    dataLog("size: %ldkB\n", static_cast<long>(m_sizeAfterLastCollect / KB));
-    dataLog("capacity: %ldkB\n", static_cast<long>(capacity() / KB));
-    dataLog("pause time: %lfms\n\n", m_lastGCLength);
-
-    StorageStatistics storageStatistics;
-    m_objectSpace.forEachLiveCell(storageStatistics);
-    dataLog("wasted .property storage: %ldkB (%ld%%)\n",
-        static_cast<long>(
-            (storageStatistics.storageCapacity() - storageStatistics.storageSize()) / KB),
-        static_cast<long>(
-            (storageStatistics.storageCapacity() - storageStatistics.storageSize()) * 100
-                / storageStatistics.storageCapacity()));
-    dataLog("objects with out-of-line .property storage: %ld (%ld%%)\n",
-        static_cast<long>(
-            storageStatistics.objectWithOutOfLineStorageCount()),
-        static_cast<long>(
-            storageStatistics.objectWithOutOfLineStorageCount() * 100
-                / storageStatistics.objectCount()));
+    if (Options::showObjectStatistics())
+        HeapStatistics::showObjectStatistics(this);
 }
 
 void Heap::markDeadObjects()
@@ -940,11 +855,6 @@ void Heap::FinalizerOwner::finalize(Handle<Unknown> handle, void* context)
 void Heap::addCompiledCode(ExecutableBase* executable)
 {
     m_compiledCode.append(executable);
-}
-
-bool Heap::isSafeToSweepStructures()
-{
-    return !m_sweeper || m_sweeper->structuresCanBeSwept();
 }
 
 void Heap::didStartVMShutdown()

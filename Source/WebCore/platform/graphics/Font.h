@@ -128,7 +128,19 @@ public:
     TypesettingFeatures typesettingFeatures() const
     {
         TextRenderingMode textRenderingMode = m_fontDescription.textRenderingMode();
-        TypesettingFeatures features = textRenderingMode == OptimizeLegibility || textRenderingMode == GeometricPrecision ? Kerning | Ligatures : 0;
+        TypesettingFeatures features = s_defaultTypesettingFeatures;
+
+        switch(textRenderingMode) {
+        case AutoTextRendering:
+            break;
+        case OptimizeSpeed:
+            features &= ~(Kerning | Ligatures);
+            break;
+        case GeometricPrecision:
+        case OptimizeLegibility:
+            features |= Kerning | Ligatures;
+            break;
+        }
 
         switch (m_fontDescription.kerning()) {
         case FontDescription::NoneKerning:
@@ -242,6 +254,9 @@ public:
     static CodePath codePath();
     static CodePath s_codePath;
 
+    static void setDefaultTypesettingFeatures(TypesettingFeatures);
+    static TypesettingFeatures defaultTypesettingFeatures();
+
     static const uint8_t s_roundingHackCharacterTable[256];
     static bool isRoundingHackCharacter(UChar32 c)
     {
@@ -279,6 +294,8 @@ private:
 #if PLATFORM(QT) && HAVE(QRAWFONT)
     void initFormatForTextLayout(QTextLayout*) const;
 #endif
+
+    static TypesettingFeatures s_defaultTypesettingFeatures;
 
     FontDescription m_fontDescription;
     mutable RefPtr<FontFallbackList> m_fontFallbackList;

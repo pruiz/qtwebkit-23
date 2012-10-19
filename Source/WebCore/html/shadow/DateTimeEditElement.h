@@ -66,6 +66,8 @@ public:
         String fallbackDateTimeFormat;
         Localizer& localizer;
         const StepRange stepRange;
+        int minimumYear;
+        int maximumYear;
         String placeholderForDay;
         String placeholderForMonth;
         String placeholderForYear;
@@ -73,10 +75,12 @@ public:
         LayoutParameters(Localizer& localizer, const StepRange& stepRange)
             : localizer(localizer)
             , stepRange(stepRange)
+            , minimumYear(undefinedYear())
+            , maximumYear(undefinedYear())
         {
         }
 
-        bool shouldHaveSecondField() const;
+        static inline int undefinedYear() { return -1; }
     };
 
     static PassRefPtr<DateTimeEditElement> create(Document*, EditControlOwner&);

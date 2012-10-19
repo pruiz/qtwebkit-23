@@ -80,6 +80,11 @@ public:
     {
         test->assertObjectIsDeletedWhenTestFinishes(G_OBJECT(resource));
         test->assertObjectIsDeletedWhenTestFinishes(G_OBJECT(request));
+
+        // Ignore favicons.
+        if (g_str_has_suffix(webkit_uri_request_get_uri(request), "favicon.ico"))
+            return;
+
         test->resourceLoadStarted(resource, request);
         g_signal_connect(resource, "sent-request", G_CALLBACK(resourceSentRequestCallback), test);
         g_signal_connect(resource, "notify::response", G_CALLBACK(resourceReceivedResponseCallback), test);
@@ -594,6 +599,8 @@ static void serverCallback(SoupServer* server, SoupMessage* message, const char*
         soup_message_headers_append(message->response_headers, "Location", "/simple-style.css");
     } else if (g_str_equal(path, "/invalid.css"))
         soup_message_set_status(message, SOUP_STATUS_CANT_CONNECT);
+    else
+        soup_message_set_status(message, SOUP_STATUS_NOT_FOUND);
     soup_message_body_complete(message->response_body);
 }
 

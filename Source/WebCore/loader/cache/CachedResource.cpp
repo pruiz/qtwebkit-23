@@ -44,6 +44,7 @@
 #include "WebCoreMemoryInstrumentation.h"
 #include <wtf/CurrentTime.h>
 #include <wtf/MathExtras.h>
+#include <wtf/MemoryInstrumentationHashCountedSet.h>
 #include <wtf/MemoryInstrumentationHashSet.h>
 #include <wtf/RefCountedLeakCounter.h>
 #include <wtf/StdLibExtras.h>
@@ -447,7 +448,7 @@ void CachedResource::removeClient(CachedResourceClient* client)
             // "no-store: ... MUST make a best-effort attempt to remove the information from volatile storage as promptly as possible"
             // "... History buffers MAY store such responses as part of their normal operation."
             // We allow non-secure content to be reused in history, but we do not allow secure content to be reused.
-            if (protocolIs(url(), "https"))
+            if (url().protocolIs("https"))
                 memoryCache()->remove(this);
         } else
             memoryCache()->prune();
@@ -612,8 +613,8 @@ void CachedResource::switchClientsToRevalidatedResource()
     Vector<CachedResourceClient*> clientsToMove;
     HashCountedSet<CachedResourceClient*>::iterator end2 = m_clients.end();
     for (HashCountedSet<CachedResourceClient*>::iterator it = m_clients.begin(); it != end2; ++it) {
-        CachedResourceClient* client = it->first;
-        unsigned count = it->second;
+        CachedResourceClient* client = it->key;
+        unsigned count = it->value;
         while (count) {
             clientsToMove.append(client);
             --count;
@@ -647,9 +648,9 @@ void CachedResource::updateResponseAfterRevalidation(const ResourceResponse& val
     HTTPHeaderMap::const_iterator end = newHeaders.end();
     for (HTTPHeaderMap::const_iterator it = newHeaders.begin(); it != end; ++it) {
         // Don't allow 304 response to update content headers, these can't change but some servers send wrong values.
-        if (it->first.startsWith(contentHeaderPrefix, false))
+        if (it->key.startsWith(contentHeaderPrefix, false))
             continue;
-        m_response.setHTTPHeaderField(it->first, it->second);
+        m_response.setHTTPHeaderField(it->key, it->value);
     }
 }
 

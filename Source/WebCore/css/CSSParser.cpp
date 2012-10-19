@@ -2765,6 +2765,13 @@ bool CSSParser::parseValue(CSSPropertyID propId, bool important)
             validPrimitive = true;
         else if (value->unit == CSSParserValue::Function)
             return parseBasicShape(propId, important);
+#if ENABLE(SVG)
+        else if (value->unit == CSSPrimitiveValue::CSS_URI) {
+            parsedValue = CSSPrimitiveValue::create(value->string, CSSPrimitiveValue::CSS_URI);
+            addProperty(propId, parsedValue.release(), important);
+            return true;
+        }
+#endif
         break;
 #if ENABLE(CSS_EXCLUSIONS)
     case CSSPropertyWebkitShapeInside:
@@ -9986,6 +9993,7 @@ PassRefPtr<CSSRuleSourceData> CSSParser::popRuleData()
         return 0;
 
     ASSERT(!m_currentRuleDataStack->isEmpty());
+    m_currentRuleData.clear();
     RefPtr<CSSRuleSourceData> data = m_currentRuleDataStack->last();
     m_currentRuleDataStack->removeLast();
     return data.release();
@@ -10290,8 +10298,14 @@ void CSSParser::markRuleHeaderStart(CSSRuleSourceData::Type ruleType)
 {
     if (!isExtractingSourceData())
         return;
+
+    // Pop off data for a previous invalid rule.
+    if (m_currentRuleData)
+        m_currentRuleDataStack->removeLast();
+
     RefPtr<CSSRuleSourceData> data = CSSRuleSourceData::create(ruleType);
     data->ruleHeaderRange.start = tokenStartOffset();
+    m_currentRuleData = data;
     m_currentRuleDataStack->append(data.release());
 }
 
@@ -10325,6 +10339,7 @@ void CSSParser::markRuleBodyStart()
 {
     if (!isExtractingSourceData())
         return;
+    m_currentRuleData.clear();
     unsigned offset = tokenStartOffset();
     if (tokenStartChar() == '{')
         ++offset; // Skip the rule body opening brace.

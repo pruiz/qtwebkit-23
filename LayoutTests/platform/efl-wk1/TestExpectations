@@ -26,9 +26,21 @@
 # TESTS EXPECTED TO FAIL
 #////////////////////////////////////////////////////////////////////////////////////////
 
-# CSS Sticky (-webkit-sticky) not supported by EFL.
-# This test passes on WK2, though.
+# CSS Sticky (-webkit-sticky) supported by EFL, these tests fail on WK1.
 webkit.org/b/95182 fast/css/sticky/sticky-overflowing.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/inflow-sticky.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/replaced-sticky.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/sticky-as-positioning-container.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/sticky-both-sides.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/sticky-left-percentage.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/sticky-left.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/sticky-margins.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/sticky-side-margins.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/sticky-top-margins.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/sticky-top.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/sticky-writing-mode-horizontal-bt.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/sticky-writing-mode-vertical-lr.html [ ImageOnlyFailure ]
+webkit.org/b/95182 fast/css/sticky/sticky-writing-mode-vertical-rl.html [ ImageOnlyFailure ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # CRASHES
@@ -64,6 +76,18 @@ Bug(EFL) fast/frames/flattening/iframe-flattening-out-of-view-and-scroll.html [ 
 Bug(EFL) fast/frames/flattening/iframe-flattening-out-of-view-scroll-and-relayout.html [ ImageOnlyFailure ]
 Bug(EFL) fast/frames/flattening/iframe-flattening-simple.html [ Failure ]
 
+# EFL's DRT explicitly disables X11 use
+webkit.org/b/98231 fast/dom/Window/Plug-ins.html [ Failure ]
+webkit.org/b/98231 fast/frames/sandboxed-iframe-about-blank.html [ Failure ]
+webkit.org/b/98231 fast/frames/sandboxed-iframe-navigation-allowed.html [ Failure ]
+webkit.org/b/98231 fast/replaced/invalid-object-with-fallback.html [ Failure ]
+webkit.org/b/98231 http/tests/security/contentSecurityPolicy/object-src-none-allowed.html [ Failure ]
+webkit.org/b/98231 http/tests/security/contentSecurityPolicy/object-src-url-blocked.html [ Failure ]
+webkit.org/b/98231 http/tests/security/cross-origin-plugin-allowed.html [ Failure ]
+webkit.org/b/98231 http/tests/security/cross-origin-plugin-private-browsing-toggled-allowed.html [ Failure ]
+webkit.org/b/98231 http/tests/security/storage-blocking-loosened-plugin.html [ Failure ]
+webkit.org/b/98231 http/tests/security/storage-blocking-loosened-private-browsing-plugin.html [ Failure ]
+
 # EFL's DumpRenderTree should support LayoutTestController's dumpEditingCallbacks()
 webkit.org/b/84835 editing/execCommand/indent-paragraphs.html [ Failure ]
 
@@ -96,10 +120,6 @@ webkit.org/b/86182 fast/frames/seamless/seamless-inherited-document-style.html [
 # Passes in some machines and fails on other (such as the bots).
 webkit.org/b/97021 fast/events/dont-loose-last-event.html [ Failure ]
 
-# New windows are created with wrong size
-webkit.org/b/53959 fast/dom/Window/window-resize.html [ Failure ]
-webkit.org/b/53959 fast/dom/Window/window-resize-and-move-arguments.html [ Failure ]
-
 # Feature not mature yet and disabled by default on WebCore
 webkit.org/b/87088 fast/js/names.html [ Failure ]
 
@@ -118,3 +138,5 @@ webkit.org/b/96620 http/tests/loading/text-content-type-with-binary-extension.ht
 
 # Needs custom policy delegate enhancement to log downloads - EFL port is missing api for getting header fields from HTTP responses.
 webkit.org/b/87974 http/tests/download [ Failure ]
+
+webkit.org/b/98570 fast/replaced/object-with-embed-url-param.html [ Failure ]

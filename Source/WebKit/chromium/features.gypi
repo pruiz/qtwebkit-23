@@ -79,7 +79,6 @@
       'ENABLE_LEGACY_VIEWPORT_ADAPTION=1',
       'ENABLE_LEGACY_VENDOR_PREFIXES=0',
       'ENABLE_LEGACY_WEB_AUDIO=1',
-      'ENABLE_LEGACY_WEBKIT_BLOB_BUILDER=1',
       'ENABLE_LINK_PREFETCH=1',
       'ENABLE_LINK_PRERENDER=1',
       'ENABLE_MEDIA_SOURCE=1',
@@ -120,7 +119,6 @@
       'ENABLE_WORKERS=1',
       'ENABLE_XHR_RESPONSE_BLOB=1',
       'ENABLE_XSLT=1',
-      'SK_SUPPORT_HINTING_SCALE_FACTOR',
       'WTF_USE_LEVELDB=1',
       'WTF_USE_BUILTIN_UTF8_CODEC=1',
       # WTF_USE_DYNAMIC_ANNOTATIONS=1 may be defined in build/common.gypi
@@ -227,6 +225,11 @@
       ['use_harfbuzz_ng==1', {
         'feature_defines': [
           'WTF_USE_HARFBUZZ_NG=1',
+        ],
+      }],
+      ['chromeos==1', {
+        'feature_defines': [
+          'SK_SUPPORT_HINTING_SCALE_FACTOR',
         ],
       }],
     ],

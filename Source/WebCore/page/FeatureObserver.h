@@ -49,6 +49,9 @@ public:
         WebAudioStart,
         PrefixedContentSecurityPolicy,
         UnprefixedIndexedDB,
+        OpenWebDatabase,
+        LegacyHTMLNotifications,
+        LegacyTextNotifications,
         // Add new features above this line.
         NumberOfFeatures, // This enum value must be last.
     };

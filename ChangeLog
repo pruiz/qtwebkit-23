@@ -1,3 +1,110 @@
+2012-10-08  Dongwoo Joshua Im  <dw.im@samsung.com>
+
+        [EFL] Fix build break when WEB_AUDIO is enabled.
+        https://bugs.webkit.org/show_bug.cgi?id=98635
+
+        Unreviewed build fix.
+
+        Build error is occurred because of the new flag, ENABLE_LEGACY_WEB_AUDIO,
+        which was introduced by https://bugs.webkit.org/show_bug.cgi?id=97050.
+
+        * Source/cmakeconfig.h.cmake: Add ENABLE_LEGACY_WEB_AUDIO.
+
+2012-10-08  Joone Hur  <joone.hur@intel.com>
+
+        [EFL] Add support for -webkit-sticky
+        https://bugs.webkit.org/show_bug.cgi?id=95182
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Turn on CSS sticky position by default for WebKitEfl,
+        but most of the CSS sticky position test cases still do not pass on WK1.
+
+        * Source/cmake/OptionsEfl.cmake:
+
+2012-10-05  José Dapena Paz  <jdapena@igalia.com>
+
+        [GTK] Add support for creating EGL contexts
+        https://bugs.webkit.org/show_bug.cgi?id=77921
+
+        Reviewed by Martin Robinson.
+
+        This patch adds support for EGL, using OpenGL and OpenGL ES 2. Both
+        options are set up on compile time, with the configure options
+        --enable-egl and --enable-gles2.
+
+        The implementation only adds support for EGL on top of X11, to
+        isolate the changes to the minimum. More changes should come
+        later to enable EGL for other targets (as Wayland).
+
+        * GNUmakefile.am:
+        * configure.ac: new configure options --enable-egl and --enable-gles2.
+
+2012-10-04  Rob Buis  <rbuis@rim.com>
+
+        [BlackBerry] Sync up CMake files
+        https://bugs.webkit.org/show_bug.cgi?id=98442
+
+        Reviewed by Gyuyoung Kim.
+
+        Amongst others some internal paths changed.
+
+        * Source/cmake/OptionsBlackBerry.cmake:
+
+2012-10-04  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Add libxml 2.8.0 to jhbuild
+        https://bugs.webkit.org/show_bug.cgi?id=98418
+
+        Reviewed by Laszlo Gombos.
+
+        Bump dependency for libxml to 2.8.0 to match
+        jhbuild.
+
+        * Source/cmake/OptionsEfl.cmake:
+
+2012-10-04  Balazs Kelemen  <kbalazs@webkit.org>
+
+        Don't allow to disable compositing in forced compositing mode
+        https://bugs.webkit.org/show_bug.cgi?id=98048
+
+        Reviewed by Jocelyn Turcotte.
+
+        Export Settings::setAcceleratedCompositingEnabled because it has been deinlined.
+
+        * Source/autotools/symbols.filter:
+
+2012-10-03  Ryuan Choi  <ryuan.choi@samsung.com>
+
+        [EFL] Default.edj should be generated although ENABLE_WEBKIT disabled.
+        https://bugs.webkit.org/show_bug.cgi?id=97753
+
+        Reviewed by Laszlo Gombos.
+
+        default.edj is used in both webkit/efl and webkit2/efl.
+        However, it has been generated only when ENABLE_WEBKIT is enabled.
+
+        This patch separates the script which generates default.edj
+        from source/webkit/platformefl.cmake.
+
+        * Source/CMakeLists.txt:
+        * Source/PlatformEfl.cmake: Added to generate custom target for default theme.
+        * Source/cmake/OptionsEfl.cmake:
+        Moved directory generation from WebKit/PlatformEfl.cmake
+        because THEME_BINARY_DIR is used for both Default Theme and control theme in Tools.
+
+2012-10-03  Otto Derek Cheung  <otcheung@rim.com>
+
+        [BlackBerry] Implementing the NetworkInfo API for BB port 
+        https://bugs.webkit.org/show_bug.cgi?id=98273
+
+        Reviewed by Rob Buis.
+
+        Adding references to new classes added to support BlackBerry's
+        NetworkInfo implementation.
+
+        * Source/cmake/OptionsBlackBerry.cmake:
+
 2012-10-01  Keishi Hattori  <keishi@webkit.org>
 
         Calendar picker should use zero as default step base

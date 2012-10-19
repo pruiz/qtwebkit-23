@@ -44,6 +44,9 @@
 #include "DefaultTapHighlight.h"
 #include "DeviceMotionClientBlackBerry.h"
 #include "DeviceOrientationClientBlackBerry.h"
+#if !defined(PUBLIC_BUILD) || !PUBLIC_BUILD
+#include "DeviceOrientationClientMock.h"
+#endif
 #include "DragClientBlackBerry.h"
 // FIXME: We should be using DumpRenderTreeClient, but I'm not sure where we should
 // create the DRT_BB object. See PR #120355.
@@ -80,6 +83,9 @@
 #include "JavaScriptDebuggerBlackBerry.h"
 #include "JavaScriptVariant_p.h"
 #include "LayerWebKitThread.h"
+#if ENABLE(NETWORK_INFO)
+#include "NetworkInfoClientBlackBerry.h"
+#endif
 #include "NetworkManager.h"
 #include "NodeRenderStyle.h"
 #if ENABLE(NOTIFICATIONS) || ENABLE(LEGACY_NOTIFICATIONS)
@@ -530,7 +536,13 @@ void WebPagePrivate::init(const WebString& pageGroupName)
 #else
         WebCore::provideGeolocationTo(m_page, new GeolocationControllerClientBlackBerry(this));
 #endif
-    WebCore::provideDeviceOrientationTo(m_page, new DeviceOrientationClientBlackBerry(this));
+#if !defined(PUBLIC_BUILD) || !PUBLIC_BUILD
+    if (getenv("drtRun"))
+        WebCore::provideDeviceOrientationTo(m_page, new DeviceOrientationClientMock);
+    else
+#endif
+        WebCore::provideDeviceOrientationTo(m_page, new DeviceOrientationClientBlackBerry(this));
+
     WebCore::provideDeviceMotionTo(m_page, new DeviceMotionClientBlackBerry(this));
 #if ENABLE(VIBRATION)
     WebCore::provideVibrationTo(m_page, new VibrationClientBlackBerry());
@@ -546,6 +558,10 @@ void WebPagePrivate::init(const WebString& pageGroupName)
 
 #if ENABLE(NOTIFICATIONS) || ENABLE(LEGACY_NOTIFICATIONS)
     WebCore::provideNotification(m_page, NotificationPresenterImpl::instance());
+#endif
+
+#if ENABLE(NETWORK_INFO)
+    WebCore::provideNetworkInfoTo(m_page, new WebCore::NetworkInfoClientBlackBerry(this));
 #endif
 
     m_page->setCustomHTMLTokenizerChunkSize(256);
@@ -1425,7 +1441,6 @@ void WebPage::scrollBy(const Platform::IntSize& delta)
 void WebPagePrivate::notifyInRegionScrollStopped()
 {
     if (m_inRegionScroller->d->isActive()) {
-        enqueueRenderingOfClippedContentOfScrollableAreaAfterInRegionScrolling();
         // Notify the client side to clear InRegion scrollable areas before we destroy them here.
         std::vector<Platform::ScrollViewBase*> emptyInRegionScrollableAreas;
         m_client->notifyInRegionScrollableAreasChanged(emptyInRegionScrollableAreas);
@@ -1436,52 +1451,6 @@ void WebPagePrivate::notifyInRegionScrollStopped()
 void WebPage::notifyInRegionScrollStopped()
 {
     d->notifyInRegionScrollStopped();
-}
-
-void WebPagePrivate::enqueueRenderingOfClippedContentOfScrollableAreaAfterInRegionScrolling()
-{
-    // If no scrolling was even performed, bail out.
-    if (m_inRegionScroller->d->m_needsActiveScrollableAreaCalculation)
-        return;
-
-    InRegionScrollableArea* scrollableArea = static_cast<InRegionScrollableArea*>(m_inRegionScroller->d->activeInRegionScrollableAreas()[0]);
-    ASSERT(scrollableArea);
-    Node* scrolledNode = scrollableArea->layer()->enclosingElement();
-
-    if (scrolledNode->isDocumentNode()) {
-        Frame* frame = static_cast<const Document*>(scrolledNode)->frame();
-        ASSERT(frame);
-        if (!frame)
-            return;
-        ASSERT(frame != m_mainFrame);
-        FrameView* view = frame->view();
-        if (!view)
-            return;
-
-        // Steps:
-        // #1 - Get frame rect in contents coords.
-        // #2 - Get the clipped scrollview rect in contents coords.
-        // #3 - Take transform into account for 1 and 2.
-        // #4 - Subtract 2 from 1, so we know exactly which areas of the frame
-        //      are offscreen, and need async repainting.
-        FrameView* mainFrameView = m_mainFrame->view();
-        ASSERT(mainFrameView);
-        IntRect frameRect = view->frameRect();
-        frameRect = frame->tree()->parent()->view()->contentsToWindow(frameRect);
-        frameRect = mainFrameView->windowToContents(frameRect);
-
-        IntRect visibleWindowRect = getRecursiveVisibleWindowRect(view);
-        IntRect visibleContentsRect = mainFrameView->windowToContents(visibleWindowRect);
-
-        IntRect transformedFrameRect = mapToTransformed(frameRect);
-        IntRect transformedVisibleContentsRect = mapToTransformed(visibleContentsRect);
-
-        Platform::IntRectRegion offscreenRegionOfIframe
-            = Platform::IntRectRegion::subtractRegions(Platform::IntRect(transformedFrameRect), Platform::IntRect(transformedVisibleContentsRect));
-
-        if (!offscreenRegionOfIframe.isEmpty())
-            m_backingStore->d->m_renderQueue->addToQueue(RenderQueue::RegularRender, offscreenRegionOfIframe.rects());
-    }
 }
 
 void WebPagePrivate::setHasInRegionScrollableAreas(bool b)
@@ -3894,6 +3863,7 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
                 m_scaleBeforeFullScreen = -1.0;
             }
             m_mainFrame->view()->setScrollPosition(m_scrollOffsetBeforeFullScreen);
+            notifyTransformChanged();
         }
 
         m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
@@ -5524,7 +5494,7 @@ LayerRenderingResults WebPagePrivate::lastCompositingResults() const
 GraphicsLayer* WebPagePrivate::overlayLayer()
 {
     if (!m_overlayLayer)
-        m_overlayLayer = GraphicsLayer::create(this);
+        m_overlayLayer = GraphicsLayer::create(0, this);
 
     return m_overlayLayer.get();
 }
@@ -5875,7 +5845,7 @@ void WebPagePrivate::setNeedsOneShotDrawingSynchronization()
     m_needsOneShotDrawingSynchronization = true;
 }
 
-void WebPagePrivate::notifySyncRequired(const GraphicsLayer*)
+void WebPagePrivate::notifyFlushRequired(const GraphicsLayer*)
 {
     scheduleRootLayerCommit();
 }

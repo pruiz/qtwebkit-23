@@ -15,6 +15,7 @@ LIST(APPEND WebCore_SOURCES
   page/efl/DragControllerEfl.cpp
   page/efl/EventHandlerEfl.cpp
   platform/Cursor.cpp
+  platform/efl/AsyncFileSystemEfl.cpp
   platform/efl/BatteryProviderEfl.cpp
   platform/efl/ClipboardEfl.cpp
   platform/efl/ContextMenuEfl.cpp
@@ -74,6 +75,7 @@ LIST(APPEND WebCore_SOURCES
   platform/network/soup/GOwnPtrSoup.cpp
   platform/network/soup/ProxyResolverSoup.cpp
   platform/network/soup/ProxyServerSoup.cpp
+  platform/network/soup/ResourceErrorSoup.cpp
   platform/network/soup/ResourceHandleSoup.cpp
   platform/network/soup/ResourceRequestSoup.cpp
   platform/network/soup/ResourceResponseSoup.cpp
@@ -324,4 +326,3 @@ IF (ENABLE_WEB_AUDIO)
   INSTALL(FILES ${WEB_AUDIO_DATA} DESTINATION ${WEB_AUDIO_DIR})
   ADD_DEFINITIONS(-DUNINSTALLED_AUDIO_RESOURCES_DIR="${WEBCORE_DIR}/platform/audio/resources")
 ENDIF ()
-

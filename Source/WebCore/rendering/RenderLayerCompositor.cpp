@@ -277,13 +277,13 @@ void RenderLayerCompositor::scheduleLayerFlush()
     if (!page)
         return;
 
-    page->chrome()->client()->scheduleCompositingLayerSync();
+    page->chrome()->client()->scheduleCompositingLayerFlush();
 }
 
 void RenderLayerCompositor::flushPendingLayerChanges(bool isFlushRoot)
 {
-    // FrameView::syncCompositingStateIncludingSubframes() flushes each subframe,
-    // but GraphicsLayer::syncCompositingState() will cross frame boundaries
+    // FrameView::flushCompositingStateIncludingSubframes() flushes each subframe,
+    // but GraphicsLayer::flushCompositingState() will cross frame boundaries
     // if the GraphicsLayers are connected (the RootLayerAttachedViaEnclosingFrame case).
     // As long as we're not the root of the flush, we can bail.
     if (!isFlushRoot && rootLayerAttachment() == RootLayerAttachedViaEnclosingFrame)
@@ -297,7 +297,7 @@ void RenderLayerCompositor::flushPendingLayerChanges(bool isFlushRoot)
         if (frameView) {
             // FIXME: Passing frameRect() is correct only when RenderLayerCompositor uses a ScrollLayer (as in WebKit2)
             // otherwise, the passed clip rect needs to take scrolling into account
-            rootLayer->syncCompositingState(frameView->frameRect());
+            rootLayer->flushCompositingState(frameView->frameRect());
         }
     }
     
@@ -2074,7 +2074,7 @@ void RenderLayerCompositor::updateOverflowControlsLayers()
 #if ENABLE(RUBBER_BANDING)
     if (requiresOverhangAreasLayer()) {
         if (!m_layerForOverhangAreas) {
-            m_layerForOverhangAreas = GraphicsLayer::create(this);
+            m_layerForOverhangAreas = GraphicsLayer::create(graphicsLayerFactory(), this);
 #ifndef NDEBUG
             m_layerForOverhangAreas->setName("overhang areas");
 #endif
@@ -2094,7 +2094,7 @@ void RenderLayerCompositor::updateOverflowControlsLayers()
 
     if (requiresContentShadowLayer()) {
         if (!m_contentShadowLayer) {
-            m_contentShadowLayer = GraphicsLayer::create(this);
+            m_contentShadowLayer = GraphicsLayer::create(graphicsLayerFactory(), this);
 #ifndef NDEBUG
             m_contentShadowLayer->setName("content shadow");
 #endif
@@ -2112,7 +2112,7 @@ void RenderLayerCompositor::updateOverflowControlsLayers()
 
     if (requiresHorizontalScrollbarLayer()) {
         if (!m_layerForHorizontalScrollbar) {
-            m_layerForHorizontalScrollbar = GraphicsLayer::create(this);
+            m_layerForHorizontalScrollbar = GraphicsLayer::create(graphicsLayerFactory(), this);
 #ifndef NDEBUG
             m_layerForHorizontalScrollbar->setName("horizontal scrollbar");
 #endif
@@ -2134,7 +2134,7 @@ void RenderLayerCompositor::updateOverflowControlsLayers()
 
     if (requiresVerticalScrollbarLayer()) {
         if (!m_layerForVerticalScrollbar) {
-            m_layerForVerticalScrollbar = GraphicsLayer::create(this);
+            m_layerForVerticalScrollbar = GraphicsLayer::create(graphicsLayerFactory(), this);
 #ifndef NDEBUG
             m_layerForVerticalScrollbar->setName("vertical scrollbar");
 #endif
@@ -2156,7 +2156,7 @@ void RenderLayerCompositor::updateOverflowControlsLayers()
 
     if (requiresScrollCornerLayer()) {
         if (!m_layerForScrollCorner) {
-            m_layerForScrollCorner = GraphicsLayer::create(this);
+            m_layerForScrollCorner = GraphicsLayer::create(graphicsLayerFactory(), this);
 #ifndef NDEBUG
             m_layerForScrollCorner->setName("scroll corner");
 #endif
@@ -2180,7 +2180,7 @@ void RenderLayerCompositor::ensureRootLayer()
          return;
 
     if (!m_rootContentLayer) {
-        m_rootContentLayer = GraphicsLayer::create(this);
+        m_rootContentLayer = GraphicsLayer::create(graphicsLayerFactory(), this);
 #ifndef NDEBUG
         m_rootContentLayer->setName("content root");
 #endif
@@ -2198,19 +2198,19 @@ void RenderLayerCompositor::ensureRootLayer()
             ASSERT(!m_clipLayer);
 
             // Create a layer to host the clipping layer and the overflow controls layers.
-            m_overflowControlsHostLayer = GraphicsLayer::create(this);
+            m_overflowControlsHostLayer = GraphicsLayer::create(graphicsLayerFactory(), this);
 #ifndef NDEBUG
             m_overflowControlsHostLayer->setName("overflow controls host");
 #endif
 
             // Create a clipping layer if this is an iframe
-            m_clipLayer = GraphicsLayer::create(this);
+            m_clipLayer = GraphicsLayer::create(graphicsLayerFactory(), this);
 #ifndef NDEBUG
             m_clipLayer->setName("frame clipping");
 #endif
             m_clipLayer->setMasksToBounds(true);
             
-            m_scrollLayer = GraphicsLayer::create(this);
+            m_scrollLayer = GraphicsLayer::create(graphicsLayerFactory(), this);
 #ifndef NDEBUG
             m_scrollLayer->setName("frame scrolling");
 #endif

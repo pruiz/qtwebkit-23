@@ -145,13 +145,15 @@ String DateTimeInputType::formatDateTimeFieldsState(const DateTimeFieldsState& d
 
 void DateTimeInputType::setupLayoutParameters(DateTimeEditElement::LayoutParameters& layoutParameters, const DateComponents& date) const
 {
-    if (date.second() || layoutParameters.shouldHaveSecondField()) {
-        layoutParameters.dateTimeFormat = layoutParameters.localizer.dateTimeFormatWithSecond();
+    if (shouldHaveSecondField(date)) {
+        layoutParameters.dateTimeFormat = layoutParameters.localizer.dateTimeFormatWithSeconds();
         layoutParameters.fallbackDateTimeFormat = "dd/MM/yyyy HH:mm:ss";
     } else {
-        layoutParameters.dateTimeFormat = layoutParameters.localizer.dateTimeFormatWithoutSecond();
+        layoutParameters.dateTimeFormat = layoutParameters.localizer.dateTimeFormatWithoutSeconds();
         layoutParameters.fallbackDateTimeFormat = "dd/MM/yyyy HH:mm";
     }
+    layoutParameters.minimumYear = fullYear(element()->fastGetAttribute(minAttr));
+    layoutParameters.maximumYear = fullYear(element()->fastGetAttribute(maxAttr));
     layoutParameters.placeholderForDay = placeholderForDayOfMonthField();
     layoutParameters.placeholderForMonth = placeholderForMonthField();
     layoutParameters.placeholderForYear = placeholderForYearField();

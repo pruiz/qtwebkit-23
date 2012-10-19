@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006, 2007, 2008, 2009, 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2006, 2007, 2008, 2009, 2011, 2012 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -62,7 +62,7 @@ static inline void setGenericFontFamilyMap(ScriptFontFamilyMap& fontMap, const A
         if (it == fontMap.end())
             return;
         fontMap.remove(it);
-    } else if (it != fontMap.end() && it->second == family)
+    } else if (it != fontMap.end() && it->value == family)
         return;
     else
         fontMap.set(static_cast<int>(script), family);
@@ -75,7 +75,7 @@ static inline const AtomicString& getGenericFontFamilyForScript(const ScriptFont
 {
     ScriptFontFamilyMap::const_iterator it = fontMap.find(static_cast<int>(script));
     if (it != fontMap.end())
-        return it->second;
+        return it->value;
     if (script != USCRIPT_COMMON)
         return getGenericFontFamilyForScript(fontMap, USCRIPT_COMMON);
     return emptyAtom;
@@ -293,6 +293,8 @@ Settings::Settings(Page* page)
     , m_windowFocusRestricted(true)
     , m_diagnosticLoggingEnabled(false)
     , m_scrollingPerformanceLoggingEnabled(false)
+    , m_applyPageScaleFactorInCompositor(false)
+    , m_plugInSnapshottingEnabled(false)
     , m_setImageLoadingSettingsTimer(this, &Settings::imageLoadingSettingsTimerFired)
     , m_incrementalRenderingSuppressionTimeoutInSeconds(defaultIncrementalRenderingSuppressionTimeoutInSeconds)
 {
@@ -840,6 +842,9 @@ void Settings::setAcceleratedCompositingEnabled(bool enabled)
 {
     if (m_acceleratedCompositingEnabled == enabled)
         return;
+
+    if (!enabled && m_forceCompositingMode)
+        return;
         
     m_acceleratedCompositingEnabled = enabled;
     m_page->setNeedsRecalcStyleInAllFrames();
@@ -966,6 +971,14 @@ void Settings::setTiledBackingStoreEnabled(bool enabled)
     if (m_page->mainFrame())
         m_page->mainFrame()->setTiledBackingStoreEnabled(enabled);
 #endif
+}
+
+void Settings::setForceCompositingMode(bool flag)
+{
+    m_forceCompositingMode = flag;
+
+    if (flag)
+        setAcceleratedCompositingEnabled(true);
 }
 
 void Settings::setScrollingPerformanceLoggingEnabled(bool enabled)

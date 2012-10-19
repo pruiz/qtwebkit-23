@@ -13,6 +13,7 @@ webkit.org/b/91666 [ Mac ] editing/pasteboard/emacs-ctrl-k-y-001.html [ Failure 
 webkit.org/b/91666 [ Mac ] editing/pasteboard/emacs-cntl-y-001.html [ ImageOnlyFailure Slow ]
 webkit.org/b/82097 editing/selection/move-by-word-visually-crash-test-5.html [ Pass Slow ]
 webkit.org/b/79679 [ Debug ] platform/chromium/virtual/gpu/fast/canvas/getPutImageDataPairTest.html [ Pass Slow ]
+webkit.org/b/79679 [ Mac Release ] platform/chromium/virtual/gpu/fast/canvas/getPutImageDataPairTest.html [ Pass Slow ]
 webkit.org/b/92287 [ Linux Mac Win ] fast/canvas/webgl/context-creation-and-destruction.html [ Pass Slow ]
 webkit.org/b/92287 [ Linux Mac Win ] platform/chromium/virtual/gpu/fast/canvas/webgl/context-creation-and-destruction.html [ Pass Slow ]
 crbug.com/24182 [ Debug ] fast/css/large-list-of-rules-crash.html [ Pass Slow ]
@@ -186,6 +187,9 @@ webkit.org/b/88172 http/tests/media/video-buffered.html
 # Proximity Events is not supported.
 webkit.org/b/92942 fast/dom/Proximity
 webkit.org/b/92942 fast/events/constructors/device-proximity-event-constructor.html
+
+# Missing support in DRT for Geolocation's Coordinate attributes.
+webkit.org/b/98212 fast/dom/Geolocation/coordinates-interface-attributes.html [ Failure ]
 
 # -----------------------------------------------------------------
 # WONTFIX TESTS
@@ -950,9 +954,6 @@ crbug.com/8630 [ Android Linux Win ] fast/repaint/body-background-image.html [ F
 
 # Relies on text metrics to pass. Rework to be meaningful for ports other than platform/mac.
 crbug.com/8630 [ Android Linux Win ] fast/repaint/overflow-outline-repaint.html [ Failure ImageOnlyFailure ]
-crbug.com/8630 [ Android Linux Win ] fast/backgrounds/solid-color-context-restore.html [ Failure ImageOnlyFailure ]
-crbug.com/8630 [ Android Linux Win Release ] fast/reflections/inline-crash.html [ Failure ImageOnlyFailure ]
-crbug.com/8630 [ Android Linux Win Debug ] fast/reflections/inline-crash.html [ Failure ImageOnlyFailure ]
 crbug.com/8630 [ Android Linux Win ] fast/text/font-initial.html [ Failure ImageOnlyFailure ]
 
 # Need a setAuthorAndUserStylesEnabled method in
@@ -968,8 +969,11 @@ crbug.com/24197 fast/css/disabled-author-styles.html
 # Test itself passes, but causes subsequent tests to fail.
 webkit.org/b/83260 fast/text/international/embed-bidi-style-in-isolate-crash.html
 
-# Marking as expected failing until the test can be updated and all platforms rebaselined.
-webkit.org/b/96319 fast/block/float/overhanging-tall-block.html [ Failure ]
+# The test needs to be reworked to work with sub-pixel layout before being rebaselined.
+webkit.org/b/58898 fast/block/float/overhanging-tall-block.html [ Failure ]
+
+# New test added that needs platform specific results
+webkit.org/b/98452 fast/text/vertical-rl-rtl-linebreak.html [ Failure ]
 
 # -----------------------------------------------------------------
 # Inspector tests
@@ -985,11 +989,6 @@ http/tests/inspector/network/network-content-replacement-embed.html [ WontFix ]
 webkit.org/b/91435 [ Linux Win ] http/tests/inspector/extensions-ignore-cache.html [ Pass Timeout ]
 webkit.org/b/91435 [ Linux ] inspector/timeline/timeline-network-received-data.html [ Failure Pass ]
 webkit.org/b/91435 [ Win Release ] inspector/timeline/timeline-network-received-data.html [ Failure Pass ]
-webkit.org/b/91435 [ Linux Win Release ] inspector/debugger/live-edit.html [ Failure Pass ]
-webkit.org/b/91435 [ Linux Win Debug ] inspector/debugger/live-edit.html [ Failure Pass Slow ]
-crbug.com/89357 [ Mac ] http/tests/inspector/extensions-ignore-cache.html [ Skip ]
-crbug.com/89357 [ Mac ] inspector/timeline/timeline-network-received-data.html [ Skip ]
-crbug.com/89357 [ Mac ] inspector/debugger/live-edit.html [ Skip ]
 
 # Add support for inspector layout tests on Mac.
 crbug.com/89357 [ Mac ] inspector
@@ -1230,6 +1229,35 @@ webkit.org/b/60118 [ Mac ] svg/dom/SVGScriptElement/script-set-href.svg [ Failur
 # Introduced due to BUGWK53512, fails under Skia right now
 webkit.org/b/65939 svg/custom/getBBox-path.svg [ Failure ]
 
+# These files need new expectations after changing the behavrior from radiaGradients to SVG2
+webkit.org/b/98569 svg/W3C-SVG-1.1-SE/styling-pres-02-f.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1-SE/svgdom-over-01-f.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/coords-units-01-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-02-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-04-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-05-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-06-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-11-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-12-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-13-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-14-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-15-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/struct-use-05-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/styling-inherit-01-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/batik/paints/gradientLimit.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/paints/patternRegions-positioned-objects.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/paints/patternRegions.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/text/textEffect.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/text/textEffect3.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/hixie/perf/006.xml [ Failure Pass ]
+webkit.org/b/98569 svg/custom/relative-sized-content-with-resources.xhtml [ Failure Pass ]
+webkit.org/b/98569 svg/custom/stroked-pattern.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/gradient-deep-referencing.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/radial-gradient-with-outstanding-focalPoint.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/radialGradient-focal-radius.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/gradient-with-1d-boundingbox.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/recursive-gradient.svg [ Failure Pass ]
+
 # Failure: drawing a filled shadow for a fill=transparent rectangle.
 webkit.org/b/76557 svg/custom/transform-with-shadow-and-gradient.svg [ ImageOnlyFailure ]
 
@@ -1445,6 +1473,8 @@ crbug.com/10323 [ Win ] http/tests/xmlhttprequest/xmlhttprequest-no-content-leng
 # Windows?
 crbug.com/10342 [ Android Linux Mac ] fast/loader/file-URL-with-port-number.html [ WontFix ]
 
+# Clipping differences between Chromium platforms. Needs investigation.
+webkit.org/b/98599 css3/masking/clip-path-reference-userSpaceOnUse.html [ ImageOnlyFailure ] 
 
 # Started timing out with agl's complex text change.  Page is verrry slow.
 crbug.com/10343 [ Android Linux ] fast/text/large-text-composed-char.html
@@ -1953,7 +1983,7 @@ webkit.org/b/44199 [ Release ] perf/class-list-remove.html [ Failure Pass Slow ]
 webkit.org/b/71652 [ Android Linux Mac Release ] perf/document-contains.html [ Pass Slow ]
 webkit.org/b/72372 [ Win Release ] perf/document-contains.html [ Pass Slow ]
 webkit.org/b/67921 [ Android Release ] perf/show-hide-table-rows.html [ Timeout ]
-webkit.org/b/67921 [ Linux Mac Win Release ] perf/show-hide-table-rows.html [ Pass Slow ]
+webkit.org/b/67921 [ Linux Mac Win Release ] perf/show-hide-table-rows.html [ Failure Pass Slow ]
 webkit.org/b/44199 [ Release ] perf/clone-with-focus.html [ Failure Pass ]
 webkit.org/b/44199 [ Release ] perf/typing-at-end-of-line.html [ Failure Pass ]
 webkit.org/b/44199 webkit.org/b/63057 [ Release ] perf/array-binary-search.html [ Failure Pass Slow ]
@@ -2452,6 +2482,10 @@ crbug.com/83994 [ Win ] platform/win/plugins/call-javascript-that-destroys-plugi
 
 crbug.com/84032 [ Win ] fast/dom/object-plugin-hides-properties.html [ Pass Timeout ]
 
+#new test added. Still fails on chrome
+webkit.org/b/98315 css3/compositing/blend-mode-property.html [ Failure ]
+webkit.org/b/98315 css3/compositing/should-have-compositing-layer.html [ Failure ]
+
 # two regions reftests failing on Chromium
 webkit.org/b/74219 fast/regions/positioned-objects-block-static-spanning-regions-rtl.html [ ImageOnlyFailure Pass ]
 webkit.org/b/74219 fast/regions/positioned-objects-block-static-spanning-regions.html [ ImageOnlyFailure Pass ]
@@ -2527,12 +2561,7 @@ webkit.org/b/67915 [ Android Linux Win ] fast/borders/borderRadiusDashed06.html 
 
 webkit.org/b/95365 fast/loader/reload-zero-byte-plugin.html
 
-# Performance issues with border radius clipping on Chromium not yet resolved
-crbug.com/97716 fast/clip/overflow-border-radius-composited.html [ ImageOnlyFailure ]
-# Consistently failing as of about r95590
-crbug.com/97716 fast/clip/overflow-border-radius-fixed-position.html [ ImageOnlyFailure ]
-crbug.com/97716 fast/clip/overflow-border-radius-transformed.html [ ImageOnlyFailure ]
-crbug.com/97716 fast/clip/overflow-border-radius-combinations.html [ ImageOnlyFailure ]
+webkit.org/b/68196 fast/clip/overflow-border-radius-composited.html [ ImageOnlyFailure ]
 
 # Caused by r92618
 webkit.org/b/65874 fast/js/preventExtensions.html [ Failure ]
@@ -2792,7 +2821,7 @@ webkit.org/b/81145 [ Lion ] platform/chromium/virtual/softwarecompositing/iframe
 webkit.org/b/81145 [ Lion ] fast/frames/invalid.html [ Failure ImageOnlyFailure Pass Slow ]
 webkit.org/b/81145 [ Lion ] fast/repaint/background-scaling.html [ ImageOnlyFailure ]
 webkit.org/b/81145 [ Lion ] fast/repaint/scale-page-shrink.html [ ImageOnlyFailure ]
-webkit.org/b/81145 [ Lion ] platform/chromium/compositing/tiny-layer-rotated.html [ ImageOnlyFailure ]
+webkit.org/b/81145 [ Debug ] platform/chromium/compositing/tiny-layer-rotated.html [ ImageOnlyFailure Pass ]
 webkit.org/b/81145 [ Lion ] editing/inserting/insert-3907422-fix.html [ Failure ]
 webkit.org/b/81145 [ Lion ] editing/pasteboard/paste-text-002.html [ Failure ]
 webkit.org/b/81145 [ Lion ] editing/pasteboard/paste-text-003.html [ Failure ]
@@ -3585,11 +3614,6 @@ webkit.org/b/98087 [ Linux ] fast/css/lang-mapped-to-webkit-locale-dynamic.xhtml
 webkit.org/b/96833 svg/carto.net/selectionlist.svg [ ImageOnlyFailure Pass ]
 webkit.org/b/96833 svg/carto.net/combobox.svg [ ImageOnlyFailure Pass ]
 
-webkit.org/b/97877 [ Mac Win ] fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic.html [ ImageOnlyFailure Pass ] 
-webkit.org/b/97877 [ Mac Win ] fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes.html [ ImageOnlyFailure Pass ] 
-webkit.org/b/97877 [ Mac Win ] fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements.html [ ImageOnlyFailure Pass ] 
-webkit.org/b/97877 [ Mac Win ] fast/forms/week-multiple-fields/week-multiple-fields-appearance-style.html [ ImageOnlyFailure Pass ] 
-
 webkit.org/b/96720 [ Mac Win ] fast/forms/time-multiple-fields/time-multiple-fields-preserve-value-after-history-back.html [ Pass Timeout ]
 webkit.org/b/96549 [ Mac ] platform/chromium/virtual/gpu/fast/hidpi/focus-rings.html [ ImageOnlyFailure ]
 webkit.org/b/96549 [ Mac ] platform/chromium/virtual/gpu/fast/hidpi/video-controls-in-hidpi.html [ ImageOnlyFailure ]
@@ -3635,14 +3659,11 @@ webkit.org/b/97672 fast/js/dfg-array-push-slow-put.html [ Failure ]
 # Failing, again, after r129712
 webkit.org/b/97672 http/tests/security/xss-eval.html [ Failure ]
 
-# Flaky from some time before r128376
-webkit.org/b/97900 [ Win Debug ] media/audio-repaint.html [ ImageOnlyFailure Pass ]
-
 # Expected to fail until WebGL extension implementation lands
 webkit.org/b/96961 fast/canvas/webgl/oes-vertex-array-object.html [ Failure Pass ]
 webkit.org/b/96961 platform/chromium/virtual/gpu/fast/canvas/webgl/oes-vertex-array-object.html [ Failure Pass ]
 
-webkit.org/b/97558 platform/chromium/fast/forms/date/date-suggestion-picker-appearance-rtl.html [ ImageOnlyFailure Pass ]
+webkit.org/b/59863 fast/repaint/box-shadow-inset-repaint.html [ ImageOnlyFailure Pass ]
 
 # Numerous failures in software compositing.
 crbug.com/152953 [ Mac ] platform/chromium/virtual/softwarecompositing/geometry/fixed-position-iframe-composited-page-scale-down.html [ ImageOnlyFailure ]
@@ -3718,4 +3739,57 @@ webkit.org/b/98198 tables/mozilla_expected_failures/marvin/backgr_border-table-c
 webkit.org/b/98192 [ Win Debug ] fast/js/dfg-cross-global-object-inline-new-array-with-elements.html [ Failure Pass ]
 webkit.org/b/98192 [ Win Debug ] fast/js/post-message-numeric-property.html [ Failure Pass ]
 
-webkit.org/b/97231 inspector/debugger/source-url-comment.html [ Failure Timeout ]
+webkit.org/b/98275 media/event-queue-crash.html [ Skip ]
+
+webkit.org/b/98564 [ Win Mac ] fast/table/colspanMinWidth-vertical.html [ Missing Failure ]
+
+# They are failing because of webkit.org/b/95121 and need rebaseline.
+webkit.org/b/95121 fast/backgrounds/repeat/mask-negative-offset-repeat.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 fast/backgrounds/size/backgroundSize15.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 fast/backgrounds/size/contain-and-cover-zoomed.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 fast/backgrounds/size/contain-and-cover.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 fast/borders/border-image-scale-transform.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 fast/borders/border-image-scaled.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 fast/borders/border-image-slice-constrained.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 fast/borders/inline-mask-overlay-image-outset-vertical-rl.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 fast/borders/inline-mask-overlay-image-outset.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 fast/borders/scaled-border-image.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 fast/repaint/background-misaligned.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirLTR-anchorEnd.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirLTR-anchorMiddle.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirLTR-anchorStart.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirNone-anchorEnd.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirNone-anchorMiddle.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirNone-anchorStart.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirRTL-anchorEnd.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirRTL-anchorMiddle.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirRTL-anchorStart.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorEnd.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorMiddle.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorStart.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorEnd.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorMiddle.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorStart.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-I18N/text-anchor-no-markup.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-SVG-1.1-SE/filters-image-05-f.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/W3C-SVG-1.1/coords-viewattr-02-b.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/as-border-image/svg-as-border-image.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/custom/clip-mask-negative-scale.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/custom/image-small-width-height.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/custom/pointer-events-image-css-transform.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/custom/pointer-events-image.svg [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/dynamic-updates/SVGFEImageElement-dom-preserveAspectRatio-attr.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/dynamic-updates/SVGFEImageElement-svgdom-preserveAspectRatio-prop.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 svg/zoom/page/zoom-background-images.html [ ImageOnlyFailure ] 
+webkit.org/b/95121 scrollbars/overflow-scrollbar-combinations.html [ ImageOnlyFailure ] 
+
+# These are real failues due to 95121.
+# This is spilling caused by LANCZOS3 scaling algorithm that samples outside the source rect.
+webkit.org/b/95121 fast/images/pixel-crack-image-background-webkit-transform-scale.html [ ImageOnlyFailure ] 
+
+# This is caused by misalignment with bitmap tiling which is not yet fixed by 95121.
+webkit.org/b/95121 fast/borders/border-image-side-reduction.html [ ImageOnlyFailure ] 
+
+# failing after r130443 but we're not sure if this is a real bug or just needs rebaselining
+webkit.org/b/98545 [ Mac ] fast/text/international/text-spliced-font.html [ Failure ]
+webkit.org/b/98545 [ Mac ] fast/writing-mode/Kusa-Makura-background-canvas.html [ Failure ]

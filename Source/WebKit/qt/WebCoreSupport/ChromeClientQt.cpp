@@ -681,7 +681,7 @@ void ChromeClientQt::setNeedsOneShotDrawingSynchronization()
         platformPageClient()->markForSync(false);
 }
 
-void ChromeClientQt::scheduleCompositingLayerSync()
+void ChromeClientQt::scheduleCompositingLayerFlush()
 {
     // we want the layers to synchronize ASAP
     if (platformPageClient())

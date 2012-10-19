@@ -1,3 +1,537 @@
+2012-10-07  Caio Marcelo de Oliveira Filho  <caio.oliveira@openbossa.org>
+
+        Rename first/second to key/value in HashMap iterators
+        https://bugs.webkit.org/show_bug.cgi?id=82784
+
+        Reviewed by Eric Seidel.
+
+        * src/WebGeolocationPermissionRequestManager.cpp:
+        (WebGeolocationPermissionRequestManager::remove):
+        * src/WebIDBMetadata.cpp:
+        (WebKit::WebIDBMetadata::WebIDBMetadata):
+        * src/WebIntent.cpp:
+        (WebKit::WebIntent::extrasValue):
+        * tests/MemoryInstrumentationTest.cpp:
+        * tests/WebSocketExtensionDispatcherTest.cpp:
+        (WebCore::TEST_F):
+
+2012-10-06  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: NMI fix String instrumentation the way it was discussed in WK97964
+        https://bugs.webkit.org/show_bug.cgi?id=98500
+
+        Reviewed by Benjamin Poulain.
+
+        Current instrumentation incorrectly covers the case when StringImpl object has been created via StringImpl::createWithTerminatingNullCharacter().
+        Looks like the only way to detect the strings that has been created from literals is to compare the addresses of buffer and stringImpl + 1.
+
+        * tests/MemoryInstrumentationTest.cpp:
+
+2012-10-05  Terry Anderson  <tdanderson@chromium.org>
+
+        [chromium] Only define SK_SUPPORT_HINTING_SCALE_FACTOR when building for chromeOS
+        https://bugs.webkit.org/show_bug.cgi?id=98526
+
+        Reviewed by Stephen White.
+
+        This is causing some problems with picture serialization between chrome 
+        and the mainline skia tools. (Once this change lands and is gardened in, 
+        I will make the corresponding change in chromium/skia/skia.gyp)
+
+        * features.gypi:
+
+2012-10-05  Adam Barth  <abarth@webkit.org>
+
+        Unreviewed.
+
+        Disable WebFrameTest.DivScrollIntoEditableTest. The test depends on
+        some code that is conditionally compiled and therefore fails in some
+        configurations.
+
+        * tests/WebFrameTest.cpp:
+
+2012-10-05  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] Enhance support for transforms in LinkHighlight.
+        https://bugs.webkit.org/show_bug.cgi?id=94355
+
+        Reviewed by Adrienne Walker.
+
+        Improved handling of transformed highlight targets, where the transform goes beyond simple translation.
+
+        * src/LinkHighlight.cpp:
+        (WebKit::convertTargetSpaceQuadToCompositedLayer): Converts target space quad to composited layer coordinates.
+        (WebKit):
+        (WebKit::addQuadToPath): Supports adding non-rectilinear quads to Path.
+        (WebKit::LinkHighlight::computeHighlightLayerPathAndPosition): Updated to deal with target's quadlist, transform individual quads according to transforms.
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::bestTouchLinkNode):
+
+2012-10-05  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed build fix after r130545.
+
+        * tests/WebFrameTest.cpp:
+        Avoid a warning about truncating the double constant on Windows. While touching the variable, changed
+        it to be proper camelCase.
+
+2012-10-05  Oli Lan  <olilan@chromium.org>
+
+        Allow EventHandler to handle longpress gestures, including longpress selection on Android.
+        https://bugs.webkit.org/show_bug.cgi?id=98173
+
+        Reviewed by Ryosuke Niwa.
+
+        This patch changes the longpress gesture handling code in WebViewImpl to call EventHandler::handleGestureEvent.
+        The WebCore part of this patch adds longpress handling to that method, including the long press selection behaviour
+        required for Android. This means that a long press gesture performed on word (that is not part of a link)
+        selects the word, without generating a context menu event.
+
+        A new test, WebViewTest.LongPressSelection has been added to test this.
+
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::handleGestureEvent):
+        (WebViewImpl):
+        * tests/WebViewTest.cpp:
+        * tests/data/longpress_selection.html: Added.
+
+2012-10-05  Yusuf Ozuysal  <yusufo@google.com>
+
+        [chromium] Support zooming focused node for mobile devices
+        https://bugs.webkit.org/show_bug.cgi?id=97958
+
+        Reviewed by Adam Barth.
+
+        This unforks the Android version of scrollFocusedNodeIntoRect().A new setting
+        autoZoomFocusedNodeToLegibleScale was added to turn it on, since not all
+        platforms with ENABLE(GESTURE_EVENTS) want this.
+
+        Test: WebFrameTest.DivScrollIntoEditableTest
+
+        * public/WebSettings.h:
+        * src/WebSettingsImpl.cpp:
+        (WebKit::WebSettingsImpl::WebSettingsImpl):
+        (WebKit::WebSettingsImpl::setAutoZoomFocusedNodeToLegibleScale):
+        (WebKit):
+        * src/WebSettingsImpl.h:
+        (WebSettingsImpl):
+        (WebKit::WebSettingsImpl::autoZoomFocusedNodeToLegibleScale):
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::scrollFocusedNodeIntoRect):
+        * tests/WebFrameTest.cpp:
+        * tests/data/get_scale_for_zoom_into_editable_test.html: Added.
+
+2012-10-05  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] Modify gesture highlight behaviour. Cancel on GestureLongPress and animate on GestureTapCancel.
+        https://bugs.webkit.org/show_bug.cgi?id=97355
+
+        Reviewed by Adrienne Walker.
+
+        This patch revises the behaviour of GestureTapDown highlighting so that the highlight should disappear if
+        interrupted by GestureTap, and animate away if interrupted by GestureTapCancel.
+
+
+        * src/LinkHighlight.cpp:
+        (WebKit::LinkHighlight::LinkHighlight):
+        (WebKit::LinkHighlight::startHighlightAnimationIfNeeded):
+        * src/LinkHighlight.h:
+        (LinkHighlight):
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::handleGestureEvent):
+        (WebKit::WebViewImpl::enableTouchHighlight):
+
+2012-10-05  Mark Pilgrim  <pilgrim@chromium.org>
+
+        [Chromium] Update some more #includes for Platform/ directory
+        https://bugs.webkit.org/show_bug.cgi?id=98534
+
+        Reviewed by Adam Barth.
+
+        Part of a refactoring series. See tracking bug 82948.
+
+        * src/WebFormElement.cpp:
+        * src/WebFrameImpl.cpp:
+        * src/WebGeolocationClientMock.cpp:
+        * src/WebGeolocationError.cpp:
+        * src/WebGeolocationPermissionRequest.cpp:
+        * src/WebHistoryItem.cpp:
+        * src/WebHitTestResult.cpp:
+        * src/WebIDBTransactionImpl.h:
+        * src/WebIconLoadingCompletionImpl.h:
+        * src/WebImageDecoder.cpp:
+        * src/WebImageSkia.cpp:
+        * src/WebInputElement.cpp:
+        * src/WebKit.cpp:
+        * src/WebLabelElement.cpp:
+        * src/WebMediaStreamRegistry.cpp:
+        * src/WebNode.cpp:
+        * src/WebNotification.cpp:
+        * src/WebOptionElement.cpp:
+        * src/WebPageSerializer.cpp:
+        * src/WebPageSerializerImpl.cpp:
+        * src/WebPageSerializerImpl.h:
+        * src/WebPluginListBuilderImpl.cpp:
+        * src/WebPluginLoadObserver.h:
+        * src/WebPopupMenuImpl.cpp:
+        * src/WebPopupMenuImpl.h:
+        * src/WebRange.cpp:
+        * src/WebRegularExpression.cpp:
+        * src/WebScriptController.cpp:
+        * src/WebSecurityOrigin.cpp:
+        * src/WebSecurityPolicy.cpp:
+        * src/WebSelectElement.cpp:
+        * src/WebSerializedScriptValue.cpp:
+        * src/WebSessionDescriptionDescriptor.cpp:
+        * src/WebSettingsImpl.cpp:
+        * src/WebSocketImpl.cpp:
+        * src/WebSocketImpl.h:
+        * src/WebStorageEventDispatcherImpl.cpp:
+        * src/WebSurroundingText.cpp:
+        * src/WebURLLoadTiming.cpp:
+        * src/WorkerAsyncFileWriterChromium.cpp:
+        * src/WorkerFileSystemCallbacksBridge.cpp:
+
+2012-10-05  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        [chromium] Allow dragging into plugins.
+        https://bugs.webkit.org/show_bug.cgi?id=98277
+
+        Reviewed by Tony Chang.
+
+        Allow plugins to receive drag events. This will make it possible to
+        perform drag-n-drop into browser plugins (and other plugins if desired).
+
+        * public/WebDragStatus.h: Added.
+        (WebKit):
+        * public/WebPlugin.h:
+        (WebKit):
+        (WebPlugin):
+        * src/WebPluginContainerImpl.cpp:
+        (WebKit::WebPluginContainerImpl::handleMouseEvent):
+        (WebKit::WebPluginContainerImpl::handleDragEvent):
+        (WebKit):
+        * src/WebPluginContainerImpl.h:
+        (WebPluginContainerImpl):
+
+2012-10-04  Kenichi Ishibashi  <bashi@chromium.org>
+
+        [WebSocket] ExtensionParser should have its own file
+        https://bugs.webkit.org/show_bug.cgi?id=98475
+
+        Reviewed by Yuta Kitamura.
+
+        Add a test for parsing Sec-WebSocket-Extensions field.
+
+        * tests/WebSocketExtensionDispatcherTest.cpp:
+        (WebCore):
+        (WebCore::TEST_F):
+
+2012-10-04  Kenichi Ishibashi  <bashi@chromium.org>
+
+        [Chromium] Improve SocketStreamHandle::send() stability
+        https://bugs.webkit.org/show_bug.cgi?id=98459
+
+        Reviewed by Yuta Kitamura.
+
+        Avoid null dereference in SocketStreamHandleInternal::send().
+        No changes in behavior.
+
+        * src/SocketStreamHandle.cpp:
+        (WebCore::SocketStreamHandleInternal::send):
+
+2012-10-04  Dirk Pranke  <dpranke@chromium.org>
+
+        Chromium DEPS roll r160281:160322
+
+        Unreviewed.
+
+        * DEPS:
+
+2012-10-04  Alexandre Elias  <aelias@chromium.org>
+
+        [chromium] Scale plugin container by frameScaleFactor
+        https://bugs.webkit.org/show_bug.cgi?id=98468
+
+        Reviewed by Adam Barth.
+
+        Plugin containers (for invalid plugins) weren't taking into account
+        frameScaleFactor, looking cut off when that was non-1.
+
+        * src/WebPluginContainerImpl.cpp:
+        (WebKit::WebPluginContainerImpl::paint):
+
+2012-10-04  Alpha Lam  <hclam@chromium.org>
+
+        Unreviewd. Chromium DEPS roll. Update to r160281.
+
+        * DEPS:
+
+2012-10-04  Mark Pilgrim  <pilgrim@chromium.org>
+
+        [Chromium] Update some #includes for Platform directory
+        https://bugs.webkit.org/show_bug.cgi?id=98440
+
+        Reviewed by Adam Barth.
+
+        Part of a refactoring series. See tracking bug 82948.
+
+        * src/ApplicationCacheHost.cpp:
+        * src/AssociatedURLLoader.h:
+        * src/AsyncFileWriterChromium.cpp:
+        * src/AudioDestinationChromium.h:
+        * src/AutofillPopupMenuClient.cpp:
+        * src/ChromeClientImpl.cpp:
+        * src/ContextMenuClientImpl.cpp:
+        * src/DeliveredIntentClientImpl.h:
+        * src/DragClientImpl.cpp:
+        * src/DragScrollTimer.h:
+        * src/FrameLoaderClientImpl.cpp:
+        * src/InspectorClientImpl.cpp:
+        * src/InspectorClientImpl.h:
+        * src/InspectorFrontendClientImpl.cpp:
+        * src/NotificationPresenterImpl.cpp:
+        * src/PageWidgetDelegate.h:
+        * src/SocketStreamHandle.cpp:
+        * src/SocketStreamHandleInternal.h:
+        * src/SpeechInputClientImpl.cpp:
+        * src/StorageAreaProxy.cpp:
+        * src/StorageNamespaceProxy.cpp:
+        * src/UserMediaClientImpl.cpp:
+        * src/WebAccessibilityObject.cpp:
+        * src/WebAnimationControllerImpl.cpp:
+        * src/WebCommon.cpp:
+        * src/WebDOMEventListenerPrivate.h:
+        * src/WebDOMMessageEvent.cpp:
+        * src/WebDOMStringList.cpp:
+        * src/WebDataSourceImpl.cpp:
+        * src/WebDatabase.cpp:
+        * src/WebDevToolsAgentImpl.cpp:
+        * src/WebDevToolsAgentImpl.h:
+        * src/WebDocument.cpp:
+        * src/WebDocumentType.cpp:
+        * src/WebDragData.cpp:
+        * src/WebElement.cpp:
+        * src/WebEntities.cpp:
+        * src/WebFileChooserCompletionImpl.h:
+        * src/WebFileSystemCallbacksImpl.cpp:
+        * src/WebFontImpl.cpp:
+
+2012-10-04  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: promote objectstore/index backend ids to the frontend
+        https://bugs.webkit.org/show_bug.cgi?id=97834
+
+        Reviewed by Tony Chang.
+
+        Support for marshalling additional IDBMetadata and new calls to
+        createObjectStore/createIndex.
+
+        * public/WebIDBDatabase.h:
+        (WebKit::WebIDBDatabase::createObjectStore):
+        * public/WebIDBMetadata.h:
+        (ObjectStore):
+        (Index):
+        * public/WebIDBObjectStore.h:
+        (WebKit::WebIDBObjectStore::createIndex):
+        * src/IDBDatabaseBackendProxy.cpp:
+        (WebKit::IDBDatabaseBackendProxy::createObjectStore):
+        (WebKit):
+        * src/IDBDatabaseBackendProxy.h:
+        (IDBDatabaseBackendProxy):
+        * src/IDBObjectStoreBackendProxy.cpp:
+        (WebKit::IDBObjectStoreBackendProxy::createIndex):
+        (WebKit):
+        * src/IDBObjectStoreBackendProxy.h:
+        (IDBObjectStoreBackendProxy):
+        * src/WebIDBDatabaseImpl.cpp:
+        (WebKit::WebIDBDatabaseImpl::createObjectStore):
+        (WebKit):
+        * src/WebIDBDatabaseImpl.h:
+        (WebIDBDatabaseImpl):
+        * src/WebIDBMetadata.cpp:
+        (WebKit::WebIDBMetadata::WebIDBMetadata):
+        (WebKit::WebIDBMetadata::operator IDBDatabaseMetadata):
+        * src/WebIDBObjectStoreImpl.cpp:
+        (WebKit::WebIDBObjectStoreImpl::createIndex):
+        (WebKit):
+        * src/WebIDBObjectStoreImpl.h:
+        (WebIDBObjectStoreImpl):
+2012-10-04  Simon Fraser  <simon.fraser@apple.com>
+
+        Standardize on "flush" terminology for compositing layer flushing/syncing
+        https://bugs.webkit.org/show_bug.cgi?id=98321
+
+        Reviewed by Simon Fraser.
+
+        Rename compositing-related methods that refer to "syncing" to instead
+        refer to "flushing".
+
+        * src/ChromeClientImpl.cpp:
+        (WebKit::ChromeClientImpl::scheduleCompositingLayerFlush):
+        * src/ChromeClientImpl.h:
+        (ChromeClientImpl):
+
+2012-10-05  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Enable the multiple fields UI for input[type=date]
+        https://bugs.webkit.org/show_bug.cgi?id=98351
+
+        Reviewed by Hajime Morita.
+
+        * features.gypi:
+        Disable ENABLE_INPUT_TYPE_DATE_LEGACY_UI.
+
+2012-10-04  Kent Tamura  <tkent@chromium.org>
+
+        Add code for input[type=date] with the multiple fields UI
+        https://bugs.webkit.org/show_bug.cgi?id=98340
+
+        Reviewed by Hajime Morita.
+
+        * features.gypi: Add ENABLE_INPUT_TYPE_DATE_LEGACY_UI=1 for non-Android.
+
+2012-10-03  Keishi Hattori  <keishi@webkit.org>
+
+        Implement localizeValue for TimeInputType
+        https://bugs.webkit.org/show_bug.cgi?id=98237
+
+        Reviewed by Kent Tamura.
+
+        * tests/LocaleMacTest.cpp:
+        (LocaleMacTest::timeComponents):
+        (LocaleMacTest):
+        (LocaleMacTest::formatTime): Tests formatDateTime() for time.
+        (TEST_F):
+
+2012-10-03  Dirk Pranke  <dpranke@chromium.org>
+
+        Roll chromium to r160008
+
+        Unreviewed, deps roll.
+
+        * DEPS:
+
+2012-10-03  Adam Barth  <abarth@webkit.org>
+
+        Remove support for ENABLE(LEGACY_WEBKIT_BLOB_BUILDER)
+        https://bugs.webkit.org/show_bug.cgi?id=98301
+
+        Reviewed by Eric Seidel.
+
+        * features.gypi:
+
+2012-10-03  Jeff Timanus  <twiz@chromium.org>
+
+        [chromium] Expose settings value to conditionally enable pinch-zoom scaling in the Chromium compositor.  The
+        flag defaults to disabled, so this change should be a no-op for scaling/scrolling behaviour.
+        https://bugs.webkit.org/show_bug.cgi?id=93292
+
+        Reviewed by James Robinson.
+
+        * public/WebSettings.h:
+        * src/NonCompositedContentHost.cpp:
+        (WebKit::NonCompositedContentHost::NonCompositedContentHost):
+        * src/WebSettingsImpl.cpp:
+        (WebKit::WebSettingsImpl::setApplyPageScaleFactorInCompositor):
+        (WebKit):
+        (WebKit::WebSettingsImpl::applyPageScaleFactorInCompositor):
+        * src/WebSettingsImpl.h:
+        (WebSettingsImpl):
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::setPageScaleFactor):
+        (WebKit::WebViewImpl::applyScrollAndScale):
+
+2012-10-03  Hans Wennborg  <hans@chromium.org>
+
+        Speech JavaScript API: Add SpeechRecognition.interimResults attribute
+        https://bugs.webkit.org/show_bug.cgi?id=98279
+
+        Reviewed by Adam Barth.
+
+        Plumb interimResults through to Chromium.
+
+        * public/WebSpeechRecognitionParams.h:
+        (WebKit::WebSpeechRecognitionParams::WebSpeechRecognitionParams):
+        (WebKit::WebSpeechRecognitionParams::interimResults):
+        (WebSpeechRecognitionParams):
+        * src/SpeechRecognitionClientProxy.cpp:
+        (WebKit::SpeechRecognitionClientProxy::start):
+        * src/SpeechRecognitionClientProxy.h:
+        (SpeechRecognitionClientProxy):
+
+2012-10-03  Hans Wennborg  <hans@chromium.org>
+
+        Speech JavaScript API: Remove resultdeleted event
+        https://bugs.webkit.org/show_bug.cgi?id=98272
+
+        Reviewed by Adam Barth.
+
+        Remove didDeleteResult. This was never used, and has been removed from
+        the spec draft.
+
+        * public/WebSpeechRecognizerClient.h:
+        * src/SpeechRecognitionClientProxy.cpp:
+        * src/SpeechRecognitionClientProxy.h:
+        (SpeechRecognitionClientProxy):
+
+2012-10-02  Anders Carlsson  <andersca@apple.com>
+
+        Change most GraphicsLayer::create calls to use the version that takes a GraphicsLayerFactory
+        https://bugs.webkit.org/show_bug.cgi?id=98217
+
+        Reviewed by Andreas Kling.
+
+        * src/NonCompositedContentHost.cpp:
+        (WebKit::NonCompositedContentHost::NonCompositedContentHost):
+
+2012-10-03  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: RTCPeerConnection should send down its handler via the FrameLoaderClient directly after creation.
+        https://bugs.webkit.org/show_bug.cgi?id=98149
+
+        Reviewed by Adam Barth.
+
+        Adding willStartUsingPeerConnectionHandler to the WebFrameClient.
+
+        * public/WebFrameClient.h:
+        (WebKit):
+        (WebFrameClient):
+        (WebKit::WebFrameClient::willStartUsingPeerConnectionHandler):
+        * src/FrameLoaderClientImpl.cpp:
+        (WebKit):
+        (WebKit::FrameLoaderClientImpl::dispatchWillStartUsingPeerConnectionHandler):
+        * src/FrameLoaderClientImpl.h:
+        (FrameLoaderClientImpl):
+
+2012-10-03  Peter Kotwicz  <pkotwicz@google.com>
+
+        WebImage::framesFromData should skip corrupted frames
+        https://bugs.webkit.org/show_bug.cgi?id=98214
+
+        Reviewed by Adam Barth.
+
+        WebImage::framesFromData() should only return bitmaps for valid frames
+        of a .ico file.
+
+        * src/WebImageSkia.cpp:
+        (WebKit::WebImage::framesFromData):
+        * tests/WebImageTest.cpp:
+        (WebKit::TEST):
+        (WebKit):
+        * tests/data/valid_header_missing_bitmap.ico: Added.
+
+2012-10-02  Yury Semikhatsky  <yurys@chromium.org>
+
+        Provide memory instrumentation for HashCountedSet
+        https://bugs.webkit.org/show_bug.cgi?id=98138
+
+        Reviewed by Pavel Feldman.
+
+        Added unit test for HashCountedSet memory instrumentation.
+
+        * tests/MemoryInstrumentationTest.cpp:
+
 2012-10-02  Kent Tamura  <tkent@chromium.org>
 
         [Chromium-Win] Implement LocaleWin::dateFormat

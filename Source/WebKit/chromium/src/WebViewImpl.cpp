@@ -200,6 +200,10 @@ static const float doubleTapZoomAlreadyLegibleRatio = 1.2f;
 
 // Constants for zooming in on a focused text field.
 static const double scrollAndScaleAnimationDurationInSeconds = 0.2;
+static const int minReadableCaretHeight = 18;
+static const float minScaleChangeToTriggerZoom = 1.05f;
+static const float leftBoxRatio = 0.3f;
+static const int caretPadding = 10;
 
 namespace WebKit {
 
@@ -659,6 +663,29 @@ void WebViewImpl::scrollBy(const WebCore::IntPoint& delta)
 bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
 {
     bool eventSwallowed = false;
+
+    // Handle link highlighting outside the main switch to avoid getting lost in the
+    // complicated set of cases handled below.
+    switch (event.type) {
+    case WebInputEvent::GestureTapDown:
+        // Queue a highlight animation, then hand off to regular handler.
+#if OS(LINUX)
+        if (settingsImpl()->gestureTapHighlightEnabled())
+            enableTouchHighlight(IntPoint(event.x, event.y));
+#endif
+        break;
+    case WebInputEvent::GestureTapCancel:
+        if (m_linkHighlight)
+            m_linkHighlight->startHighlightAnimationIfNeeded();
+        break;
+    case WebInputEvent::GestureTap:
+        // If a link highlight is active, kill it.
+        m_linkHighlight.clear();
+        break;
+    default:
+        break;
+    }
+
     switch (event.type) {
     case WebInputEvent::GestureFlingStart: {
         m_client->cancelScheduledContentIntents();
@@ -715,7 +742,18 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
 
         break;
     }
-    case WebInputEvent::GestureTwoFingerTap:
+    case WebInputEvent::GestureTwoFingerTap: {
+        if (!mainFrameImpl() || !mainFrameImpl()->frameView())
+            break;
+
+        m_page->contextMenuController()->clearContextMenu();
+        m_contextMenuAllowed = true;
+        PlatformGestureEventBuilder platformEvent(mainFrameImpl()->frameView(), event);
+        eventSwallowed = mainFrameImpl()->frame()->eventHandler()->sendContextMenuEventForGesture(platformEvent);
+        m_contextMenuAllowed = false;
+
+        break;
+    }
     case WebInputEvent::GestureLongPress: {
         if (!mainFrameImpl() || !mainFrameImpl()->frameView())
             break;
@@ -729,18 +767,13 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
         m_page->contextMenuController()->clearContextMenu();
         m_contextMenuAllowed = true;
         PlatformGestureEventBuilder platformEvent(mainFrameImpl()->frameView(), event);
-        eventSwallowed = mainFrameImpl()->frame()->eventHandler()->sendContextMenuEventForGesture(platformEvent);
+        eventSwallowed = mainFrameImpl()->frame()->eventHandler()->handleGestureEvent(platformEvent);
         m_contextMenuAllowed = false;
 
         break;
     }
     case WebInputEvent::GestureTapDown: {
         m_client->cancelScheduledContentIntents();
-        // Queue a highlight animation, then hand off to regular handler.
-#if OS(LINUX)
-        if (settingsImpl()->gestureTapHighlightEnabled())
-            enableTouchHighlight(IntPoint(event.x, event.y));
-#endif
         PlatformGestureEventBuilder platformEvent(mainFrameImpl()->frameView(), event);
         eventSwallowed = mainFrameImpl()->frame()->eventHandler()->handleGestureEvent(platformEvent);
         break;
@@ -1170,10 +1203,10 @@ Node* WebViewImpl::bestTouchLinkNode(IntPoint touchEventLocation)
     while (bestTouchNode && !highlightConditions(bestTouchNode))
         bestTouchNode = bestTouchNode->parentNode();
 
-    // If the document has click handlers installed, we don't want to default to applying the highlight to the entire RenderView, or the
-    // entire body. Also, if the node has non-auto Z-index, we cannot be sure of it's ordering with respect to other possible target nodes.
+    // If the document/body have click handlers installed, we don't want to default to applying the highlight to the entire RenderView, or the
+    // entire body.
     RenderObject* touchNodeRenderer = bestTouchNode ? bestTouchNode->renderer() : 0;
-    if (bestTouchNode && (!touchNodeRenderer || touchNodeRenderer->isRenderView() || touchNodeRenderer->isBody() || !touchNodeRenderer->style()->hasAutoZIndex()))
+    if (bestTouchNode && (!touchNodeRenderer || touchNodeRenderer->isRenderView() || touchNodeRenderer->isBody()))
         return 0;
 
     return bestTouchNode;
@@ -1197,7 +1230,6 @@ void WebViewImpl::enableTouchHighlight(IntPoint touchEventLocation)
         return;
 
     m_linkHighlight = LinkHighlight::create(touchNode, this);
-    m_linkHighlight->startHighlightAnimation();
 }
 
 #endif
@@ -2621,8 +2653,78 @@ void WebViewImpl::scrollFocusedNodeIntoRect(const WebRect& rect)
     Node* focusedNode = focusedWebCoreNode();
     if (!frame || !frame->view() || !focusedNode || !focusedNode->isElementNode())
         return;
-    Element* elementNode = static_cast<Element*>(focusedNode);
-    frame->view()->scrollElementToRect(elementNode, IntRect(rect.x, rect.y, rect.width, rect.height));
+
+    if (!m_webSettings->autoZoomFocusedNodeToLegibleScale()) {
+        Element* elementNode = static_cast<Element*>(focusedNode);
+        frame->view()->scrollElementToRect(elementNode, IntRect(rect.x, rect.y, rect.width, rect.height));
+        return;
+    }
+
+#if ENABLE(GESTURE_EVENTS)
+    focusedNode->document()->updateLayoutIgnorePendingStylesheets();
+
+    // 'caret' is rect encompassing the blinking cursor.
+    IntRect textboxRect = focusedNode->document()->view()->contentsToWindow(pixelSnappedIntRect(focusedNode->Node::boundingBox()));
+    WebRect caret, end;
+    selectionBounds(caret, end);
+
+    // Pick a scale which is reasonably readable. This is the scale at which
+    // the caret height will become minReadableCaretHeight (adjusted for dpi
+    // and font scale factor).
+    float targetScale = deviceScaleFactor();
+#if ENABLE(TEXT_AUTOSIZING)
+    if (page() && page()->settings())
+        targetScale *= page()->settings()->textAutosizingFontScaleFactor();
+#endif
+    const float newScale = clampPageScaleFactorToLimits(pageScaleFactor() * minReadableCaretHeight * targetScale / caret.height);
+    const float deltaScale = newScale / pageScaleFactor();
+
+    // Convert the rects to absolute space in the new scale.
+    IntRect textboxRectInDocumentCoordinates = textboxRect;
+    textboxRectInDocumentCoordinates.move(mainFrame()->scrollOffset());
+    textboxRectInDocumentCoordinates.scale(deltaScale);
+    IntRect caretInDocumentCoordinates = caret;
+    caretInDocumentCoordinates.move(mainFrame()->scrollOffset());
+    caretInDocumentCoordinates.scale(deltaScale);
+
+    IntPoint newOffset;
+    if (textboxRectInDocumentCoordinates.width() <= m_size.width) {
+        // Field is narrower than screen. Try to leave padding on left so field's
+        // label is visible, but it's more important to ensure entire field is
+        // onscreen.
+        int idealLeftPadding = m_size.width * leftBoxRatio;
+        int maxLeftPaddingKeepingBoxOnscreen = m_size.width - textboxRectInDocumentCoordinates.width();
+        newOffset.setX(textboxRectInDocumentCoordinates.x() - min<int>(idealLeftPadding, maxLeftPaddingKeepingBoxOnscreen));
+    } else {
+        // Field is wider than screen. Try to left-align field, unless caret would
+        // be offscreen, in which case right-align the caret.
+        newOffset.setX(max<int>(textboxRectInDocumentCoordinates.x(), caretInDocumentCoordinates.x() + caretInDocumentCoordinates.width() + caretPadding - m_size.width));
+    }
+    if (textboxRectInDocumentCoordinates.height() <= m_size.height) {
+        // Field is shorter than screen. Vertically center it.
+        newOffset.setY(textboxRectInDocumentCoordinates.y() - (m_size.height - textboxRectInDocumentCoordinates.height()) / 2);
+    } else {
+        // Field is taller than screen. Try to top align field, unless caret would
+        // be offscreen, in which case bottom-align the caret.
+        newOffset.setY(max<int>(textboxRectInDocumentCoordinates.y(), caretInDocumentCoordinates.y() + caretInDocumentCoordinates.height() + caretPadding - m_size.height));
+    }
+
+    bool needAnimation = false;
+    // If we are at less than the target zoom level, zoom in.
+    if (deltaScale > minScaleChangeToTriggerZoom)
+        needAnimation = true;
+    // If the caret is offscreen, then animate.
+    IntRect sizeRect(0, 0, m_size.width, m_size.height);
+    if (!sizeRect.contains(caret))
+        needAnimation = true;
+    // If the box is partially offscreen and it's possible to bring it fully
+    // onscreen, then animate.
+    if (sizeRect.contains(textboxRectInDocumentCoordinates.width(), textboxRectInDocumentCoordinates.height()) && !sizeRect.contains(textboxRect))
+        needAnimation = true;
+
+    if (needAnimation)
+        startPageScaleAnimation(newOffset, false, newScale, scrollAndScaleAnimationDurationInSeconds);
+#endif
 }
 
 void WebViewImpl::advanceFocus(bool reverse)
@@ -2749,8 +2851,20 @@ void WebViewImpl::setPageScaleFactor(float scaleFactor, const WebPoint& origin)
     }
 
     scaleFactor = clampPageScaleFactorToLimits(scaleFactor);
-    WebPoint clampedOrigin = clampOffsetAtScale(origin, scaleFactor);
-    page()->setPageScaleFactor(scaleFactor, clampedOrigin);
+    WebPoint scrollOffset;
+    if (!m_page->settings()->applyPageScaleFactorInCompositor()) {
+        // If page scale is not applied in the compositor, then the scroll offsets should
+        // be modified by the scale factor.
+        scrollOffset = clampOffsetAtScale(origin, scaleFactor);
+    } else {
+        IntPoint offset = origin;
+        WebSize contentSize = mainFrame()->contentsSize();
+        offset.shrunkTo(IntPoint(contentSize.width - m_size.width, contentSize.height - m_size.height));
+        offset.clampNegativeToZero();
+        scrollOffset = offset;
+    }
+
+    page()->setPageScaleFactor(scaleFactor, scrollOffset);
     m_pageScaleFactorIsSet = true;
 }
 
@@ -3919,15 +4033,21 @@ void WebViewImpl::applyScrollAndScale(const WebSize& scrollDelta, float pageScal
         mainFrameImpl()->frameView()->scrollBy(scrollDelta);
     } else {
         // The page scale changed, so apply a scale and scroll in a single
-        // operation. The old scroll offset (and passed-in delta) are
-        // in the old coordinate space, so we first need to multiply them
-        // by the page scale delta.
+        // operation.
         WebSize scrollOffset = mainFrame()->scrollOffset();
         scrollOffset.width += scrollDelta.width;
         scrollOffset.height += scrollDelta.height;
-        WebPoint scaledScrollOffset(scrollOffset.width * pageScaleDelta,
-                                    scrollOffset.height * pageScaleDelta);
-        setPageScaleFactor(pageScaleFactor() * pageScaleDelta, scaledScrollOffset);
+
+        WebPoint scrollPoint(scrollOffset.width, scrollOffset.height);
+        if (!m_page->settings()->applyPageScaleFactorInCompositor()) {
+            // The old scroll offset (and passed-in delta) are in the old
+            // coordinate space, so we first need to multiply them by the page
+            // scale delta.
+            scrollPoint.x = scrollPoint.x * pageScaleDelta;
+            scrollPoint.y = scrollPoint.y * pageScaleDelta;
+        }
+
+        setPageScaleFactor(pageScaleFactor() * pageScaleDelta, scrollPoint);
         m_doubleTapZoomInEffect = false;
     }
 }

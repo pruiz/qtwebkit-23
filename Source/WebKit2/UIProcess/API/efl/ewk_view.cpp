@@ -44,6 +44,7 @@
 #include "ewk_popup_menu_item.h"
 #include "ewk_popup_menu_item_private.h"
 #include "ewk_private.h"
+#include "ewk_resource.h"
 #include "ewk_settings_private.h"
 #include "ewk_view_find_client_private.h"
 #include "ewk_view_form_client_private.h"
@@ -52,7 +53,6 @@
 #include "ewk_view_private.h"
 #include "ewk_view_resource_load_client_private.h"
 #include "ewk_view_ui_client_private.h"
-#include "ewk_web_resource.h"
 #include <Ecore_Evas.h>
 #include <Edje.h>
 #include <WebCore/Cursor.h>
@@ -79,7 +79,7 @@ static const char EWK_VIEW_TYPE_STR[] = "EWK2_View";
 
 static const int defaultCursorSize = 16;
 
-typedef HashMap<uint64_t, Ewk_Web_Resource*> LoadingResourcesMap;
+typedef HashMap<uint64_t, Ewk_Resource*> LoadingResourcesMap;
 static void _ewk_view_priv_loading_resources_clear(LoadingResourcesMap& loadingResourcesMap);
 
 struct _Ewk_View_Private_Data {
@@ -426,7 +426,7 @@ static void _ewk_view_priv_loading_resources_clear(LoadingResourcesMap& loadingR
     LoadingResourcesMap::iterator it = loadingResourcesMap.begin();
     LoadingResourcesMap::iterator end = loadingResourcesMap.end();
     for ( ; it != end; ++it)
-        ewk_web_resource_unref(it->second);
+        ewk_resource_unref(it->value);
 
     loadingResourcesMap.clear();
 }
@@ -946,15 +946,15 @@ Ewk_Settings* ewk_view_settings_get(const Evas_Object* ewkView)
  *
  * Emits signal: "resource,request,new" with pointer to resource request.
  */
-void ewk_view_resource_load_initiated(Evas_Object* ewkView, uint64_t resourceIdentifier, Ewk_Web_Resource* resource, Ewk_Url_Request* request)
+void ewk_view_resource_load_initiated(Evas_Object* ewkView, uint64_t resourceIdentifier, Ewk_Resource* resource, Ewk_Url_Request* request)
 {
     EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
 
-    Ewk_Web_Resource_Request resourceRequest = {resource, request, 0};
+    Ewk_Resource_Request resourceRequest = {resource, request, 0};
 
     // Keep the resource internally to reuse it later.
-    priv->loadingResourcesMap.add(resourceIdentifier, ewk_web_resource_ref(resource));
+    priv->loadingResourcesMap.add(resourceIdentifier, ewk_resource_ref(resource));
 
     evas_object_smart_callback_call(ewkView, "resource,request,new", &resourceRequest);
 }
@@ -973,8 +973,8 @@ void ewk_view_resource_load_response(Evas_Object* ewkView, uint64_t resourceIden
     if (!priv->loadingResourcesMap.contains(resourceIdentifier))
         return;
 
-    Ewk_Web_Resource* resource = priv->loadingResourcesMap.get(resourceIdentifier);
-    Ewk_Web_Resource_Load_Response resourceLoadResponse = {resource, response};
+    Ewk_Resource* resource = priv->loadingResourcesMap.get(resourceIdentifier);
+    Ewk_Resource_Load_Response resourceLoadResponse = {resource, response};
     evas_object_smart_callback_call(ewkView, "resource,request,response", &resourceLoadResponse);
 }
 
@@ -984,7 +984,7 @@ void ewk_view_resource_load_response(Evas_Object* ewkView, uint64_t resourceIden
  *
  * Emits signal: "resource,request,finished" with pointer to the resource load error.
  */
-void ewk_view_resource_load_failed(Evas_Object* ewkView, uint64_t resourceIdentifier, Ewk_Web_Error* error)
+void ewk_view_resource_load_failed(Evas_Object* ewkView, uint64_t resourceIdentifier, Ewk_Error* error)
 {
     EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
@@ -992,8 +992,8 @@ void ewk_view_resource_load_failed(Evas_Object* ewkView, uint64_t resourceIdenti
     if (!priv->loadingResourcesMap.contains(resourceIdentifier))
         return;
 
-    Ewk_Web_Resource* resource = priv->loadingResourcesMap.get(resourceIdentifier);
-    Ewk_Web_Resource_Load_Error resourceLoadError = {resource, error};
+    Ewk_Resource* resource = priv->loadingResourcesMap.get(resourceIdentifier);
+    Ewk_Resource_Load_Error resourceLoadError = {resource, error};
     evas_object_smart_callback_call(ewkView, "resource,request,failed", &resourceLoadError);
 }
 
@@ -1011,10 +1011,10 @@ void ewk_view_resource_load_finished(Evas_Object* ewkView, uint64_t resourceIden
     if (!priv->loadingResourcesMap.contains(resourceIdentifier))
         return;
 
-    Ewk_Web_Resource* resource = priv->loadingResourcesMap.take(resourceIdentifier);
+    Ewk_Resource* resource = priv->loadingResourcesMap.take(resourceIdentifier);
     evas_object_smart_callback_call(ewkView, "resource,request,finished", resource);
 
-    ewk_web_resource_unref(resource);
+    ewk_resource_unref(resource);
 }
 
 /**
@@ -1031,8 +1031,8 @@ void ewk_view_resource_request_sent(Evas_Object* ewkView, uint64_t resourceIdent
     if (!priv->loadingResourcesMap.contains(resourceIdentifier))
         return;
 
-    Ewk_Web_Resource* resource = priv->loadingResourcesMap.get(resourceIdentifier);
-    Ewk_Web_Resource_Request resourceRequest = {resource, request, redirectResponse};
+    Ewk_Resource* resource = priv->loadingResourcesMap.get(resourceIdentifier);
+    Ewk_Resource_Request resourceRequest = {resource, request, redirectResponse};
 
     evas_object_smart_callback_call(ewkView, "resource,request,sent", &resourceRequest);
 }
@@ -1299,7 +1299,7 @@ void ewk_view_download_job_requested(Evas_Object* ewkView, Ewk_Download_Job* dow
  *
  * Emits signal: "download,failed" with pointer to a Ewk_Download_Job_Error.
  */
-void ewk_view_download_job_failed(Evas_Object* ewkView, Ewk_Download_Job* download, Ewk_Web_Error* error)
+void ewk_view_download_job_failed(Evas_Object* ewkView, Ewk_Download_Job* download, Ewk_Error* error)
 {
     Ewk_Download_Job_Error downloadError = { download, error };
     evas_object_smart_callback_call(ewkView, "download,failed", &downloadError);
@@ -1410,11 +1410,11 @@ void ewk_view_form_submission_request_new(Evas_Object* ewkView, Ewk_Form_Submiss
  * @internal
  * Reports load failed with error information.
  *
- * Emits signal: "load,error" with pointer to Ewk_Web_Error.
+ * Emits signal: "load,error" with pointer to Ewk_Error.
  */
-void ewk_view_load_error(Evas_Object* ewkView, const Ewk_Web_Error* error)
+void ewk_view_load_error(Evas_Object* ewkView, const Ewk_Error* error)
 {
-    evas_object_smart_callback_call(ewkView, "load,error", const_cast<Ewk_Web_Error*>(error));
+    evas_object_smart_callback_call(ewkView, "load,error", const_cast<Ewk_Error*>(error));
 }
 
 /**
@@ -1433,11 +1433,11 @@ void ewk_view_load_finished(Evas_Object* ewkView)
  * @internal
  * Reports view provisional load failed with error information.
  *
- * Emits signal: "load,provisional,failed" with pointer to Ewk_Web_Error.
+ * Emits signal: "load,provisional,failed" with pointer to Ewk_Error.
  */
-void ewk_view_load_provisional_failed(Evas_Object* ewkView, const Ewk_Web_Error* error)
+void ewk_view_load_provisional_failed(Evas_Object* ewkView, const Ewk_Error* error)
 {
-    evas_object_smart_callback_call(ewkView, "load,provisional,failed", const_cast<Ewk_Web_Error*>(error));
+    evas_object_smart_callback_call(ewkView, "load,provisional,failed", const_cast<Ewk_Error*>(error));
 }
 
 /**
@@ -1598,6 +1598,17 @@ Eina_Bool ewk_view_text_find_highlight_clear(Evas_Object* ewkView)
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     WKPageHideFindUI(toAPI(priv->pageProxy.get()));
+
+    return true;
+}
+
+Eina_Bool ewk_view_text_matches_count(Evas_Object* ewkView, const char* text, Ewk_Find_Options options, unsigned maxMatchCount)
+{
+    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData, false);
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
+    EINA_SAFETY_ON_NULL_RETURN_VAL(text, false);
+
+    priv->pageProxy->countStringMatches(String::fromUTF8(text), static_cast<WebKit::FindOptions>(options), maxMatchCount);
 
     return true;
 }

@@ -323,6 +323,7 @@ fast/sub-pixel/table-rows-no-gaps.html
 fast/sub-pixel/sub-pixel-accumulates-to-layers.html
 fast/sub-pixel/selection/selection-rect-in-sub-pixel-table.html
 fast/sub-pixel/snap-negative-location.html
+fast/sub-pixel/zoomed-image-tiles.html
 
 # USE(V8)
 
@@ -399,10 +400,6 @@ http/tests/inspector/compiler-source-mapping-debug.html
 # https://bugs.webkit.org/show_bug.cgi?id=79068
 inspector/styles/svg-style.xhtml
 
-# REGRESSION(r126717): It made inspector/styles/media-queries.html fail/flakey
-# https://bugs.webkit.org/show_bug.cgi?id=95070
-inspector/styles/media-queries.html
-
 # Microdata DOM API is not yet enabled.
 # https://bugs.webkit.org/show_bug.cgi?id=68610
 fast/dom/MicroData
@@ -423,6 +420,7 @@ fast/mutation/inline-event-listener.html
 fast/mutation/mutate-during-delivery.html
 fast/mutation/mutation-observer-constructor.html
 fast/mutation/mutation-callback-non-element-crash.html
+fast/mutation/mutation-record-nullity.html
 fast/mutation/observe-attributes.html
 fast/mutation/observe-characterdata.html
 fast/mutation/observe-childList.html
@@ -546,6 +544,9 @@ http/tests/security/contentSecurityPolicy/1.1
 # Proximity Events is now supported.
 fast/dom/Proximity
 fast/events/constructors/device-proximity-event-constructor.html
+
+# Missing support in DRT for Geolocation's Coordinate attributes.
+fast/dom/Geolocation/coordinates-interface-attributes.html
 
 # =========================================================================== #
 #       Drag and Drop Support in DRT.                                         #
@@ -750,11 +751,6 @@ http/tests/inspector/resource-main-cookies.php
 # https://bugs.webkit.org/show_bug.cgi?id=75614
 http/tests/workers/terminate-during-sync-operation.html
 
-# [Qt] DumpRenderTree converts "file:///" to a path differently
-# https://bugs.webkit.org/show_bug.cgi?id=76563
-http/tests/misc/drag-over-iframe-invalid-source-crash.html
-http/tests/misc/iframe-invalid-source-crash.html
-
 # Needs custom policy delegate enhancement to log downloads
 http/tests/download
 
@@ -765,18 +761,9 @@ http/tests/download
 # will not be in the output.
 http/tests/misc/redirect-to-external-url.html
 
-# [Qt] new test http/tests/misc/xslt-bad-import.html is failing
-# https://bugs.webkit.org/show_bug.cgi?id=72252
-http/tests/misc/xslt-bad-import.html
-
 # [Qt] http/tests/cookies/js-get-and-set-http-only-cookie.html failing since introduction in r119947
 # https://bugs.webkit.org/show_bug.cgi?id=87208
 http/tests/cookies/js-get-and-set-http-only-cookie.html
-
-# [Qt] new tests introduced in r122528 fail
-# https://bugs.webkit.org/show_bug.cgi?id=91218
-http/tests/w3c/webperf/approved/navigation-timing/html/test_performance_attributes_exist_in_object.html
-http/tests/w3c/webperf/approved/navigation-timing/html/test_timing_xserver_redirect.html
 
 # =========================================================================== #
 #       Failing xmlhttprequest tests                                          #
@@ -815,10 +802,6 @@ editing/pasteboard/paste-xml.xhtml
 # https://bugs.webkit.org/show_bug.cgi?id=72430
 editing/pasteboard/data-transfer-items-image-png.html
 
-# REGRESSION(r96870): editing/pasteboard/smart-paste-008.html fails on non-Mac
-# https://bugs.webkit.org/show_bug.cgi?id=69587
-editing/pasteboard/smart-paste-008.html
-
 # ============================================================================= #
 # Failing editing/deleting tests
 # ============================================================================= #
@@ -851,9 +834,6 @@ editing/selection/fake-drag.html
 editing/selection/select-from-textfield-outwards.html
 editing/selection/move-left-right.html
 editing/selection/move-past-trailing-space.html
-
-# https://bugs.webkit.org/show_bug.cgi?id=52883
-editing/selection/rtl-move-selection-right-left.html
 
 # [Qt] editing tests fails after r54980
 # https://bugs.webkit.org/show_bug.cgi?id=35145
@@ -969,10 +949,6 @@ plugins/embed-attributes-style.html
 # https://bugs.webkit.org/show_bug.cgi?id=60722
 http/tests/plugins/plugin-document-has-focus.html
 
-# [Qt] wrong ref count of npobject
-# https://bugs.webkit.org/show_bug.cgi?id=49749
-plugins/refcount-leaks.html
-
 # [Qt] plugins/netscape-plugin-page-cache-works.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=74482
 plugins/netscape-plugin-page-cache-works.html
@@ -1007,14 +983,8 @@ sputnik/Conformance/15_Native_Objects/15.8_Math/15.8.2/15.8.2.18_tan/S15.8.2.18_
 # =========================================================================== #
 # Fluctuating/flakey tests
 # =========================================================================== #
-animations/3d/transform-origin-vs-functions.html
-animations/change-one-anim.html
 fast/frames/sandboxed-iframe-plugins.html
-fast/frames/sandboxed-iframe-scripting.html
-fast/frames/sandboxed-iframe-storage.html
 http/tests/cookies/simple-cookies-max-age.html
-
-transitions/change-values-during-transition.html
 
 # http/tests/inspector/resource-har-conversion.html is failing on the release bot after r63191
 # webkit.org/b/42162
@@ -1023,15 +993,6 @@ http/tests/inspector/resource-har-conversion.html
 # [Qt] Some inspector test fail intermittently
 # https://bugs.webkit.org/show_bug.cgi?id=42090
 http/tests/inspector/network/network-size.html
-# This test consistently fails if run with --singly flag
-inspector/timeline/timeline-paint.html
-
-# [Qt] New fails caused by change(s) between r79317-r79320.
-inspector/debugger/open-close-open.html
-
-# [Qt] fast/frames/flattening/frameset-flattening-subframesets.html fails intermittently on Qt bot
-# Fails caused by layoutTestController.display() in fast/frames/flattening/frameset-flattening-subframe-resize.html
-# https://bugs.webkit.org/show_bug.cgi?id=37334
 
 # Tests that currently fail but perhaps used to work at some point.
 fast/dom/open-and-close-by-DOM.html
@@ -1046,10 +1007,6 @@ fast/forms/listbox-width-change.html
 fast/forms/plaintext-mode-2.html
 fast/forms/menulist-width-change.html
 
-# Flaky Test: fast/events/tabindex-focus-blur-all.html
-# https://bugs.webkit.org/show_bug.cgi?id=52115
-fast/events/tabindex-focus-blur-all.html
-
 # [Qt] http/tests/misc/link-rel-icon-beforeload.html is flakey
 # https://bugs.webkit.org/show_bug.cgi?id=63518
 http/tests/misc/link-rel-icon-beforeload.html
@@ -1061,6 +1018,8 @@ fast/selectors/unqualified-hover-strict.html
 # https://bugs.webkit.org/show_bug.cgi?id=89153
 http/tests/websocket/tests/hybi/workers/close.html
 
+# New test added for https://bugs.webkit.org/show_bug.cgi?id=98452 needs platform specific results
+fast/text/vertical-rl-rtl-linebreak.html
 
 # =========================================================================== #
 # failing media tests
@@ -1218,6 +1177,7 @@ loader/go-back-to-different-window-size.html
 editing/text-iterator/findString.html
 
 # Missing layoutTestController.testRepaint()
+fast/images/repaint-subrect-grid.html
 fast/repaint/table-writing-modes-h.html
 fast/repaint/table-writing-modes-v.html
 fast/repaint/text-emphasis-h.html
@@ -1237,11 +1197,6 @@ svg/as-image/svg-as-image-canvas.html
 http/tests/security/isolatedWorld/didClearWindowObject.html
 # This needs more investigation
 http/tests/security/isolatedWorld/world-reuse.html
-
-# ------- broken ICO file decoding
-fast/images/favicon-as-image.html
-fast/images/icon-0colors.html
-fast/images/icon-decoding.html
 
 # ------- missing ruby annotation support for japanese fonts
 fast/ruby/ruby-beforeafter.html
@@ -1326,13 +1281,6 @@ css3/filters/custom/effect-custom-parameters.html
 css3/filters/custom/filter-repaint-custom-clipped.html
 css3/filters/custom/filter-repaint-custom-rotated.html
 css3/filters/custom/filter-repaint-custom.html
-
-# ERROR: TestRunner::overridePreference() does not support the 'WebKitDisplayImagesKey' preference
-# http://trac.webkit.org/changeset/129462
-fast/loader/display-image-unset-allows-cached-image-load.html
-fast/loader/display-image-unset-can-block-image-and-can-reload-in-place.html
-fast/loader/images-enabled-unset-can-block-image-and-can-reload-in-place.html
-http/tests/misc/favicon-loads-with-images-disabled.html
 
 # ReferenceError: Can't find variable: MediaKeyError
 # http://trac.webkit.org/changeset/114067
@@ -1523,6 +1471,65 @@ svg/carto.net/tabgroup.svg
 # [Qt] svg/css/text-gradient-shadow.svg fails
 # https://bugs.webkit.org/show_bug.cgi?id=92734
 svg/css/text-gradient-shadow.svg
+
+
+# These files need new expectations after changing the behavrior from radiaGradients to SVG2
+webkit.org/b/98569 svg/W3C-SVG-1.1-SE/styling-pres-02-f.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1-SE/svgdom-over-01-f.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/coords-units-01-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-02-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-04-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-05-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-06-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-11-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-12-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-13-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-14-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-15-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/struct-use-05-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/styling-inherit-01-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/batik/paints/gradientLimit.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/paints/patternRegions-positioned-objects.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/paints/patternRegions.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/text/textEffect.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/text/textEffect3.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/hixie/perf/006.xml [ Failure Pass ]
+webkit.org/b/98569 svg/custom/relative-sized-content-with-resources.xhtml [ Failure Pass ]
+webkit.org/b/98569 svg/custom/stroked-pattern.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/gradient-deep-referencing.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/radial-gradient-with-outstanding-focalPoint.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/radialGradient-focal-radius.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/gradient-with-1d-boundingbox.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/recursive-gradient.svg [ Failure Pass ]
+
+# These files need new expectations after changing the behavrior from radiaGradients to SVG2
+webkit.org/b/98569 svg/W3C-SVG-1.1-SE/styling-pres-02-f.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1-SE/svgdom-over-01-f.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/coords-units-01-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-02-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-04-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-05-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-06-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-11-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-12-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-13-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-14-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-15-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/struct-use-05-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/styling-inherit-01-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/batik/paints/gradientLimit.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/paints/patternRegions-positioned-objects.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/paints/patternRegions.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/text/textEffect.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/text/textEffect3.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/hixie/perf/006.xml [ Failure Pass ]
+webkit.org/b/98569 svg/custom/relative-sized-content-with-resources.xhtml [ Failure Pass ]
+webkit.org/b/98569 svg/custom/stroked-pattern.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/gradient-deep-referencing.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/radial-gradient-with-outstanding-focalPoint.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/radialGradient-focal-radius.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/gradient-with-1d-boundingbox.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/recursive-gradient.svg [ Failure Pass ]
 
 # ============================================================================= #
 # Failing CSS Tests
@@ -2046,6 +2053,14 @@ fast/block/positioning/002.html
 # https://bugs.webkit.org/show_bug.cgi?id=92733
 fast/block/positioning/056.html
 
+# REGRESSION (r130557): fast/exclusions/shape-inside/shape-inside-rounded-rectangle-003.html fails on Qt and GTK
+# https://bugs.webkit.org/show_bug.cgi?id=98585
+fast/exclusions/shape-inside/shape-inside-rounded-rectangle-003.html
+
+# REGRESSION (r130570): fast/writing-mode/vertical-subst-font-vert-no-dflt.html fails on non-Chromium platforms
+# https://bugs.webkit.org/show_bug.cgi?id=98587
+fast/writing-mode/vertical-subst-font-vert-no-dflt.html
+
 # ============================================================================= #
 # failing fonts tests
 # ============================================================================= #
@@ -2086,9 +2101,6 @@ tables/mozilla_expected_failures/bugs/bug178855.xml
 tables/mozilla_expected_failures/bugs/bug2479-5.html
 tables/mozilla/bugs/bug12384.html
 tables/mozilla/bugs/bug99948.html
-
-# The inner <input> should now grow to take the full cell's height.
-fast/table/colspanMinWidth-vertical.html
 
 # ============================================================================= #
 # Failed canvas tests from http://philip.html5.org/tests/canvas/suite/tests/
@@ -2682,13 +2694,6 @@ inspector/timeline/timeline-frames.html
 inspector/elements/edit-dom-actions.html
 jquery/data.html
 
-# [Qt] css2.1/20110323/text-indent-intrinsic-00* fail
-# https://bugs.webkit.org/show_bug.cgi?id=91772
-css2.1/20110323/text-indent-intrinsic-001.htm
-css2.1/20110323/text-indent-intrinsic-002.htm
-css2.1/20110323/text-indent-intrinsic-003.htm
-css2.1/20110323/text-indent-intrinsic-004.htm
-
 # [Qt] new test introduced in r123205 fails on Qt
 # https://bugs.webkit.org/show_bug.cgi?id=91967
 inspector/styles/protocol-css-regions-commands.html
@@ -2722,6 +2727,7 @@ svg/custom/use-instanceRoot-as-event-target.xhtml
 fast/events/autoscroll-in-textarea.html
 
 # ENABLE(INPUT_MULTIPLE_FIELDS_UI) is disabled
+fast/forms/date-multiple-fields
 fast/forms/month-multiple-fields
 fast/forms/time-multiple-fields
 fast/forms/week-multiple-fields
@@ -2733,8 +2739,6 @@ inspector/timeline/timeline-decode-resize.html
 # REGRESSION(r126852): It broke inspector tests
 # https://bugs.webkit.org/show_bug.cgi?id=95176
 http/tests/inspector-enabled/console-clear-arguments-on-frame-navigation.html
-http/tests/inspector-enabled/contentSecurityPolicy-blocks-setInterval.html
-http/tests/inspector-enabled/contentSecurityPolicy-blocks-setTimeout.html
 
 # [Qt] New svg/custom/clamped-masking-clipping.svg asserts
 # https://bugs.webkit.org/show_bug.cgi?id=95431
@@ -2781,13 +2785,10 @@ inspector/extensions/extensions-panel.html
 # https://bugs.webkit.org/show_bug.cgi?id=97199
 fast/regions/overflow-size-change-with-stacking-context.html
 
-# [Qt] New test introduced in r129346 inspector-protocol/css-getSupportedCSSProperties.html fails
-# https://bugs.webkit.org/show_bug.cgi?id=97451
-inspector-protocol/css-getSupportedCSSProperties.html
-
 # [Qt] fast/profiler/apply.html fails with LLInt on 32 bit
 # https://bugs.webkit.org/show_bug.cgi?id=97791
 fast/profiler/apply.html
+http/tests/w3c/webperf/approved/navigation-timing/html/test_timing_xserver_redirect.html
 
 # =========================================================================== #
 #       End of entries merged in from the old Skipped file                    #
@@ -2899,6 +2900,8 @@ webkit.org/b/90951 fast/text/shaping
 # Missing test infrastructure, no gamepads available.
 webkit.org/b/92873 gamepad/gamepad-polling-access.html [ Skip ]
 
+webkit.org/b/98564 fast/table/colspanMinWidth-vertical.html [ Missing Failure ]
+
 # Flaky tests
 webkit.org/b/91376 http/tests/security/sandboxed-iframe-modify-self.html [ Failure Pass ]
 webkit.org/b/91379 http/tests/security/contentSecurityPolicy/policy-does-not-affect-child.html [ Failure Pass ]
@@ -2920,6 +2923,8 @@ webkit.org/b/94005 css2.1/20110323/word-spacing-remove-space-003.htm [ ImageOnly
 webkit.org/b/94005 css2.1/20110323/word-spacing-remove-space-006.htm [ ImageOnlyFailure ]
 webkit.org/b/94006 fast/css/word-spacing-characters-complex-text.html [ ImageOnlyFailure ]
 
-# [Qt] REGRESSION(r130160): It made 2 tests crash
-webkit.org/b/98158 svg/text/text-fonts-02-t.svg [ Crash Pass ]
-webkit.org/b/98158 http/tests/css/link-css-disabled-value-with-slow-loading-sheet-in-error.html [ Crash Pass ]
+# [Qt] Unidentified plugin failures
+webkit.org/b/98525 plugins/mouse-click-plugin-clears-selection.html
+webkit.org/b/98525 plugins/netscape-dom-access.html
+webkit.org/b/98525 plugins/resize-from-plugin.html
+webkit.org/b/98640 plugins/refcount-leaks.html

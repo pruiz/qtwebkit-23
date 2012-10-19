@@ -83,7 +83,7 @@ LayerTreeCoordinator::LayerTreeCoordinator(WebPage* webPage)
     , m_forceRepaintAsyncCallbackID(0)
 {
     // Create a root layer.
-    m_rootLayer = GraphicsLayer::create(this);
+    m_rootLayer = GraphicsLayer::create(this, this);
     CoordinatedGraphicsLayer* webRootLayer = toCoordinatedGraphicsLayer(m_rootLayer.get());
     webRootLayer->setRootLayer(true);
 #ifndef NDEBUG
@@ -93,7 +93,7 @@ LayerTreeCoordinator::LayerTreeCoordinator(WebPage* webPage)
     m_rootLayer->setSize(m_webPage->size());
     m_layerTreeContext.webLayerID = toCoordinatedGraphicsLayer(webRootLayer)->id();
 
-    m_nonCompositedContentLayer = GraphicsLayer::create(this);
+    m_nonCompositedContentLayer = GraphicsLayer::create(this, this);
     toCoordinatedGraphicsLayer(m_rootLayer.get())->setCoordinatedGraphicsLayerClient(this);
 #ifndef NDEBUG
     m_nonCompositedContentLayer->setName("LayerTreeCoordinator non-composited content");
@@ -258,12 +258,12 @@ bool LayerTreeCoordinator::flushPendingLayerChanges()
         m_webPage->send(Messages::LayerTreeCoordinatorProxy::DeleteCompositingLayer(m_detachedLayers[i]));
     m_detachedLayers.clear();
 
-    bool didSync = m_webPage->corePage()->mainFrame()->view()->syncCompositingStateIncludingSubframes();
-    m_nonCompositedContentLayer->syncCompositingStateForThisLayerOnly();
+    bool didSync = m_webPage->corePage()->mainFrame()->view()->flushCompositingStateIncludingSubframes();
+    m_nonCompositedContentLayer->flushCompositingStateForThisLayerOnly();
     if (m_pageOverlayLayer)
-        m_pageOverlayLayer->syncCompositingStateForThisLayerOnly();
+        m_pageOverlayLayer->flushCompositingStateForThisLayerOnly();
 
-    m_rootLayer->syncCompositingStateForThisLayerOnly();
+    m_rootLayer->flushCompositingStateForThisLayerOnly();
 
     if (m_shouldSyncRootLayer) {
         m_webPage->send(Messages::LayerTreeCoordinatorProxy::SetRootCompositingLayer(toCoordinatedGraphicsLayer(m_rootLayer.get())->id()));
@@ -425,7 +425,7 @@ void LayerTreeCoordinator::createPageOverlayLayer()
 {
     ASSERT(!m_pageOverlayLayer);
 
-    m_pageOverlayLayer = GraphicsLayer::create(this);
+    m_pageOverlayLayer = GraphicsLayer::create(this, this);
 #ifndef NDEBUG
     m_pageOverlayLayer->setName("LayerTreeCoordinator page overlay content");
 #endif
@@ -470,7 +470,7 @@ int64_t LayerTreeCoordinator::adoptImageBackingStore(Image* image)
     HashMap<int64_t, int>::iterator it = m_directlyCompositedImageRefCounts.find(key);
 
     if (it != m_directlyCompositedImageRefCounts.end()) {
-        ++(it->second);
+        ++(it->value);
         return key;
     }
 
@@ -495,9 +495,9 @@ void LayerTreeCoordinator::releaseImageBackingStore(int64_t key)
     if (it == m_directlyCompositedImageRefCounts.end())
         return;
 
-    it->second--;
+    it->value--;
 
-    if (it->second)
+    if (it->value)
         return;
 
     m_directlyCompositedImageRefCounts.remove(it);
@@ -514,7 +514,7 @@ void LayerTreeCoordinator::notifyAnimationStarted(const WebCore::GraphicsLayer*,
 {
 }
 
-void LayerTreeCoordinator::notifySyncRequired(const WebCore::GraphicsLayer*)
+void LayerTreeCoordinator::notifyFlushRequired(const WebCore::GraphicsLayer*)
 {
 }
 

@@ -1307,6 +1307,26 @@ void RenderStyle::getShadowExtent(const ShadowData* shadow, LayoutUnit &top, Lay
     }
 }
 
+LayoutBoxExtent RenderStyle::getShadowInsetExtent(const ShadowData* shadow) const
+{
+    LayoutUnit top = 0;
+    LayoutUnit right = 0;
+    LayoutUnit bottom = 0;
+    LayoutUnit left = 0;
+
+    for ( ; shadow; shadow = shadow->next()) {
+        if (shadow->style() == Normal)
+            continue;
+        int blurAndSpread = shadow->blur() + shadow->spread();
+        top = max<LayoutUnit>(top, shadow->y() + blurAndSpread);
+        right = min<LayoutUnit>(right, shadow->x() - blurAndSpread);
+        bottom = min<LayoutUnit>(bottom, shadow->y() - blurAndSpread);
+        left = max<LayoutUnit>(left, shadow->x() + blurAndSpread);
+    }
+
+    return LayoutBoxExtent(top, right, bottom, left);
+}
+
 void RenderStyle::getShadowHorizontalExtent(const ShadowData* shadow, LayoutUnit &left, LayoutUnit &right) const
 {
     left = 0;
@@ -1410,48 +1430,6 @@ Color RenderStyle::visitedDependentColor(int colorProperty) const
 
     // Take the alpha from the unvisited color, but get the RGB values from the visited color.
     return Color(visitedColor.red(), visitedColor.green(), visitedColor.blue(), unvisitedColor.alpha());
-}
-
-Length RenderStyle::logicalWidth() const
-{
-    if (isHorizontalWritingMode())
-        return width();
-    return height();
-}
-
-Length RenderStyle::logicalHeight() const
-{
-    if (isHorizontalWritingMode())
-        return height();
-    return width();
-}
-
-Length RenderStyle::logicalMinWidth() const
-{
-    if (isHorizontalWritingMode())
-        return minWidth();
-    return minHeight();
-}
-
-Length RenderStyle::logicalMaxWidth() const
-{
-    if (isHorizontalWritingMode())
-        return maxWidth();
-    return maxHeight();
-}
-
-Length RenderStyle::logicalMinHeight() const
-{
-    if (isHorizontalWritingMode())
-        return minHeight();
-    return minWidth();
-}
-
-Length RenderStyle::logicalMaxHeight() const
-{
-    if (isHorizontalWritingMode())
-        return maxHeight();
-    return maxWidth();
 }
 
 const BorderValue& RenderStyle::borderBefore() const

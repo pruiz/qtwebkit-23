@@ -460,6 +460,9 @@ void WebContext::disconnectProcess(WebProcessProxy* process)
 
     m_visitedLinkProvider.processDidClose(process);
 
+    if (m_haveInitialEmptyProcess && process == m_processes.last())
+        m_haveInitialEmptyProcess = false;
+
     // FIXME (Multi-WebProcess): <rdar://problem/12239765> All the invalidation calls below are still necessary in multi-process mode, but they should only affect data structures pertaining to the process being disconnected.
     // Clearing everything causes assertion failures, so it's less trouble to skip that for now.
     if (m_processModel != ProcessModelSharedSecondaryProcess) {
@@ -986,7 +989,7 @@ static PassRefPtr<MutableDictionary> createDictionaryFromHashMap(const HashMap<S
     RefPtr<MutableDictionary> result = MutableDictionary::create();
     HashMap<String, uint64_t>::const_iterator end = map.end();
     for (HashMap<String, uint64_t>::const_iterator it = map.begin(); it != end; ++it)
-        result->set(it->first, RefPtr<WebUInt64>(WebUInt64::create(it->second)).get());
+        result->set(it->key, RefPtr<WebUInt64>(WebUInt64::create(it->value)).get());
     
     return result;
 }

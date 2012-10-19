@@ -449,7 +449,6 @@ fast/css/widget-region-parser.html
 # http://webkit.org/b/96828
 fast/canvas/webgl/oes-vertex-array-object.html
 
-
 #////////////////////////////////////////////////////////////////////////////////////////
 # TESTS EXPECTED TO FAIL
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -477,9 +476,6 @@ webkit.org/b/83898 fast/exclusions
 
 # CSS Filters support not yet enabled (needs ENABLE_CSS_FILTERS).
 webkit.org/b/85465 css3/filters [ Skip ]
-
-# Needs results
-webkit.org/b/97409 svg/custom/clip-mask-negative-scale.svg [ Missing Pass ]
 
 # Needs rebaseline after bug 97217 is fixed
 webkit.org/b/97325 css3/masking/clip-path-circle-relative-overflow.html [ ImageOnlyFailure Pass ]
@@ -586,23 +582,9 @@ webkit.org/b/86623 editing/pasteboard/drop-text-without-selection.html [ Missing
 webkit.org/b/86623 editing/pasteboard/smart-drag-drop.html [ Missing ]
 webkit.org/b/86623 editing/pasteboard/subframe-dragndrop-1.html [ Missing ]
 
-# CSS Sticky (-webkit-sticky) not supported by EFL.
-webkit.org/b/95182 fast/css/sticky/inflow-sticky.html [ ImageOnlyFailure ]
+# CSS Sticky (-webkit-sticky) supported by EFL, but these tests fail.
 webkit.org/b/95182 fast/css/sticky/inline-sticky-abspos-child.html [ ImageOnlyFailure ]
 webkit.org/b/95182 fast/css/sticky/inline-sticky.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/replaced-sticky.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-as-positioning-container.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-both-sides.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-left-percentage.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-left.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-margins.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-side-margins.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-stacking-context.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-top-margins.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-top.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-writing-mode-horizontal-bt.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-writing-mode-vertical-lr.html [ ImageOnlyFailure ]
-webkit.org/b/95182 fast/css/sticky/sticky-writing-mode-vertical-rl.html [ ImageOnlyFailure ]
 
 # Testcase assumes a thumb width of 12px, default there uses 29px.
 webkit.org/b/95071 fast/forms/range/slider-in-multi-column.html [ Failure ]
@@ -727,6 +709,7 @@ webkit.org/b/93213 fast/text/international/text-spliced-font.html [ Failure Pass
 webkit.org/b/93214 http/tests/loading/307-after-303-after-post.html [ Failure Pass Timeout ]
 webkit.org/b/93212 http/tests/incremental/slow-utf8-text.pl [ Pass Timeout ]
 webkit.org/b/68878 media/video-playing-and-pause.html [ Failure Pass ]
+webkit.org/b/98621 media/video-controls-rendering.html [ Failure Pass ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # FAILING TESTS
@@ -888,7 +871,6 @@ Bug(EFL) svg/custom
 Bug(EFL) svg/dom/altGlyph-dom.xhtml
 Bug(EFL) svg/text
 Bug(EFL) svg/W3C-SVG-1.1
-Bug(EFL) svg/W3C-SVG-1.1-SE
 Bug(EFL) svg/zoom/page/zoom-zoom-coords.xhtml
 
 # EFL's TestRunner does not implement setMediaType
@@ -1377,9 +1359,6 @@ webkit.org/b/91477 fast/multicol/shrink-to-column-height-for-pagination.html [ M
 webkit.org/b/91210 http/tests/w3c/webperf/approved/navigation-timing/html/test_performance_attributes_exist_in_object.html [ Failure ]
 webkit.org/b/91210 http/tests/w3c/webperf/approved/navigation-timing/html/test_timing_xserver_redirect.html [ Failure ]
 
-# Failing after r123379 on EFL and GTK.
-webkit.org/b/92063 fast/css/sticky/parsing-position-sticky.html [ Failure ]
-
 # This test depends on subpixel layout.
 webkit.org/b/92352 css3/flexbox/flex-rounding.html [ Failure ]
 
@@ -1408,6 +1387,7 @@ webkit.org/b/50485 inspector/profiler/heap-snapshot-summary-sorting.html [ Skip 
 webkit.org/b/50485 inspector/profiler/heap-snapshot-summary-sorting-instances.html [ Skip ]
 
 # ENABLE(INPUT_MULTIPLE_FIELDS_UI) is disabled
+fast/forms/date-multiple-fields
 webkit.org/b/97299 fast/forms/month-multiple-fields
 webkit.org/b/94186 fast/forms/time-multiple-fields
 webkit.org/b/97877 fast/forms/week-multiple-fields
@@ -1462,32 +1442,28 @@ webkit.org/b/95530 http/tests/security/inactive-document-with-empty-security-ori
 webkit.org/b/95551 fast/forms/datalist/input-appearance-range-with-datalist-rtl.html [ ImageOnlyFailure ]
 
 # EFL port does not support plugins yet
-webkit.org/b/96881 fast/dom/Window/Plug-ins.html [ Failure ]
-webkit.org/b/96881 fast/frames/sandboxed-iframe-about-blank.html [ Failure ]
-webkit.org/b/96881 fast/frames/sandboxed-iframe-navigation-allowed.html [ Failure ]
 webkit.org/b/96881 fast/frames/sandboxed-iframe-plugins.html [ Failure ]
-webkit.org/b/96881 fast/replaced/invalid-object-with-fallback.html [ Failure ]
-webkit.org/b/96881 http/tests/security/contentSecurityPolicy/object-src-none-allowed.html [ Failure ]
-webkit.org/b/96881 http/tests/security/contentSecurityPolicy/object-src-url-blocked.html [ Failure ]
 webkit.org/b/96881 http/tests/plugins [ Skip ]
-webkit.org/b/96881 http/tests/security/cross-origin-plugin-allowed.html [ Failure ]
-webkit.org/b/96881 http/tests/security/cross-origin-plugin-private-browsing-toggled-allowed.html [ Failure ]
 webkit.org/b/96881 http/tests/security/cross-origin-plugin-private-browsing-toggled.html [ Failure ]
 webkit.org/b/96881 http/tests/security/cross-origin-plugin.html [ Failure ]
 webkit.org/b/96881 http/tests/security/frameNavigation/xss-DENIED-plugin-navigation.html [ Failure ]
-webkit.org/b/96881 http/tests/security/storage-blocking-loosened-plugin.html [ Failure ]
-webkit.org/b/96881 http/tests/security/storage-blocking-loosened-private-browsing-plugin.html [ Failure ]
 webkit.org/b/96881 http/tests/security/storage-blocking-strengthened-plugin.html [ Failure ]
 webkit.org/b/96881 http/tests/security/storage-blocking-strengthened-private-browsing-plugin.html [ Failure ]
 webkit.org/b/96881 java [ Skip ]
 webkit.org/b/96881 plugins [ Skip ]
 webkit.org/b/96881 userscripts/user-script-plugin-document.html [ Failure ]
 
+# Ref tests added in r130592 that are failing on both EFL and GTK ports
+webkit.org/b/98613 css3/masking/clip-path-reference-userSpaceOnUse.html [ ImageOnlyFailure ] 
+webkit.org/b/98613 css3/masking/clip-path-reference.html [ ImageOnlyFailure ]
+
 # EFL does not yet support global selection
 webkit.org/b/88238 editing/pasteboard/paste-global-selection.html [ Skip ]
 
 # Gradient instead of solid color in the rectangle
 webkit.org/b/54251 fast/canvas/DrawImageSinglePixelStretch.html [ Failure ]
+
+webkit.org/b/98564 fast/table/colspanMinWidth-vertical.html [ Missing Failure ]
 
 # Fails after r129175.
 webkit.org/b/97296 fast/text/international/hebrew-selection.html [ ImageOnlyFailure ]
@@ -1498,6 +1474,10 @@ webkit.org/b/97077 inspector/extensions/extensions-panel.html [ Failure ]
 # Fails on the bots.
 webkit.org/b/97968 media/unsupported-rtsp.html [ Failure ]
 
+webkit.org/b/98306 css3/flexbox/flexbox-baseline.html [ Failure Missing ]
+
+webkit.org/b/98587 fast/writing-mode/vertical-subst-font-vert-no-dflt.html [ ImageOnlyFailure ]
+
 # Needs rebaseline eventually
 webkit.org/b/97990 mathml/presentation/attributes.xhtml [ Failure ]
 webkit.org/b/97990 mathml/presentation/fractions.xhtml [ Failure ]
@@ -1506,3 +1486,12 @@ webkit.org/b/97990 mathml/presentation/mo-stretch.html [ Failure ]
 webkit.org/b/97990 mathml/presentation/roots.xhtml [ Failure ]
 webkit.org/b/97990 mathml/presentation/row-alignment.xhtml [ Failure ]
 webkit.org/b/97990 mathml/presentation/subsup.xhtml [ Failure ]
+
+# r130231 introcudes a regression for some complex font cases:
+webkit.org/b/98247 fast/text/atsui-multiple-renderers.html [ Failure ]
+webkit.org/b/98247 fast/text/atsui-spacing-features.html [ Failure ]
+webkit.org/b/98247 fast/text/wide-zero-width-space.html [ Failure ]
+
+# Occasionally fails if run after right after
+# fast/selectors/unqualified-hover-quirks.html or itself.
+webkit.org/b/10890 fast/selectors/unqualified-hover-strict.html [ Failure Pass ]

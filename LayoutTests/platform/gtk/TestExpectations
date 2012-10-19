@@ -88,17 +88,17 @@ fast/dom/Window/slow-unload-handler-only-frame-is-stopped.html [ WontFix ]
 # Accessibility tests that should never be run for GTK due to be
 # written in a platform-specific way. They should either be moved to
 # the right platform or re-written in a more platform-agnostic way.
-accessibility/aria-list-and-listitem.html [ WontFix ]
-accessibility/aria-option-role.html [ WontFix ]
-accessibility/internal-link-anchors2.html [ WontFix ]
-accessibility/radio-button-group-members.html [ WontFix ]
-accessibility/table-attributes.html [ WontFix ]
-accessibility/table-detection.html [ WontFix ]
-accessibility/table-one-cell.html [ WontFix ]
-accessibility/table-sections.html [ WontFix ]
-accessibility/table-with-aria-role.html [ WontFix ]
-accessibility/table-with-rules.html [ WontFix ]
-accessibility/plugin.html [ WontFix ]
+webkit.org/b/98348 accessibility/aria-list-and-listitem.html [ WontFix ]
+webkit.org/b/98348 accessibility/aria-option-role.html [ WontFix ]
+webkit.org/b/98348 accessibility/internal-link-anchors2.html [ WontFix ]
+webkit.org/b/98348 accessibility/radio-button-group-members.html [ WontFix ]
+webkit.org/b/98348 accessibility/table-attributes.html [ WontFix ]
+webkit.org/b/98348 accessibility/table-detection.html [ WontFix ]
+webkit.org/b/98348 accessibility/table-one-cell.html [ WontFix ]
+webkit.org/b/98348 accessibility/table-sections.html [ WontFix ]
+webkit.org/b/98348 accessibility/table-with-aria-role.html [ WontFix ]
+webkit.org/b/98348 accessibility/table-with-rules.html [ WontFix ]
+webkit.org/b/98348 accessibility/plugin.html [ WontFix ]
 
 # Feature disabled, see: https://bugs.webkit.org/show_bug.cgi?id=85425
 Bug(GTK) fast/viewport/viewport-legacy-handheldfriendly.html [ Skip ]
@@ -282,7 +282,7 @@ Bug(GTK) fast/events/page-visibility-iframe-propagation-test.html [ Skip ]
 Bug(GTK) fast/events/page-visibility-transition-test.html [ Skip ]
 
 # GTK doesn't support smart replace.
-webkit.org/b/61661 editing/pasteboard/drag-drop-list.html [ Failure ]
+webkit.org/b/61661 [ Release ] editing/pasteboard/drag-drop-list.html [ Failure ]
 
 # Tests for MediaSource API. Feature is not yet functional.
 webkit.org/b/64731 http/tests/media/media-source [ Skip ]
@@ -384,6 +384,7 @@ webkit.org/b/85532 fast/sub-pixel/table-rows-have-stable-height.html [ Skip ]
 webkit.org/b/85532 fast/sub-pixel/table-rows-no-gaps.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/vertical-align-middle-overflow.html [ Pass ]
 webkit.org/b/85532 fast/sub-pixel/sub-pixel-accumulates-to-layers.html [ Pass ]
+webkit.org/b/85532 fast/sub-pixel/zoomed-image-tiles.html [ Skip ]
 
 # Mediastream implementation is not complete yet.
 webkit.org/b/79203 fast/mediastream [ Skip ]
@@ -431,6 +432,9 @@ webkit.org/b/84635 fast/dom/HTMLDialogElement [ Skip ]
 webkit.org/b/92942 fast/dom/Proximity
 webkit.org/b/92942 fast/events/constructors/device-proximity-event-constructor.html
 
+# CSS compositing is not yet enabled.
+Bug(GTK) css3/compositing [ Skip ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Expected failures
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -461,6 +465,19 @@ webkit.org/b/90957 [ Release ] fast/js/random-array-gc-stress.html [ Crash Pass 
 
 webkit.org/b/94458 [ Debug ] http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-in-body.html [ Crash Failure ]
 webkit.org/b/94458 [ Debug ] fast/events/message-port-context-destroyed.html [ Crash Pass ]
+
+webkit.org/b/98612 [ Debug ] fast/events/drag-link.html [ Crash ]
+webkit.org/b/98612 [ Debug ] fast/events/crash-on-mutate-during-drop.html [ Crash ]
+webkit.org/b/98612 [ Debug ] fast/lists/drag-into-marker.html [ Crash ]
+webkit.org/b/98612 [ Debug ] editing/pasteboard/drag-drop-list.html [ Crash Failure ]
+webkit.org/b/98612 [ Debug ] editing/pasteboard/drop-link.html [ Crash ]
+webkit.org/b/98612 [ Debug ] editing/pasteboard/smart-drag-drop.html [ Crash Pass ]
+webkit.org/b/98612 [ Debug ] editing/pasteboard/subframe-dragndrop-1.html [ Crash ]
+webkit.org/b/98612 [ Debug ] editing/selection/4895428-1.html [ Crash Pass ]
+webkit.org/b/98612 [ Debug ] editing/selection/4895428-4.html [ Crash Pass ]
+webkit.org/b/98612 [ Debug ] editing/selection/contains-boundaries.html [ Crash ]
+webkit.org/b/98612 [ Debug ] svg/custom/use-animation-in-fill.html [ Crash Pass ]
+webkit.org/b/98612 [ Debug ] svg/custom/use-multiple-on-nested-disallowed-font.html [ Crash Pass ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Crashing tests
@@ -642,7 +659,7 @@ webkit.org/b/72698 media/audio-garbage-collect.html [ Timeout ]
 # EventSender::dumpFilenameBeingDragged not implemented.
 webkit.org/b/61826 fast/events/drag-image-filename.html [ Timeout ]
 
-Bug(GTK) accessibility/aria-invalid.html [ Timeout ]
+webkit.org/b/98350 accessibility/aria-invalid.html [ Timeout ]
 
 webkit.org/b/73003 [ Release ] editing/spelling/spellcheck-async.html [ Timeout ]
 webkit.org/b/73003 [ Release ] editing/spelling/spellcheck-paste.html [ Timeout ]
@@ -685,37 +702,37 @@ webkit.org/b/73766 css3/unicode-bidi-isolate-aharon-failing.html [ ImageOnlyFail
 
 webkit.org/b/79757 fast/selectors/selection-window-inactive.html [ ImageOnlyFailure ]
 
-Bug(GTK) accessibility/aria-hidden.html [ Failure ]
-Bug(GTK) accessibility/aria-hidden-with-elements.html [ Failure ]
-Bug(GTK) accessibility/aria-labelledby-overrides-label.html [ Failure ]
-Bug(GTK) accessibility/aria-link-supports-press.html [ Failure ]
-Bug(GTK) accessibility/aria-presentational-role.html [ Failure ]
-Bug(GTK) accessibility/aria-readonly.html [ Failure ]
-Bug(GTK) accessibility/aria-scrollbar-role.html [ Failure ]
-Bug(GTK) accessibility/aria-text-role.html [ Failure ]
-Bug(GTK) accessibility/aria-used-on-image-maps.html [ Failure ]
-Bug(GTK) accessibility/button-press-action.html [ Failure ]
-Bug(GTK) accessibility/canvas-fallback-content.html [ Failure ]
-Bug(GTK) accessibility/canvas-fallback-content-2.html [ Failure ]
-Bug(GTK) accessibility/editable-webarea-context-menu-point.html [ Failure ]
-Bug(GTK) accessibility/ellipsis-text.html [ Failure ]
-Bug(GTK) accessibility/ignore-spacer-elements.html [ Failure ]
-Bug(GTK) accessibility/inline-continuations.html [ Failure ]
-Bug(GTK) accessibility/label-for-control-hittest.html [ Failure ]
-Bug(GTK) accessibility/language-attribute.html [ Failure ]
-Bug(GTK) accessibility/loading-iframe-sends-notification.html [ Failure ]
-Bug(GTK) accessibility/loading-iframe-updates-axtree.html [ Failure ]
-Bug(GTK) accessibility/onclick-handlers.html [ Failure ]
-Bug(GTK) accessibility/placeholder.html [ Failure ]
-Bug(GTK) accessibility/radio-button-title-label.html [ Failure ]
-Bug(GTK) accessibility/secure-textfield-title-ui.html [ Failure ]
-Bug(GTK) accessibility/selection-states.html [ Failure ]
-Bug(GTK) accessibility/textarea-insertion-point-line-number.html [ Failure ]
-Bug(GTK) accessibility/textarea-line-for-index.html [ Failure ]
-Bug(GTK) accessibility/textarea-selected-text-range.html [ Failure ]
-Bug(GTK) accessibility/th-as-title-ui.html [ Failure ]
-Bug(GTK) accessibility/transformed-element.html [ Failure ]
-Bug(GTK) accessibility/visible-elements.html [ Failure ]
+webkit.org/b/98352 accessibility/aria-hidden.html [ Failure ]
+webkit.org/b/98353 accessibility/aria-hidden-with-elements.html [ Failure ]
+webkit.org/b/98354 accessibility/aria-labelledby-overrides-label.html [ Failure ]
+webkit.org/b/98355 accessibility/aria-link-supports-press.html [ Failure ]
+webkit.org/b/98356 accessibility/aria-presentational-role.html [ Failure ]
+webkit.org/b/98357 accessibility/aria-readonly.html [ Failure ]
+webkit.org/b/98358 accessibility/aria-scrollbar-role.html [ Failure ]
+webkit.org/b/98359 accessibility/aria-text-role.html [ Failure ]
+webkit.org/b/98360 accessibility/aria-used-on-image-maps.html [ Failure ]
+webkit.org/b/98361 accessibility/button-press-action.html [ Failure ]
+webkit.org/b/98362 accessibility/canvas-fallback-content.html [ Failure ]
+webkit.org/b/98363 accessibility/canvas-fallback-content-2.html [ Failure ]
+webkit.org/b/98364 accessibility/editable-webarea-context-menu-point.html [ Failure ]
+webkit.org/b/98365 accessibility/ellipsis-text.html [ Failure ]
+webkit.org/b/98366 accessibility/ignore-spacer-elements.html [ Failure ]
+webkit.org/b/98367 accessibility/inline-continuations.html [ Failure ]
+webkit.org/b/98368 accessibility/label-for-control-hittest.html [ Failure ]
+webkit.org/b/98369 accessibility/language-attribute.html [ Failure ]
+webkit.org/b/98370 accessibility/loading-iframe-sends-notification.html [ Failure ]
+webkit.org/b/98371 accessibility/loading-iframe-updates-axtree.html [ Failure ]
+webkit.org/b/98372 accessibility/onclick-handlers.html [ Failure ]
+webkit.org/b/98373 accessibility/placeholder.html [ Failure ]
+webkit.org/b/98374 accessibility/radio-button-title-label.html [ Failure ]
+webkit.org/b/98375 accessibility/secure-textfield-title-ui.html [ Failure ]
+webkit.org/b/98376 accessibility/selection-states.html [ Failure ]
+webkit.org/b/98377 accessibility/textarea-insertion-point-line-number.html [ Failure ]
+webkit.org/b/98378 accessibility/textarea-line-for-index.html [ Failure ]
+webkit.org/b/98379 accessibility/textarea-selected-text-range.html [ Failure ]
+webkit.org/b/98380 accessibility/th-as-title-ui.html [ Failure ]
+webkit.org/b/98381 accessibility/transformed-element.html [ Failure ]
+webkit.org/b/98382 accessibility/visible-elements.html [ Failure ]
 
 # Blur and focus events are not received for the following tests.
 Bug(GTK) fast/events/blur-focus-window-should-blur-focus-element.html [ Failure ]
@@ -1180,9 +1197,6 @@ webkit.org/b/81320 editing/pasteboard/copy-two-pasteboard-types-both-work.html [
 
 webkit.org/b/82020 plugins/netscape-dom-access-and-reload.html [ Failure ]
 
-# The inner <input> should now grow to take the full cell's height.
-Bug(GTK) fast/table/colspanMinWidth-vertical.html [ Failure ]
-
 # EditorClient::checkTextOfParagraph() is not implemented.
 Bug(GTK) editing/spelling/spelling-marker-description.html [ Failure ]
 
@@ -1316,6 +1330,7 @@ webkit.org/b/94009 css2.1/20110323/c541-word-sp-000.htm [ ImageOnlyFailure ]
 
 webkit.org/b/94083 media/video-controls-fullscreen-volume.html [ Skip ]
 
+fast/forms/date-multiple-fields
 webkit.org/b/97299 fast/forms/month-multiple-fields
 webkit.org/b/94186 fast/forms/time-multiple-fields
 webkit.org/b/97877 fast/forms/week-multiple-fields
@@ -1344,6 +1359,8 @@ webkit.org/b/73003 [ Debug ] editing/spelling/spellcheck-async.html [ Failure ]
 webkit.org/b/73003 [ Debug ] editing/spelling/spellcheck-paste.html [ Pass ]
 webkit.org/b/50740 [ Debug ] editing/spelling/spellcheck-queue.html [ Failure ]
 
+webkit.org/b/98564 fast/table/colspanMinWidth-vertical.html [ Missing Failure ]
+
 webkit.org/b/96900 fast/text/stale-TextLayout-from-first-line.html [ ImageOnlyFailure ]
 
 webkit.org/b/97188 fast/text/word-space-with-kerning.html [ ImageOnlyFailure ]
@@ -1362,7 +1379,78 @@ webkit.org/b/91488 fast/dom/shadow/shadowdom-for-output-only-shadow.html [ Image
 webkit.org/b/91489 fast/dom/shadow/shadowdom-for-fieldset-complex-shadow.html [ ImageOnlyFailure ]
 webkit.org/b/91489 fast/dom/shadow/shadowdom-for-fieldset-only-shadow.html [ ImageOnlyFailure ]
 
+
+# These files need new expectations after changing the behavrior from radiaGradients to SVG2
+webkit.org/b/98569 svg/W3C-SVG-1.1-SE/styling-pres-02-f.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1-SE/svgdom-over-01-f.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/coords-units-01-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-02-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-04-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-05-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-06-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-11-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-12-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-13-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-14-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-15-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/struct-use-05-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/styling-inherit-01-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/batik/paints/gradientLimit.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/paints/patternRegions-positioned-objects.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/paints/patternRegions.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/text/textEffect.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/text/textEffect3.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/hixie/perf/006.xml [ Failure Pass ]
+webkit.org/b/98569 svg/custom/relative-sized-content-with-resources.xhtml [ Failure Pass ]
+webkit.org/b/98569 svg/custom/stroked-pattern.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/gradient-deep-referencing.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/radial-gradient-with-outstanding-focalPoint.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/radialGradient-focal-radius.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/gradient-with-1d-boundingbox.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/recursive-gradient.svg [ Failure Pass ]
+
+# These files need new expectations after changing the behavrior from radiaGradients to SVG2
+webkit.org/b/98569 svg/W3C-SVG-1.1-SE/styling-pres-02-f.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1-SE/svgdom-over-01-f.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/coords-units-01-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-02-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-04-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-05-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-06-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-11-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-12-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-13-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-14-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-15-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/struct-use-05-b.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/W3C-SVG-1.1/styling-inherit-01-b.svg [ Failure Pass ]
+webkit.org/b/98569 svg/batik/paints/gradientLimit.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/paints/patternRegions-positioned-objects.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/paints/patternRegions.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/text/textEffect.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/batik/text/textEffect3.svg [ Failure Pass ] 
+webkit.org/b/98569 svg/hixie/perf/006.xml [ Failure Pass ]
+webkit.org/b/98569 svg/custom/relative-sized-content-with-resources.xhtml [ Failure Pass ]
+webkit.org/b/98569 svg/custom/stroked-pattern.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/gradient-deep-referencing.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/radial-gradient-with-outstanding-focalPoint.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/radialGradient-focal-radius.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/gradient-with-1d-boundingbox.svg [ Failure Pass ]
+webkit.org/b/98569 svg/custom/recursive-gradient.svg [ Failure Pass ]
+
 webkit.org/b/49142 fast/regions/style-scoped-in-flow-override-region-styling-multiple-regions.html [ ImageOnlyFailure ]
+
+# Missing support in DRT for Geolocation's Coordinate attributes.
+fast/dom/Geolocation/coordinates-interface-attributes.html [ Failure ]
+
+webkit.org/b/98585 fast/exclusions/shape-inside/shape-inside-rounded-rectangle-003.html [ ImageOnlyFailure ]
+
+webkit.org/b/98587 fast/writing-mode/vertical-subst-font-vert-no-dflt.html [ ImageOnlyFailure ]
+
+webkit.org/b/98612 [ Release ] fast/dom/gc-dom-tree-lifetime.html [ Failure ]
+
+webkit.org/b/98613 css3/masking/clip-path-reference-userSpaceOnUse.html [ ImageOnlyFailure ]
+webkit.org/b/98613 css3/masking/clip-path-reference.html [ ImageOnlyFailure ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Tests failing

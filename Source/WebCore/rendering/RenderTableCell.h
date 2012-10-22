@@ -80,9 +80,27 @@ public:
         return row()->rowIndex();
     }
 
-    Length styleOrColLogicalWidth() const;
+    Length styleOrColLogicalWidth() const
+    {
+        Length styleWidth = style()->logicalWidth();
+        if (!styleWidth.isAuto())
+            return styleWidth;
+        if (RenderTableCol* firstColumn = table()->colElement(col()))
+            return logicalWidthFromColumns(firstColumn, styleWidth);
+        return styleWidth;
+    }
 
-    LayoutUnit logicalHeightForRowSizing() const;
+    LayoutUnit logicalHeightForRowSizing() const
+    {
+        // FIXME: This function does too much work, and is very hot during table layout!
+        LayoutUnit adjustedLogicalHeight = logicalHeight() - (intrinsicPaddingBefore() + intrinsicPaddingAfter());
+        LayoutUnit styleLogicalHeight = valueForLength(style()->logicalHeight(), 0, view());
+        // In strict mode, box-sizing: content-box do the right thing and actually add in the border and padding.
+        // Call computedCSSPadding* directly to avoid including implicitPadding.
+        if (!document()->inQuirksMode() && style()->boxSizing() != BORDER_BOX)
+            styleLogicalHeight += computedCSSPaddingBefore() + computedCSSPaddingAfter() + borderBefore() + borderAfter();
+        return max(styleLogicalHeight, adjustedLogicalHeight);
+    }
 
     virtual void computePreferredLogicalWidths();
 
@@ -236,6 +254,8 @@ private:
     CollapsedBorderValue computeCollapsedEndBorder(IncludeBorderColorOrNot = IncludeBorderColor) const;
     CollapsedBorderValue computeCollapsedBeforeBorder(IncludeBorderColorOrNot = IncludeBorderColor) const;
     CollapsedBorderValue computeCollapsedAfterBorder(IncludeBorderColorOrNot = IncludeBorderColor) const;
+
+    Length logicalWidthFromColumns(RenderTableCol* firstColForThisCell, Length widthFromStyle) const;
 
     void updateColAndRowSpanFlags();
 

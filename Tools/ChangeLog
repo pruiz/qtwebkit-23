@@ -1,3 +1,301 @@
+2012-10-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [GTK] Respect WEBKITOUTPUTDIR in run-with-jhbuild.
+        https://bugs.webkit.org/show_bug.cgi?id=98732
+
+        Reviewed by Gustavo Noronha Silva.
+
+        Follow-up to r113066: if the WEBKITOUTPUTDIR environment variable
+        was used when running update-webkitgtk-libs,
+        WebKitBuild/Dependencies will not exist, so we now check its
+        contents first and then fall back to WebKitBuild/.
+
+        * gtk/run-with-jhbuild:
+
+2012-10-09  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Skipping the accept-policy test in TestCookieManager API test that's
+        currently failing. The test failure is covered by
+        https://bugs.webkit.org/show_bug.cgi?id=98738.
+
+        * Scripts/run-gtk-tests:
+        (TestRunner):
+
+2012-10-09  Laszlo Gombos  <l.gombos@samsung.com>
+
+        [Qt] Remove redundant JAVASCRIPTCORE_JIT variable
+        https://bugs.webkit.org/show_bug.cgi?id=50000
+
+        Reviewed by Simon Hausmann.
+
+        Use ENABLE_JIT instead.
+
+        * qmake/mkspecs/features/valgrind.prf:
+
+2012-10-08  Kiran Muppala  <cmuppala@apple.com>
+
+        Throttle DOM timers on hidden pages.
+        https://bugs.webkit.org/show_bug.cgi?id=98474
+
+        Reviewed by Maciej Stachowiak.
+
+        Implement testRunner.setPageVisibility on mac for testing throttling
+        of timers on hidden pages using DumpRenderTree.
+
+        * DumpRenderTree/mac/Configurations/Base.xcconfig:
+        Fix build error on mac-ews bot.  Add JSC copy of ICU headers to search path.
+
+        * DumpRenderTree/mac/TestRunnerMac.mm:
+        (TestRunner::resetPageVisibility):
+        (TestRunner::setPageVisibility):
+
+2012-10-08  Dirk Pranke  <dpranke@chromium.org>
+
+        results.html and garden-o-matic are ignoring IMAGE failures when expected to FAIL
+        https://bugs.webkit.org/show_bug.cgi?id=98706
+
+        Reviewed by Ojan Vafai.
+
+        FAIL is supposed to map onto Failure which is supposed to map
+        onto the old [ TEXT, IMAGE_PLUS_TEXT, AUDIO ] mapping.
+        results.html was including IMAGE in this and garden-o-matic was
+        including CRASH and TIMEOUT as well :(.
+
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/results.js:
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/results_unittests.js:
+
+2012-10-08  Ryuan Choi  <ryuan.choi@samsung.com>
+
+        [EFL] Build ControlTheme only when necessary
+        https://bugs.webkit.org/show_bug.cgi?id=98519
+
+        Reviewed by Eric Seidel.
+
+        * EWebLauncher/ControlTheme/CMakeLists.txt:
+        Added custom command keyword not to build ControlTheme every time.
+        In addition, removed `ALL` keyword because targets, which use ControlTheme,
+        already have dependency.
+
+2012-10-08  Peter Rybin  <peter.rybin@gmail.com>
+
+        Do not swallow fatal messages in qt/DumpRenderTree
+        https://bugs.webkit.org/show_bug.cgi?id=98211
+
+        Reviewed by Eric Seidel.
+
+        Fix condition in message type filtering.
+
+        * DumpRenderTree/qt/DumpRenderTreeMain.cpp:
+        (messageHandler):
+
+2012-10-08  Caio Marcelo de Oliveira Filho  <caio.oliveira@openbossa.org>
+
+        Unreviewed. Moving myself from Committer to Reviewer list.
+        http://lists.webkit.org/pipermail/webkit-dev/2012-October/022460.html
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-10-08  Dirk Pranke  <dpranke@chromium.org>
+
+        nrwt: [chromium] run http tests in parallel on bigger machines
+        https://bugs.webkit.org/show_bug.cgi?id=98562
+
+        Reviewed by Eric Seidel.
+
+        The "locked tests" shard (which includes the http tests and the
+        perf tests) is the long pole on machines where we have 4 or more
+        workers, so we should start making sure that
+        we can run http tests in parallel, following the normal sharding
+        rules (all tests in the same directory are in the same shard by
+        default). We should still probably limit the number of workers
+        hitting the web server in parallel where we can; a heuristic of
+        no more than 25% of them seems okay for a start. This will
+        likely only affect developer workstations and a couple of bots
+        at first, so should be low risk and a good reward.
+
+        * Scripts/webkitpy/layout_tests/port/base.py:
+        (Port.default_max_locked_shards):
+        * Scripts/webkitpy/layout_tests/port/chromium.py:
+        (ChromiumPort.default_max_locked_shards):
+        * Scripts/webkitpy/layout_tests/port/chromium_port_testcase.py:
+        (ChromiumPortTestCase.test_default_max_locked_shards):
+        * Scripts/webkitpy/layout_tests/port/port_testcase.py:
+        (PortTestCase.test_default_max_locked_shards):
+        * Scripts/webkitpy/layout_tests/run_webkit_tests.py:
+        (_set_up_derived_options):
+        (parse_args):
+        * Scripts/webkitpy/layout_tests/run_webkit_tests_integrationtest.py:
+        (MainTest.test_max_locked_shards):
+
+2012-10-08  Zan Dobersek  <zandobersek@gmail.com>
+
+        GTK port should warn if bug modifier is missing in TestExpectations
+        https://bugs.webkit.org/show_bug.cgi?id=98678
+
+        Reviewed by Dirk Pranke.
+
+        Reimplement the warn_if_bug_missing_in_test_expectations method in
+        GtkPort, returning True for producing a warning in such cases.
+
+        * Scripts/webkitpy/layout_tests/port/gtk.py:
+        (GtkPort.warn_if_bug_missing_in_test_expectations):
+
+2012-10-08  Ryuan Choi  <ryuan.choi@samsung.com>
+
+        [EFL][DRT] Switch default backing store to single
+        https://bugs.webkit.org/show_bug.cgi?id=98591
+
+        Reviewed by Eric Seidel.
+
+        There are two backing stores for WebKit/Efl, Single Backing Store(SBS) and
+        Tiled Backing Store(TBS), and DRT/Efl has used TBS.
+        But, TBS is not suitable to run pixel tests because it does not have a good way
+        to render mock scrollbars well.
+
+        So, this patch changes the default backing store to SBS.
+        In addition, this changes the environment variable from DRT_USE_SINGLE_BACKING_STORE
+        to DRT_USE_TILED_BACKING_STORE.
+
+        * DumpRenderTree/efl/DumpRenderTreeView.cpp:
+        (shouldUseTiledBackingStore):
+        (chooseAndInitializeAppropriateSmartClass):
+
+2012-10-08  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [WK2][WTR] WebKitTestRunner needs testRunner.dispatchPendingLoadRequests
+        https://bugs.webkit.org/show_bug.cgi?id=98638
+
+        Reviewed by Eric Seidel.
+
+        Add implementation for testRunner.dispatchPendingLoadRequests in
+        WebKitTestRunner.
+
+        * WebKitTestRunner/InjectedBundle/Bindings/TestRunner.idl:
+        * WebKitTestRunner/InjectedBundle/TestRunner.cpp:
+        (WTR::TestRunner::dispatchPendingLoadRequests):
+        (WTR):
+        * WebKitTestRunner/InjectedBundle/TestRunner.h:
+        (TestRunner):
+
+2012-10-08  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Add support for window.close in Minibrowser
+        https://bugs.webkit.org/show_bug.cgi?id=98667
+
+        Reviewed by Laszlo Gombos.
+
+        When calling window.close() from JavaScript, MiniBrowser
+        now closes the given window.
+
+        * MiniBrowser/efl/main.c:
+        (window_close):
+        (on_ecore_evas_delete):
+        (on_close_window):
+        (window_create):
+
+2012-10-08  Ojan Vafai  <ojan@chromium.org>
+
+        Properly strip new tests from the test results json if they are pass/nodata/skip.
+        https://bugs.webkit.org/show_bug.cgi?id=98669
+
+        Reviewed by Eric Seidel.
+
+        In _merge_json, we had a codepath that didn't call _normalize_results_json
+        for tests that aren't already in the aggregated results.
+        Instead, now do all the merging first and then normalize the aggregated results.
+
+        * TestResultServer/model/jsonresults.py:
+        (JsonResults._merge_json):
+        (JsonResults._merge_tests):
+        (JsonResults._normalize_results):
+        (JsonResults):
+        (JsonResults._should_delete_leaf):
+        * TestResultServer/model/jsonresults_unittest.py:
+        Removed test_merge_build_directory_hierarchy_old_version since there is
+        no longer any version 3 json to support.
+        (JsonResultsTest.test_merge_remove_new_test):
+        (JsonResultsTest.test_merge_prune_extra_results_with_new_result_of_same_type):
+
+2012-10-08  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Simplify frame flattening support in MiniBrowser
+        https://bugs.webkit.org/show_bug.cgi?id=98657
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Simplify frame flattening support code in MiniBrowser to
+        avoid passing the setting around to window_create()
+        function().
+
+        * MiniBrowser/efl/main.c:
+        (on_key_down):
+        (on_new_window):
+        (window_create):
+        (main):
+
+2012-10-08  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Use Ctrl+n shortcut to create a new window in MiniBrowser / EWebLauncher
+        https://bugs.webkit.org/show_bug.cgi?id=98655
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Use "Ctrl+n" shortcut instead of "F9" to open a new window in
+        MiniBrowser and EWebLauncher. This is the shortcut that is
+        commonly used for this action.
+
+        * EWebLauncher/main.c:
+        (on_key_down):
+        * MiniBrowser/efl/main.c:
+        (on_key_down):
+
+2012-10-08  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Add support for window.create in Minibrowser
+        https://bugs.webkit.org/show_bug.cgi?id=98649
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Calling window.create() from JavaScript now creates a
+        new window in Minibrowser, as directed.
+
+        * MiniBrowser/efl/main.c:
+        (on_new_window):
+        (window_create):
+
+2012-10-08  Andreas Kling  <kling@webkit.org>
+
+        Using float/double as WTF hash table key is unreliable.
+        <http://webkit.org/b/98627>
+
+        Reviewed by Geoffrey Garen.
+
+        Add a test case checking that using double as the hash table key type won't
+        have problems distinguishing between keys that are considered equal by operator==
+        but have different binary representations.
+
+        * TestWebKitAPI/Tests/WTF/HashMap.cpp:
+        (TestDoubleHashTraits):
+
+2012-10-08  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Use URL instead of URI in the API
+        https://bugs.webkit.org/show_bug.cgi?id=98643
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Update Minibrowser to reflect API changes. We now
+        use URL instead of URI in WK2 EFL API.
+
+        * EWebLauncher/url_bar.c:
+        (on_urlbar_key_down):
+        * MiniBrowser/efl/CMakeLists.txt:
+        * MiniBrowser/efl/main.c:
+        (on_url_changed):
+        (window_create):
+
 2012-10-08  Balazs Kelemen  <kbalazs@webkit.org>
 
         [Qt] Reenable plugin tests

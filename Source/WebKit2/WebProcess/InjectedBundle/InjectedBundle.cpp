@@ -580,7 +580,7 @@ void InjectedBundle::didReceiveMessage(CoreIPC::Connection*, CoreIPC::MessageID 
 
 void InjectedBundle::setPageVisibilityState(WebPage* page, int state, bool isInitialState)
 {
-#if ENABLE(PAGE_VISIBILITY_API)
+#if ENABLE(PAGE_VISIBILITY_API) || ENABLE(HIDDEN_PAGE_DOM_TIMER_THROTTLING)
     page->corePage()->setVisibilityState(static_cast<PageVisibilityState>(state), isInitialState);
 #endif
 }
@@ -650,6 +650,11 @@ void InjectedBundle::setTabKeyCyclesThroughElements(WebPage* page, bool enabled)
 void InjectedBundle::setSerialLoadingEnabled(bool enabled)
 {
     resourceLoadScheduler()->setSerialLoadingEnabled(enabled);
+}
+
+void InjectedBundle::dispatchPendingLoadRequests()
+{
+    resourceLoadScheduler()->servePendingRequests();
 }
 
 } // namespace WebKit

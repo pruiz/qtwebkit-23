@@ -39,6 +39,7 @@ static const char APP_NAME[] = "EFL MiniBrowser";
 static int verbose = 1;
 static Eina_List *windows = NULL;
 static char *evas_engine_name = NULL;
+static Eina_Bool frame_flattening_enabled = EINA_FALSE;
 
 typedef struct _Browser_Window {
     Ecore_Evas *ee;
@@ -72,7 +73,7 @@ static const Ecore_Getopt options = {
     }
 };
 
-static Browser_Window *window_create(const char *url, Eina_Bool frame_flattening);
+static Browser_Window *window_create(const char *url);
 
 static Browser_Window *browser_window_find(Ecore_Evas *ee)
 {
@@ -97,6 +98,15 @@ static void window_free(Browser_Window *window)
     free(window);
 }
 
+static void window_close(Browser_Window *window)
+{
+    windows = eina_list_remove(windows, window);
+    window_free(window);
+
+    if (!windows)
+        ecore_main_loop_quit();
+}
+
 static Eina_Bool main_signal_exit(void *data, int ev_type, void *ev)
 {
     Browser_Window *window;
@@ -109,13 +119,7 @@ static Eina_Bool main_signal_exit(void *data, int ev_type, void *ev)
 
 static void on_ecore_evas_delete(Ecore_Evas *ee)
 {
-    Browser_Window *window = browser_window_find(ee);
-
-    window_free(window);
-    windows = eina_list_remove(windows, window);
-
-    if (!windows)
-        ecore_main_loop_quit();
+    window_close(browser_window_find(ee));
 }
 
 static void on_ecore_evas_resize(Ecore_Evas *ee)
@@ -147,6 +151,8 @@ on_key_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
         NULL
     };
     static int currentEncoding = -1;
+    Eina_Bool ctrlPressed = evas_key_modifier_is_set(evas_key_modifier_get(e), "Control");
+
     if (!strcmp(ev->key, "F1")) {
         info("Back (F1) was pressed\n");
         if (!ewk_view_back(obj))
@@ -165,9 +171,9 @@ on_key_down(void *data, Evas *e, Evas_Object *obj, void *event_info)
     } else if (!strcmp(ev->key, "F6")) {
         info("Stop (F6) was pressed, stop loading.\n");
         ewk_view_stop(obj);
-    } else if (!strcmp(ev->key, "F9")) {
-        info("Create new window (F9) was pressed.\n");
-        Browser_Window *window = window_create(DEFAULT_URL, EINA_FALSE);
+    } else if (!strcmp(ev->key, "n") && ctrlPressed) {
+        info("Create new window (Ctrl+n) was pressed.\n");
+        Browser_Window *window = window_create(DEFAULT_URL);
         windows = eina_list_append(windows, window);
     }
 }
@@ -216,7 +222,22 @@ static void
 on_url_changed(void *user_data, Evas_Object *webview, void *event_info)
 {
     Browser_Window *window = (Browser_Window *)user_data;
-    url_bar_url_set(window->url_bar, ewk_view_uri_get(window->webview));
+    url_bar_url_set(window->url_bar, ewk_view_url_get(window->webview));
+}
+
+static void
+on_new_window(void *user_data, Evas_Object *webview, void *event_info)
+{
+    Evas_Object **new_view = (Evas_Object **)event_info;
+    Browser_Window *window = window_create(NULL);
+    *new_view = window->webview;
+    windows = eina_list_append(windows, window);
+}
+
+static void
+on_close_window(void *user_data, void *event_info)
+{
+    window_close((Browser_Window *)user_data);
 }
 
 static void
@@ -292,7 +313,7 @@ quit(Eina_Bool success, const char *msg)
     return EXIT_SUCCESS;
 }
 
-static Browser_Window *window_create(const char *url, Eina_Bool frame_flattening)
+static Browser_Window *window_create(const char *url)
 {
     Browser_Window *window = malloc(sizeof(Browser_Window));
     if (!window) {
@@ -323,18 +344,20 @@ static Browser_Window *window_create(const char *url, Eina_Bool frame_flattening
     /* Create webview */
     window->webview = ewk_view_add(window->evas);
     ewk_view_theme_set(window->webview, THEME_DIR"/default.edj");
-    ewk_settings_enable_frame_flattening_set(ewk_view_settings_get(window->webview), frame_flattening);
+    ewk_settings_enable_frame_flattening_set(ewk_view_settings_get(window->webview), frame_flattening_enabled);
 
     Ewk_Settings *settings = ewk_view_settings_get(window->webview);
     ewk_settings_file_access_from_file_urls_allowed_set(settings, EINA_TRUE);
 
+    evas_object_smart_callback_add(window->webview, "close,window", on_close_window, window);
+    evas_object_smart_callback_add(window->webview, "create,window", on_new_window, window);
     evas_object_smart_callback_add(window->webview, "download,failed", on_download_failed, window);
     evas_object_smart_callback_add(window->webview, "download,finished", on_download_finished, window);
     evas_object_smart_callback_add(window->webview, "download,request", on_download_request, window);
     evas_object_smart_callback_add(window->webview, "load,error", on_error, window);
     evas_object_smart_callback_add(window->webview, "load,progress", on_progress, window);
     evas_object_smart_callback_add(window->webview, "title,changed", on_title_changed, window);
-    evas_object_smart_callback_add(window->webview, "uri,changed", on_url_changed, window);
+    evas_object_smart_callback_add(window->webview, "url,changed", on_url_changed, window);
 
     evas_object_event_callback_add(window->webview, EVAS_CALLBACK_KEY_DOWN, on_key_down, window);
     evas_object_event_callback_add(window->webview, EVAS_CALLBACK_MOUSE_DOWN, on_mouse_down, window);
@@ -347,7 +370,8 @@ static Browser_Window *window_create(const char *url, Eina_Bool frame_flattening
 
     window->url_bar = url_bar_add(window->webview, DEFAULT_WIDTH);
 
-    ewk_view_uri_set(window->webview, url);
+    if (url)
+        ewk_view_url_set(window->webview, url);
 
     return window;
 }
@@ -358,12 +382,10 @@ int main(int argc, char *argv[])
     unsigned char quitOption = 0;
     Browser_Window *window;
 
-    Eina_Bool frame_flattening = EINA_FALSE;
-
     Ecore_Getopt_Value values[] = {
         ECORE_GETOPT_VALUE_STR(evas_engine_name),
         ECORE_GETOPT_VALUE_BOOL(quitOption),
-        ECORE_GETOPT_VALUE_BOOL(frame_flattening),
+        ECORE_GETOPT_VALUE_BOOL(frame_flattening_enabled),
         ECORE_GETOPT_VALUE_BOOL(quitOption),
         ECORE_GETOPT_VALUE_BOOL(quitOption),
         ECORE_GETOPT_VALUE_BOOL(quitOption),
@@ -384,10 +406,10 @@ int main(int argc, char *argv[])
 
     if (args < argc) {
         char *url = url_from_user_input(argv[args]);
-        window = window_create(url, frame_flattening);
+        window = window_create(url);
         free(url);
     } else
-        window = window_create(DEFAULT_URL, frame_flattening);
+        window = window_create(DEFAULT_URL);
 
     if (!window)
         return quit(EINA_FALSE, "ERROR: could not create browser window.\n");

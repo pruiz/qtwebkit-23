@@ -1,3 +1,234 @@
+2012-10-09  Simon Pena  <spena@igalia.com>
+
+        [GTK] Add support for running JavaScript from GResources
+        https://bugs.webkit.org/show_bug.cgi?id=98488
+
+        Reviewed by Carlos Garcia Campos.
+
+        GResources allow embedding certain resources, frequently used, in a "bundle"
+        which can be kept separated or stored in the binary. This patch adds
+        support for running JavaScript from GResources.
+
+        For this, methods run_javascript_from_gresource and
+        run_javascript_from_gresource_finish are added, which load the resource
+        asynchronously and, when it is ready, run the JavaScript.
+
+        * UIProcess/API/gtk/WebKitWebView.cpp: Include the new methods.
+        (resourcesStreamReadCallback):
+        (webkit_web_view_run_javascript_from_gresource):
+        (webkit_web_view_run_javascript_from_gresource_finish):
+        * UIProcess/API/gtk/WebKitWebView.h:
+        * UIProcess/API/gtk/docs/webkit2gtk-sections.txt: Include the new
+        methods in the documentation.
+        * UIProcess/API/gtk/tests/GNUmakefile.am: Add the test resources to the
+        build infrastructure.
+        * UIProcess/API/gtk/tests/TestMain.cpp: Register the resources in the tests,
+        so that they can be accessed in all of them.
+        (register_gresource):
+        (main):
+        * UIProcess/API/gtk/tests/TestWebKitWebView.cpp: Test the
+        run_javascript_from_gresource method.
+        (testWebViewRunJavaScript):
+        * UIProcess/API/gtk/tests/WebViewTest.cpp: Add a method for testing the
+        new run_javascript_from_gresource method.
+        (runJavaScriptFromGResourceReadyCallback):
+        (WebViewTest::runJavaScriptFromGResourceAndWaitUntilFinished):
+        * UIProcess/API/gtk/tests/WebViewTest.h:
+        * UIProcess/API/gtk/tests/resources/webkit2gtk-tests.gresource.xml: Added.
+        Resource bundle containing the resources.
+        * UIProcess/API/gtk/tests/resources/webkit2gtk-tests.test.js: Added.
+        Example JavaScript file to test the GResources support.
+
+
+2012-10-08  Kiran Muppala  <cmuppala@apple.com>
+
+        Throttle DOM timers on hidden pages.
+        https://bugs.webkit.org/show_bug.cgi?id=98474
+
+        Reviewed by Maciej Stachowiak.
+
+        Add HIDDEN_PAGE_DOM_TIMER_THROTTLING feature define.  Use existing code of
+        PAGE_VISIBILITY_API to detect changes to page visibility state.
+
+        * Configurations/FeatureDefines.xcconfig:
+        * UIProcess/WebPageProxy.cpp:
+        (WebKit::WebPageProxy::WebPageProxy):
+        Check visibility state on construction.
+        (WebKit::WebPageProxy::initializeWebPage):
+        Send initial visibility state message if HIDDEN_PAGE_DOM_TIMER_THROTTLING
+        is enabled or if PAGE_VISIBILITY_API is enabled.
+        (WebKit::WebPageProxy::viewStateDidChange):
+        When PAGE_VISIBILITY_API is not enabled, compare new visibility against
+        WebPageProxy::m_isVisible, to minimize number of messages sent.
+        Remove unnecessary second call to PageClient::isViewVisible for updating
+        visibility state.
+
+        * WebProcess/InjectedBundle/InjectedBundle.cpp:
+        (WebKit::InjectedBundle::setPageVisibilityState):
+        WebKitTestRunner uses this method to implement testRunner.setPageVisibility(),
+        hence enable it for testing hidden page timer throttling as well.
+
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit):
+        (WebKit::WebPage::setVisibilityState):
+        Ensure Page::setVisibilityState is called either if PAGE_VISIBILITY_API is
+        enabled or if HIDDEN_PAGE_DOM_TIMER_THROTTLING is enabled.
+
+        * WebProcess/WebPage/WebPage.h:
+        (WebPage):
+        * WebProcess/WebPage/WebPage.messages.in:
+
+2012-10-08  Simon Fraser  <simon.fraser@apple.com>
+
+        Try to fix Windows build by exporting Frame::layerTreeAsText().
+
+        * win/WebKit2.def:
+
+2012-10-08  Rik Cabanier  <cabanier@adobe.com>
+
+        Add missing compile flag for compositing
+        https://bugs.webkit.org/show_bug.cgi?id=98681
+
+        Reviewed by Dirk Schulze.
+
+        This flag is needed in case there is a difference in API
+        when compositing is enabled
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-10-08  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] EWK2UnitTestBase.ewk_cookie_manager_accept_policy unit test is failing
+        https://bugs.webkit.org/show_bug.cgi?id=98663
+
+        Reviewed by Laszlo Gombos.
+
+        EWK2UnitTestBase.ewk_cookie_manager_accept_policy unit test was
+        failing because the elements of a list were checked in a given
+        order but the list was not sorted beforehand.
+
+        * UIProcess/API/efl/tests/test_ewk2_cookie_manager.cpp:
+        (sortHostNames):
+        (TEST_F):
+
+2012-10-08  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL][WK2] Avoid useless converting to WKPage
+        https://bugs.webkit.org/show_bug.cgi?id=98516
+
+        Reviewed by Eric Seidel.
+
+        Use priv->pageProxy->findString() and priv->pageProxy->hideFindUI()
+        to avoid useless converting to WK.
+
+        * UIProcess/API/efl/ewk_view.cpp:
+        (ewk_view_text_find):
+        (ewk_view_text_find_highlight_clear):
+
+2012-10-08  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [WK2][WTR] WebKitTestRunner needs testRunner.dispatchPendingLoadRequests
+        https://bugs.webkit.org/show_bug.cgi?id=98638
+
+        Reviewed by Eric Seidel.
+
+        Add implementation for testRunner.dispatchPendingLoadRequests in
+        WebKitTestRunner.
+
+        * WebProcess/InjectedBundle/API/c/WKBundle.cpp:
+        (WKBundleDispatchPendingLoadRequests):
+        * WebProcess/InjectedBundle/API/c/WKBundlePrivate.h:
+        * WebProcess/InjectedBundle/InjectedBundle.cpp:
+        (WebKit::InjectedBundle::dispatchPendingLoadRequests):
+        (WebKit):
+        * WebProcess/InjectedBundle/InjectedBundle.h:
+        (InjectedBundle):
+
+2012-10-08  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        [GTK] Add a setting to enable/disable smooth scrolling to WebKit2 GTK+ API
+        https://bugs.webkit.org/show_bug.cgi?id=98646
+
+        Reviewed by Xan Lopez.
+
+        * UIProcess/API/gtk/WebKitSettings.cpp:
+        (webKitSettingsSetProperty): Implement setter for new property.
+        (webKitSettingsGetProperty): Implement getter for new property.
+        (webkit_settings_class_init): Add new property
+        enable-smooth-scrolling.
+        (webkit_settings_get_enable_smooth_scrolling):
+        (webkit_settings_set_enable_smooth_scrolling):
+        * UIProcess/API/gtk/WebKitSettings.h:
+        * UIProcess/API/gtk/docs/webkit2gtk-sections.txt: Add new symbols.
+        * UIProcess/API/gtk/tests/TestWebKitSettings.cpp:
+        (testWebKitSettings): Test smooth scrolling setting API.
+
+2012-10-08  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Use URL instead of URI in the API
+        https://bugs.webkit.org/show_bug.cgi?id=98643
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Use URL instead of URI in WebKit2 EFL API. This change
+        was discussed on the mailing list and aims at making
+        the API more consistent.
+
+        * UIProcess/API/efl/ewk_back_forward_list_item.cpp:
+        (_Ewk_Back_Forward_List_Item):
+        (ewk_back_forward_list_item_url_get):
+        (ewk_back_forward_list_item_original_url_get):
+        * UIProcess/API/efl/ewk_back_forward_list_item.h:
+        * UIProcess/API/efl/ewk_context.cpp:
+        (ewk_context_url_scheme_register):
+        * UIProcess/API/efl/ewk_context.h:
+        * UIProcess/API/efl/ewk_context_download_client.cpp:
+        (decideDestinationWithSuggestedFilename):
+        * UIProcess/API/efl/ewk_download_job.h:
+        * UIProcess/API/efl/ewk_resource_private.h:
+        * UIProcess/API/efl/ewk_view.cpp:
+        (_Ewk_View_Private_Data):
+        (ewk_view_url_update):
+        (ewk_view_url_set):
+        (ewk_view_url_get):
+        (ewk_view_reload):
+        (ewk_view_reload_bypass_cache):
+        (ewk_view_load_finished):
+        (ewk_view_load_provisional_redirect):
+        (ewk_view_load_provisional_started):
+        (ewk_view_html_string_load):
+        * UIProcess/API/efl/ewk_view.h:
+        * UIProcess/API/efl/ewk_view_loader_client.cpp:
+        (didSameDocumentNavigationForFrame):
+        * UIProcess/API/efl/ewk_view_private.h:
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestBase.cpp:
+        (EWK2UnitTest::EWK2UnitTestBase::loadUrlSync):
+        (EWK2UnitTest::onURLChanged):
+        (EWK2UnitTest::timeOutWhileWaitingUntilURLChangedTo):
+        (EWK2UnitTest::EWK2UnitTestBase::waitUntilURLChangedTo):
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestBase.h:
+        (EWK2UnitTestBase):
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestServer.cpp:
+        (EWK2UnitTestServer::EWK2UnitTestServer):
+        (EWK2UnitTestServer::~EWK2UnitTestServer):
+        (EWK2UnitTestServer::getURLForPath):
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestServer.h:
+        (EWK2UnitTestServer):
+        * UIProcess/API/efl/tests/resources/redirect_url_to_default.html: Renamed from Source/WebKit2/UIProcess/API/efl/tests/resources/redirect_uri_to_default.html.
+        * UIProcess/API/efl/tests/test_ewk2_back_forward_list.cpp:
+        (checkItem):
+        (urlFromTitle):
+        * UIProcess/API/efl/tests/test_ewk2_context.cpp:
+        (TEST_F):
+        * UIProcess/API/efl/tests/test_ewk2_cookie_manager.cpp:
+        (TEST_F):
+        * UIProcess/API/efl/tests/test_ewk2_download_job.cpp:
+        (TEST_F):
+        * UIProcess/API/efl/tests/test_ewk2_settings.cpp:
+        (TEST_F):
+        * UIProcess/API/efl/tests/test_ewk2_view.cpp:
+        (TEST_F):
+
 2012-10-08  Zoltan Horvath  <zoltan@webkit.org>
 
         [Qt] r122720 causes performance regression with DirectFB on ARMv7

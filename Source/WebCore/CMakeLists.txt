@@ -1081,6 +1081,7 @@ SET(WebCore_SOURCES
     css/StyleResolver.cpp
     css/StyleRule.cpp
     css/StyleRuleImport.cpp
+    css/StyleScopeResolver.cpp
     css/StyleSheet.cpp
     css/StyleSheetContents.cpp
     css/StyleSheetList.cpp
@@ -2037,6 +2038,7 @@ SET(WebCore_SOURCES
     rendering/CounterNode.cpp
     rendering/EllipsisBox.cpp
     rendering/ExclusionInterval.cpp
+    rendering/ExclusionPolygon.cpp
     rendering/ExclusionRectangle.cpp
     rendering/ExclusionShape.cpp
     rendering/ExclusionShapeInsideInfo.cpp
@@ -2116,6 +2118,7 @@ SET(WebCore_SOURCES
     rendering/RenderScrollbarTheme.cpp
     rendering/RenderSearchField.cpp
     rendering/RenderSlider.cpp
+    rendering/RenderSnapshottedPlugIn.cpp
     rendering/RenderTable.cpp
     rendering/RenderTableCaption.cpp
     rendering/RenderTableCell.cpp

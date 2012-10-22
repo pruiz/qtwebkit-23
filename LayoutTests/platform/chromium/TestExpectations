@@ -90,6 +90,9 @@ webkit.org/b/90488 [ Linux Win Debug ] inspector [ Pass Slow ]
 webkit.org/b/90488 [ Linux Win Debug ] http/tests/inspector [ Pass Slow ]
 webkit.org/b/90488 [ Linux Win Debug ] http/tests/inspector-enabled [ Pass Slow ]
 
+# The test has been timing out since landed in r130587.
+webkit.org/b/98659 [ Debug ] fast/dom/gc-dom-tree-lifetime.html [ Pass Slow ]
+
 # -----------------------------------------------------------------
 # TEMPORARILY SKIPPED TESTS
 # -----------------------------------------------------------------
@@ -907,6 +910,9 @@ platform/gtk/plugins/invalidate-rect-with-null-npp-argument.html [ WontFix ]
 
 webkit.org/b/96109 [ Linux ] editing/pasteboard/paste-global-selection.html [ Skip ]
 
+# Chromium does not enable HIDDEN_PAGE_DOM_TIMER_THROTTLING
+fast/dom/timer-throttling-hidden-page.html [ WontFix ]
+
 # Skipping rules for ANDROID are in platform/chromium-android/TestExpectations.
 
 # -----------------------------------------------------------------
@@ -1531,9 +1537,6 @@ crbug.com/10384 [ Mac ] fast/dom/Window/new-window-opener.html [ Failure Pass Sl
 crbug.com/10399 [ Mac ] fast/encoding/char-decoding-mac.html [ Failure ]
 crbug.com/10399 [ Mac ] fast/encoding/char-encoding-mac.html [ Failure ]
 
-crbug.com/23496 [ Mac ] tables/mozilla_expected_failures/core/captions1.html [ Failure ]
-crbug.com/23496 [ Mac ] tables/mozilla_expected_failures/core/captions2.html [ Failure ]
-
 # These should not be pixel tests, they're not testing anything
 # layout/rendering-specific. They also dump layout tree, so depending on which baselines
 # are around either or both text or image may mismatch.
@@ -1550,52 +1553,13 @@ crbug.com/23477 [ Mac ] platform/chromium/virtual/gpu/fast/canvas/canvas-increme
 crbug.com/23476 [ Mac ] fast/frames/inline-object-inside-frameset.html [ ImageOnlyFailure ]
 crbug.com/23476 [ Mac ] fast/text/font-initial.html [ ImageOnlyFailure ]
 
-crbug.com/23473 [ Mac ] fast/repaint/background-generated.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/body-background-image.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/bugzilla-5699.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/bugzilla-6278.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/content-into-overflow.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/control-clip.html [ Failure ]
-crbug.com/23473 [ Mac ] fast/repaint/create-layer-repaint.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/intermediate-layout-position-clip.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/intermediate-layout-position.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/invisible-objects.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/layout-state-only-positioned.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/line-in-scrolled-clipped-block.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/line-overflow.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/list-marker-2.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/make-children-non-inline.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/outline-child-repaint.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/outline-inset.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/outline-repaint-glitch.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/overflow-into-content.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/overflow-outline-repaint.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/overflow-scroll-delete.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/reflection-redraw.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/rel-positioned-inline-with-overflow.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/selection-after-delete.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/selection-clear.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/selection-gap-overflow-scroll.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/stacked-diacritics.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/static-to-positioned.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/table-cell-move.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/table-cell-overflow.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/table-col-background.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/table-collapsed-border.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/table-extra-bottom-grow.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/table-outer-border.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/table-row.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/table-section-overflow.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/table-section-repaint.html [ Failure ]
-crbug.com/23473 [ Mac ] fast/repaint/table-two-pass-layout-overpaint.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/text-append-dirty-lines.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/text-selection-rect-in-overflow-2.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/text-selection-rect-in-overflow.html [ ImageOnlyFailure ]
 # Win/Linux also failed after r83514.
-crbug.com/23473 [ Mac ] fast/repaint/transform-absolute-child.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/transform-disable-layoutstate.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/transform-relative-position.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/transform-repaint-descendants.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/transform-replaced-shadows.html [ ImageOnlyFailure ]
 
 webkit.org/b/93439 [ Mac ] fast/forms/file/file-appearance-transform-no-effects.html [ ImageOnlyFailure ]
@@ -3451,7 +3415,6 @@ webkit.org/b/94528 [ Mac ] fast/text-autosizing/nested-em-line-height.html [ Ima
 webkit.org/b/94532 [ Linux ] fast/forms/formmethod-attribute-button-html.html [ Missing Pass ]
 
 webkit.org/b/94660 fast/js/create-lots-of-workers.html [ Crash Pass Timeout ]
-webkit.org/b/95366 [ Debug ] css3/flexbox/flexitem-stretch-image.html [ Failure Pass ]
 
 crbug.com/67540 webkit.org/b/94735 [ Linux ] fast/text/emphasis-overlap.html [ Failure ImageOnlyFailure ]
 
@@ -3741,48 +3704,6 @@ webkit.org/b/98192 [ Win Debug ] fast/js/post-message-numeric-property.html [ Fa
 
 webkit.org/b/98275 media/event-queue-crash.html [ Skip ]
 
-webkit.org/b/98564 [ Win Mac ] fast/table/colspanMinWidth-vertical.html [ Missing Failure ]
-
-# They are failing because of webkit.org/b/95121 and need rebaseline.
-webkit.org/b/95121 fast/backgrounds/repeat/mask-negative-offset-repeat.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 fast/backgrounds/size/backgroundSize15.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 fast/backgrounds/size/contain-and-cover-zoomed.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 fast/backgrounds/size/contain-and-cover.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 fast/borders/border-image-scale-transform.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 fast/borders/border-image-scaled.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 fast/borders/border-image-slice-constrained.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 fast/borders/inline-mask-overlay-image-outset-vertical-rl.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 fast/borders/inline-mask-overlay-image-outset.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 fast/borders/scaled-border-image.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 fast/repaint/background-misaligned.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirLTR-anchorEnd.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirLTR-anchorMiddle.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirLTR-anchorStart.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirNone-anchorEnd.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirNone-anchorMiddle.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirNone-anchorStart.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirRTL-anchorEnd.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirRTL-anchorMiddle.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-dirRTL-anchorStart.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorEnd.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorMiddle.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorStart.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorEnd.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorMiddle.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorStart.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-I18N/text-anchor-no-markup.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-SVG-1.1-SE/filters-image-05-f.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/W3C-SVG-1.1/coords-viewattr-02-b.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/as-border-image/svg-as-border-image.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/custom/clip-mask-negative-scale.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/custom/image-small-width-height.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/custom/pointer-events-image-css-transform.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/custom/pointer-events-image.svg [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/dynamic-updates/SVGFEImageElement-dom-preserveAspectRatio-attr.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/dynamic-updates/SVGFEImageElement-svgdom-preserveAspectRatio-prop.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 svg/zoom/page/zoom-background-images.html [ ImageOnlyFailure ] 
-webkit.org/b/95121 scrollbars/overflow-scrollbar-combinations.html [ ImageOnlyFailure ] 
-
 # These are real failues due to 95121.
 # This is spilling caused by LANCZOS3 scaling algorithm that samples outside the source rect.
 webkit.org/b/95121 fast/images/pixel-crack-image-background-webkit-transform-scale.html [ ImageOnlyFailure ] 
@@ -3793,3 +3714,7 @@ webkit.org/b/95121 fast/borders/border-image-side-reduction.html [ ImageOnlyFail
 # failing after r130443 but we're not sure if this is a real bug or just needs rebaselining
 webkit.org/b/98545 [ Mac ] fast/text/international/text-spliced-font.html [ Failure ]
 webkit.org/b/98545 [ Mac ] fast/writing-mode/Kusa-Makura-background-canvas.html [ Failure ]
+
+webkit.org/b/98686 editing/pasteboard/data-transfer-items.html [ Failure ]
+
+webkit.org/b/98699 [ Lion ] fast/writing-mode/vertical-subst-font-vert-no-dflt.html [ Crash ]

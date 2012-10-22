@@ -1,3 +1,1953 @@
+2012-10-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Rebaseline some svg/text tests.
+
+        Some pixel tests now have the red rectangle drawn around some
+        areas like other ports.
+
+        While here, also add an expectation for selection-tripleclick.svg,
+        which seems to be passing now.
+
+        * platform/efl/TestExpectations:
+        * platform/efl/svg/text/foreignObject-text-clipping-bug-expected.png:
+        * platform/efl/svg/text/selection-tripleclick-expected.png: Added.
+        * platform/efl/svg/text/selection-tripleclick-expected.txt: Added.
+        * platform/efl/svg/text/text-align-01-b-expected.png:
+        * platform/efl/svg/text/text-align-02-b-expected.png:
+        * platform/efl/svg/text/text-align-03-b-expected.png:
+        * platform/efl/svg/text/text-align-04-b-expected.png:
+        * platform/efl/svg/text/text-align-05-b-expected.png:
+        * platform/efl/svg/text/text-align-06-b-expected.png:
+        * platform/efl/svg/text/text-altglyph-01-b-expected.png:
+        * platform/efl/svg/text/text-deco-01-b-expected.png:
+        * platform/efl/svg/text/text-fonts-01-t-expected.png:
+        * platform/efl/svg/text/text-fonts-02-t-expected.png:
+        * platform/efl/svg/text/text-intro-05-t-expected.png:
+        * platform/efl/svg/text/text-path-01-b-expected.png:
+        * platform/efl/svg/text/text-spacing-01-b-expected.png:
+        * platform/efl/svg/text/text-text-01-b-expected.png:
+        * platform/efl/svg/text/text-text-03-b-expected.png:
+        * platform/efl/svg/text/text-text-04-t-expected.png:
+        * platform/efl/svg/text/text-text-05-t-expected.png:
+        * platform/efl/svg/text/text-text-06-t-expected.png:
+        * platform/efl/svg/text/text-text-07-t-expected.png:
+        * platform/efl/svg/text/text-text-08-b-expected.png:
+        * platform/efl/svg/text/text-tref-01-b-expected.png:
+        * platform/efl/svg/text/text-tselect-01-b-expected.png:
+        * platform/efl/svg/text/text-tselect-02-f-expected.png:
+        * platform/efl/svg/text/text-tspan-01-b-expected.png:
+        * platform/efl/svg/text/text-ws-01-t-expected.png:
+        * platform/efl/svg/text/text-ws-02-t-expected.png:
+
+2012-10-09  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Uploading images to Google+ using QtWebKit does not work.
+        https://bugs.webkit.org/show_bug.cgi?id=72329
+
+        Reviewed by Jocelyn Turcotte.
+
+        Unskip the two BLOB tests that now passes. The rest of the BLOB tests unfortunately depend
+        on features we do not have.
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unskip and rebase now passing tests.
+
+        * platform/qt/TestExpectations:
+        * platform/qt/compositing/overflow/clip-descendents-expected.txt: Added.
+        * platform/qt/css1/formatting_model/floating_elements-expected.png:
+        * platform/qt/css1/formatting_model/floating_elements-expected.txt:
+        * platform/qt/editing/selection/caret-ltr-2-expected.png:
+        * platform/qt/editing/selection/caret-ltr-2-expected.txt:
+        * platform/qt/editing/selection/caret-ltr-2-left-expected.png:
+        * platform/qt/editing/selection/caret-ltr-2-left-expected.txt:
+        * platform/qt/editing/selection/caret-ltr-expected.png:
+        * platform/qt/editing/selection/caret-ltr-expected.txt:
+        * platform/qt/editing/selection/caret-ltr-right-expected.png:
+        * platform/qt/editing/selection/caret-ltr-right-expected.txt:
+        * platform/qt/editing/selection/caret-rtl-2-left-expected.png:
+        * platform/qt/editing/selection/caret-rtl-2-left-expected.txt:
+        * platform/qt/editing/selection/caret-rtl-right-expected.png:
+        * platform/qt/editing/selection/caret-rtl-right-expected.txt:
+        * platform/qt/fast/backgrounds/size/zero-expected.png: Added.
+        * platform/qt/fast/backgrounds/size/zero-expected.txt:
+        * platform/qt/fast/block/basic/fieldset-stretch-to-legend-expected.png:
+        * platform/qt/fast/block/basic/fieldset-stretch-to-legend-expected.txt:
+        * platform/qt/fast/forms/basic-buttons-expected.png:
+        * platform/qt/fast/forms/basic-buttons-expected.txt:
+        * platform/qt/fast/multicol/overflow-across-columns-expected.png: Added.
+        * platform/qt/fast/multicol/overflow-across-columns-expected.txt: Added.
+        * platform/qt/fast/multicol/overflow-unsplittable-expected.png: Added.
+        * platform/qt/fast/multicol/overflow-unsplittable-expected.txt: Added.
+        * platform/qt/fast/multicol/positive-leading-expected.png: Added.
+        * platform/qt/fast/multicol/positive-leading-expected.txt: Added.
+        * platform/qt/fast/multicol/shadow-breaking-expected.png:
+        * platform/qt/fast/multicol/span/span-as-immediate-child-property-removal-expected.png:
+        * platform/qt/fast/multicol/span/span-as-immediate-child-property-removal-expected.txt:
+        * platform/qt/fast/multicol/span/span-as-immediate-columns-child-removal-expected.png:
+        * platform/qt/fast/multicol/span/span-as-immediate-columns-child-removal-expected.txt:
+        * platform/qt/fast/overflow/003-expected.png:
+        * platform/qt/fast/overflow/003-expected.txt:
+        * platform/qt/fast/regions/overflow-size-change-with-stacking-context-expected.txt: Added.
+        * platform/qt/fast/replaced/table-percent-height-expected.txt:
+        * platform/qt/fast/text/line-initial-and-final-swashes-expected.txt: Added.
+        * platform/qt/fonts/cursive-expected.png: Added.
+        * platform/qt/fonts/cursive-expected.txt: Added.
+        * platform/qt/fonts/default-expected.png: Added.
+        * platform/qt/fonts/default-expected.txt: Added.
+        * platform/qt/fonts/fantasy-expected.png: Added.
+        * platform/qt/fonts/fantasy-expected.txt: Added.
+        * platform/qt/fonts/monospace-expected.png: Added.
+        * platform/qt/fonts/monospace-expected.txt: Added.
+        * platform/qt/fonts/sans-serif-expected.png: Added.
+        * platform/qt/fonts/sans-serif-expected.txt: Added.
+        * platform/qt/fonts/serif-expected.png: Added.
+        * platform/qt/fonts/serif-expected.txt: Added.
+        * platform/qt/printing/page-count-relayout-shrink-expected.txt: Added.
+        * platform/qt/printing/return-from-printing-mode-expected.png: Added.
+        * platform/qt/printing/return-from-printing-mode-expected.txt: Added.
+        * platform/qt/printing/setPrinting-expected.png: Added.
+        * platform/qt/printing/setPrinting-expected.txt: Added.
+        * platform/qt/printing/single-line-must-not-be-split-into-two-pages-expected.txt: Added.
+        * platform/qt/svg/custom/clip-mask-negative-scale-expected.png: Added.
+        * platform/qt/tables/mozilla/bugs/bug10296-1-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug10296-1-expected.txt:
+        * platform/qt/tables/mozilla/bugs/bug12384-expected.png: Added.
+        * platform/qt/tables/mozilla/bugs/bug12384-expected.txt:
+        * platform/qt/tables/mozilla/bugs/bug99948-expected.png: Added.
+        * platform/qt/tables/mozilla/bugs/bug99948-expected.txt:
+        * platform/qt/tables/mozilla/marvin/colgroup_width_pct-expected.png: Added.
+        * platform/qt/tables/mozilla/marvin/colgroup_width_pct-expected.txt:
+        * platform/qt/tables/mozilla/marvin/table_overflow_hidden_td-expected.png: Added.
+        * platform/qt/tables/mozilla/marvin/table_overflow_hidden_td-expected.txt:
+        * platform/qt/tables/mozilla_expected_failures/bugs/bug2479-5-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/bugs/bug2479-5-expected.txt:
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption-expected.png: Added.
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption-expected.txt:
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_bottom-expected.png: Added.
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_bottom-expected.txt:
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_hidden-expected.png: Added.
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_hidden-expected.txt:
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_hidden_table-expected.png: Added.
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_hidden_table-expected.txt:
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_left-expected.png: Added.
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_left-expected.txt:
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_right-expected.png: Added.
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_right-expected.txt:
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_top-expected.png: Added.
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_caption_top-expected.txt:
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_hidden_table-expected.png: Added.
+        * platform/qt/tables/mozilla_expected_failures/marvin/table_overflow_hidden_table-expected.txt:
+
+2012-10-09  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        [EFL] remove duplicate failure expectations
+        https://bugs.webkit.org/show_bug.cgi?id=98736
+
+        Unreviewed gardening.
+
+        Many tests are listed in both efl and wk2 expectations. Remove the efl expectations
+        in cases where the bug seems to be a wk2 issue.
+
+        Most expectations are also added into the efl-wk1 expectations (which is where
+        they should have been all along).
+
+        * platform/efl-wk1/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-10-09  Arpita Bahuguna  <arpitabahuguna@gmail.com>
+
+        Text decorations specified on the containing block are not properly applied when ::first-line is present.
+        https://bugs.webkit.org/show_bug.cgi?id=93829
+
+        Reviewed by Abhishek Arya.
+
+        * fast/css/text-decorations-on-first-line-and-containing-block-expected.html: Added.
+        * fast/css/text-decorations-on-first-line-and-containing-block.html: Added.
+        Tests added for verifying the behavior of text-decorations when specified
+        both for the ::first-line as well as its containing block.
+
+2012-10-09  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r130746.
+        http://trac.webkit.org/changeset/130746
+        https://bugs.webkit.org/show_bug.cgi?id=98749
+
+        It made 45 tests crash on Qt (Requested by Ossy on #webkit).
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Mark a few tests skipped in r130745 as failures instead of timeouts.
+
+        * platform/efl/TestExpectations:
+
+2012-10-09  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Uploading images to Google+ using QtWebKit does not work.
+        https://bugs.webkit.org/show_bug.cgi?id=72329
+
+        Reviewed by Jocelyn Turcotte.
+
+        Unskip the two BLOB tests that now passes. The rest of the BLOB tests unfortunately depend
+        on features we do not have.
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Skip a few tests after r130699.
+
+        * platform/efl/TestExpectations:
+
+2012-10-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Remove comment added in r130650 now that I've run the GTK+ tests.
+
+        * platform/efl-wk1/TestExpectations:
+
+2012-10-09  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Adding more failure expectations for regressions after r130699.
+
+        * platform/gtk/TestExpectations:
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unskip now passing tests.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt/TestExpectations:
+
+2012-10-09  Tullio Lucena  <tullio.lucena@openbossa.org>
+
+        [Qt] /editing/selection/caret-bidi-first-and-last-letters.html fails
+        https://bugs.webkit.org/show_bug.cgi?id=51884
+
+        Reviewed by Ryosuke Niwa.
+
+        This test pass with this change in testfonts https://gitorious.org/qtwebkit/testfonts/merge_requests/1
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Tullio Lucena  <tullio.lucena@openbossa.org>
+
+        [Qt] editing/selection/caret-at-bidi-boundary.html fails
+        https://bugs.webkit.org/show_bug.cgi?id=66514
+
+        Reviewed by Yuta Kitamura.
+
+        Unskipping test. The update in testfonts solved this bug.
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unskip and rebase a now passing test.
+
+        * platform/qt/TestExpectations:
+        * platform/qt/fast/repaint/line-flow-with-floats-in-regions-expected.png:
+        * platform/qt/fast/repaint/line-flow-with-floats-in-regions-expected.txt:
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unskip fast/transforms/scrollIntoView-transformed.html.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt/TestExpectations:
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unskip and rebase now passing tests.
+
+        * platform/qt-5.0/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/qt/editing/selection/vertical-rl-rtl-extend-line-forward-br-expected.png:
+        * platform/qt/editing/selection/vertical-rl-rtl-extend-line-forward-br-expected.txt:
+        * platform/qt/editing/selection/vertical-rl-rtl-extend-line-forward-p-expected.png:
+        * platform/qt/editing/selection/vertical-rl-rtl-extend-line-forward-p-expected.txt:
+
+2012-10-09  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Adding failure expectations for regressions after r130699 and
+        a failing multipart test introduced in r130651.
+
+        * platform/gtk/TestExpectations:
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unskip and rebasing now passing tests.
+
+        * platform/qt-5.0-wk1/TestExpectations:
+        * platform/qt/fast/css/word-space-extra-expected.png:
+        * platform/qt/fast/css/word-space-extra-expected.txt:
+        * platform/qt/fast/history/history-back-initial-vs-final-url-expected.txt: Added.
+        * platform/qt/fast/repaint/renderer-destruction-by-invalidateSelection-crash-expected.png:
+        * platform/qt/fast/repaint/renderer-destruction-by-invalidateSelection-crash-expected.txt:
+        * platform/qt/fast/transforms/transformed-focused-text-input-expected.png:
+        * platform/qt/fast/transforms/transformed-focused-text-input-expected.txt:
+        * platform/qt/http/tests/navigation/postredirect-frames-expected.txt:
+        * platform/qt/http/tests/navigation/postredirect-goback2-expected.txt:
+
+2012-10-09  Keishi Hattori  <keishi@webkit.org>
+
+        Page popup should be smarter about its layout
+        https://bugs.webkit.org/show_bug.cgi?id=98499
+
+        Reviewed by Kent Tamura.
+
+        * platform/chromium/fast/forms/page-popup/page-popup-adjust-rect-expected.txt: Added.
+        * platform/chromium/fast/forms/page-popup/page-popup-adjust-rect.html: Added.
+        * platform/chromium-android/TestExpectations: Added platform/chromium/fast/forms/page-popup.
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unskip now passing tests.
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unskip now passing tests.
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unskip now passing tests.
+
+        * platform/qt-5.0-wk1/TestExpectations:
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt-5.0/TestExpectations:
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        Unreviewed gadening after r130709.
+
+        * fast/harness/results-expected.txt:
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt][WK2] Unskip now passing tests.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+
+2012-10-08  Tullio Lucena  <tullio.lucena@openbossa.org>
+
+        [Qt]REGRESSION(r128699): It made 2 fast/js/dfg tests assert
+        https://bugs.webkit.org/show_bug.cgi?id=96907
+
+        Reviewed by Csaba Osztrogonác.
+
+        Unskipping tests.
+
+        * platform/qt/TestExpectations:
+
+2012-10-08  Kiran Muppala  <cmuppala@apple.com>
+
+        Throttle DOM timers on hidden pages.
+        https://bugs.webkit.org/show_bug.cgi?id=98474
+
+        Reviewed by Maciej Stachowiak.
+
+        Add a test for DOM timer throttling on hidden pages.
+
+        * fast/dom/timer-throttling-hidden-page-expected.txt: Added.
+        * fast/dom/timer-throttling-hidden-page.html: Added.
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+        Skip the test since HIDDEN_PAGE_DOM_TIMER_THROTTLING is not enabled by default.
+
+2012-10-08  Yoshifumi Inoue  <yosin@chromium.org>
+
+        HTMLSelectElement::typeAheadFind depends on implementation dependent behavior
+        https://bugs.webkit.org/show_bug.cgi?id=98710
+
+        Reviewed by Kent Tamura.
+
+        This patch adds a test for checking HTMLSelectElement::typeAheadFind
+        doesn't crash.
+
+        * fast/forms/select/select-typeahead-crash-expected.txt: Added.
+        * fast/forms/select/select-typeahead-crash.html: Added.
+
+2012-10-08  Kent Tamura  <tkent@chromium.org>
+
+        Take account of overflowing values for width calculation of a year sub-field
+        https://bugs.webkit.org/show_bug.cgi?id=98506
+
+        Reviewed by Eric Seidel.
+
+        * fast/forms/date-multiple-fields/date-multiple-fields-change-layout-by-value-expected.txt: Added.
+        * fast/forms/date-multiple-fields/date-multiple-fields-change-layout-by-value.html: Added.
+
+2012-10-08  Tony Chang  <tony@chromium.org>
+
+        image not displayed in flexbox
+        https://bugs.webkit.org/show_bug.cgi?id=98611
+
+        Reviewed by Ojan Vafai.
+
+        Load an image after flexbox layout has happened.
+
+        * css3/flexbox/relayout-image-load-expected.txt: Added.
+        * css3/flexbox/relayout-image-load.html: Added.
+        * platform/chromium/TestExpectations: Remove css3/flexbox/flexitem-stretch-image.html
+        since it should no longer be flaky.
+
+2012-10-08  Dirk Pranke  <dpranke@chromium.org>
+
+        results.html and garden-o-matic are ignoring IMAGE failures when expected to FAIL
+        https://bugs.webkit.org/show_bug.cgi?id=98706
+
+        Reviewed by Ojan Vafai.
+
+        FAIL is supposed to map onto Failure which is supposed to map
+        onto the old [ TEXT, IMAGE_PLUS_TEXT, AUDIO ] mapping.
+        results.html was including IMAGE in this and garden-o-matic was
+        including CRASH and TIMEOUT as well :(.
+
+        * fast/harness/resources/results-test.js:
+        * fast/harness/results.html:
+
+2012-10-08  Alpha Lam  <hclam@chromium.org>
+
+        Not reviewed. Rebaselines for Chromium.
+
+        Rebaseline after r130412 which affected image scaling pixel tests.
+
+        * platform/chromium-linux-x86/fast/backgrounds/repeat/mask-negative-offset-repeat-expected.png: Added.
+        * platform/chromium-linux-x86/fast/backgrounds/size/backgroundSize15-expected.png: Added.
+        * platform/chromium-linux-x86/fast/backgrounds/size/contain-and-cover-expected.png: Added.
+        * platform/chromium-linux-x86/fast/backgrounds/size/contain-and-cover-zoomed-expected.png: Added.
+        * platform/chromium-linux-x86/fast/borders/border-image-scale-transform-expected.png: Added.
+        * platform/chromium-linux-x86/fast/borders/border-image-scaled-expected.png: Added.
+        * platform/chromium-linux-x86/fast/borders/border-image-slice-constrained-expected.png: Added.
+        * platform/chromium-linux-x86/fast/borders/inline-mask-overlay-image-outset-expected.png: Added.
+        * platform/chromium-linux-x86/fast/borders/inline-mask-overlay-image-outset-vertical-rl-expected.png: Added.
+        * platform/chromium-linux-x86/fast/borders/scaled-border-image-expected.png: Added.
+        * platform/chromium-linux-x86/fast/repaint/background-misaligned-expected.png:
+        * platform/chromium-linux-x86/scrollbars/overflow-scrollbar-combinations-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-dirLTR-anchorEnd-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-dirLTR-anchorMiddle-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-dirLTR-anchorStart-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-dirNone-anchorEnd-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-dirNone-anchorMiddle-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-dirNone-anchorStart-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-dirRTL-anchorEnd-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-dirRTL-anchorMiddle-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-dirRTL-anchorStart-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorEnd-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorMiddle-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorStart-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorEnd-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorMiddle-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorStart-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-I18N/text-anchor-no-markup-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-SVG-1.1-SE/filters-image-05-f-expected.png: Added.
+        * platform/chromium-linux-x86/svg/W3C-SVG-1.1/coords-viewattr-02-b-expected.png: Added.
+        * platform/chromium-linux-x86/svg/as-border-image/svg-as-border-image-expected.png: Added.
+        * platform/chromium-linux-x86/svg/custom/clip-mask-negative-scale-expected.png: Added.
+        * platform/chromium-linux-x86/svg/custom/image-small-width-height-expected.png: Added.
+        * platform/chromium-linux-x86/svg/custom/pointer-events-image-css-transform-expected.png: Added.
+        * platform/chromium-linux-x86/svg/custom/pointer-events-image-expected.png: Added.
+        * platform/chromium-linux-x86/svg/dynamic-updates/SVGFEImageElement-dom-preserveAspectRatio-attr-expected.png: Added.
+        * platform/chromium-linux-x86/svg/dynamic-updates/SVGFEImageElement-svgdom-preserveAspectRatio-prop-expected.png: Added.
+        * platform/chromium-linux-x86/svg/zoom/page/zoom-background-images-expected.png: Added.
+        * platform/chromium-linux/fast/backgrounds/repeat/mask-negative-offset-repeat-expected.png:
+        * platform/chromium-linux/fast/backgrounds/size/backgroundSize15-expected.png:
+        * platform/chromium-linux/fast/backgrounds/size/contain-and-cover-expected.png:
+        * platform/chromium-linux/fast/backgrounds/size/contain-and-cover-zoomed-expected.png:
+        * platform/chromium-linux/fast/borders/border-image-scale-transform-expected.png:
+        * platform/chromium-linux/fast/borders/border-image-scaled-expected.png:
+        * platform/chromium-linux/fast/borders/border-image-slice-constrained-expected.png: Added.
+        * platform/chromium-linux/fast/borders/inline-mask-overlay-image-outset-expected.png:
+        * platform/chromium-linux/fast/borders/inline-mask-overlay-image-outset-vertical-rl-expected.png:
+        * platform/chromium-linux/fast/borders/scaled-border-image-expected.png:
+        * platform/chromium-linux/fast/repaint/background-misaligned-expected.png:
+        * platform/chromium-linux/scrollbars/overflow-scrollbar-combinations-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-dirLTR-anchorEnd-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-dirLTR-anchorMiddle-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-dirLTR-anchorStart-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-dirNone-anchorEnd-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-dirNone-anchorMiddle-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-dirNone-anchorStart-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-dirRTL-anchorEnd-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-dirRTL-anchorMiddle-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-dirRTL-anchorStart-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorEnd-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorMiddle-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorStart-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorEnd-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorMiddle-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorStart-expected.png:
+        * platform/chromium-linux/svg/W3C-I18N/text-anchor-no-markup-expected.png:
+        * platform/chromium-linux/svg/W3C-SVG-1.1-SE/filters-image-05-f-expected.png:
+        * platform/chromium-linux/svg/W3C-SVG-1.1/coords-viewattr-02-b-expected.png:
+        * platform/chromium-linux/svg/as-border-image/svg-as-border-image-expected.png:
+        * platform/chromium-linux/svg/custom/clip-mask-negative-scale-expected.png:
+        * platform/chromium-linux/svg/custom/image-small-width-height-expected.png:
+        * platform/chromium-linux/svg/custom/pointer-events-image-css-transform-expected.png:
+        * platform/chromium-linux/svg/custom/pointer-events-image-expected.png:
+        * platform/chromium-linux/svg/dynamic-updates/SVGFEImageElement-dom-preserveAspectRatio-attr-expected.png:
+        * platform/chromium-linux/svg/dynamic-updates/SVGFEImageElement-svgdom-preserveAspectRatio-prop-expected.png:
+        * platform/chromium-linux/svg/zoom/page/zoom-background-images-expected.png:
+        * platform/chromium-mac-snowleopard/fast/backgrounds/repeat/mask-negative-offset-repeat-expected.png:
+        * platform/chromium-mac-snowleopard/fast/backgrounds/size/backgroundSize15-expected.png:
+        * platform/chromium-mac-snowleopard/fast/backgrounds/size/contain-and-cover-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/backgrounds/size/contain-and-cover-zoomed-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/borders/border-image-scale-transform-expected.png:
+        * platform/chromium-mac-snowleopard/fast/borders/border-image-scaled-expected.png:
+        * platform/chromium-mac-snowleopard/fast/borders/border-image-slice-constrained-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/borders/inline-mask-overlay-image-outset-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/borders/inline-mask-overlay-image-outset-vertical-rl-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/borders/scaled-border-image-expected.png:
+        * platform/chromium-mac-snowleopard/fast/repaint/background-misaligned-expected.png:
+        * platform/chromium-mac-snowleopard/scrollbars/overflow-scrollbar-combinations-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-dirLTR-anchorEnd-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-dirLTR-anchorMiddle-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-dirLTR-anchorStart-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-dirNone-anchorEnd-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-dirNone-anchorMiddle-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-dirNone-anchorStart-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-dirRTL-anchorEnd-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-dirRTL-anchorMiddle-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-dirRTL-anchorStart-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorEnd-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorMiddle-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorStart-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorEnd-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorMiddle-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorStart-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-I18N/text-anchor-no-markup-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-SVG-1.1-SE/filters-image-05-f-expected.png:
+        * platform/chromium-mac-snowleopard/svg/W3C-SVG-1.1/coords-viewattr-02-b-expected.png:
+        * platform/chromium-mac-snowleopard/svg/as-border-image/svg-as-border-image-expected.png: Added.
+        * platform/chromium-mac-snowleopard/svg/custom/clip-mask-negative-scale-expected.png:
+        * platform/chromium-mac-snowleopard/svg/custom/image-small-width-height-expected.png:
+        * platform/chromium-mac-snowleopard/svg/custom/pointer-events-image-css-transform-expected.png:
+        * platform/chromium-mac-snowleopard/svg/custom/pointer-events-image-expected.png:
+        * platform/chromium-mac-snowleopard/svg/dynamic-updates/SVGFEImageElement-dom-preserveAspectRatio-attr-expected.png:
+        * platform/chromium-mac-snowleopard/svg/dynamic-updates/SVGFEImageElement-svgdom-preserveAspectRatio-prop-expected.png:
+        * platform/chromium-mac-snowleopard/svg/zoom/page/zoom-background-images-expected.png: Added.
+        * platform/chromium-mac/fast/backgrounds/repeat/mask-negative-offset-repeat-expected.png:
+        * platform/chromium-mac/fast/backgrounds/size/backgroundSize15-expected.png:
+        * platform/chromium-mac/fast/backgrounds/size/contain-and-cover-expected.png:
+        * platform/chromium-mac/fast/backgrounds/size/contain-and-cover-zoomed-expected.png:
+        * platform/chromium-mac/fast/borders/border-image-scale-transform-expected.png:
+        * platform/chromium-mac/fast/borders/border-image-scaled-expected.png:
+        * platform/chromium-mac/fast/borders/border-image-slice-constrained-expected.png:
+        * platform/chromium-mac/fast/borders/inline-mask-overlay-image-outset-expected.png:
+        * platform/chromium-mac/fast/borders/inline-mask-overlay-image-outset-vertical-rl-expected.png:
+        * platform/chromium-mac/fast/borders/scaled-border-image-expected.png:
+        * platform/chromium-mac/fast/repaint/background-misaligned-expected.png:
+        * platform/chromium-mac/scrollbars/overflow-scrollbar-combinations-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-dirLTR-anchorEnd-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-dirLTR-anchorMiddle-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-dirLTR-anchorStart-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-dirNone-anchorEnd-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-dirNone-anchorMiddle-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-dirNone-anchorStart-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-dirRTL-anchorEnd-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-dirRTL-anchorMiddle-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-dirRTL-anchorStart-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorEnd-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorMiddle-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorStart-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorEnd-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorMiddle-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorStart-expected.png:
+        * platform/chromium-mac/svg/W3C-I18N/text-anchor-no-markup-expected.png:
+        * platform/chromium-mac/svg/W3C-SVG-1.1-SE/filters-image-05-f-expected.png:
+        * platform/chromium-mac/svg/W3C-SVG-1.1/coords-viewattr-02-b-expected.png:
+        * platform/chromium-mac/svg/as-border-image/svg-as-border-image-expected.png:
+        * platform/chromium-mac/svg/custom/clip-mask-negative-scale-expected.png:
+        * platform/chromium-mac/svg/custom/image-small-width-height-expected.png:
+        * platform/chromium-mac/svg/custom/pointer-events-image-css-transform-expected.png:
+        * platform/chromium-mac/svg/custom/pointer-events-image-expected.png:
+        * platform/chromium-mac/svg/dynamic-updates/SVGFEImageElement-dom-preserveAspectRatio-attr-expected.png:
+        * platform/chromium-mac/svg/dynamic-updates/SVGFEImageElement-svgdom-preserveAspectRatio-prop-expected.png:
+        * platform/chromium-mac/svg/zoom/page/zoom-background-images-expected.png:
+        * platform/chromium-win-xp/fast/backgrounds/repeat/mask-negative-offset-repeat-expected.png: Added.
+        * platform/chromium-win-xp/fast/backgrounds/size/backgroundSize15-expected.png: Added.
+        * platform/chromium-win-xp/fast/backgrounds/size/contain-and-cover-expected.png: Added.
+        * platform/chromium-win-xp/fast/backgrounds/size/contain-and-cover-zoomed-expected.png: Added.
+        * platform/chromium-win-xp/fast/borders/border-image-scale-transform-expected.png: Added.
+        * platform/chromium-win-xp/fast/borders/border-image-scaled-expected.png: Added.
+        * platform/chromium-win-xp/fast/borders/border-image-slice-constrained-expected.png: Added.
+        * platform/chromium-win-xp/fast/borders/inline-mask-overlay-image-outset-expected.png: Added.
+        * platform/chromium-win-xp/fast/borders/inline-mask-overlay-image-outset-vertical-rl-expected.png: Added.
+        * platform/chromium-win-xp/fast/borders/scaled-border-image-expected.png: Added.
+        * platform/chromium-win-xp/fast/repaint/background-misaligned-expected.png:
+        * platform/chromium-win-xp/scrollbars/overflow-scrollbar-combinations-expected.png: Added.
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-dirLTR-anchorEnd-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-dirLTR-anchorMiddle-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-dirLTR-anchorStart-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-dirNone-anchorEnd-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-dirNone-anchorMiddle-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-dirNone-anchorStart-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-dirRTL-anchorEnd-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-dirRTL-anchorMiddle-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-dirRTL-anchorStart-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorEnd-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorMiddle-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorStart-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorEnd-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorMiddle-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorStart-expected.png:
+        * platform/chromium-win-xp/svg/W3C-I18N/text-anchor-no-markup-expected.png:
+        * platform/chromium-win-xp/svg/W3C-SVG-1.1-SE/filters-image-05-f-expected.png: Added.
+        * platform/chromium-win-xp/svg/W3C-SVG-1.1/coords-viewattr-02-b-expected.png: Added.
+        * platform/chromium-win-xp/svg/as-border-image/svg-as-border-image-expected.png: Added.
+        * platform/chromium-win-xp/svg/custom/clip-mask-negative-scale-expected.png: Added.
+        * platform/chromium-win-xp/svg/custom/image-small-width-height-expected.png: Added.
+        * platform/chromium-win-xp/svg/custom/pointer-events-image-css-transform-expected.png: Added.
+        * platform/chromium-win-xp/svg/custom/pointer-events-image-expected.png: Added.
+        * platform/chromium-win-xp/svg/dynamic-updates/SVGFEImageElement-dom-preserveAspectRatio-attr-expected.png: Added.
+        * platform/chromium-win-xp/svg/dynamic-updates/SVGFEImageElement-svgdom-preserveAspectRatio-prop-expected.png: Added.
+        * platform/chromium-win-xp/svg/zoom/page/zoom-background-images-expected.png: Added.
+        * platform/chromium-win/fast/backgrounds/repeat/mask-negative-offset-repeat-expected.png:
+        * platform/chromium-win/fast/backgrounds/size/backgroundSize15-expected.png:
+        * platform/chromium-win/fast/backgrounds/size/contain-and-cover-expected.png:
+        * platform/chromium-win/fast/backgrounds/size/contain-and-cover-zoomed-expected.png:
+        * platform/chromium-win/fast/borders/border-image-scale-transform-expected.png:
+        * platform/chromium-win/fast/borders/border-image-scaled-expected.png:
+        * platform/chromium-win/fast/borders/border-image-slice-constrained-expected.png:
+        * platform/chromium-win/fast/borders/inline-mask-overlay-image-outset-expected.png:
+        * platform/chromium-win/fast/borders/inline-mask-overlay-image-outset-vertical-rl-expected.png:
+        * platform/chromium-win/fast/borders/scaled-border-image-expected.png:
+        * platform/chromium-win/fast/repaint/background-misaligned-expected.png:
+        * platform/chromium-win/scrollbars/overflow-scrollbar-combinations-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-dirLTR-anchorEnd-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-dirLTR-anchorMiddle-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-dirLTR-anchorStart-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-dirNone-anchorEnd-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-dirNone-anchorMiddle-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-dirNone-anchorStart-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-dirRTL-anchorEnd-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-dirRTL-anchorMiddle-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-dirRTL-anchorStart-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorEnd-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorMiddle-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-inherited-dirLTR-anchorStart-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorEnd-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorMiddle-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-inherited-dirRTL-anchorStart-expected.png:
+        * platform/chromium-win/svg/W3C-I18N/text-anchor-no-markup-expected.png:
+        * platform/chromium-win/svg/W3C-SVG-1.1-SE/filters-image-05-f-expected.png:
+        * platform/chromium-win/svg/W3C-SVG-1.1/coords-viewattr-02-b-expected.png:
+        * platform/chromium-win/svg/as-border-image/svg-as-border-image-expected.png:
+        * platform/chromium-win/svg/custom/clip-mask-negative-scale-expected.png:
+        * platform/chromium-win/svg/custom/image-small-width-height-expected.png:
+        * platform/chromium-win/svg/custom/pointer-events-image-css-transform-expected.png:
+        * platform/chromium-win/svg/custom/pointer-events-image-expected.png:
+        * platform/chromium-win/svg/dynamic-updates/SVGFEImageElement-dom-preserveAspectRatio-attr-expected.png:
+        * platform/chromium-win/svg/dynamic-updates/SVGFEImageElement-svgdom-preserveAspectRatio-prop-expected.png:
+        * platform/chromium-win/svg/zoom/page/zoom-background-images-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-10-08  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed Chromium gardening.
+
+        * platform/chromium/TestExpectations:
+        Marked a test as crashing on Lion.
+
+        * platform/chromium-linux/transforms/3d/point-mapping/3d-point-mapping-expected.png:
+        * platform/chromium-mac-snowleopard/transforms/3d/point-mapping/3d-point-mapping-expected.png:
+        * platform/chromium-mac-snowleopard/transforms/3d/point-mapping/3d-point-mapping-origins-expected.png:
+        * platform/chromium-mac/transforms/3d/point-mapping/3d-point-mapping-expected.png:
+        * platform/chromium-mac/transforms/3d/point-mapping/3d-point-mapping-origins-expected.png:
+        * platform/chromium-win/transforms/3d/point-mapping/3d-point-mapping-origins-expected.png:
+        Rebaselined these tests after a change in Chromium compositor (Chromium r160671).
+
+2012-10-08  Simon Fraser  <simon.fraser@apple.com>
+
+        Move layerTreeAsText to window.internals
+        https://bugs.webkit.org/show_bug.cgi?id=98690
+
+        Reviewed by James Robinson.
+
+        Add window.internals.layerTreeAsText(document), and change the tests to use it.
+        I'll remove testRunner.layerTreeAsText() in a later patch.
+
+        * compositing/animation/animation-compositing.html:
+        * compositing/backing/no-backing-for-clip-overlap.html:
+        * compositing/backing/no-backing-for-clip.html:
+        * compositing/backing/no-backing-for-perspective.html:
+        * compositing/bounds-in-flipped-writing-mode.html:
+        * compositing/clip-child-by-non-stacking-ancestor.html:
+        * compositing/columns/composited-in-paginated.html:
+        * compositing/geometry/ancestor-overflow-change.html:
+        * compositing/geometry/bounds-clipped-composited-child.html:
+        * compositing/geometry/bounds-ignores-hidden-composited-descendant.html:
+        * compositing/geometry/bounds-ignores-hidden-dynamic-negzindex.html:
+        * compositing/geometry/bounds-ignores-hidden-dynamic.html:
+        * compositing/geometry/bounds-ignores-hidden.html:
+        * compositing/geometry/clip.html:
+        * compositing/geometry/composited-in-columns.html:
+        * compositing/geometry/fixed-position-composited-switch.html:
+        * compositing/geometry/flipped-writing-mode.html:
+        * compositing/geometry/foreground-layer.html:
+        * compositing/geometry/layer-due-to-layer-children-deep-switch.html:
+        * compositing/geometry/layer-due-to-layer-children-switch.html:
+        * compositing/geometry/limit-layer-bounds-clipping-ancestor.html:
+        * compositing/geometry/limit-layer-bounds-fixed-positioned.html:
+        * compositing/geometry/limit-layer-bounds-opacity-transition.html:
+        * compositing/geometry/limit-layer-bounds-overflow-root.html:
+        * compositing/geometry/limit-layer-bounds-positioned-transition.html:
+        * compositing/geometry/limit-layer-bounds-positioned.html:
+        * compositing/geometry/limit-layer-bounds-transformed-overflow.html:
+        * compositing/geometry/limit-layer-bounds-transformed.html:
+        * compositing/geometry/preserve-3d-switching.html:
+        * compositing/iframes/become-composited-nested-iframes.html:
+        * compositing/iframes/become-overlapped-iframe.html:
+        * compositing/iframes/composited-parent-iframe.html:
+        * compositing/iframes/connect-compositing-iframe-delayed.html:
+        * compositing/iframes/connect-compositing-iframe.html:
+        * compositing/iframes/connect-compositing-iframe2.html:
+        * compositing/iframes/connect-compositing-iframe3.html:
+        * compositing/iframes/enter-compositing-iframe.html:
+        * compositing/iframes/iframe-resize.html:
+        * compositing/iframes/iframe-size-from-zero.html:
+        * compositing/iframes/iframe-size-to-zero.html:
+        * compositing/iframes/iframe-src-change.html:
+        * compositing/iframes/invisible-nested-iframe-hide.html:
+        * compositing/iframes/invisible-nested-iframe-show.html:
+        * compositing/iframes/leave-compositing-iframe.html:
+        * compositing/iframes/overlapped-iframe-iframe.html:
+        * compositing/iframes/overlapped-iframe.html:
+        * compositing/iframes/overlapped-nested-iframes.html:
+        * compositing/iframes/page-cache-layer-tree.html:
+        * compositing/iframes/resizer.html:
+        * compositing/iframes/scrolling-iframe.html:
+        * compositing/images/clip-on-directly-composited-image.html:
+        * compositing/layer-creation/animation-overlap-with-children.html:
+        * compositing/layer-creation/fixed-position-and-transform.html:
+        * compositing/layer-creation/fixed-position-out-of-view.html:
+        * compositing/layer-creation/fixed-position-under-transform.html:
+        * compositing/layer-creation/no-compositing-for-preserve-3d.html:
+        * compositing/layer-creation/overflow-scroll-overlap.html:
+        * compositing/layer-creation/overlap-animation.html:
+        * compositing/layer-creation/overlap-child-layer.html:
+        * compositing/layer-creation/overlap-clipping.html:
+        * compositing/layer-creation/overlap-transformed-and-clipped.html:
+        * compositing/layer-creation/overlap-transformed-layer.html:
+        * compositing/layer-creation/overlap-transforms.html:
+        * compositing/layer-creation/rotate3d-overlap.html:
+        * compositing/layer-creation/scroll-partial-update.html:
+        * compositing/layer-creation/spanOverlapsCanvas.html:
+        * compositing/layer-creation/stacking-context-overlap-nested.html:
+        * compositing/layer-creation/stacking-context-overlap.html:
+        * compositing/layer-creation/translatez-overlap.html:
+        * compositing/overflow-trumps-transform-style.html:
+        * compositing/overflow/clip-descendents.html:
+        * compositing/overflow/content-gains-scrollbars.html:
+        * compositing/overflow/content-loses-scrollbars.html:
+        * compositing/overflow/overflow-auto-with-touch-no-overflow.html:
+        * compositing/overflow/overflow-auto-with-touch-toggle.html:
+        * compositing/overflow/overflow-auto-with-touch.html:
+        * compositing/overflow/overflow-hidden-with-touch.html:
+        * compositing/overflow/overflow-overlay-with-touch-no-overflow.html:
+        * compositing/overflow/overflow-overlay-with-touch.html:
+        * compositing/overflow/overflow-scroll-with-touch-no-overflow.html:
+        * compositing/overflow/overflow-scrollbar-layers.html:
+        * compositing/overflow/overflow-visible-with-touch.html:
+        * compositing/overflow/resize-painting.html:
+        * compositing/overflow/scrolling-content-clip-to-viewport.html:
+        * compositing/overflow/textarea-scroll-touch.html:
+        * compositing/plugins/1x1-composited-plugin.html:
+        * compositing/plugins/large-to-small-composited-plugin.html:
+        * compositing/plugins/no-backing-store.html:
+        * compositing/plugins/small-to-large-composited-plugin.html:
+        * compositing/rtl/rtl-absolute-overflow-scrolled.html:
+        * compositing/rtl/rtl-absolute-overflow.html:
+        * compositing/rtl/rtl-absolute.html:
+        * compositing/rtl/rtl-fixed-overflow-scrolled.html:
+        * compositing/rtl/rtl-fixed-overflow.html:
+        * compositing/rtl/rtl-fixed.html:
+        * compositing/rtl/rtl-iframe-absolute-overflow-scrolled.html:
+        * compositing/rtl/rtl-iframe-absolute-overflow.html:
+        * compositing/rtl/rtl-iframe-absolute.html:
+        * compositing/rtl/rtl-iframe-fixed-overflow-scrolled.html:
+        * compositing/rtl/rtl-iframe-fixed-overflow.html:
+        * compositing/rtl/rtl-iframe-fixed.html:
+        * compositing/rtl/rtl-iframe-relative.html:
+        * compositing/rtl/rtl-relative.html:
+        * compositing/tiled-layers-hidpi.html:
+        * compositing/tiling/crash-reparent-tiled-layer.html:
+        * compositing/tiling/huge-layer-add-remove-child.html-disabled:
+        * compositing/tiling/huge-layer-img.html-disabled:
+        * compositing/tiling/huge-layer-resize.html-disabled:
+        * compositing/tiling/huge-layer-with-layer-children-resize.html-disabled:
+        * compositing/tiling/huge-layer-with-layer-children.html-disabled:
+        * compositing/tiling/huge-layer.html-disabled:
+        * compositing/video/video-poster.html:
+        * compositing/visibility/layer-visible-content.html:
+        * compositing/visibility/visibility-image-layers-dynamic.html:
+        * css3/compositing/should-have-compositing-layer.html:
+        * css3/filters/composited-during-animation-layertree.html:
+        * css3/filters/composited-during-transition-layertree.html:
+        * css3/filters/filtered-compositing-descendant.html:
+        * css3/filters/should-not-have-compositing-layer.html:
+        * platform/chromium-android/compositing/layer-creation/overflow-scrolling-touch.html:
+        * platform/chromium/compositing/force-compositing-mode/force-composite-empty.html:
+        * platform/chromium/compositing/force-compositing-mode/no-overflow-iframe-layer.html:
+        * platform/chromium/compositing/force-compositing-mode/overflow-hidden-iframe-layer.html:
+        * platform/chromium/compositing/force-compositing-mode/overflow-iframe-enter-compositing.html:
+        * platform/chromium/compositing/force-compositing-mode/overflow-iframe-layer.html:
+        * platform/chromium/compositing/force-compositing-mode/overflow-iframe-leave-compositing.html:
+        * platform/mac/compositing/canvas/accelerated-canvas-compositing.html:
+
+2012-10-08  Hans Muller  <hmuller@adobe.com>
+
+        [CSS Exclusions] Add support for polygonal shapes
+        https://bugs.webkit.org/show_bug.cgi?id=96811
+
+        Reviewed by Dirk Schulze.
+
+        Verify that a rectangular shape-inside specified as a polygon works as expected for all
+        writing-modes.
+
+        Added exclusions tests for non-complex concave shape-inside polygons as well.
+        The shapes in this set of tests are "rectangular" in the sense that
+        horizontal lines that overlap the polygon only cross the polygon twice.
+        The expected part of each test uses float "sandbags" to simulate the
+        shape-inside area in the test expectations. The  tests use SVG to
+        display the polygon itself, to simplify visual inspection.
+        (See http://www.alistapart.com/articles/sandbags/).
+
+        * fast/exclusions/shape-inside/shape-inside-polygon-rectangle-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-polygon-rectangle.html: Added.
+        * fast/exclusions/resources/simple-polygon.js: Added.
+        (createPolygon):
+        (polygonXIntercepts):
+        (generatePolygonContentString):
+        (simulatePolygonShape):
+        (generateSimulatedPolygonShapeInsideElement):
+        (positionInformativeText):
+        (createPolygonShapeInsideTestCase):
+        (createPolygonShapeInsideTestCaseExpected):
+        * fast/exclusions/shape-inside/shape-inside-simple-polygon-001-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-simple-polygon-001.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-simple-polygon-002-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-simple-polygon-002.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-simple-polygon-003-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-simple-polygon-003.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-simple-polygon-004-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-simple-polygon-004.html: Added.
+
+2012-10-08  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening. Add PNGs after r130653,
+        and skip tests on Qt-WK2, because they fail on it.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt/fast/ruby/rubyDOM-insert-rt-expected.png: Added.
+        * platform/qt/fast/ruby/rubyDOM-insert-text1-expected.png: Added.
+        * platform/qt/fast/ruby/rubyDOM-insert-text2-expected.png: Added.
+        * platform/qt/fast/ruby/rubyDOM-insert-text3-expected.png: Added.
+        * platform/qt/fast/ruby/rubyDOM-remove-rt1-expected.png: Added.
+        * platform/qt/fast/ruby/rubyDOM-remove-rt2-expected.png: Added.
+        * platform/qt/fast/ruby/rubyDOM-remove-text1-expected.png: Added.
+        * platform/qt/fast/ruby/rubyDOM-remove-text2-expected.png: Added.
+
+2012-10-08  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed Chromium gardening.
+
+        Rebaselined those 2 tables/ tests that were forgotten in the rebaselining after r103875.
+        https://bugs.webkit.org/show_bug.cgi?id=74888 was opened to track those rebaselining but
+        it looks like some platform fell through the cracks.
+
+        * platform/chromium/TestExpectations:
+        Removed the 2 entries.
+
+        * platform/chromium-mac-snowleopard/tables/mozilla_expected_failures/core/captions1-expected.png: Added.
+        * platform/chromium-mac-snowleopard/tables/mozilla_expected_failures/core/captions2-expected.png: Added.
+        * platform/chromium-mac/tables/mozilla_expected_failures/core/captions1-expected.png: Added.
+        * platform/chromium-mac/tables/mozilla_expected_failures/core/captions1-expected.txt: Added.
+        * platform/chromium-mac/tables/mozilla_expected_failures/core/captions2-expected.png: Added.
+        * platform/chromium-mac/tables/mozilla_expected_failures/core/captions2-expected.txt: Added.
+        Progression: the table captions are larger, which matches other browsers and other platforms' baselines.
+
+2012-10-08  Zan Dobersek  <zandobersek@gmail.com>
+
+        GTK port should warn if bug modifier is missing in TestExpectations
+        https://bugs.webkit.org/show_bug.cgi?id=98678
+
+        Reviewed by Dirk Pranke.
+
+        Add generic Bug(GTK) modifiers for two test expectations.
+
+        * platform/gtk/TestExpectations:
+
+2012-10-08  Dirk Pranke  <dpranke@chromium.org>
+
+        Suppress editing/pasteboard/data-transfer-items.html failure.
+        https://bugs.webkit.org/show_bug.cgi?id=98686
+
+        Unreviewed, expectations change.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-08  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed rebaselining after r130598 and r130600.
+
+        * platform/chromium-linux-x86/svg/filters/filterRes-expected.txt:
+        This baseline was forgotten.
+
+2012-10-08  Tullio Lucena  <tullio.lucena@openbossa.org>
+
+        [Qt] new test introduced in r120354 fails on Qt
+        https://bugs.webkit.org/show_bug.cgi?id=91968
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskipping test.
+
+        * platform/qt/TestExpectations:
+
+2012-10-08  Huang Dongsung  <luxtella@company100.net>
+
+        [Qt] Make ImageBufferQt use premultiplied converting functions in Color.h instead of its own mechanism.
+        https://bugs.webkit.org/show_bug.cgi?id=98582
+
+        Reviewed by Eric Seidel.
+
+        Unskipping canvas/philip/tests/2d.imageData.put.unchanged.html that is passing.
+
+        * platform/qt/TestExpectations:
+
+2012-10-08  Shadi Khalek  <shadi@chromium.org>
+
+        Fix video-test.js relativeURL() bug
+        https://bugs.webkit.org/show_bug.cgi?id=98546
+
+        Reviewed by Eric Seidel.
+
+        Some layout tests failed due to this bug (crbug.com/154157)
+
+        * media/video-test.js:
+        (testArraysEqual):
+        (relativeURL):
+
+2012-10-08  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Additional fast/repaint Chromium rebaseline.
+
+        Rebaselined more tests on Chromium Mac. Same as r130654 but there
+        is some anti-aliasing differences on transformed lines.
+
+        * platform/chromium/TestExpectations:
+        Removed the rebaselined tests.
+
+        * fast/repaint/table-section-repaint-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/overflow-outline-repaint-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/table-collapsed-border-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/text-append-dirty-lines-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/text-selection-rect-in-overflow-2-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/text-selection-rect-in-overflow-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/transform-relative-position-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/transform-repaint-descendants-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/overflow-outline-repaint-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/table-col-background-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/table-collapsed-border-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/table-outer-border-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/table-row-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/table-section-overflow-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/table-section-repaint-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/table-two-pass-layout-overpaint-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/text-append-dirty-lines-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/text-selection-rect-in-overflow-2-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/text-selection-rect-in-overflow-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/transform-absolute-child-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/transform-disable-layoutstate-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/transform-relative-position-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/transform-repaint-descendants-expected.png: Added.
+        * platform/chromium-win/fast/repaint/table-section-repaint-expected.txt: Removed.
+        * platform/chromium/fast/repaint/table-section-repaint-expected.txt: Added.
+        * platform/efl/fast/repaint/table-section-repaint-expected.txt: Removed.
+        * platform/gtk/fast/repaint/table-section-repaint-expected.txt: Removed.
+        * platform/qt/fast/repaint/table-section-repaint-expected.txt: Removed.
+
+2012-10-08  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Rebaselining SVG tests after changes in r130599.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/svg/W3C-SVG-1.1-SE/styling-pres-02-f-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/coords-units-01-b-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/coords-units-01-b-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-02-b-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-02-b-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-04-b-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-04-b-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-05-b-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-05-b-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-06-b-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-06-b-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-11-b-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-11-b-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-12-b-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-12-b-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-13-b-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-13-b-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-14-b-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-14-b-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-15-b-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/pservers-grad-15-b-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/struct-use-05-b-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/styling-inherit-01-b-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/styling-inherit-01-b-expected.txt:
+        * platform/gtk/svg/batik/paints/gradientLimit-expected.png:
+        * platform/gtk/svg/batik/paints/gradientLimit-expected.txt:
+        * platform/gtk/svg/batik/paints/patternRegions-expected.png:
+        * platform/gtk/svg/batik/paints/patternRegions-expected.txt:
+        * platform/gtk/svg/batik/paints/patternRegions-positioned-objects-expected.png:
+        * platform/gtk/svg/batik/paints/patternRegions-positioned-objects-expected.txt:
+        * platform/gtk/svg/batik/text/textEffect-expected.png:
+        * platform/gtk/svg/batik/text/textEffect-expected.txt: Added.
+        * platform/gtk/svg/batik/text/textEffect3-expected.png:
+        * platform/gtk/svg/batik/text/textEffect3-expected.txt: Added.
+        * platform/gtk/svg/custom/gradient-deep-referencing-expected.png:
+        * platform/gtk/svg/custom/gradient-deep-referencing-expected.txt:
+        * platform/gtk/svg/custom/gradient-with-1d-boundingbox-expected.png: Added.
+        * platform/gtk/svg/custom/gradient-with-1d-boundingbox-expected.txt:
+        * platform/gtk/svg/custom/radial-gradient-with-outstanding-focalPoint-expected.png:
+        * platform/gtk/svg/custom/radial-gradient-with-outstanding-focalPoint-expected.txt: Added.
+        * platform/gtk/svg/custom/radialGradient-focal-radius-expected.png: Added.
+        * platform/gtk/svg/custom/radialGradient-focal-radius-expected.txt: Added.
+        * platform/gtk/svg/custom/recursive-gradient-expected.png:
+        * platform/gtk/svg/custom/recursive-gradient-expected.txt:
+        * platform/gtk/svg/custom/relative-sized-content-with-resources-expected.png:
+        * platform/gtk/svg/custom/relative-sized-content-with-resources-expected.txt:
+        * platform/gtk/svg/custom/stroked-pattern-expected.png:
+        * platform/gtk/svg/custom/stroked-pattern-expected.txt:
+        * platform/gtk/svg/hixie/perf/006-expected.png:
+        * platform/gtk/svg/hixie/perf/006-expected.txt:
+
+2012-10-08  Dongwoo Joshua Im  <dw.im@samsung.com>
+
+        audiobuffer.html need to include audio-testing.js file.
+        https://bugs.webkit.org/show_bug.cgi?id=98641
+
+        Reviewed by Eric Seidel.
+
+        As we discussed at the bug https://bugs.webkit.org/show_bug.cgi?id=88624,
+        WebAudio tests need to include audio-testing.js file to set WebKitWebAudioEnabled.
+
+        * webaudio/audiobuffer.html: Include audio-testing.js file.
+
+2012-10-08  Robert Hogan  <robert@webkit.org>
+
+        Border, margin and padding of an inline's inline ancestors counted twice
+        https://bugs.webkit.org/show_bug.cgi?id=63074
+
+        Reviewed by David Hyatt.
+
+        * fast/inline/bpm-inline-ancestors-expected.html: Added.
+        * fast/inline/bpm-inline-ancestors.html: Added.
+
+2012-10-08  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [WK2][WTR] WebKitTestRunner needs testRunner.dispatchPendingLoadRequests
+        https://bugs.webkit.org/show_bug.cgi?id=98638
+
+        Reviewed by Eric Seidel.
+
+        Unskip http/tests/loading/deleted-host-in-resource-load-delegate-callback.html
+
+        * platform/wk2/TestExpectations:
+
+2012-10-08  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Skip http/tests/multipart/multipart-html.php while we wait for kov's patch.
+
+        * platform/efl/TestExpectations:
+
+2012-10-08  Mike West  <mkwst@chromium.org>
+
+        Null-check for DOMWindow before feeding it to FeatureObserver.
+        https://bugs.webkit.org/show_bug.cgi?id=98624
+
+        Reviewed by Adam Barth.
+
+        * http/tests/security/contentSecurityPolicy/xmlhttprequest-protected-resource-does-not-crash-expected.txt: Added.
+        * http/tests/security/contentSecurityPolicy/xmlhttprequest-protected-resource-does-not-crash.html: Added.
+            This test shouldn't crash.
+
+2012-10-08  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, new baseline for fast/table/colspanMinWidth-vertical.html.
+
+        The baseline changed in http://trac.webkit.org/changeset/130569 because
+        controls should all be horizontal.
+
+        * platform/chromium-mac-snowleopard/fast/table/colspanMinWidth-vertical-expected.png:
+        * platform/chromium-mac/fast/table/colspanMinWidth-vertical-expected.png:
+        * platform/chromium-mac/fast/table/colspanMinWidth-vertical-expected.txt: Removed.
+        * platform/chromium-win/fast/table/colspanMinWidth-vertical-expected.png:
+        * platform/chromium/TestExpectations:
+        * platform/efl/fast/table/colspanMinWidth-vertical-expected.png: Removed.
+        * platform/gtk/TestExpectations:
+        * platform/gtk/fast/table/colspanMinWidth-vertical-expected.png: Removed.
+        * platform/gtk/fast/table/colspanMinWidth-vertical-expected.txt:
+        * platform/mac/TestExpectations:
+        * platform/mac/fast/table/colspanMinWidth-vertical-expected.png: Removed.
+        * platform/mac/fast/table/colspanMinWidth-vertical-expected.txt:
+        * platform/qt/TestExpectations:
+        * platform/qt/fast/table/colspanMinWidth-vertical-expected.png: Removed.
+        * platform/qt/fast/table/colspanMinWidth-vertical-expected.txt:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+
+2012-10-08  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed fast/repaint Chromium rebaselining.
+
+        Rebaselined those tests on Chromium Mac. The differences fall in 3 buckets:
+        - the background has an alpha off-by-one (crbug.com/23473)
+        - the repaint rectangles are united (the Mac baselines don't do the union).
+        - On Lion, the font used is different.
+
+        * platform/chromium/TestExpectations:
+        Removed the rebaselined tests' entries.
+
+        * platform/chromium-mac-snowleopard/fast/repaint/bugzilla-5699-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/control-clip-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/create-layer-repaint-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/layout-state-only-positioned-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/line-in-scrolled-clipped-block-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/line-overflow-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/list-marker-2-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/make-children-non-inline-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/outline-child-repaint-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/outline-repaint-glitch-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/overflow-scroll-delete-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/reflection-redraw-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/rel-positioned-inline-with-overflow-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/selection-after-delete-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/selection-gap-overflow-scroll-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/stacked-diacritics-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/static-to-positioned-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/table-cell-move-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/background-generated-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/bugzilla-5699-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/content-into-overflow-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/control-clip-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/control-clip-expected.txt:
+        * platform/chromium-mac/fast/repaint/create-layer-repaint-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/intermediate-layout-position-clip-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/intermediate-layout-position-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/layout-state-only-positioned-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/line-in-scrolled-clipped-block-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/line-overflow-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/list-marker-2-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/make-children-non-inline-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/outline-child-repaint-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/outline-inset-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/outline-repaint-glitch-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/overflow-into-content-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/overflow-scroll-delete-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/reflection-redraw-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/rel-positioned-inline-with-overflow-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/selection-after-delete-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/selection-gap-overflow-scroll-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/stacked-diacritics-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/static-to-positioned-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/table-cell-move-expected.png: Added.
+        * platform/chromium-win/fast/repaint/box-shadow-inset-repaint-expected.png: Added.
+        * platform/mac-lion/fast/repaint: Removed.
+        * platform/mac-lion/fast/repaint/control-clip-expected.txt: Removed.
+
+2012-10-08  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Add baselines to passing ruby DOM tests.
+
+        Unreviewed gardening.
+
+        * platform/qt/TestExpectations:
+        * platform/qt/fast/ruby/rubyDOM-insert-rt-expected.txt: Added.
+        * platform/qt/fast/ruby/rubyDOM-insert-text1-expected.txt: Added.
+        * platform/qt/fast/ruby/rubyDOM-insert-text2-expected.txt: Added.
+        * platform/qt/fast/ruby/rubyDOM-insert-text3-expected.txt: Added.
+        * platform/qt/fast/ruby/rubyDOM-remove-rt1-expected.txt: Added.
+        * platform/qt/fast/ruby/rubyDOM-remove-rt2-expected.txt: Added.
+        * platform/qt/fast/ruby/rubyDOM-remove-text1-expected.txt: Added.
+        * platform/qt/fast/ruby/rubyDOM-remove-text2-expected.txt: Added.
+
+2012-10-08  Nate Chapin  <japhet@chromium.org>
+
+        Add a test for multipart/x-mixed-replace documents with text/html
+        parts.
+        https://bugs.webkit.org/show_bug.cgi?id=49072
+
+        Reviewed by Eric Seidel.
+
+        * http/tests/multipart/multipart-html-expected.txt: Added.
+        * http/tests/multipart/multipart-html.php: Added.
+
+2012-10-08  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Skip svg/text/caret-in-svg-text.xhtml in WK1.
+
+        * platform/efl-wk1/TestExpectations:
+
+2012-10-08  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed gardening after r130587.
+
+        Per discussion with Adam, this change lands the failing baselines to
+        get some coverage until V8 matches JSC. Fixing the baselines is
+        covered by https://bugs.webkit.org/show_bug.cgi?id=98658
+
+        * platform/chromium/TestExpectations:
+        Marked one of test as SLOW as it is timing out in Debug.
+
+        * platform/chromium/fast/dom/gc-12-expected.txt: Added.
+        * platform/chromium/fast/dom/gc-3-expected.txt: Added.
+        * platform/chromium/fast/dom/gc-5-expected.txt: Added.
+        * platform/chromium/fast/dom/gc-dom-tree-lifetime-expected.txt: Added.
+
+2012-10-08  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        Unreviewed Qt gardening.
+
+        Rebaseline Qt expectations for these passing tests.
+
+        * platform/qt/TestExpectations:
+        * platform/qt/fast/text/basic/013-expected.txt:
+        * platform/qt/fast/text/basic/015-expected.txt:
+        * platform/qt/fast/text/line-breaks-expected.txt:
+
+2012-10-08  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Mark fast/dynamic/window-scrollbars-test.html as flaky.
+
+        * platform/efl/TestExpectations:
+
+2012-10-08  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Unskip svg/text.
+
+        Most of the text cases are passing, the ones which don't have been
+        properly skipped.
+
+        * platform/efl/TestExpectations:
+        * platform/efl/svg/text/append-text-node-to-tspan-expected.png: Added.
+        * platform/efl/svg/text/append-text-node-to-tspan-expected.txt: Added.
+        * platform/efl/svg/text/bidi-embedded-direction-expected.png: Added.
+        * platform/efl/svg/text/bidi-embedded-direction-expected.txt: Added.
+        * platform/efl/svg/text/bidi-reorder-value-lists-expected.png: Added.
+        * platform/efl/svg/text/bidi-reorder-value-lists-expected.txt: Added.
+        * platform/efl/svg/text/bidi-text-anchor-direction-expected.png: Added.
+        * platform/efl/svg/text/bidi-text-anchor-direction-expected.txt: Added.
+        * platform/efl/svg/text/bidi-text-query-expected.png: Added.
+        * platform/efl/svg/text/bidi-text-query-expected.txt: Added.
+        * platform/efl/svg/text/bidi-tspans-expected.png: Added.
+        * platform/efl/svg/text/bidi-tspans-expected.txt: Added.
+        * platform/efl/svg/text/ems-display-none-expected.png: Added.
+        * platform/efl/svg/text/ems-display-none-expected.txt: Added.
+        * platform/efl/svg/text/exs-display-none-expected.png: Added.
+        * platform/efl/svg/text/exs-display-none-expected.txt: Added.
+        * platform/efl/svg/text/font-size-below-point-five-2-expected.png: Added.
+        * platform/efl/svg/text/font-size-below-point-five-2-expected.txt: Added.
+        * platform/efl/svg/text/font-size-below-point-five-expected.png: Added.
+        * platform/efl/svg/text/font-size-below-point-five-expected.txt: Added.
+        * platform/efl/svg/text/foreignObject-repaint-expected.png: Added.
+        * platform/efl/svg/text/foreignObject-repaint-expected.txt: Added.
+        * platform/efl/svg/text/foreignObject-text-clipping-bug-expected.png: Added.
+        * platform/efl/svg/text/foreignObject-text-clipping-bug-expected.txt: Added.
+        * platform/efl/svg/text/kerning-expected.png: Added.
+        * platform/efl/svg/text/kerning-expected.txt: Added.
+        * platform/efl/svg/text/modify-text-node-in-tspan-expected.png: Added.
+        * platform/efl/svg/text/modify-text-node-in-tspan-expected.txt: Added.
+        * platform/efl/svg/text/multichar-glyph-expected.png: Added.
+        * platform/efl/svg/text/multichar-glyph-expected.txt: Added.
+        * platform/efl/svg/text/remove-text-node-from-tspan-expected.png: Added.
+        * platform/efl/svg/text/remove-text-node-from-tspan-expected.txt: Added.
+        * platform/efl/svg/text/remove-tspan-from-text-expected.png: Added.
+        * platform/efl/svg/text/remove-tspan-from-text-expected.txt: Added.
+        * platform/efl/svg/text/scaled-font-expected.png: Added.
+        * platform/efl/svg/text/scaled-font-expected.txt: Added.
+        * platform/efl/svg/text/scaling-font-with-geometric-precision-expected.png: Added.
+        * platform/efl/svg/text/scaling-font-with-geometric-precision-expected.txt: Added.
+        * platform/efl/svg/text/selection-background-color-expected.png: Added.
+        * platform/efl/svg/text/selection-background-color-expected.txt: Added.
+        * platform/efl/svg/text/selection-styles-expected.png: Added.
+        * platform/efl/svg/text/selection-styles-expected.txt: Added.
+        * platform/efl/svg/text/small-fonts-2-expected.png: Added.
+        * platform/efl/svg/text/small-fonts-2-expected.txt: Added.
+        * platform/efl/svg/text/small-fonts-3-expected.png: Added.
+        * platform/efl/svg/text/small-fonts-3-expected.txt: Added.
+        * platform/efl/svg/text/small-fonts-expected.png: Added.
+        * platform/efl/svg/text/small-fonts-in-html5-expected.png: Added.
+        * platform/efl/svg/text/small-fonts-in-html5-expected.txt: Added.
+        * platform/efl/svg/text/text-align-01-b-expected.png: Added.
+        * platform/efl/svg/text/text-align-01-b-expected.txt: Added.
+        * platform/efl/svg/text/text-align-02-b-expected.png: Added.
+        * platform/efl/svg/text/text-align-02-b-expected.txt: Added.
+        * platform/efl/svg/text/text-align-03-b-expected.png: Added.
+        * platform/efl/svg/text/text-align-03-b-expected.txt: Added.
+        * platform/efl/svg/text/text-align-04-b-expected.png: Added.
+        * platform/efl/svg/text/text-align-04-b-expected.txt: Added.
+        * platform/efl/svg/text/text-align-05-b-expected.png: Added.
+        * platform/efl/svg/text/text-align-05-b-expected.txt: Added.
+        * platform/efl/svg/text/text-align-06-b-expected.png: Added.
+        * platform/efl/svg/text/text-align-06-b-expected.txt: Added.
+        * platform/efl/svg/text/text-altglyph-01-b-expected.png: Added.
+        * platform/efl/svg/text/text-altglyph-01-b-expected.txt: Added.
+        * platform/efl/svg/text/text-deco-01-b-expected.png: Added.
+        * platform/efl/svg/text/text-deco-01-b-expected.txt: Added.
+        * platform/efl/svg/text/text-fill-opacity-expected.png: Added.
+        * platform/efl/svg/text/text-fill-opacity-expected.txt: Added.
+        * platform/efl/svg/text/text-fonts-01-t-expected.png: Added.
+        * platform/efl/svg/text/text-fonts-01-t-expected.txt: Added.
+        * platform/efl/svg/text/text-fonts-02-t-expected.png: Added.
+        * platform/efl/svg/text/text-fonts-02-t-expected.txt: Added.
+        * platform/efl/svg/text/text-gradient-positioning-expected.png: Added.
+        * platform/efl/svg/text/text-gradient-positioning-expected.txt: Added.
+        * platform/efl/svg/text/text-hkern-expected.png: Added.
+        * platform/efl/svg/text/text-hkern-expected.txt: Added.
+        * platform/efl/svg/text/text-hkern-on-vertical-text-expected.png: Added.
+        * platform/efl/svg/text/text-hkern-on-vertical-text-expected.txt: Added.
+        * platform/efl/svg/text/text-intro-05-t-expected.png: Added.
+        * platform/efl/svg/text/text-intro-05-t-expected.txt: Added.
+        * platform/efl/svg/text/text-midpoint-split-bug-expected.png: Added.
+        * platform/efl/svg/text/text-midpoint-split-bug-expected.txt: Added.
+        * platform/efl/svg/text/text-overflow-ellipsis-svgfont-expected.png: Added.
+        * platform/efl/svg/text/text-overflow-ellipsis-svgfont-expected.txt: Added.
+        * platform/efl/svg/text/text-path-01-b-expected.png: Added.
+        * platform/efl/svg/text/text-path-01-b-expected.txt: Added.
+        * platform/efl/svg/text/text-path-middle-align-expected.png: Added.
+        * platform/efl/svg/text/text-path-middle-align-expected.txt: Added.
+        * platform/efl/svg/text/text-repaint-rects-expected.png: Added.
+        * platform/efl/svg/text/text-repaint-rects-expected.txt: Added.
+        * platform/efl/svg/text/text-rescale-expected.png: Added.
+        * platform/efl/svg/text/text-rescale-expected.txt: Added.
+        * platform/efl/svg/text/text-spacing-01-b-expected.png: Added.
+        * platform/efl/svg/text/text-spacing-01-b-expected.txt: Added.
+        * platform/efl/svg/text/text-text-01-b-expected.png: Added.
+        * platform/efl/svg/text/text-text-01-b-expected.txt: Added.
+        * platform/efl/svg/text/text-text-03-b-expected.png: Added.
+        * platform/efl/svg/text/text-text-03-b-expected.txt: Added.
+        * platform/efl/svg/text/text-text-04-t-expected.png: Added.
+        * platform/efl/svg/text/text-text-04-t-expected.txt: Added.
+        * platform/efl/svg/text/text-text-05-t-expected.png: Added.
+        * platform/efl/svg/text/text-text-05-t-expected.txt: Added.
+        * platform/efl/svg/text/text-text-06-t-expected.png: Added.
+        * platform/efl/svg/text/text-text-06-t-expected.txt: Added.
+        * platform/efl/svg/text/text-text-07-t-expected.png: Added.
+        * platform/efl/svg/text/text-text-07-t-expected.txt: Added.
+        * platform/efl/svg/text/text-text-08-b-expected.png: Added.
+        * platform/efl/svg/text/text-text-08-b-expected.txt: Added.
+        * platform/efl/svg/text/text-tref-01-b-expected.png: Added.
+        * platform/efl/svg/text/text-tref-01-b-expected.txt: Added.
+        * platform/efl/svg/text/text-tselect-01-b-expected.png: Added.
+        * platform/efl/svg/text/text-tselect-01-b-expected.txt: Added.
+        * platform/efl/svg/text/text-tselect-02-f-expected.png: Added.
+        * platform/efl/svg/text/text-tselect-02-f-expected.txt: Added.
+        * platform/efl/svg/text/text-tspan-01-b-expected.png: Added.
+        * platform/efl/svg/text/text-tspan-01-b-expected.txt: Added.
+        * platform/efl/svg/text/text-viewbox-rescale-expected.png: Added.
+        * platform/efl/svg/text/text-vkern-expected.png: Added.
+        * platform/efl/svg/text/text-vkern-expected.txt: Added.
+        * platform/efl/svg/text/text-vkern-on-horizontal-text-expected.png: Added.
+        * platform/efl/svg/text/text-vkern-on-horizontal-text-expected.txt: Added.
+        * platform/efl/svg/text/text-ws-01-t-expected.png: Added.
+        * platform/efl/svg/text/text-ws-01-t-expected.txt: Added.
+        * platform/efl/svg/text/text-ws-02-t-expected.png: Added.
+        * platform/efl/svg/text/text-ws-02-t-expected.txt: Added.
+        * platform/efl/svg/text/textPathBoundsBug-expected.png: Added.
+        * platform/efl/svg/text/textPathBoundsBug-expected.txt: Added.
+        * platform/efl/svg/text/tspan-dynamic-positioning-expected.png: Added.
+        * platform/efl/svg/text/tspan-dynamic-positioning-expected.txt: Added.
+
+2012-10-08  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Unskip svg/dom/altGlyph-dom.xhtml
+
+        Seems to be passing these days.
+
+        * platform/efl/TestExpectations:
+
+2012-10-08  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Removing crash expectations for tests that were fixed in r130611.
+
+        Removing failure expectations for fast/xsl/xslt-missing-namespace-in-xslt.xml,
+        the test is working fine after r130543.
+
+        * platform/gtk-wk2/TestExpectations:
+        * platform/gtk/TestExpectations:
+
+2012-10-08  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        Unreviewed Qt gardening.
+
+        Adding expectations for tests under css2.1.
+
+        * platform/qt/TestExpectations:
+
+2012-10-08  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Unskip svg/W3C-SVG-1.1.
+
+        All but one test case worked fine (compared to the expectations in
+        mac/).
+
+        * platform/efl/TestExpectations:
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-04-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-04-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-05-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-05-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-06-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-06-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-07-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-07-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-08-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-08-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-09-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-09-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-10-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-10-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-11-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-11-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-12-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-12-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-13-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-13-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-14-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-14-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-15-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-15-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-16-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-16-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-17-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-17-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-18-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-18-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-19-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-19-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-20-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-20-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-21-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-21-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-22-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-22-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-23-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-23-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-24-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-24-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-25-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-25-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-26-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-26-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-27-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-27-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-28-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-28-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-29-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-29-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-30-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-30-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-31-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-31-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-32-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-32-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-33-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-33-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-34-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-34-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-36-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-36-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-37-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-37-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-39-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-39-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-40-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-40-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-41-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-41-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-44-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-44-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-46-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-46-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-52-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-52-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-60-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-60-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-61-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-61-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-62-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-62-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-63-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-63-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-64-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-64-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-65-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-65-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-66-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-66-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-67-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-67-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-68-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-68-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-69-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-69-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-70-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-70-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-77-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-77-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-78-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-78-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-80-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-80-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-81-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-81-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-82-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-82-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-83-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-83-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-84-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-84-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-85-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-85-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/color-prof-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/color-prof-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/color-prop-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/color-prop-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/color-prop-02-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/color-prop-02-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/color-prop-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/color-prop-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-coord-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-coord-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-coord-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-coord-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-04-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-04-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-05-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-05-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-06-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-trans-06-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-units-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-units-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-units-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-units-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-viewattr-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-viewattr-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-viewattr-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-viewattr-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-viewattr-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/coords-viewattr-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/extend-namespace-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/extend-namespace-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-blend-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-blend-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-color-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-color-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-composite-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-composite-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-comptran-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-comptran-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-conv-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-conv-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-diffuse-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-diffuse-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-displace-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-displace-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-example-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-example-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-felem-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-felem-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-gauss-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-gauss-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-image-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-image-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-light-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-light-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-light-04-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-light-04-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-morph-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-morph-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-offset-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-offset-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-specular-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-specular-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-tile-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-tile-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-turb-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-turb-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-turb-02-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/filters-turb-02-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-desc-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-desc-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-04-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-04-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-05-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-05-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-06-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-06-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-07-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-elem-07-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-glyph-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-glyph-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-glyph-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-glyph-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-glyph-04-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-glyph-04-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-kern-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/fonts-kern-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-cursor-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-cursor-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-dom-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-dom-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-events-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-events-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-order-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-order-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-order-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-order-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-order-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-order-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-zoom-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/interact-zoom-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-04-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-04-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-05-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-05-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-07-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-a-07-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-uri-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-uri-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-uri-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-uri-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-uri-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/linking-uri-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-intro-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-intro-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-mask-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-mask-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-opacity-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-opacity-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-path-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-path-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-path-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-path-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-path-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-path-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-path-04-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-path-04-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-path-05-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/masking-path-05-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/metadata-example-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/metadata-example-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-fill-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-fill-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-fill-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-fill-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-fill-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-fill-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-fill-04-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-fill-04-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-fill-05-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-fill-05-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-marker-01-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-marker-01-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-marker-02-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-marker-02-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-marker-03-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-marker-03-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-render-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-render-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-stroke-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-stroke-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-stroke-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-stroke-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-stroke-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-stroke-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-stroke-04-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-stroke-04-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-stroke-07-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/painting-stroke-07-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-03-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-03-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-04-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-04-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-05-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-05-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-06-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-06-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-07-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-07-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-08-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-08-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-09-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-09-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-10-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-10-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-12-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-12-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-13-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-13-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-14-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-14-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-15-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-15-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-07-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-07-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-08-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-08-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-09-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-09-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-10-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-10-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-16-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-16-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-17-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-17-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-18-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-18-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-19-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-grad-19-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-pattern-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/pservers-pattern-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-06-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-06-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-07-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-07-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-08-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-elems-08-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-groups-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-groups-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-groups-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/render-groups-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/script-handle-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/script-handle-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/script-handle-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/script-handle-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/script-handle-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/script-handle-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/script-handle-04-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/script-handle-04-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-circle-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-circle-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-circle-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-circle-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-ellipse-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-ellipse-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-ellipse-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-ellipse-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-intro-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-intro-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-line-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-line-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-polygon-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-polygon-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-polyline-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-polyline-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-rect-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-rect-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-rect-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/shapes-rect-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-cond-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-cond-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-cond-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-cond-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-cond-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-cond-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-defs-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-defs-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-04-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-04-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-05-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-05-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-06-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-dom-06-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-04-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-04-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-05-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-05-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-06-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-frag-06-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-group-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-group-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-group-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-group-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-group-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-group-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-04-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-04-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-05-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-05-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-06-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-06-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-07-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-07-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-08-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-08-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-09-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-09-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-10-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-image-10-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-symbol-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-symbol-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-use-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-use-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-use-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/struct-use-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-04-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-04-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-05-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-05-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-06-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-css-06-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-pres-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/styling-pres-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-04-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-04-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-05-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-05-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-06-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-06-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-08-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-align-08-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-altglyph-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-altglyph-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-deco-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-deco-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-fonts-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-fonts-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-fonts-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-fonts-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-fonts-03-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-fonts-03-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-intro-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-intro-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-intro-02-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-intro-02-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-intro-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-intro-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-intro-04-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-intro-04-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-intro-05-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-intro-05-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-path-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-path-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-spacing-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-spacing-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-03-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-03-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-04-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-04-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-05-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-05-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-06-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-06-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-07-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-07-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-08-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-text-08-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-tref-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-tref-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-tselect-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-tselect-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-tselect-02-f-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-tselect-02-f-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-tspan-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-tspan-01-b-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-ws-01-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-ws-01-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-ws-02-t-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/text-ws-02-t-expected.txt: Added.
+        * platform/efl/svg/W3C-SVG-1.1/types-basicDOM-01-b-expected.png: Added.
+        * platform/efl/svg/W3C-SVG-1.1/types-basicDOM-01-b-expected.txt: Added.
+
 2012-10-08  Csaba Osztrogonác  <ossy@webkit.org>
 
         [Qt][WK2] REGRESSION(r130629): It made touchadjustment/focusout-on-touch.html fail

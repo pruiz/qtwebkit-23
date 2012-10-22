@@ -435,6 +435,9 @@ webkit.org/b/92942 fast/events/constructors/device-proximity-event-constructor.h
 # CSS compositing is not yet enabled.
 Bug(GTK) css3/compositing [ Skip ]
 
+# HIDDEN_PAGE_DOM_TIMER_THROTTLING is not enabled
+fast/dom/timer-throttling-hidden-page.html [ WontFix ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Expected failures
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -465,19 +468,6 @@ webkit.org/b/90957 [ Release ] fast/js/random-array-gc-stress.html [ Crash Pass 
 
 webkit.org/b/94458 [ Debug ] http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-in-body.html [ Crash Failure ]
 webkit.org/b/94458 [ Debug ] fast/events/message-port-context-destroyed.html [ Crash Pass ]
-
-webkit.org/b/98612 [ Debug ] fast/events/drag-link.html [ Crash ]
-webkit.org/b/98612 [ Debug ] fast/events/crash-on-mutate-during-drop.html [ Crash ]
-webkit.org/b/98612 [ Debug ] fast/lists/drag-into-marker.html [ Crash ]
-webkit.org/b/98612 [ Debug ] editing/pasteboard/drag-drop-list.html [ Crash Failure ]
-webkit.org/b/98612 [ Debug ] editing/pasteboard/drop-link.html [ Crash ]
-webkit.org/b/98612 [ Debug ] editing/pasteboard/smart-drag-drop.html [ Crash Pass ]
-webkit.org/b/98612 [ Debug ] editing/pasteboard/subframe-dragndrop-1.html [ Crash ]
-webkit.org/b/98612 [ Debug ] editing/selection/4895428-1.html [ Crash Pass ]
-webkit.org/b/98612 [ Debug ] editing/selection/4895428-4.html [ Crash Pass ]
-webkit.org/b/98612 [ Debug ] editing/selection/contains-boundaries.html [ Crash ]
-webkit.org/b/98612 [ Debug ] svg/custom/use-animation-in-fill.html [ Crash Pass ]
-webkit.org/b/98612 [ Debug ] svg/custom/use-multiple-on-nested-disallowed-font.html [ Crash Pass ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Crashing tests
@@ -664,6 +654,11 @@ webkit.org/b/98350 accessibility/aria-invalid.html [ Timeout ]
 webkit.org/b/73003 [ Release ] editing/spelling/spellcheck-async.html [ Timeout ]
 webkit.org/b/73003 [ Release ] editing/spelling/spellcheck-paste.html [ Timeout ]
 webkit.org/b/50740 [ Release ] editing/spelling/spellcheck-queue.html [ Timeout ]
+
+webkit.org/b/98729 fast/events/attribute-listener-cloned-from-frameless-doc-context.html [ Timeout ]
+webkit.org/b/98729 fast/events/attribute-listener-cloned-from-frameless-doc-context-2.html [ Timeout ]
+webkit.org/b/98729 fast/events/attribute-listener-extracted-from-frameless-doc-context.html [ Timeout ]
+webkit.org/b/98729 fast/events/attribute-listener-extracted-from-frameless-doc-context-2.html [ Timeout ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Tests timing out
@@ -1135,11 +1130,12 @@ webkit.org/b/68855 editing/selection/select-bidi-run.html [ Failure ]
 webkit.org/b/65709 canvas/philip/tests/2d.drawImage.outsidesource.html [ Failure ]
 
 # missing multipart/x-mixed-replace support in libsoup
-webkit.org/b/68979 http/tests/multipart/invalid-image-data.html
-webkit.org/b/68979 http/tests/multipart/load-last-non-html-frame.php [ Failure ]
-webkit.org/b/68979 http/tests/multipart/multipart-replace-non-html-content.php [ Failure ]
-webkit.org/b/68979 http/tests/multipart/policy-ignore-crash.php [ Failure ]
-webkit.org/b/68979 http/tests/multipart/stop-crash.html [ Skip ]
+webkit.org/b/94515 http/tests/multipart/invalid-image-data.html
+webkit.org/b/94515 http/tests/multipart/load-last-non-html-frame.php [ Failure ]
+webkit.org/b/94515 http/tests/multipart/multipart-replace-non-html-content.php [ Failure ]
+webkit.org/b/94515 http/tests/multipart/policy-ignore-crash.php [ Failure ]
+webkit.org/b/94515 http/tests/multipart/stop-crash.html [ Skip ]
+webkit.org/b/94515 http/tests/multipart/multipart-html.php [ Failure ]
 
 # Fails because it does not throw a couple of expected exceptions
 Bug(GTK) http/tests/local/fileapi/send-sliced-dragged-file.html [ Failure ]
@@ -1306,8 +1302,6 @@ webkit.org/b/74219 fast/regions/positioned-objects-block-static-spanning-regions
 
 webkit.org/b/89231 fast/js/global-constructors.html [ Failure ]
 
-webkit.org/b/91009 [ Debug ] fast/xsl/xslt-missing-namespace-in-xslt.xml [ Failure ]
-
 # Skip tests in fast/text/shaping
 webkit.org/b/90951 fast/text/shaping
 
@@ -1330,7 +1324,7 @@ webkit.org/b/94009 css2.1/20110323/c541-word-sp-000.htm [ ImageOnlyFailure ]
 
 webkit.org/b/94083 media/video-controls-fullscreen-volume.html [ Skip ]
 
-fast/forms/date-multiple-fields
+Bug(GTK) fast/forms/date-multiple-fields [ Skip ]
 webkit.org/b/97299 fast/forms/month-multiple-fields
 webkit.org/b/94186 fast/forms/time-multiple-fields
 webkit.org/b/97877 fast/forms/week-multiple-fields
@@ -1359,8 +1353,6 @@ webkit.org/b/73003 [ Debug ] editing/spelling/spellcheck-async.html [ Failure ]
 webkit.org/b/73003 [ Debug ] editing/spelling/spellcheck-paste.html [ Pass ]
 webkit.org/b/50740 [ Debug ] editing/spelling/spellcheck-queue.html [ Failure ]
 
-webkit.org/b/98564 fast/table/colspanMinWidth-vertical.html [ Missing Failure ]
-
 webkit.org/b/96900 fast/text/stale-TextLayout-from-first-line.html [ ImageOnlyFailure ]
 
 webkit.org/b/97188 fast/text/word-space-with-kerning.html [ ImageOnlyFailure ]
@@ -1379,69 +1371,10 @@ webkit.org/b/91488 fast/dom/shadow/shadowdom-for-output-only-shadow.html [ Image
 webkit.org/b/91489 fast/dom/shadow/shadowdom-for-fieldset-complex-shadow.html [ ImageOnlyFailure ]
 webkit.org/b/91489 fast/dom/shadow/shadowdom-for-fieldset-only-shadow.html [ ImageOnlyFailure ]
 
-
-# These files need new expectations after changing the behavrior from radiaGradients to SVG2
-webkit.org/b/98569 svg/W3C-SVG-1.1-SE/styling-pres-02-f.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1-SE/svgdom-over-01-f.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/coords-units-01-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-02-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-04-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-05-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-06-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-11-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-12-b.svg [ Failure Pass ]
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-13-b.svg [ Failure Pass ]
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-14-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-15-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/struct-use-05-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/styling-inherit-01-b.svg [ Failure Pass ]
-webkit.org/b/98569 svg/batik/paints/gradientLimit.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/batik/paints/patternRegions-positioned-objects.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/batik/paints/patternRegions.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/batik/text/textEffect.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/batik/text/textEffect3.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/hixie/perf/006.xml [ Failure Pass ]
-webkit.org/b/98569 svg/custom/relative-sized-content-with-resources.xhtml [ Failure Pass ]
-webkit.org/b/98569 svg/custom/stroked-pattern.svg [ Failure Pass ]
-webkit.org/b/98569 svg/custom/gradient-deep-referencing.svg [ Failure Pass ]
-webkit.org/b/98569 svg/custom/radial-gradient-with-outstanding-focalPoint.svg [ Failure Pass ]
-webkit.org/b/98569 svg/custom/radialGradient-focal-radius.svg [ Failure Pass ]
-webkit.org/b/98569 svg/custom/gradient-with-1d-boundingbox.svg [ Failure Pass ]
-webkit.org/b/98569 svg/custom/recursive-gradient.svg [ Failure Pass ]
-
-# These files need new expectations after changing the behavrior from radiaGradients to SVG2
-webkit.org/b/98569 svg/W3C-SVG-1.1-SE/styling-pres-02-f.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1-SE/svgdom-over-01-f.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/coords-units-01-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-02-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-04-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-05-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-06-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-11-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-12-b.svg [ Failure Pass ]
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-13-b.svg [ Failure Pass ]
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-14-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/pservers-grad-15-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/struct-use-05-b.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/W3C-SVG-1.1/styling-inherit-01-b.svg [ Failure Pass ]
-webkit.org/b/98569 svg/batik/paints/gradientLimit.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/batik/paints/patternRegions-positioned-objects.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/batik/paints/patternRegions.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/batik/text/textEffect.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/batik/text/textEffect3.svg [ Failure Pass ] 
-webkit.org/b/98569 svg/hixie/perf/006.xml [ Failure Pass ]
-webkit.org/b/98569 svg/custom/relative-sized-content-with-resources.xhtml [ Failure Pass ]
-webkit.org/b/98569 svg/custom/stroked-pattern.svg [ Failure Pass ]
-webkit.org/b/98569 svg/custom/gradient-deep-referencing.svg [ Failure Pass ]
-webkit.org/b/98569 svg/custom/radial-gradient-with-outstanding-focalPoint.svg [ Failure Pass ]
-webkit.org/b/98569 svg/custom/radialGradient-focal-radius.svg [ Failure Pass ]
-webkit.org/b/98569 svg/custom/gradient-with-1d-boundingbox.svg [ Failure Pass ]
-webkit.org/b/98569 svg/custom/recursive-gradient.svg [ Failure Pass ]
-
 webkit.org/b/49142 fast/regions/style-scoped-in-flow-override-region-styling-multiple-regions.html [ ImageOnlyFailure ]
 
 # Missing support in DRT for Geolocation's Coordinate attributes.
-fast/dom/Geolocation/coordinates-interface-attributes.html [ Failure ]
+Bug(GTK) fast/dom/Geolocation/coordinates-interface-attributes.html [ Failure ]
 
 webkit.org/b/98585 fast/exclusions/shape-inside/shape-inside-rounded-rectangle-003.html [ ImageOnlyFailure ]
 
@@ -1451,6 +1384,13 @@ webkit.org/b/98612 [ Release ] fast/dom/gc-dom-tree-lifetime.html [ Failure ]
 
 webkit.org/b/98613 css3/masking/clip-path-reference-userSpaceOnUse.html [ ImageOnlyFailure ]
 webkit.org/b/98613 css3/masking/clip-path-reference.html [ ImageOnlyFailure ]
+
+webkit.org/b/98729 fast/css/import-style-update.html [ Failure ]
+webkit.org/b/98729 fast/html/link-rel-stylesheet.html [ Failure ]
+webkit.org/b/98729 fast/loader/data-url-encoding-html.html [ Failure ]
+webkit.org/b/98729 fast/loader/data-url-encoding-svg.html [ Failure ]
+webkit.org/b/98729 fast/spatial-navigation/snav-iframe-nested.html [ Failure ]
+webkit.org/b/98729 svg/custom/object-data-href.html [ ImageOnlyFailure ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Tests failing

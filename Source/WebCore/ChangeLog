@@ -1,3 +1,1128 @@
+2012-10-09  Garrett Casto  <gcasto@chromium.org>
+
+        Allow users to specify a different hover image for TextFieldDecorationElement
+        https://bugs.webkit.org/show_bug.cgi?id=93662
+
+        Reviewed by Kent Tamura.
+
+        * html/shadow/TextFieldDecorationElement.cpp:
+        (WebCore::TextFieldDecorationElement::TextFieldDecorationElement):
+        (WebCore::TextFieldDecorationElement::updateImage):
+        (WebCore::TextFieldDecorationElement::defaultEventHandler): Handles mouseover and mouseout events.
+        (WebCore::TextFieldDecorationElement::willRespondToMouseMoveEvents): Now returns true if the element is not disabled.
+        (WebCore):
+        * html/shadow/TextFieldDecorationElement.h:
+        (TextFieldDecorator):
+        (TextFieldDecorationElement):
+
+2012-10-09  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Uploading images to Google+ using QtWebKit does not work.
+        https://bugs.webkit.org/show_bug.cgi?id=72329
+
+        Reviewed by Jocelyn Turcotte.
+
+        Implement handling of Blob FormData, including its extensions to the File FormData.
+
+        * platform/network/qt/QNetworkReplyHandler.cpp:
+        (WebCore::FormDataIODevice::FormDataIODevice):
+        (WebCore::appendBlobResolved):
+        (WebCore::FormDataIODevice::prepareFormElements):
+        (WebCore::FormDataIODevice::computeSize):
+        (WebCore::FormDataIODevice::moveToNextElement):
+        (WebCore::FormDataIODevice::prepareCurrentElement):
+        (WebCore::FormDataIODevice::openFileForCurrentElement):
+        (WebCore::FormDataIODevice::readData):
+        (WebCore::QNetworkReplyHandler::sendNetworkRequest):
+        * platform/network/qt/QNetworkReplyHandler.h:
+        (FormDataIODevice):
+
+2012-10-09  Arpita Bahuguna  <arpitabahuguna@gmail.com>
+
+        Text decorations specified on the containing block are not properly applied when ::first-line is present.
+        https://bugs.webkit.org/show_bug.cgi?id=93829
+
+        Reviewed by Abhishek Arya.
+
+        If a container's style and its pseudo :first-line style have unique
+        text-decorations specified for them, only the :first-line text-decoarations
+        were being applied.
+
+        The uploaded patch intends to first compute the text decoration colors
+        for the containing box, followed by that of the first-line (if specified).
+
+        This thus avoids the condition wherein our containing box's text-decorations
+        were not getting applied at all since initially we were only computing
+        for the first-line style.
+
+        Test: fast/css/text-decorations-on-first-line-and-containing-block.html
+
+        * rendering/InlineTextBox.cpp:
+        (WebCore::InlineTextBox::paintDecoration):
+        getTextDecorationColors() is first called for computing the containing box's
+        text-decoration values and then for first-line style's text-decorations,
+        if specified.
+
+2012-10-09  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r130746.
+        http://trac.webkit.org/changeset/130746
+        https://bugs.webkit.org/show_bug.cgi?id=98749
+
+        It made 45 tests crash on Qt (Requested by Ossy on #webkit).
+
+        * platform/network/qt/QNetworkReplyHandler.cpp:
+        (WebCore::FormDataIODevice::FormDataIODevice):
+        (WebCore::FormDataIODevice::computeSize):
+        (WebCore::FormDataIODevice::moveToNextElement):
+        (WebCore::FormDataIODevice::openFileForCurrentElement):
+        (WebCore::FormDataIODevice::readData):
+        (WebCore::QNetworkReplyHandler::getIODevice):
+        (WebCore::QNetworkReplyHandler::sendNetworkRequest):
+        * platform/network/qt/QNetworkReplyHandler.h:
+        (QNetworkReplyHandler):
+        (FormDataIODevice):
+
+2012-10-09  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Uploading images to Google+ using QtWebKit does not work.
+        https://bugs.webkit.org/show_bug.cgi?id=72329
+
+        Reviewed by Jocelyn Turcotte.
+
+        Implement handling of Blob FormData, including its extensions to the File FormData.
+
+        * platform/network/qt/QNetworkReplyHandler.cpp:
+        (WebCore::FormDataIODevice::FormDataIODevice):
+        (WebCore::FormDataIODevice::computeSize):
+        (WebCore::FormDataIODevice::moveToNextElement):
+        (WebCore::FormDataIODevice::prepareCurrentElement):
+        (WebCore::FormDataIODevice::openFileForCurrentElement):
+        (WebCore::FormDataIODevice::readData):
+        (WebCore::QNetworkReplyHandler::getIODevice):
+        (WebCore::QNetworkReplyHandler::handleBlobDataIfAny):
+        (WebCore::QNetworkReplyHandler::sendNetworkRequest):
+        * platform/network/qt/QNetworkReplyHandler.h:
+        (QNetworkReplyHandler):
+        (FormDataIODevice):
+
+2012-10-09  Keishi Hattori  <keishi@webkit.org>
+
+        Page popup should be smarter about its layout
+        https://bugs.webkit.org/show_bug.cgi?id=98499
+
+        Reviewed by Kent Tamura.
+
+        This change fixes these two issues:
+        1. Page popup should reposition itself so it won't get clipped by screen(Win/Linux) or rootview(Mac) bounds.
+        2. Page popup should resize itself when it doesn't fit.
+
+        Test: platform/chromium/fast/forms/page-popup/page-popup-adjust-rect.html
+
+        * Resources/pagepopups/calendarPicker.js:
+        (initialize): We need to set global.params at the beginning because we need it for resizeWindow().
+        * Resources/pagepopups/colorSuggestionPicker.js: Added global.params.
+        (handleMessage):
+        (initialize):
+        (handleArgumentsTimeout):
+        * Resources/pagepopups/pickerCommon.js:
+        (Rect): Represents an axis aligned rectangle.
+        (Rect.prototype.get maxX): Gets position of right edge.
+        (Rect.prototype.get maxY): Gets position of bottom edge.
+        (Rect.prototype.toString):
+        (Rect.intersection): Returns the intersection of two rectangles.
+        (resizeWindow): Resize window to a certain size. Don't allow shrinking.
+        (adjustWindowRect): Calculates the best position and size for the popup.
+        (_adjustWindowRectVertically):
+        (_adjustWindowRectHorizontally):
+        (setWindowRect): Sets the position and size of the popup to the given rect.
+        * Resources/pagepopups/suggestionPicker.css:
+        (.suggestion-list): Don't show horizontal scroll bar.
+        * Resources/pagepopups/suggestionPicker.js:
+        (SuggestionPicker.prototype._fixWindowSize): 
+        * page/PagePopupClient.cpp:
+        (WebCore::PagePopupClient::addProperty): For adding an int to JSON.
+        (WebCore::PagePopupClient::addProperty): For adding an IntRect to JSON.
+        (WebCore):
+        * page/PagePopupClient.h:
+        (PagePopupClient):
+
+2012-10-09  Hajime Morrita  <morrita@google.com>
+
+        [Refactoring] Scoped Style related code should have its own class.
+        https://bugs.webkit.org/show_bug.cgi?id=98244
+
+        Reviewed by Dimitri Glazkov.
+
+        This change extracts StyleScopeResolver from StyleResolver to clarify
+        the responsibility of the style scope handling. Now we can easily see
+        where the style scoping needs to be involed.
+
+        Coming Shadow DOM related change like @host rules will fit within this class.
+
+        No new tests, refactoring.
+
+        * CMakeLists.txt:
+        * GNUmakefile.list.am:
+        * Target.pri:
+        * WebCore.gypi:
+        * WebCore.xcodeproj/project.pbxproj:
+        * css/CSSAllInOne.cpp:
+        * css/StyleResolver.cpp:
+        (WebCore::StyleResolver::StyleResolver):
+        (WebCore::StyleResolver::collectFeatures):
+        (WebCore::StyleResolver::appendAuthorStylesheets):
+        (WebCore::StyleResolver::pushParentElement):
+        (WebCore::StyleResolver::popParentElement):
+        (WebCore::StyleResolver::pushParentShadowRoot):
+        (WebCore::StyleResolver::popParentShadowRoot):
+        (WebCore::StyleResolver::matchScopedAuthorRules):
+        (WebCore::StyleResolver::collectMatchingRulesForList):
+        (WebCore::StyleResolver::reportMemoryUsage):
+        * css/StyleResolver.h:
+        (StyleResolver):
+        * css/StyleScopeResolver.cpp: Added.
+        (WebCore):
+        (WebCore::StyleScopeResolver::StyleScopeResolver):
+        (WebCore::StyleScopeResolver::~StyleScopeResolver):
+        (WebCore::StyleScopeResolver::scopeFor):
+        (WebCore::StyleScopeResolver::ruleSetFor):
+        (WebCore::StyleScopeResolver::ensureRuleSetFor):
+        (WebCore::StyleScopeResolver::setupStack):
+        (WebCore::StyleScopeResolver::push):
+        (WebCore::StyleScopeResolver::pop):
+        (WebCore::StyleScopeResolver::collectFeaturesTo):
+        (WebCore::StyleScopeResolver::reportMemoryUsage):
+        * css/StyleScopeResolver.h: Added.
+        (WebCore):
+        (StyleScopeResolver):
+        (WebCore::StyleScopeResolver::StackFrame::StackFrame):
+        (StackFrame):
+        (WebCore::StyleScopeResolver::hasScopedStyles):
+        (WebCore::StyleScopeResolver::stackSize):
+        (WebCore::StyleScopeResolver::stackFrameAt):
+        (WebCore::StyleScopeResolver::matchesStyleBounds):
+        (WebCore::StyleScopeResolver::stackIsConsistent):
+        (WebCore::StyleScopeResolver::ensureStackConsistency):
+        (WebCore::StyleScopeResolver::scopeFor):
+        (WebCore::StyleScopeResolver::ensureRuleSetFor):
+
+2012-10-08  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Make RenderThemeQStyle/ScrollbarThemeQStyle compile without QStyle/QtWidgets
+        https://bugs.webkit.org/show_bug.cgi?id=98268
+
+        Reviewed by Tor Arne Vestbø.
+
+        Extracted QStyle/QWidget related code into a QWebStyle class that implements the QStyleFacade interface.
+
+        QStyleFacade is a pure interface that lives in WebCore/platform/qt
+        (next to RenderThemeQStyle and ScrollbarThemeQStyle) and provides a
+        minimal interface of what we need to draw with QStyle as well as basic
+        hit testing and metric retrieval. It also provides a
+        QStyleFacadeOption class that aggregates common meta-data for
+        rendering primitives, such as direction, rectangle, state (sunken,
+        enabled, etc.) or palette. It also provides some more slider/scrollbar
+        specific fields in a slider sub-structure.
+
+        RenderThemeQStyle/ScrollbarThemeQStyle used to instantiate specific QStyleOption sub-classes and populate
+        them with state information from render objects, before calling straight to QStyle. Most of the common code
+        was encapsulated in StylePainterQStyle.
+
+        The new RenderThemeQStyle/ScrolllbarThemeQStyle uses common code in
+        StylePainterQStyle to populate state into QStyleFacadeOption before
+        calling into QStyleFacade.
+
+        The style facade is then implemented by QStyleFacadeImp, which extracts
+        meta-data from QStyleFacadeOption arguments, populates style
+        primitive specific QStyleOption objects and then calls on QStyle.
+
+        RenderThemeQStyle/ScrollbarThemeQStyle can only use interface methods
+        from QStyleFacade. QStyleFacadeImp on the other hand will live in the
+        separate QtWebKitWidgets library in the future and therefore cannot use
+        any WebCore types.
+
+        * Target.pri:
+        * platform/qt/QStyleFacade.cpp: Added.
+        (WebCore):
+        (WebCore::QStyleFacade::styleForPage):
+        * platform/qt/QStyleFacade.h: Added.
+        (WebCore):
+        (QStyleFacade):
+        (WebCore::QStyleFacade::~QStyleFacade):
+        (WebCore::QStyleFacadeOption::QStyleFacadeOption):
+        (QStyleFacadeOption):
+        * platform/qt/RenderThemeQStyle.cpp: Renamed from Source/WebKit/qt/WebCoreSupport/RenderThemeQStyle.cpp.
+        (WebCore):
+        (WebCore::RenderThemeQStyle::getStylePainter):
+        (WebCore::StylePainterQStyle::StylePainterQStyle):
+        (WebCore::StylePainterQStyle::init):
+        (WebCore::RenderThemeQStyle::create):
+        (WebCore::RenderThemeQStyle::setStyleFactoryFunction):
+        (WebCore::RenderThemeQStyle::styleFactory):
+        (WebCore::RenderThemeQStyle::RenderThemeQStyle):
+        (WebCore::RenderThemeQStyle::~RenderThemeQStyle):
+        (WebCore::RenderThemeQStyle::setPaletteFromPageClientIfExists):
+        (WebCore::RenderThemeQStyle::inflateButtonRect):
+        (WebCore::RenderThemeQStyle::computeSizeBasedOnStyle):
+        (WebCore::RenderThemeQStyle::adjustButtonStyle):
+        (WebCore::RenderThemeQStyle::setButtonPadding):
+        (WebCore::RenderThemeQStyle::paintButton):
+        (WebCore::RenderThemeQStyle::paintTextField):
+        (WebCore::RenderThemeQStyle::adjustTextAreaStyle):
+        (WebCore::RenderThemeQStyle::paintTextArea):
+        (WebCore::RenderThemeQStyle::setPopupPadding):
+        (WebCore::RenderThemeQStyle::colorPalette):
+        (WebCore::RenderThemeQStyle::paintMenuList):
+        (WebCore::RenderThemeQStyle::adjustMenuListButtonStyle):
+        (WebCore::RenderThemeQStyle::paintMenuListButton):
+        (WebCore::RenderThemeQStyle::animationDurationForProgressBar):
+        (WebCore::RenderThemeQStyle::paintProgressBar):
+        (WebCore::RenderThemeQStyle::paintSliderTrack):
+        (WebCore::RenderThemeQStyle::adjustSliderTrackStyle):
+        (WebCore::RenderThemeQStyle::paintSliderThumb):
+        (WebCore::RenderThemeQStyle::adjustSliderThumbStyle):
+        (WebCore::RenderThemeQStyle::paintSearchField):
+        (WebCore::RenderThemeQStyle::adjustSearchFieldDecorationStyle):
+        (WebCore::RenderThemeQStyle::paintSearchFieldDecoration):
+        (WebCore::RenderThemeQStyle::adjustSearchFieldResultsDecorationStyle):
+        (WebCore::RenderThemeQStyle::paintSearchFieldResultsDecoration):
+        (WebCore::RenderThemeQStyle::paintInnerSpinButton):
+        (WebCore::RenderThemeQStyle::initializeCommonQStyleOptions):
+        (WebCore::RenderThemeQStyle::adjustSliderThumbSize):
+        * platform/qt/RenderThemeQStyle.h: Renamed from Source/WebKit/qt/WebCoreSupport/RenderThemeQStyle.h.
+        (WebCore):
+        (RenderThemeQStyle):
+        (WebCore::RenderThemeQStyle::qStyle):
+        (StylePainterQStyle):
+        (WebCore::StylePainterQStyle::isValid):
+        (WebCore::StylePainterQStyle::paintButton):
+        (WebCore::StylePainterQStyle::paintTextField):
+        (WebCore::StylePainterQStyle::paintComboBox):
+        (WebCore::StylePainterQStyle::paintComboBoxArrow):
+        (WebCore::StylePainterQStyle::paintSliderTrack):
+        (WebCore::StylePainterQStyle::paintSliderThumb):
+        (WebCore::StylePainterQStyle::paintInnerSpinButton):
+        (WebCore::StylePainterQStyle::paintProgressBar):
+        (WebCore::StylePainterQStyle::paintScrollCorner):
+        (WebCore::StylePainterQStyle::paintScrollBar):
+        * platform/qt/ScrollbarThemeQStyle.cpp: Renamed from Source/WebKit/qt/WebCoreSupport/ScrollbarThemeQStyle.cpp.
+        (WebCore):
+        (WebCore::ScrollbarThemeQStyle::ScrollbarThemeQStyle):
+        (WebCore::ScrollbarThemeQStyle::~ScrollbarThemeQStyle):
+        (WebCore::scPart):
+        (WebCore::scrollbarPart):
+        (WebCore::initSliderStyleOption):
+        (WebCore::ScrollbarThemeQStyle::paint):
+        (WebCore::ScrollbarThemeQStyle::hitTest):
+        (WebCore::ScrollbarThemeQStyle::shouldCenterOnThumb):
+        (WebCore::ScrollbarThemeQStyle::invalidatePart):
+        (WebCore::ScrollbarThemeQStyle::scrollbarThickness):
+        (WebCore::ScrollbarThemeQStyle::thumbPosition):
+        (WebCore::ScrollbarThemeQStyle::thumbLength):
+        (WebCore::ScrollbarThemeQStyle::trackPosition):
+        (WebCore::ScrollbarThemeQStyle::trackLength):
+        (WebCore::ScrollbarThemeQStyle::paintScrollCorner):
+        * platform/qt/ScrollbarThemeQStyle.h: Renamed from Source/WebKit/qt/WebCoreSupport/ScrollbarThemeQStyle.h.
+        (WebCore):
+        (ScrollbarThemeQStyle):
+        (WebCore::ScrollbarThemeQStyle::qStyle):
+
+2012-10-08  Kiran Muppala  <cmuppala@apple.com>
+
+        Throttle DOM timers on hidden pages.
+        https://bugs.webkit.org/show_bug.cgi?id=98474
+
+        Reviewed by Maciej Stachowiak.
+
+        When the visibility of a page changes to "hidden", all it's DOM timers are
+        updated to align their fire times on one second intervals.  This limits the
+        number of CPU wakes due to a hidden pages to one per second.
+
+        Test: fast/dom/timer-throttling-hidden-page.html
+
+        * Configurations/FeatureDefines.xcconfig:
+        * WebCore.exp.in:
+        * dom/Document.cpp:
+        (WebCore):
+        (WebCore::Document::timerAlignmentInterval):
+        Read Page::timerAlignmentInterval and pass it along to DOMTimer.
+
+        * dom/Document.h:
+        (Document):
+        * dom/ScriptExecutionContext.cpp:
+        (WebCore):
+        (WebCore::ScriptExecutionContext::didChangeTimerAlignmentInterval):
+        Scan through self DOM Timers and tell them to recompute their fire
+        time based on the updated alignment interval.
+        (WebCore::ScriptExecutionContext::timerAlignmentInterval):
+
+        * dom/ScriptExecutionContext.h:
+        (ScriptExecutionContext):
+        * page/DOMTimer.cpp:
+        (WebCore):
+        (WebCore::DOMTimer::alignedFireTime):
+        If the document's alignment interval is non zero, round up the fire
+        time to the next multiple of alignment interval.
+
+        * page/DOMTimer.h:
+        (DOMTimer):
+        (WebCore::DOMTimer::defaultTimerAlignmentInterval):
+        (WebCore::DOMTimer::setDefaultTimerAlignmentInterval):
+        * page/Page.cpp:
+        (WebCore::Page::Page):
+        (WebCore):
+        (WebCore::Page::setTimerAlignmentInterval):
+        (WebCore::Page::timerAlignmentInterval):
+        (WebCore::Page::setVisibilityState):
+        Getter and Setter for alignment interval.  Expose setVisibilityState
+        if either PAGE_VISIBILITY_API is enabled or if HIDDEN_PAGE_DOM_TIMER_REDUCTION
+        is enabled.
+
+        * page/Page.h:
+        (Page):
+        * page/Settings.cpp:
+        (WebCore):
+        (WebCore::Settings::setDefaultDOMTimerAlignmentInterval):
+        (WebCore::Settings::defaultDOMTimerAlignmentInterval):
+        (WebCore::Settings::setDOMTimerAlignmentInterval):
+        (WebCore::Settings::domTimerAlignmentInterval):
+        * page/Settings.h:
+        (Settings):
+        * page/SuspendableTimer.cpp:
+        (WebCore::SuspendableTimer::suspend):
+        Save the time remaining to the original unaligned fire time, so that
+        on resuming, the fire time will be correctly aligned using the latest
+        alignment interval.
+
+        * platform/ThreadTimers.cpp:
+        (WebCore::ThreadTimers::sharedTimerFiredInternal):
+        Clear m_unalignedNextFireTime along with m_nextFireTime to keep
+        them always in sync.
+
+        * platform/Timer.cpp:
+        (WebCore::TimerBase::TimerBase):
+        (WebCore::TimerBase::setNextFireTime):
+        Save the requested fire time in m_unalignedNextFireTime and
+        set m_nextFireTime to the aligned value.  The unalinged value
+        is used to recompute fire time if alignment interval changes.
+        (WebCore):
+        (WebCore::TimerBase::didChangeAlignmentInterval):
+        Recompute next fire time from m_unalignedNextFireTime.
+        (WebCore::TimerBase::nextUnalignedFireInterval):
+        Interval from current time to the original unaligned fire time.
+
+        * platform/Timer.h:
+        (TimerBase):
+        (WebCore::TimerBase::alignedFireTime):
+
+2012-10-08  Andreas Kling  <kling@webkit.org>
+
+        1.18MB below RenderTableSection::setCachedCollapsedBorderValue() on Membuster3.
+        <http://webkit.org/b/98670>
+        <rdar://problem/12454276>
+
+        Reviewed by Anders Carlsson.
+
+        Refactor CollapsedBorderValue to only store the bits and pieces from the BorderValue
+        that it actually needs. Packed the whole thing into 64 bits.
+
+        Reduces memory consumption by 547kB on Membuster3.
+
+        * rendering/RenderTableCell.cpp:
+
+            Add compile-time size assertion for CollapsedBorderValue.
+
+        * rendering/style/CollapsedBorderValue.h:
+        (WebCore::CollapsedBorderValue::CollapsedBorderValue):
+        (WebCore::CollapsedBorderValue::width):
+        (WebCore::CollapsedBorderValue::style):
+        (WebCore::CollapsedBorderValue::color):
+        (WebCore::CollapsedBorderValue::isTransparent):
+        (WebCore::CollapsedBorderValue::precedence):
+        (WebCore::CollapsedBorderValue::isSameIgnoringColor):
+        (CollapsedBorderValue):
+
+            Apply shrinkwrap to CollapsedBorderValue. Removed specialized copy constructor since
+            the class only has primitive members now.
+
+2012-10-08  Yoshifumi Inoue  <yosin@chromium.org>
+
+        HTMLSelectElement::typeAheadFind depends on implementation dependent behavior
+        https://bugs.webkit.org/show_bug.cgi?id=98710
+
+        Reviewed by Kent Tamura.
+
+        This patch gets rid of C/C++ implementation dependent behavior from
+        HTMLSelectElement::typeAheadFind() which does modulo operation with
+        a negative operand.
+
+        HTMLSelectElement::typeAheadFind() contains expression with modulo
+        operator and dividend can be -1 when the "select" element without
+        "option" element but "optgroup" element.
+
+        Test: fast/forms/select/select-typeahead-crash.html
+
+        * html/HTMLSelectElement.cpp:
+        (WebCore::HTMLSelectElement::typeAheadFind): Changed to do modulo
+        operation with both operands are non-negative.
+
+2012-10-08  Kent Tamura  <tkent@chromium.org>
+
+        Take account of overflowing values for width calculation of a year sub-field
+        https://bugs.webkit.org/show_bug.cgi?id=98506
+
+        Reviewed by Eric Seidel.
+
+        When we decide the width of a year field of an input[type=date]
+        with the multiple fields UI, we need to take account of the
+        current value width because we allow to set overflowing values to
+        the input[type=date].
+
+        This change affects only platforms with INPUT_TYPE_DATE &&
+        INPUT_MULTIPLE_FIELDS_UI.
+
+        Test: fast/forms/date-multiple-fields/date-multiple-fields-change-layout-by-value.html
+
+        * html/shadow/DateTimeNumericFieldElement.cpp:
+        (WebCore::DateTimeNumericFieldElement::customStyleForRenderer):
+        Take account of the current value width.
+
+2012-10-08  Tony Chang  <tony@chromium.org>
+
+        image not displayed in flexbox
+        https://bugs.webkit.org/show_bug.cgi?id=98611
+
+        Reviewed by Ojan Vafai.
+
+        Flexbox will override the width of a child and when stretching, will override the height of the child.
+        When this happens, when an image loads, it checks to see if it's width/height has
+        changed, and if so, does a relayout.  The overridden width/height was preventing this
+        relayout from happening.
+
+        To fix, we clear all the override sizes when we're done laying out the flex children.
+
+        Test: css3/flexbox/relayout-image-load.html
+
+        * rendering/RenderFlexibleBox.cpp:
+        (WebCore::RenderFlexibleBox::layoutBlock): Clear child override sizes.
+        (WebCore::RenderFlexibleBox::clearChildOverrideSizes):
+        (WebCore::RenderFlexibleBox::computeMainAxisPreferredSizes): No longer need to clear the override size
+        here since it should have already been cleared.
+        * rendering/RenderFlexibleBox.h:
+
+2012-10-08  Andreas Kling  <kling@webkit.org>
+
+        REGRESSION(r130643): editing/pasteboard/data-transfer-item is failing on chromium.
+        <http://webkit.org/b/98686>
+
+        Reviewed by Tony Chang.
+
+        Change ChromiumDataObject::createFromPasteboard() to use a ListHashSet instead of a HashSet so that
+        item order is preserved.
+
+        * platform/chromium/ChromiumDataObject.cpp:
+        (WebCore::ChromiumDataObject::createFromPasteboard):
+
+2012-10-08  Eric Seidel  <eric@webkit.org>
+
+        Inline logicalHeightForRowSizing to shave another 2-3% off robohornet's resizecol.html
+        https://bugs.webkit.org/show_bug.cgi?id=98703
+
+        Reviewed by Emil A Eklund.
+
+        This is very small potatoes.  There are much bigger wins for table layout yet, but
+        this was an easy win.
+
+        This function should probably be converted to use int's only, as table cells are pixel-sized
+        according to our subpixel-experts.
+
+        Also, I suspect there should be ways to early return with less-math in the common cases, but
+        I've saved such for a later patch.
+
+        Note that I changed from using paddingBefore/paddingAfter (which include the instrinsic padding)
+        to calling computedCSSPaddingBefore/computedCSSPaddingAfter directly as well.
+
+        This single function is about 11% of total time for robohornet's resizecol.
+
+        * rendering/RenderTableCell.cpp:
+        * rendering/RenderTableCell.h:
+        (WebCore::RenderTableCell::logicalHeightForRowSizing):
+
+2012-10-08  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: remove autogenerated objectStore/index id code
+        https://bugs.webkit.org/show_bug.cgi?id=98085
+
+        Reviewed by Tony Chang.
+
+        Remove support for backend-generated objectstore and index
+        ids. The frontend objects now manage that state during
+        versionchange transactions. The IDBDatabaseBackendInterface and
+        IDBObjectStoreBackendInterface methods will go away when
+        https://bugs.webkit.org/show_bug.cgi?id=98682 lands.
+
+        No new tests as this is part of a refactoring, existing indexeddb
+        tests cover correctness.
+
+        * Modules/indexeddb/IDBBackingStore.h:
+        (IDBBackingStore):
+        * Modules/indexeddb/IDBDatabase.cpp:
+        (WebCore::IDBDatabase::createObjectStore):
+        * Modules/indexeddb/IDBDatabaseBackendImpl.cpp:
+        (WebCore::IDBDatabaseBackendImpl::createObjectStore):
+        (WebCore::IDBDatabaseBackendImpl::createObjectStoreInternal):
+        (WebCore::IDBDatabaseBackendImpl::loadObjectStores):
+        * Modules/indexeddb/IDBDatabaseBackendInterface.h:
+        (IDBDatabaseBackendInterface):
+        * Modules/indexeddb/IDBLevelDBBackingStore.cpp:
+        (WebCore::IDBLevelDBBackingStore::createObjectStore):
+        (WebCore::setMaxIndexId):
+        (WebCore::IDBLevelDBBackingStore::createIndex):
+        * Modules/indexeddb/IDBLevelDBBackingStore.h:
+        (IDBLevelDBBackingStore):
+        * Modules/indexeddb/IDBObjectStore.cpp:
+        (WebCore::IDBObjectStore::createIndex):
+        * Modules/indexeddb/IDBObjectStoreBackendImpl.cpp:
+        (WebCore::IDBObjectStoreBackendImpl::IDBObjectStoreBackendImpl):
+        (WebCore::IDBObjectStoreBackendImpl::createIndex):
+        (WebCore::IDBObjectStoreBackendImpl::createIndexInternal):
+        * Modules/indexeddb/IDBObjectStoreBackendInterface.h:
+
+2012-10-08  Jaehun Lim  <ljaehun.lim@samsung.com>
+
+        [CAIRO] Adjust the source rect size when IMAGE_DECODER_DOWN_SAMPLING is enabled
+        https://bugs.webkit.org/show_bug.cgi?id=98630
+
+        Reviewed by Martin Robinson.
+
+        IMAGE_DECODER_DOWN_SAMPLING scales down the size of the big image.
+        CAIRO needs to adjust the source size to the scaled value.
+
+        No new tests.
+
+        * platform/graphics/cairo/BitmapImageCairo.cpp:
+        (WebCore::BitmapImage::draw):
+
+2012-10-08  Adam Barth  <abarth@webkit.org>
+
+        Remove unused features of BlobBuilder
+        https://bugs.webkit.org/show_bug.cgi?id=98331
+
+        Reviewed by Eric Seidel.
+
+        Now that we don't expose BlobBuilder as a web platform API, we can
+        strip down the class to handle only those cases that are needed by the
+        Blob constructor.
+
+        I've also renamed the class from WebKitBlobBuilder to BlobBuilder and
+        made it stack allocated rather than RefCounted. A future patch will
+        actually move the files around. (I didn't want to mix moving code
+        around with modifying the code.)
+
+        * bindings/js/JSBlobCustom.cpp:
+        (WebCore::JSBlobConstructor::constructJSBlob):
+        * bindings/v8/custom/V8BlobCustom.cpp:
+        (WebCore::V8Blob::constructorCallback):
+        * fileapi/WebKitBlobBuilder.cpp:
+        (WebCore):
+        (WebCore::BlobBuilder::BlobBuilder):
+        (WebCore::BlobBuilder::getBuffer):
+        (WebCore::BlobBuilder::append):
+        (WebCore::BlobBuilder::appendBytesData):
+        (WebCore::BlobBuilder::getBlob):
+        * fileapi/WebKitBlobBuilder.h:
+        (WebCore):
+        (BlobBuilder):
+        * page/FeatureObserver.h:
+
+2012-10-08  Martin Robinson  <mrobinson@igalia.com>
+
+        Try to fix the debug build after r130699
+
+        Move the assignment of the ResourceHandleInternal local to before
+        the include statement where it is used.
+
+        * platform/network/soup/ResourceHandleSoup.cpp:
+        (WebCore::createSoupMessageForHandleAndRequest):
+
+2012-10-08  Nate Chapin  <japhet@chromium.org>
+
+        Post-r130226 Cleanup: Comment a complicated if statement and make it a helper.
+        https://bugs.webkit.org/show_bug.cgi?id=98463
+
+        Reviewed by Eric Seidel.
+
+        No new tests, refactor only.
+
+        * rendering/RenderLayer.cpp:
+        (WebCore::frameElementAndViewPermitScroll):
+        (WebCore::RenderLayer::scrollRectToVisible):
+
+2012-10-06  Martin Robinson  <mrobinson@igalia.com>
+
+        [Soup] Simplify the way that requests are started
+        https://bugs.webkit.org/show_bug.cgi?id=98532
+
+        Reviewed by Gustavo Noronha Silva.
+
+        Simplify the creation of the libsoup request and message when kicking off
+        requests, by elminating a bit of duplicate code.
+
+        No new tests. This should not change any behavior.
+
+        * platform/network/ResourceHandle.h:
+        (ResourceHandle):
+        * platform/network/soup/ResourceHandleSoup.cpp:
+        (WebCore):
+        (WebCore::ResourceHandleInternal::soupSession): Ensure the session
+        is initialized when passing it to the caller.
+        (WebCore::createSoupMessageForHandleAndRequest): Added this helper which
+        takes care of creating the SoupMessage for HTTP/HTTPS requests.
+        (WebCore::createSoupRequestAndMessageForHandle): Collapsed the HTTP and
+        non-HTTP request creation into this helper.
+        (WebCore::ResourceHandle::start): Call the new helper now and then sendPendingRequest.
+        (WebCore::ResourceHandle::sendPendingRequest): Instead of having special
+        helpers to create and send the request, duplicating the logic for sending it
+        across the file, add this method which can be used in both cases.
+        (WebCore::waitingToSendRequest): Reworked the hasBeenSent method to answer
+        the question of whether or not the request is ready to be sent, but is unsent.
+        (WebCore::ResourceHandle::platformSetDefersLoading): Use the new helper.
+        * platform/network/soup/ResourceRequest.h:
+        (ResourceRequest): Added a new method for getting the URL string for soup.
+        * platform/network/soup/ResourceRequestSoup.cpp:
+        (WebCore::ResourceRequest::urlStringForSoup): Added.
+
+2012-10-08  Eric Seidel  <eric@webkit.org>
+
+        Make no-column table-layout cases a little faster with inlining
+        https://bugs.webkit.org/show_bug.cgi?id=98566
+
+        Reviewed by Julien Chaffraix.
+
+        This change is almost not worth it at only a couple percent boost on
+        http://www.robohornet.org/tests/resizecol.html
+        However, I think the logicalWidthFromTableColumn split it kinda nice
+        so I've decided to post it anyway.
+
+        * rendering/RenderTable.cpp:
+        (WebCore::RenderTable::slowColElement):
+        * rendering/RenderTable.h:
+        (WebCore::RenderTable::colElement):
+        (RenderTable):
+        * rendering/RenderTableCell.cpp:
+        (WebCore::RenderTableCell::logicalWidthFromTableColumn):
+        * rendering/RenderTableCell.h:
+        (WebCore::RenderTableCell::styleOrColLogicalWidth):
+        (RenderTableCell):
+
+2012-10-08  Arpita Bahuguna  <arpitabahuguna@gmail.com>
+
+        Rename RenderObject::firstLineStyleSlowCase() to a more appropriate cachedFirstLineStyle()
+        https://bugs.webkit.org/show_bug.cgi?id=98631
+
+        Reviewed by Eric Seidel.
+
+        Renaming firstLineStyleSlowCase() to cachedFirstLineStyle().
+
+        The current name is confusing since the function actually gets the
+        the cached first-line styles.
+        It also makes the name more descriptive of its functionality
+        and in accordance with RenderObject::uncachedFirstLineStyle().
+
+        No new tests required for this change since no change in behavior is expected.
+
+        * rendering/RenderObject.cpp:
+        (WebCore::RenderObject::cachedFirstLineStyle):
+        * rendering/RenderObject.h:
+        (WebCore::RenderObject::firstLineStyle):
+        (RenderObject):
+        Renamed RenderObject::firstLineStyleSlowCase() to cachedFirstLineStyle()
+        and made the associated changes.
+
+2012-10-08  Sami Kyostila  <skyostil@chromium.org>
+
+        Some non-scrollable elements are added to non-fast-scrollable region
+        https://bugs.webkit.org/show_bug.cgi?id=97927
+
+        Reviewed by James Robinson.
+
+        Only RenderLayers that can actually be scrolled should be added to the
+        ScrollingCoordinator's non-fast scrollable region. Otherwise we may
+        needlessly fall back to main thread scrolling.
+
+        Test: ScrollingCoordinatorChromiumTest.clippedBodyTest
+
+        * rendering/RenderLayer.cpp:
+        (WebCore::RenderLayer::updateScrollbarsAfterLayout):
+        (WebCore::RenderLayer::updateScrollbarsAfterStyleChange):
+
+2012-10-08  Simon Fraser  <simon.fraser@apple.com>
+
+        Move layerTreeAsText to window.internals
+        https://bugs.webkit.org/show_bug.cgi?id=98690
+
+        Reviewed by James Robinson.
+
+        Add window.internals.layerTreeAsText(document), and change the tests to use it.
+        I'll remove testRunner.layerTreeAsText() in a later patch.
+
+        * testing/Internals.cpp:
+        (WebCore::Internals::layerTreeAsText):
+        * testing/Internals.h:
+        (Internals):
+        * testing/Internals.idl:
+
+2012-10-08  Jon Lee  <jonlee@apple.com>
+
+        Add render object that paints plugin snapshots
+        https://bugs.webkit.org/show_bug.cgi?id=98322
+        <rdar://problem/12426546>
+
+        Reviewed by Simon Fraser.
+
+        First, teach plugins to maintain a set of states when plugin snapshotting is enabled.
+
+        Second, a new RenderSnapshottedPlugIn class is a RenderEmbeddedObject that knows how to paint
+        snapshots when the plugin is not visibly playing. It maintains a RenderImageResource to
+        the generated poster image.
+
+        * html/HTMLPlugInElement.cpp:
+        (WebCore::HTMLPlugInElement::HTMLPlugInElement): By default all plugins play on load.
+        * html/HTMLPlugInElement.h: Move the inheritance of ImageLoaderClientBase down to
+        HTMLPlugInImageElement, since that is the class that actually deals with image-based plugins.
+        (WebCore::HTMLPlugInElement::displayState): Add bit for display state.
+        (WebCore::HTMLPlugInElement::setDisplayState):
+        (WebCore::HTMLPlugInElement::updateSnapshot):
+
+        * html/HTMLPlugInImageElement.cpp:
+        (WebCore::HTMLPlugInImageElement::HTMLPlugInImageElement): If plugin snapshotting is
+        enabled, plugin state is set to wait for a poster image.
+        (WebCore::HTMLPlugInImageElement::createRenderer): Create RenderSnapshottedPlugIn if
+        plugin snapshotting is enabled.
+        (WebCore::HTMLPlugInImageElement::updateSnapshot): Once a snapshot is available, update the
+        renderer and set its state to wait for user input to start the plugin.
+        * html/HTMLPlugInImageElement.h:
+        (HTMLPlugInImageElement):
+
+        * rendering/RenderObject.h:
+        (WebCore::RenderObject::isSnapshottedPlugIn): Add new function to identify
+        RenderSnapshottedPlugIn instances. Since RenderSnapshottedPlugIn inherits from
+        RenderEmbeddedObject, isEmbeddedObject() still returns true.
+        * rendering/RenderEmbeddedObject.h:
+        (RenderEmbeddedObject): Elevate a few virtual methods to protected for
+        RenderSnapshottedPlugIn to override.
+
+        * rendering/RenderSnapshottedPlugIn.cpp: Added.
+        (WebCore::RenderSnapshottedPlugIn::RenderSnapshottedPlugIn): Initialize snapshot
+        resource.
+        (WebCore::RenderSnapshottedPlugIn::~RenderSnapshottedPlugIn): Shut down snapshot
+        image resource to remove the renderer as a client, and remove image from memory cache.
+        (WebCore::RenderSnapshottedPlugIn::plugInImageElement): Convenience function to get the
+        HTML element.
+        (WebCore::RenderSnapshottedPlugIn::updateSnapshot): Cache the snapshot, and repaint.
+        (WebCore::RenderSnapshottedPlugIn::paint): If the plugin is not playing, paint like a
+        RenderImage does.
+        (WebCore::RenderSnapshottedPlugIn::paintReplaced): Paint the snapshot and overlay if the
+        plugin is not playing.
+        (WebCore::RenderSnapshottedPlugIn::paintReplacedSnapshot): Inspired by
+        RenderImage::paintReplaced() and RenderImage::paintIntoRect().
+        * rendering/RenderSnapshottedPlugIn.h: Added.
+        (WebCore::RenderSnapshottedPlugIn::isSnapshottedPlugin): Returns true.
+
+        * rendering/RenderTheme.h: Add a function that paints the overlay on top of the snapshot.
+        * rendering/RenderThemeMac.h:
+        * rendering/RenderThemeMac.mm:
+        (WebCore::RenderThemeMac::paintPlugInSnapshotOverlay):
+
+        * WebCore.xcodeproj/project.pbxproj: Add new RenderSnapshottedPlugIn class.
+        * CMakeLists.txt: Ditto.
+        * GNUmakefile.list.am: Ditto.
+        * Target.pri: Ditto.
+        * WebCore.gypi: Ditto.
+        * WebCore.vcproj/WebCore.vcproj: Ditto.
+        * rendering/RenderingAllInOne.cpp: Ditto.
+
+2012-10-08  Hans Muller  <hmuller@adobe.com>
+
+        [CSS Exclusions] Add support for polygonal shapes
+        https://bugs.webkit.org/show_bug.cgi?id=96811
+
+        Reviewed by Dirk Schulze.
+
+        Initial version of the layout support for polygonal exclusion shapes: the ExclusionPolygon class.
+        Supports the public ExclusionShape operations using the algorithm described here:
+        http://hansmuller-webkit.blogspot.com/2012/06/horizontal-box-polygon-intersection-for.html.
+        Although both the "included" and "excluded" operations are supported, only the former is
+        used, since only shape-inside is supported at the moment.
+
+        The ExclusionPolygon class stores the polygon's edges in an interval tree.
+
+        Polygon edges are represented by the ExclusionPolygonEdge struct, which records the indices of
+        the pair of vertices joined by the edge.  Edge vertex index1 is usually less than index2, except
+        the last edge where index2 is 0.  We plan to improve the algorithm that creates the edges
+        by spanning vertices contained in sequences of more than two colinear vertices. For example,
+        a triangular polygon might be specified with 5 vertices like this: 3,0 5,0, 5,5, 4,4 2,2, 0,0.
+        By spanning the extra colinear points: 0,0 5,0, 5,5, which implies index1-index2 edges: 5-1 1-2 2-5.
+
+        Although the implementation supports complex polygons, the layout code is limited to
+        essentially rectangular shapes until a patch for https://bugs.webkit.org/show_bug.cgi?id=96813
+        lands.
+
+        Tests: fast/exclusions/shape-inside/shape-inside-polygon-rectangle.html
+               fast/exclusions/shape-inside/shape-inside-simple-polygon-001.html
+               fast/exclusions/shape-inside/shape-inside-simple-polygon-002.html
+               fast/exclusions/shape-inside/shape-inside-simple-polygon-003.html
+               fast/exclusions/shape-inside/shape-inside-simple-polygon-004.html
+
+        * CMakeLists.txt:
+        * GNUmakefile.list.am:
+        * Target.pri:
+        * WebCore.gypi:
+        * WebCore.vcproj/WebCore.vcproj:
+        * WebCore.xcodeproj/project.pbxproj:
+        * rendering/ExclusionPolygon.cpp: Added.
+        (WebCore):
+        (EdgeIntersection): Internal description of the intersection of a polygon edge and a horizontal line.
+        (WebCore::ExclusionPolygon::ExclusionPolygon): See the introductory text above for a description of this type.
+        (WebCore::computeXIntersection): Find and classify the X intercept of a polygon edge with horizontal line, if any.
+        (WebCore::ExclusionPolygon::rightVertexY): This method is used to decide if a horizontal line "crosses" a vertex.
+        (WebCore::appendIntervalX): Append an x coordinate to a vector of ExclusionIntervals.
+        (WebCore::ExclusionPolygon::computeXIntersections): Return a vector of the intersections of a horizontal line with the polygon's edges.
+        (WebCore::ExclusionPolygon::computeEdgeIntersections): Return a vector of the X projections of the edges that overlap a horizonal rectangle.
+        (WebCore::ExclusionPolygon::getExcludedIntervals): Return a SegmentList of the X intervals within a horizontal rectangle that overlap the polygon.
+        (WebCore::ExclusionPolygon::getIncludedIntervals): Return the X intervals within a horizontal rectangle that fit inside the polygon.
+        * rendering/ExclusionPolygon.h: Added.
+        (WebCore):
+        (ExclusionPolygon):
+        (WebCore::ExclusionPolygon::getXAt): X coordinate of a polygon vertex
+        (WebCore::ExclusionPolygon::getYAt): Y coordinate of a polygon vertex
+        (WebCore::ExclusionPolygon::numberOfVertices):
+        (WebCore::ExclusionPolygon::fillRule): A WindRule value that defines "inside" for self-intersecting polygons.
+        (ExclusionPolygonEdge):
+        (WebCore::ExclusionPolygonEdge::ExclusionPolygonEdge):
+        (WebCore::ExclusionPolygonEdge::vertex1):
+        (WebCore::ExclusionPolygonEdge::vertex2):
+        (WebCore::ExclusionPolygonEdge::minX):
+        (WebCore::ExclusionPolygonEdge::minY):
+        (WebCore::ExclusionPolygonEdge::maxX):
+        (WebCore::ExclusionPolygonEdge::maxY):
+        * rendering/ExclusionShape.cpp:
+        (WebCore::createExclusionPolygon): Return a new ExclusionPolygon.
+        (WebCore):
+        (WebCore::ExclusionShape::createExclusionShape): Added support for BasicShape::BASIC_SHAPE_POLYGON.
+        * rendering/ExclusionShapeInsideInfo.cpp:
+        (WebCore::ExclusionShapeInsideInfo::isExclusionShapeInsideInfoEnabledForRenderBlock): Enable BASIC_SHAPE_POLYGON shapes for RenderBlocks.
+
+2012-10-08  Tony Chang  <tony@chromium.org>
+
+        Replace 2 uses of updateLogicalHeight with computeLogicalHeight
+        https://bugs.webkit.org/show_bug.cgi?id=98677
+
+        Reviewed by Ojan Vafai.
+
+        This is part of bug 96804.  Convert RenderTextControl and RenderSVGForeignObject to
+        override the const computeLogicalHeight method rather than the updateLogicalHeight
+        setter method.
+
+        No new tests, there should be no behavior change as this is just a refactor.
+
+        * rendering/RenderTextControl.cpp:
+        (WebCore::RenderTextControl::computeLogicalHeight): Pass logicalHeight through rather than setting height.
+        This is a slight correctness fix, although we don't support vertical inputs yet.
+        * rendering/RenderTextControl.h:
+        (RenderTextControl):
+        * rendering/svg/RenderSVGForeignObject.cpp:
+        (WebCore::RenderSVGForeignObject::computeLogicalHeight):
+        * rendering/svg/RenderSVGForeignObject.h:
+        (RenderSVGForeignObject):
+
+2012-10-08  Min Qin  <qinmin@chromium.org>
+
+        Upstream some tweaks for overlay play button on Android
+        https://bugs.webkit.org/show_bug.cgi?id=98671
+
+        Reviewed by Adam Barth.
+
+        This change stops displaying the overlay play button if video height is too small
+        No test for this. Will rebase layout test expectations for android later.
+
+        * css/mediaControlsChromiumAndroid.css:
+        (video::-webkit-media-controls-overlay-enclosure):
+
+2012-10-08  Simon Fraser  <simon.fraser@apple.com>
+
+        Some GraphicsLayer cleanup to separate the concepts of using a tile cache, and being the main tile cache layer
+        https://bugs.webkit.org/show_bug.cgi?id=98574
+
+        Reviewed by Dean Jackson.
+
+        GraphicsLayerCA assumed that using a TileCache equated to being the main page tile
+        cache layer, which has some special considerations. Make these two concepts separate
+        to get closer to being able to use TileCaches in place of CATiledLayer.
+
+        * platform/graphics/GraphicsLayer.h:
+        (GraphicsLayer): Remove m_usingTileCache member, which was not appropriate
+        for this class to have.
+        * platform/graphics/GraphicsLayer.cpp:
+        (WebCore::GraphicsLayer::GraphicsLayer): Remove init of m_usingTileCache.
+        (WebCore::GraphicsLayer::debugBorderInfo): Can no longer use m_usingTileCache to
+        get the blue color, so moved code into a virtual debugBorderInfo() method.
+        (WebCore::GraphicsLayer::updateDebugIndicators): Call the virtual debugBorderInfo().
+        * platform/graphics/GraphicsLayerClient.h: Remove the usingTileCache() callback;
+        we now just cache this information in the GraphicsLayerCA on creation.
+        * platform/graphics/ca/GraphicsLayerCA.cpp:
+        (WebCore::GraphicsLayerCA::GraphicsLayerCA): Init m_isPageTileCacheLayer to false,
+        then set to m_isPageTileCacheLayer if the client says we should create a tile cache.
+        (WebCore::GraphicsLayerCA::platformCALayerShowRepaintCounter): Overidden to avoid duplicate repaint
+        counters in the top-left tile.
+        (WebCore::GraphicsLayerCA::updateLayerBackgroundColor): If this layer is the page tile cache layer,
+        we allow setting of its background color.
+        (WebCore::GraphicsLayerCA::debugBorderInfo): Overidden to use a blue color for tiles.
+        (WebCore::GraphicsLayerCA::requiresTiledLayer): Don't make CATiledLayers for the page tile cache.
+        * platform/graphics/ca/GraphicsLayerCA.h:
+        (GraphicsLayerCA):
+        * platform/graphics/ca/PlatformCALayerClient.h:
+        (PlatformCALayerClient): Need to pass the platform layer into platformCALayerShowRepaintCounter()
+        so we can distinguish between calls for tiles, and calls for the tile cache layer itself.
+        * platform/graphics/ca/mac/TileCache.mm:
+        (WebCore::TileCache::shouldShowRepaintCounters): Pass 0 to platformCALayerShowRepaintCounter() to
+        indicate that we're asking about a tile.
+        * platform/graphics/mac/WebLayer.mm:
+        (drawLayerContents): Now we can just rely on platformCALayerShowRepaintCounter() to tell us whether
+        to draw the repaint counter.
+        (-[WebLayer setNeedsDisplayInRect:]):
+        * platform/graphics/mac/WebTiledLayer.mm:
+        (-[WebTiledLayer setNeedsDisplayInRect:]):
+        * rendering/RenderLayerBacking.h:
+        (WebCore::RenderLayerBacking::usingTileCache):
+        (RenderLayerBacking):
+        * rendering/RenderLayerCompositor.cpp:
+        (WebCore::RenderLayerCompositor::documentBackgroundColorDidChange): We can ask the RenderLayerBacking
+        whether it's for the tile cache, rather than going to the GraphicsLayer.
+        * platform/graphics/win/MediaPlayerPrivateQuickTimeVisualContext.cpp:
+        (WebCore::MediaPlayerPrivateQuickTimeVisualContext::LayerClient::platformCALayerShowRepaintCounter):
+
+2012-10-08  Huang Dongsung  <luxtella@company100.net>
+
+        [Qt] Make ImageBufferQt use premultiplied converting functions in Color.h instead of its own mechanism.
+        https://bugs.webkit.org/show_bug.cgi?id=98582
+
+        Reviewed by Eric Seidel.
+
+        Only Qt port failed canvas/philip/tests/2d.imageData.put.unchanged.html because
+        ImageBufferQt converts from or to a premultiplied color using its own code. When
+        we convert twice from an unmultiplied color to a premultiplied color and then to
+        an unmultiplied color using this code, the calculated result are pretty
+        different against the input color. It is why Gtk passes this test although Qt
+        fails. Gtk port uses them in Color.h.
+
+        In addition, Qt should use the functions in Color.h to reduce duplicated codes.
+
+        Tests: canvas/philip/tests/2d.imageData.put.unchanged.html: Fixed a test case
+
+        * platform/graphics/qt/ImageBufferQt.cpp:
+        (WebCore::getImageData):
+        (WebCore::convertBGRAToRGBA):
+        (WebCore::ImageBuffer::putByteArray):
+
+2012-10-08  Tab Atkins  <jackalmage@gmail.com>
+
+        Remove "orphaned units" quirk
+        https://bugs.webkit.org/show_bug.cgi?id=98553
+
+        Reviewed by Eric Seidel.
+
+        This patch removes our "orphaned units" quirk.
+        We have an "orphaned units" quirk to match IE, which allows things like "width: 20 px;".
+        But FF and Opera don't have it and aren't aware of bugs for it,
+        and it's not in Simon Pieters' Quirks Mode spec <http://dvcs.w3.org/hg/quirks-mode/raw-file/tip/Overview.html>
+
+        No new tests, because I'm killing a quirk.
+
+        * css/CSSParser.cpp:
+        (WebCore::CSSParser::parseValue):
+        * css/CSSParser.h:
+        (CSSParser):
+
+2012-10-08  Robert Hogan  <robert@webkit.org>
+
+        Border, margin and padding of an inline's inline ancestors counted twice
+        https://bugs.webkit.org/show_bug.cgi?id=63074
+
+        Reviewed by David Hyatt.
+
+        In a line such as '<span><span><img>Text' the border, padding and margin belonging
+        to the two spans was counted twice by RenderBlockLineLayout::nextLineBreak(): once
+        when adding the width of the <img> object to the line, and a second time when adding
+        the 'Text'. The result was that nextLineBreak() now had a length for the line that 
+        exceeded the line's maximum length and inserted a bogus line break.
+
+        This all happened because the helper function that is used to add in the border etc.
+        from inline ancestors was crawling up the tree each time. It doesn't need to do that, it
+        should stop crawling up the tree when the current object is not the first or last sibling below a parent.
+
+        Test: fast/inline/bpm-inline-ancestors.html
+
+        * rendering/RenderBlockLineLayout.cpp:
+        (WebCore::shouldAddBorderPaddingMargin): Broke this check out into a helper function so that it 
+        can help inlineLogicalWidth() return early and also treat empty RenderTexts the same as no previous/next
+        sibling on the line. This ensures that collapsed leading space does not interfere with the decision to
+        crawl up the ancestors accumulating border, padding, and margin.
+        (WebCore):
+        (WebCore::inlineLogicalWidth): Return early once the current child is no longer on the edge of its line - 
+        this ensures the border, padding and margin of ancestors is not counted twice. 
+
+2012-10-08  Mike West  <mkwst@chromium.org>
+
+        Null-check for DOMWindow before feeding it to FeatureObserver.
+        https://bugs.webkit.org/show_bug.cgi?id=98624
+
+        Reviewed by Adam Barth.
+
+        We shouldn't call out to FeatureObserver in
+        ContentSecurityPolicy::didReceiveHeader if the policy's document doesn't
+        have a DOMWindow.
+
+        Test: http/tests/security/contentSecurityPolicy/xmlhttprequest-protected-resource-does-not-crash.html
+
+        * page/ContentSecurityPolicy.cpp:
+        (WebCore::ContentSecurityPolicy::didReceiveHeader):
+            Null check 'document->domWindow' before passing it on.
+        * page/FeatureObserver.cpp:
+        (WebCore::FeatureObserver::observe):
+            ASSERT 'domWindow'.
+
+2012-10-08  Nate Chapin  <japhet@chromium.org>
+
+        Loader cleanup : Simplify FrameLoader/DocumentLoader setupForReplace()
+        https://bugs.webkit.org/show_bug.cgi?id=49072
+
+        Reviewed by Eric Seidel.
+
+        This patch contains one small known behavior change: multipart/x-mixed-replace main resources with text/html parts
+        will no longer load the text/html progressively. In practice, loading the html progressively causes the document
+        to get cleared as soon as the next part's data starts arriving, which leads to a blank page most of the time. This case
+        seems to be pathological, as IE, FF, Opera and WebKit all do something different currently. This patch will cause
+        us to behave like Firefox, which is the most sane of the current behaviors.
+
+        Test: http/tests/multipart/multipart-html.php
+
+        * loader/DocumentLoader.cpp:
+        (WebCore::DocumentLoader::commitData): Use isMultipartReplacingLoad() helper.
+        (WebCore::DocumentLoader::receivedData):
+        (WebCore::DocumentLoader::setupForReplace): Renamed from setupForReplaceByMIMEType(). Call maybeFinishLoadingMultipartContent()
+            instead of doing identical work inline. After we call frameLoader()->setReplacing(), we will never load progressively, so remove
+            the if (doesProgressiveLoad(newMIMEType)) {} block.
+        (WebCore::DocumentLoader::isMultipartReplacingLoad):
+        (WebCore::DocumentLoader::maybeFinishLoadingMultipartContent): Inline the old DocumentLoader::setupForeReplace(), check
+            frameLoader()->isReplacing() instead of the delete doesProgressiveLoad().
+        * loader/DocumentLoader.h:
+        * loader/FrameLoader.cpp:
+        (WebCore::FrameLoader::setupForReplace): Move all calls to revertToProvisionalState here.
+        * loader/MainResourceLoader.cpp:
+        (WebCore::MainResourceLoader::didReceiveResponse): Call setupForReplace(), renamed from setupForReplaceByMIMEType().
+
 2012-10-08  Zoltan Horvath  <zoltan@webkit.org>
 
         [Qt] r122720 causes performance regression with DirectFB on ARMv7

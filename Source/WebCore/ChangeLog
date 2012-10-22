@@ -1,3 +1,1217 @@
+2012-10-10  Andreas Kling  <kling@webkit.org>
+
+        ElementAttributeData: tighten member packing on 64-bit.
+        <http://webkit.org/b/98861>
+
+        Reviewed by Anders Carlsson.
+
+        Pack m_isMutable and m_arraySize into the slack from the RefCounted base on 64-bit.
+        218kB progression on Membuster3.
+
+        * dom/ElementAttributeData.h:
+        (ElementAttributeData):
+
+2012-10-10  Alexandre Elias  <aelias@chromium.org>
+
+        Text Autosizing: Counteract funky window sizing on Android.
+        https://bugs.webkit.org/show_bug.cgi?id=98809
+
+        Reviewed by Adam Barth.
+
+        In Chrome for Android, the window sizes provided to WebCore are
+        currently in physical screen pixels instead of
+        device-scale-adjusted units. For example window width on a
+        Galaxy Nexus is 720 instead of 360.  Text autosizing expects
+        device-independent pixels.  When Chrome for Android cuts over to
+        the new coordinate space, it will be tied to the setting
+        applyPageScaleFactorInCompositor.
+
+        No new tests.
+
+        * rendering/TextAutosizer.cpp:
+        (WebCore::TextAutosizer::processSubtree):
+
+2012-10-09  Philip Rogers  <pdr@google.com>
+
+        Recursively detach SVGElementInstances
+        https://bugs.webkit.org/show_bug.cgi?id=98851
+
+        Reviewed by Ryosuke Niwa and Abhishek Arya
+
+        Before this patch, SVGElementInstance child nodes were not being detached. This
+        patch makes detach() recursively detach SVGElementInstances.
+
+        * svg/SVGElementInstance.cpp:
+        (WebCore::SVGElementInstance::detach):
+
+2012-10-09  Kenichi Ishibashi  <bashi@chromium.org>
+
+        [Chromium] Fix harfbuzz-ng related code after r130231
+        https://bugs.webkit.org/show_bug.cgi?id=98858
+
+        Reviewed by Kent Tamura.
+
+        Replace first/second with key/value.
+
+        No new tests. No changes in behavior.
+
+        * platform/graphics/harfbuzz/ng/HarfBuzzNGFaceSkia.cpp:
+        (WebCore::harfbuzzGetGlyph):
+        * platform/graphics/skia/SimpleFontDataSkia.cpp:
+        (WebCore::SimpleFontData::canRenderCombiningCharacterSequence):
+
+2012-10-09  Enrica Casucci  <enrica@apple.com>
+
+        Only measure text once instead of twice when performing line layout.
+        https://bugs.webkit.org/show_bug.cgi?id=98317
+        <rdar://problem/12080821>
+
+        Reviewed by Dan Bernstein.
+
+        Since we are measuring each word to find out where the line break should occur,
+        we should cache that information to avoid measuring the run again when
+        creating the line box. The bulk of the change is in nextLineBreak, where
+        the measurements are collected and placed in a vector so that they can
+        be consumed in setLogicalWidthForTextRun where we used to measure the
+        text one more time.
+        Each entry in the vector is a WordMeasurement object that contains information
+        about the start and end offset in the run, the renderer, the measured width
+        and, possibly, a list of fallback fonts.
+        When we need to compute the width of the run to create the line box, we add
+        all the measurements for the given renderer in the run to get the total width.
+        This optiomization is currently disabled for platforms using HarfBuzz.
+
+        * platform/graphics/Font.cpp:
+        (WebCore::Font::width): Added fallback fonts parameter.
+        * platform/graphics/Font.h:
+        (Font): Added fallback fonts parameter to the width static member function.
+        This method is called when we compute the width using TextLayout.
+        * platform/graphics/mac/ComplexTextController.cpp:
+        (WebCore::TextLayout::width): Added fallback fonts parameter.
+        (WebCore::Font::width):
+        (WebCore::ComplexTextController::advance):
+        * platform/graphics/mac/ComplexTextController.h:
+        (ComplexTextController): Added fallback fonts parameter to advance method.
+        * rendering/RenderBlock.h: Added WordMeasures parameter to few methods.
+        * rendering/RenderBlockLineLayout.cpp:
+        (WordMeasurement): Added new class to hold measurement information.
+        (WebCore::setLogicalWidthForTextRun): This is where we compute the run width using the
+        cached information.
+        (WebCore::RenderBlock::computeInlineDirectionPositionsForLine): Added wordMeasures parameter.
+        (WebCore::RenderBlock::createLineBoxesFromBidiRuns): Added wordMeasures parameter.
+        (WebCore::RenderBlock::layoutRunsAndFloatsInRange): Added declaration of the WordMeasures
+        vector and its use.
+        (WebCore::textWidth): Added fallbackFonts parameter, since now we only measure once.
+        (WebCore::RenderBlock::LineBreaker::nextLineBreak): This method has been modified to collect
+        the measurements of the individual words and add them to the vector.
+
+2012-10-09  Andreas Kling  <kling@webkit.org>
+
+        GlyphPageTreeNode should use HashMap<OwnPtr>.
+        <http://webkit.org/b/98845>
+
+        Reviewed by Dan Bernstein.
+
+        - Replace manual memory management by OwnPtrs.
+        - Added a GlyphPageTreeNodeMap typedef to make call sites look a bit nicer.
+        = Changed some hashmap get()/remove() pairs to use the more efficient take() instead.
+        - Made the constructor private, it has no external clients.
+
+        * platform/graphics/GlyphPageTreeNode.cpp:
+        (WebCore::GlyphPageTreeNode::getRoot):
+        (WebCore::GlyphPageTreeNode::pageCount):
+        (WebCore::GlyphPageTreeNode::getChild):
+        (WebCore::GlyphPageTreeNode::pruneCustomFontData):
+        (WebCore::GlyphPageTreeNode::pruneFontData):
+        (WebCore::GlyphPageTreeNode::showSubtree):
+        * platform/graphics/GlyphPageTreeNode.h:
+        (GlyphPageTreeNode):
+        (WebCore::GlyphPageTreeNode::GlyphPageTreeNode):
+
+2012-10-09  Kent Tamura  <tkent@chromium.org>
+
+        Sub-fields in input[type=time] should not be focusable if the input is disabled or read-only
+        https://bugs.webkit.org/show_bug.cgi?id=98850
+
+        Reviewed by Kentaro Hara.
+
+        Covered by additional test cases of
+        time-multiple-fields/time-multiple-fields-keyboard-events.html and
+        time-multiple-fields/time-multiple-fields-mouse-events.html.
+
+        * html/shadow/DateTimeFieldElement.h:
+        (FieldOwner): Add isFieldOwnerDisabledOrReadOnly.
+        * html/shadow/DateTimeFieldElement.cpp:
+        (WebCore::DateTimeFieldElement::isFocusable):
+        Check isFieldOwnerDisabledOrReadOnly, and calls HTMLElement::isFocusable()
+        just in case.
+        * html/shadow/DateTimeEditElement.cpp:
+        (WebCore::DateTimeEditElement::isFieldOwnerDisabledOrReadOnly): Added.
+        * html/shadow/DateTimeEditElement.h:
+        (DateTimeEditElement): Declare isFieldOwnerDisabledOrReadOnly.
+
+2012-10-09  Robert Kroeger  <rjkroege@chromium.org>
+
+        [chromium] revert fling deacceleration parameter change
+        https://bugs.webkit.org/show_bug.cgi?id=98820
+
+        Reviewed by Adrienne Walker.
+
+        After an extended discussion, it has been decided that a previous
+        adjustment to fling deacceleration parameters should be reverted.
+
+        Tested by existing unit tests.
+
+        * platform/TouchFlingPlatformGestureCurve.cpp:
+        (WebCore::TouchFlingPlatformGestureCurve::createForTouchPad):
+        (WebCore::TouchFlingPlatformGestureCurve::createForTouchScreen):
+
+2012-10-09  Kent Tamura  <tkent@chromium.org>
+
+        Should reject invalid dates constructed with multiple fields UI
+        https://bugs.webkit.org/show_bug.cgi?id=98727
+
+        Reviewed by Hajime Morita.
+
+        In input[type=date] with multiple fields UI, we allow users to set
+        day-of-month value to 1-31 regardless of the month value. So users can
+        construct an invalid date such as "2012-02-31". We should sanitize such
+        values.
+
+        This change affects platforms with ENABLE_INPUT_TYPE_DATE &&
+        ENABLE_INPUT_MULTIPLE_FIELDS_UI.
+
+        Test: fast/forms/date-multiple-fields/date-multiple-fields-keyboard-events.html
+
+        * html/BaseDateAndTimeInputType.h:
+        (BaseDateAndTimeInputType): Make sanitizeValue protected to be called from
+        BaseMultipleFieldsDateAndTimeInputType.
+        * html/BaseMultipleFieldsDateAndTimeInputType.cpp:
+        (WebCore::BaseMultipleFieldsDateAndTimeInputType::editControlValueChanged):
+        Apply sanitizeValue to a value constructed in UI.
+        (WebCore::BaseMultipleFieldsDateAndTimeInputType::restoreFormControlState):
+        Ditto.
+
+2012-10-09  Joe Mason  <jmason@rim.com>
+
+        Check for null m_frame in NetworkJob
+        https://bugs.webkit.org/show_bug.cgi?id=98830
+
+        Reviewed by George Staikos.
+
+        PR 220025
+
+        * platform/network/blackberry/NetworkJob.cpp:
+        (WebCore::NetworkJob::sendRequestWithCredentials):
+        (WebCore::NetworkJob::storeCredentials):
+
+2012-10-09  Jian Li  <jianli@chromium.org>
+
+        Update the CSS property used to support draggable regions.
+        https://bugs.webkit.org/show_bug.cgi?id=97156
+
+        Reviewed by Adam Barth.
+
+        The CSS property to support draggable regions has been changed from
+        "-webkit-widget-region" to "-webkit-app-region" in the following syntax:
+           -webkit-app-region: drag|no-drag
+
+        The CSS parsing code for draggable regions is now different from the CSS
+        parsing code for dashboard regions since we have quite different syntax.
+
+        We still try to share as much rendering update code as possible for
+        these two features. To make the shared code easier to understand for
+        both features, the name "DashboardRegions" in the shared code is changed
+        to "AnnotatedRegions" to work for both dashboard regions and draggable
+        regions.
+
+        Note that we still using WIDGET_REGION as feature name in order not to
+        add more changes to this patch. It will be renamed to a more appropriate
+        name in next patch. WIDGET_REGION is now only turned on for the chromium
+        port.
+
+        Test: fast/css/draggable-region-parser.html
+
+        * Configurations/FeatureDefines.xcconfig: Disable WIDGET_REGION feature.
+        * WebCore.exp.in: Update the exported symbol due to renaming.
+        * css/CSSComputedStyleDeclaration.cpp: Update the CSS parsing.
+        (WebCore):
+        (WebCore::CSSComputedStyleDeclaration::getPropertyCSSValue):
+        * css/CSSParser.cpp: Update the CSS parsing.
+        (WebCore::CSSParser::parseValue):
+        (WebCore):
+        (WebCore::CSSParser::parseDashboardRegions):
+        * css/CSSParserValues.cpp: Update the CSS parsing.
+        (WebCore::CSSParserValue::createCSSValue):
+        * css/CSSPrimitiveValue.cpp: Update the CSS parsing.
+        (WebCore::isValidCSSUnitTypeForDoubleConversion):
+        (WebCore):
+        (WebCore::CSSPrimitiveValue::cleanup):
+        (WebCore::CSSPrimitiveValue::customCssText):
+        (WebCore::CSSPrimitiveValue::cloneForCSSOM):
+        (WebCore::CSSPrimitiveValue::reportDescendantMemoryUsage):
+        * css/CSSPrimitiveValue.h: Update the CSS parsing.
+        (CSSPrimitiveValue):
+        * css/CSSProperty.cpp:
+        (WebCore::CSSProperty::isInheritedProperty):
+        * css/CSSPropertyNames.in: Rename the CSS property for draggable region.
+        * css/CSSValueKeywords.in: Add the keywords supported for the draggable region.
+        * css/DashboardRegion.h: Remove WIDGET_REGION guard.
+        (DashboardRegion):
+        * css/StyleResolver.cpp: Update the CSS parsing.
+        (WebCore::StyleResolver::collectMatchingRulesForList):
+        * dom/Document.cpp: Rename dashboardRegions to annotatedRegions.
+        (WebCore::Document::Document):
+        (WebCore::Document::annotatedRegions):
+        (WebCore::Document::setAnnotatedRegions):
+        (WebCore::Document::reportMemoryUsage):
+        * dom/Document.h: Rename dashboardRegions to annotatedRegions.
+        (WebCore):
+        (WebCore::Document::setAnnotatedRegionsDirty):
+        (WebCore::Document::annotatedRegionsDirty):
+        (WebCore::Document::hasAnnotatedRegions):
+        (WebCore::Document::setHasAnnotatedRegions):
+        (Document):
+        * page/Chrome.cpp: Rename dashboardRegions to annotatedRegions.
+        (WebCore::ChromeClient::annotatedRegionsChanged):
+        * page/ChromeClient.h: Rename dashboardRegions to annotatedRegions.
+        (ChromeClient):
+        * page/FrameView.cpp: Rename dashboardRegions to annotatedRegions.
+        (WebCore::FrameView::layout):
+        (WebCore::FrameView::updateAnnotatedRegions):
+        (WebCore::FrameView::paintContents):
+        * page/FrameView.h: Rename dashboardRegions to annotatedRegions.
+        (FrameView):
+        * rendering/RenderInline.cpp:
+        (WebCore::RenderInline::addAnnotatedRegions):
+        * rendering/RenderInline.h: Rename dashboardRegions to annotatedRegions.
+        (RenderInline):
+        * rendering/RenderLayer.cpp: Rename dashboardRegions to annotatedRegions.
+        (WebCore::RenderLayer::scrollTo):
+        (WebCore::RenderLayer::setHasHorizontalScrollbar):
+        (WebCore::RenderLayer::setHasVerticalScrollbar):
+        (WebCore::RenderLayer::updateScrollbarsAfterLayout):
+        * rendering/RenderListBox.cpp: Rename dashboardRegions to annotatedRegions.
+        (WebCore::RenderListBox::setHasVerticalScrollbar):
+        * rendering/RenderObject.cpp: Rename dashboardRegions to annotatedRegions.
+        (WebCore::RenderObject::styleWillChange):
+        (WebCore::RenderObject::addAnnotatedRegions):
+        (WebCore::RenderObject::collectAnnotatedRegions):
+        * rendering/RenderObject.h: Rename dashboardRegions to annotatedRegions.
+        (WebCore::AnnotatedRegionValue::operator==):
+        (WebCore::AnnotatedRegionValue::operator!=):
+        (AnnotatedRegionValue):
+        (RenderObject):
+        * rendering/style/RenderStyle.cpp: Update the CSS parsing.
+        (WebCore::RenderStyle::diff):
+        (WebCore):
+        * rendering/style/RenderStyle.h: Update the CSS parsing.
+        * rendering/style/RenderStyleConstants.h: Update the CSS parsing.
+        * rendering/style/StyleDashboardRegion.h: Update the CSS parsing.
+        * rendering/style/StyleRareNonInheritedData.cpp: Update the CSS parsing.
+        (WebCore::StyleRareNonInheritedData::StyleRareNonInheritedData):
+        (WebCore::StyleRareNonInheritedData::operator==):
+        * rendering/style/StyleRareNonInheritedData.h: Update the CSS parsing.
+        (WebCore):
+        (StyleRareNonInheritedData):
+
+2012-10-09  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r130811 and r130821.
+        http://trac.webkit.org/changeset/130811
+        http://trac.webkit.org/changeset/130821
+        https://bugs.webkit.org/show_bug.cgi?id=98831
+
+        Broke date-suggestion-picker-appearance-with-scroll-bar.html
+        (Requested by abarth|gardening on #webkit).
+
+        * WebCore.exp.in:
+        * dom/ContainerNode.cpp:
+        (WebCore::ContainerNode::getUpperLeftCorner):
+        (WebCore::ContainerNode::getLowerRightCorner):
+        * dom/MouseRelatedEvent.cpp:
+        (WebCore::MouseRelatedEvent::computeRelativePosition):
+        * dom/Node.cpp:
+        (WebCore::Node::convertToPage):
+        (WebCore::Node::convertFromPage):
+        * editing/FrameSelection.cpp:
+        (WebCore::CaretBase::absoluteBoundsForLocalRect):
+        * editing/RenderedPosition.cpp:
+        (WebCore::RenderedPosition::absoluteRect):
+        * editing/VisiblePosition.cpp:
+        (WebCore::VisiblePosition::absoluteCaretBounds):
+        * html/HTMLSelectElement.cpp:
+        (WebCore::HTMLSelectElement::listBoxDefaultEventHandler):
+        * html/shadow/SliderThumbElement.cpp:
+        (WebCore::SliderThumbElement::setPositionFromPoint):
+        * html/shadow/SpinButtonElement.cpp:
+        (WebCore::SpinButtonElement::defaultEventHandler):
+        * page/FrameView.cpp:
+        (WebCore::FrameView::convertFromRenderer):
+        (WebCore::FrameView::convertToRenderer):
+        * rendering/InlineTextBox.cpp:
+        (WebCore::InlineTextBox::paintDocumentMarker):
+        (WebCore::InlineTextBox::paintTextMatchMarker):
+        (WebCore::InlineTextBox::computeRectForReplacementMarker):
+        * rendering/LayoutState.cpp:
+        (WebCore::LayoutState::LayoutState):
+        * rendering/RenderBlock.cpp:
+        (WebCore::RenderBlock::absoluteQuads):
+        * rendering/RenderBox.cpp:
+        (WebCore::RenderBox::absoluteQuads):
+        (WebCore::RenderBox::absoluteContentBox):
+        (WebCore::RenderBox::mapLocalToContainer):
+        (WebCore::RenderBox::mapAbsoluteToLocalPoint):
+        * rendering/RenderBox.h:
+        (RenderBox):
+        * rendering/RenderBoxModelObject.cpp:
+        (WebCore::RenderBoxModelObject::computeStickyPositionConstraints):
+        (WebCore::RenderBoxModelObject::mapAbsoluteToLocalPoint):
+        * rendering/RenderBoxModelObject.h:
+        (RenderBoxModelObject):
+        * rendering/RenderEmbeddedObject.cpp:
+        (WebCore::RenderEmbeddedObject::isInUnavailablePluginIndicator):
+        * rendering/RenderFrameSet.cpp:
+        (WebCore::RenderFrameSet::userResize):
+        * rendering/RenderGeometryMap.cpp:
+        (WebCore::RenderGeometryMap::absolutePoint):
+        * rendering/RenderInline.cpp:
+        (WebCore::RenderInline::mapLocalToContainer):
+        * rendering/RenderInline.h:
+        (RenderInline):
+        * rendering/RenderLayer.cpp:
+        (WebCore::RenderLayer::absoluteToContents):
+        (WebCore::RenderLayer::convertToLayerCoords):
+        (WebCore::RenderLayer::scrollTo):
+        (WebCore::RenderLayer::calculateClipRects):
+        (WebCore::RenderLayer::childrenClipRect):
+        (WebCore::RenderLayer::selfClipRect):
+        * rendering/RenderLayerBacking.cpp:
+        (WebCore::RenderLayerBacking::contentsVisible):
+        * rendering/RenderMediaControls.cpp:
+        (WebCore::RenderMediaControls::volumeSliderOffsetFromMuteButton):
+        * rendering/RenderMenuList.cpp:
+        (WebCore::RenderMenuList::showPopup):
+        * rendering/RenderObject.cpp:
+        (WebCore::RenderObject::absoluteFocusRingQuads):
+        (WebCore::RenderObject::localToAbsolute):
+        (WebCore::RenderObject::absoluteToLocal):
+        (WebCore::RenderObject::mapLocalToContainer):
+        (WebCore::RenderObject::mapAbsoluteToLocalPoint):
+        (WebCore::RenderObject::localToContainerQuad):
+        (WebCore::RenderObject::localToContainerPoint):
+        * rendering/RenderObject.h:
+        (RenderObject):
+        (WebCore::RenderObject::localToAbsoluteQuad):
+        * rendering/RenderText.cpp:
+        (WebCore::RenderText::absoluteRectsForRange):
+        (WebCore::RenderText::absoluteQuads):
+        (WebCore::RenderText::absoluteQuadsForRange):
+        * rendering/RenderTheme.cpp:
+        (WebCore::RenderTheme::volumeSliderOffsetFromMuteButton):
+        * rendering/RenderView.cpp:
+        (WebCore::RenderView::mapLocalToContainer):
+        (WebCore::RenderView::mapAbsoluteToLocalPoint):
+        (WebCore::RenderView::selectionBounds):
+        * rendering/RenderView.h:
+        (RenderView):
+        * rendering/RenderWidget.cpp:
+        (WebCore::RenderWidget::updateWidgetGeometry):
+        * rendering/svg/RenderSVGForeignObject.cpp:
+        (WebCore::RenderSVGForeignObject::mapLocalToContainer):
+        * rendering/svg/RenderSVGForeignObject.h:
+        (RenderSVGForeignObject):
+        * rendering/svg/RenderSVGInline.cpp:
+        (WebCore::RenderSVGInline::mapLocalToContainer):
+        * rendering/svg/RenderSVGInline.h:
+        (RenderSVGInline):
+        * rendering/svg/RenderSVGModelObject.cpp:
+        (WebCore::RenderSVGModelObject::mapLocalToContainer):
+        (WebCore::RenderSVGModelObject::absoluteQuads):
+        * rendering/svg/RenderSVGModelObject.h:
+        (RenderSVGModelObject):
+        * rendering/svg/RenderSVGRoot.cpp:
+        (WebCore::RenderSVGRoot::mapLocalToContainer):
+        * rendering/svg/RenderSVGRoot.h:
+        (RenderSVGRoot):
+        * rendering/svg/RenderSVGText.cpp:
+        (WebCore::RenderSVGText::mapLocalToContainer):
+        (WebCore::RenderSVGText::absoluteQuads):
+        * rendering/svg/RenderSVGText.h:
+        (RenderSVGText):
+        * rendering/svg/SVGRenderSupport.cpp:
+        (WebCore::SVGRenderSupport::mapLocalToContainer):
+        * svg/SVGSVGElement.cpp:
+        (WebCore::SVGSVGElement::localCoordinateSpaceTransform):
+
+2012-10-09  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r130812.
+        http://trac.webkit.org/changeset/130812
+        https://bugs.webkit.org/show_bug.cgi?id=98826
+
+        Caused fast/text/shaping/shaping-selection-rect to fail
+        (Requested by abarth|gardening on #webkit).
+
+        * platform/graphics/Font.cpp:
+        (WebCore::Font::width):
+        * platform/graphics/Font.h:
+        (Font):
+        * platform/graphics/mac/ComplexTextController.cpp:
+        (WebCore::TextLayout::width):
+        (WebCore::Font::width):
+        (WebCore::ComplexTextController::advance):
+        * platform/graphics/mac/ComplexTextController.h:
+        (ComplexTextController):
+        * rendering/RenderBlock.h:
+        (WebCore):
+        (LineBreaker):
+        (RenderBlock):
+        * rendering/RenderBlockLineLayout.cpp:
+        (WebCore::setLogicalWidthForTextRun):
+        (WebCore::RenderBlock::computeInlineDirectionPositionsForLine):
+        (WebCore::RenderBlock::createLineBoxesFromBidiRuns):
+        (WebCore::RenderBlock::layoutRunsAndFloatsInRange):
+        (WebCore::textWidth):
+        (WebCore::RenderBlock::LineBreaker::nextLineBreak):
+
+2012-10-09  Ryosuke Niwa  <rniwa@webkit.org>
+
+        DOM/textarea-edit.html spends 35% of time in numGraphemeClusters
+        https://bugs.webkit.org/show_bug.cgi?id=98711
+
+        Reviewed by Kent Tamura.
+
+        Since the number of characters is always greater than the number of grapheme clusters,
+        we can avoid calling computeLengthForSubmission when the number of characters is less
+        than maxlength. We still have to count the number of LFs since they all need to be
+        converted into CRLFs. This improves WebKit's score on DOM/textarea-edit.html by 45%.
+
+        * html/HTMLTextAreaElement.cpp:
+        (WebCore::computeLengthForSubmission):
+        (WebCore::numberOfLineBreaks):
+        (WebCore::upperBoundForLengthForSubmission): Added.
+        (WebCore::HTMLTextAreaElement::handleBeforeTextInsertedEvent):
+        (WebCore::HTMLTextAreaElement::tooLong):
+
+2012-10-09  Nate Chapin  <japhet@chromium.org>
+
+        Make CachedResourceLoader RefCounted and have both Document
+        and DocumentLoader hold RefPtrs. This is in preparation for
+        caching main resources.
+        https://bugs.webkit.org/show_bug.cgi?id=86787
+
+        Reviewed by Adam Barth.
+
+        No new tests, no functionality changes at this time.
+
+        * WebCore.exp.in:
+        * WebCore.xcodeproj/project.pbxproj:
+        * dom/Document.cpp:
+        (WebCore::Document::Document): Only create our own CachedResourceLoader
+            if we were given a null frame.
+        (WebCore::Document::~Document):
+        (WebCore::Document::cachedResourceLoader):
+        (WebCore):
+        * dom/Document.h:
+        (Document):
+        * loader/DocumentLoader.cpp: Throughout, use our m_cachedResourceLoader instead
+            of the Document's pointer.
+        (WebCore::DocumentLoader::DocumentLoader): Create a CachedResourceLoader.
+        (WebCore::DocumentLoader::~DocumentLoader):
+        (WebCore::DocumentLoader::isLoadingInAPISense):
+        (WebCore::DocumentLoader::subresource):
+        (WebCore::DocumentLoader::getSubresources):
+        * loader/DocumentLoader.h:
+        (WebCore::DocumentLoader::cachedResourceLoader):
+        (DocumentLoader):
+        * loader/SubresourceLoader.cpp: Remove m_document, since it only existed to keep alive and access the CachedResourceLoader.
+            It can now be accessed from m_documentLoader.
+        (WebCore::SubresourceLoader::SubresourceLoader):
+        (WebCore::SubresourceLoader::~SubresourceLoader):
+        (WebCore::SubresourceLoader::willSendRequest):
+        (WebCore::SubresourceLoader::releaseResources):
+        * loader/SubresourceLoader.h:
+        (SubresourceLoader):
+        * loader/cache/CachedResourceLoader.cpp: Handle the possibility of a null Document in several places.
+        (WebCore::CachedResourceLoader::CachedResourceLoader):
+        (WebCore::CachedResourceLoader::~CachedResourceLoader):
+        (WebCore::CachedResourceLoader::frame):
+        (WebCore::CachedResourceLoader::canRequest):
+        (WebCore::CachedResourceLoader::determineRevalidationPolicy):
+        (WebCore::CachedResourceLoader::printAccessDeniedMessage):
+        (WebCore::CachedResourceLoader::loadDone):
+        * loader/cache/CachedResourceLoader.h:
+        (WebCore):
+        (WebCore::CachedResourceLoader::create): Add create(), make constructor private.
+        (CachedResourceLoader):
+        (WebCore::CachedResourceLoader::document):
+        (WebCore::CachedResourceLoader::setDocument):
+        (WebCore::CachedResourceLoader::clearDocumentLoader):
+
+2012-10-09  Alexander Shalamov  <alexander.shalamov@intel.com>
+
+        CSS Style is not recalculated when media attribute of style element is changed
+        https://bugs.webkit.org/show_bug.cgi?id=96752
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        When "media" attribute of style element is changed, style should be recalculated.
+        This patch modifies HTMLStyleElement::parseAttribute, so that when the media attribute
+        is updated, new MediaQuerySet is created and applied to the style element then, document
+        style is recalculated. Since media query set is updated for CSSStyleSheet, CSSOM wrapper
+        for media query should be updated as well in order to sync with new media query set value.
+
+        Test: fast/media/mq-js-update-media.html
+
+        * css/CSSStyleSheet.cpp:
+        (WebCore::CSSStyleSheet::setMediaQueries):
+        * html/HTMLStyleElement.cpp:
+        (WebCore::HTMLStyleElement::parseAttribute):
+
+2012-10-09  Ben Murdoch  <benm@google.com>
+
+        [chromium][Android] Add WebSecurityOrigin::grantLoadLocalResources()
+        https://bugs.webkit.org/show_bug.cgi?id=97689
+
+        Reviewed by Adam Barth.
+
+        In addition to the WebKit/chromium side of the change, remove the
+        ASSERT in SecurityOrigin::grantLoadLocalResources(). Android WebView
+        is a legitimate user of this API in cases where neither of the
+        ASSERT'd conditions hold.
+
+        * page/SecurityOrigin.cpp:
+        (WebCore::SecurityOrigin::grantLoadLocalResources): Remove ASSERT.
+
+2012-10-09  Jon Lee  <jonlee@apple.com>
+
+        Build fix for Qt Windows.
+
+        * html/HTMLPlugInElement.h: Include Image.h.
+
+2012-10-09  Enrica Casucci  <enrica@apple.com>
+
+        Only measure text once instead of twice when performing line layout.
+        https://bugs.webkit.org/show_bug.cgi?id=98317
+        <rdar://problem/12080821>
+
+        Reviewed by Dan Bernstein.
+
+        Since we are measuring each word to find out where the line break should occur,
+        we should cache that information to avoid measuring the run again when
+        creating the line box. The bulk of the change is in nextLineBreak, where
+        the measurements are collected and placed in a vector so that they can
+        be consumed in setLogicalWidthForTextRun where we used to measure the
+        text one more time.
+        Each entry in the vector is a WordMeasurement object that contains information
+        about the start and end offset in the run, the renderer, the measured width
+        and, possibly, a list of fallback fonts.
+        When we need to compute the width of the run to create the line box, we add
+        all the measurements for the given renderer in the run to get the total width.
+
+        * platform/graphics/Font.cpp:
+        (WebCore::Font::width): Added fallback fonts parameter.
+        * platform/graphics/Font.h:
+        (Font): Added fallback fonts parameter to the width static member function.
+        This method is called when we compute the width using TextLayout.
+        * platform/graphics/mac/ComplexTextController.cpp:
+        (WebCore::TextLayout::width): Added fallback fonts parameter.
+        (WebCore::Font::width):
+        (WebCore::ComplexTextController::advance):
+        * platform/graphics/mac/ComplexTextController.h:
+        (ComplexTextController): Added fallback fonts parameter to advance method.
+        * rendering/RenderBlock.h: Added WordMeasures parameter to few methods.
+        * rendering/RenderBlockLineLayout.cpp:
+        (WordMeasurement): Added new class to hold measurement information.
+        (WebCore::setLogicalWidthForTextRun): This is where we compute the run width using the
+        cached information.
+        (WebCore::RenderBlock::computeInlineDirectionPositionsForLine): Added wordMeasures parameter.
+        (WebCore::RenderBlock::createLineBoxesFromBidiRuns): Added wordMeasures parameter.
+        (WebCore::RenderBlock::layoutRunsAndFloatsInRange): Added declaration of the WordMeasures
+        vector and its use.
+        (WebCore::textWidth): Added fallbackFonts parameter, since now we only measure once.
+        (WebCore::RenderBlock::LineBreaker::nextLineBreak): This method has been modified to collect
+        the measurements of the individual words and add them to the vector.
+
+2012-10-09  Levi Weintraub  <leviw@chromium.org>
+
+        [Sub pixel layout] Fast-path iframe scrolling can picks up an extra pixel
+        https://bugs.webkit.org/show_bug.cgi?id=98571
+
+        Reviewed by Emil A Eklund.
+
+        Refactoring all coordinate-switching functionality to use a single "mode" flag
+        as opposed to having a bunch of boolean values. This enables the same set of
+        options across the board, and a consistent interface. This was previously
+        done for mapLocalToContainer.
+
+        The imptetus for this for this stems from the one logical change in this patch
+        which only effects sub-pixel layout. FrameView::convertToRenderer and
+        convertFromRenderer return IntPoint coordinates, and need to also snap transform
+        offsets to determine proper rects for scrolling.
+
+        Unlabeled functions below are simply being updated to these new interfaces.
+
+        Test: fast/sub-pixel/sub-pixel-iframe-copy-on-scroll.html
+
+        * WebCore.exp.in:
+        * dom/ContainerNode.cpp:
+        (WebCore::ContainerNode::getUpperLeftCorner):
+        (WebCore::ContainerNode::getLowerRightCorner):
+        * dom/Element.cpp:
+        (WebCore::Element::boundsInRootViewSpace):
+        * dom/MouseRelatedEvent.cpp:
+        (WebCore::MouseRelatedEvent::computeRelativePosition):
+        * dom/Node.cpp:
+        (WebCore::Node::convertToPage):
+        (WebCore::Node::convertFromPage):
+        * html/HTMLSelectElement.cpp:
+        (WebCore::HTMLSelectElement::listBoxDefaultEventHandler):
+        * html/shadow/SliderThumbElement.cpp:
+        (WebCore::SliderThumbElement::setPositionFromPoint):
+        * html/shadow/SpinButtonElement.cpp:
+        (WebCore::SpinButtonElement::defaultEventHandler):
+        * page/FrameView.cpp:
+        (WebCore::FrameView::convertToRenderer): Now pixel-snaps offsets before passing
+        them to TransformState, which transforms the coordinates.
+        (WebCore::FrameView::convertFromRenderer): Ditto.
+        * rendering/LayoutState.cpp:
+        (WebCore::LayoutState::LayoutState):
+        * rendering/RenderBlock.cpp:
+        (WebCore::RenderBlock::absoluteQuads):
+        * rendering/RenderBox.cpp:
+        (WebCore::RenderBox::absoluteQuads):
+        (WebCore::RenderBox::mapLocalToContainer):
+        (WebCore::RenderBox::mapAbsoluteToLocalPoint):
+        * rendering/RenderBox.h:
+        (RenderBox):
+        * rendering/RenderBoxModelObject.cpp:
+        (WebCore::RenderBoxModelObject::mapAbsoluteToLocalPoint):
+        * rendering/RenderBoxModelObject.h:
+        (RenderBoxModelObject):
+        * rendering/RenderEmbeddedObject.cpp:
+        (WebCore::RenderEmbeddedObject::isInUnavailablePluginIndicator):
+        * rendering/RenderFrameSet.cpp:
+        (WebCore::RenderFrameSet::userResize):
+        * rendering/RenderGeometryMap.cpp:
+        (WebCore::RenderGeometryMap::absolutePoint):
+        * rendering/RenderInline.cpp:
+        (WebCore::RenderInline::mapLocalToContainer):
+        * rendering/RenderInline.h:
+        (RenderInline):
+        * rendering/RenderLayer.cpp:
+        (WebCore::RenderLayer::absoluteToContents):
+        (WebCore::RenderLayer::calculateClipRects):
+        * rendering/RenderMediaControls.cpp:
+        (WebCore::RenderMediaControls::volumeSliderOffsetFromMuteButton):
+        * rendering/RenderMenuList.cpp:
+        (WebCore::RenderMenuList::showPopup):
+        * rendering/RenderObject.cpp:
+        (WebCore::RenderObject::localToAbsolute):
+        (WebCore::RenderObject::absoluteToLocal):
+        (WebCore::RenderObject::mapLocalToContainer):
+        (WebCore::RenderObject::mapAbsoluteToLocalPoint):
+        (WebCore::RenderObject::localToContainerQuad):
+        (WebCore::RenderObject::localToContainerPoint):
+        * rendering/RenderObject.h:
+        (RenderObject): MapLocalToContainerFlags is now MapCoordinatesFlags since it's
+        now used for other conversion methods.
+        (WebCore::RenderObject::localToAbsoluteQuad):
+        * rendering/RenderTheme.cpp:
+        (WebCore::RenderTheme::volumeSliderOffsetFromMuteButton):
+        * rendering/RenderView.cpp:
+        (WebCore::RenderView::mapLocalToContainer):
+        (WebCore::RenderView::mapAbsoluteToLocalPoint):
+        * rendering/RenderView.h:
+        (RenderView):
+        * rendering/svg/RenderSVGForeignObject.cpp:
+        (WebCore::RenderSVGForeignObject::mapLocalToContainer):
+        * rendering/svg/RenderSVGForeignObject.h:
+        (RenderSVGForeignObject):
+        * rendering/svg/RenderSVGInline.cpp:
+        (WebCore::RenderSVGInline::mapLocalToContainer):
+        * rendering/svg/RenderSVGInline.h:
+        (RenderSVGInline):
+        * rendering/svg/RenderSVGModelObject.cpp:
+        (WebCore::RenderSVGModelObject::mapLocalToContainer):
+        * rendering/svg/RenderSVGModelObject.h:
+        (RenderSVGModelObject):
+        * rendering/svg/RenderSVGRoot.cpp:
+        (WebCore::RenderSVGRoot::mapLocalToContainer):
+        * rendering/svg/RenderSVGRoot.h:
+        (RenderSVGRoot):
+        * rendering/svg/RenderSVGText.cpp:
+        (WebCore::RenderSVGText::mapLocalToContainer):
+        * rendering/svg/RenderSVGText.h:
+        (RenderSVGText):
+        * rendering/svg/SVGRenderSupport.cpp:
+        (WebCore::SVGRenderSupport::mapLocalToContainer):
+        * svg/SVGSVGElement.cpp:
+        (WebCore::SVGSVGElement::localCoordinateSpaceTransform):
+
+2012-10-09  Jon Lee  <jonlee@apple.com>
+
+        [WK2] Have plugins render offscreen to capture snapshot
+        https://bugs.webkit.org/show_bug.cgi?id=98326
+        <rdar://problem/12426658>
+
+        Reviewed by Simon Fraser.
+
+        Change updateSnapshot() to use a PassRefPtr<Image> instead of Image*. WebKit2 ultimately
+        hands the image off to RenderSnapshottedPlugin. A CachedImage instance then manages the
+        lifetime of the Image.
+
+        * html/HTMLPlugInElement.h:
+        (WebCore::HTMLPlugInElement::updateSnapshot):
+        * html/HTMLPlugInImageElement.cpp:
+        (WebCore::HTMLPlugInImageElement::updateSnapshot):
+        * html/HTMLPlugInImageElement.h:
+        (HTMLPlugInImageElement):
+        * rendering/RenderSnapshottedPlugIn.cpp:
+        (WebCore::RenderSnapshottedPlugIn::updateSnapshot): Updated to use the PassRefPtr<Image>
+        pointer.
+        * rendering/RenderSnapshottedPlugIn.h:
+        (RenderSnapshottedPlugIn):
+
+2012-10-09  Adam Barth  <abarth@webkit.org>
+
+        Unreviewed. Move this file to where the build systems think it should
+        be. See https://bugs.webkit.org/show_bug.cgi?id=94755
+
+        * platform/graphics/CustomFilterConstants.h: Removed.
+        * platform/graphics/filters/CustomFilterConstants.h: Copied from Source/WebCore/platform/graphics/CustomFilterConstants.h.
+
+2012-10-09  Tony Chang  <tony@chromium.org>
+
+        Use computeLogical* methods instead of updateLogical* methods in RenderImage
+        https://bugs.webkit.org/show_bug.cgi?id=98802
+
+        Reviewed by Eric Seidel.
+
+        We were storing the old values of width/height, calling updateLogical{Width,Height}, then restoring
+        the old values.  Instead, use the computeLogical{Width,Height} methods so we don't have to overwrite
+        the current values.
+
+        No new tests, this is just a refactoring.
+
+        * rendering/RenderImage.cpp:
+        (WebCore::RenderImage::imageDimensionsChanged):
+
+2012-10-09  Enrica Casucci  <enrica@apple.com>
+
+        [chromium] fast/text/international/text-spliced-font.html and fast/writing-mode/Kusa-Makura-
+        background-canvas.html failing on the Mac after r130443
+        https://bugs.webkit.org/show_bug.cgi?id=98545
+
+        Reviewed by Tony Chang.
+
+        Adding back the ! removed by mistake before submitting r130779. 
+
+        * platform/graphics/FontFastPath.cpp:
+        (WebCore::Font::glyphDataAndPageForCharacter):
+
+2012-10-09  Artem Simonov  <asimonov@rim.com>
+
+        [BlackBerry] EGL Context deleted prematurely in GraphicsContext3D destructor
+        https://bugs.webkit.org/show_bug.cgi?id=98796
+
+        Reviewed by George Staikos.
+
+        Reordered destruction of GraphicsContext3D so that the compositing layer is
+        destroyed first.
+
+        * platform/graphics/blackberry/GraphicsContext3DBlackBerry.cpp:
+        (WebCore::GraphicsContext3D::~GraphicsContext3D):
+
+2012-10-09  Ben Wagner  <bungeman@chromium.org>
+
+        Disable hinting when webkit-font-smoothing:antialiased is used on Mac.
+        https://bugs.webkit.org/show_bug.cgi?id=98061
+
+        Reviewed by Stephen White.
+
+        Normal anti-aliased text matches subpixel anti-aliased text.
+        However, text marked with webkit-font-smoothing:antialiased should be drawn without hinting to match Safari.
+        See crbug.com/152304 . 
+
+        Test is fast/css/font-smoothing.html, but DRT runs with font smoothing disabled, so no change visible. 
+
+        * platform/graphics/skia/FontSkia.cpp:
+        (WebCore::setupPaint):
+        Set kNo_Hinting when webkit-font-smoothing is antialiased.
+
+2012-10-09  Max Vujovic  <mvujovic@adobe.com>
+
+        [CSS Shaders] Create constants for vertex attribute sizes and offsets
+        https://bugs.webkit.org/show_bug.cgi?id=94755
+
+        Reviewed by Dean Jackson.
+
+        Factor out the vertex attribute size and offset constants into a new file,
+        CustomFilterConstants.h. Replace literals in CustomFilterMeshGenerator with the constants.
+
+        I could have added the constants to CustomFilterMeshGenerator.h, but this would make
+        FECustomFilter depend on CustomFilterMeshGenerator.
+
+        I also could have added the constants to CustomFilterMesh.h, but this would make
+        CustomFilterMeshGenerator depend on CustomFilterMesh.
+
+        No new tests. No change in behavior.
+
+        * GNUmakefile.list.am:
+        * Target.pri:
+        * WebCore.gypi:
+        * WebCore.vcproj/WebCore.vcproj:
+        * WebCore.xcodeproj/project.pbxproj:
+        * platform/graphics/CustomFilterConstants.h: Added.
+        (WebCore):
+        * platform/graphics/filters/CustomFilterMeshGenerator.h:
+        (WebCore::CustomFilterMeshGenerator::floatsPerVertex):
+            Use the new constants instead of literal values.
+        * platform/graphics/filters/FECustomFilter.cpp:
+        (WebCore::FECustomFilter::bindProgramAndBuffers):
+            Pull the constant definitions out of here.
+
+2012-10-09  Michael Saboff  <msaboff@apple.com>
+
+        MarkupAccumulator should optimally handle 8 bit Strings
+        https://bugs.webkit.org/show_bug.cgi?id=98224
+
+        Reviewed by Ryosuke Niwa.
+
+        Updated appendCharactersReplacingEntities to take a string, offset and length and process 8 or 16 bit
+        data as appropriate.  Also made it a member function of MarkupAccumulator.
+
+        No new tests, behavior covered by existing tests.
+
+        * editing/MarkupAccumulator.cpp:
+        (WebCore::MarkupAccumulator::appendCharactersReplacingEntities):
+        (WebCore::MarkupAccumulator::appendAttributeValue):
+        (WebCore::MarkupAccumulator::appendNodeValue):
+        * editing/MarkupAccumulator.h:
+        (MarkupAccumulator):
+        * editing/markup.cpp:
+        (WebCore::StyledMarkupAccumulator::appendText):
+        (WebCore::urlToMarkup):
+
+2012-10-09  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: Overflowing key generator should throw ConstraintError
+        https://bugs.webkit.org/show_bug.cgi?id=98807
+
+        Reviewed by Tony Chang.
+
+        After the WebKit implementation landed throwing DataError, public-webapps
+        consensus was that the exception thrown should be ConstraintError. Trivial
+        change, and we pass one more W3C test submission.
+
+        Test: storage/indexeddb/key-generator.html
+
+        * Modules/indexeddb/IDBObjectStoreBackendImpl.cpp:
+        (WebCore::IDBObjectStoreBackendImpl::putInternal):
+
+2012-10-08  Martin Robinson  <mrobinson@igalia.com>
+
+        Fix the order of the statements in my previous build fix.
+
+        Reviewed by Gustavo Noronha Silva.
+
+        My previous build build fix for ResourceHandleSoup ordered the assignment
+        of the local ResourceHandleInternal incorrectly. Instead of being before
+        both assertions, it should be interspersed among them.
+
+        * platform/network/soup/ResourceHandleSoup.cpp:
+        (WebCore::createSoupMessageForHandleAndRequest):
+
+2012-10-09  Beth Dakin  <bdakin@apple.com>
+
+        https://bugs.webkit.org/show_bug.cgi?id=98457
+        ScrollingStateNodes should be referenced via IDs on 
+        RenderLayerBacking
+
+        Reviewed by Simon Fraser.
+
+        This patch associates all ScrollingStateNodes with a 
+        RenderLayerBacking via a HashMap from RenderLayerBackings to 
+        ScrollingStateNodes on ScrollingCoordinator. Prior to this patch, the 
+        root ScrollingStateNode was created immediately upon creation of the 
+        ScrollingCoordinator, and it was constantly re-used for every main 
+        FrameView. This doesn't work in the new model since that doesn't 
+        allow that ScrollingStateNode to have a definite association with a 
+        RenderLayerBacking. So this patch does also introduce some lifetime 
+        differences with the ScrollingStateNodes.
+
+        If a page is going into the page cache, we should clear the state 
+        tree. When the page is in the cache, we won't have access to the 
+        RenderLayerBacking, and we don't want to be doing anything with the 
+        ScrollingStateNodes anyway.
+        * dom/Document.cpp:
+        (WebCore::Document::setInPageCache):
+
+        When a page is restored from the page cache, call 
+        frameViewRootLayerDidChange() to re-create the state tree.
+        * loader/HistoryController.cpp:
+        (WebCore::HistoryController::restoreScrollPositionAndViewState):
+
+        This new FrameView function will return the scrollLayerID for a given FrameView.
+        * page/FrameView.cpp:
+        (WebCore::FrameView::scrollLayerID):
+        (WebCore):
+        * page/FrameView.h:
+        (FrameView):
+
+        There is a lot of unfortunate fiddling with the terrible 
+        if-defs in ScrollingCoordinator. I added a FIXME to the header
+        noting how we can avoid this in the future.
+        * page/scrolling/ScrollingCoordinator.cpp:
+
+        All of this code used to refer to the rootStateNode directly. 
+        Instead, now it looks up the proper ScrollingStateNode for the given 
+        FrameView in the HashMap.
+        (WebCore::ScrollingCoordinator::frameViewLayoutUpdated):
+        (WebCore::ScrollingCoordinator::frameViewWheelEventHandlerCountChanged):
+        (WebCore::ScrollingCoordinator::frameViewRootLayerDidChange):
+        (WebCore::ScrollingCoordinator::requestScrollPositionUpdate):
+        (WebCore::ScrollingCoordinator::updateMainFrameScrollLayerPosition):
+        (WebCore::ScrollingCoordinator::recomputeWheelEventHandlerCountForFrameView):
+        (WebCore::ScrollingCoordinator::setScrollLayerForNode):
+        (WebCore::ScrollingCoordinator::setNonFastScrollableRegionForNode):
+        (WebCore::ScrollingCoordinator::setScrollParametersForNode):
+        (WebCore::ScrollingCoordinator::setWheelEventHandlerCountForNode):
+
+        Returns the existing ScrollingStateNode for a given FrameView by 
+        looking it up in the HashMap.
+        (WebCore::ScrollingCoordinator::stateNodeForFrameView):
+
+        This is called when a RenderLayerBacking is destroyed. At that time, 
+        its associated ScrollingStateNode is destroyed.
+        (WebCore::ScrollingCoordinator::detachFromStateTree):
+
+        clearStateTree() clears the HashMap and destroys all of the nodes in 
+        the current state tree.
+        (WebCore::ScrollingCoordinator::clearStateTree):
+
+        Creates a new root state node for the given FrameView.
+        (WebCore::ScrollingCoordinator::ensureRootStateNodeForFrameView):
+
+        Some new functions for the new node stuff.
+        * page/scrolling/ScrollingCoordinator.h:
+        * page/scrolling/ScrollingCoordinatorNone.cpp:
+        (WebCore::ScrollingCoordinator::setShouldUpdateScrollLayerPositionOnMainThread):
+        (WebCore::ScrollingCoordinator::supportsFixedPositionLayers):
+        (WebCore::ScrollingCoordinator::setLayerIsContainerForFixedPositionLayers):
+        (WebCore::ScrollingCoordinator::setLayerIsFixedToContainerLayer):
+        (WebCore::ScrollingCoordinator::scrollableAreaScrollLayerDidChange):
+        (WebCore::ScrollingCoordinator::detachFromStateTree):
+        (WebCore::ScrollingCoordinator::clearStateTree):
+        (WebCore::ScrollingCoordinator::ensureRootStateNodeForFrameView):
+        (WebCore::setScrollParameters):
+        (WebCore::setWheelEventHandlerCount):
+
+        New remove functions are used when the sate tree is cleared and when 
+        a RenderLayerBacking is destroyed.
+        * page/scrolling/ScrollingStateNode.cpp:
+        (WebCore::ScrollingStateNode::removeChild):
+        (WebCore):
+        * page/scrolling/ScrollingStateNode.h:
+        (WebCore::ScrollingStateNode::isScrollingStateScrollingNode):
+        (ScrollingStateNode):
+        (WebCore::ScrollingStateNode::parent):
+
+        New convenience function for casting to ScrollingStateScrollingNodes.
+        * page/scrolling/ScrollingStateScrollingNode.h:
+        (WebCore::toScrollingStateScrollingNode):
+        (WebCore):
+
+        No longer automatically create a root node upon creation of the 
+        ScrollingStateTree. We now want to wait to create the root node until 
+        we have a RenderLayerBacking to associate it with.
+        * page/scrolling/ScrollingStateTree.cpp:
+        (WebCore::ScrollingStateTree::ScrollingStateTree):
+        (WebCore::ScrollingStateTree::removeNode):
+        (WebCore):
+        * page/scrolling/ScrollingStateTree.h:
+        (WebCore::ScrollingStateTree::setRootStateNode):
+        (ScrollingStateTree):
+
+        RenderLayerBacking has a new data member called m_scrollLayerID. If 
+        this RenderLayerBacking is represented in the scrolling tree, then 
+        the ID with be unique and non-zero. 
+        * rendering/RenderLayerBacking.cpp:
+        (WebCore::RenderLayerBacking::RenderLayerBacking):
+        (WebCore::RenderLayerBacking::~RenderLayerBacking):
+        (WebCore::generateScrollLayerID):
+        (WebCore):
+        (WebCore::RenderLayerBacking::attachToScrollingCoordinator):
+        (WebCore::RenderLayerBacking::detachFromScrollingCoordinator):
+        * rendering/RenderLayerBacking.h:
+        (RenderLayerBacking):
+        (WebCore::RenderLayerBacking::scrollLayerID):
+
+        Move the call to ScrollingCooridinator::frameViewRootLayerDidChange() 
+        from RenderLayerCompositor::attachRootLayer() to 
+        RenderLayerCompositor:: updateBacking(). The problem with the old call 
+        site is that there is no backing at that time, so we are trying to set 
+        state on the root scrolling state node before we have enough 
+        information to create that node and add it to the HashMap.
+        * rendering/RenderLayerCompositor.cpp:
+        (WebCore::RenderLayerCompositor::updateBacking):
+        (WebCore::RenderLayerCompositor::attachRootLayer):
+
+2012-10-09  Florin Malita  <fmalita@chromium.org>
+
+        SVGResources should use HashSet<AtomicString> instead of HashSet<AtomicStringImpl*>
+        https://bugs.webkit.org/show_bug.cgi?id=98683
+
+        Reviewed by Darin Adler.
+
+        Eric's notes:
+
+        SVGResources should use HashSet<AtomicString> instead of HashSet<AtomicStringImpl*>
+        They do basically the same thing, and the former is much more common (and less code). It's
+        also safe, on the off-chance that we're using AtomicStrings which might otherwise go away.
+
+        No new tests, refactoring. 
+
+        * rendering/svg/SVGResources.cpp:
+        (WebCore::clipperFilterMaskerTags):
+        (WebCore::markerTags):
+        (WebCore::fillAndStrokeTags):
+        (WebCore::chainableResourceTags):
+        (WebCore::SVGResources::buildCachedResources):
+
+2012-10-09  Enrica Casucci  <enrica@apple.com>
+
+        [chromium] fast/text/international/text-spliced-font.html and fast/writing-mode/Kusa-Makura-background-canvas.html
+        failing on the Mac after r130443
+        https://bugs.webkit.org/show_bug.cgi?id=98545
+
+        Reviewed by Tony Chang.
+
+        Fixes a regression introduced with r130443.
+        No new tests added since we already have tests covering this.
+        Updated TestExpectations for chromium and mac.
+
+        * platform/graphics/FontFastPath.cpp:
+        (WebCore::Font::glyphDataAndPageForCharacter): Text orientation should not be
+        taken into account if the character is an ideograph or a symbol.
+
+2012-10-09  Philip Rogers  <pdr@google.com>
+
+        Prevent animation when CSS attributeType is invalid.
+        https://bugs.webkit.org/show_bug.cgi?id=94569
+
+        Reviewed by Dirk Schulze.
+
+        This patch changes hasValidAttributeType() to return false when
+        we have attributeType=CSS with a non-CSS attribute name.
+
+        Previously we would animate non-CSS attributes when attributeType was
+        CSS which resulted in crashes. To track this case, this patch catches
+        changes to targetElement, attributeName, and attributeType and checks
+        if an invalid combination is present. If invalid, hasInvalidCSSAttributeType()
+        will return true causing hasValidAttributeType() to return false and prevent
+        the animation from running.
+
+        Tests: svg/animations/animate-css-xml-attributeType.html
+               svg/animations/invalid-css-attribute-crash-expected.svg
+               svg/animations/invalid-css-attribute-crash.svg
+
+        * svg/SVGAnimateElement.cpp:
+        (WebCore::SVGAnimateElement::hasValidAttributeType):
+        (WebCore::SVGAnimateElement::targetElementWillChange):
+        * svg/SVGAnimationElement.cpp:
+        (WebCore::SVGAnimationElement::SVGAnimationElement):
+        (WebCore::SVGAnimationElement::isSupportedAttribute):
+
+            This now supports the attributeType attribute which is stored in m_attributeType.
+
+        (WebCore::SVGAnimationElement::parseAttribute):
+        (WebCore::SVGAnimationElement::setAttributeType):
+
+            Changes to attributeType, attributeName, and targetElement need to be tracked
+            to determine when an invalid combination happens.
+
+        (WebCore::SVGAnimationElement::targetElementWillChange):
+        (WebCore):
+        (WebCore::SVGAnimationElement::setAttributeName):
+        (WebCore::SVGAnimationElement::checkInvalidCSSAttributeType):
+        * svg/SVGAnimationElement.h:
+        (WebCore::SVGAnimationElement::attributeType):
+        (SVGAnimationElement):
+        (WebCore::SVGAnimationElement::hasInvalidCSSAttributeType):
+        * svg/animation/SVGSMILElement.cpp:
+        (WebCore::SVGSMILElement::targetElement):
+        * svg/animation/SVGSMILElement.h:
+        (SVGSMILElement):
+
+2012-10-09  Pravin D  <pravind.2k4@gmail.com>
+
+        max-width property is does not overriding the width properties for css tables(display:table)
+        https://bugs.webkit.org/show_bug.cgi?id=98455
+
+        Reviewed by Tony Chang.
+
+        The max-width property determines the maximum computed width an element can have. In case of css tables(display:table),
+        the computed was not being limited by the max-width property. The current patch fixes this issue.
+
+        Test: fast/table/css-table-max-width.html
+
+        * rendering/RenderTable.cpp:
+        (WebCore::RenderTable::updateLogicalWidth):
+         Logic to compute the logical width of an element such that it does not exceed the max-width value.
+         Also when both min-width and max-width are present, the following contraint is used to compute the logical width:
+           1) min-width < Computed LogicalWidth < max-width, when min-width < max-width.
+           2) Computed LogicalWidth = min-width, when min-width > max-width.
+
+2012-10-09  Harald Alvestrand  <hta@google.com>
+
+        Change PeerConnection getStats function to single value local / remote
+        elements in RTCStatsReport.
+
+        https://bugs.webkit.org/show_bug.cgi?id=98753
+
+        Reviewed by Adam Barth.
+
+        IDL of RTCStatsReport has been changed to make local/remote
+        single valued RTCStatsElement attributes.
+        The RTCStatsReport argument to index the list of RTCStatsElement
+        in the local and remote functions has been removed.
+
+        Tested by modifications to RTCPeerConnection-stats.html
+
+        * Modules/mediastream/RTCStatsReport.cpp:
+        (WebCore::RTCStatsReport::addElement):
+        (WebCore::RTCStatsReport::addStatistic):
+        * Modules/mediastream/RTCStatsReport.h:
+        (WebCore::RTCStatsReport::local):
+        (WebCore::RTCStatsReport::remote):
+        (RTCStatsReport):
+        * Modules/mediastream/RTCStatsReport.idl:
+        * Modules/mediastream/RTCStatsResponse.cpp:
+        (WebCore::RTCStatsResponse::addElement):
+        (WebCore::RTCStatsResponse::addStatistic):
+        * Modules/mediastream/RTCStatsResponse.h:
+        (RTCStatsResponse):
+        * platform/chromium/support/WebRTCStatsResponse.cpp:
+        (WebKit::WebRTCStatsResponse::addElement):
+        (WebKit::WebRTCStatsResponse::addStatistic):
+        * platform/mediastream/RTCStatsResponseBase.h:
+        (RTCStatsResponseBase):
+
+2012-10-09  Antonio Gomes  <agomes@rim.com>
+
+        Get rid of FIXED_POSITION_CREATES_STACKING_CONTEXT in favor of Settings::fixedPositionCreatesStackingContext()
+        https://bugs.webkit.org/show_bug.cgi?id=98756
+
+        Reviewed by Rob Buis.
+
+        No behavior change so no new tests.
+
+        * css/StyleResolver.cpp:
+        (WebCore::StyleResolver::collectMatchingRulesForList):
+
 2012-10-09  Garrett Casto  <gcasto@chromium.org>
 
         Allow users to specify a different hover image for TextFieldDecorationElement

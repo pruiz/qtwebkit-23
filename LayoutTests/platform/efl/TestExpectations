@@ -93,21 +93,6 @@ sputnik/Unicode/Unicode_510/S7.6_A3.2.html
 sputnik/Unicode/Unicode_510/S7.6_A5.3_T1.html
 sputnik/Unicode/Unicode_510/S7.6_A5.3_T2.html
 
-# A testcase for this failure is already in cairo tree, but has not yet been fixed.
-# Cairo commit http://cgit.freedesktop.org/cairo/commit/?id=4d4056872db94573183473610ad1d81d5439fdc6
-# https://bugs.webkit.org/show_bug.cgi?id=54471
-canvas/philip/tests/2d.path.arc.selfintersect.1.html
-canvas/philip/tests/2d.path.arc.shape.3.html
-
-# A testcase for this failure is already in cairo tree, but has not yet been fixed.
-# Cairo commit http://cgit.freedesktop.org/cairo/commit/?id=303f56a2d34a23d933a02fa625873211fb51eb3b
-canvas/philip/tests/2d.path.rect.selfintersect.html
-
-# Strangely set miter limit - calculations suggest it should be 1.414 (and the test passes
-# with miter limit set to that) but perhaps there are special steps to be taken because the
-# rectangle has zero height.
-canvas/philip/tests/2d.path.rect.zero.6.html
-
 # Rendering of multipart images is broken: this test times out
 # https://bugs.webkit.org/show_bug.cgi?id=54251
 http/tests/multipart/invalid-image-data-standalone.html
@@ -381,7 +366,7 @@ inspector/debugger/dom-breakpoints.html
 inspector/timeline/timeline-receive-response-event.html
 
 # ENABLE(WIDGET_REGION) is disabled
-fast/css/widget-region-parser.html
+fast/css/draggable-region-parser.html
 
 # http://webkit.org/b/96828
 fast/canvas/webgl/oes-vertex-array-object.html
@@ -637,6 +622,7 @@ webkit.org/b/96886 inspector/debugger/dynamic-script-tag.html [ Failure Pass ]
 Bug(EFL) inspector/profiler/heap-snapshot.html [ Failure Pass ]
 Bug(EFL) inspector/timeline/timeline-enum-stability.html [ Failure Pass ]
 webkit.org/b/95066 inspector/styles/media-queries.html [ Failure Pass ]
+webkit.org/b/98777 inspector/styles/styles-history.html [ Failure Pass ]
 
 # Sometimes asserts in MessagePort::contextDestroyed
 webkit.org/b/94458 http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-in-body.html [ Crash Failure Pass ]
@@ -818,6 +804,8 @@ Bug(EFL) svg/zoom/page/zoom-zoom-coords.xhtml
 webkit.org/b/98644 svg/W3C-SVG-1.1/pservers-grad-13-b.svg [ Skip ]
 webkit.org/b/98651 svg/text/non-bmp-positioning-lists.svg [ Skip ]
 webkit.org/b/98653 svg/text/lengthAdjust-text-metrics.html [ Failure ]
+
+webkit.org/b/98718 svg/animations/animate-css-xml-attributeType.html [ Failure Pass ]
 
 # EFL's TestRunner does not implement setMediaType
 Bug(EFL) fast/media/print-restores-previous-mediatype.html [ Failure ]

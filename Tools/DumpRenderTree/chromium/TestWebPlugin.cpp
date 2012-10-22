@@ -109,6 +109,12 @@ static void printEventDetails(const WebKit::WebInputEvent& event)
         printTouchList(touch.touches, touch.touchesLength);
         printTouchList(touch.changedTouches, touch.changedTouchesLength);
         printTouchList(touch.targetTouches, touch.targetTouchesLength);
+    } else if (WebKit::WebInputEvent::isMouseEventType(event.type) || event.type == WebKit::WebInputEvent::MouseWheel) {
+        const WebKit::WebMouseEvent& mouse = static_cast<const WebKit::WebMouseEvent&>(event);
+        printf("* %d, %d\n", mouse.x, mouse.y);
+    } else if (WebKit::WebInputEvent::isGestureEventType(event.type)) {
+        const WebKit::WebGestureEvent& gesture = static_cast<const WebKit::WebGestureEvent&>(event);
+        printf("* %d, %d\n", gesture.x, gesture.y);
     }
 }
 
@@ -475,6 +481,9 @@ bool TestWebPlugin::handleDragStatusUpdate(WebKit::WebDragStatus dragStatus, con
         break;
     case WebKit::WebDragStatusLeave:
         dragStatusName = "DragLeave";
+        break;
+    case WebKit::WebDragStatusDrop:
+        dragStatusName = "DragDrop";
         break;
     case WebKit::WebDragStatusUnknown:
         ASSERT_NOT_REACHED();

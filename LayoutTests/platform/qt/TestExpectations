@@ -449,7 +449,7 @@ fast/forms/time-multiple-fields
 fast/forms/week-multiple-fields
 
 # ENABLE(WIDGET_REGION) is disabled
-fast/css/widget-region-parser.html
+fast/css/draggable-region-parser.html
 
 # Text Autosizing is not enabled.
 webkit.org/b/84186 fast/text-autosizing
@@ -897,10 +897,6 @@ editing/selection/5195166-1.html
 # https://bugs.webkit.org/show_bug.cgi?id=66431
 editing/selection/collapse-selection-in-bidi.html
 
-# RTL: selection.modify("move", "forward", "line") when cursor is at start of a line does not move down a line
-# https://bugs.webkit.org/show_bug.cgi?id=51517
-editing/selection/extend-to-line-boundary.html
-
 # [Qt] editing/selection/move-vertically-with-paddings-borders.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=62821
 editing/selection/move-vertically-with-paddings-borders.html
@@ -912,10 +908,6 @@ editing/selection/select-bidi-run.html
 # [Qt] REGRESSION (r71465): editing/selection/after-line-break.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=49127
 editing/selection/after-line-break.html
-
-# REGRESSION(r72861): editing/selection/click-left-of-rtl-wrapping-text.html and modify-up-on-rtl-wrapping-text.html fail on all but Mac platform
-# https://bugs.webkit.org/show_bug.cgi?id=50204
-editing/selection/modify-up-on-rtl-wrapping-text.html
 
 # [Qt]REGRESSION(r78846): editing/selection/mixed-editability-10.html
 # https://bugs.webkit.org/show_bug.cgi?id=54725
@@ -1426,6 +1418,8 @@ svg/text/text-fonts-01-t.svg
 svg/text/text-intro-05-t.svg
 svg/text/text-tselect-02-f.svg
 
+webkit.org/b/98718 svg/animations/animate-css-xml-attributeType.html [ Failure Pass ]
+
 # [Qt] svg/animations/animate-path-nested-transforms.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=48987
 svg/animations/animate-path-nested-transforms.html
@@ -1497,7 +1491,6 @@ svg/carto.net/tabgroup.svg
 # [Qt] svg/css/text-gradient-shadow.svg fails
 # https://bugs.webkit.org/show_bug.cgi?id=92734
 svg/css/text-gradient-shadow.svg
-
 
 # These files need new expectations after changing the behavrior from radiaGradients to SVG2
 webkit.org/b/98569 svg/W3C-SVG-1.1-SE/styling-pres-02-f.svg [ Failure Pass ] 
@@ -2044,6 +2037,10 @@ fast/writing-mode/vertical-subst-font-vert-no-dflt.html
 # https://bugs.webkit.org/show_bug.cgi?id=98751
 fast/xmlhttprequest/xmlhttprequest-nonexistent-file.html
 
+# [Qt] REGRESSION (r130851): fast/text/word-space-with-kerning.html fails
+# https://bugs.webkit.org/show_bug.cgi?id=98876
+fast/text/word-space-with-kerning.html
+
 # ============================================================================= #
 # failing security tests
 # ============================================================================= #
@@ -2436,10 +2433,6 @@ fast/workers/worker-crash-with-invalid-location.html
 # https://bugs.webkit.org/show_bug.cgi?id=71266
 fast/ruby/text-decoration-in-descendants-ruby.html
 
-# Failing since isWordTextBreak is not implemented. https://bugs.webkit.org/show_bug.cgi?id=81136
-editing/selection/move-by-word-visually-multi-line.html
-editing/selection/move-by-word-visually-mac.html
-
 # https://bugs.webkit.org/show_bug.cgi?id=82628
 svg/hittest/svg-ellipse-non-scale-stroke.xhtml
 
@@ -2507,10 +2500,6 @@ http/tests/inspector/network/network-initiator.html
 # Requires ENABLE(MEDIA_CAPTURE)
 fast/forms/file/file-input-capture.html
 
-# [Qt] new test http/tests/cookies/single-quoted-value.html is failing
-# https://bugs.webkit.org/show_bug.cgi?id=86066
-http/tests/cookies/single-quoted-value.html
-
 # [Qt] fast/frames/seamless/seamless-inherited-document-style.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=86182
 fast/frames/seamless/seamless-inherited-document-style.html
@@ -2531,10 +2520,6 @@ inspector/styles/region-style-crash.html
 # most likely related to https://bugs.webkit.org/show_bug.cgi?id=84102
 fast/profiler/stop-profiling-after-setTimeout.html
 fast/profiler/dead-time.html
-
-# [Qt]REGRESSION(r120107): It made http/tests/xmlhttprequest/origin-exact-matching.html fails
-# https://bugs.webkit.org/show_bug.cgi?id=88913
-http/tests/xmlhttprequest/origin-exact-matching.html
 
 # [Qt]Web Inspector: inspector/extensions/extensions-network.html makes inspector/extensions/extensions-reload.html timeout
 # https://bugs.webkit.org/show_bug.cgi?id=89349
@@ -2641,7 +2626,6 @@ Bug(_qt_slow) [ Debug ] fast/js/dfg-poison-fuzz.html [ Pass Slow ]
 webkit.org/b/62662 [ Debug ] inspector/cookie-parser.html [ Crash Pass ]
 
 webkit.org/b/73766 css3/unicode-bidi-isolate-aharon-failing.html [ ImageOnlyFailure ]
-
 
 webkit.org/b/83906 ietestcenter/css3/grid/grid-column-001.htm [ ImageOnlyFailure ]
 webkit.org/b/83907 ietestcenter/css3/grid/grid-column-002.htm [ ImageOnlyFailure ]

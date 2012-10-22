@@ -1,3 +1,239 @@
+2012-10-10  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL][WK2] Add History callbacks API
+        https://bugs.webkit.org/show_bug.cgi?id=98594
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added History callbacks API to Ewk Context. Added unit tests.
+
+        * PlatformEfl.cmake:
+        * UIProcess/API/efl/EWebKit2.h:
+        * UIProcess/API/efl/ewk_context.cpp:
+        (_Ewk_Context):
+        (_Ewk_Context::_Ewk_Context):
+        (ewk_context_history_callbacks_set): New public function which lets the client to set History callbacks.
+        (ewk_context_history_client_get):
+        (ewk_context_add_visited_link): New public function to mark a URL as visited link.
+        * UIProcess/API/efl/ewk_context.h:
+        * UIProcess/API/efl/ewk_context_history_client.cpp: Added.
+        (getEwkHistoryDelegate):
+        (didNavigateWithNavigationData):
+        (didPerformClientRedirect):
+        (didPerformServerRedirect):
+        (didUpdateHistoryTitle):
+        (populateVisitedLinks):
+        (ewk_context_history_client_attach):
+        * UIProcess/API/efl/ewk_context_history_client_private.h: Added.
+        * UIProcess/API/efl/ewk_context_private.h:
+        * UIProcess/API/efl/ewk_navigation_data.cpp: Added.
+        (_Ewk_Navigation_Data):
+        (_Ewk_Navigation_Data::_Ewk_Navigation_Data):
+        (_Ewk_Navigation_Data::~_Ewk_Navigation_Data):
+        (ewk_navigation_data_ref):
+        (ewk_navigation_data_unref):
+        (ewk_navigation_data_title_get):
+        (ewk_navigation_data_original_request_get):
+        (ewk_navigation_data_url_get):
+        (ewk_navigation_data_new):
+        * UIProcess/API/efl/ewk_navigation_data.h: Added.
+        * UIProcess/API/efl/ewk_navigation_data_private.h: Added.
+        * UIProcess/API/efl/ewk_view.cpp:
+        (addToPageViewMap):
+        (removeFromPageViewMap):
+        (_ewk_view_smart_del):
+        (_ewk_view_initialize):
+        (ewk_view_from_page_get):
+        * UIProcess/API/efl/ewk_view_private.h:
+        * UIProcess/API/efl/tests/test_ewk2_context_history_delegate.cpp: Added.
+        (httpServer):
+        (navigateWithNavigationData):
+        (performClientRedirect):
+        (performServerRedirect):
+        (updateHistoryTitle):
+        (populateVisitedLinks):
+        (onLoadFinishedForRedirection):
+        (serverCallbackRedirection):
+        (TEST_F):
+
+2012-10-09  Byungwoo Lee  <bw80.lee@samsung.com>
+
+        [EFL][WK2] Change parameter and return type of loadUrlSync().
+        https://bugs.webkit.org/show_bug.cgi?id=97920
+
+        Reviewed by Gyuyoung Kim.
+
+        loadUrlSync() uses waitUntilLoadFinished() internally, and it has
+        a parameter and return value for timeout.
+        To set and check timeout, loadUrlSync() should have those.
+
+        A parameter for timeout interval is added to loadUrlSync() and it
+        returns the result of waitUntilLoadFinished() for checking timeout.
+
+        And I added codes to check the result of all the LoadUrlSync()
+        function calls with ASSERT_TRUE() macro.
+
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestBase.cpp:
+        (EWK2UnitTest::EWK2UnitTestBase::loadUrlSync):
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestBase.h:
+        (EWK2UnitTestBase):
+        * UIProcess/API/efl/tests/test_ewk2_back_forward_list.cpp:
+        (TEST_F):
+        * UIProcess/API/efl/tests/test_ewk2_context.cpp:
+        (TEST_F):
+        * UIProcess/API/efl/tests/test_ewk2_cookie_manager.cpp:
+        (TEST_F):
+        * UIProcess/API/efl/tests/test_ewk2_intents.cpp:
+        (TEST_F):
+        * UIProcess/API/efl/tests/test_ewk2_view.cpp:
+        (TEST_F):
+
+2012-10-09  Byungwoo Lee  <bw80.lee@samsung.com>
+
+        [EFL][WK2] Move timeout callback to the CallbackDataTimer class.
+        https://bugs.webkit.org/show_bug.cgi?id=97861
+
+        Reviewed by Gyuyoung Kim.
+
+        Timeout callbacks for waitUntil{LoadFinished,TitleChanged,URIChanged}
+        can be moved to the CallbackDataTimer class.
+
+        Moved the callback implementation to the CallbackDataTimer class.
+
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestBase.cpp:
+        (EWK2UnitTest::CallbackDataTimer::CallbackDataTimer):
+        (CallbackDataTimer):
+        (EWK2UnitTest::CallbackDataTimer::timeOutCallback):
+        (EWK2UnitTest::CallbackDataExpectedValue::CallbackDataExpectedValue):
+        (EWK2UnitTest::EWK2UnitTestBase::waitUntilLoadFinished):
+        (EWK2UnitTest::EWK2UnitTestBase::waitUntilTitleChangedTo):
+        (EWK2UnitTest::EWK2UnitTestBase::waitUntilURIChangedTo):
+
+2012-10-09  Jian Li  <jianli@chromium.org>
+
+        Update the CSS property used to support draggable regions.
+        https://bugs.webkit.org/show_bug.cgi?id=97156
+
+        Reviewed by Adam Barth.
+
+        The CSS property to support draggable regions, guarded under
+        WIDGET_REGION is now disabled from Mac WebKit, in order not to cause
+        confusion with DASHBOARD_SUPPORT feature.
+
+        Also update the code to use the new name annotatedRegions to work for
+        both features.
+
+        * Configurations/FeatureDefines.xcconfig: Disable WIDGET_REGION feature.
+        * WebProcess/WebCoreSupport/WebChromeClient.cpp: Rename dashboardRegions to annotatedRegions.
+        (WebKit::WebChromeClient::annotatedRegionsChanged):
+        * WebProcess/WebCoreSupport/WebChromeClient.h: Rename dashboardRegions to annotatedRegions.
+        (WebChromeClient):
+
+2012-10-09  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r130811 and r130821.
+        http://trac.webkit.org/changeset/130811
+        http://trac.webkit.org/changeset/130821
+        https://bugs.webkit.org/show_bug.cgi?id=98831
+
+        Broke date-suggestion-picker-appearance-with-scroll-bar.html
+        (Requested by abarth|gardening on #webkit).
+
+        * Shared/WebRenderObject.cpp:
+        (WebKit::WebRenderObject::WebRenderObject):
+        * WebProcess/FullScreen/WebFullScreenManager.cpp:
+        (WebKit::screenRectOfContents):
+
+2012-10-09  Jon Lee  <jonlee@apple.com>
+
+        [WK2] Have plugins render offscreen to capture snapshot
+        https://bugs.webkit.org/show_bug.cgi?id=98326
+        <rdar://problem/12426658>
+
+        Reviewed by Simon Fraser.
+
+        Keep the plugin rendering without compositing to easily grab the snapshot.
+
+        PluginView now has two variables referring to snapshots, but are unrelated. The timer
+        is used to capture a snapshot that acts as a poster for a plugin. The ShareableBitmap
+        variable m_snapshot is used whenever the plugin paints in software, to avoid side effects
+        should the plugin run JS during painting.
+
+        * WebProcess/Plugins/PluginView.cpp:
+        (WebKit): Add a named constant for the time delay before a snapshot is taken.
+        (WebKit::PluginView::PluginView): Initialize a 3-second timer to get the snapshot.
+        (WebKit::PluginView::~PluginView): Refactor part of the destructor code out into
+        destroyPluginAndReset() for reuse.
+        (WebKit::PluginView::destroyPluginAndReset): Contains part of the destructor code.
+        In addition to destroying the plugin, the destructor cancels pending loads and streams.
+        (WebKit::PluginView::didInitializePlugin): If the plugin is in a state where it needs
+        to generate or display a poster, don't setup the compositing layer and start the timer.
+        (WebKit::PluginView::paint): Avoid painting if the plugin is not running.
+        (WebKit::PluginView::invalidateRect): Avoid painting if the plugin is not running.
+        (WebKit::PluginView::isAcceleratedCompositingEnabled): Don't enable accelerated compositing
+        until the plugin is running.
+        (WebKit::PluginView::pluginSnapshotTimerFired): When the timer fires, get a snapshot, generate
+        an Image that WebCore can render, and destroy the plugin.
+
+        Rename m_snapshot to m_transientPaintingSnapshot.
+        * WebProcess/Plugins/PluginView.h:
+        * WebProcess/Plugins/PluginView.cpp:
+        (WebKit::PluginView::paint):
+        (WebKit::PluginView::notifyWidget):
+        (WebKit::PluginView::pluginSnapshotTimerFired):
+
+2012-10-09  Rik Cabanier  <cabanier@adobe.com>
+
+        Add missing compile flag for compositing
+        https://bugs.webkit.org/show_bug.cgi?id=98681
+
+        Reviewed by Dirk Schulze.
+
+        This flag is needed in case there is a difference in API
+        when compositing is enabled
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-10-09  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r130680.
+        http://trac.webkit.org/changeset/130680
+        https://bugs.webkit.org/show_bug.cgi?id=98720
+
+        this patch has a typo so was ineffective (Requested by
+        cabanier on #webkit).
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-10-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL][WK2] Inform the PageProxy about visibility changes when the view is shown/hidden.
+        https://bugs.webkit.org/show_bug.cgi?id=98757
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        SVN r130720 exposed a bug in our code: the PageProxy is not
+        notified when one calls evas_object_show() or evas_object_hide()
+        on the view, so the visibility it has when the WebPageProxy is
+        constructed remained set forever.
+
+        This made the ewk_context_vibration_client_callbacks_set unit test
+        start running forever, because WebPageProxy's constructor now sets
+        the page's visibility to hidden by the default for us, since it is
+        called from within ewk_view_smart_add() and before
+        evas_object_show().
+
+        We now listen to the EVAS_CALLBACK_SHOW and EVAS_CALLBACK_HIDE
+        callbacks and update the WebPageProxy accordingly. Note that we
+        could not do this from the smart_show and smart_hide functions we
+        already had, since they are called before the object's actual
+        visibility is updated.
+
+        * UIProcess/API/efl/ewk_view.cpp:
+        (_ewk_view_on_show):
+        (_ewk_view_on_hide):
+        (_ewk_view_smart_add):
+
 2012-10-09  Simon Pena  <spena@igalia.com>
 
         [GTK] Add support for running JavaScript from GResources

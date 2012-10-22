@@ -45,6 +45,7 @@ SOURCES += \
     assembler/ARMAssembler.cpp \
     assembler/ARMv7Assembler.cpp \
     assembler/LinkBuffer.cpp \
+    assembler/MacroAssembler.cpp \
     assembler/MacroAssemblerARM.cpp \
     assembler/MacroAssemblerSH4.cpp \
     bytecode/ArrayProfile.cpp \
@@ -200,6 +201,7 @@ SOURCES += \
     runtime/GetterSetter.cpp \
     runtime/Options.cpp \
     runtime/Identifier.cpp \
+    runtime/IndexingType.cpp \
     runtime/InitializeThreading.cpp \
     runtime/InternalFunction.cpp \
     runtime/JSActivation.cpp \

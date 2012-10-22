@@ -139,7 +139,7 @@
 #include "WebKitCSSFilterValue.h"
 #endif
 
-#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(WIDGET_REGION)
+#if ENABLE(DASHBOARD_SUPPORT)
 #include "DashboardRegion.h"
 #endif
 
@@ -170,11 +170,6 @@
 #include "CSSImageSetValue.h"
 #include "StyleCachedImageSet.h"
 #endif
-
-#if PLATFORM(BLACKBERRY)
-#define FIXED_POSITION_CREATES_STACKING_CONTEXT 1
-#endif
-
 
 using namespace std;
 
@@ -1943,11 +1938,7 @@ void StyleResolver::adjustRenderStyle(RenderStyle* style, RenderStyle* parentSty
         || style->hasFilter()
         || style->hasBlendMode()
         || style->position() == StickyPosition
-#ifdef FIXED_POSITION_CREATES_STACKING_CONTEXT
-        || style->position() == FixedPosition
-#else
         || (style->position() == FixedPosition && e && e->document()->page() && e->document()->page()->settings()->fixedPositionCreatesStackingContext())
-#endif
 #if ENABLE(ACCELERATED_OVERFLOW_SCROLLING)
         // Touch overflow scrolling creates a stacking context.
         || ((style->overflowX() != OHIDDEN || style->overflowY() != OHIDDEN) && style->useTouchOverflowScrolling())
@@ -3327,13 +3318,8 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
         setTextSizeAdjust(primitiveValue->getIdent() == CSSValueAuto);
         return;
     }
-#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(WIDGET_REGION)
 #if ENABLE(DASHBOARD_SUPPORT)
     case CSSPropertyWebkitDashboardRegion:
-#endif
-#if ENABLE(WIDGET_REGION)
-    case CSSPropertyWebkitWidgetRegion:
-#endif
     {
         HANDLE_INHERIT_AND_INITIAL(dashboardRegions, DashboardRegions)
         if (!primitiveValue)
@@ -3371,8 +3357,17 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
             region = region->m_next.get();
         }
 
-        m_element->document()->setHasDashboardRegions(true);
+        m_element->document()->setHasAnnotatedRegions(true);
 
+        return;
+    }
+#endif
+#if ENABLE(WIDGET_REGION)
+    case CSSPropertyWebkitAppRegion: {
+        if (!primitiveValue || !primitiveValue->getIdent())
+            return;
+        m_style->setDraggableRegionMode(primitiveValue->getIdent() == CSSValueDrag ? DraggableRegionDrag : DraggableRegionNoDrag);
+        m_element->document()->setHasAnnotatedRegions(true);
         return;
     }
 #endif

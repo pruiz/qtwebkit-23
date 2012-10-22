@@ -1,3 +1,131 @@
+2012-10-08  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Add WebElement::hasHTMLTagName, and deprecate hasTagName
+        https://bugs.webkit.org/show_bug.cgi?id=98714
+
+        Reviewed by Abhishek Arya.
+
+        * public/WebElement.h:
+        (WebElement):
+        - Add a comment to tagName().
+        - Add a comment to hasTagName().
+        - Declare hasHTMLTagName(), which is useful to check HTML tags.
+        * src/WebElement.cpp:
+        (WebKit::WebElement::hasHTMLTagName): Added.
+
+2012-10-09  Jian Li  <jianli@chromium.org>
+
+        Update the CSS property used to support draggable regions.
+        https://bugs.webkit.org/show_bug.cgi?id=97156
+
+        Reviewed by Adam Barth.
+
+        Update the code to use the new name annotatedRegions to work for
+        both features.
+
+        * public/WebDraggableRegion.h: Rename dashboardRegions to annotatedRegions.
+        (WebDraggableRegion):
+        * src/ChromeClientImpl.cpp: Rename dashboardRegions to annotatedRegions.
+        (WebKit::ChromeClientImpl::annotatedRegionsChanged):
+        * src/ChromeClientImpl.h: Rename dashboardRegions to annotatedRegions.
+        (ChromeClientImpl):
+        * src/WebDocument.cpp: Rename dashboardRegions to annotatedRegions.
+        (WebKit::WebDocument::draggableRegions):
+
+2012-10-09  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        [chromium] Add drop event for plugins.
+        https://bugs.webkit.org/show_bug.cgi?id=98827
+
+        Reviewed by Adam Barth.
+
+        Add conversion for drop events.
+
+        * public/WebDragStatus.h:
+        * src/WebPluginContainerImpl.cpp:
+        (WebKit::WebPluginContainerImpl::handleDragEvent):
+
+2012-10-09  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r130811 and r130821.
+        http://trac.webkit.org/changeset/130811
+        http://trac.webkit.org/changeset/130821
+        https://bugs.webkit.org/show_bug.cgi?id=98831
+
+        Broke date-suggestion-picker-appearance-with-scroll-bar.html
+        (Requested by abarth|gardening on #webkit).
+
+        * src/FindInPageCoordinates.cpp:
+        (WebKit::toNormalizedRect):
+        * src/LinkHighlight.cpp:
+        (WebKit::convertTargetSpaceQuadToCompositedLayer):
+        * src/WebInputEventConversion.cpp:
+        (WebKit::convertLocationForRenderObject):
+
+2012-10-09  Ben Murdoch  <benm@google.com>
+
+        [chromium][Android] Add WebSecurityOrigin::grantLoadLocalResources()
+        https://bugs.webkit.org/show_bug.cgi?id=97689
+
+        Reviewed by Adam Barth.
+
+        This change exposes the WebCore::SecurityOrigin::grantLoadLocalResources()
+        function to the Chromium WebKit API layer. This is needed in Chromium
+        to implement the Android WebView.loadDataWithBaseUrl function in a
+        compatible manner.
+
+        Please see crbug.com/152223 for further information and the chromium
+        side patch.
+
+        * public/WebSecurityOrigin.h:
+        (WebSecurityOrigin): Add grantLoadLocalResources() API.
+        * src/WebSecurityOrigin.cpp:
+        (WebKit::WebSecurityOrigin::grantLoadLocalResources):
+            Implement the API by calling through to the WebCore function
+            of the same name.
+        (WebKit):
+
+2012-10-09  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        [Chromium] Chromium DEPS has a stray directory, turning our Win bots red
+        https://bugs.webkit.org/show_bug.cgi?id=98817
+
+        Reviewed by Dirk Pranke.
+
+        * DEPS: Removed the stray directory which solved the redness on several of our bots.
+
+2012-10-09  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        [chromium] Make sure events are transformed correctly for plugins.
+        https://bugs.webkit.org/show_bug.cgi?id=89250
+
+        Reviewed by Tony Chang.
+
+        The events arriving in WebPluginContainerImpl are in the coordinate
+        space of the page containing the plugin. Before the events are
+        dispatched to the plugin, it is necessary to convert them into the
+        plugin's own coordinate system.
+
+        * src/WebInputEventConversion.cpp:
+        (WebKit::convertLocationForRenderObject): Transforms an event location for the specified RenderObject.
+        (WebKit):
+        (WebKit::updateWebMouseEventFromWebCoreMouseEvent): Refactored code to reduce code-duplication for mouse and wheel events.
+        (WebKit::WebMouseEventBuilder::WebMouseEventBuilder):
+        (WebKit::WebMouseWheelEventBuilder::WebMouseWheelEventBuilder):
+        (WebKit::addTouchPoints):
+        (WebKit::WebTouchEventBuilder::WebTouchEventBuilder):
+        (WebKit::WebGestureEventBuilder::WebGestureEventBuilder):
+        * src/WebInputEventConversion.h:
+        (WebCore):
+        (WebKit):
+        (WebMouseEventBuilder):
+        (WebMouseWheelEventBuilder):
+        (WebTouchEventBuilder):
+        (WebGestureEventBuilder):
+        * src/WebPluginContainerImpl.cpp:
+        (WebKit::WebPluginContainerImpl::handleMouseEvent):
+        (WebKit::WebPluginContainerImpl::handleWheelEvent):
+
 2012-10-09  Garrett Casto  <gcasto@chromium.org>
 
         Allow users to specify a different hover image for TextFieldDecorationElement

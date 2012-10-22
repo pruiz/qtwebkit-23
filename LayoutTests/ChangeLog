@@ -1,3 +1,703 @@
+2012-10-10  Zoltan Arvai  <zarvai@inf.u-szeged.hu>
+
+        [Qt] Unreviewed gardening. Skip failing test.
+        https://bugs.webkit.org/show_bug.cgi?id=98876
+
+        * platform/qt/TestExpectations: skip fast/text/word-space-with-kerning.html.
+
+2012-10-09  Kent Tamura  <tkent@chromium.org>
+
+        Add a test to check a step attribute works for a calendar picker
+        https://bugs.webkit.org/show_bug.cgi?id=98866
+
+        Reviewed by Yuta Kitamura.
+
+        * platform/chromium-android/TestExpectations:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png: Added.
+        * platform/chromium/TestExpectations:
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.txt: Added.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step.html: Added.
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, skip tests to paint the bot green.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+
+2012-10-09  Noel Gordon  <noel.gordon@gmail.com>
+
+        Flush load-and-stall.php output after sleeping
+        https://bugs.webkit.org/show_bug.cgi?id=98862
+
+        Reviewed by Kent Tamura.
+
+        Should not be a behavioral change: testing the bots with this change to see if
+        it helps with chromium linux/win test flakyness.
+
+        * http/tests/resources/load-and-stall.php:
+
+2012-10-09  Adam Barth  <abarth@webkit.org>
+
+        Note test failures after http://trac.webkit.org/changeset/130851. We
+        plan to follow up in the morning in
+        https://bugs.webkit.org/show_bug.cgi?id=98867.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-09  Enrica Casucci  <enrica@apple.com>
+
+        Tests failure on Chromium Mac after r130821.
+        https://bugs.webkit.org/show_bug.cgi?id=98865
+
+        Unreviewed.
+
+        Marking tests as failing.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-09  Noel Gordon  <noel.gordon@gmail.com>
+
+        Initialize $written variable in load-and-stall.php script
+        https://bugs.webkit.org/show_bug.cgi?id=98854
+
+        Reviewed by Kent Tamura.
+
+        * http/tests/resources/load-and-stall.php:
+
+2012-10-09  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening.
+
+        * platform/qt-5.0-wk1/fast/history/history-back-initial-vs-final-url-expected.txt: Renamed from LayoutTests/platform/qt/fast/history/history-back-initial-vs-final-url-expected.txt.
+
+2012-10-09  Kent Tamura  <tkent@chromium.org>
+
+        Sub-fields in input[type=time] should not be focusable if the input is disabled or read-only
+        https://bugs.webkit.org/show_bug.cgi?id=98850
+
+        Reviewed by Kentaro Hara.
+
+        * fast/forms/time-multiple-fields/time-multiple-fields-keyboard-events-expected.txt:
+        * fast/forms/time-multiple-fields/time-multiple-fields-keyboard-events.html:
+        * fast/forms/time-multiple-fields/time-multiple-fields-mouse-events-expected.txt:
+        * fast/forms/time-multiple-fields/time-multiple-fields-mouse-events.html:
+
+2012-10-09  Pablo Flouret  <pablof@motorola.com>
+
+        [Qt]REGRESSION(r120107): It made http/tests/xmlhttprequest/origin-exact-matching.html fails
+        https://bugs.webkit.org/show_bug.cgi?id=88913
+
+        Reviewed by Csaba Osztrogonác.
+
+        Blind fix to try to fix the test.
+
+        * http/tests/xmlhttprequest/access-control-allow-lists-starting-with-comma.html:
+        * http/tests/xmlhttprequest/resources/access-control-allow-lists.php:
+
+2012-10-09  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [EFL] Update EFL baselines after r130840
+        https://bugs.webkit.org/show_bug.cgi?id=98846
+
+        Unreviewed EFL gardening.
+
+        Update baselines after the cairo update in r130840.
+
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-08-t-expected.png:
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-08-t-expected.txt:
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-30-t-expected.png:
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-30-t-expected.txt:
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-83-t-expected.png:
+        * platform/efl/svg/W3C-SVG-1.1/animate-elem-83-t-expected.txt:
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-01-t-expected.png:
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-01-t-expected.txt:
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-02-t-expected.png:
+        * platform/efl/svg/W3C-SVG-1.1/paths-data-02-t-expected.txt:
+
+2012-10-09  Tullio Lucena  <tullio.lucena@openbossa.org>
+
+        [Qt] new test http/tests/cookies/single-quoted-value.html is failing
+        https://bugs.webkit.org/show_bug.cgi?id=86066
+
+        Reviewed by Csaba Osztrogonác.
+
+        Unskipping test.
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [Cairo] Bump Cairo to fix more canvas/philip tests
+        https://bugs.webkit.org/show_bug.cgi?id=97658
+
+        Reviewed by Martin Robinson.
+
+        Update platform-specific baselines after the cairo update. Also,
+        unksip canvas/philip tests which are passing now.
+
+        * platform/efl/TestExpectations:
+        * platform/efl/fast/box-shadow/box-shadow-clipped-slices-expected.png:
+        * platform/efl/fast/canvas/canvas-incremental-repaint-expected.png:
+        * platform/efl/fast/dynamic/window-scrollbars-test-expected.png:
+        * platform/efl/fast/images/pixel-crack-image-background-webkit-transform-scale-expected.png:
+        * platform/efl/svg/as-image/img-preserveAspectRatio-support-1-expected.png:
+        * platform/efl/svg/batik/text/smallFonts-expected.png:
+        * platform/efl/svg/batik/text/smallFonts-expected.txt:
+        * platform/efl/svg/batik/text/textGlyphOrientationHorizontal-expected.png:
+        * platform/efl/svg/batik/text/textGlyphOrientationHorizontal-expected.txt:
+        * platform/efl/svg/batik/text/textOnPath-expected.png:
+        * platform/efl/svg/batik/text/textOnPath-expected.txt:
+        * platform/efl/svg/batik/text/textOnPath2-expected.png:
+        * platform/efl/svg/batik/text/textOnPath2-expected.txt:
+        * platform/efl/svg/batik/text/textOnPath3-expected.png:
+        * platform/efl/svg/batik/text/textOnPath3-expected.txt:
+        * platform/efl/svg/batik/text/textOnPathSpaces-expected.png:
+        * platform/efl/svg/batik/text/textOnPathSpaces-expected.txt:
+        * platform/efl/svg/batik/text/verticalTextOnPath-expected.png:
+        * platform/efl/svg/batik/text/verticalTextOnPath-expected.txt:
+        * platform/efl/svg/zoom/page/zoom-coords-viewattr-01-b-expected.png:
+        * platform/efl/svg/zoom/text/zoom-coords-viewattr-01-b-expected.png:
+        * platform/efl/transforms/2d/transform-fixed-container-expected.png:
+        * platform/gtk/TestExpectations:
+        * platform/gtk/fast/canvas/canvas-incremental-repaint-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/animate-elem-83-t-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/animate-elem-83-t-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/paths-data-01-t-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/paths-data-01-t-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/paths-data-02-t-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/paths-data-02-t-expected.txt:
+        * platform/gtk/svg/batik/text/smallFonts-expected.png:
+        * platform/gtk/svg/batik/text/smallFonts-expected.txt:
+        * platform/gtk/svg/batik/text/textGlyphOrientationHorizontal-expected.png:
+        * platform/gtk/svg/batik/text/textGlyphOrientationHorizontal-expected.txt:
+        * platform/gtk/svg/batik/text/textOnPath-expected.png:
+        * platform/gtk/svg/batik/text/textOnPath-expected.txt:
+        * platform/gtk/svg/batik/text/textOnPath2-expected.png:
+        * platform/gtk/svg/batik/text/textOnPath2-expected.txt:
+        * platform/gtk/svg/batik/text/textOnPath3-expected.png:
+        * platform/gtk/svg/batik/text/textOnPath3-expected.txt:
+        * platform/gtk/svg/batik/text/textOnPathSpaces-expected.png:
+        * platform/gtk/svg/batik/text/textOnPathSpaces-expected.txt:
+        * platform/gtk/svg/batik/text/verticalTextOnPath-expected.png:
+        * platform/gtk/svg/batik/text/verticalTextOnPath-expected.txt:
+        * platform/gtk/svg/custom/js-update-path-changes-expected.png:
+        * platform/gtk/svg/custom/js-update-path-changes-expected.txt:
+        * platform/gtk/svg/custom/js-update-path-removal-expected.png:
+        * platform/gtk/svg/custom/js-update-path-removal-expected.txt:
+        * platform/gtk/svg/custom/path-textPath-simulation-expected.png:
+        * platform/gtk/svg/custom/path-textPath-simulation-expected.txt:
+
+2012-10-09  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        fast/canvas/canvas-fillRect-gradient-shadow.html failing
+        https://bugs.webkit.org/show_bug.cgi?id=98760
+
+        Reviewed by Martin Robinson.
+
+        Adjust the test case to verify the pixel in the middle of the shadow,
+        instead of the outer edge, to make sure that the test will not fail
+        in case if there is any effect around the borders.
+
+        * fast/canvas/script-tests/canvas-fillRect-gradient-shadow.js:
+
+2012-10-09  Kent Tamura  <tkent@chromium.org>
+
+        Should reject invalid dates constructed with multiple fields UI
+        https://bugs.webkit.org/show_bug.cgi?id=98727
+
+        Reviewed by Hajime Morita.
+
+        * fast/forms/date-multiple-fields/date-multiple-fields-keyboard-events-expected.txt: Added.
+        * fast/forms/date-multiple-fields/date-multiple-fields-keyboard-events.html: Added.
+        * fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events-expected.txt:
+        * fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events.html:
+          Updated the test. 275760-12 is not a valid month value.
+
+2012-10-08  Tullio Lucena  <tullio.lucena@openbossa.org>
+
+        [Qt]REGRESSION(r128699): It made 2 fast/js/dfg tests assert
+        https://bugs.webkit.org/show_bug.cgi?id=96907
+
+        Reviewed by Csaba Osztrogonác.
+
+        Unskipping tests.
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Jeffrey Pfau  <jpfau@apple.com>
+
+        [Mac] Unreviewed, skipping http/tests/security/svg-image-leak.html
+
+        * platform/mac/TestExpectations:
+
+2012-10-09  Adam Barth  <abarth@webkit.org>
+
+        filesystem-url-in-iframe test is flaky
+        https://bugs.webkit.org/show_bug.cgi?id=95246
+
+        Reviewed by Eric Seidel.
+
+        This test was assuming that the navigation would complete before the
+        async JavaScript executed, which is true usually (but not always).
+
+        * http/tests/security/mixedContent/filesystem-url-in-iframe.html:
+        * platform/chromium/TestExpectations:
+
+2012-10-09  Jian Li  <jianli@chromium.org>
+
+        Update the CSS property used to support draggable regions.
+        https://bugs.webkit.org/show_bug.cgi?id=97156
+
+        Reviewed by Adam Barth.
+
+        Update the test and rename the files due to CSS property name and
+        syntax changes.
+
+        * fast/css/draggable-region-parser-expected.txt: Added.
+        * fast/css/draggable-region-parser.html: Added.
+        * fast/css/widget-region-parser-expected.txt: Removed.
+        * fast/css/widget-region-parser.html: Removed.
+        * platform/efl/TestExpectations: Rename the skipped test.
+        * platform/gtk/TestExpectations: Rename the skipped test.
+        * platform/mac/TestExpectations: Skip the renamed test since WIDGET_REGION is off.
+        * platform/qt/TestExpectations: Rename the skipped test.
+        * platform/win/TestExpectations: Rename the skipped test.
+        * platform/wincairo/TestExpectations: Rename the skipped test.
+
+2012-10-09  Kiran Muppala  <cmuppala@apple.com>
+
+        Fix coding style of layout test fast/dom/timer-throttling-hidden-page.html
+        https://bugs.webkit.org/show_bug.cgi?id=98828
+
+        Reviewed by Ojan Vafai.
+
+        Replaced tab characters with spaces, fixed position of braces and renamed
+        variables to be more explanatory.
+
+        * fast/dom/timer-throttling-hidden-page.html:
+
+2012-10-09  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        [chromium] Add drop event for plugins.
+        https://bugs.webkit.org/show_bug.cgi?id=98827
+
+        Reviewed by Adam Barth.
+
+        Updated the test to verify that a plugin can receive drop events. Note
+        that the plugin needs contentEditable set to true.
+
+        * platform/chromium/plugins/drag-events-expected.txt:
+        * platform/chromium/plugins/drag-events.html:
+
+2012-10-09  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r130811 and r130821.
+        http://trac.webkit.org/changeset/130811
+        http://trac.webkit.org/changeset/130821
+        https://bugs.webkit.org/show_bug.cgi?id=98831
+
+        Broke date-suggestion-picker-appearance-with-scroll-bar.html
+        (Requested by abarth|gardening on #webkit).
+
+        * fast/sub-pixel/sub-pixel-iframe-copy-on-scroll.html: Removed.
+        * platform/chromium-linux/fast/repaint/repaint-across-writing-mode-boundary-expected.png:
+        * platform/chromium-linux/fast/sub-pixel/sub-pixel-iframe-copy-on-scroll-expected.png: Removed.
+        * platform/chromium-linux/fast/sub-pixel/sub-pixel-iframe-copy-on-scroll-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/sub-pixel/sub-pixel-iframe-copy-on-scroll-expected.png: Removed.
+        * platform/chromium-mac/fast/repaint/repaint-across-writing-mode-boundary-expected.png:
+        * platform/chromium-mac/fast/sub-pixel/sub-pixel-iframe-copy-on-scroll-expected.png: Removed.
+        * platform/chromium-mac/fast/sub-pixel/sub-pixel-iframe-copy-on-scroll-expected.txt: Removed.
+        * platform/mac-lion/TestExpectations:
+        * platform/mac-snowleopard/TestExpectations:
+        * platform/mac-wk2/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt-4.8/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win-wk2/TestExpectations:
+        * platform/win-xp/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+        * platform/wk2/TestExpectations:
+
+2012-10-09  Dominic Mazzoni  <dmazzoni@google.com>
+
+        AX: 5 accessibility tests just need minor tweaks to pass on chromium
+        https://bugs.webkit.org/show_bug.cgi?id=98311
+
+        Reviewed by Chris Fleizach.
+
+        Modifies tests so that they log data that tends to vary between
+        platforms using debug(), rather than asserting a platform-specific
+        value. Gets rid of "forks" of tests in the gtk directory. Adds
+        expectations and unskips 5 tests on Chromium.
+
+        * accessibility/aria-list-and-listitem.html:
+        * accessibility/aria-option-role.html:
+        * accessibility/aria-tab-roles.html:
+        * platform/chromium/TestExpectations:
+        * platform/chromium/accessibility/aria-fallback-roles-expected.txt: Renamed from LayoutTests/platform/chromium-win/accessibility/aria-fallback-roles-expected.txt.
+        * platform/chromium/accessibility/aria-list-and-listitem-expected.txt: Copied from LayoutTests/platform/mac/accessibility/aria-list-and-listitem-expected.txt.
+        * platform/chromium/accessibility/aria-option-role-expected.txt: Copied from LayoutTests/platform/mac/accessibility/aria-option-role-expected.txt.
+        * platform/chromium/accessibility/aria-tab-roles-expected.txt: Copied from LayoutTests/platform/mac/accessibility/aria-tab-roles-expected.txt.
+        * platform/gtk/accessibility/aria-list-and-listitem-expected.txt:
+        * platform/gtk/accessibility/aria-list-and-listitem.html: Removed.
+        * platform/gtk/accessibility/aria-option-role-expected.txt:
+        * platform/gtk/accessibility/aria-option-role.html: Removed.
+        * platform/mac/accessibility/aria-list-and-listitem-expected.txt:
+        * platform/mac/accessibility/aria-option-role-expected.txt:
+        * platform/mac/accessibility/aria-tab-roles-expected.txt:
+
+2012-10-09  Levi Weintraub  <leviw@chromium.org>
+
+        Rolling back unintended change to iframe-copy-on-scroll.html from previous commit.
+
+        * compositing/iframes/iframe-copy-on-scroll.html:
+
+2012-10-09  Levi Weintraub  <leviw@chromium.org>
+
+        Unreviewed gardening. Updating test expectations after r130811.
+
+        * compositing/iframes/iframe-copy-on-scroll.html:
+        * platform/chromium-mac-snowleopard/fast/sub-pixel/sub-pixel-iframe-copy-on-scroll-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/repaint-across-writing-mode-boundary-expected.png:
+        * platform/chromium-mac/fast/sub-pixel/sub-pixel-iframe-copy-on-scroll-expected.png: Added.
+        * platform/chromium-mac/fast/sub-pixel/sub-pixel-iframe-copy-on-scroll-expected.txt: Added.
+        * platform/chromium/TestExpectations:
+
+2012-10-09  Alexander Shalamov  <alexander.shalamov@intel.com>
+
+        CSS Style is not recalculated when media attribute of style element is changed
+        https://bugs.webkit.org/show_bug.cgi?id=96752
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added test to verify that when "media" attribute for style element is updated,
+        style is recalculated.
+
+        * fast/media/mq-js-update-media.html: Added.
+
+2012-10-09  Levi Weintraub  <leviw@chromium.org>
+
+        [Sub pixel layout] Fast-path iframe scrolling can picks up an extra pixel
+        https://bugs.webkit.org/show_bug.cgi?id=98571
+
+        Reviewed by Emil A Eklund.
+
+        Tests scrolling of sub-pixel layers on sub-pixel platforms (Chromium).
+
+        * fast/sub-pixel/sub-pixel-iframe-copy-on-scroll.html: Added.
+        * platform/chromium-linux/fast/sub-pixel/sub-pixel-iframe-copy-on-scroll-expected.png: Added.
+        * platform/chromium-linux/fast/sub-pixel/sub-pixel-iframe-copy-on-scroll-expected.txt: Added.
+        * platform/chromium-linux/fast/repaint/repaint-across-writing-mode-boundary-expected.png:
+        The repaint rect shrinks safely by one pixel.
+        * platform/chromium/TestExpectations:
+        * platform/mac-lion/TestExpectations:
+        * platform/mac-snowleopard/TestExpectations:
+        * platform/mac-wk2/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt-4.8/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win-wk2/TestExpectations:
+        * platform/win-xp/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+        * platform/wk2/TestExpectations:
+
+2012-10-09  Adam Barth  <abarth@webkit.org>
+
+        These tests also fail with ImageOnlyFailures.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-09  Adam Barth  <abarth@webkit.org>
+
+        This test now appears to fail on the bots because
+        http://trac.webkit.org/changeset/130799 removed the ImageOnlyFailure
+        attribute.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-09  Peter Beverloo  <peter@chromium.org>
+
+        [Chromium] More TestExpectation updates for Android
+        https://bugs.webkit.org/show_bug.cgi?id=98818
+
+        Unreviewed test expectation updates.
+
+        List more failures (all with bugs assigned) in the TestExpectation file for
+        Android. Move an older block around, considering we may want to re-triage it.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-09  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed Chromium gardening.
+
+        * platform/chromium/TestExpectations:
+        Removed this entry: there was no need for new baselines.
+
+2012-10-09  Adam Barth  <abarth@webkit.org>
+
+        dfg-cross-global tests are flaky because they misuse js-test-pre.js
+        https://bugs.webkit.org/show_bug.cgi?id=98813
+
+        Reviewed by Daniel Bates.
+
+        These tests have a race between js-test-pre's "done" message and the
+        timeout. This patch change then to use jsTestIsAsync and finishJSTest()
+        appropriately.
+
+        * fast/js/script-tests/dfg-cross-global-object-inline-new-array-literal-with-variables.js:
+        * fast/js/script-tests/dfg-cross-global-object-inline-new-array-literal.js:
+        * fast/js/script-tests/dfg-cross-global-object-inline-new-array-with-elements.js:
+        * fast/js/script-tests/dfg-cross-global-object-inline-new-array-with-size.js:
+        * fast/js/script-tests/dfg-cross-global-object-inline-new-array.js:
+
+2012-10-09  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: Overflowing key generator should throw ConstraintError
+        https://bugs.webkit.org/show_bug.cgi?id=98807
+
+        Reviewed by Tony Chang.
+
+        Verify that overflowing key generator throws ConstraintError.
+
+        * storage/indexeddb/key-generator-expected.txt:
+        * storage/indexeddb/resources/key-generator.js:
+
+2012-10-09  Dirk Pranke  <dpranke@chromium.org>
+
+        [chromium] Don't run perf/mouse-event on debug builds
+
+        Unreviewed, expectations change.
+
+        We don't normally run any perf tests on a debug build, but this
+        one was getting run due to an improperly scoped expectation
+        overriding the wontfix rule.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-09  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: open-in-upgradeneeded layout test
+        https://bugs.webkit.org/show_bug.cgi?id=95912
+
+        Reviewed by Tony Chang.
+
+        * storage/indexeddb/intversion-open-in-upgradeneeded-expected.txt: Added.
+        * storage/indexeddb/intversion-open-in-upgradeneeded.html: Added.
+        * storage/indexeddb/resources/intversion-open-in-upgradeneeded.js: Added.
+        (test):
+        (deleteSuccess):
+        (upgradeNeeded1.transaction.oncomplete):
+        (upgradeNeeded1):
+        (openSuccess1):
+        (onVersionChange):
+        (onBlocked):
+        (upgradeNeeded2):
+        (openSuccess2):
+
+2012-10-09  Tullio Lucena  <tullio.lucena@openbossa.org>
+
+        Need implement isWordTextBreak for QT, and WinCE for visual word movement functionality
+        https://bugs.webkit.org/show_bug.cgi?id=81136
+
+        Reviewed by Caio Marcelo de Oliveira Filho.
+
+        Uskipping tests that are passing after the merge https://gitorious.org/qtwebkit/testfonts/merge_requests/1
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Tullio Lucena  <tullio.lucena@openbossa.org>
+
+        RTL: selection.modify("move", "forward", "line") when cursor is at start of a line does not move down a line
+        https://bugs.webkit.org/show_bug.cgi?id=51517
+
+        Reviewed by Caio Marcelo de Oliveira Filho.
+
+        Unskipping a test that is passing, with testfonts change in https://gitorious.org/qtwebkit/testfonts/merge_requests/1
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Adam Barth  <abarth@webkit.org>
+
+        Note that this test is flaky.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-09  Adam Barth  <abarth@webkit.org>
+
+        Revert change to TestExpectations in http://trac.webkit.org/changeset/130779.
+        These tests still give the wrong results.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-09  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed Chromium gardening.
+
+        * platform/chromium/TestExpectations:
+        Fix new-run-webkit-tests --lint-test-files after r130778.
+
+2012-10-09  Tullio Lucena  <tullio.lucena@openbossa.org>
+
+        [Qt] modify-up-on-rtl-wrapping-text.html fails on DRT
+        https://bugs.webkit.org/show_bug.cgi?id=50291
+
+        Reviewed by Csaba Osztrogonác.
+
+        Unskipping editing/selection/modify-up-on-rtl-wrapping-text.html
+
+        * platform/qt/TestExpectations:
+
+2012-10-09  Enrica Casucci  <enrica@apple.com>
+
+        [chromium] fast/text/international/text-spliced-font.html and fast/writing-mode/Kusa-Makura-background-canvas.html
+        failing on the Mac after r130443
+        https://bugs.webkit.org/show_bug.cgi?id=98545
+
+        Reviewed by Tony Chang.
+
+        Updated TextExpectations for Chromium and Mac.
+        Moved existing expected results from mac to mac-lion and added new results for Mountain Lion.
+
+        * platform/chromium/TestExpectations:
+        * platform/mac-lion/fast/writing-mode/Kusa-Makura-background-canvas-expected.txt: Added.
+        * platform/mac/TestExpectations:
+        * platform/mac/fast/writing-mode/Kusa-Makura-background-canvas-expected.txt:
+
+2012-10-09  Mike Reed  <reed@google.com>
+
+        Update expectations in preparation for enabling float-src-rect behavior in SkCanvas::drawBitmapRect
+        https://bugs.webkit.org/show_bug.cgi?id=98795
+
+        Reviewed by NOBODY.
+
+        Expectations change only.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-09  Philip Rogers  <pdr@google.com>
+
+        Prevent animation when CSS attributeType is invalid.
+        https://bugs.webkit.org/show_bug.cgi?id=94569
+
+        Reviewed by Dirk Schulze.
+
+        Adding a test to prove this patch works (invalid-css-attribute-crash.svg)
+        and an additional test to show that switching between XML and CSS
+        attributeTypes works as expected (animate-css-xml-attributeType.html).
+
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+        * svg/animations/animate-css-xml-attributeType-expected.txt: Added.
+        * svg/animations/animate-css-xml-attributeType.html: Added.
+        * svg/animations/invalid-css-attribute-crash-expected.svg: Added.
+        * svg/animations/invalid-css-attribute-crash.svg: Added.
+        * svg/animations/script-tests/animate-css-xml-attributeType.js: Added.
+        (sample1):
+        (sample6):
+        (executeTest):
+
+2012-10-08  Simon Fraser  <simon.fraser@apple.com>
+
+        Remove DRT/WTR implementations of layerTreeAsText
+        https://bugs.webkit.org/show_bug.cgi?id=98697
+
+        Reviewed by Tim Horton, James Robinson, Alexey Proskuryakov.
+
+        Fix a couple of tests missed in the previous chnage.
+
+        * compositing/geometry/preserve-3d-switching.html:
+        * compositing/visibility/visibility-image-layers-dynamic.html:
+
+2012-10-09  Pravin D  <pravind.2k4@gmail.com>
+
+        max-width property is does not overriding the width properties for css tables(display:table)
+        https://bugs.webkit.org/show_bug.cgi?id=98455
+
+        Reviewed by Tony Chang.
+
+        * fast/table/css-table-max-width-expected.txt: Added.
+        * fast/table/css-table-max-width.html: Added.
+
+2012-10-09  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Expanding failure expectation for editing/pasteboard/drag-drop-list.html to
+        again include debug configurations as well.
+
+        * platform/gtk/TestExpectations:
+
+2012-10-09  Peter Beverloo  <peter@chromium.org>
+
+        [Chromium] Test expectation updates for Android
+        https://bugs.webkit.org/show_bug.cgi?id=98786
+
+        Unreviewed test expectation update.
+
+        Update the test expectations for Android. Nineteen bugs were filed,
+        which are all blocking bug 96398.
+
+        * platform/chromium-android/TestExpectations:
+        * platform/chromium/TestExpectations:
+
+2012-10-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Unreviewed gardening.
+
+        * platform/efl-wk1/TestExpectations:
+        * platform/efl-wk2/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-10-09  Harald Alvestrand  <hta@google.com>
+
+        Change PeerConnection getStats function to single value local / remote
+        elements in RTCStatsReport.
+        https://bugs.webkit.org/show_bug.cgi?id=98753
+
+        Reviewed by Adam Barth.
+
+        * fast/mediastream/RTCPeerConnection-stats-expected.txt:
+        * fast/mediastream/RTCPeerConnection-stats.html:
+
+2012-10-09  Adam Barth  <abarth@webkit.org>
+
+        Unreviewed. Add chromium-mac specific results for these tests. They
+        differ from the expected results only in text rendering.
+
+        * platform/chromium-mac-snowleopard/fast/text/hyphenate-character-expected.png:
+        * platform/chromium-mac-snowleopard/fast/text/hyphens-expected.png:
+        * platform/chromium-mac/fast/text/hyphenate-character-expected.png: Added.
+        * platform/chromium-mac/fast/text/hyphenate-limit-before-after-expected.png: Added.
+        * platform/chromium-mac/fast/text/hyphens-expected.png: Added.
+
+2012-10-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Mark svg/text/selection-tripleclick.svg as flaky on WK2.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-10-09  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        [chromium] Make sure events are transformed correctly for plugins.
+        https://bugs.webkit.org/show_bug.cgi?id=89250
+
+        Reviewed by Tony Chang.
+
+        Added tests to make sure that events are transformed properly. Note that
+        for touch-events, each point in the three touch-point lists in the
+        touch-event is printed, so the same touch-point is printed out three
+        times.
+
+        * platform/chromium/plugins/transformed-events-expected.txt: Added.
+        * platform/chromium/plugins/transformed-events.html: Added.
+
 2012-10-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
 
         [EFL] Rebaseline some svg/text tests.

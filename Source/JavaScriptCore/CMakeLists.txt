@@ -37,6 +37,7 @@ SET(JavaScriptCore_SOURCES
     API/JSWeakObjectMapRefPrivate.cpp
     API/OpaqueJSString.cpp
     
+    assembler/MacroAssembler.cpp
     assembler/LinkBuffer.cpp
 
     bytecode/ArrayProfile.cpp
@@ -191,6 +192,7 @@ SET(JavaScriptCore_SOURCES
     runtime/GCActivityCallback.cpp
     runtime/GetterSetter.cpp
     runtime/Identifier.cpp
+    runtime/IndexingType.cpp
     runtime/InitializeThreading.cpp
     runtime/InternalFunction.cpp
     runtime/JSActivation.cpp

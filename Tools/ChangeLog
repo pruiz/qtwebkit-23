@@ -1,3 +1,492 @@
+2012-10-10  KwangYong Choi  <ky0.choi@samsung.com>
+
+        [EFL][WTR][CMake] Add a missing TestNetscapePlugin file
+        https://bugs.webkit.org/show_bug.cgi?id=98637
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        PluginScriptableObjectOverridesAllProperties.cpp is used during
+        plugins/npruntime/overrides-all-properties.html test introduced by r123936.
+
+        * DumpRenderTree/TestNetscapePlugIn/CMakeLists.txt:
+
+2012-10-10  Kenichi Ishibashi  <bashi@chromium.org>
+
+        Update pywebsocket to 0.7.7
+        https://bugs.webkit.org/show_bug.cgi?id=98872
+
+        Reviewed by Yuta Kitamura.
+
+        This version contains server-side permessage-compress extension support.
+        We need this version to add tests for permessage-compress extension.
+
+        I confirmed all tests under http/tests/websocket passed.
+
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/__init__.py:
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/_stream_hixie75.py:
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/_stream_hybi.py:
+        (parse_frame):
+        (FragmentedFrameBuilder.__init__):
+        (FragmentedFrameBuilder.build):
+        (create_closing_handshake_body):
+        (StreamOptions.__init__):
+        (Stream.__init__):
+        (Stream._receive_frame._receive_bytes):
+        (Stream._receive_frame):
+        (Stream.receive_filtered_frame):
+        (Stream.send_message):
+        (Stream._get_message_from_frame):
+        (Stream):
+        (Stream._process_close_message):
+        (Stream._process_ping_message):
+        (Stream._process_pong_message):
+        (Stream.receive_message):
+        (Stream._send_closing_handshake):
+        (Stream.get_last_received_opcode):
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/common.py:
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/dispatch.py:
+        (Dispatcher.transfer_data):
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/extensions.py:
+        (ExtensionProcessorInterface.name):
+        (DeflateStreamExtensionProcessor):
+        (DeflateStreamExtensionProcessor.name):
+        (_log_compression_ratio):
+        (_log_decompression_ratio):
+        (DeflateFrameExtensionProcessor):
+        (DeflateFrameExtensionProcessor.name):
+        (DeflateFrameExtensionProcessor._outgoing_filter):
+        (DeflateFrameExtensionProcessor._incoming_filter):
+        (CompressionExtensionProcessorBase):
+        (CompressionExtensionProcessorBase.for):
+        (CompressionExtensionProcessorBase.__init__):
+        (CompressionExtensionProcessorBase.name):
+        (CompressionExtensionProcessorBase._get_compression_processor_response):
+        (CompressionExtensionProcessorBase.set_compression_processor_hook):
+        (PerFrameCompressionExtensionProcessor):
+        (PerFrameCompressionExtensionProcessor.__init__):
+        (PerFrameCompressionExtensionProcessor.name):
+        (PerFrameCompressionExtensionProcessor._lookup_compression_processor):
+        (DeflateMessageProcessor):
+        (DeflateMessageProcessor.__init__):
+        (DeflateMessageProcessor.name):
+        (DeflateMessageProcessor.get_extension_response):
+        (DeflateMessageProcessor.setup_stream_options):
+        (DeflateMessageProcessor.setup_stream_options._OutgoingMessageFilter):
+        (DeflateMessageProcessor.setup_stream_options._OutgoingMessageFilter.__init__):
+        (DeflateMessageProcessor.setup_stream_options._OutgoingMessageFilter.filter):
+        (DeflateMessageProcessor.setup_stream_options._IncomingMessageFilter):
+        (DeflateMessageProcessor.setup_stream_options._IncomingMessageFilter.__init__):
+        (DeflateMessageProcessor.setup_stream_options._IncomingMessageFilter.decompress_next_message):
+        (DeflateMessageProcessor.setup_stream_options._IncomingMessageFilter.filter):
+        (DeflateMessageProcessor.setup_stream_options._OutgoingFrameFilter):
+        (DeflateMessageProcessor.setup_stream_options._OutgoingFrameFilter.__init__):
+        (DeflateMessageProcessor.setup_stream_options._OutgoingFrameFilter.set_compression_bit):
+        (DeflateMessageProcessor.setup_stream_options._OutgoingFrameFilter.filter):
+        (DeflateMessageProcessor.setup_stream_options._IncomingFrameFilter):
+        (DeflateMessageProcessor.setup_stream_options._IncomingFrameFilter.__init__):
+        (DeflateMessageProcessor.setup_stream_options._IncomingFrameFilter.filter):
+        (DeflateMessageProcessor.set_c2s_max_window_bits):
+        (DeflateMessageProcessor.set_c2s_no_context_takeover):
+        (DeflateMessageProcessor.enable_outgoing_compression):
+        (DeflateMessageProcessor.disable_outgoing_compression):
+        (DeflateMessageProcessor._process_incoming_message):
+        (DeflateMessageProcessor._process_outgoing_message):
+        (DeflateMessageProcessor._process_incoming_frame):
+        (DeflateMessageProcessor._process_outgoing_frame):
+        (PerMessageCompressionExtensionProcessor):
+        (PerMessageCompressionExtensionProcessor.__init__):
+        (PerMessageCompressionExtensionProcessor.name):
+        (PerMessageCompressionExtensionProcessor._lookup_compression_processor):
+        (MuxExtensionProcessor):
+        (MuxExtensionProcessor.__init__):
+        (MuxExtensionProcessor.name):
+        (MuxExtensionProcessor.get_extension_response):
+        (MuxExtensionProcessor.setup_stream_options):
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/handshake/__init__.py:
+        (do_handshake):
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/handshake/_base.py:
+        (validate_subprotocol):
+        (check_request_line):
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/handshake/draft75.py: Removed.
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/handshake/hybi.py:
+        (Handshaker.do_handshake):
+        (Handshaker._set_protocol):
+        (Handshaker._create_stream):
+        (Handshaker):
+        (Handshaker._create_handshake_response):
+        (Handshaker._send_handshake):
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/headerparserhandler.py:
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/msgutil.py:
+        (send_message):
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/mux.py: Added.
+        (MuxUnexpectedException):
+        (MuxNotImplementedException):
+        (LogicalConnectionClosedException):
+        (PhysicalConnectionError):
+        (PhysicalConnectionError.__init__):
+        (LogicalChannelError):
+        (LogicalChannelError.__init__):
+        (_encode_channel_id):
+        (_encode_number):
+        (_create_add_channel_response):
+        (_create_drop_channel):
+        (_create_flow_control):
+        (_create_new_channel_slot):
+        (_create_fallback_new_channel_slot):
+        (_parse_request_text):
+        (_ControlBlock):
+        (_ControlBlock.__init__):
+        (_MuxFramePayloadParser):
+        (_MuxFramePayloadParser.that):
+        (_MuxFramePayloadParser.__init__):
+        (_MuxFramePayloadParser.read_channel_id):
+        (_MuxFramePayloadParser.read_inner_frame):
+        (_MuxFramePayloadParser._read_number):
+        (_MuxFramePayloadParser._read_size_and_contents):
+        (_MuxFramePayloadParser._read_add_channel_request):
+        (_MuxFramePayloadParser._read_add_channel_response):
+        (_MuxFramePayloadParser._read_flow_control):
+        (_MuxFramePayloadParser._read_drop_channel):
+        (_MuxFramePayloadParser._read_new_channel_slot):
+        (_MuxFramePayloadParser.read_control_blocks):
+        (_MuxFramePayloadParser.remaining_data):
+        (_LogicalRequest):
+        (_LogicalRequest.__init__):
+        (_LogicalRequest.is_https):
+        (_LogicalConnection):
+        (_LogicalConnection.__init__):
+        (_LogicalConnection.get_local_addr):
+        (_LogicalConnection.get_remote_addr):
+        (_LogicalConnection.get_memorized_lines):
+        (_LogicalConnection.write):
+        (_LogicalConnection.write_control_data):
+        (_LogicalConnection.notify_write_done):
+        (_LogicalConnection.append_frame_data):
+        (_LogicalConnection.read):
+        (_LogicalConnection.set_read_state):
+        (_LogicalStream):
+        (_LogicalStream.interprets):
+        (_LogicalStream.__init__):
+        (_LogicalStream._create_inner_frame):
+        (_LogicalStream._write_inner_frame):
+        (_LogicalStream.replenish_send_quota):
+        (_LogicalStream.consume_receive_quota):
+        (_LogicalStream.send_message):
+        (_LogicalStream._receive_frame):
+        (_LogicalStream.receive_message):
+        (_LogicalStream._send_closing_handshake):
+        (_LogicalStream.send_ping):
+        (_LogicalStream._send_pong):
+        (_LogicalStream.close_connection):
+        (_LogicalStream._drain_received_data):
+        (_OutgoingData):
+        (_OutgoingData.__init__):
+        (_PhysicalConnectionWriter):
+        (_PhysicalConnectionWriter.__init__):
+        (_PhysicalConnectionWriter.put_outgoing_data):
+        (_PhysicalConnectionWriter._write_data):
+        (_PhysicalConnectionWriter.run):
+        (_PhysicalConnectionWriter.stop):
+        (_PhysicalConnectionReader):
+        (_PhysicalConnectionReader.__init__):
+        (_PhysicalConnectionReader.run):
+        (_Worker):
+        (_Worker.__init__):
+        (_Worker.run):
+        (_MuxHandshaker):
+        (_MuxHandshaker.__init__):
+        (_MuxHandshaker._create_stream):
+        (_MuxHandshaker._create_handshake_response):
+        (_MuxHandshaker._send_handshake):
+        (_LogicalChannelData):
+        (_LogicalChannelData.__init__):
+        (_HandshakeDeltaBase):
+        (_HandshakeDeltaBase.that):
+        (_HandshakeDeltaBase.__init__):
+        (_HandshakeDeltaBase.create_headers):
+        (_MuxHandler):
+        (_MuxHandler.are):
+        (_MuxHandler.__init__):
+        (_MuxHandler.start):
+        (_MuxHandler.add_channel_slots):
+        (_MuxHandler.wait_until_done):
+        (_MuxHandler.notify_write_done):
+        (_MuxHandler.send_control_data):
+        (_MuxHandler.send_data):
+        (_MuxHandler._send_drop_channel):
+        (_MuxHandler._send_error_add_channel_response):
+        (_MuxHandler._create_logical_request):
+        (_MuxHandler._do_handshake_for_logical_request):
+        (_MuxHandler._add_logical_channel):
+        (_MuxHandler._process_add_channel_request):
+        (_MuxHandler._process_flow_control):
+        (_MuxHandler._process_drop_channel):
+        (_MuxHandler._process_control_blocks):
+        (_MuxHandler._process_logical_frame):
+        (_MuxHandler.dispatch_message):
+        (_MuxHandler.notify_worker_done):
+        (_MuxHandler.notify_reader_done):
+        (_MuxHandler.fail_physical_connection):
+        (_MuxHandler.fail_logical_channel):
+        (use_mux):
+        (start):
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/standalone.py:
+        (_StandaloneRequest.get_protocol):
+        (_StandaloneRequest):
+        (_alias_handlers):
+        (WebSocketServer.__init__):
+        (WebSocketServer._create_sockets):
+        (WebSocketServer.server_bind):
+        (WebSocketServer.server_activate):
+        (WebSocketRequestHandler.parse_request):
+        (_configure_logging):
+        (_build_option_parser):
+        (_main):
+        (_main.if):
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/stream.py:
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/util.py:
+        (_Deflater.compress):
+        (_RFC1979Deflater.filter):
+
+2012-10-09  Damian Kaleta  <dkaleta@apple.com>
+
+        extract-localizable-strings script should be able to handle paths to files containing whitespaces.
+        https://bugs.webkit.org/show_bug.cgi?id=98844
+
+        Reviewed by Dan Bernstein.
+
+        * Scripts/extract-localizable-strings: Added ability to handle whitespace.
+
+2012-10-09  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [Cairo] Bump Cairo to fix more canvas/philip tests
+        https://bugs.webkit.org/show_bug.cgi?id=97658
+
+        Reviewed by Martin Robinson.
+
+        Bumping cairo to version 1.12.4 which fixes more canvas/philip tests.
+
+        * efl/jhbuild.modules:
+        * gtk/jhbuild.modules:
+
+2012-10-09  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Unreviewed Chromium Windows build fix after r130823.
+
+        * DumpRenderTree/chromium/TestRunner/AccessibilityUIElementChromium.cpp:
+        (roleToString): Re-added the 'default' label as some cases are not handled.
+
+2012-10-09  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        [chromium] Add drop event for plugins.
+        https://bugs.webkit.org/show_bug.cgi?id=98827
+
+        Reviewed by Adam Barth.
+
+        Update the test plugin to receive drop events.
+
+        * DumpRenderTree/chromium/TestWebPlugin.cpp:
+        (TestWebPlugin::handleDragStatusUpdate):
+
+2012-10-09  Dominic Mazzoni  <dmazzoni@google.com>
+
+        AX: 5 accessibility tests just need minor tweaks to pass on chromium
+        https://bugs.webkit.org/show_bug.cgi?id=98311
+
+        Reviewed by Chris Fleizach.
+
+        Update roleToString on Chromium to include all missing roles,
+        which enables some layout tests to pass.
+
+        * DumpRenderTree/chromium/TestRunner/AccessibilityUIElementChromium.cpp:
+        (roleToString):
+
+2012-10-09  Dirk Pranke  <dpranke@chromium.org>
+
+        webkit-patch rebaseline-expectations doesn't work w/o failures specified
+        https://bugs.webkit.org/show_bug.cgi?id=98810
+
+        Reviewed by Ojan Vafai.
+
+        If you try to mark a test as foo.html [ Rebaseline ] it wasn't
+        getting picked up for rebaselining; we needed to think the test
+        was failing.
+
+        * Scripts/webkitpy/layout_tests/models/test_expectations.py:
+        (TestExpectations.get_rebaselining_failures):
+        * Scripts/webkitpy/layout_tests/models/test_expectations_unittest.py:
+        (RebaseliningTest.test_get_rebaselining_failures):
+
+2012-10-09  Daniel Bates  <dbates@webkit.org>
+
+        VCSUtils.pm doesn't support SVN 1.7 diff files
+        <https://bugs.webkit.org/show_bug.cgi?id=80762>
+
+        Reviewed by Eric Seidel.
+
+        Implement support for the SVN 1.7 diff format.
+
+        * Scripts/VCSUtils.pm:
+        (parseChunkRange): Modified to support parsing an SVN 1.7 chunk range
+        that begins and ends with "##" (e.g. ## -0,0 +1,7 ##). For comparison,
+        earlier versions of SVN parsed chunk ranges of the form "@@ -0,0 +1,7 @@".
+
+        (parseSvnDiffHeader): Modified to parse an SVN 1.7 binary diff; SVN 1.7
+        has an unusual display format for a binary diff. It repeats the first
+        two lines of the diff header.
+
+        (parseSvnProperty): Modified to ignore both an SVN 1.7 chunk range and
+        lines of the form "\ No newline at end of property". SVN 1.7 emits the latter
+        message after a property value that doesn't end in a newline.
+
+        (parseSvnPropertyValue): Stop parsing an SVN property value when we encounter
+        a line of the form "\ No newline at end of property" (emitted by svn diff as of
+        SVN 1.7).
+
+        * Scripts/webkitperl/VCSUtils_unittest/parseChunkRange.pl:
+          - Added the following unit tests:
+          "Line count is 0"
+          "New line count is 1"
+
+        * Scripts/webkitperl/VCSUtils_unittest/parseSvnDiffFooter.pl:
+          - Added the following unit tests:
+          "svn:executable followed by custom property using SVN 1.7 syntax"
+          "svn:executable followed by custom property without newline using SVN 1.7 syntax"
+
+        * Scripts/webkitperl/VCSUtils_unittest/parseSvnDiffHeader.pl:
+          - Updated test results for test "binary file".
+          - Added unit test "binary file using SVN 1.7 syntax".
+
+        * Scripts/webkitperl/VCSUtils_unittest/parseSvnProperty.pl:
+          - Added the following unit tests:
+          "simple: add svn:executable using SVN 1.7 syntax"
+          "simple: delete svn:executable using SVN 1.7 syntax"
+          "add svn:mime-type and add svn:executable using SVN 1.7 syntax"
+
+        * Scripts/webkitperl/VCSUtils_unittest/parseSvnPropertyValue.pl:
+          - Added the following unit tests:
+          "singe-line '+' change using SVN 1.7 syntax"
+          "single-line '-' change using SVN 1.7 syntax"
+
+2012-10-09  James Robinson  <jamesr@chromium.org>
+
+        Unreviewed, rolling out r128488.
+        http://trac.webkit.org/changeset/128488
+        https://bugs.webkit.org/show_bug.cgi?id=96678
+
+        The bot is fixed now
+
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/config.js:
+        (.):
+
+2012-10-09  Zan Dobersek  <zandobersek@gmail.com>
+
+        XvfbDriver unit test is flaky on Linux builders
+        https://bugs.webkit.org/show_bug.cgi?id=98346
+
+        Reviewed by Adam Barth.
+
+        Temporarily skip the XvfbDriver test case that tests
+        the display number of the next free display. The test
+        is flaky on Linux builders.
+
+        * Scripts/webkitpy/layout_tests/port/xvfbdriver_unittest.py:
+        (XvfbDriverTest.disabled_test_next_free_display):
+
+2012-10-09  Ojan Vafai  <ojan@chromium.org>
+
+        Don't duplicated build numbers when merging flakiness dashboard JSON
+        https://bugs.webkit.org/show_bug.cgi?id=98812
+
+        Reviewed by Dirk Pranke.
+
+        In general, build numbers are not unique, but we should basically never
+        get the same build number uploaded twice in a row. This is a workaround
+        for https://bugs.webkit.org/show_bug.cgi?id=97643, which frequently hits this
+        because we update results_small.json and timeout updating results.json and then
+        we retry the whole request.
+
+        * TestResultServer/model/jsonresults.py:
+        (JsonResults.merge):
+        * TestResultServer/model/jsonresults_unittest.py:
+        (JsonResultsTest.test_merge_duplicate_build_number):
+
+2012-10-09  Alexis Menard  <alexis@webkit.org>
+
+        [GTK] Shadow builds are not working anymore.
+        https://bugs.webkit.org/show_bug.cgi?id=98785
+
+        Reviewed by Martin Robinson.
+
+        When setting WEBKITOUTPUTDIR the build was failing with a python
+        error : the os.execve expect three arguments. Also the condition
+        to check whether we build the GTK port with jhbuild or not was buggy
+        as it was always assuming an in source build. We can use now jhbuildutils
+        which has a convenient function to locate the directory where 
+        the dependencies built with jhbuild are and take into account WEBKITOUTPUTDIR.
+        If the Dependencies path does not exist then the build was not done using
+        jhbuild so we can fallback to a regular build against system libraries.
+
+        * gtk/run-with-jhbuild:
+
+2012-10-08  Simon Fraser  <simon.fraser@apple.com>
+
+        Remove DRT/WTR implementations of layerTreeAsText
+        https://bugs.webkit.org/show_bug.cgi?id=98697
+
+        Reviewed by Tim Horton, James Robinson, Alexey Proskuryakov.
+
+        Remove code related to layerTreeAsText(), which is now on window.internals.
+
+        * DumpRenderTree/TestRunner.cpp:
+        (TestRunner::staticFunctions):
+        * DumpRenderTree/TestRunner.h:
+        (TestRunner):
+        * DumpRenderTree/blackberry/TestRunnerBlackBerry.cpp:
+        * DumpRenderTree/chromium/DRTTestRunner.cpp:
+        (DRTTestRunner::DRTTestRunner):
+        * DumpRenderTree/chromium/DRTTestRunner.h:
+        (DRTTestRunner):
+        * DumpRenderTree/efl/TestRunnerEfl.cpp:
+        * DumpRenderTree/gtk/TestRunnerGtk.cpp:
+        * DumpRenderTree/mac/TestRunnerMac.mm:
+        * DumpRenderTree/qt/TestRunnerQt.cpp:
+        * DumpRenderTree/qt/TestRunnerQt.h:
+        (TestRunner):
+        * DumpRenderTree/win/TestRunnerWin.cpp:
+        * DumpRenderTree/wx/TestRunnerWx.cpp:
+        * WebKitTestRunner/InjectedBundle/TestRunner.cpp:
+        * WebKitTestRunner/InjectedBundle/TestRunner.h:
+
+2012-10-09  Zoltan Horvath  <zoltan@webkit.org>
+
+        Unreviewed. Remove myself from QtWebKit2 subscriptions.
+
+        * Scripts/webkitpy/common/config/watchlist:
+
+2012-10-09  Harald Alvestrand  <hta@google.com>
+
+        Change PeerConnection getStats function to single value local / remote
+        elements in RTCStatsReport.
+        https://bugs.webkit.org/show_bug.cgi?id=98753
+
+        Reviewed by Adam Barth.
+
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.cpp:
+        (MockWebRTCPeerConnectionHandler::getStats):
+
+2012-10-09  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        [chromium] Make sure events are transformed correctly for plugins.
+        https://bugs.webkit.org/show_bug.cgi?id=89250
+
+        Reviewed by Tony Chang.
+
+        Update the test plugin to print event details for mouse and gesture events.
+
+        * DumpRenderTree/chromium/TestWebPlugin.cpp:
+        (printEventDetails):
+
 2012-10-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
 
         [GTK] Respect WEBKITOUTPUTDIR in run-with-jhbuild.

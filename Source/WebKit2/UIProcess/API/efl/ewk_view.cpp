@@ -82,6 +82,30 @@ static const int defaultCursorSize = 16;
 typedef HashMap<uint64_t, Ewk_Resource*> LoadingResourcesMap;
 static void _ewk_view_priv_loading_resources_clear(LoadingResourcesMap& loadingResourcesMap);
 
+typedef HashMap<const WebPageProxy*, const Evas_Object*> PageViewMap;
+
+static inline PageViewMap& pageViewMap()
+{
+    DEFINE_STATIC_LOCAL(PageViewMap, map, ());
+    return map;
+}
+
+static inline void addToPageViewMap(const Evas_Object* ewkView)
+{
+    ASSERT(ewkView);
+    ASSERT(ewk_view_page_get(ewkView));
+    PageViewMap::AddResult result = pageViewMap().add(ewk_view_page_get(ewkView), ewkView);
+    ASSERT_UNUSED(result, result.isNewEntry);
+}
+
+static inline void removeFromPageViewMap(const Evas_Object* ewkView)
+{
+    ASSERT(ewkView);
+    ASSERT(ewk_view_page_get(ewkView));
+    ASSERT(pageViewMap().contains(ewk_view_page_get(ewkView)));
+    pageViewMap().remove(ewk_view_page_get(ewkView));
+}
+
 struct _Ewk_View_Private_Data {
     OwnPtr<PageClientImpl> pageClient;
 #if USE(COORDINATED_GRAPHICS)
@@ -362,6 +386,24 @@ static void _ewk_view_on_key_up(void* data, Evas*, Evas_Object*, void* eventInfo
     smartData->api->key_up(smartData, upEvent);
 }
 
+static void _ewk_view_on_show(void* data, Evas*, Evas_Object*, void* /*eventInfo*/)
+{
+    Ewk_View_Smart_Data* smartData = static_cast<Ewk_View_Smart_Data*>(data);
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
+    priv->pageProxy->viewStateDidChange(WebPageProxy::ViewIsVisible);
+}
+
+static void _ewk_view_on_hide(void* data, Evas*, Evas_Object*, void* /*eventInfo*/)
+{
+    Ewk_View_Smart_Data* smartData = static_cast<Ewk_View_Smart_Data*>(data);
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
+
+    // This call may look wrong, but we really need to pass ViewIsVisible here.
+    // viewStateDidChange() itself is responsible for actually setting the visibility to Visible or Hidden
+    // depending on what WebPageProxy::isViewVisible() returns, this simply triggers the process.
+    priv->pageProxy->viewStateDidChange(WebPageProxy::ViewIsVisible);
+}
+
 #if ENABLE(TOUCH_EVENTS)
 static inline void _ewk_view_feed_touch_event_using_touch_point_list_of_evas(Evas_Object* ewkView, Ewk_Touch_Event_Type type)
 {
@@ -481,11 +523,14 @@ static void _ewk_view_smart_add(Evas_Object* ewkView)
     CONNECT(EVAS_CALLBACK_MOUSE_WHEEL, _ewk_view_on_mouse_wheel);
     CONNECT(EVAS_CALLBACK_KEY_DOWN, _ewk_view_on_key_down);
     CONNECT(EVAS_CALLBACK_KEY_UP, _ewk_view_on_key_up);
+    CONNECT(EVAS_CALLBACK_SHOW, _ewk_view_on_show);
+    CONNECT(EVAS_CALLBACK_HIDE, _ewk_view_on_hide);
 #undef CONNECT
 }
 
 static void _ewk_view_smart_del(Evas_Object* ewkView)
 {
+    removeFromPageViewMap(ewkView);
     EWK_VIEW_SD_GET(ewkView, smartData);
     if (smartData && smartData->priv)
         _ewk_view_priv_del(smartData->priv);
@@ -755,6 +800,9 @@ static void _ewk_view_initialize(Evas_Object* ewkView, Ewk_Context* context, WKP
         priv->pageProxy = toImpl(ewk_context_WKContext_get(context))->createWebPage(priv->pageClient.get(), toImpl(pageGroupRef));
     else
         priv->pageProxy = toImpl(ewk_context_WKContext_get(context))->createWebPage(priv->pageClient.get(), WebPageGroup::create().get());
+
+    addToPageViewMap(ewkView);
+
 #if USE(COORDINATED_GRAPHICS)
     priv->pageProxy->pageGroup()->preferences()->setAcceleratedCompositingEnabled(true);
     priv->pageProxy->pageGroup()->preferences()->setForceCompositingMode(true);
@@ -1520,6 +1568,13 @@ void ewk_view_intent_service_register(Evas_Object* ewkView, const Ewk_Intent_Ser
     evas_object_smart_callback_call(ewkView, "intent,service,register", const_cast<Ewk_Intent_Service*>(ewkIntentService));
 }
 #endif // ENABLE(WEB_INTENTS_TAG)
+
+const Evas_Object* ewk_view_from_page_get(const WebKit::WebPageProxy* page)
+{
+    EINA_SAFETY_ON_NULL_RETURN_VAL(page, 0);
+
+    return pageViewMap().get(page);
+}
 
 WebPageProxy* ewk_view_page_get(const Evas_Object* ewkView)
 {

@@ -417,7 +417,6 @@ fast/text/international/unicode-bidi-plaintext-in-textarea.html [ Failure ]
 fast/text/large-text-composed-char.html [ Failure ]
 fast/text/letter-spacing-negative-opacity.html [ Failure ]
 fast/text/midword-break-before-surrogate-pair-2.html [ Failure ]
-fast/text/text-letter-spacing.html [ Failure ]
 fast/text/textIteratorNilRenderer.html [ Failure ]
 fast/text/whitespace/028.html [ Failure ]
 fast/transforms/transformed-focused-text-input.html [ Failure ]
@@ -642,9 +641,6 @@ webkit.org/b/85405 tables/mozilla/bugs/bug10296-1.html [ Skip ]
 # Paletted PNG with ICC color profiles not working.
 webkit.org/b/86722 fast/images/paletted-png-with-color-profile.html
 
-# Needs Rebaseline after bug 86942
-webkit.org/b/86942 fast/backgrounds/size/zero.html [ Failure ]
-
 # LayoutTestController::setAutomaticLinkDetectionEnabled isn't implemented
 webkit.org/b/85463 editing/inserting/typing-space-to-trigger-smart-link.html [ Skip ]
 
@@ -652,9 +648,6 @@ webkit.org/b/85463 editing/inserting/typing-space-to-trigger-smart-link.html [ S
 webkit.org/b/88794 webaudio/codec-tests [ Skip ]
 
 webkit.org/b/90007 http/tests/security/mixedContent/insecure-audio-video-in-main-frame.html [ Skip ]
-
-# Require rebaseline after bug 88171
-webkit.org/b/88171 css1/formatting_model/floating_elements.html [ Failure ]
 
 # Text Autosizing is not enabled.
 webkit.org/b/84186 fast/text-autosizing [ Skip ]
@@ -677,9 +670,6 @@ http/tests/security/contentSecurityPolicy/object-src-url-allowed.html [ Failure 
 svg/custom/use-instanceRoot-event-listeners.xhtml [ Skip ]
 svg/dom/SVGScriptElement/script-change-externalResourcesRequired-while-loading.svg [ Skip ]
 fast/loader/javascript-url-in-embed.html [ Failure Pass ]
-
-# Needs rebaseline after https://bugs.webkit.org/show_bug.cgi?id=80219
-webkit.org/b/80219 compositing/overflow/clip-descendents.html [ Failure ]
 
 webkit.org/b/93247 [ Debug ] fast/lists/list-marker-remove-crash.html [ Crash ]
 
@@ -734,6 +724,7 @@ svg/clip-path/deep-nested-clip-in-mask-panning.svg [ Missing ]
 svg/clip-path/deep-nested-clip-in-mask.svg [ Missing ]
 svg/custom/radialGradient-focal-radius.svg [ Missing ]
 fast/repaint/box-shadow-inset-repaint.html [ Missing ]
+fast/xsl/xslt-extra-content-at-end.xml [ Missing ]
 
 # [Qt4] editing/selection/5354455-1.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=99013
@@ -787,3 +778,17 @@ webkit.org/b/99841 editing/pasteboard/smart-paste-006.html [ Failure ]
 webkit.org/b/99841 editing/pasteboard/smart-paste-007.html [ Failure ]
 webkit.org/b/99841 editing/pasteboard/smart-paste-008.html [ Failure ]
 webkit.org/b/99841 editing/selection/replace-selection-crash.html [ Failure ]
+
+// Test failing on QtWebKit 2.3 since merge of October 8th
+fast/text/font-kerning.html [ ImageOnlyFailure ]
+
+// Re-skipping tests unskipped in Qt trunk, but still failing in QtWebKit2.3
+platform/qt/editing/selection/caret-rtl-2-left.html [ Failure ]
+platform/qt/editing/selection/caret-rtl-right.html [ Failure ]
+platform/qt/tables/mozilla/bugs/bug12384.html [ Failure ]
+platform/qt/tables/mozilla/bugs/bug99948.html [ Failure ]
+tables/mozilla_expected_failures/bugs/bug2479-5.html [ Failure ]
+
+# [Qt] new test http/tests/cookies/single-quoted-value.html is failing
+# https://bugs.webkit.org/show_bug.cgi?id=86066
+http/tests/cookies/single-quoted-value.html [ Failure ]

@@ -522,8 +522,13 @@ bool GraphicsContext3D::getImageData(Image* image,
         qtImage = QImage::fromData(reinterpret_cast<const uchar*>(image->data()->data()), image->data()->size());
     else {
         QPixmap* nativePixmap = image->nativeImageForCurrentFrame();
+#if HAVE(QT5)
         // With QPA, we can avoid a deep copy.
         qtImage = *nativePixmap->handle()->buffer();
+#else
+        // This might be a deep copy, depending on other references to the pixmap.
+        qtImage = nativePixmap->toImage();
+#endif
     }
 
     AlphaOp alphaOp = AlphaDoNothing;

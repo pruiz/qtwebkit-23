@@ -51,6 +51,7 @@
 #include "RenderStyle.h"
 #include "ScrollableArea.h"
 #include "ScrollbarTheme.h"
+#include "SiblingTraversalStrategies.h"
 #include "StyledElement.h"
 #include "Text.h"
 #include "XLinkNames.h"
@@ -439,11 +440,10 @@ bool SelectorChecker::isFastCheckableSelector(const CSSSelector* selector)
 // * SelectorFailsLocally     - the selector fails for the element e
 // * SelectorFailsAllSiblings - the selector fails for e and any sibling of e
 // * SelectorFailsCompletely  - the selector fails for e and any sibling or ancestor of e
-template<typename CheckingContext>
-SelectorChecker::SelectorMatch SelectorChecker::checkSelector(const CheckingContext& context, PseudoId& dynamicPseudo, bool& hasUnknownPseudoElements) const
+SelectorChecker::SelectorMatch SelectorChecker::checkSelector(const SelectorCheckingContext& context, PseudoId& dynamicPseudo, bool& hasUnknownPseudoElements) const
 {
     // first selector has to match
-    if (!checkOneSelector(context))
+    if (!checkOneSelector(context, DOMSiblingTraversalStrategy()))
         return SelectorFailsLocally;
 
     if (context.selector->m_match == CSSSelector::PseudoElement) {
@@ -460,7 +460,7 @@ SelectorChecker::SelectorMatch SelectorChecker::checkSelector(const CheckingCont
                 if (Document* document = context.element->document())
                     document->styleSheetCollection()->setUsesFirstLetterRules(true);
             }
-            if (pseudoId != NOPSEUDO)
+            if (pseudoId != NOPSEUDO && m_mode != SharingRules)
                 dynamicPseudo = pseudoId;
         }
     }
@@ -473,7 +473,7 @@ SelectorChecker::SelectorMatch SelectorChecker::checkSelector(const CheckingCont
     if (!historySelector)
         return SelectorMatches;
 
-    CheckingContext nextContext(context);
+    SelectorCheckingContext nextContext(context);
     nextContext.selector = historySelector;
 
     PseudoId ignoreDynamicPseudo = NOPSEUDO;
@@ -727,8 +727,8 @@ static bool anyAttributeMatches(Element* element, CSSSelector::Match match, cons
     return false;
 }
 
-template<typename CheckingContext>
-bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
+template<typename SiblingTraversalStrategy>
+bool SelectorChecker::checkOneSelector(const SelectorCheckingContext& context, const SiblingTraversalStrategy& siblingTraversalStrategy) const
 {
     Element* const & element = context.element;
     CSSSelector* const & selector = context.selector;
@@ -765,7 +765,7 @@ bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
             if (!selectorList)
                 return false;
 
-            CheckingContext subContext(context);
+            SelectorCheckingContext subContext(context);
             subContext.isSubSelector = true;
             for (subContext.selector = selectorList->first(); subContext.selector; subContext.selector = subContext.selector->tagHistory()) {
                 // :not cannot nest. I don't really know why this is a
@@ -775,7 +775,7 @@ bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
                 // We select between :visited and :link when applying. We don't know which one applied (or not) yet.
                 if (subContext.selector->pseudoType() == CSSSelector::PseudoVisited || (subContext.selector->pseudoType() == CSSSelector::PseudoLink && subContext.visitedMatchType == VisitedMatchEnabled))
                     return true;
-                if (!checkOneSelector(subContext))
+                if (!checkOneSelector(subContext, DOMSiblingTraversalStrategy()))
                     return true;
             }
         } else if (context.hasScrollbarPseudo) {
@@ -819,7 +819,7 @@ bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
         case CSSSelector::PseudoFirstChild:
             // first-child matches the first child that is an element
             if (element->parentElement()) {
-                bool result = DOMTraversalStrategy<CheckingContext>::isFirstChild(context, element);
+                bool result = siblingTraversalStrategy.isFirstChild(element);
                 if (m_mode == ResolvingStyle) {
                     RenderStyle* childStyle = context.elementStyle ? context.elementStyle : element->renderStyle();
                     RenderStyle* parentStyle = context.elementStyle ? context.elementParentStyle : element->parentNode()->renderStyle();
@@ -834,7 +834,7 @@ bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
         case CSSSelector::PseudoFirstOfType:
             // first-of-type matches the first element of its type
             if (element->parentElement()) {
-                bool result = DOMTraversalStrategy<CheckingContext>::isFirstOfType(context, element, element->tagQName());
+                bool result = siblingTraversalStrategy.isFirstOfType(element, element->tagQName());
                 if (m_mode == ResolvingStyle) {
                     RenderStyle* parentStyle = context.elementStyle ? context.elementParentStyle : element->parentNode()->renderStyle();
                     if (parentStyle)
@@ -846,7 +846,7 @@ bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
         case CSSSelector::PseudoLastChild:
             // last-child matches the last child that is an element
             if (Element* parentElement = element->parentElement()) {
-                bool result = parentElement->isFinishedParsingChildren() && DOMTraversalStrategy<CheckingContext>::isLastChild(context, element);
+                bool result = parentElement->isFinishedParsingChildren() && siblingTraversalStrategy.isLastChild(element);
                 if (m_mode == ResolvingStyle) {
                     RenderStyle* childStyle = context.elementStyle ? context.elementStyle : element->renderStyle();
                     RenderStyle* parentStyle = context.elementStyle ? context.elementParentStyle : parentElement->renderStyle();
@@ -868,13 +868,13 @@ bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
                 }
                 if (!parentElement->isFinishedParsingChildren())
                     return false;
-                return DOMTraversalStrategy<CheckingContext>::isLastOfType(context, element, element->tagQName());
+                return siblingTraversalStrategy.isLastOfType(element, element->tagQName());
             }
             break;
         case CSSSelector::PseudoOnlyChild:
             if (Element* parentElement = element->parentElement()) {
-                bool firstChild = DOMTraversalStrategy<CheckingContext>::isFirstChild(context, element);
-                bool onlyChild = firstChild && parentElement->isFinishedParsingChildren() && DOMTraversalStrategy<CheckingContext>::isLastChild(context, element);
+                bool firstChild = siblingTraversalStrategy.isFirstChild(element);
+                bool onlyChild = firstChild && parentElement->isFinishedParsingChildren() && siblingTraversalStrategy.isLastChild(element);
                 if (m_mode == ResolvingStyle) {
                     RenderStyle* childStyle = context.elementStyle ? context.elementStyle : element->renderStyle();
                     RenderStyle* parentStyle = context.elementStyle ? context.elementParentStyle : parentElement->renderStyle();
@@ -902,14 +902,14 @@ bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
                 }
                 if (!parentElement->isFinishedParsingChildren())
                     return false;
-                return DOMTraversalStrategy<CheckingContext>::isFirstOfType(context, element, element->tagQName()) && DOMTraversalStrategy<CheckingContext>::isLastOfType(context, element, element->tagQName());
+                return siblingTraversalStrategy.isFirstOfType(element, element->tagQName()) && siblingTraversalStrategy.isLastOfType(element, element->tagQName());
             }
             break;
         case CSSSelector::PseudoNthChild:
             if (!selector->parseNth())
                 break;
             if (Element* parentElement = element->parentElement()) {
-                int count = 1 + DOMTraversalStrategy<CheckingContext>::countElementsBefore(context, element);
+                int count = 1 + siblingTraversalStrategy.countElementsBefore(element);
                 if (m_mode == ResolvingStyle) {
                     RenderStyle* childStyle = context.elementStyle ? context.elementStyle : element->renderStyle();
                     RenderStyle* parentStyle = context.elementStyle ? context.elementParentStyle : parentElement->renderStyle();
@@ -927,7 +927,7 @@ bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
             if (!selector->parseNth())
                 break;
             if (Element* parentElement = element->parentElement()) {
-                int count = 1 + DOMTraversalStrategy<CheckingContext>::countElementsOfTypeBefore(context, element, element->tagQName());
+                int count = 1 + siblingTraversalStrategy.countElementsOfTypeBefore(element, element->tagQName());
                 if (m_mode == ResolvingStyle) {
                     RenderStyle* parentStyle = context.elementStyle ? context.elementParentStyle : parentElement->renderStyle();
                     if (parentStyle)
@@ -949,7 +949,7 @@ bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
                 }
                 if (!parentElement->isFinishedParsingChildren())
                     return false;
-                int count = 1 + DOMTraversalStrategy<CheckingContext>::countElementsAfter(context, element);
+                int count = 1 + siblingTraversalStrategy.countElementsAfter(element);
                 if (selector->matchNth(count))
                     return true;
             }
@@ -966,7 +966,7 @@ bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
                 if (!parentElement->isFinishedParsingChildren())
                     return false;
 
-                int count = 1 + DOMTraversalStrategy<CheckingContext>::countElementsOfTypeAfter(context, element, element->tagQName());
+                int count = 1 + siblingTraversalStrategy.countElementsOfTypeAfter(element, element->tagQName());
                 if (selector->matchNth(count))
                     return true;
             }
@@ -977,7 +977,7 @@ bool SelectorChecker::checkOneSelector(const CheckingContext& context) const
             break;
         case CSSSelector::PseudoAny:
             {
-                CheckingContext subContext(context);
+                SelectorCheckingContext subContext(context);
                 subContext.isSubSelector = true;
                 bool hasUnknownPseudoElements = false;
                 PseudoId ignoreDynamicPseudo = NOPSEUDO;
@@ -1359,90 +1359,7 @@ bool SelectorChecker::determineSelectorScopes(const CSSSelectorList& selectorLis
     return true;
 }
 
-template<>
-inline bool SelectorChecker::DOMTraversalStrategy<SelectorChecker::SelectorCheckingContext>::isFirstChild(const SelectorChecker::SelectorCheckingContext&, Element* element)
-{
-    return !element->previousElementSibling();
-}
-
-template<>
-inline bool SelectorChecker::DOMTraversalStrategy<SelectorChecker::SelectorCheckingContext>::isLastChild(const SelectorChecker::SelectorCheckingContext&, Element* element)
-{
-    return !element->nextElementSibling();
-}
-
-template<>
-inline bool SelectorChecker::DOMTraversalStrategy<SelectorChecker::SelectorCheckingContext>::isFirstOfType(const SelectorChecker::SelectorCheckingContext&, Element* element, const QualifiedName& type)
-{
-    for (const Element* sibling = element->previousElementSibling(); sibling; sibling = sibling->previousElementSibling()) {
-        if (sibling->hasTagName(type))
-            return false;
-    }
-    return true;
-}
-
-template<>
-inline bool SelectorChecker::DOMTraversalStrategy<SelectorChecker::SelectorCheckingContext>::isLastOfType(const SelectorChecker::SelectorCheckingContext&, Element* element, const QualifiedName& type)
-{
-    for (const Element* sibling = element->nextElementSibling(); sibling; sibling = sibling->nextElementSibling()) {
-        if (sibling->hasTagName(type))
-            return false;
-    }
-    return true;
-}
-
-template<>
-inline int SelectorChecker::DOMTraversalStrategy<SelectorChecker::SelectorCheckingContext>::countElementsBefore(const SelectorChecker::SelectorCheckingContext&, Element* element)
-{
-    int count = 0;
-    for (const Element* sibling = element->previousElementSibling(); sibling; sibling = sibling->previousElementSibling()) {
-        RenderStyle* s = sibling->renderStyle();
-        unsigned index = s ? s->childIndex() : 0;
-        if (index) {
-            count += index;
-            break;
-        }
-        count++;
-    }
-
-    return count;
-}
-
-template<>
-inline int SelectorChecker::DOMTraversalStrategy<SelectorChecker::SelectorCheckingContext>::countElementsOfTypeBefore(const SelectorChecker::SelectorCheckingContext&, Element* element, const QualifiedName& type)
-{
-    int count = 0;
-    for (const Element* sibling = element->previousElementSibling(); sibling; sibling = sibling->previousElementSibling()) {
-        if (sibling->hasTagName(type))
-            ++count;
-    }
-
-    return count;
-}
-
-template<>
-inline int SelectorChecker::DOMTraversalStrategy<SelectorChecker::SelectorCheckingContext>::countElementsAfter(const SelectorChecker::SelectorCheckingContext&, Element* element)
-{
-    int count = 0;
-    for (const Element* sibling = element->nextElementSibling(); sibling; sibling = sibling->nextElementSibling())
-        ++count;
-
-    return count;
-}
-
-template<>
-inline int SelectorChecker::DOMTraversalStrategy<SelectorChecker::SelectorCheckingContext>::countElementsOfTypeAfter(const SelectorChecker::SelectorCheckingContext&, Element* element, const QualifiedName& type)
-{
-    int count = 0;
-    for (const Element* sibling = element->nextElementSibling(); sibling; sibling = sibling->nextElementSibling()) {
-        if (sibling->hasTagName(type))
-            ++count;
-    }
-
-    return count;
-}
-
 template
-SelectorChecker::SelectorMatch SelectorChecker::checkSelector<SelectorChecker::SelectorCheckingContext>(const SelectorCheckingContext&, PseudoId&, bool&) const;
+bool SelectorChecker::checkOneSelector(const SelectorChecker::SelectorCheckingContext&, const ShadowDOMSiblingTraversalStrategy&) const;
 
 }

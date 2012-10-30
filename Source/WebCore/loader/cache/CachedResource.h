@@ -47,6 +47,7 @@ class CachedResourceHandleBase;
 class CachedResourceLoader;
 class InspectorResource;
 class PurgeableBuffer;
+class ResourceBuffer;
 class SecurityOrigin;
 class SubresourceLoader;
 
@@ -99,7 +100,7 @@ public:
 
     virtual void setEncoding(const String&) { }
     virtual String encoding() const { return String(); }
-    virtual void data(PassRefPtr<SharedBuffer> data, bool allDataReceived);
+    virtual void data(PassRefPtr<ResourceBuffer> data, bool allDataReceived);
     virtual void error(CachedResource::Status);
 
     virtual bool shouldIgnoreHTTPStatusCodeErrors() const { return false; }
@@ -178,7 +179,7 @@ public:
     
     void stopLoading();
 
-    SharedBuffer* data() const { ASSERT(!m_purgeableData); return m_data.get(); }
+    ResourceBuffer* resourceBuffer() const { ASSERT(!m_purgeableData); return m_data.get(); }
 
     virtual void willSendRequest(ResourceRequest&, const ResourceResponse&) { m_requestedFromNetworkingLayer = true; }
     virtual void setResponse(const ResourceResponse&);
@@ -287,7 +288,7 @@ protected:
     ResourceResponse m_response;
     double m_responseTimestamp;
 
-    RefPtr<SharedBuffer> m_data;
+    RefPtr<ResourceBuffer> m_data;
     OwnPtr<PurgeableBuffer> m_purgeableData;
     Timer<CachedResource> m_decodedDataDeletionTimer;
 

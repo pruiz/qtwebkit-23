@@ -56,6 +56,7 @@ public:
     virtual bool hasChangedProperties() const = 0;
     virtual unsigned changedProperties() const = 0;
     virtual void resetChangedProperties() = 0;
+    virtual void setHasChangedProperties() { setScrollLayerDidChange(true); }
 
     PlatformLayer* platformScrollLayer() const;
     void setScrollLayer(const GraphicsLayer*);
@@ -82,7 +83,7 @@ protected:
 private:
     ScrollingStateNode* m_parent;
 
-    Vector<OwnPtr<ScrollingStateNode> >* m_children;
+    OwnPtr<Vector<OwnPtr<ScrollingStateNode> > > m_children;
 
     bool m_scrollLayerDidChange;
 

@@ -698,38 +698,40 @@ bool InputHandler::shouldRequestSpellCheckingOptionsForPoint(Platform::IntPoint&
     if (!marker)
         return false;
 
-    SpellingLog(LogLevelInfo, "InputHandler::shouldRequestSpellCheckingOptionsForPoint Found spelling marker at point %d, %d", point.x(), point.y());
-
-    // imf_sp_text_t should be generated in pixel viewport coordinates.
-    WebCore::IntRect rect = m_webPage->mapToTransformed(m_webPage->focusedOrMainFrame()->view()->contentsToWindow(enclosingIntRect(marker->renderedRect())));
-    m_webPage->clipToTransformedContentsRect(rect);
-
-    // TODO use the actual caret position after it is placed.
-    spellCheckingOptionRequest.caret_rect.caret_top_x = point.x();
-    spellCheckingOptionRequest.caret_rect.caret_top_y = rect.y();
-    spellCheckingOptionRequest.caret_rect.caret_bottom_x = point.x();
-    spellCheckingOptionRequest.caret_rect.caret_bottom_y = rect.y() + rect.height();
+    // Populate the marker details in preparation for the request as the marker is
+    // not guaranteed to be valid after the cursor is placed.
     spellCheckingOptionRequest.startTextPosition = marker->startOffset();
     spellCheckingOptionRequest.endTextPosition = marker->endOffset();
 
-    SpellingLog(LogLevelInfo, "InputHandler::shouldRequestSpellCheckingOptionsForPoint spellCheckingOptionRequest\ntop %d, %d\nbottom %d %d\nMarker start %d end %d"
-                , spellCheckingOptionRequest.caret_rect.caret_top_x, spellCheckingOptionRequest.caret_rect.caret_top_y
-                , spellCheckingOptionRequest.caret_rect.caret_bottom_x, spellCheckingOptionRequest.caret_rect.caret_bottom_y
-                , spellCheckingOptionRequest.startTextPosition, spellCheckingOptionRequest.endTextPosition);
+    SpellingLog(LogLevelInfo, "InputHandler::shouldRequestSpellCheckingOptionsForPoint Found spelling marker at point %d, %d\nMarker start %d end %d",
+        point.x(), point.y(), spellCheckingOptionRequest.startTextPosition, spellCheckingOptionRequest.endTextPosition);
 
     return true;
 }
 
 void InputHandler::requestSpellingCheckingOptions(imf_sp_text_t& spellCheckingOptionRequest)
 {
+    // If the caret is no longer active, no message should be sent.
+    if (m_webPage->focusedOrMainFrame()->selection()->selectionType() != VisibleSelection::CaretSelection)
+        return;
+
+    // imf_sp_text_t should be generated in pixel viewport coordinates.
+    WebCore::IntRect caretLocation = m_webPage->focusedOrMainFrame()->selection()->selection().visibleStart().absoluteCaretBounds();
+    caretLocation = m_webPage->mapToTransformed(m_webPage->focusedOrMainFrame()->view()->contentsToWindow(enclosingIntRect(caretLocation)));
+    m_webPage->clipToTransformedContentsRect(caretLocation);
+
+    spellCheckingOptionRequest.caret_rect.caret_top_x = caretLocation.x();
+    spellCheckingOptionRequest.caret_rect.caret_top_y = caretLocation.y();
+    spellCheckingOptionRequest.caret_rect.caret_bottom_x = caretLocation.x();
+    spellCheckingOptionRequest.caret_rect.caret_bottom_y = caretLocation.y() + caretLocation.height();
+
     SpellingLog(LogLevelInfo, "InputHandler::requestSpellingCheckingOptions Sending request:\ncaret_rect.caret_top_x = %d\ncaret_rect.caret_top_y = %d" \
                               "\ncaret_rect.caret_bottom_x = %d\ncaret_rect.caret_bottom_y = %d\nstartTextPosition = %d\nendTextPosition = %d",
                               spellCheckingOptionRequest.caret_rect.caret_top_x, spellCheckingOptionRequest.caret_rect.caret_top_y,
                               spellCheckingOptionRequest.caret_rect.caret_bottom_x, spellCheckingOptionRequest.caret_rect.caret_bottom_y,
                               spellCheckingOptionRequest.startTextPosition, spellCheckingOptionRequest.endTextPosition);
 
-    if (spellCheckingOptionRequest.startTextPosition || spellCheckingOptionRequest.endTextPosition)
-        m_webPage->m_client->requestSpellingCheckingOptions(spellCheckingOptionRequest);
+    m_webPage->m_client->requestSpellingCheckingOptions(spellCheckingOptionRequest);
 }
 
 void InputHandler::setElementUnfocused(bool refocusOccuring)
@@ -745,7 +747,7 @@ void InputHandler::setElementUnfocused(bool refocusOccuring)
 
         // Only hide the keyboard if we aren't refocusing on a new input field.
         if (!refocusOccuring)
-            notifyClientOfKeyboardVisibilityChange(false);
+            notifyClientOfKeyboardVisibilityChange(false, true /* triggeredByFocusChange */);
 
         m_webPage->m_client->inputFocusLost();
 
@@ -826,7 +828,7 @@ void InputHandler::setElementFocused(Element* element)
     handleInputLocaleChanged(m_webPage->m_webSettings->isWritingDirectionRTL());
 
     if (!m_delayKeyboardVisibilityChange)
-        notifyClientOfKeyboardVisibilityChange(true);
+        notifyClientOfKeyboardVisibilityChange(true, true /* triggeredByFocusChange */);
 
 #ifdef ENABLE_SPELLING_LOG
     SpellingLog(LogLevelInfo, "InputHandler::setElementFocused Focusing the field took %f seconds.", timer.elapsed());
@@ -1259,10 +1261,15 @@ void InputHandler::processPendingKeyboardVisibilityChange()
     m_pendingKeyboardVisibilityChange = NoChange;
 }
 
-void InputHandler::notifyClientOfKeyboardVisibilityChange(bool visible)
+void InputHandler::notifyClientOfKeyboardVisibilityChange(bool visible, bool triggeredByFocusChange)
 {
     // If we aren't ready for input, keyboard changes should be ignored.
     if (!isInputModeEnabled() && visible)
+        return;
+
+    // If we are processing a change assume the keyboard is visbile to avoid
+    // flooding the VKB with show requests.
+    if (!triggeredByFocusChange && processingChange() && visible)
         return;
 
     if (!m_delayKeyboardVisibilityChange) {

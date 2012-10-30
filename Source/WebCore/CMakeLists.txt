@@ -1638,6 +1638,7 @@ SET(WebCore_SOURCES
     loader/PolicyChecker.cpp
     loader/ProgressTracker.cpp
     loader/NavigationScheduler.cpp
+    loader/ResourceBuffer.cpp
     loader/ResourceLoadNotifier.cpp
     loader/ResourceLoadScheduler.cpp
     loader/ResourceLoader.cpp
@@ -1758,7 +1759,6 @@ SET(WebCore_SOURCES
 
     page/scrolling/ScrollingConstraints.cpp
     page/scrolling/ScrollingCoordinator.cpp
-    page/scrolling/ScrollingCoordinatorNone.cpp
 
     platform/Arena.cpp
     platform/AsyncFileSystem.cpp
@@ -2684,7 +2684,6 @@ IF (WTF_USE_3D_GRAPHICS)
 ENDIF ()
 
 SET(WebCoreTestSupport_INCLUDE_DIRECTORIES
-    "${WebCore_INCLUDE_DIRECTORIES}"
     "${WEBCORE_DIR}/testing"
 )
 

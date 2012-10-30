@@ -88,6 +88,9 @@
 #endif
 #include "NetworkManager.h"
 #include "NodeRenderStyle.h"
+#if ENABLE(NAVIGATOR_CONTENT_UTILS)
+#include "NavigatorContentUtilsClientBlackBerry.h"
+#endif
 #if ENABLE(NOTIFICATIONS) || ENABLE(LEGACY_NOTIFICATIONS)
 #include "NotificationPresenterImpl.h"
 #endif
@@ -434,6 +437,8 @@ WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const In
         BlackBerry::Platform::DeviceInfo::instance();
         defaultUserAgent();
     }
+
+    AuthenticationChallengeManager::instance()->pageCreated(this);
 }
 
 WebPage::WebPage(WebPageClient* client, const WebString& pageGroupName, const Platform::IntRect& rect)
@@ -445,6 +450,7 @@ WebPage::WebPage(WebPageClient* client, const WebString& pageGroupName, const Pl
 
 WebPagePrivate::~WebPagePrivate()
 {
+    AuthenticationChallengeManager::instance()->pageDeleted(this);
     // Hand the backingstore back to another owner if necessary.
     m_webPage->setVisible(false);
     if (BackingStorePrivate::currentBackingStoreOwner() == m_webPage)
@@ -558,6 +564,10 @@ void WebPagePrivate::init(const WebString& pageGroupName)
 
 #if ENABLE(NOTIFICATIONS) || ENABLE(LEGACY_NOTIFICATIONS)
     WebCore::provideNotification(m_page, NotificationPresenterImpl::instance());
+#endif
+
+#if ENABLE(NAVIGATOR_CONTENT_UTILS)
+    WebCore::provideNavigatorContentUtilsTo(m_page, new NavigatorContentUtilsClientBlackBerry(this));
 #endif
 
 #if ENABLE(NETWORK_INFO)
@@ -2185,18 +2195,19 @@ bool WebPagePrivate::isActive() const
     return m_client->isActive();
 }
 
-void WebPagePrivate::authenticationChallenge(const KURL& url, const ProtectionSpace& protectionSpace, const Credential& inputCredential, AuthenticationChallengeClient* client)
+void WebPagePrivate::authenticationChallenge(const KURL& url, const ProtectionSpace& protectionSpace, const Credential& inputCredential)
 {
     WebString username;
     WebString password;
+    AuthenticationChallengeManager* authmgr = AuthenticationChallengeManager::instance();
 
 #if !defined(PUBLIC_BUILD) || !PUBLIC_BUILD
     if (m_dumpRenderTree) {
         Credential credential(inputCredential, inputCredential.persistence());
         if (m_dumpRenderTree->didReceiveAuthenticationChallenge(credential))
-            client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeSuccess, credential);
+            authmgr->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeSuccess, credential);
         else
-            client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeCancelled, inputCredential);
+            authmgr->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeCancelled, inputCredential);
         return;
     }
 #endif
@@ -2217,9 +2228,9 @@ void WebPagePrivate::authenticationChallenge(const KURL& url, const ProtectionSp
 #endif
 
     if (isConfirmed)
-        client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeSuccess, credential);
+        authmgr->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeSuccess, credential);
     else
-        client->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeCancelled, inputCredential);
+        authmgr->notifyChallengeResult(url, protectionSpace, AuthenticationChallengeCancelled, inputCredential);
 }
 
 PageClientBlackBerry::SaveCredentialType WebPagePrivate::notifyShouldSaveCredential(bool isNew)
@@ -3090,6 +3101,9 @@ void WebPage::destroyWebPageCompositor()
 void WebPage::destroy()
 {
     // TODO: need to verify if this call needs to be made before calling
+    // Close the Inspector to resume the JS engine if it's paused.
+    disableWebInspector();
+
     // WebPage::destroyWebPageCompositor()
     d->m_backingStore->d->suspendScreenAndBackingStoreUpdates();
 
@@ -3224,6 +3238,7 @@ void WebPage::setVisible(bool visible)
         return;
 
     d->setVisible(visible);
+    AuthenticationChallengeManager::instance()->pageVisibilityChanged(d, visible);
 
     if (!visible) {
         d->suspendBackingStore();
@@ -4057,10 +4072,6 @@ bool WebPage::touchEvent(const Platform::TouchEvent& event)
         return false;
 
     if (d->m_page->defersLoading())
-        return false;
-
-    // FIXME: this checks if node search on inspector is enabled, though it might not be optimized.
-    if (InspectorInstrumentation::handleMousePress(d->m_mainFrame->page()))
         return false;
 
     PluginView* pluginView = d->m_fullScreenPluginView.get();

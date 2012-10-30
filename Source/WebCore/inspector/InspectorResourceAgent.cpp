@@ -54,6 +54,7 @@
 #include "NetworkResourcesData.h"
 #include "Page.h"
 #include "ProgressTracker.h"
+#include "ResourceBuffer.h"
 #include "ResourceError.h"
 #include "ResourceLoader.h"
 #include "ResourceRequest.h"
@@ -112,7 +113,7 @@ static PassRefPtr<InspectorObject> buildObjectForHeaders(const HTTPHeaderMap& he
 static PassRefPtr<TypeBuilder::Network::ResourceTiming> buildObjectForTiming(const ResourceLoadTiming& timing, DocumentLoader* loader)
 {
     return TypeBuilder::Network::ResourceTiming::create()
-        .setRequestTime(timing.convertResourceLoadTimeToDocumentTime(loader->timing(), 0))
+        .setRequestTime(loader->timing()->monotonicTimeToPseudoWallTime(timing.convertResourceLoadTimeToMonotonicTime(0)))
         .setProxyStart(timing.proxyStart)
         .setProxyEnd(timing.proxyEnd)
         .setDnsStart(timing.dnsStart)
@@ -302,8 +303,10 @@ void InspectorResourceAgent::didReceiveData(unsigned long identifier, const char
 void InspectorResourceAgent::didFinishLoading(unsigned long identifier, DocumentLoader* loader, double finishTime)
 {
     String requestId = IdentifiersFactory::requestId(identifier);
-    if (m_resourcesData->resourceType(requestId) == InspectorPageAgent::DocumentResource)
-        m_resourcesData->addResourceSharedBuffer(requestId, loader->frameLoader()->documentLoader()->mainResourceData(), loader->frame()->document()->inputEncoding());
+    if (m_resourcesData->resourceType(requestId) == InspectorPageAgent::DocumentResource) {
+        RefPtr<ResourceBuffer> buffer = loader->frameLoader()->documentLoader()->mainResourceData();
+        m_resourcesData->addResourceSharedBuffer(requestId, buffer ? buffer->sharedBuffer() : 0, loader->frame()->document()->inputEncoding());
+    }
 
     m_resourcesData->maybeDecodeDataToContent(requestId);
 
@@ -319,8 +322,10 @@ void InspectorResourceAgent::didFailLoading(unsigned long identifier, DocumentLo
 
     if (m_resourcesData->resourceType(requestId) == InspectorPageAgent::DocumentResource) {
         Frame* frame = loader ? loader->frame() : 0;
-        if (frame && frame->loader()->documentLoader() && frame->document())
-            m_resourcesData->addResourceSharedBuffer(requestId, frame->loader()->documentLoader()->mainResourceData(), frame->document()->inputEncoding());
+        if (frame && frame->loader()->documentLoader() && frame->document()) {
+            RefPtr<ResourceBuffer> buffer = frame->loader()->documentLoader()->mainResourceData();
+            m_resourcesData->addResourceSharedBuffer(requestId, buffer ? buffer->sharedBuffer() : 0, frame->document()->inputEncoding());
+        }
     }
 
     bool canceled = error.isCancellation();

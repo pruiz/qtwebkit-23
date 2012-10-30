@@ -1522,6 +1522,8 @@ bool CSSParser::validUnit(CSSParserValue* value, Units unitflags, CSSParserMode 
         }
         if (!b && (unitflags & FInteger) && value->isInt)
             b = true;
+        if (!b && (unitflags & FPositiveInteger) && value->isInt && value->fValue > 0)
+            b = true;
         break;
     case CSSPrimitiveValue::CSS_PERCENTAGE:
         b = (unitflags & FPercent);
@@ -2436,7 +2438,7 @@ bool CSSParser::parseValue(CSSPropertyID propId, bool important)
         if (id == CSSValueAuto)
             validPrimitive = true;
         else
-            validPrimitive = !id && validUnit(value, FInteger | FNonNeg, CSSQuirksMode);
+            validPrimitive = !id && validUnit(value, FPositiveInteger, CSSQuirksMode);
         break;
     case CSSPropertyWebkitColumnGap:         // normal | <length>
         if (id == CSSValueNormal)
@@ -9817,8 +9819,10 @@ MediaQuerySet* CSSParser::createMediaQuerySet()
 
 StyleRuleBase* CSSParser::createImportRule(const CSSParserString& url, MediaQuerySet* media)
 {
-    if (!media || !m_allowImportRules)
+    if (!media || !m_allowImportRules) {
+        popRuleData();
         return 0;
+    }
     RefPtr<StyleRuleImport> rule = StyleRuleImport::create(url, media);
     StyleRuleImport* result = rule.get();
     m_parsedRules.append(rule.release());
@@ -9930,6 +9934,7 @@ StyleRuleBase* CSSParser::createFontFaceRule()
             // have 'initial' value and cannot 'inherit' from parent.
             // See http://dev.w3.org/csswg/css3-fonts/#font-family-desc
             clearProperties();
+            popRuleData();
             return 0;
         }
     }
@@ -10019,7 +10024,8 @@ StyleRuleBase* CSSParser::createPageRule(PassOwnPtr<CSSParserSelector> pageSelec
         pageRule = rule.get();
         m_parsedRules.append(rule.release());
         processAndAddNewRuleToSourceTreeIfNeeded();
-    }
+    } else
+        popRuleData();
     clearProperties();
     return pageRule;
 }
@@ -10032,8 +10038,10 @@ void CSSParser::setReusableRegionSelectorVector(CSSSelectorVector* selectors)
 
 StyleRuleBase* CSSParser::createRegionRule(Vector<OwnPtr<CSSParserSelector> >* regionSelector, RuleList* rules)
 {
-    if (!cssRegionsEnabled() || !regionSelector || !rules)
+    if (!cssRegionsEnabled() || !regionSelector || !rules) {
+        popRuleData();
         return 0;
+    }
 
     m_allowImportRules = m_allowNamespaceDeclarations = false;
 

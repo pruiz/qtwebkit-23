@@ -28,7 +28,6 @@
 
 #include "Arguments.h"
 #include "ImmutableArray.h"
-#include "InjectedBundleMessageKinds.h"
 #include "InjectedBundleScriptWorld.h"
 #include "InjectedBundleUserMessageCoders.h"
 #include "LayerTreeHost.h"
@@ -539,43 +538,6 @@ void InjectedBundle::didReceiveMessage(const String& messageName, APIObject* mes
 void InjectedBundle::didReceiveMessageToPage(WebPage* page, const String& messageName, APIObject* messageBody)
 {
     m_client.didReceiveMessageToPage(this, page, messageName, messageBody);
-}
-
-void InjectedBundle::didReceiveMessage(CoreIPC::Connection*, CoreIPC::MessageID messageID, CoreIPC::ArgumentDecoder* arguments)
-{
-    switch (messageID.get<InjectedBundleMessage::Kind>()) {
-        case InjectedBundleMessage::PostMessage: {
-            String messageName;            
-            RefPtr<APIObject> messageBody;
-            InjectedBundleUserMessageDecoder messageDecoder(messageBody);
-            if (!arguments->decode(CoreIPC::Out(messageName, messageDecoder)))
-                return;
-
-            didReceiveMessage(messageName, messageBody.get());
-            return;
-        }
-
-        case InjectedBundleMessage::PostMessageToPage: {
-            uint64_t pageID = arguments->destinationID();
-            if (!pageID)
-                return;
-            
-            WebPage* page = WebProcess::shared().webPage(pageID);
-            if (!page)
-                return;
-
-            String messageName;
-            RefPtr<APIObject> messageBody;
-            InjectedBundleUserMessageDecoder messageDecoder(messageBody);
-            if (!arguments->decode(CoreIPC::Out(messageName, messageDecoder)))
-                return;
-
-            didReceiveMessageToPage(page, messageName, messageBody.get());
-            return;
-        }
-    }
-
-    ASSERT_NOT_REACHED();
 }
 
 void InjectedBundle::setPageVisibilityState(WebPage* page, int state, bool isInitialState)

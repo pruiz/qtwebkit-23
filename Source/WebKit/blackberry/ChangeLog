@@ -1,3 +1,146 @@
+2012-10-11  Peter Wang  <peter.wang@torchmobile.com.cn>
+
+        [BlackBerry] Paused in Inspector, Browser doesn't exit cleanly
+        https://bugs.webkit.org/show_bug.cgi?id=97962
+
+        Reviewed by George Staikos.
+
+        Before destroying webpage, close the inspector, so if the JSC is paused it will be resumed.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPage::destroy):
+
+2012-10-11  Konrad Piascik  <kpiascik@rim.com>
+
+        Web Inspector: node search does not work with elements on touch start listener
+        https://bugs.webkit.org/show_bug.cgi?id=95252
+
+        Reviewed by Pavel Feldman.
+
+        Removed calls to InspectorInstrumentation that no didn't work anyway.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPage::touchEvent):
+
+2012-10-11  Chris Guan  <chris.guan@torchmobile.com.cn>
+
+        [Blackberry] makes NavigatorContentUtils work
+        https://bugs.webkit.org/show_bug.cgi?id=99022
+
+        Reviewed by Rob Buis.
+
+        Because r126735 renamed RegisterProtocolHandler API to NavigatorContentUtils and 
+        r122810 added RegisterProtocolHandlerClient to the Modules/protocolhandler,
+        we need sync up code:
+        1. Add NavigatorContentUtilsClientBlackBerry class.
+        2. use new API provideNavigatorContentUtilsTo.
+
+        No new tests. Covered by existing tests.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::init):
+        * WebCoreSupport/NavigatorContentUtilsClientBlackBerry.cpp: Added.
+        (WebCore):
+        (WebCore::NavigatorContentUtilsClientBlackBerry::NavigatorContentUtilsClientBlackBerry):
+        (WebCore::NavigatorContentUtilsClientBlackBerry::registerProtocolHandler):
+        (WebCore::NavigatorContentUtilsClientBlackBerry::isProtocolHandlerRegistered):
+        (WebCore::NavigatorContentUtilsClientBlackBerry::unregisterProtocolHandler):
+        * WebCoreSupport/NavigatorContentUtilsClientBlackBerry.h: Added.
+        (WebKit):
+        (NavigatorContentUtilsClientBlackBerry):
+        (WebCore::NavigatorContentUtilsClientBlackBerry::~NavigatorContentUtilsClientBlackBerry):
+
+2012-10-10  Lianghui Chen  <liachen@rim.com>
+
+        [BlackBerry] Fix assertion in NetworkJob::notifyChallengeResult.
+        https://bugs.webkit.org/show_bug.cgi?id=97397
+        Internal PR: 186597.
+
+        Internally reviewed by Yong Li, Joe Mason.
+        Reviewed by George Staikos.
+
+        Update WebPage to use new AuthenticationChallengeManager.
+        Register page creation/deletion and visibility change to the new
+            AuthenticationChallengeManager.
+        Initialize AuthenticationChallengeManager in GlobalInitialize() function.
+
+        * Api/BlackBerryGlobal.cpp:
+        (BlackBerry::WebKit::globalInitialize):
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::WebPagePrivate):
+        (BlackBerry::WebKit::WebPagePrivate::~WebPagePrivate):
+        (BlackBerry::WebKit::WebPagePrivate::authenticationChallenge):
+        (BlackBerry::WebKit::WebPage::setVisible):
+        * Api/WebPage_p.h:
+        (WebPagePrivate):
+
+2012-10-10  Andrew Lo  <anlo@rim.com>
+
+        [BlackBerry] Do not perform backing store blit for animations during one-shot drawing synchronization
+        https://bugs.webkit.org/show_bug.cgi?id=98944
+
+        Reviewed by Rob Buis.
+
+        Internally reviewed by: Arvid Nilsson.
+        Internal PR 220014
+        Prevent animations from causing a backing store blit during a
+        one-shot drawing synchronization.
+
+        * Api/WebPageCompositor.cpp:
+        (BlackBerry::WebKit::WebPageCompositorPrivate::animationFrameChanged):
+
+2012-10-10  Mike Fenton  <mifenton@rim.com>
+
+        [BlackBerry] Fix crash for detached node when validating selection change.
+        https://bugs.webkit.org/show_bug.cgi?id=98926
+
+        Reviewed by Rob Buis.
+
+        PR 220628.
+
+        Guard against detached nodes when generating selection rect.
+
+        * WebKitSupport/DOMSupport.cpp:
+        (BlackBerry::WebKit::DOMSupport::visibleTextQuads):
+
+2012-10-10  Mike Fenton  <mifenton@rim.com>
+
+        [BlackBerry] Adjust spell checking location to update after the cursor position is set.
+        https://bugs.webkit.org/show_bug.cgi?id=98904
+
+        Reviewed by Rob Buis.
+
+        PR 215172.
+
+        Delay calculation of caret position until it is updated on mouse release
+        handling.
+
+        Reviewed Internally by Nima Ghanavatian.
+
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::shouldRequestSpellCheckingOptionsForPoint):
+        (BlackBerry::WebKit::InputHandler::requestSpellingCheckingOptions):
+
+2012-10-10  Mike Fenton  <mifenton@rim.com>
+
+        [BlackBerry] Suppress keyboard requests while processing spell checking suggestions unless focus change is occurring..
+        https://bugs.webkit.org/show_bug.cgi?id=98903
+
+        Reviewed by Rob Buis.
+
+        PR 221143.
+
+        Suppress keyboard state changes when they are not triggered by
+        focus changes.
+
+        Reviewed Internally by Nima Ghanavatian.
+
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::setElementUnfocused):
+        (BlackBerry::WebKit::InputHandler::setElementFocused):
+        (BlackBerry::WebKit::InputHandler::notifyClientOfKeyboardVisibilityChange):
+        * WebKitSupport/InputHandler.h:
+
 2012-10-09  Rob Buis  <rbuis@rim.com>
 
         [BlackBerry] Cleanup FatFingers.cpp

@@ -44,7 +44,6 @@ fast/history/window-open.html
 # BUG84835: Tests failing because of missing editing delegate callbacks.
 editing/deleting
 editing/inserting
-editing/pasteboard
 editing/selection
 editing/spelling
 editing/style
@@ -315,6 +314,7 @@ http/tests/security/xss-DENIED-xsl-document-redirect.xml
 http/tests/security/xss-DENIED-xsl-external-entity-redirect.xml
 http/tests/workers/terminate-during-sync-operation.html
 http/tests/xmlhttprequest/access-control-basic-whitelist-request-headers.html
+http/tests/xmlhttprequest/cross-origin-cookie-storage.html
 http/tests/xmlhttprequest/cross-origin-no-authorization.html
 http/tests/xmlhttprequest/logout.html
 http/tests/xmlhttprequest/redirect-cross-origin-tripmine.html
@@ -438,19 +438,21 @@ webkit.org/b/43568 sputnik/Conformance/15_Native_Objects/15.8_Math/15.8.2/15.8.2
 webkit.org/b/85969 http/tests/loading/post-in-iframe-with-back-navigation.html [ Failure ]
 
 # Missing drag'n'drop support.
+webkit.org/b/86623 editing/pasteboard/data-transfer-items-drag-drop-string.html [ Failure ]
 webkit.org/b/86623 editing/pasteboard/drag-and-drop-image-contenteditable.html [ Failure ]
 webkit.org/b/86623 editing/pasteboard/drag-and-drop-inputimage-contenteditable.html [ Failure ]
 webkit.org/b/86623 editing/pasteboard/drag-and-drop-objectimage-contenteditable.html [ Failure ]
-webkit.org/b/86623 editing/pasteboard/drag-image-in-about-blank-frame.html [ Failure ]
-webkit.org/b/86623 editing/pasteboard/files-during-page-drags.html [ Failure ]
-webkit.org/b/86623 editing/selection/drag-text-delay.html [ Failure ]
 webkit.org/b/86623 editing/pasteboard/drag-drop-input-textarea.html [ Failure ]
 webkit.org/b/86623 editing/pasteboard/drag-drop-list.html [ Failure ]
 webkit.org/b/86623 editing/pasteboard/drag-drop-url-text.html [ Failure ]
+webkit.org/b/86623 editing/pasteboard/drag-drop-url-with-style.html [ Failure ]
+webkit.org/b/86623 editing/pasteboard/drag-image-in-about-blank-frame.html [ Failure ]
 webkit.org/b/86623 editing/pasteboard/drop-inputtext-acquires-style.html [ Failure ]
 webkit.org/b/86623 editing/pasteboard/drop-link.html [ Failure ]
 webkit.org/b/86623 editing/pasteboard/drop-text-events.html [ Failure ]
+webkit.org/b/86623 editing/pasteboard/files-during-page-drags.html [ Failure ]
 webkit.org/b/86623 editing/pasteboard/get-data-text-plain-drop.html [ Failure ]
+webkit.org/b/86623 editing/selection/drag-text-delay.html [ Failure ]
 webkit.org/b/86623 fast/block/positioning/hittest-on-relative-positioned-children.html
 webkit.org/b/86623 fast/dom/shadow/drop-event-for-input-in-shadow.html [ Failure ]
 webkit.org/b/86623 fast/dom/shadow/drop-event-in-shadow.html [ Failure ]
@@ -500,9 +502,11 @@ webkit.org/b/86623 http/tests/security/drag-drop-different-origin.html
 webkit.org/b/86623 http/tests/security/drag-over-remote-content-iframe.html
 
 # Missing drag'n'drop, needs baselines
+webkit.org/b/86623 editing/pasteboard/4947130.html [ Missing ]
 webkit.org/b/86623 editing/pasteboard/drag-drop-dead-frame.html [ Missing ]
 webkit.org/b/86623 editing/pasteboard/drag-drop-modifies-page.html [ Missing ]
 webkit.org/b/86623 editing/pasteboard/drag-image-to-contenteditable-in-iframe.html [ Missing ]
+webkit.org/b/86623 editing/pasteboard/drag-selected-image-to-contenteditable.html [ Missing ]
 webkit.org/b/86623 editing/pasteboard/drop-text-without-selection.html [ Missing ]
 webkit.org/b/86623 editing/pasteboard/smart-drag-drop.html [ Missing ]
 webkit.org/b/86623 editing/pasteboard/subframe-dragndrop-1.html [ Missing ]
@@ -586,6 +590,10 @@ webkit.org/b/82340 fast/regions/style-scoped-in-flow.html [ ImageOnlyFailure ]
 # This port does not enable HIDDEN_PAGE_DOM_TIMER_THROTTLING
 fast/dom/timer-throttling-hidden-page.html [ WontFix ]
 
+# Ignored because we do not have OBJC bindings
+editing/pasteboard/paste-RTFD.html [ WontFix ]
+editing/pasteboard/paste-TIFF.html [ WontFix ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # CRASHES
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -649,7 +657,6 @@ webkit.org/b/98621 media/video-controls-rendering.html [ Failure Pass ]
 webkit.org/b/74219 fast/regions/positioned-objects-block-static-spanning-regions-rtl.html [ ImageOnlyFailure ]
 
 # CSS Regions issues.
-webkit.org/b/97208 fast/regions/webkit-flow-inlines-inside-regions-bounds-vertical-rl.html [ Missing ]
 webkit.org/b/97209 fast/regions/webkit-flow-floats-inside-regions-bounds.html [ Missing ]
 
 # Needs inner spin button to respect -webkit-inner-spin-button style
@@ -723,11 +730,8 @@ webkit.org/b/84333 http/tests/local/fileapi/send-sliced-dragged-file.html [ Fail
 webkit.org/b/84333 http/tests/local/formdata [ Failure ]
 webkit.org/b/84333 http/tests/security/clipboard/clipboard-file-access.html [ Failure ]
 
-# Missing execCommand('copy') and execCommand('paste').
+# EFL port needs Pasteboard implementation.
 webkit.org/b/84338 editing/deleting/paste-with-transparent-background-color.html [ Failure ]
-webkit.org/b/84338 editing/execCommand/find-after-replace.html [ Failure Missing ]
-webkit.org/b/84338 editing/execCommand/paste-1.html [ Failure Missing ]
-webkit.org/b/84338 editing/execCommand/paste-2.html [ Failure Missing ]
 webkit.org/b/84338 editing/input/paste-text-ending-with-interchange-newline.html [ Failure ]
 webkit.org/b/84338 editing/input/reveal-contenteditable-on-paste-vertically.html [ Failure ]
 webkit.org/b/84338 editing/inserting/insert-3786362-fix.html [ Failure ]
@@ -747,14 +751,17 @@ webkit.org/b/84338 editing/pasteboard/clipboard-customData.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/contenteditable-pre-2.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/contenteditable-pre.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/copy-backslash-with-euc.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/copy-element-with-conflicting-background-color-from-rule.html [ ImageOnlyFailure ]
 webkit.org/b/84338 editing/pasteboard/copy-in-password-field.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/copy-null-characters.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/copy-paste-bidi.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/copy-paste-float.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/copy-paste-pre-line-content.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/copy-resolves-urls.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/copy-text-with-backgroundcolor.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/copy-two-pasteboard-types-both-work.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/data-transfer-items.html [ Failure ]
+webkit.org/b/86623 editing/pasteboard/data-transfer-items-image-png.html [ ImageOnlyFailure ]
 webkit.org/b/84338 editing/pasteboard/display-block-on-spans.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/do-not-copy-unnecessary-styles-2.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/do-not-copy-unnecessary-styles.html [ Failure ]
@@ -783,13 +790,111 @@ webkit.org/b/84338 editing/pasteboard/paste-plaintext-user-select-none.html [ Fa
 webkit.org/b/84338 editing/pasteboard/paste-pre-001.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/paste-sanitize-crash-1.html [ Failure ]
 webkit.org/b/84338 editing/pasteboard/paste-sanitize-crash-2.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-table-001.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-table-001.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-table-002.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-001.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-002.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-003.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-010.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-011.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-012.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-015.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-017.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-018.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-at-tabspan-001.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-at-tabspan-002.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-events.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-with-style-2.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-with-style-3.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-with-style-4.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-with-style-5.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-text-with-style.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-unrendered-select.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-visible-script.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-without-nesting.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/paste-wrapped-blockquote-into-nonblockquote.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/preserve-underline-color.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/select-element-1.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/smart-paste-001.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/smart-paste-002.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/smart-paste-003-trailing-whitespace.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/smart-paste-003.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/smart-paste-004.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/smart-paste-005.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/smart-paste-006.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/smart-paste-in-text-control.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/style-from-rules.html [ Failure ]
+webkit.org/b/84338 editing/pasteboard/testcase-9507.html [ Failure ]
 webkit.org/b/84338 editing/style/apply-through-end-of-document.html [ Failure ]
 webkit.org/b/84338 editing/style/non-inheritable-styles.html [ Failure ]
 webkit.org/b/84338 editing/style/smoosh-styles-003.html [ Failure ]
 webkit.org/b/84338 fast/events/clipboard-dataTransferItemList.html [ Failure ]
 webkit.org/b/84338 fast/forms/input-paste-undo.html [ Failure ]
-webkit.org/b/84338 fast/forms/plaintext-mode-2.html [ Missing ]
 webkit.org/b/84338 fast/forms/textarea-paste-newline.html [ Failure ]
+
+# EFL port needs Pasteboard implementation, needs baselines.
+webkit.org/b/84338 editing/execCommand/find-after-replace.html [ Failure Missing ]
+webkit.org/b/84338 editing/execCommand/paste-1.html [ Failure Missing ]
+webkit.org/b/84338 editing/execCommand/paste-2.html [ Failure Missing ]
+webkit.org/b/84338 editing/pasteboard/3976872.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/4076267-2.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/4076267-3.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/4076267.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/4242293.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/4641033.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/4944770-1.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/4944770-2.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/4989774.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/5006779.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/5028447.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/5071074.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/5075944.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/5247341.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/5478250.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/5601583-1.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/copy-standalone-image.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/cut-text-001.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/input-field-1.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-4035648-fix.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-4038267-fix.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-line-endings-001.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-line-endings-002.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-line-endings-003.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-line-endings-004.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-line-endings-005.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-line-endings-006.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-line-endings-007.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-line-endings-008.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-line-endings-009.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-line-endings-010.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-match-style-001.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-match-style-002.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-table-003.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-table-cells.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-text-004.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-text-005.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-text-006.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-text-007.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-text-008.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-text-009.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-text-013.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-text-014.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-text-016.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-text-019.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-text-at-tabspan-003.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/paste-xml.xhtml [ Missing ]
+webkit.org/b/84338 editing/pasteboard/pasting-tabs.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/smart-paste-007.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/smart-paste-008.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/styled-element-markup.html [ Missing ]
+webkit.org/b/84338 editing/pasteboard/undoable-fragment-removes.html [ Missing ]
+webkit.org/b/84338 fast/forms/plaintext-mode-2.html [ Missing ]
+
+# EFL port is missing Clipboard implementation.
+Bug(EFL) editing/pasteboard/crash-accessing-clipboardData-types.html [ Failure ]
+Bug(EFL) editing/pasteboard/dataTransfer-setData-getData.html [ Failure ]
+Bug(EFL) editing/pasteboard/pasting-empty-html-falls-back-to-text.html [ Failure ]
 
 # MathML: Absolute and Integral operators are not stacked properly
 webkit.org/b/47744 mathml/presentation/mo.xhtml
@@ -853,12 +958,17 @@ webkit.org/b/61540 inspector/extensions/extensions-eval-content-script.html [ Fa
 #__worldID is undefined in isolated world
 Bug(EFL) http/tests/security/isolatedWorld/didClearWindowObject.html
 
-# Needs custom policy delegate enhancement to log DOM node info - EFL port is missing DOM node abstraction
-webkit.org/b/87972 fast/loader/policy-delegate-action-hit-test-zoomed.html [ Failure ]
-webkit.org/b/87972 fast/encoding/mailto-always-utf-8.html [ Failure ]
-
 # EFL has accelerated compositing disabled
 webkit.org/b/79766 compositing/animation/animation-compositing.html [ Failure ]
+webkit.org/b/99043 compositing/backface-visibility/backface-visibility-3d.html [ ImageOnlyFailure ]
+webkit.org/b/99044 compositing/backface-visibility/backface-visibility-hierarchical-transform.html [ ImageOnlyFailure ]
+webkit.org/b/99045 compositing/backface-visibility/backface-visibility-image.html [ ImageOnlyFailure ]
+webkit.org/b/99047 compositing/backface-visibility/backface-visibility-non3d.html [ ImageOnlyFailure ]
+webkit.org/b/99048 compositing/backface-visibility/backface-visibility-simple.html [ ImageOnlyFailure ]
+webkit.org/b/99050 compositing/culling/filter-occlusion-alpha-large.html [ ImageOnlyFailure ]
+webkit.org/b/99051 compositing/culling/filter-occlusion-alpha.html [ ImageOnlyFailure ]
+webkit.org/b/99185 compositing/culling/filter-occlusion-blur-large.html [ ImageOnlyFailure ]
+webkit.org/b/99185 compositing/culling/filter-occlusion-blur.html [ ImageOnlyFailure ]
 webkit.org/b/79766 compositing/geometry/ancestor-overflow-change.html [ Failure ]
 webkit.org/b/79766 compositing/geometry/clip.html [ Failure ]
 webkit.org/b/79766 compositing/geometry/composited-in-columns.html [ Failure ]
@@ -1046,13 +1156,16 @@ webkit.org/b/61932 [ Debug ] jquery/manipulation.html [ Failure Pass Timeout ]
 # These test -apple- prefixed CSS properties, which we don't support.
 fast/css/apple-prefix.html [ WontFix ]
 
-webkit.org/b/75747 fast/css/color-correction-on-background-image.html [ Failure ]
-webkit.org/b/75747 fast/css/color-correction-on-backgrounds.html [ Failure ]
-webkit.org/b/75747 fast/css/color-correction-on-box-shadow.html [ Failure ]
-webkit.org/b/75747 fast/css/color-correction-on-text-shadow.html [ Failure ]
-webkit.org/b/75747 fast/css/color-correction-untagged-images.html [ Failure ]
+webkit.org/b/75747 fast/css/color-correction-backgrounds-and-text.html [ Missing Failure ]
+webkit.org/b/75747 fast/css/color-correction-on-background-image.html [ Missing Failure ]
+webkit.org/b/75747 fast/css/color-correction-on-backgrounds.html [ Missing Failure ]
+webkit.org/b/75747 fast/css/color-correction-on-box-shadow.html [ Missing Failure ]
+webkit.org/b/75747 fast/css/color-correction-on-text-shadow.html [ Missing Failure ]
+webkit.org/b/75747 fast/css/color-correction-on-text.html [ Missing Failure ]
+webkit.org/b/75747 fast/css/color-correction-untagged-images.html [ Missing Failure ]
+webkit.org/b/75747 fast/css/color-correction.html [ Missing Failure ]
 
-webkit.org/b/65536 fast/css/text-rendering.html [ Failure ]
+webkit.org/b/65536 fast/css/text-rendering.html [ Missing Failure ]
 
 webkit.org/b/49142 fast/css/style-scoped [ Failure ]
 
@@ -1282,9 +1395,6 @@ webkit.org/b/90007 http/tests/security/mixedContent/insecure-audio-video-in-main
 # Looks like missing multipart/x-mixed-replace support in libsoup. Failing on both GTK and EFL.
 webkit.org/b/68979 http/tests/multipart/multipart-replace-non-html-content.php [ Failure ]
 
-# Test added by Mac port, rendering results totally different on EFL.
-webkit.org/b/91477 fast/multicol/shrink-to-column-height-for-pagination.html [ Missing ]
-
 # These tests are failing after r122528.
 webkit.org/b/91210 http/tests/w3c/webperf/approved/navigation-timing/html/test_performance_attributes_exist_in_object.html [ Failure ]
 webkit.org/b/91210 http/tests/w3c/webperf/approved/navigation-timing/html/test_timing_xserver_redirect.html [ Failure ]
@@ -1332,6 +1442,9 @@ webkit.org/b/94009 css2.1/20110323/c541-word-sp-000.htm [ ImageOnlyFailure ]
 # Requires CSS_COMPOSITING to be turned on
 webkit.org/b/94024 css3/compositing [ Skip ]
 
+# Fails because Blend Mode is not enabled yet.
+webkit.org/b/91908 transitions/blendmode-transitions.html [ Skip ]
+
 # Alt text should be displayed if src attribute is not set.
 webkit.org/b/94198 fast/dom/HTMLImageElement/image-alt-text.html [ ImageOnlyFailure ]
 webkit.org/b/94198 fast/dom/HTMLInputElement/input-image-alt-text.html [ ImageOnlyFailure ]
@@ -1343,8 +1456,6 @@ webkit.org/b/97109 tables/mozilla/bugs/bug99948.html [ Pass ]
 
 # New test introduced in r125790 fails
 webkit.org/b/94341 inspector/timeline/timeline-decode-resize.html [ Failure ]
-
-webkit.org/b/94690 fast/dom/shadow/shadowdom-dynamic-styling.html [ Failure ]
 
 # Fails after r126350
 webkit.org/b/94788 media/track/track-cue-rendering-snap-to-lines-not-set.html [ Failure ]
@@ -1380,7 +1491,6 @@ webkit.org/b/96881 http/tests/security/frameNavigation/xss-DENIED-plugin-navigat
 webkit.org/b/96881 http/tests/security/storage-blocking-strengthened-plugin.html [ Failure ]
 webkit.org/b/96881 http/tests/security/storage-blocking-strengthened-private-browsing-plugin.html [ Failure ]
 webkit.org/b/96881 java [ Skip ]
-webkit.org/b/96881 plugins [ Skip ]
 webkit.org/b/96881 userscripts/user-script-plugin-document.html [ Failure ]
 
 # Ref tests added in r130592 that are failing on both EFL and GTK ports
@@ -1398,13 +1508,8 @@ webkit.org/b/98564 fast/table/colspanMinWidth-vertical.html [ Missing Failure ]
 # Fails after r129175.
 webkit.org/b/97296 fast/text/international/hebrew-selection.html [ ImageOnlyFailure ]
 
-# Frame does not get focus as expected
-webkit.org/b/97077 inspector/extensions/extensions-panel.html [ Failure ]
-
 # Fails on the bots.
 webkit.org/b/97968 media/unsupported-rtsp.html [ Failure ]
-
-webkit.org/b/98306 css3/flexbox/flexbox-baseline.html [ Failure Missing ]
 
 webkit.org/b/98587 fast/writing-mode/vertical-subst-font-vert-no-dflt.html [ ImageOnlyFailure ]
 
@@ -1416,11 +1521,6 @@ webkit.org/b/97990 mathml/presentation/mo-stretch.html [ Failure ]
 webkit.org/b/97990 mathml/presentation/roots.xhtml [ Failure ]
 webkit.org/b/97990 mathml/presentation/row-alignment.xhtml [ Failure ]
 webkit.org/b/97990 mathml/presentation/subsup.xhtml [ Failure ]
-
-# r130231 introcudes a regression for some complex font cases:
-webkit.org/b/98247 fast/text/atsui-multiple-renderers.html [ Failure ]
-webkit.org/b/98247 fast/text/atsui-spacing-features.html [ Failure ]
-webkit.org/b/98247 fast/text/wide-zero-width-space.html [ Failure ]
 
 # Occasionally fails if run after right after
 # fast/selectors/unqualified-hover-quirks.html or itself.
@@ -1436,3 +1536,33 @@ webkit.org/b/98729 fast/html/link-rel-stylesheet.html [ Failure ]
 webkit.org/b/98729 fast/loader/data-url-encoding-html.html [ Failure ]
 webkit.org/b/98729 fast/loader/data-url-encoding-svg.html [ Failure ]
 webkit.org/b/98729 fast/spatial-navigation/snav-iframe-nested.html [ Failure ]
+
+# New inspector/profiler/memory-instrumentation-canvas.html fails on JSC platforms
+webkit.org/b/99001 inspector/profiler/memory-instrumentation-canvas.html
+
+# EFL port does not support Emacs commands.
+Bug(EFL) editing/pasteboard/emacs-cntl-y-001.html [ Missing ]
+Bug(EFL) editing/pasteboard/emacs-ctrl-a-k-y.html [ Missing ]
+Bug(EFL) editing/pasteboard/emacs-ctrl-k-y-001.html [ Missing ]
+
+# Cairo 1.12.4 regressions
+webkit.org/b/99189 fast/backgrounds/background-leakage-transforms.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusAllStylesAllCorners.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusAllStylesAllCorners.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusDashed02.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusDashed03.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusDashed04.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusDashed05.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusDashed06.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusDotted01.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusDotted02.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusDotted03.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusDotted04.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/borderRadiusDotted06.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/box-shadow/box-shadow-transformed.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/box-shadow/transform-fringing.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/inline-mask-overlay-image-outset-vertical-rl.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/inline-mask-overlay-image-outset.html [ ImageOnlyFailure ]
+webkit.org/b/99189 fast/borders/inline-mask-overlay-image.html [ ImageOnlyFailure ]
+webkit.org/b/99189 ietestcenter/css3/bordersbackgrounds/border-radius-style-001.htm [ ImageOnlyFailure ]
+webkit.org/b/99189 ietestcenter/css3/bordersbackgrounds/border-radius-style-002.htm [ ImageOnlyFailure ]

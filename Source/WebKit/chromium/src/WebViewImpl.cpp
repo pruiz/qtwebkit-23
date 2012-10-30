@@ -707,7 +707,7 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
         break;
     case WebInputEvent::GestureTap: {
         m_client->cancelScheduledContentIntents();
-        if (detectContentOnTouch(WebPoint(event.x, event.y), event.type)) {
+        if (detectContentOnTouch(WebPoint(event.x, event.y))) {
             eventSwallowed = true;
             break;
         }
@@ -759,11 +759,6 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
             break;
 
         m_client->cancelScheduledContentIntents();
-        if (detectContentOnTouch(WebPoint(event.x, event.y), event.type)) {
-            eventSwallowed = true;
-            break;
-        }
-
         m_page->contextMenuController()->clearContextMenu();
         m_contextMenuAllowed = true;
         PlatformGestureEventBuilder platformEvent(mainFrameImpl()->frameView(), event);
@@ -1748,13 +1743,6 @@ void WebViewImpl::updateAnimations(double monotonicFrameBeginTime)
 #if ENABLE(REQUEST_ANIMATION_FRAME)
     TRACE_EVENT0("webkit", "WebViewImpl::updateAnimations");
 
-    WebFrameImpl* webframe = mainFrameImpl();
-    if (!webframe)
-        return;
-    FrameView* view = webframe->frameView();
-    if (!view)
-        return;
-
     // Create synthetic wheel events as necessary for fling.
     if (m_gestureAnimation) {
         if (m_gestureAnimation->animate(monotonicFrameBeginTime))
@@ -1762,6 +1750,9 @@ void WebViewImpl::updateAnimations(double monotonicFrameBeginTime)
         else
             m_gestureAnimation.clear();
     }
+
+    if (!m_page)
+        return;
 
     PageWidgetDelegate::animate(m_page.get(), monotonicFrameBeginTime);
 #endif
@@ -3868,6 +3859,8 @@ void WebViewImpl::paintRootLayer(GraphicsContext& context, const IntRect& conten
     if (!page())
         return;
     FrameView* view = page()->mainFrame()->view();
+    if (context.platformContext())
+        context.platformContext()->setDeviceScaleFactor(page()->deviceScaleFactor());
     view->paintContents(&context, contentRect);
     double paintEnd = currentTime();
     double pixelsPerSec = (contentRect.width() * contentRect.height()) / (paintEnd - paintStart);
@@ -4139,12 +4132,8 @@ void WebViewImpl::selectAutofillSuggestionAtIndex(unsigned listIndex)
         m_autofillPopupClient->valueChanged(listIndex);
 }
 
-bool WebViewImpl::detectContentOnTouch(const WebPoint& position, WebInputEvent::Type touchType)
+bool WebViewImpl::detectContentOnTouch(const WebPoint& position)
 {
-    ASSERT(touchType == WebInputEvent::GestureTap
-           || touchType == WebInputEvent::GestureTwoFingerTap
-           || touchType == WebInputEvent::GestureLongPress);
-
     HitTestResult touchHit = hitTestResultForWindowPos(position);
 
     if (touchHit.isContentEditable())
@@ -4157,21 +4146,13 @@ bool WebViewImpl::detectContentOnTouch(const WebPoint& position, WebInputEvent::
     // Ignore when tapping on links or nodes listening to click events, unless the click event is on the
     // body element, in which case it's unlikely that the original node itself was intended to be clickable.
     for (; node && !node->hasTagName(HTMLNames::bodyTag); node = node->parentNode()) {
-        if (node->isLink() || (touchType == WebInputEvent::GestureTap
-                && (node->willRespondToTouchEvents() || node->willRespondToMouseClickEvents()))) {
+        if (node->isLink() || node->willRespondToTouchEvents() || node->willRespondToMouseClickEvents())
             return false;
-        }
     }
 
     WebContentDetectionResult content = m_client->detectContentAround(touchHit);
     if (!content.isValid())
         return false;
-
-    if (touchType != WebInputEvent::GestureTap) {
-        // Select the detected content as a block.
-        focusedFrame()->selectRange(content.range());
-        return true;
-    }
 
     m_client->scheduleContentIntent(content.intent());
     return true;

@@ -2174,8 +2174,8 @@ void EventHandler::updateMouseEventTargetNode(Node* targetNode, const PlatformMo
     else {
         // If the target node is a text node, dispatch on the parent node - rdar://4196646
         if (result && result->isTextNode()) {
-            ComposedShadowTreeParentWalker walker(result);
-            walker.parentIncludingInsertionPointAndShadowRoot();
+            AncestorChainWalker walker(result);
+            walker.parent();
             result = walker.get();
         }
     }
@@ -2582,7 +2582,11 @@ bool EventHandler::handleGestureLongPress(const PlatformGestureEvent& gestureEve
             return true;
     }
 #endif
+#if ENABLE(CONTEXT_MENUS)
     return sendContextMenuEventForGesture(gestureEvent);
+#else
+    return false;
+#endif
 }
 
 bool EventHandler::handleGestureScrollUpdate(const PlatformGestureEvent& gestureEvent)
@@ -3694,6 +3698,9 @@ bool EventHandler::handleTouchEvent(const PlatformTouchEvent& event)
             // Touch events should not go to text nodes
             if (node->isTextNode())
                 node = node->parentNode();
+
+            if (InspectorInstrumentation::handleTouchEvent(m_frame->page(), node))
+                return true;
 
             Document* doc = node->document();
             if (!doc)

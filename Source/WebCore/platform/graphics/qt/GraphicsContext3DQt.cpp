@@ -71,7 +71,7 @@ public:
 #endif
 #if USE(GRAPHICS_SURFACE)
     virtual uint32_t copyToGraphicsSurface();
-    virtual uint64_t graphicsSurfaceToken() const;
+    virtual GraphicsSurfaceToken graphicsSurfaceToken() const;
 #endif
 
     QRectF boundingRect() const;
@@ -208,6 +208,11 @@ void GraphicsContext3DPrivate::initializeANGLE()
 
     // Always set to 1 for OpenGL ES.
     ANGLEResources.MaxDrawBuffers = 1;
+
+    Extensions3D* extensions = m_context->getExtensions();
+    if (extensions->supports("GL_ARB_texture_rectangle"))
+        ANGLEResources.ARB_texture_rectangle = 1;
+
     m_context->m_compiler.setResources(ANGLEResources);
 }
 
@@ -293,7 +298,7 @@ uint32_t GraphicsContext3DPrivate::copyToGraphicsSurface()
     return frontBuffer;
 }
 
-uint64_t GraphicsContext3DPrivate::graphicsSurfaceToken() const
+GraphicsSurfaceToken GraphicsContext3DPrivate::graphicsSurfaceToken() const
 {
     return m_graphicsSurface->exportToken();
 }

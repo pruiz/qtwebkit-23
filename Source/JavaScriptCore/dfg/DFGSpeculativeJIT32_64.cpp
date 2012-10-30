@@ -3516,10 +3516,8 @@ void SpeculativeJIT::compile(Node& node)
         if (!node.numChildren()) {
             flushRegisters();
             GPRResult result(this);
-            GPRResult2 resultTagIgnored(this);
             callOperation(
-                operationNewEmptyArray, resultTagIgnored.gpr(), result.gpr(),
-                globalObject->arrayStructure());
+                operationNewEmptyArray, result.gpr(), globalObject->arrayStructure());
             cellResult(result.gpr(), m_compileIndex);
             break;
         }
@@ -3548,11 +3546,10 @@ void SpeculativeJIT::compile(Node& node)
             m_jit.storePtr(TrustedImmPtr(scratchSize), scratch.gpr());
         }
 
-        GPRResult resultPayload(this);
-        GPRResult2 resultTag(this);
+        GPRResult result(this);
         
         callOperation(
-            operationNewArray, resultTag.gpr(), resultPayload.gpr(), globalObject->arrayStructure(),
+            operationNewArray, result.gpr(), globalObject->arrayStructure(),
             static_cast<void *>(buffer), node.numChildren());
 
         if (scratchSize) {
@@ -3562,8 +3559,7 @@ void SpeculativeJIT::compile(Node& node)
             m_jit.storePtr(TrustedImmPtr(0), scratch.gpr());
         }
 
-        // FIXME: make the callOperation above explicitly return a cell result, or jitAssert the tag is a cell tag.
-        cellResult(resultPayload.gpr(), m_compileIndex, UseChildrenCalledExplicitly);
+        cellResult(result.gpr(), m_compileIndex, UseChildrenCalledExplicitly);
         break;
     }
 
@@ -3576,23 +3572,23 @@ void SpeculativeJIT::compile(Node& node)
         GPRReg sizeGPR = size.gpr();
         flushRegisters();
         GPRResult result(this);
-        GPRResult2 resultTagIgnored(this);
         callOperation(
-            operationNewArrayWithSize, resultTagIgnored.gpr(), result.gpr(),
-            globalObject->arrayStructure(), sizeGPR);
+            operationNewArrayWithSize, result.gpr(), globalObject->arrayStructure(), sizeGPR);
         cellResult(result.gpr(), m_compileIndex);
         break;
     }
         
     case NewArrayBuffer: {
+        JSGlobalObject* globalObject = m_jit.graph().globalObjectFor(node.codeOrigin);
+        if (!globalObject->isHavingABadTime())
+            globalObject->havingABadTimeWatchpoint()->add(speculationWatchpoint());
+        
         flushRegisters();
-        GPRResult resultPayload(this);
-        GPRResult2 resultTag(this);
+        GPRResult result(this);
         
-        callOperation(operationNewArrayBuffer, resultTag.gpr(), resultPayload.gpr(), node.startConstant(), node.numConstants());
+        callOperation(operationNewArrayBuffer, result.gpr(), globalObject->arrayStructure(), node.startConstant(), node.numConstants());
         
-        // FIXME: make the callOperation above explicitly return a cell result, or jitAssert the tag is a cell tag.
-        cellResult(resultPayload.gpr(), m_compileIndex);
+        cellResult(result.gpr(), m_compileIndex);
         break;
     }
         

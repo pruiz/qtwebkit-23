@@ -957,9 +957,22 @@ bool InspectorDOMAgent::handleMousePress()
     return false;
 }
 
-void InspectorDOMAgent::inspect(Node* node)
+bool InspectorDOMAgent::handleTouchEvent(Node* node)
+{
+    if (!m_searchingForNode)
+        return false;
+    if (node && m_inspectModeHighlightConfig) {
+        m_overlay->highlightNode(node, *m_inspectModeHighlightConfig);
+        inspect(node);
+        return true;
+    }
+    return false;
+}
+
+void InspectorDOMAgent::inspect(Node* inspectedNode)
 {
     ErrorString error;
+    RefPtr<Node> node = inspectedNode;
     setSearchingForNode(&error, false, 0);
 
     if (node->nodeType() != Node::ELEMENT_NODE && node->nodeType() != Node::DOCUMENT_NODE)

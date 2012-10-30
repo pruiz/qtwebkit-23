@@ -33,6 +33,7 @@
 #include "DrawingArea.h"
 #include "InjectedBundle.h"
 #include "InjectedBundleBackForwardList.h"
+#include "InjectedBundleUserMessageCoders.h"
 #include "LayerTreeHost.h"
 #include "MessageID.h"
 #include "NetscapePlugin.h"
@@ -104,6 +105,7 @@
 #include <WebCore/RenderLayer.h>
 #include <WebCore/RenderTreeAsText.h>
 #include <WebCore/RenderView.h>
+#include <WebCore/ResourceBuffer.h>
 #include <WebCore/ResourceRequest.h>
 #include <WebCore/RunLoop.h>
 #include <WebCore/SchemeRegistry.h>
@@ -245,6 +247,8 @@ WebPage::WebPage(uint64_t pageID, const WebPageCreationParameters& parameters)
     , m_isRunningModal(false)
     , m_cachedMainFrameIsPinnedToLeftSide(false)
     , m_cachedMainFrameIsPinnedToRightSide(false)
+    , m_cachedMainFrameIsPinnedToTopSide(false)
+    , m_cachedMainFrameIsPinnedToBottomSide(false)
     , m_canShortCircuitHorizontalWheelEvents(false)
     , m_numWheelEventHandlers(0)
     , m_cachedPageCount(0)
@@ -1172,6 +1176,25 @@ void WebPage::setGapBetweenPages(double gap)
     m_page->setPagination(pagination);
 }
 
+void WebPage::postInjectedBundleMessage(const CoreIPC::DataReference& messageData)
+{
+    InjectedBundle* injectedBundle = WebProcess::shared().injectedBundle();
+    if (!injectedBundle)
+        return;
+
+    CoreIPC::ArgumentDecoder messageDecoder(messageData.data(), messageData.size());
+
+    String messageName;
+    if (!messageDecoder.decode(messageName))
+        return;
+
+    RefPtr<APIObject> messageBody;
+    if (!messageDecoder.decode(InjectedBundleUserMessageDecoder(messageBody)))
+        return;
+
+    injectedBundle->didReceiveMessageToPage(this, messageName, messageBody.get());
+}
+
 void WebPage::installPageOverlay(PassRefPtr<PageOverlay> pageOverlay)
 {
     bool shouldFadeIn = true;
@@ -1922,7 +1945,7 @@ void WebPage::getMainResourceDataOfFrame(uint64_t frameID, uint64_t callbackID)
 {
     CoreIPC::DataReference dataReference;
 
-    RefPtr<SharedBuffer> buffer;
+    RefPtr<ResourceBuffer> buffer;
     if (WebFrame* frame = WebProcess::shared().webFrame(frameID)) {
         if (DocumentLoader* loader = frame->coreFrame()->loader()->documentLoader()) {
             if ((buffer = loader->mainResourceData()))
@@ -2619,12 +2642,16 @@ void WebPage::didChangeScrollOffsetForMainFrame()
 
     bool isPinnedToLeftSide = (scrollPosition.x() <= minimumScrollPosition.x());
     bool isPinnedToRightSide = (scrollPosition.x() >= maximumScrollPosition.x());
+    bool isPinnedToTopSide = (scrollPosition.y() <= minimumScrollPosition.y());
+    bool isPinnedToBottomSide = (scrollPosition.y() >= maximumScrollPosition.y());
 
-    if (isPinnedToLeftSide != m_cachedMainFrameIsPinnedToLeftSide || isPinnedToRightSide != m_cachedMainFrameIsPinnedToRightSide) {
-        send(Messages::WebPageProxy::DidChangeScrollOffsetPinningForMainFrame(isPinnedToLeftSide, isPinnedToRightSide));
+    if (isPinnedToLeftSide != m_cachedMainFrameIsPinnedToLeftSide || isPinnedToRightSide != m_cachedMainFrameIsPinnedToRightSide || isPinnedToTopSide != m_cachedMainFrameIsPinnedToTopSide || isPinnedToBottomSide != m_cachedMainFrameIsPinnedToBottomSide) {
+        send(Messages::WebPageProxy::DidChangeScrollOffsetPinningForMainFrame(isPinnedToLeftSide, isPinnedToRightSide, isPinnedToTopSide, isPinnedToBottomSide));
         
         m_cachedMainFrameIsPinnedToLeftSide = isPinnedToLeftSide;
         m_cachedMainFrameIsPinnedToRightSide = isPinnedToRightSide;
+        m_cachedMainFrameIsPinnedToTopSide = isPinnedToTopSide;
+        m_cachedMainFrameIsPinnedToBottomSide = isPinnedToBottomSide;
     }
 }
 

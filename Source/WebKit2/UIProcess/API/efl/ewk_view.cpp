@@ -64,6 +64,10 @@
 #include "WebFullScreenManagerProxy.h"
 #endif
 
+#if ENABLE(INSPECTOR)
+#include "WebInspectorProxy.h"
+#endif
+
 #if USE(ACCELERATED_COMPOSITING)
 #include <Evas_GL.h>
 #endif
@@ -622,6 +626,7 @@ bool ewk_view_accelerated_compositing_mode_enter(const Evas_Object* ewkView)
         return false;
     }
 
+    priv->viewportHandler->setRendererActive(true);
     return true;
 }
 
@@ -1521,6 +1526,17 @@ void ewk_view_load_provisional_started(Evas_Object* ewkView)
 
 /**
  * @internal
+ * Reports that the view's back / forward list has changed.
+ *
+ * Emits signal: "back,forward,list,changed".
+ */
+void ewk_view_back_forward_list_changed(Evas_Object* ewkView)
+{
+    evas_object_smart_callback_call(ewkView, "back,forward,list,changed", 0);
+}
+
+/**
+ * @internal
  * Reports that a navigation policy decision should be taken.
  *
  * Emits signal: "policy,decision,navigation".
@@ -1952,6 +1968,38 @@ Eina_Bool ewk_view_touch_events_enabled_get(const Evas_Object* ewkView)
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     return priv->areTouchEventsEnabled;
+#else
+    return false;
+#endif
+}
+
+Eina_Bool ewk_view_inspector_show(Evas_Object* ewkView)
+{
+#if ENABLE(INSPECTOR)
+    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData, false);
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
+
+    WebInspectorProxy* inspector = priv->pageProxy->inspector();
+    if (inspector)
+        inspector->show();
+
+    return true;
+#else
+    return false;
+#endif
+}
+
+Eina_Bool ewk_view_inspector_close(Evas_Object* ewkView)
+{
+#if ENABLE(INSPECTOR)
+    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData, false);
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
+
+    WebInspectorProxy* inspector = priv->pageProxy->inspector();
+    if (inspector)
+        inspector->close();
+
+    return true;
 #else
     return false;
 #endif

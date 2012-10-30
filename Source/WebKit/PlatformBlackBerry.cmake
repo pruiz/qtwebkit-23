@@ -62,9 +62,9 @@ IF (ENABLE_BATTERY_STATUS)
     LIST(APPEND WebKit_SOURCES blackberry/WebCoreSupport/BatteryClientBlackBerry.cpp)
 ENDIF ()
 
-IF (ENABLE_REGISTER_PROTOCOL_HANDLER OR ENABLE_CUSTOM_SCHEME_HANDLER)
+IF (ENABLE_NAVIGATOR_CONTENT_UTILS)
   LIST(APPEND WebKit_INCLUDE_DIRECTORIES
-    "${WEBCORE_DIR}/Modules/protocolhandler"
+    "${WEBCORE_DIR}/Modules/navigatorcontentutils"
   )
 ENDIF ()
 
@@ -117,7 +117,7 @@ LIST(APPEND WebKit_SOURCES
     blackberry/WebCoreSupport/NetworkInfoClientBlackBerry.cpp
     blackberry/WebCoreSupport/NotificationPresenterImpl.cpp
     blackberry/WebCoreSupport/PagePopupBlackBerry.cpp
-    blackberry/WebCoreSupport/RegisterProtocolHandlerClientBlackBerry.cpp
+    blackberry/WebCoreSupport/NavigatorContentUtilsClientBlackBerry.cpp
     blackberry/WebCoreSupport/SelectPopupClient.cpp
     blackberry/WebCoreSupport/VibrationClientBlackBerry.cpp
     blackberry/WebCoreSupport/DatePickerClient.cpp
@@ -248,6 +248,26 @@ IF (ENABLE_VIDEO_TRACK)
         "${WEBCORE_DIR}/html/track"
     )
 ENDIF ()
+
+INSTALL(DIRECTORY ${WEBCORE_DIR}/inspector/front-end/
+        DESTINATION ../../usr/share/webkit/inspector/
+        FILES_MATCHING PATTERN "*.js")
+INSTALL(DIRECTORY ${WEBCORE_DIR}/inspector/front-end/
+        DESTINATION ../../usr/share/webkit/inspector/
+        FILES_MATCHING PATTERN "*.css")
+INSTALL(DIRECTORY ${WEBCORE_DIR}/inspector/front-end/
+        DESTINATION ../../usr/share/webkit/inspector/
+        FILES_MATCHING PATTERN "*.png")
+INSTALL(DIRECTORY ${WEBCORE_DIR}/inspector/front-end/
+        DESTINATION ../../usr/share/webkit/inspector/
+        FILES_MATCHING PATTERN "*.jpg")
+INSTALL(DIRECTORY ${WEBCORE_DIR}/inspector/front-end/
+        DESTINATION ../../usr/share/webkit/inspector/
+        FILES_MATCHING PATTERN "*.gif")
+INSTALL(FILES ${DERIVED_SOURCES_WEBCORE_DIR}/inspectorBB.html
+              ${WEBKIT_DIR}/blackberry/WebCoreSupport/inspectorBB.js
+              ${DERIVED_SOURCES_WEBCORE_DIR}/InspectorBackendCommands.js
+        DESTINATION ../../usr/share/webkit/inspector/)
 
 ADD_CUSTOM_TARGET (
     inspector ALL

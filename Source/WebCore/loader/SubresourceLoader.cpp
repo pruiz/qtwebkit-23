@@ -36,6 +36,7 @@
 #include "FrameLoader.h"
 #include "Logging.h"
 #include "MemoryCache.h"
+#include "ResourceBuffer.h"
 #include "SecurityOrigin.h"
 #include "SecurityPolicy.h"
 #include "WebCoreMemoryInstrumentation.h"
@@ -220,7 +221,7 @@ void SubresourceLoader::didReceiveResponse(const ResourceResponse& response)
         }
     }
 
-    RefPtr<SharedBuffer> buffer = resourceData();
+    RefPtr<ResourceBuffer> buffer = resourceData();
     if (m_loadingMultipartContent && buffer && buffer->size()) {
         sendDataToResource(buffer->data(), buffer->size());
         clearResourceData();
@@ -269,8 +270,8 @@ void SubresourceLoader::sendDataToResource(const char* data, int length)
     //     ResourceLoader::resourceData() will be null. However, unlike the multipart case, we don't want to tell the CachedResource 
     //     that all data has been received yet. 
     if (m_loadingMultipartContent || !resourceData()) { 
-        RefPtr<SharedBuffer> copiedData = SharedBuffer::create(data, length); 
-        m_resource->data(copiedData.release(), m_loadingMultipartContent); 
+        RefPtr<ResourceBuffer> copiedData = ResourceBuffer::create(data, length); 
+        m_resource->data(copiedData.release(), m_loadingMultipartContent);
     } else 
         m_resource->data(resourceData(), false);
 }

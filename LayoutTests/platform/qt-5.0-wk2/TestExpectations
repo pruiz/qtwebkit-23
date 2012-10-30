@@ -64,6 +64,32 @@ fast/forms/legend-access-key.html
 fast/loader/policy-delegate-action-hit-test-zoomed.html
 # eventSender.gestureTap
 fast/events/touch/gesture/gesture-click.html
+# eventSender.beginDragWithFiles
+fast/dom/Window/window-postmessage-clone-frames.html
+fast/dom/Window/window-postmessage-clone.html
+fast/events/drag-file-crash.html
+fast/events/drag-to-navigate.html
+fast/events/file-input-hidden-in-ondrop.html
+fast/events/input-element-display-none-in-dragleave-crash.html
+fast/events/prevent-drag-to-navigate.html
+fast/files/apply-blob-url-to-img.html
+fast/files/file-list-test.html
+fast/files/file-reader-abort.html
+fast/files/file-reader-directory-crash.html
+fast/files/file-reader-event-listener.html
+fast/files/read-blob-async.html
+fast/files/read-file-async.html
+fast/files/null-origin-string.html
+fast/files/workers/worker-read-blob-sync.html
+fast/files/workers/worker-read-file-async.html
+fast/files/workers/worker-read-file-sync.html
+fast/forms/file/get-file-upload.html
+fast/forms/file/input-file-write-files.html
+fast/forms/file/file-input-change-event.html
+fast/forms/file/recover-file-input-in-unposted-form.html
+fast/forms/file/selected-files-from-history-state.html
+http/tests/local/blob/send-hybrid-blob.html
+http/tests/local/formdata
 
 svg/custom/use-events-crash.svg
 
@@ -245,6 +271,10 @@ http/tests/xmlhttprequest/workers/abort-exception-assert.html
 # [Qt][WK2]fast/loader/submit-form-while-parsing-2.html fails intermittently
 # https://bugs.webkit.org/show_bug.cgi?id=75950
 fast/loader/submit-form-while-parsing-2.html
+
+# New test hangs QT bot
+# Discussed in https://bugs.webkit.org/show_bug.cgi?id=38928
+fast/loader/recursive-before-unload-crash.html
 
 # [Qt][WK2] css3/filters/should-not-have-compositing-layer.html is failing since added in 104622
 # https://bugs.webkit.org/show_bug.cgi?id=76061
@@ -534,9 +564,6 @@ webkit.org/b/98525 plugins/npruntime/browser-object-identity.html
 webkit.org/b/98525 plugins/npruntime/embed-property-equality.html
 webkit.org/b/98525 plugins/refcount-leaks.html
 
-# [Qt][WK2] REGRESSION(r130629): It made touchadjustment/focusout-on-touch.html fail
-webkit.org/b/98642 touchadjustment/focusout-on-touch.html
-
 # [Qt][WK2] Ruby DOM tests differ on WK1 and WK2
 webkit.org/b/98688 fast/ruby/rubyDOM-insert-rt.html
 webkit.org/b/98688 fast/ruby/rubyDOM-insert-text1.html
@@ -550,3 +577,41 @@ webkit.org/b/98688 fast/ruby/rubyDOM-remove-text2.html
 # [Qt][WK2]REGRESSION(r130826): It made fast/js/sparse-array.html crash on 64 bit
 webkit.org/b/98859 fast/js/sort-stability.html
 webkit.org/b/98859 fast/js/sort-with-side-effecting-comparisons.html
+
+# [Qt][WK2] Tests producing bad repaint rects in pixel results
+webkit.org/b/98897 compositing/clip-change.html [ ImageOnlyFailure ]
+webkit.org/b/98897 compositing/geometry/foreground-offset-change.html [ ImageOnlyFailure ]
+webkit.org/b/98897 compositing/iframes/iframe-content-flipping.html [ ImageOnlyFailure ]
+webkit.org/b/98897 compositing/iframes/repaint-after-losing-scrollbars.html [ ImageOnlyFailure ]
+webkit.org/b/98897 compositing/iframes/scroll-grandchild-iframe.html [ ImageOnlyFailure ]
+webkit.org/b/98897 compositing/iframes/scroll-grandchild-iframe.html [ ImageOnlyFailure ]
+webkit.org/b/98897 compositing/overflow/repaint-after-losing-scrollbars.html [ ImageOnlyFailure ]
+webkit.org/b/98897 compositing/repaint/transform-style-change.html [ ImageOnlyFailure ]
+webkit.org/b/98897 compositing/video-page-visibility.html [ ImageOnlyFailure ]
+webkit.org/b/98897 css3/filters/filter-change-repaint-composited.html [ ImageOnlyFailure ]
+webkit.org/b/98897 css3/filters/filter-repaint-composited-fallback-crash.html [ ImageOnlyFailure ]
+webkit.org/b/98897 css3/filters/filter-repaint-composited-fallback.html [ ImageOnlyFailure ]
+webkit.org/b/98897 fast/canvas/canvas-as-image-incremental-repaint.html [ ImageOnlyFailure ]
+webkit.org/b/98897 fast/dynamic/containing-block-change.html [ ImageOnlyFailure ]
+webkit.org/b/98897 fast/frames/inline-object-inside-frameset.html [ ImageOnlyFailure ]
+webkit.org/b/98897 fast/repaint/overflow-flipped-writing-mode-block-in-regions.html [ ImageOnlyFailure ]
+webkit.org/b/98897 fast/repaint/textarea-set-disabled.html [ ImageOnlyFailure ]
+
+# Will need rebaselining after bug 98527 fixed
+webkit.org/b/98994 http/tests/loading/text-content-type-with-binary-extension.html [ Failure ]
+
+# [Qt] some tests fail after unskipped in r131044
+# https://bugs.webkit.org/show_bug.cgi?id=99034
+http/tests/cookies/third-party-cookie-relaxing.html
+http/tests/security/cookies/third-party-cookie-blocking-user-action.html
+http/tests/security/cookies/third-party-cookie-blocking-xslt.xml
+http/tests/security/cookies/third-party-cookie-blocking.html
+
+[Qt][WK2] http/tests/misc/willCacheResponse-delegate-callback.html fails
+webkit.org/b/99148 http/tests/misc/willCacheResponse-delegate-callback.html
+
+[Qt][WK2] REGRESSION(r131057): It made plugins/plugin-document-back-forward.html timeout
+webkit.org/b/99152 plugins/plugin-document-back-forward.html
+
+[Qt][WK2] http/tests/navigation/ping-cross-origin-from-https.html fails
+webkit.org/b/99155 http/tests/navigation/ping-cross-origin-from-https.html

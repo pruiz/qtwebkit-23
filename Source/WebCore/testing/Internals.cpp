@@ -297,6 +297,16 @@ Node* Internals::parentTreeScope(Node* node, ExceptionCode& ec)
     return parentTreeScope ? parentTreeScope->rootNode() : 0;
 }
 
+PassRefPtr<NodeList> Internals::distributedNodes(Element* insertionPoint, ExceptionCode& ec)
+{
+    if (!insertionPoint || !isInsertionPoint(insertionPoint)) {
+        ec = INVALID_ACCESS_ERR;
+        return 0;
+    }
+
+    return toInsertionPoint(insertionPoint)->distributedNodes();
+}
+
 bool Internals::hasShadowInsertionPoint(const Node* root, ExceptionCode& ec) const
 {
     if (root && root->isShadowRoot())
@@ -1224,12 +1234,21 @@ void Internals::resumeAnimations(Document* document, ExceptionCode& ec) const
 
 String Internals::layerTreeAsText(Document* document, ExceptionCode& ec) const
 {
+    return layerTreeAsText(document, 0, ec);
+}
+
+String Internals::layerTreeAsText(Document* document, unsigned flags, ExceptionCode& ec) const
+{
     if (!document || !document->frame()) {
         ec = INVALID_ACCESS_ERR;
         return String();
     }
-    
-    return document->frame()->layerTreeAsText();
+
+    LayerTreeFlags layerTreeFlags = 0;
+    if (flags & LAYER_TREE_INCLUDES_VISIBLE_RECTS)
+        layerTreeFlags |= LayerTreeFlagsIncludeVisibleRects;
+
+    return document->frame()->layerTreeAsText(layerTreeFlags);
 }
 
 void Internals::garbageCollectDocumentResources(Document* document, ExceptionCode& ec) const

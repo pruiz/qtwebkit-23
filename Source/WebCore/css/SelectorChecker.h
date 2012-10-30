@@ -52,7 +52,7 @@ public:
 
     enum SelectorMatch { SelectorMatches, SelectorFailsLocally, SelectorFailsAllSiblings, SelectorFailsCompletely };
     enum VisitedMatchType { VisitedMatchDisabled, VisitedMatchEnabled };
-    enum Mode { ResolvingStyle = 0, CollectingRules, QueryingRules };
+    enum Mode { ResolvingStyle = 0, CollectingRules, QueryingRules, SharingRules };
 
     struct SelectorCheckingContext {
         // Initial selector constructor
@@ -61,10 +61,10 @@ public:
             , element(element)
             , scope(0)
             , visitedMatchType(visitedMatchType)
+            , pseudoStyle(NOPSEUDO)
             , elementStyle(0)
             , elementParentStyle(0)
             , isSubSelector(false)
-            , pseudoStyle(NOPSEUDO)
             , hasScrollbarPseudo(false)
             , hasSelectionPseudo(false)
         { }
@@ -73,32 +73,18 @@ public:
         Element* element;
         const ContainerNode* scope;
         VisitedMatchType visitedMatchType;
+        PseudoId pseudoStyle;
         RenderStyle* elementStyle;
         RenderStyle* elementParentStyle;
         bool isSubSelector;
-        PseudoId pseudoStyle;
         bool hasScrollbarPseudo;
         bool hasSelectionPseudo;
     };
 
-    template<typename Context>
-    struct DOMTraversalStrategy {
-        static bool isFirstChild(const Context&, Element*);
-        static bool isLastChild(const Context&, Element*);
-        static bool isFirstOfType(const Context&, Element*, const QualifiedName&);
-        static bool isLastOfType(const Context&, Element*, const QualifiedName&);
-
-        static int countElementsBefore(const Context&, Element*);
-        static int countElementsAfter(const Context&, Element*);
-        static int countElementsOfTypeBefore(const Context&, Element*, const QualifiedName&);
-        static int countElementsOfTypeAfter(const Context&, Element*, const QualifiedName&);
-    };
-
     bool checkSelector(CSSSelector*, Element*, bool isFastCheckableSelector = false) const;
-    template<typename CheckingContext>
-    SelectorMatch checkSelector(const CheckingContext&, PseudoId&, bool& hasUnknownPseudoElements) const;
-    template<typename CheckingContext>
-    bool checkOneSelector(const CheckingContext&) const;
+    SelectorMatch checkSelector(const SelectorCheckingContext&, PseudoId&, bool& hasUnknownPseudoElements) const;
+    template<typename SiblingTraversalStrategy>
+    bool checkOneSelector(const SelectorCheckingContext&, const SiblingTraversalStrategy&) const;
 
     static bool isFastCheckableSelector(const CSSSelector*);
     bool fastCheckSelector(const CSSSelector*, const Element*) const;

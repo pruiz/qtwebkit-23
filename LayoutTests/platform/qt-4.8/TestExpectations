@@ -812,8 +812,10 @@ tables/mozilla_expected_failures/bugs/bug2479-5.html [ Failure ]
 # https://bugs.webkit.org/show_bug.cgi?id=86066
 http/tests/cookies/single-quoted-value.html [ Failure ]
 
-# Tests unskipped in trunk in r131079, but still failing here.
-# Many probably just need qt-4.8 specific baseline.
+#### Tests unskipped in trunk (10/10 -> 12/10), but still failing here:
+
+# Tests unskipped in trunk in r131079
+css3/unicode-bidi-isolate-basic.html [ Failure ]
 fast/borders/rtl-border-04.html [ Failure ]
 fast/borders/rtl-border-05.html [ Failure ]
 fast/css/text-overflow-ellipsis-text-align-right.html [ Failure ]
@@ -853,3 +855,33 @@ svg/text/select-textLength-spacingAndGlyphs-stretch-2.svg [ Failure ]
 svg/text/select-textLength-spacingAndGlyphs-stretch-3.svg [ Failure ]
 webkit.org/b/78128 svg/zoom/page/zoom-coords-viewattr-01-b.svg [ Failure ]
 css3/filters/composited-during-animation-layertree.html [ Failure Pass ]
+
+# This test fails because Qt does not support conditionals in unicode special casing.
+# See also http://trolltech.com/developer/task-tracker/index_html?id=212870&method=entry
+fast/css/case-transform.html [ Failure ]
+
+# New fast/dom/Window/mozilla-focus-blur.html introduced in r118916 fails
+webkit.org/b/87956 fast/dom/Window/mozilla-focus-blur.html [ Failure ]
+
+# [Qt] REGRESSION(r114059): It made these tests fail
+webkit.org/b/83432 fast/dom/dom-parse-serialize-display.html [ Failure ]
+webkit.org/b/83432 fast/dom/dom-parse-serialize-xmldecl.html [ Failure ]
+webkit.org/b/83432 fast/dom/dom-parse-serialize.html [ Failure ]
+webkit.org/b/83432 fast/xmlhttprequest/xmlhttprequest-get.xhtml [ Failure ]
+
+webkit.org/b/35973 fast/multicol/hit-test-above-or-below.html [ Failure ]
+css2.1/t051201-c23-first-line-00-b.html [ Failure ]
+
+# [Qt] svg/custom/svg-fonts-no-latin-glyph.html fails
+webkit.org/b/74847 svg/custom/svg-fonts-no-latin-glyph.html [ Failure ]
+
+# Crashes due to debug assert until we fix issues with style elements in SVG
+svg/custom/use-referencing-style-crash.svg [ Failure ]
+
+#### End reskipped tests
+
+# New crash test that doesn't crash but still fails (from https://bugs.webkit.org/show_bug.cgi?id=98755 )
+svg/text/alt-glpyh-on-fallback-font-crash.html [ Failure ]
+
+# Needs rebaseline
+fast/text/basic/013.html [ Failure ]

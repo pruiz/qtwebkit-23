@@ -90,9 +90,9 @@ public:
 
     static const Vector<WebContext*>& allContexts();
 
-    void addMessageReceiver(CoreIPC::MessageClass, CoreIPC::MessageReceiver*);
-    bool dispatchMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::ArgumentDecoder*);
-    bool dispatchSyncMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::ArgumentDecoder*, OwnPtr<CoreIPC::ArgumentEncoder>&);
+    void deprecatedAddMessageReceiver(CoreIPC::MessageClass, CoreIPC::MessageReceiver*);
+    bool dispatchMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&);
+    bool dispatchSyncMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&, OwnPtr<CoreIPC::MessageEncoder>&);
 
     void initializeInjectedBundleClient(const WKContextInjectedBundleClient*);
     void initializeConnectionClient(const WKContextConnectionClient*);
@@ -130,10 +130,12 @@ public:
     void didReceiveSynchronousMessageFromInjectedBundle(const String&, APIObject*, RefPtr<APIObject>& returnData);
 
     void populateVisitedLinks();
-    
+
+#if ENABLE(NETSCAPE_PLUGIN_API)
     void setAdditionalPluginsDirectory(const String&);
 
     PluginInfoStore& pluginInfoStore() { return m_pluginInfoStore; }
+#endif
     String applicationCacheDirectory();
 
     void setAlwaysUsesComplexTextCodePath(bool);
@@ -151,8 +153,8 @@ public:
     void addVisitedLinkHash(WebCore::LinkHash);
 
     // MessageReceiver.
-    virtual void didReceiveMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::ArgumentDecoder*) OVERRIDE;
-    virtual void didReceiveSyncMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::ArgumentDecoder*, OwnPtr<CoreIPC::ArgumentEncoder>&) OVERRIDE;
+    virtual void didReceiveMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&) OVERRIDE;
+    virtual void didReceiveSyncMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&, OwnPtr<CoreIPC::MessageEncoder>&) OVERRIDE;
 
     void setCacheModel(CacheModel);
     CacheModel cacheModel() const { return m_cacheModel; }
@@ -195,7 +197,9 @@ public:
     WebNetworkInfoManagerProxy* networkInfoManagerProxy() const { return m_networkInfoManagerProxy.get(); }
 #endif
     WebNotificationManagerProxy* notificationManagerProxy() const { return m_notificationManagerProxy.get(); }
+#if ENABLE(NETSCAPE_PLUGIN_API)
     WebPluginSiteDataManager* pluginSiteDataManager() const { return m_pluginSiteDataManager.get(); }
+#endif
     WebResourceCacheManagerProxy* resourceCacheManagerProxy() const { return m_resourceCacheManagerProxy.get(); }
 #if USE(SOUP)
     WebSoupRequestManagerProxy* soupRequestManagerProxy() const { return m_soupRequestManagerProxy.get(); }
@@ -283,8 +287,8 @@ private:
     void didGetWebCoreStatistics(const StatisticsData&, uint64_t callbackID);
         
     // Implemented in generated WebContextMessageReceiver.cpp
-    void didReceiveWebContextMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::ArgumentDecoder*);
-    void didReceiveSyncWebContextMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::ArgumentDecoder*, OwnPtr<CoreIPC::ArgumentEncoder>&);
+    void didReceiveWebContextMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&);
+    void didReceiveSyncWebContextMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&, OwnPtr<CoreIPC::MessageEncoder>&);
 
     static void languageChanged(void* context);
     void languageChanged();
@@ -315,10 +319,12 @@ private:
     WebContextInjectedBundleClient m_injectedBundleClient;
 
     WebContextConnectionClient m_connectionClient;
-    
+
     WebHistoryClient m_historyClient;
 
+#if ENABLE(NETSCAPE_PLUGIN_API)
     PluginInfoStore m_pluginInfoStore;
+#endif
     VisitedLinkProvider m_visitedLinkProvider;
         
     HashSet<String> m_schemesToRegisterAsEmptyDocument;
@@ -360,7 +366,9 @@ private:
     RefPtr<WebNetworkInfoManagerProxy> m_networkInfoManagerProxy;
 #endif
     RefPtr<WebNotificationManagerProxy> m_notificationManagerProxy;
+#if ENABLE(NETSCAPE_PLUGIN_API)
     RefPtr<WebPluginSiteDataManager> m_pluginSiteDataManager;
+#endif
     RefPtr<WebResourceCacheManagerProxy> m_resourceCacheManagerProxy;
 #if USE(SOUP)
     RefPtr<WebSoupRequestManagerProxy> m_soupRequestManagerProxy;

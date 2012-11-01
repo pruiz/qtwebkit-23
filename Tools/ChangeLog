@@ -1,3 +1,569 @@
+2012-10-18  Roger Fong  <roger_fong@apple.com>
+
+        Unreviewed. Skip really old flaky failing jscore date test. 
+        There's a bug tracking it here: https://bugs.webkit.org/show_bug.cgi?id=53712.
+
+        * Scripts/run-javascriptcore-tests:
+
+2012-10-18  Byungwoo Lee  <bw80.lee@samsung.com>
+
+        Fix build warning.
+        https://bugs.webkit.org/show_bug.cgi?id=99788
+
+        Reviewed by Kentaro Hara.
+
+        Use return value of mktemp() for removing -Wunused-result.
+
+        * MiniBrowser/efl/main.c:
+        (on_download_request):
+
+2012-10-18  Benjamin Poulain  <bpoulain@apple.com>
+
+        [WK2] WebKit2 does not build without PLUGIN_PROCESS on Mac
+        https://bugs.webkit.org/show_bug.cgi?id=99771
+
+        Reviewed by Anders Carlsson.
+
+        * DumpRenderTree/mac/MockWebNotificationProvider.mm: The file was not including config.h,
+        effectively breaking feature flags.
+
+2012-10-18  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL][DRT] Make textareas resizable by default.
+        https://bugs.webkit.org/show_bug.cgi?id=99719
+
+        Reviewed by Gyuyoung Kim.
+
+        Enable painting the textarea resizer at the corner by default,
+        just as it already is the case for WK2. This eases the work needed
+        to get the pixel tests in shape and run by the bots, as both the
+        WK1 and WK2 ports will have more similar results.
+
+        * DumpRenderTree/efl/DumpRenderTreeChrome.cpp:
+        (DumpRenderTreeChrome::resetDefaultsToConsistentValues):
+
+2012-10-18  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] Add a webkit_test_support target that WebTestingSupport
+        https://bugs.webkit.org/show_bug.cgi?id=99772
+
+        Reviewed by Adam Barth.
+
+        * DumpRenderTree/DumpRenderTree.gyp/DumpRenderTree.gyp:
+
+2012-10-18  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] move TestRunner files into a src/ sub directory
+        https://bugs.webkit.org/show_bug.cgi?id=99776
+
+        Reviewed by Adam Barth.
+
+        This is in preparation of adding a public API to the TestRunner library.
+
+        * DumpRenderTree/DumpRenderTree.gyp/DumpRenderTree.gyp:
+        * DumpRenderTree/DumpRenderTree.gypi:
+        * DumpRenderTree/chromium/DRTTestRunner.h:
+        * DumpRenderTree/chromium/TestRunner/src/AccessibilityControllerChromium.cpp: Renamed from Tools/DumpRenderTree/chromium/TestRunner/AccessibilityControllerChromium.cpp.
+        * DumpRenderTree/chromium/TestRunner/src/AccessibilityControllerChromium.h: Renamed from Tools/DumpRenderTree/chromium/TestRunner/AccessibilityControllerChromium.h.
+        * DumpRenderTree/chromium/TestRunner/src/AccessibilityUIElementChromium.cpp: Renamed from Tools/DumpRenderTree/chromium/TestRunner/AccessibilityUIElementChromium.cpp.
+        * DumpRenderTree/chromium/TestRunner/src/AccessibilityUIElementChromium.h: Renamed from Tools/DumpRenderTree/chromium/TestRunner/AccessibilityUIElementChromium.h.
+        * DumpRenderTree/chromium/TestRunner/src/CppBoundClass.cpp: Renamed from Tools/DumpRenderTree/chromium/TestRunner/CppBoundClass.cpp.
+        * DumpRenderTree/chromium/TestRunner/src/CppBoundClass.h: Renamed from Tools/DumpRenderTree/chromium/TestRunner/CppBoundClass.h.
+        * DumpRenderTree/chromium/TestRunner/src/CppVariant.cpp: Renamed from Tools/DumpRenderTree/chromium/TestRunner/CppVariant.cpp.
+        * DumpRenderTree/chromium/TestRunner/src/CppVariant.h: Renamed from Tools/DumpRenderTree/chromium/TestRunner/CppVariant.h.
+        * DumpRenderTree/chromium/TestRunner/src/EventSender.cpp: Renamed from Tools/DumpRenderTree/chromium/TestRunner/EventSender.cpp.
+        * DumpRenderTree/chromium/TestRunner/src/EventSender.h: Renamed from Tools/DumpRenderTree/chromium/TestRunner/EventSender.h.
+        * DumpRenderTree/chromium/TestRunner/src/GamepadController.cpp: Renamed from Tools/DumpRenderTree/chromium/TestRunner/GamepadController.cpp.
+        * DumpRenderTree/chromium/TestRunner/src/GamepadController.h: Renamed from Tools/DumpRenderTree/chromium/TestRunner/GamepadController.h.
+        * DumpRenderTree/chromium/TestRunner/src/Task.cpp: Renamed from Tools/DumpRenderTree/chromium/TestRunner/Task.cpp.
+        * DumpRenderTree/chromium/TestRunner/src/Task.h: Renamed from Tools/DumpRenderTree/chromium/TestRunner/Task.h.
+        * DumpRenderTree/chromium/TestRunner/src/TestDelegate.h: Renamed from Tools/DumpRenderTree/chromium/TestRunner/TestDelegate.h.
+        * DumpRenderTree/chromium/TestRunner/src/TestInterfaces.cpp: Renamed from Tools/DumpRenderTree/chromium/TestRunner/TestInterfaces.cpp.
+        * DumpRenderTree/chromium/TestRunner/src/TestInterfaces.h: Renamed from Tools/DumpRenderTree/chromium/TestRunner/TestInterfaces.h.
+        * DumpRenderTree/chromium/TestRunner/src/TestRunner.cpp: Renamed from Tools/DumpRenderTree/chromium/TestRunner/TestRunner.cpp.
+        * DumpRenderTree/chromium/TestRunner/src/TestRunner.h: Renamed from Tools/DumpRenderTree/chromium/TestRunner/TestRunner.h.
+        * DumpRenderTree/chromium/TestRunner/src/TextInputController.cpp: Renamed from Tools/DumpRenderTree/chromium/TestRunner/TextInputController.cpp.
+        * DumpRenderTree/chromium/TestRunner/src/TextInputController.h: Renamed from Tools/DumpRenderTree/chromium/TestRunner/TextInputController.h.
+
+2012-10-18  Dirk Pranke  <dpranke@chromium.org>
+
+        [chromium] garden-o-matic should ignore the 10.8 Tests bot
+        https://bugs.webkit.org/show_bug.cgi?id=99765
+
+        Reviewed by Adam Barth.
+
+        It's really more of an FYI bot at this point and can be safely
+        ignored like the Content Shell bots.
+
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/config.js:
+        (.):
+
+2012-10-18  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] Simplify TestInterfaces, as this class won't be directly exposed in the TestRunner library's interface
+        https://bugs.webkit.org/show_bug.cgi?id=99766
+
+        Reviewed by Adam Barth.
+
+        This reverts http://trac.webkit.org/changeset/123240
+
+        * DumpRenderTree/chromium/TestRunner/TestInterfaces.cpp:
+        (TestInterfaces::TestInterfaces):
+        (TestInterfaces::~TestInterfaces):
+        (TestInterfaces::setWebView):
+        (TestInterfaces::setDelegate):
+        (TestInterfaces::bindTo):
+        (TestInterfaces::resetAll):
+        (TestInterfaces::accessibilityController):
+        (TestInterfaces::eventSender):
+        * DumpRenderTree/chromium/TestRunner/TestInterfaces.h:
+        (TestInterfaces):
+
+2012-10-18  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r131810.
+        http://trac.webkit.org/changeset/131810
+        https://bugs.webkit.org/show_bug.cgi?id=99762
+
+        Broke linux debug webkit_unit_tests (Requested by
+        danakj|gardening on #webkit).
+
+        * DumpRenderTree/chromium/DumpRenderTree.cpp:
+        (main):
+        * DumpRenderTree/chromium/TestShell.cpp:
+        (TestShell::TestShell):
+        (TestShell::resetWebSettings):
+        * DumpRenderTree/chromium/TestShell.h:
+        (TestShell):
+        * DumpRenderTree/chromium/WebPreferences.cpp:
+        (WebPreferences::reset):
+        (WebPreferences::applyTo):
+        * DumpRenderTree/chromium/WebPreferences.h:
+        (WebPreferences):
+        * Scripts/webkitpy/layout_tests/port/chromium.py:
+        (ChromiumPort.virtual_test_suites):
+
+2012-10-18  Alpha Lam  <hclam@chromium.org>
+
+        [chromium] Implement deferred image decoding
+        https://bugs.webkit.org/show_bug.cgi?id=94240
+
+        Reviewed by Stephen White.
+
+        Add --enable-deferred-image-decoding to DRT.
+
+        * DumpRenderTree/chromium/DumpRenderTree.cpp:
+        (main):
+        * DumpRenderTree/chromium/TestShell.cpp:
+        (TestShell::TestShell):
+        (TestShell::resetWebSettings):
+        * DumpRenderTree/chromium/TestShell.h:
+        (TestShell::setDeferredImageDecodingEnabled):
+        (TestShell):
+        * DumpRenderTree/chromium/WebPreferences.cpp:
+        (WebPreferences::reset):
+        (WebPreferences::applyTo):
+        * DumpRenderTree/chromium/WebPreferences.h:
+        (WebPreferences):
+        * Scripts/webkitpy/layout_tests/port/chromium.py:
+        (ChromiumPort.virtual_test_suites):
+
+2012-10-18  Dirk Pranke  <dpranke@chromium.org>
+
+        webkitpy: fix chromium bot configs in builders.py
+        https://bugs.webkit.org/show_bug.cgi?id=99638
+
+        Reviewed by Ojan Vafai.
+
+        Updating after the great bot-renaming and deleting a test case
+        that is no longer needed.
+
+        * Scripts/webkitpy/layout_tests/port/builders.py:
+        * Scripts/webkitpy/tool/servers/gardeningserver_unittest.py:
+        (BuildCoverageExtrapolatorTest.test_extrapolate):
+
+2012-10-18  Dirk Pranke  <dpranke@chromium.org>
+
+        [chromium] Add 10.8 bot into fallback path, make work with garden-o-matic
+        https://bugs.webkit.org/show_bug.cgi?id=99748
+
+        Reviewed by Ryosuke Niwa.
+
+        Subject pretty much says it all ...
+
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/config.js:
+        * Scripts/webkitpy/layout_tests/port/builders.py:
+        * Scripts/webkitpy/layout_tests/port/chromium_mac.py:
+        (ChromiumMacPort):
+        * Scripts/webkitpy/layout_tests/port/chromium_mac_unittest.py:
+        (ChromiumMacPortTest.test_versions):
+        (ChromiumMacPortTest.test_baseline_path):
+        * Scripts/webkitpy/tool/commands/rebaseline_unittest.py:
+        (TestRebaseline.test_baseline_directory):
+        (test_rebaseline_and_copy_test_with_lion_result):
+        (test_rebaseline_expectations):
+
+2012-10-18  Timothy Hatcher  <timothy@apple.com>
+
+        Teach prepare-ChangeLog how to handle non-function properties in JavaScript prototypes.
+
+        https://bugs.webkit.org/show_bug.cgi?id=99747
+
+        Reviewed by Joseph Pecoraro.
+
+        * Scripts/prepare-ChangeLog:
+        (get_function_line_ranges_for_javascript): Clear currentIdentifiers when comma is encountered
+        so it does not tack those identifiers onto the next changed function.
+
+2012-10-18  James Simonsen  <simonjam@chromium.org>
+
+        Add a script for exporting http/tests/w3c/webperf/submission to W3C
+        https://bugs.webkit.org/show_bug.cgi?id=99675
+
+        Reviewed by Tony Gentilcore.
+
+        This does the inverse of Scripts/import-w3c-performance-wg-tests.
+
+        * Scripts/export-w3c-performance-wg-tests: Added.
+
+2012-10-18  Pablo Flouret  <pablof@motorola.com>
+
+        Implement css3-conditional's @supports rule
+        https://bugs.webkit.org/show_bug.cgi?id=86146
+
+        Reviewed by Antti Koivisto.
+
+        * Scripts/webkitperl/FeatureList.pm:
+        * qmake/mkspecs/features/features.pri:
+            Add an ENABLE_CSS3_CONDITIONAL_RULES flag.
+
+2012-10-18  Xiaobo Wang  <xbwang@torchmobile.com.cn>
+
+        [BlackBerry] Dump DRT output to stdout if test is passed as command line argument
+        https://bugs.webkit.org/show_bug.cgi?id=99150
+
+        Reviewed by Rob Buis.
+
+        Fixed some code style errors as well.
+
+        * DumpRenderTree/blackberry/DumpRenderTree.cpp:
+        (BlackBerry::WebKit::DumpRenderTree::runTest):
+        (BlackBerry::WebKit::DumpRenderTree::runRemainingTests):
+        (BlackBerry::WebKit::DumpRenderTree::runTests):
+        (BlackBerry::WebKit::DumpRenderTree::isHTTPTest):
+        (BlackBerry::WebKit::DumpRenderTree::dump):
+        (BlackBerry::WebKit::DumpRenderTree::addMessageToConsole):
+        * DumpRenderTree/blackberry/DumpRenderTreeBlackBerry.h:
+        (DumpRenderTree):
+
+2012-10-18  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Improved support for silent builds
+
+        Reviewed by Tor Arne Vestbø.
+
+        Silence our extra compilers when CONFIG+=silent is set.
+
+        * qmake/mkspecs/features/default_post.prf:
+
+2012-10-18  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Reduce memory pressure at link time with less compromise on speed of linking
+
+        Reviewed by Csaba Osztrogonác.
+
+        Revert r131718 that made us pass -fno-keep-memory to the linker for any
+        i386 builds. The downside of passing that option is that it slows down
+        the process of linking and as Ossy determined, release builds do _not_
+        take as much memory (2.x GB) for linking but much less (~350MB).
+
+        However there is one condition where even release builds do take up too
+        much memory, and that is when Qt is configured with
+        -separate-debug-info, because it adds a -g next to -O2. The recent
+        introduction of loading qt_build_config enabled us to read qmodule.pri,
+        which adds the -g if Qt is configured with -separate-debug-info. So
+        instead of playing with -fno-keep-memory (which is a last resort
+        measure for debug builds) we should tweak our existing mechanism of
+        dealing with the debug info:
+
+        production_build.prf tries to ensure that we use -g only in static
+        libraries that contain API facing code, so that we get nice backtraces
+        at least into the API layer. For other static libraries such as WebCore
+        we skip -g via CONFIG += no_debug_info. One of the conditions for
+        enabling this tweak is CONFIG(debug, debug|release). This patch adds
+        contains(QT_CONFIG,separate_debug_info) to the conditions.
+
+        The patch also extend the CONFIG += no_debug_info part with the removal
+        of no_separate_debug_info. There is no point in running an extra
+        build step to strip out debug info into a separate file if at the same
+        time we tell the compiler to not generate any debug info altogether.
+
+        * qmake/mkspecs/features/production_build.prf:
+        * qmake/mkspecs/features/unix/default_post.prf:
+
+2012-10-18  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] OpenGL rendering is not possible on bots using Xvfb
+        https://bugs.webkit.org/show_bug.cgi?id=99463
+
+        Reviewed by Jocelyn Turcotte.
+
+        Added a workaround to be able to disallow UI side OpenGL rendering
+        if the environment is not suitable because it can be extremely slow
+        with a software backend.
+
+        * Scripts/webkitpy/layout_tests/port/qt.py:
+        (QtPort.setup_environ_for_server): Let the environment variable
+        QT_WEBKIT_DISABLE_UIPROCESS_DUMPPIXELS reach the driver. This variable
+        should be defined on bots that don't have a suitable OpenGL environment.
+        * WebKitTestRunner/PlatformWebView.h:
+        (PlatformWebView):
+        * WebKitTestRunner/qt/PlatformWebViewQt.cpp:
+        (WTR::WrapperWindow::handleStatusChanged): Don't try to create an OpenGL
+        surface and set the setRenderWithoutShowing flag on the window if the
+        variable is set.
+        (WTR::PlatformWebView::windowSnapshotImage):
+        (WTR::PlatformWebView::windowShapshotEnabled):
+        (WTR):
+        * WebKitTestRunner/qt/TestInvocationQt.cpp:
+        (WTR::TestInvocation::dumpPixelsAndCompareWithExpected): Use the old method
+        of evaluating pixel results if the snapshot is not supported, that is to check
+        the image we got from the web process. This is necessary for the bots to be able
+        to run ref tests.
+
+2012-10-15  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] Implement pixel snapshot generation in WTR
+        https://bugs.webkit.org/show_bug.cgi?id=95992
+
+        Reviewed by Jocelyn Turcotte.
+
+        Switch the Qt implementation of the PlatformWebView to use
+        QQuickWindow::grabWindow to generate the pixel results. This way
+        we will go through the scenegraph and test the actual rendering backend.
+        We use QQuickWindowPrivate::setRenderWithoutShowing to avoid the need of
+        showing the window.
+
+        * WebKitTestRunner/Target.pri: Had to added a bunch
+        of modules to be able to use QQuickWindowPrivate.
+        * WebKitTestRunner/qt/PlatformWebViewQt.cpp:
+        (WTR::WrapperWindow::handleStatusChanged):
+        (WTR::PlatformWebView::windowSnapshotImage):
+
+2012-10-15  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WTR] Do a forced repaint before generating pixel results
+        https://bugs.webkit.org/show_bug.cgi?id=98654
+
+        Reviewed by Jocelyn Turcotte.
+
+        Do a forced repaint before grabbing the pixel snapshot. This extra
+        synchronisation is necessary with the CoordinatedGraphics rendering
+        backend because it has a fully asynchronous nature. This patch make
+        us using the window snapshot for pixel results which is necessary to
+        capture animations and other dynamic content. The actual grabbing of
+        the window has not been implemented in this patch. It will come in
+        a follow-up.
+
+        * WebKitTestRunner/TestInvocation.cpp:
+        (WTR::TestInvocation::invoke):
+        (WTR::TestInvocation::dump): Store results in member variables.
+        Don't close output channels yet.
+        (WTR::TestInvocation::dumpResults): Added. This is where we dump
+        the results if no error happened.
+        (WTR):
+        (WTR::TestInvocation::didReceiveMessageFromInjectedBundle):
+        * WebKitTestRunner/TestInvocation.h:
+        (TestInvocation):
+        * WebKitTestRunner/qt/PlatformWebViewQt.cpp:
+        (WTR::PlatformWebView::windowSnapshotImage):
+        * WebKitTestRunner/qt/TestInvocationQt.cpp:
+        (WTR::TestInvocation::forceRepaintDoneCallback):
+        (WTR):
+        (WTR::TestInvocation::dumpPixelsAndCompareWithExpected):
+
+2012-10-18  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Clean up variables controlling Qt module creation/handling
+
+        Reviewed by Tor Arne Vestbø.
+
+        We now depend on a Qt 5 version that is new enough to allow us to
+        clean this up. Qt's default_pre.prf uses MODULE_QMAKE_OUTDIR, but
+        the other MODULE_BASE_* variables are onl used in qmodule.prf.
+
+        * qmake/mkspecs/features/default_pre.prf:
+
+2012-10-18  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Reduce memory pressure during link time
+
+        Reviewed by Tor Arne Vestbø.
+
+        If possible always pass -fkeep-memory to the linker on i386. The
+        library has grown so big that we need this not only for i386 debug
+        builds but at least also for release.
+
+        * qmake/mkspecs/features/unix/default_post.prf:
+
+2012-10-17  Tor Arne Vestbø  <tor.arne.vestbo@digia.com>
+
+        [Qt] Modularize documentation for QtWebKit
+
+        Running 'make docs' would fail unless 'make qmake_all' was ran first,
+        but qmake_all involved generating all the derived sources, which seems
+        overly complex just for building documentation.
+
+        We solve this by preventing all subdirs except QtWebKit from having a
+        docs target. This would normally work fine on its own, but since we
+        use CONFIG += ordered, there's now a missing doc target for the
+        immediate dependency of the QtWebKit subdir. We solve this by adding
+        a dummy-target ourselves.
+
+        Finally, we clean up the qdocconf file to match the rest of the Qt
+        documentation modularization efforts.
+
+        Reviewed by Simon Hausmann.
+
+        * qmake/mkspecs/features/default_post.prf:
+
+2012-10-17  Zoltan Horvath  <zoltan@webkit.org>
+
+        Remove the JSHeap memory measurement of the PageLoad performacetests since it creates bogus JSGlobalDatas
+        https://bugs.webkit.org/show_bug.cgi?id=99609 
+
+        Reviewed by Ryosuke Niwa.
+
+        Remove the implementation since it creates bogus JSGlobalDatas in the layout tests.
+
+        * DumpRenderTree/mac/DumpRenderTree.mm:
+        (dump):
+
+2012-10-17  Dirk Pranke  <dpranke@chromium.org>
+
+        [chromium] stop falling back to platform/mac for LayoutTest results
+        https://bugs.webkit.org/show_bug.cgi?id=99666
+
+        Reviewed by James Robinson.
+
+        Previously the Chromium ports would fall back to results in
+        platform/mac if a result was not found in platform/chromium-*.
+        This allowed us to share a lot of results w/ the Apple Mac port,
+        but often surprised people (especially at Apple ;) when changing
+        something in that directory would break a Chromium build.
+
+        The tests that are deleted in baselineoptimizer were for cases
+        that are no longer relevant or possible in the current fallback
+        graph.
+
+        * Scripts/webkitpy/common/checkout/baselineoptimizer_unittest.py:
+        (BaselineOptimizerTest.test_move_baselines):
+        (BaselineOptimizerTest.test_chromium_covers_mac_win_linux):
+        * Scripts/webkitpy/layout_tests/port/chromium_android.py:
+        (ChromiumAndroidPort):
+        * Scripts/webkitpy/layout_tests/port/chromium_linux.py:
+        (ChromiumLinuxPort):
+        * Scripts/webkitpy/layout_tests/port/chromium_mac.py:
+        (ChromiumMacPort):
+        * Scripts/webkitpy/layout_tests/port/chromium_win.py:
+        (ChromiumWinPort):
+        * TestResultServer/static-dashboards/flakiness_dashboard.js:
+
+2012-10-17  Shashi Shekhar  <shashishekhar@google.com>
+
+        Remove redundant sdk_build parameter.
+        https://bugs.webkit.org/show_bug.cgi?id=99648
+
+        Reviewed by Adam Barth.
+
+        sdk_build parameter is no longer needed.
+
+        * DumpRenderTree/DumpRenderTree.gyp/DumpRenderTree.gyp:
+        * TestWebKitAPI/TestWebKitAPI.gyp/TestWebKitAPI.gyp:
+
+2012-10-17  Joanmarie Diggs  <jdiggs@igalia.com>
+
+        [GTK] AccessibilityUIElement::role() should be consistent across platforms wherever possible
+        https://bugs.webkit.org/show_bug.cgi?id=99640
+
+        Reviewed by Chris Fleizach.
+
+        Convert AtkRole instances to the Mac/Safari-style AXRole string.
+
+        * DumpRenderTree/gtk/AccessibilityUIElementGtk.cpp:
+        (roleToString): New method to convert AtkRole instances to the Mac/Safari-style AXRole string
+        (AccessibilityUIElement::role): Output the Mac/Safair-style AXRole string rather than the AtkRole's name
+
+2012-10-17  Anders Carlsson  <andersca@apple.com>
+
+        Clean up Vector.h
+        https://bugs.webkit.org/show_bug.cgi?id=99622
+
+        Reviewed by Benjamin Poulain.
+
+        Remove ReversedProxy test.
+
+        * TestWebKitAPI/Tests/WTF/Vector.cpp:
+
+2012-10-17  Scott Graham  <scottmg@chromium.org>
+
+        Integer overflows/underflows in all Gamepad controller api calls.
+        https://bugs.webkit.org/show_bug.cgi?id=97262
+
+        Reviewed by Abhishek Arya.
+
+        Range check controller inputs. This code is not exposed to the web,
+        but makes fuzzers try less hard to break uninteresting code.
+
+        * DumpRenderTree/chromium/TestRunner/GamepadController.cpp:
+        (GamepadController::setButtonCount):
+        (GamepadController::setButtonData):
+        (GamepadController::setAxisCount):
+        (GamepadController::setAxisData):
+
+2012-10-17  Joseph Pecoraro  <pecoraro@apple.com>
+
+        Unreviewed watchlist email change.
+
+        * Scripts/webkitpy/common/config/watchlist:
+
+2012-10-17  Dan Carney  <dcarney@google.com>
+
+        Bind isolatedWorldSecurityOrigin to world
+        https://bugs.webkit.org/show_bug.cgi?id=99582
+
+        Reviewed by Adam Barth.
+
+        Added ability to unset isolatedWorldSecurityOrigin.
+
+        * DumpRenderTree/chromium/DRTTestRunner.cpp:
+        (DRTTestRunner::setIsolatedWorldSecurityOrigin):
+
+2012-10-17  Joseph Pecoraro  <pecoraro@apple.com>
+
+        Unreviewed watchlist addition.
+
+        * Scripts/webkitpy/common/config/watchlist:
+
+2012-10-17  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        plugins: Allow a plugin to dictate whether it can receive drag events or not.
+        https://bugs.webkit.org/show_bug.cgi?id=99355
+
+        Reviewed by Tony Chang.
+
+        Update the TestWebPlugin to implement the new |canProcessDrag| interface.
+
+        * DumpRenderTree/chromium/TestWebPlugin.h:
+        (TestWebPlugin::canProcessDrag):
+
+2012-10-17  Dominic Mazzoni  <dmazzoni@google.com>
+
+        Unreviewed. Create an accessibility watchlist.
+
+        * Scripts/webkitpy/common/config/committers.py:
+        * Scripts/webkitpy/common/config/watchlist:
+
 2012-10-17  Jochen Eisinger  <jochen@chromium.org>
 
         [gyp] fix bundle resources for DumpRenderTree on mac

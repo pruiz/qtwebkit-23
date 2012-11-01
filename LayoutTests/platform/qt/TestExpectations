@@ -193,12 +193,13 @@ fast/dom/shadow/adopt-node-with-shadow-root.html
 fast/dom/shadow/composed-shadow-tree-walker.html
 fast/dom/shadow/content-after-style.html
 fast/dom/shadow/content-element-api.html
+fast/dom/shadow/content-element-distributed-nodes.html
 fast/dom/shadow/content-element-move.html
 fast/dom/shadow/content-element-outside-shadow.html
 fast/dom/shadow/content-element-outside-shadow-style.html
 fast/dom/shadow/content-element-in-media-element.html
 fast/dom/shadow/content-element-in-meter-element.html
-fast/dom/shadow/distributed-nodes.html
+fast/dom/shadow/content-reprojection-dynamic.html
 fast/dom/shadow/drop-event-for-input-in-shadow.html
 fast/dom/shadow/drop-event-in-shadow.html
 fast/dom/shadow/elements-in-frameless-document.html
@@ -586,6 +587,12 @@ fast/events/constructors/device-proximity-event-constructor.html
 
 # Missing support in DRT for Geolocation's Coordinate attributes.
 fast/dom/Geolocation/coordinates-interface-attributes.html
+
+# User Timing is not enabled
+webkit.org/b/84893 http/tests/w3c/webperf/submission/Intel/user-timing
+
+# Resource Timing is not enable yet, skip it.
+webkit.org/b/61138 http/tests/w3c/webperf/submission/Intel/resource-timing
 
 # =========================================================================== #
 #       Drag and Drop Support in DRT.                                         #
@@ -2197,7 +2204,6 @@ fast/block/line-layout/selection-highlight-overlap.html
 fast/css/empty-cell-baseline.html
 fast/forms/datalist/input-appearance-range-with-datalist-rtl.html
 fast/forms/datalist/update-range-with-datalist.html
-fast/forms/range/input-appearance-range-rtl.html
 fast/multicol/cell-shrinkback.html
 fast/multicol/overflow-into-columngap.html
 fast/overflow/line-clamp-and-columns.html
@@ -2412,19 +2418,7 @@ webkit.org/b/91376 http/tests/security/sandboxed-iframe-modify-self.html [ Failu
 webkit.org/b/91379 http/tests/security/contentSecurityPolicy/policy-does-not-affect-child.html [ Failure Pass ]
 webkit.org/b/91379 http/tests/security/contentSecurityPolicy/object-src-none-allowed.html [ Failure Pass ]
 
-webkit.org/b/98666 fast/events/touch/touch-slider.html [ Failure ]
-webkit.org/b/98666 fast/dom/HTMLInputElement/input-slider-update.html [ Failure ]
-webkit.org/b/98666 fast/dom/HTMLInputElement/input-slider-update-styled.html [ Failure ]
-webkit.org/b/98666 fast/forms/box-shadow-override.html [ Failure ]
-webkit.org/b/98666 fast/forms/datalist/input-appearance-range-with-datalist.html [ Failure ]
-webkit.org/b/98666 fast/forms/range/input-appearance-range.html [ Failure ]
-webkit.org/b/98666 fast/forms/range/input-appearance-range-rtl.html [ Failure ]
-webkit.org/b/98666 fast/forms/range/range-thumb-height-percentage.html [ Failure ]
-webkit.org/b/98666 fast/forms/range/slider-padding.html [ Failure ]
-webkit.org/b/98666 fast/multicol/client-rects.html [ Failure ]
-webkit.org/b/98666 fast/repaint/slider-thumb-drag-release.html [ Failure ]
-webkit.org/b/98666 fast/repaint/slider-thumb-float.html [ Failure ]
-webkit.org/b/98666 media/video-playing-and-pause.html [ Failure ]
+webkit.org/b/99756 fast/events/touch/touch-slider.html [ Failure ]
 
 webkit.org/b/93247 [ Debug ] fast/lists/list-marker-remove-crash.html [ Crash ]
 
@@ -2434,6 +2428,9 @@ webkit.org/b/94004 css2.1/20110323/c541-word-sp-000.htm [ ImageOnlyFailure ]
 # May need rebaseline
 webkit.org/b/23166 fast/css/background-clip-radius-values.html [ Pass ImageOnlyFailure ]
 webkit.org/b/23166 ietestcenter/css3/bordersbackgrounds/border-radius-clip-002.htm [ Pass ImageOnlyFailure ]
+
+# css3-conditionals support is not yet enabled.
+webkit.org/b/86146 css3/supports.html
 
 # Added by bug 89826
 webkit.org/b/94005 css2.1/20110323/word-spacing-remove-space-003.htm [ ImageOnlyFailure ]

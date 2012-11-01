@@ -88,7 +88,7 @@ public:
     GraphicsLayer* scrollingLayer() const { return m_scrollingLayer.get(); }
     GraphicsLayer* scrollingContentsLayer() const { return m_scrollingContentsLayer.get(); }
 
-    void attachToScrollingCoordinator();
+    void attachToScrollingCoordinator(RenderLayerBacking* parent);
     uint64_t scrollLayerID() const { return m_scrollLayerID; }
     
     bool hasMaskLayer() const { return m_maskLayer != 0; }
@@ -139,18 +139,20 @@ public:
     bool usingTileCache() const { return m_usingTiledCacheLayer; }
 
     // GraphicsLayerClient interface
-    virtual bool shouldUseTileCache(const GraphicsLayer*) const;
-    virtual void notifyAnimationStarted(const GraphicsLayer*, double startTime);
-    virtual void notifyFlushRequired(const GraphicsLayer*);
+    virtual bool shouldUseTileCache(const GraphicsLayer*) const OVERRIDE;
+    virtual void notifyAnimationStarted(const GraphicsLayer*, double startTime) OVERRIDE;
+    virtual void notifyFlushRequired(const GraphicsLayer*) OVERRIDE;
+    virtual void notifyFlushBeforeDisplayRefresh(const GraphicsLayer*) OVERRIDE;
 
-    virtual void paintContents(const GraphicsLayer*, GraphicsContext&, GraphicsLayerPaintingPhase, const IntRect& clip);
+    virtual void paintContents(const GraphicsLayer*, GraphicsContext&, GraphicsLayerPaintingPhase, const IntRect& clip) OVERRIDE;
 
-    virtual float deviceScaleFactor() const;
-    virtual float pageScaleFactor() const;
-    virtual void didCommitChangesForLayer(const GraphicsLayer*) const;
+    virtual float deviceScaleFactor() const OVERRIDE;
+    virtual float pageScaleFactor() const OVERRIDE;
+    virtual void didCommitChangesForLayer(const GraphicsLayer*) const OVERRIDE;
+    virtual bool getCurrentTransform(const GraphicsLayer*, TransformationMatrix&) const OVERRIDE;
 
-    virtual bool showDebugBorders(const GraphicsLayer*) const;
-    virtual bool showRepaintCounter(const GraphicsLayer*) const;
+    virtual bool showDebugBorders(const GraphicsLayer*) const OVERRIDE;
+    virtual bool showRepaintCounter(const GraphicsLayer*) const OVERRIDE;
 
 #ifndef NDEBUG
     virtual void verifyNotPainting();

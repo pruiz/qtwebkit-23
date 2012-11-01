@@ -182,6 +182,10 @@
 #include <wtf/StdLibExtras.h>
 #include <wtf/text/StringBuffer.h>
 
+#if USE(ACCELERATED_COMPOSITING)
+#include "RenderLayerCompositor.h"
+#endif
+
 #if ENABLE(SHARED_WORKERS)
 #include "SharedWorkerRepository.h"
 #endif
@@ -4962,14 +4966,18 @@ void Document::resumeScriptedAnimationControllerCallbacks()
 
 void Document::windowScreenDidChange(PlatformDisplayID displayID)
 {
+    UNUSED_PARAM(displayID);
+
 #if ENABLE(REQUEST_ANIMATION_FRAME)
     if (m_scriptedAnimationController)
         m_scriptedAnimationController->windowScreenDidChange(displayID);
-#else
-    UNUSED_PARAM(displayID);
+#endif
+
+#if USE(ACCELERATED_COMPOSITING)
+    if (renderView()->usesCompositing())
+        renderView()->compositor()->windowScreenDidChange(displayID);
 #endif
 }
-
 
 String Document::displayStringModifiedByEncoding(const String& str) const
 {
@@ -5232,6 +5240,9 @@ void Document::webkitExitFullscreen()
 
     // 6. Return, and run the remaining steps asynchronously.
     // 7. Optionally, perform some animation.
+
+    if (!page())
+        return;
 
     // Only exit out of full screen window mode if there are no remaining elements in the 
     // full screen stack.

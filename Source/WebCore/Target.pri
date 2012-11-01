@@ -843,6 +843,7 @@ SOURCES += \
     loader/ImageLoader.cpp \
     loader/LinkLoader.cpp \
     loader/MainResourceLoader.cpp \
+    loader/MixedContentChecker.cpp \
     loader/NavigationAction.cpp \
     loader/NetscapePlugInStreamLoader.cpp \
     loader/PingLoader.cpp \
@@ -979,6 +980,7 @@ SOURCES += \
     platform/graphics/GraphicsContext.cpp \
     platform/graphics/GraphicsLayer.cpp \
     platform/graphics/GraphicsLayerAnimation.cpp \
+    platform/graphics/GraphicsLayerUpdater.cpp \
     platform/graphics/GraphicsLayerTransform.cpp \
     platform/graphics/GraphicsTypes.cpp \
     platform/graphics/Image.cpp \
@@ -1963,6 +1965,7 @@ HEADERS += \
     loader/LinkLoader.h \
     loader/LinkLoaderClient.h \
     loader/MainResourceLoader.h \
+    loader/MixedContentChecker.h \
     loader/NavigationAction.h \
     loader/NetscapePlugInStreamLoader.h \
     loader/PlaceholderDocument.h \
@@ -3925,6 +3928,7 @@ contains(DEFINES, ENABLE_WEBGL=1) {
         html/canvas/OESStandardDerivatives.h \
         html/canvas/OESTextureFloat.h \
         html/canvas/OESVertexArrayObject.h \
+        html/canvas/OESElementIndexUint.h \
         html/canvas/WebGLTexture.h \
         html/canvas/WebGLUniformLocation.h \
         html/canvas/WebGLVertexArrayObjectOES.h \
@@ -3958,6 +3962,7 @@ contains(DEFINES, ENABLE_WEBGL=1) {
         html/canvas/OESStandardDerivatives.cpp \
         html/canvas/OESTextureFloat.cpp \
         html/canvas/OESVertexArrayObject.cpp \
+        html/canvas/OESElementIndexUint.cpp \
         html/canvas/WebGLTexture.cpp \
         html/canvas/WebGLUniformLocation.cpp \
         html/canvas/WebGLVertexArrayObjectOES.cpp

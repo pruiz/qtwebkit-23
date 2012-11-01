@@ -43,6 +43,10 @@ using namespace WebCore;
 
 namespace WebKit {
 
+void PluginProcessProxy::platformInitializeLaunchOptions(ProcessLauncher::LaunchOptions&, const PluginModuleInfo&)
+{
+}
+
 void PluginProcessProxy::platformInitializePluginProcess(PluginProcessCreationParameters&)
 {
 }

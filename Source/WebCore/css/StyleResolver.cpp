@@ -1547,8 +1547,8 @@ PassRefPtr<RenderStyle> StyleResolver::styleForElement(Element* element, RenderS
     // be propagated from shadow host to distributed node.
     if (m_distributedToInsertionPoint) {
         ASSERT(element->parentElement());
-        ASSERT(element->parentElement()->renderStyle());
-        m_style->setUserModify(element->parentElement()->renderStyle()->userModify());
+        if (RenderStyle* styleOfShadowHost = element->parentElement()->renderStyle())
+            m_style->setUserModify(styleOfShadowHost->userModify());
     }
 
     if (element->isLink()) {
@@ -3318,9 +3318,6 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
         }
         return;
     }
-    case CSSPropertyWebkitLineClamp:
-        HANDLE_INHERIT_AND_INITIAL_AND_PRIMITIVE(lineClamp, LineClamp)
-        return;
     case CSSPropertyWebkitLocale: {
         HANDLE_INHERIT_AND_INITIAL(locale, Locale);
         if (!primitiveValue)
@@ -3835,6 +3832,7 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
     case CSSPropertyWebkitHyphens:
     case CSSPropertyWebkitLineAlign:
     case CSSPropertyWebkitLineBreak:
+    case CSSPropertyWebkitLineClamp:
     case CSSPropertyWebkitLineGrid:
     case CSSPropertyWebkitLineSnap:
     case CSSPropertyWebkitMarqueeDirection:

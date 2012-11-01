@@ -522,6 +522,7 @@ SET(WebCore_IDL_FILES
     html/canvas/OESStandardDerivatives.idl
     html/canvas/OESTextureFloat.idl
     html/canvas/OESVertexArrayObject.idl
+    html/canvas/OESElementIndexUint.idl
     html/canvas/Uint16Array.idl
     html/canvas/Uint32Array.idl
     html/canvas/Uint8Array.idl
@@ -1483,6 +1484,7 @@ SET(WebCore_SOURCES
     html/canvas/OESStandardDerivatives.cpp
     html/canvas/OESTextureFloat.cpp
     html/canvas/OESVertexArrayObject.cpp
+    html/canvas/OESElementIndexUint.cpp
     html/canvas/WebGLBuffer.cpp
     html/canvas/WebGLCompressedTextureS3TC.cpp
     html/canvas/WebGLContextAttributes.cpp
@@ -1634,6 +1636,7 @@ SET(WebCore_SOURCES
     loader/ImageLoader.cpp
     loader/LinkLoader.cpp
     loader/MainResourceLoader.cpp
+    loader/MixedContentChecker.cpp
     loader/NavigationAction.cpp
     loader/NetscapePlugInStreamLoader.cpp
     loader/PingLoader.cpp
@@ -1878,6 +1881,7 @@ SET(WebCore_SOURCES
     platform/graphics/GraphicsContext.cpp
     platform/graphics/GraphicsLayer.cpp
     platform/graphics/GraphicsLayerAnimation.cpp
+    platform/graphics/GraphicsLayerUpdater.cpp
     platform/graphics/GraphicsLayerTransform.cpp
     platform/graphics/GraphicsTypes.cpp
     platform/graphics/Image.cpp
@@ -2493,6 +2497,11 @@ SET(WebCore_USER_AGENT_STYLE_SHEETS
     ${WEBCORE_DIR}/css/view-source.css
 )
 
+SET(WebCore_LIBRARIES
+    ${WTF_LIBRARY_NAME}
+    ${JavaScriptCore_LIBRARY_NAME}
+)
+
 IF (ENABLE_SQL_DATABASE AND ENABLE_WORKERS)
     LIST(APPEND WebCore_SOURCES
         Modules/webdatabase/WorkerContextWebDatabase.cpp
@@ -2536,6 +2545,7 @@ IF (ENABLE_WEBGL)
         html/canvas/OESStandardDerivatives.cpp
         html/canvas/OESTextureFloat.cpp
         html/canvas/OESVertexArrayObject.cpp
+        html/canvas/OESElementIndexUint.cpp
         html/canvas/WebGLBuffer.cpp
         html/canvas/WebGLCompressedTextureS3TC.cpp
         html/canvas/WebGLContextAttributes.cpp
@@ -2563,12 +2573,14 @@ IF (ENABLE_WEBGL)
         html/canvas/OESStandardDerivatives.cpp
         html/canvas/OESTextureFloat.cpp
         html/canvas/OESVertexArrayObject.cpp
+        html/canvas/OESElementIndexUint.cpp
     )
     LIST(APPEND WebCore_IDL_FILES
         html/canvas/EXTTextureFilterAnisotropic.idl
         html/canvas/OESStandardDerivatives.idl
         html/canvas/OESTextureFloat.idl
         html/canvas/OESVertexArrayObject.idl
+        html/canvas/OESElementIndexUint.idl
         html/canvas/WebGLActiveInfo.idl
         html/canvas/WebGLBuffer.idl
         html/canvas/WebGLCompressedTextureS3TC.idl
@@ -2723,7 +2735,6 @@ SET(IDL_ATTRIBUTES_FILE ${WEBCORE_DIR}/bindings/scripts/IDLAttributes.txt)
 
 INCLUDE(${WEBCORE_DIR}/UseJSC.cmake)
 
-SET(WebCore_LIBRARIES ${WTF_LIBRARY_NAME} ${JavaScriptCore_LIBRARY_NAME})
 WEBKIT_INCLUDE_CONFIG_FILES_IF_EXISTS()
 
 # ANGLE tokenizer & parser

@@ -70,6 +70,7 @@
 #include "HTMLFormElement.h"
 #include "HTMLNames.h"
 #include "HTMLObjectElement.h"
+#include "HTMLParserIdioms.h"
 #include "HTTPParsers.h"
 #include "HistoryItem.h"
 #include "InspectorController.h"
@@ -212,6 +213,7 @@ FrameLoader::FrameLoader(Frame* frame, FrameLoaderClient* client)
     , m_notifer(frame)
     , m_subframeLoader(frame)
     , m_icon(frame)
+    , m_mixedContentChecker(frame)
     , m_state(FrameStateCommittedPage)
     , m_loadType(FrameLoadTypeStandard)
     , m_delegateIsHandlingProvisionalLoadError(false)
@@ -665,6 +667,15 @@ void FrameLoader::didBeginDocument(bool dispatch)
         String reportOnlyContentSecurityPolicy = m_documentLoader->response().httpHeaderField("X-WebKit-CSP-Report-Only");
         if (!reportOnlyContentSecurityPolicy.isEmpty())
             m_frame->document()->contentSecurityPolicy()->didReceiveHeader(reportOnlyContentSecurityPolicy, ContentSecurityPolicy::ReportOnly);
+
+        String headerContentLanguage = m_documentLoader->response().httpHeaderField("Content-Language");
+        if (!headerContentLanguage.isEmpty()) {
+            size_t commaIndex = headerContentLanguage.find(',');
+            headerContentLanguage.truncate(commaIndex); // notFound == -1 == don't truncate
+            headerContentLanguage = headerContentLanguage.stripWhiteSpace(isHTMLSpace);
+            if (!headerContentLanguage.isEmpty())
+                m_frame->document()->setContentLanguage(headerContentLanguage);
+        }
     }
 
     history()->restoreDocumentState();
@@ -912,51 +923,6 @@ String FrameLoader::outgoingReferrer() const
 String FrameLoader::outgoingOrigin() const
 {
     return m_frame->document()->securityOrigin()->toString();
-}
-
-bool FrameLoader::isMixedContent(SecurityOrigin* context, const KURL& url)
-{
-    if (context->protocol() != "https")
-        return false;  // We only care about HTTPS security origins.
-
-    // We're in a secure context, so |url| is mixed content if it's insecure.
-    return !SecurityOrigin::isSecure(url);
-}
-
-bool FrameLoader::checkIfDisplayInsecureContent(SecurityOrigin* context, const KURL& url)
-{
-    if (!isMixedContent(context, url))
-        return true;
-
-    Settings* settings = m_frame->settings();
-    bool allowed = m_client->allowDisplayingInsecureContent(settings && settings->allowDisplayOfInsecureContent(), context, url);
-    String message = (allowed ? emptyString() : "[blocked] ") + "The page at " +
-        m_frame->document()->url().string() + " displayed insecure content from " + url.string() + ".\n";
-        
-    m_frame->document()->domWindow()->console()->addMessage(HTMLMessageSource, LogMessageType, WarningMessageLevel, message);
-
-    if (allowed)
-        m_client->didDisplayInsecureContent();
-
-    return allowed;
-}
-
-bool FrameLoader::checkIfRunInsecureContent(SecurityOrigin* context, const KURL& url)
-{
-    if (!isMixedContent(context, url))
-        return true;
-
-    Settings* settings = m_frame->settings();
-    bool allowed = m_client->allowRunningInsecureContent(settings && settings->allowRunningOfInsecureContent(), context, url);
-    String message = (allowed ? emptyString() : "[blocked] ") + "The page at " +
-        m_frame->document()->url().string() + " ran insecure content from " + url.string() + ".\n";
-       
-    m_frame->document()->domWindow()->console()->addMessage(HTMLMessageSource, LogMessageType, WarningMessageLevel, message);
-
-    if (allowed)
-        m_client->didRunInsecureContent(context, url);
-
-    return allowed;
 }
 
 bool FrameLoader::checkIfFormActionAllowedByCSP(const KURL& url) const
@@ -3236,8 +3202,10 @@ void FrameLoader::dispatchDidCommitLoad()
 
     m_client->dispatchDidCommitLoad();
 
-    if (isLoadingMainFrame())
+    if (isLoadingMainFrame()) {
         m_frame->page()->resetSeenPlugins();
+        m_frame->page()->resetSeenMediaEngines();
+    }
 
     InspectorInstrumentation::didCommitLoad(m_frame, m_documentLoader.get());
 }

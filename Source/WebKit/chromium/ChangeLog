@@ -1,3 +1,219 @@
+2012-10-18  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] Add a webkit_test_support target that WebTestingSupport
+        https://bugs.webkit.org/show_bug.cgi?id=99772
+
+        Reviewed by Adam Barth.
+
+        Before, embedders would need to compile the WebTestingSupport.cpp
+        themselves, which in turn depends on WebCore headers.
+
+        * WebKit.gyp:
+
+2012-10-18  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] Re-enable gesture highlight layout tests, fix GestureLongPress regression.
+        https://bugs.webkit.org/show_bug.cgi?id=99632
+
+        Reviewed by James Robinson.
+
+        Re-enable layout tests for gesture highlights. Includes fix for GestureTapCancel test.
+
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::handleGestureEvent):
+
+2012-10-18  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r131810.
+        http://trac.webkit.org/changeset/131810
+        https://bugs.webkit.org/show_bug.cgi?id=99762
+
+        Broke linux debug webkit_unit_tests (Requested by
+        danakj|gardening on #webkit).
+
+        * WebKit.gypi:
+        * public/WebSettings.h:
+        * src/WebKit.cpp:
+        (WebKit::shutdown):
+        * src/WebSettingsImpl.cpp:
+        (WebKit::WebSettingsImpl::WebSettingsImpl):
+        * src/WebSettingsImpl.h:
+        (WebSettingsImpl):
+        * tests/DeferredImageDecoderTest.cpp: Removed.
+        * tests/MockImageDecoder.h: Removed.
+
+2012-10-18  Alpha Lam  <hclam@chromium.org>
+
+        [chromium] Implement deferred image decoding
+        https://bugs.webkit.org/show_bug.cgi?id=94240
+
+        Reviewed by Stephen White.
+
+        Adding new unit tests for deferred image decoding.
+        These tests are defined in DeferredImageDecoderTest.cpp. They verify
+        image decoding happens only when SkPicture is rasterized for both
+        scaled and non-scaled cases.
+
+        Tests: DeferredImageDecoderTest.drawIntoSkPicture
+               DeferredImageDecoderTest.drawScaledIntoSkPicture
+
+        * WebKit.gypi:
+        * public/WebSettings.h:
+        * src/WebKit.cpp:
+        (WebKit::shutdown):
+        * src/WebSettingsImpl.cpp:
+        (WebKit::WebSettingsImpl::setDeferredImageDecodingEnabled):
+        (WebKit):
+        * src/WebSettingsImpl.h:
+        (WebSettingsImpl):
+        * tests/DeferredImageDecoderTest.cpp: Added.
+        (WebCore):
+        (DeferredImageDecoderTest):
+        (WebCore::DeferredImageDecoderTest::SetUp):
+        (WebCore::DeferredImageDecoderTest::TearDown):
+        (WebCore::TEST_F):
+        * tests/MockImageDecoder.h: Added.
+        (WebCore):
+        (MockImageDecoder):
+        (WebCore::MockImageDecoder::MockImageDecoder):
+        (WebCore::MockImageDecoder::filenameExtension):
+        (WebCore::MockImageDecoder::frameBufferAtIndex):
+        (WebCore::MockImageDecoder::frameBufferRequestCount):
+
+2012-10-18  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-10-18  Pablo Flouret  <pablof@motorola.com>
+
+        Implement css3-conditional's @supports rule
+        https://bugs.webkit.org/show_bug.cgi?id=86146
+
+        Reviewed by Antti Koivisto.
+
+        * features.gypi:
+            Add an ENABLE_CSS3_CONDITIONAL_RULES flag.
+
+2012-10-18  Kent Tamura  <tkent@chromium.org>
+
+        Add Localizer::monthFormat and implementations
+        https://bugs.webkit.org/show_bug.cgi?id=99704
+
+        * tests/LocaleMacTest.cpp:
+        (TEST_F): Remove tests for fr_FR and ru locales for a compatibility reason.
+
+2012-10-18  Kent Tamura  <tkent@chromium.org>
+
+        Add Localizer::monthFormat and implementations
+        https://bugs.webkit.org/show_bug.cgi?id=99704
+
+        Reviewed by Kentaro Hara.
+
+        * tests/LocaleMacTest.cpp:
+        (LocaleMacTest::monthFormat): A helper function.
+        (TEST_F): Added some tests.
+        * tests/LocaleWinTest.cpp:
+        (LocaleWinTest::monthFormat): A helper function.
+        (TEST_F): Added some tests.
+        * tests/LocalizedDateICUTest.cpp:
+        (LocalizedDateICUTest::monthFormat): A helper function.
+        (TEST_F): Added some tests.
+
+2012-10-17  Mike West  <mkwst@chromium.org>
+
+        Move mixed content logic out of FrameLoader
+        https://bugs.webkit.org/show_bug.cgi?id=45638
+
+        Reviewed by Eric Seidel.
+
+        * src/WebFrameImpl.cpp:
+        (WebKit::WebFrameImpl::checkIfRunInsecureContent):
+            Use the new method location.
+
+2012-10-17  Shashi Shekhar  <shashishekhar@google.com>
+
+        Remove redundant sdk_build parameter.
+        https://bugs.webkit.org/show_bug.cgi?id=99648
+
+        Reviewed by Adam Barth.
+
+        sdk_build parameter is no longer needed.
+
+        * WebKitUnitTests.gyp:
+
+2012-10-17  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-10-17  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: Explicitly send null/undefined/integers to frontend IDBCallbacks
+        https://bugs.webkit.org/show_bug.cgi?id=99619
+
+        Reviewed by Adam Barth.
+
+        Hook up new undefined/integer-based onSuccess handlers.
+
+        * src/IDBCallbacksProxy.cpp:
+        (WebKit::IDBCallbacksProxy::onSuccess):
+        (WebKit):
+        * src/IDBCallbacksProxy.h:
+        (IDBCallbacksProxy):
+        * src/WebIDBCallbacksImpl.cpp:
+        (WebKit::WebIDBCallbacksImpl::onSuccess):
+        (WebKit):
+        * src/WebIDBCallbacksImpl.h:
+        (WebIDBCallbacksImpl):
+        * tests/IDBAbortOnCorruptTest.cpp:
+        * tests/IDBDatabaseBackendTest.cpp:
+
+2012-10-17  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        plugins: Allow a plugin to dictate whether it can receive drag events or not.
+        https://bugs.webkit.org/show_bug.cgi?id=99355
+
+        Reviewed by Tony Chang.
+
+        Introduce WebPlugin::canProcessDrag() and use that to implement PluginViewBase::canProcessDrag.
+
+        * public/WebPlugin.h:
+        (WebKit::WebPlugin::canProcessDrag):
+        (WebPlugin):
+        * src/WebPluginContainerImpl.cpp:
+        (WebKit::WebPluginContainerImpl::canProcessDrag):
+        (WebKit):
+        (WebKit::WebPluginContainerImpl::handleMouseEvent):
+        * src/WebPluginContainerImpl.h:
+        (WebPluginContainerImpl):
+
+2012-10-17  Jian Li  <jianli@chromium.org>
+
+        [chromium] Remove legacy members from WebDraggableRegion
+        https://bugs.webkit.org/show_bug.cgi?id=99612
+
+        Reviewed by Adam Barth.
+
+        Those legacy members to support old syntax are not longer needed after
+        chromium side changes landed.
+
+        * public/WebDraggableRegion.h:
+        (WebDraggableRegion):
+
+2012-10-17  Joshua Bell  <jsbell@chromium.org>
+
+        [Chromium] IndexedDB: Delete obsolete public API method
+        https://bugs.webkit.org/show_bug.cgi?id=99603
+
+        Reviewed by Dimitri Glazkov.
+
+        Remove a stub that was necessary while the Chromium side of webkit.org/b/99097 was landing.
+
+        * public/WebIDBTransactionCallbacks.h:
+
 2012-10-17  Keishi Hattori  <keishi@webkit.org>
 
         Localized date should be based on LDML

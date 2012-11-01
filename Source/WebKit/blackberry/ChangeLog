@@ -1,3 +1,87 @@
+2012-10-18  Jacky Jiang  <zhajiang@rim.com>
+
+        [BlackBerry] Page viewport aspect ratio not kept on navigating back
+        https://bugs.webkit.org/show_bug.cgi?id=99760
+
+        Reviewed by Rob Buis.
+        Internally reviewed by Konrad Piascik.
+
+        PR: 190469
+        This was added in r127628 which was trying to fix some rendering
+        defects on maps.google.com and news.qq.com, however it was very harmful
+        and caused regressions.
+        zoomToFitScale() depends on the current contents size. During history
+        navigation and device rotation, if zoomToFitScale() is based on the
+        final contents size which is expected, there will still be a scale
+        calculation like this afterwards
+        screenSize.width()/screenSize.height()*zoomToFitScale() which will
+        result in a wrong scale. During the history navigation, if
+        zoomToFitScale() isn't based on the final contents size, then we will
+        get the wrong scale as well for sure.
+        This issue will be fixed by removing the wrong calculation.
+        The original issue of r127628 was fixed by the patch of PR225981.
+
+        * WebCoreSupport/FrameLoaderClientBlackBerry.cpp:
+        (WebCore::FrameLoaderClientBlackBerry::restoreViewState):
+
+2012-10-18  John Griggs  <jgriggs@rim.com>
+
+        2012-10-18  John Griggs  <jgriggs@rim.com>
+
+        Crash in InRegionScrollableArea constructor while loading page
+        https://bugs.webkit.org/show_bug.cgi?id=99733
+
+        Reviewed by Antonio Gomes.
+
+        Check scrollLayer and avoid constructing InRegionScrollableArea when it is NULL.
+
+        * Api/InRegionScroller.cpp:
+        (BlackBerry::WebKit::InRegionScrollerPrivate::calculateInRegionScrollableAreasForPoint):
+
+2012-10-17  Jacky Jiang  <zhajiang@rim.com>
+
+        [BlackBerry] Possible redundant zoomToInitialScaleOnLoad() in WebPagePrivate::setLoadState
+        https://bugs.webkit.org/show_bug.cgi?id=99624
+
+        Reviewed by Rob Buis.
+        Internally reviewed by Arvid Nilsson
+
+        PR: 225981
+        Several reasons to eliminate the ancient unnecessary
+        zoomToInitialScaleOnLoad() in WebPagePrivate::setLoadState committed:
+        - At this point, we have only committed the data we received.
+        - For the new load, we haven't started parsing the tokens and building
+          the DOM tree and the first layout will happen after that.
+        - For the load restored from cache, the first layout will happen after
+          setLoadState committed which is called by
+          FrameLoader::dispatchDidCommitLoad().
+        - zoomToInitialScaleOnLoad() can still be called after the first
+          layout finished.
+        - zoomToInitialScaleOnLoad() is expensive and it will boost the load
+          performance after the removal.
+        - Removal of this can fix some weird rendering defects on yahoo.com,
+          maps.google.com, news.qq.com and so on during load and rotation
+          mentioned on the PR.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::setLoadState):
+
+2012-10-17  Mike Fenton  <mifenton@rim.com>
+
+        [BlackBerry] Prevent focus zoom on non-userscalable pages.
+        https://bugs.webkit.org/show_bug.cgi?id=99608
+
+        Reviewed by Rob Buis.
+
+        PR 222378.
+
+        Disable focus zoom when the page is non-user scalable.
+
+        Reviewed Internally by Nima Ghanavatian.
+
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::ensureFocusTextElementVisible):
+
 2012-10-16  Mike Lattanzio  <mlattanzio@rim.com>
 
         2012-10-16  Mike Lattanzio  <mlattanzio@rim.com>

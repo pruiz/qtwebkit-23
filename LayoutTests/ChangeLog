@@ -1,3 +1,1382 @@
+2012-10-18  Dirk Pranke  <dpranke@chromium.org>
+
+        Land first batch of Chromium Mac 10.8-specific baselines.
+
+        Unreviewed, gardening.
+
+        * animations/cross-fade-background-image-expected.png: Renamed from LayoutTests/platform/efl/animations/cross-fade-background-image-expected.png.
+        * animations/cross-fade-border-image-source-expected.png: Renamed from LayoutTests/platform/efl/animations/cross-fade-border-image-source-expected.png.
+        * animations/cross-fade-list-style-image-expected.png: Renamed from LayoutTests/platform/efl/animations/cross-fade-list-style-image-expected.png.
+        * animations/cross-fade-webkit-mask-image-expected.png: Renamed from LayoutTests/platform/efl/animations/cross-fade-webkit-mask-image-expected.png.
+        * platform/chromium-mac-lion/animations/3d/change-transform-in-end-event-expected.png: Copied from LayoutTests/platform/chromium-mac/animations/3d/change-transform-in-end-event-expected.png.
+        * platform/chromium-mac-lion/animations/3d/matrix-transform-type-animation-expected.png: Copied from LayoutTests/platform/chromium-mac/animations/3d/matrix-transform-type-animation-expected.png.
+        * platform/chromium-mac-lion/animations/3d/state-at-end-event-transform-expected.png: Copied from LayoutTests/platform/chromium-mac/animations/3d/state-at-end-event-transform-expected.png.
+        * platform/chromium-mac-lion/animations/cross-fade-background-image-expected.png: Copied from LayoutTests/platform/chromium-mac/animations/cross-fade-background-image-expected.png.
+        * platform/chromium-mac-lion/animations/cross-fade-border-image-source-expected.png: Copied from LayoutTests/platform/chromium-mac/animations/cross-fade-border-image-source-expected.png.
+        * platform/chromium-mac-lion/animations/cross-fade-list-style-image-expected.png: Copied from LayoutTests/platform/chromium-mac/animations/cross-fade-list-style-image-expected.png.
+        * platform/chromium-mac-lion/animations/cross-fade-webkit-mask-image-expected.png: Copied from LayoutTests/platform/chromium-mac/animations/cross-fade-webkit-mask-image-expected.png.
+        * platform/chromium-mac-lion/animations/state-at-end-event-expected.png: Copied from LayoutTests/platform/chromium-mac/animations/state-at-end-event-expected.png.
+        * platform/chromium-mac-lion/compositing/animation/state-at-end-event-transform-layer-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/animation/state-at-end-event-transform-layer-expected.png.
+        * platform/chromium-mac-lion/compositing/color-matching/pdf-image-match-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/color-matching/pdf-image-match-expected.png.
+        * platform/chromium-mac-lion/compositing/compositing-visible-descendant-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/compositing-visible-descendant-expected.png.
+        * platform/chromium-mac-lion/compositing/generated-content-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/generated-content-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/abs-position-inside-opacity-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/abs-position-inside-opacity-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/composited-html-size-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/composited-html-size-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/fixed-in-composited-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/fixed-in-composited-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/fixed-position-composited-page-scale-down-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/fixed-position-composited-page-scale-down-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/fixed-position-composited-page-scale-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/fixed-position-composited-page-scale-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/fixed-position-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/fixed-position-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/fixed-position-iframe-composited-page-scale-down-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/fixed-position-iframe-composited-page-scale-down-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/fixed-position-iframe-composited-page-scale-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/fixed-position-iframe-composited-page-scale-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/fixed-position-transform-composited-page-scale-down-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/fixed-position-transform-composited-page-scale-down-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/fixed-position-transform-composited-page-scale-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/fixed-position-transform-composited-page-scale-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/layer-due-to-layer-children-deep-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/layer-due-to-layer-children-deep-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/layer-due-to-layer-children-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/layer-due-to-layer-children-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/outline-change-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/outline-change-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/partial-layout-update-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/partial-layout-update-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/root-layer-update-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/root-layer-update-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/transfrom-origin-on-zero-size-layer-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/transfrom-origin-on-zero-size-layer-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/video-fixed-scrolling-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/video-fixed-scrolling-expected.png.
+        * platform/chromium-mac-lion/compositing/geometry/video-opacity-overlay-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/geometry/video-opacity-overlay-expected.png.
+        * platform/chromium-mac-lion/compositing/iframes/composited-iframe-alignment-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/iframes/composited-iframe-alignment-expected.png.
+        * platform/chromium-mac-lion/compositing/iframes/iframe-copy-on-scroll-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/iframes/iframe-copy-on-scroll-expected.png.
+        * platform/chromium-mac-lion/compositing/images/direct-image-background-color-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/images/direct-image-background-color-expected.png.
+        * platform/chromium-mac-lion/compositing/layers-inside-overflow-scroll-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/layers-inside-overflow-scroll-expected.png.
+        * platform/chromium-mac-lion/compositing/masks/direct-image-mask-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/masks/direct-image-mask-expected.png.
+        * platform/chromium-mac-lion/compositing/masks/masked-ancestor-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/masks/masked-ancestor-expected.png.
+        * platform/chromium-mac-lion/compositing/masks/multiple-masks-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/masks/multiple-masks-expected.png.
+        * platform/chromium-mac-lion/compositing/masks/simple-composited-mask-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/masks/simple-composited-mask-expected.png.
+        * platform/chromium-mac-lion/compositing/overflow/ancestor-overflow-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/overflow/ancestor-overflow-expected.png.
+        * platform/chromium-mac-lion/compositing/overflow/fixed-position-ancestor-clip-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/overflow/fixed-position-ancestor-clip-expected.png.
+        * platform/chromium-mac-lion/compositing/overflow/nested-scrolling-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/overflow/nested-scrolling-expected.png.
+        * platform/chromium-mac-lion/compositing/overflow/overflow-compositing-descendant-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/overflow/overflow-compositing-descendant-expected.png.
+        * platform/chromium-mac-lion/compositing/overflow/overflow-positioning-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/overflow/overflow-positioning-expected.png.
+        * platform/chromium-mac-lion/compositing/overflow/overflow-scroll-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/overflow/overflow-scroll-expected.png.
+        * platform/chromium-mac-lion/compositing/overflow/parent-overflow-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/overflow/parent-overflow-expected.png.
+        * platform/chromium-mac-lion/compositing/overflow/remove-overflow-crash2-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/overflow/remove-overflow-crash2-expected.png.
+        * platform/chromium-mac-lion/compositing/overflow/scroll-ancestor-update-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/overflow/scroll-ancestor-update-expected.png.
+        * platform/chromium-mac-lion/compositing/overflow/scrollbar-painting-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/overflow/scrollbar-painting-expected.png.
+        * platform/chromium-mac-lion/compositing/overflow/theme-affects-visual-overflow-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/overflow/theme-affects-visual-overflow-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/animation-inside-reflection-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/animation-inside-reflection-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/compositing-change-inside-reflection-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/compositing-change-inside-reflection-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/deeply-nested-reflections-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/deeply-nested-reflections-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/load-video-in-reflection-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/load-video-in-reflection-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/masked-reflection-on-composited-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/masked-reflection-on-composited-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/nested-reflection-anchor-point-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/nested-reflection-anchor-point-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/nested-reflection-animated-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/nested-reflection-animated-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/nested-reflection-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/nested-reflection-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/nested-reflection-mask-change-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/nested-reflection-mask-change-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/nested-reflection-on-overflow-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/nested-reflection-on-overflow-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/nested-reflection-opacity-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/nested-reflection-opacity-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/nested-reflection-size-change-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/nested-reflection-size-change-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/nested-reflection-transformed-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/nested-reflection-transformed-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/nested-reflection-transformed2-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/nested-reflection-transformed2-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/nested-reflection-transition-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/nested-reflection-transition-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/reflection-in-composited-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/reflection-in-composited-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/reflection-on-composited-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/reflection-on-composited-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/reflection-ordering-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/reflection-ordering-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/reflection-positioning-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/reflection-positioning-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/reflection-positioning2-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/reflection-positioning2-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/simple-composited-reflections-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/simple-composited-reflections-expected.png.
+        * platform/chromium-mac-lion/compositing/reflections/transform-inside-reflection-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/reflections/transform-inside-reflection-expected.png.
+        * platform/chromium-mac-lion/compositing/repaint/become-overlay-composited-layer-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/repaint/become-overlay-composited-layer-expected.png.
+        * platform/chromium-mac-lion/compositing/repaint/composited-document-element-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/repaint/composited-document-element-expected.png.
+        * platform/chromium-mac-lion/compositing/repaint/layer-repaint-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/repaint/layer-repaint-expected.png.
+        * platform/chromium-mac-lion/compositing/repaint/layer-repaint-rects-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/repaint/layer-repaint-rects-expected.png.
+        * platform/chromium-mac-lion/compositing/repaint/opacity-between-absolute-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/repaint/opacity-between-absolute-expected.png.
+        * platform/chromium-mac-lion/compositing/repaint/opacity-between-absolute2-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/repaint/opacity-between-absolute2-expected.png.
+        * platform/chromium-mac-lion/compositing/self-painting-layers-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/self-painting-layers-expected.png.
+        * platform/chromium-mac-lion/compositing/sibling-positioning-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/sibling-positioning-expected.png.
+        * platform/chromium-mac-lion/compositing/text-on-large-layer-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/text-on-large-layer-expected.png.
+        * platform/chromium-mac-lion/compositing/transitions/scale-transition-no-start-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/transitions/scale-transition-no-start-expected.png.
+        * platform/chromium-mac-lion/compositing/transitions/singular-scale-transition-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/transitions/singular-scale-transition-expected.png.
+        * platform/chromium-mac-lion/compositing/video/video-controls-layer-creation-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/video/video-controls-layer-creation-expected.png.
+        * platform/chromium-mac-lion/compositing/webgl/webgl-background-color-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/webgl/webgl-background-color-expected.png.
+        * platform/chromium-mac-lion/compositing/webgl/webgl-reflection-expected.png: Copied from LayoutTests/platform/chromium-mac/compositing/webgl/webgl-reflection-expected.png.
+        * platform/chromium-mac/animations/3d/change-transform-in-end-event-expected.png:
+        * platform/chromium-mac/animations/3d/matrix-transform-type-animation-expected.png:
+        * platform/chromium-mac/animations/3d/state-at-end-event-transform-expected.png:
+        * platform/chromium-mac/animations/cross-fade-background-image-expected.png:
+        * platform/chromium-mac/animations/cross-fade-border-image-source-expected.png:
+        * platform/chromium-mac/animations/cross-fade-list-style-image-expected.png:
+        * platform/chromium-mac/animations/cross-fade-webkit-mask-image-expected.png:
+        * platform/chromium-mac/animations/state-at-end-event-expected.png:
+        * platform/chromium-mac/compositing/animation/state-at-end-event-transform-layer-expected.png:
+        * platform/chromium-mac/compositing/color-matching/pdf-image-match-expected.png:
+        * platform/chromium-mac/compositing/compositing-visible-descendant-expected.png:
+        * platform/chromium-mac/compositing/generated-content-expected.png:
+        * platform/chromium-mac/compositing/geometry/abs-position-inside-opacity-expected.png:
+        * platform/chromium-mac/compositing/geometry/composited-html-size-expected.png:
+        * platform/chromium-mac/compositing/geometry/fixed-in-composited-expected.png:
+        * platform/chromium-mac/compositing/geometry/fixed-position-composited-page-scale-down-expected.png:
+        * platform/chromium-mac/compositing/geometry/fixed-position-composited-page-scale-expected.png:
+        * platform/chromium-mac/compositing/geometry/fixed-position-expected.png:
+        * platform/chromium-mac/compositing/geometry/fixed-position-iframe-composited-page-scale-down-expected.png:
+        * platform/chromium-mac/compositing/geometry/fixed-position-iframe-composited-page-scale-expected.png:
+        * platform/chromium-mac/compositing/geometry/fixed-position-transform-composited-page-scale-down-expected.png:
+        * platform/chromium-mac/compositing/geometry/fixed-position-transform-composited-page-scale-expected.png:
+        * platform/chromium-mac/compositing/geometry/layer-due-to-layer-children-deep-expected.png:
+        * platform/chromium-mac/compositing/geometry/layer-due-to-layer-children-expected.png:
+        * platform/chromium-mac/compositing/geometry/outline-change-expected.png:
+        * platform/chromium-mac/compositing/geometry/partial-layout-update-expected.png:
+        * platform/chromium-mac/compositing/geometry/root-layer-update-expected.png:
+        * platform/chromium-mac/compositing/geometry/transfrom-origin-on-zero-size-layer-expected.png:
+        * platform/chromium-mac/compositing/geometry/video-fixed-scrolling-expected.png:
+        * platform/chromium-mac/compositing/geometry/video-opacity-overlay-expected.png:
+        * platform/chromium-mac/compositing/iframes/composited-iframe-alignment-expected.png:
+        * platform/chromium-mac/compositing/iframes/iframe-copy-on-scroll-expected.png:
+        * platform/chromium-mac/compositing/images/direct-image-background-color-expected.png:
+        * platform/chromium-mac/compositing/layers-inside-overflow-scroll-expected.png:
+        * platform/chromium-mac/compositing/masks/direct-image-mask-expected.png:
+        * platform/chromium-mac/compositing/masks/masked-ancestor-expected.png:
+        * platform/chromium-mac/compositing/masks/multiple-masks-expected.png:
+        * platform/chromium-mac/compositing/masks/simple-composited-mask-expected.png:
+        * platform/chromium-mac/compositing/overflow/ancestor-overflow-expected.png:
+        * platform/chromium-mac/compositing/overflow/fixed-position-ancestor-clip-expected.png:
+        * platform/chromium-mac/compositing/overflow/nested-scrolling-expected.png:
+        * platform/chromium-mac/compositing/overflow/overflow-compositing-descendant-expected.png:
+        * platform/chromium-mac/compositing/overflow/overflow-positioning-expected.png:
+        * platform/chromium-mac/compositing/overflow/overflow-scroll-expected.png:
+        * platform/chromium-mac/compositing/overflow/parent-overflow-expected.png:
+        * platform/chromium-mac/compositing/overflow/remove-overflow-crash2-expected.png:
+        * platform/chromium-mac/compositing/overflow/scroll-ancestor-update-expected.png:
+        * platform/chromium-mac/compositing/overflow/scrollbar-painting-expected.png:
+        * platform/chromium-mac/compositing/overflow/theme-affects-visual-overflow-expected.png:
+        * platform/chromium-mac/compositing/reflections/animation-inside-reflection-expected.png:
+        * platform/chromium-mac/compositing/reflections/compositing-change-inside-reflection-expected.png:
+        * platform/chromium-mac/compositing/reflections/deeply-nested-reflections-expected.png:
+        * platform/chromium-mac/compositing/reflections/load-video-in-reflection-expected.png:
+        * platform/chromium-mac/compositing/reflections/masked-reflection-on-composited-expected.png:
+        * platform/chromium-mac/compositing/reflections/nested-reflection-anchor-point-expected.png:
+        * platform/chromium-mac/compositing/reflections/nested-reflection-animated-expected.png:
+        * platform/chromium-mac/compositing/reflections/nested-reflection-expected.png:
+        * platform/chromium-mac/compositing/reflections/nested-reflection-mask-change-expected.png:
+        * platform/chromium-mac/compositing/reflections/nested-reflection-on-overflow-expected.png:
+        * platform/chromium-mac/compositing/reflections/nested-reflection-opacity-expected.png:
+        * platform/chromium-mac/compositing/reflections/nested-reflection-size-change-expected.png:
+        * platform/chromium-mac/compositing/reflections/nested-reflection-transformed-expected.png:
+        * platform/chromium-mac/compositing/reflections/nested-reflection-transformed2-expected.png:
+        * platform/chromium-mac/compositing/reflections/nested-reflection-transition-expected.png:
+        * platform/chromium-mac/compositing/reflections/reflection-in-composited-expected.png:
+        * platform/chromium-mac/compositing/reflections/reflection-on-composited-expected.png:
+        * platform/chromium-mac/compositing/reflections/reflection-ordering-expected.png:
+        * platform/chromium-mac/compositing/reflections/reflection-positioning-expected.png:
+        * platform/chromium-mac/compositing/reflections/reflection-positioning2-expected.png:
+        * platform/chromium-mac/compositing/reflections/simple-composited-reflections-expected.png:
+        * platform/chromium-mac/compositing/reflections/transform-inside-reflection-expected.png:
+        * platform/chromium-mac/compositing/repaint/become-overlay-composited-layer-expected.png:
+        * platform/chromium-mac/compositing/repaint/composited-document-element-expected.png:
+        * platform/chromium-mac/compositing/repaint/layer-repaint-expected.png:
+        * platform/chromium-mac/compositing/repaint/layer-repaint-rects-expected.png:
+        * platform/chromium-mac/compositing/repaint/opacity-between-absolute-expected.png:
+        * platform/chromium-mac/compositing/repaint/opacity-between-absolute2-expected.png:
+        * platform/chromium-mac/compositing/self-painting-layers-expected.png:
+        * platform/chromium-mac/compositing/sibling-positioning-expected.png:
+        * platform/chromium-mac/compositing/text-on-large-layer-expected.png:
+        * platform/chromium-mac/compositing/transitions/scale-transition-no-start-expected.png:
+        * platform/chromium-mac/compositing/transitions/singular-scale-transition-expected.png:
+        * platform/chromium-mac/compositing/video/video-controls-layer-creation-expected.png:
+        * platform/chromium-mac/compositing/webgl/webgl-background-color-expected.png:
+        * platform/chromium-mac/compositing/webgl/webgl-reflection-expected.png:
+
+2012-10-18  Anand Chakravarty  <anandc@google.com>
+
+        Incorrect check performed in Media Source objects test.
+        https://bugs.webkit.org/show_bug.cgi?id=99390
+
+        Reviewed by Eric Carlson.
+
+        Use an expected value of 5 in the buffered attribute.
+
+        * http/tests/media/media-source/video-media-source-objects-expected.txt:
+        * http/tests/media/media-source/video-media-source-objects.html:
+
+2012-10-18  Anand Chakravarty  <anandc@google.com>
+
+        Use of uninitialized variable in Media Source API test.
+        https://bugs.webkit.org/show_bug.cgi?id=99387
+
+        Reviewed by Eric Carlson.
+
+        Set value of seekTime to 1 before using it.
+
+        * http/tests/media/media-source/video-media-source-state-changes.html:
+
+2012-10-18  Dirk Pranke  <dpranke@chromium.org>
+
+        De-dup expectations for chromium mountainlion
+
+        Unreviewed, expectations update.
+
+        * platform/chromium-mac-mountainlion/TestExpectations:
+        * platform/chromium/TestExpectations:
+
+2012-10-18  Adam Barth  <abarth@webkit.org>
+
+        [V8] fast/dom/gc-9.html fails for document.styleSheets
+        https://bugs.webkit.org/show_bug.cgi?id=99786
+
+        Reviewed by Kentaro Hara.
+
+        * platform/chromium/fast/dom/gc-9-expected.txt:
+            - Test progression.
+
+2012-10-18  Adam Barth  <abarth@webkit.org>
+
+        [V8] fast/dom/gc-9.html fails for document.implementation
+        https://bugs.webkit.org/show_bug.cgi?id=99783
+
+        Reviewed by Kentaro Hara.
+
+        * platform/chromium/TestExpectations:
+            - TestExpectations claims that this test is "brain damaged", but it
+              looks like the test has improved since that comment was written
+              and that this test is actually quite valuable.
+        * platform/chromium/fast/dom/gc-9-expected.txt: Added.
+            - This patch adds a Chromium-specific baseline for this test.
+              Before this patch, we failed the document.implementation
+              subtests.
+
+2012-10-18  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Test expectation update.
+
+        * platform/chromium/TestExpectations: Remove entries for passing *-multiple-fieds tests.
+        * platform/chromium-mac-mountainlion/TestExpectations: Add them.
+
+2012-10-18  Pan Deng  <pan.deng@intel.com>
+
+        [Resource Timing]Test cases for set buffer size functionality and event when buffer full.
+        https://bugs.webkit.org/show_bug.cgi?id=84885.
+
+        Reviewed by Tony Gentilcore.
+
+        Test cases in this patch validate buffer size restriction functionality, clear resource timing functionality and the fired event when buffer full. 
+
+        * http/tests/w3c/webperf/resources/webperftestharnessextension.js:
+        (PerformanceContext.prototype.getEntriesByName):
+        (PerformanceContext.prototype.setResourceTimingBufferSize):
+        (PerformanceContext.prototype.registerResourceTimingBufferFullCallback):
+        (PerformanceContext.prototype.clearResourceTimings):
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_buffer_full_when_populate_entries-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_buffer_full_when_populate_entries.html: Added.
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_buffer_full_when_shrink_buffer_size-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_buffer_full_when_shrink_buffer_size.html: Added.
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_buffer_size_restriction-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_buffer_size_restriction.html: Added.
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_clear_resource_timing_functionality-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_clear_resource_timing_functionality.html: Added.
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_on_shrink_buffer_size-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_on_shrink_buffer_size.html: Added.
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_store_and_clear_during_callback-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/Intel/resource-timing/test_resource_timing_store_and_clear_during_callback.html: Added.
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+
+2012-10-18  Ryosuke Niwa  <rniwa@webkit.org>
+
+        REGRESSION(r130411): Copying & pasting the first line of text can move caret to the end of text area
+        https://bugs.webkit.org/show_bug.cgi?id=99663
+
+        Reviewed by Enrica Casucci and Levi Weintraub.
+
+        Add a regression test for copying and pasting the first line in a textarea with two lines of text.
+
+        * editing/pasteboard/copy-paste-first-line-in-textarea-expected.txt: Added.
+        * editing/pasteboard/copy-paste-first-line-in-textarea.html: Added.
+
+2012-10-18  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] Re-enable gesture highlight layout tests, fix GestureLongPress regression.
+        https://bugs.webkit.org/show_bug.cgi?id=99632
+
+        Reviewed by James Robinson.
+
+        Re-enable layout tests for gesture highlights. Includes fix for GestureTapCancel test.
+
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-longPress.html:
+        * platform/chromium/TestExpectations:
+
+2012-10-18  Dirk Pranke  <dpranke@chromium.org>
+
+        [chromium] fix lint errors/conflicts in ML TestExpectations
+
+        Unreviewed, expectations change.
+
+        * platform/chromium-mac-mountainlion/TestExpectations:
+
+2012-10-18  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r131810.
+        http://trac.webkit.org/changeset/131810
+        https://bugs.webkit.org/show_bug.cgi?id=99762
+
+        Broke linux debug webkit_unit_tests (Requested by
+        danakj|gardening on #webkit).
+
+        * platform/chromium/TestExpectations:
+        * platform/chromium/virtual/deferred/fast/images/README.txt: Removed.
+
+2012-10-18  Mike West  <mkwst@chromium.org>
+
+        Add layout tests for wildcarded hosts in CSP directives.
+        https://bugs.webkit.org/show_bug.cgi?id=99693
+
+        Reviewed by Adam Barth.
+
+        Adds four test cases to ensure that wildcarded hosts in Content Security
+        Policy source expressions function correctly with and without paths,
+        and with wildcarded ports.
+
+        * http/tests/security/contentSecurityPolicy/source-list-parsing-09-expected.txt: Added.
+        * http/tests/security/contentSecurityPolicy/source-list-parsing-09.html: Added.
+
+2012-10-18  Dirk Pranke  <dpranke@chromium.org>
+
+        [chromium] update ML-specific failures
+        https://bugs.webkit.org/show_bug.cgi?id=99505
+
+        Unreviewed, expectations change.
+
+        * platform/chromium-mac-mountainlion/TestExpectations:
+
+2012-10-18  Alpha Lam  <hclam@chromium.org>
+
+        [chromium] Implement deferred image decoding
+        https://bugs.webkit.org/show_bug.cgi?id=94240
+
+        Reviewed by Stephen White.
+
+        Adding a virtual test suite for Chromium to test deferred image
+        decoding.
+
+        platform/chromium/virtual/deferred/fast/images will be tested with
+        --force-compositing --enable-per-tile-painting --enable-deferred-image-decoding.
+
+        * platform/chromium/virtual/deferred/fast/images/README.txt: Added.
+
+2012-10-18  Max Vujovic  <mvujovic@adobe.com>
+
+        [CSS Shaders] Validate types of built-in vertex attributes
+        https://bugs.webkit.org/show_bug.cgi?id=98972
+
+        Reviewed by Dean Jackson.
+
+        invalid-custom-filter-attribute-types.html uses a set of vertex shaders. Each vertex shader
+        defines a specific attribute with the wrong type. None of the vertex shaders in the test
+        should execute. If a vertex shader does execute, its associated fragment shader will render
+        a green div as red.
+
+        * css3/filters/custom/invalid-custom-filter-attribute-types-expected.html: Added.
+        * css3/filters/custom/invalid-custom-filter-attribute-types.html: Added.
+        * css3/filters/resources/invalid-type-a-mesh-coord.vs: Added.
+        * css3/filters/resources/invalid-type-a-position.vs: Added.
+        * css3/filters/resources/invalid-type-a-tex-coord.vs: Added.
+        * css3/filters/resources/invalid-type-a-triangle-coord.vs: Added.
+        * css3/filters/resources/invalid-type-attribute-array.vs: Added.
+
+2012-10-18  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, update Qt expectations for slider tests.
+
+        fast/events/touch/touch-slider.html now has a specific bug number.
+        media/video-playing-and-pause.html is removed. I added it by accident
+        causing it to be run. Qt didn't run this test before my change.
+
+        * platform/qt/TestExpectations:
+
+2012-10-18  James Simonsen  <simonjam@chromium.org>
+
+        Add a script for exporting http/tests/w3c/webperf/submission to W3C
+        https://bugs.webkit.org/show_bug.cgi?id=99675
+
+        Reviewed by Tony Gentilcore.
+
+        The W3C tests expect a company to contribute them. Move these to the Intel directory.
+
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_clearMarks-expected.txt: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_clearMarks-expected.txt.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_clearMarks.html: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_clearMarks.html.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_clearMeasures-expected.txt: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_clearMeasures-expected.txt.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_clearMeasures.html: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_clearMeasures.html.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_mark-expected.txt: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_mark-expected.txt.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_mark.html: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_mark.html.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_mark_exception-expected.txt: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_mark_exception-expected.txt.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_mark_exception.html: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_mark_exception.html.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_measure-expected.txt: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure-expected.txt.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_measure.html: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure.html.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_measure_associate_with_navigation_timing-expected.txt: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure_associate_with_navigation_timing-expected.txt.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_measure_associate_with_navigation_timing.html: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure_associate_with_navigation_timing.html.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_measure_exception-expected.txt: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure_exception-expected.txt.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_measure_exception.html: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure_exception.html.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_method_exist-expected.txt: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_method_exist-expected.txt.
+        * http/tests/w3c/webperf/submission/Intel/user-timing/test_user_timing_method_exist.html: Renamed from LayoutTests/http/tests/w3c/webperf/submission/user-timing/test_user_timing_method_exist.html.
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+
+2012-10-18  Pablo Flouret  <pablof@motorola.com>
+
+        Implement css3-conditional's @supports rule
+        https://bugs.webkit.org/show_bug.cgi?id=86146
+
+        Reviewed by Antti Koivisto.
+
+        * css3/supports-expected.txt: Added.
+        * css3/supports.html: Added.
+
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+        * platform/wk2/TestExpectations:
+            Skip the test until the feature is enabled.
+
+2012-10-18  Jer Noble  <jer.noble@apple.com>
+
+        Fullscreen movie controls behave incorrectly when clicked (and dragged)
+        https://bugs.webkit.org/show_bug.cgi?id=99610
+
+        Reviewed by Eric Carlson.
+
+        Add a second drag operation, testing that the location does not reset at the beginning of
+        each additional drag.
+
+        * fullscreen/video-controls-drag-expected.txt:
+        * fullscreen/video-controls-drag.html:
+
+2012-10-18  Brandon Jones  <bajones@google.com>
+
+        Implement OES_element_index_uint / WEBKIT_OES_element_index_uint
+        https://bugs.webkit.org/show_bug.cgi?id=97400
+
+        Reviewed by Kenneth Russell.
+
+        Added OES_element_index_uint extension conformance test from KHRONOS
+
+        * fast/canvas/webgl/oes-element-index-uint-expected.txt: Added.
+        * fast/canvas/webgl/oes-element-index-uint.html: Added.
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/wk2/TestExpectations:
+
+2012-10-18  Dana Jansens  <danakj@chromium.org>
+
+        Unreviewed, mark http/tests/xmlhttprequest/request-encoding2.html as flaky.
+        https://bugs.webkit.org/show_bug.cgi?id=99734
+
+        * platform/chromium/TestExpectations:
+
+2012-10-18  Stephen Chenney  <schenney@chromium.org>
+
+        Unreviewed testExpectation change for Chromium.
+
+        * platform/chromium/TestExpectations: Marked svg/hixie/perf/007.xml as [ Pass Slow ]
+
+2012-10-18  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, rebaseline a slider test on Mac.
+        I think I grabbed the baseline at the wrong time or from the wrong bot yesterday.
+
+        * platform/mac/media/video-playing-and-pause-expected.txt:
+
+2012-10-18  Hans Muller  <hmuller@adobe.com>
+
+        [CSS Exclusions] Handle special case "empty" shapes
+        https://bugs.webkit.org/show_bug.cgi?id=99342
+
+        Reviewed by Dirk Schulze.
+
+        Verify that "empty" shape-inside shapes do not constrain the text their element contains.
+
+        * fast/exclusions/shape-inside/shape-inside-empty-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-empty.html: Added.
+
+2012-10-18  Takashi Sakamoto  <tasak@google.com>
+
+        REGRESSION(r131464): Null-pointer crash in StyleResolver::styleForElement
+        https://bugs.webkit.org/show_bug.cgi?id=99587
+
+        Reviewed by Dimitri Glazkov.
+
+        * fast/dom/shadow/user-modify-in-datalist-crash-expected.txt: Added.
+        * fast/dom/shadow/user-modify-in-datalist-crash.html: Added.
+
+2012-10-18  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Test expectation update mainly for
+        https://bugs.webkit.org/show_bug.cgi?id=99673
+
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-win-xp/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png: Added.
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png:
+
+2012-10-18  Stephen Chenney  <schenney@chromium.org>
+
+        Rebaselining some longstanding Chromium expectations.
+
+        Unreviewed test expectations update.
+
+        These were marked as expected fail when a Skia roll went in. That was ago.
+
+        * platform/chromium-linux/fast/repaint/list-marker-expected.png:
+        * platform/chromium-linux/svg/as-background-image/background-image-preserveaspectRatio-support-expected.png:
+        * platform/chromium-linux/svg/as-image/img-preserveAspectRatio-support-1-expected.png:
+        * platform/chromium-mac-snowleopard/fast/repaint/list-marker-expected.png:
+        * platform/chromium-mac-snowleopard/svg/as-background-image/background-image-preserveaspectRatio-support-expected.png:
+        * platform/chromium-mac-snowleopard/svg/as-image/img-preserveAspectRatio-support-1-expected.png:
+        * platform/chromium-mac-snowleopard/svg/hixie/perf/007-expected.png:
+        * platform/chromium-mac/fast/repaint/list-marker-expected.png:
+        * platform/chromium-mac/svg/as-background-image/background-image-preserveaspectRatio-support-expected.png:
+        * platform/chromium-mac/svg/as-image/img-preserveAspectRatio-support-1-expected.png:
+        * platform/chromium-win-xp/svg/as-image/img-preserveAspectRatio-support-1-expected.png: Added.
+        * platform/chromium-win/fast/repaint/focus-ring-expected.png:
+        * platform/chromium-win/fast/repaint/list-marker-expected.png:
+        * platform/chromium-win/svg/as-background-image/background-image-preserveaspectRatio-support-expected.png:
+        * platform/chromium-win/svg/as-image/img-preserveAspectRatio-support-1-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-10-18  Anton Muhin  <antonm@chromium.org>
+
+        Unreviewed Chromium rebaselines.
+
+        * platform/chromium-linux/fast/table/border-collapsing/collapsed-border-with-col-colgroup-span-expected.png: Removed.
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-colgroup-border-color-expected.png:
+        * platform/chromium-mac/fast/table/border-collapsing/cached-change-colgroup-border-width-expected.png:
+        * platform/chromium-mac/fast/table/border-collapsing/collapsed-border-with-col-colgroup-span-expected.png: Added.
+        * platform/chromium-win/fast/table/border-collapsing/collapsed-border-with-col-colgroup-span-expected.png: Added.
+
+2012-10-18  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Update pixel expectation for a datalist test.
+
+        * platform/efl/fast/forms/datalist/input-appearance-range-with-datalist-expected.png:
+
+2012-10-18  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Gardening. Remove pixel expectation for a test that's actually a reftest.
+
+        * platform/efl/fast/forms/datalist/update-range-with-datalist-expected.png: Removed.
+
+2012-10-18  KwangYong Choi  <ky0.choi@samsung.com>
+
+        [EFL] Rebaseline http/tests/plugins/ after r129972
+        https://bugs.webkit.org/show_bug.cgi?id=99672
+
+        Unreviewed. Plugin feature is enabled on EFL WK2 port after r129972.
+
+        * platform/efl-wk1/TestExpectations:
+        * platform/efl-wk2/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-10-18  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Unskip http/tests/security/xss-DENIED-xsl-external-entity.xml.
+
+        It seems to be passing consistently now.
+
+        * platform/efl/TestExpectations:
+
+2012-10-18  Nandor Huszka  <hnandor@inf.u-szeged.hu>
+
+        [Qt] Unreviewed gardening
+
+        Skipping a test, remove unnecessary expected files.
+
+        * platform/qt-5.0/fast/forms/box-shadow-override-expected.png: Removed.
+        * platform/qt-5.0/fast/forms/box-shadow-override-expected.txt: Removed.
+        * platform/qt/TestExpectations:
+
+2012-10-18  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL] Gardening after r131640
+        https://bugs.webkit.org/show_bug.cgi?id=99692
+
+        Unreviewed gardening.
+
+        Failing gamepad/gamepad-out-of-range-crasher.html is skipped for EFL.
+
+        * platform/efl/TestExpectations:
+
+2012-10-18  Kent Tamura  <tkent@chromium.org>
+
+        Set min-width property instead of width property for date/time fields
+        https://bugs.webkit.org/show_bug.cgi?id=99673
+
+        Reviewed by Hajime Morita.
+
+        Update affected test results. Non-Mac chromium ports already have lines
+        for them in TestExpectations.
+
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png:
+
+2012-10-18  MORITA Hajime  <morrita@google.com>
+
+        Assertion failure at TreeScopeAdopter::moveNodeToNewDocument()
+        https://bugs.webkit.org/show_bug.cgi?id=99510
+
+        Reviewed by Kent Tamura.
+
+        * fast/forms/textarea/textarea-autofocus-removal-while-focusing-with-style-expected.txt: Added.
+        * fast/forms/textarea/textarea-autofocus-removal-while-focusing-with-style.html: Added.
+
+2012-10-18  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Updating baselines for two accessibility tests after r131674.
+
+        Updating baseline for media/video-playing-and-pause.html but still
+        marking the test a flaky as the render tree output can differ from
+        the new baseline.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/accessibility/inline-continuations-expected.txt:
+        * platform/gtk/accessibility/media-element-expected.txt:
+        * platform/gtk/media/video-playing-and-pause-expected.txt:
+
+2012-10-17  Kangil Han  <kangil.han@samsung.com>
+
+        Let's move use-while-animating-crash-expected.txt to common place.
+        https://bugs.webkit.org/show_bug.cgi?id=99678
+
+        Unreviewed, expectations change.
+
+        Move expected result to common place to pass svg/animations/use-while-animating-crash.html case.
+
+        * svg/animations/use-while-animating-crash-expected.txt: Renamed from LayoutTests/platform/mac/svg/animations/use-while-animating-crash-expected.txt.
+
+2012-10-17  Hayato Ito  <hayato@chromium.org>
+
+        Content element does not expose distributedNodes property.
+        https://bugs.webkit.org/show_bug.cgi?id=99232
+
+        Reviewed by Dimitri Glazkov.
+
+        Add getDistributedNodes() to HTMLContentElement's IDL, which returns a
+        static NodeList whose node are distributed to the content element.
+
+        * fast/dom/shadow/content-element-distributed-nodes-expected.txt: Added.
+        * fast/dom/shadow/content-element-distributed-nodes.html: Added.
+        * fast/dom/shadow/distributed-nodes-expected.txt: Removed.
+        * fast/dom/shadow/distributed-nodes.html: Removed.
+        * platform/qt/TestExpectations:
+
+2012-10-17  Dirk Pranke  <dpranke@chromium.org>
+
+        Clone baselines from platform/mac to platform/chromium [7 of 7]
+        https://bugs.webkit.org/show_bug.cgi?id=99666
+
+        Unreviewed, expectations change.
+
+        (long list of expectations files omitted).
+
+2012-10-17  Dirk Pranke  <dpranke@chromium.org>
+
+        Clone baselines from platform/mac to platform/chromium [6 of 7]
+        https://bugs.webkit.org/show_bug.cgi?id=99666
+
+        Unreviewed, expectations change.
+
+        (long list of expectations files omitted).
+
+2012-10-17  Dirk Pranke  <dpranke@chromium.org>
+
+        Clone baselines from platform/mac to platform/chromium [5 of 7]
+        https://bugs.webkit.org/show_bug.cgi?id=99666
+
+        Unreviewed, expectations change.
+
+        (long list of expectations files omitted).
+
+2012-10-17  Dirk Pranke  <dpranke@chromium.org>
+
+        Clone baselines from platform/mac to platform/chromium [4 of 7]
+        https://bugs.webkit.org/show_bug.cgi?id=99666
+
+        Unreviewed, expectations change.
+
+        (long list of expectations files omitted).
+
+2012-10-17  Pan Deng  <pan.deng@intel.com>
+
+        [User Timing] Test Cases of User Timing. According to http://www.w3.org/TR/2012/CR-user-timing-20120726/
+        https://bugs.webkit.org/show_bug.cgi?id=90963
+
+        Reviewed by Tony Gentilcore.
+
+        Test cases in this patch validate functionality of W3C User Timing interface. These test cases use W3C testharness. Since User Timing feature is not enabled in any platform yet, all skipped currenttly. 
+
+        * http/tests/w3c/webperf/resources/webperftestharnessextension.js: Added.
+        (test_method_exists):
+        (test_noless_than):
+        (performance_entrylist_checker.entry_check.test_equals):
+        (performance_entrylist_checker.entry_check):
+        (performance_entrylist_checker.entrylist_order_check):
+        (performance_entrylist_checker.entrylist_check):
+        (PerformanceContext):
+        (PerformanceContext.prototype.initialMeasures):
+        (PerformanceContext.prototype.mark):
+        (PerformanceContext.prototype.measure):
+        (PerformanceContext.prototype.clearMarks):
+        (PerformanceContext.prototype.clearMeasures):
+        (PerformanceContext.prototype.getEntries):
+        (PerformanceContext.prototype.getEntriesByType):
+        (PerformanceContext.prototype.getEntriesByName):
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_clearMarks-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_clearMarks.html: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_clearMeasures-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_clearMeasures.html: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_mark-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_mark.html: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_mark_exception-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_mark_exception.html: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure.html: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure_associate_with_navigation_timing-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure_associate_with_navigation_timing.html: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure_exception-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_measure_exception.html: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_method_exist-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/user-timing/test_user_timing_method_exist.html: Added.
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+
+2012-10-17  Dirk Pranke  <dpranke@chromium.org>
+
+        Clone baselines from platform/mac to platform/chromium [3 of 7]
+        https://bugs.webkit.org/show_bug.cgi?id=99666
+
+        Unreviewed, expectations change.
+
+        (long list of expectations files omitted).
+
+2012-10-17  Dirk Pranke  <dpranke@chromium.org>
+
+        Clone baselines from platform/mac to platform/chromium [2 of 7]
+        https://bugs.webkit.org/show_bug.cgi?id=99666
+
+        Unreviewed, expectations change.
+
+        (long list of expectations files omitted).
+
+2012-10-17  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Rebaseline expectations for multiple-fields <input>
+
+        * platform/chromium-linux-x86/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png:
+        * platform/chromium-linux-x86/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png: Added.
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png: Added.
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png:
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-rtl-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-with-scroll-bar-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-rtl-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-with-scroll-bar-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-rtl-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-with-scroll-bar-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-rtl-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-with-scroll-bar-expected.png:
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png:
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png:
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-rtl-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-with-scroll-bar-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-rtl-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-with-scroll-bar-expected.png:
+        * platform/chromium-win-xp/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-win-xp/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png:
+        * platform/chromium-win-xp/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png: Added.
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png: Added.
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png:
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png: Added.
+        * platform/chromium-win/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-rtl-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-appearance-with-scroll-bar-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-rtl-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-appearance-with-scroll-bar-expected.png:
+
+2012-10-17  Elliott Sprehn  <esprehn@chromium.org>
+
+        StyleRareNonInheritedData::contentDataEquivalent only looks at the first ContentData
+        https://bugs.webkit.org/show_bug.cgi?id=99560
+
+        Reviewed by Eric Seidel.
+
+        Test that when the content CSS property changes we update the displayed content.
+
+        * fast/css-generated-content/content-property-change-expected.html: Added.
+        * fast/css-generated-content/content-property-change.html: Added.
+
+2012-10-17  Dirk Pranke  <dpranke@chromium.org>
+
+        Clone baselines from platform/mac to platform/chromium [1 of 7]
+        https://bugs.webkit.org/show_bug.cgi?id=99666
+
+        Unreviewed, expectations change.
+
+2012-10-17  Joanmarie Diggs  <jdiggs@igalia.com>
+
+        [GTK] AccessibilityUIElement::role() should be consistent across platforms wherever possible
+        https://bugs.webkit.org/show_bug.cgi?id=99640
+
+        Reviewed by Chris Fleizach.
+
+        Updated tests and expectations to use the Mac/Safari-style AXRole strings
+
+        * platform/gtk/accessibility/adjacent-continuations-cause-assertion-failure-expected.txt:
+        * platform/gtk/accessibility/aria-combobox-expected.txt:
+        * platform/gtk/accessibility/aria-fallback-roles-expected.txt:
+        * platform/gtk/accessibility/aria-menubar-menuitems-expected.txt:
+        * platform/gtk/accessibility/aria-roles-expected.txt:
+        * platform/gtk/accessibility/aria-roles-unignored-expected.txt:
+        * platform/gtk/accessibility/aria-roles-unignored.html:
+        * platform/gtk/accessibility/aria-slider-required-attributes-expected.txt:
+        * platform/gtk/accessibility/aria-slider-required-attributes.html:
+        * platform/gtk/accessibility/aria-table-hierarchy-expected.txt:
+        * platform/gtk/accessibility/aria-table-hierarchy.html:
+        * platform/gtk/accessibility/aria-tables-expected.txt:
+        * platform/gtk/accessibility/aria-toggle-button-role-expected.txt:
+        * platform/gtk/accessibility/aria-toggle-button-role.html:
+        * platform/gtk/accessibility/aria-toggle-button-with-title-expected.txt:
+        * platform/gtk/accessibility/button-accessible-name-expected.txt:
+        * platform/gtk/accessibility/button-accessible-name.html:
+        * platform/gtk/accessibility/canvas-description-and-role-expected.txt:
+        * platform/gtk/accessibility/caret-browsing-text-focus-expected.txt:
+        * platform/gtk/accessibility/caret-browsing-text-focus.html:
+        * platform/gtk/accessibility/deleting-iframe-destroys-axcache-expected.txt:
+        * platform/gtk/accessibility/div-within-anchors-causes-crash-expected.txt:
+        * platform/gtk/accessibility/entry-and-password-expected.txt:
+        * platform/gtk/accessibility/input-slider-expected.txt:
+        * platform/gtk/accessibility/input-slider.html:
+        * platform/gtk/accessibility/legend-expected.txt:
+        * platform/gtk/accessibility/list-items-always-exposed-expected.txt:
+        * platform/gtk/accessibility/list-items-always-exposed.html:
+        * platform/gtk/accessibility/media-controls-panel-title-expected.txt:
+        * platform/gtk/accessibility/media-controls-panel-title.html:
+        * platform/gtk/accessibility/name-from-label-expected.txt:
+        * platform/gtk/accessibility/name-from-label.html:
+        * platform/gtk/accessibility/object-with-title-expected.txt:
+        * platform/gtk/accessibility/object-with-title.html:
+        * platform/gtk/accessibility/replaced-objects-in-anonymous-blocks-expected.txt:
+        * platform/gtk/accessibility/spans-expected.txt:
+        * platform/gtk/accessibility/spans-paragraphs-and-divs-expected.txt:
+        * platform/gtk/accessibility/spans-paragraphs-and-divs.html:
+        * platform/gtk/accessibility/spans.html:
+        * platform/gtk/accessibility/svg-image-expected.txt:
+        * platform/gtk/accessibility/table-hierarchy-expected.txt:
+        * platform/gtk/accessibility/table-hierarchy.html:
+
+2012-10-17  Arpita Bahuguna  <arpitabahuguna@gmail.com>
+
+        Incorrect rendering of borders on <col> with span > 1
+        https://bugs.webkit.org/show_bug.cgi?id=76246
+
+        Reviewed by Julien Chaffraix.
+
+        * fast/table/border-collapsing/cached-change-colgroup-border-color-expected.png:
+        * fast/table/border-collapsing/cached-change-colgroup-border-color-expected.txt:
+        * fast/table/border-collapsing/cached-change-colgroup-border-width-expected.png:
+        * fast/table/border-collapsing/cached-change-colgroup-border-width-expected.txt:
+        Existing tests modified. This is because previously, while computing collapsed
+        start border, we did not take the preceeding col's enclosing colgroup's end border
+        into consideration. While computing the collapsed start border, only the preceeding
+        col element's end border was considered.
+
+        With this fix, for the above two tests, the last col's width now changes due to
+        the border being applied to it (the preceeding col's enclosing colgroup's end border)
+        which causes the table's width to change. Also, we should note that the cell's grow
+        by half the border's width; which is expected (on account of their being collapsed
+        borders).
+
+        * fast/table/border-collapsing/collapsed-border-with-col-colgroup-span-expected.txt: Added.
+        * fast/table/border-collapsing/collapsed-border-with-col-colgroup-span.html: Added.
+        * platform/chromium-linux/fast/table/border-collapsing/collapsed-border-with-col-colgroup-span-expected.png: Added.
+        Image only test added for verifying the behavior of collapsed borders with
+        col and colgroup span.
+        New expected image file added for the chromium-linux port.
+
+2012-10-17  Tom Sepez  <tsepez@chromium.org>
+
+        Crash in ContainerNode::removeAllChildren()
+        https://bugs.webkit.org/show_bug.cgi?id=98443
+
+        Reviewed by Eric Carlson.
+
+        * http/tests/security/video-poster-cross-origin-crash2-expected.txt: Added.
+        * http/tests/security/video-poster-cross-origin-crash2.html: Added.
+
+2012-10-17  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: Closing connection in upgradeneeded should result in error event
+        https://bugs.webkit.org/show_bug.cgi?id=99486
+
+        Reviewed by Tony Chang.
+
+        Updated test expectation - error, not success.
+
+        * storage/indexeddb/intversion-close-in-oncomplete-expected.txt:
+        * storage/indexeddb/resources/intversion-close-in-oncomplete.js:
+        (deleteSuccess):
+        (upgradeNeeded.transaction.oncomplete):
+        (upgradeNeeded):
+        (openError):
+
+2012-10-17  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Build fix after r131651.
+
+        * fast/harness/perftests/runs-per-second-iterations.html:
+        * fast/harness/perftests/runs-per-second-log.html:
+
+2012-10-17  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Certain SVG content freezes QtWebKit
+        https://bugs.webkit.org/show_bug.cgi?id=97258
+
+        Reviewed by Simon Hausmann.
+
+        * svg/stroke/zero-width-hang-expected.txt: Added.
+        * svg/stroke/zero-width-hang.html: Added.
+
+2012-10-17  Filip Pizlo  <fpizlo@apple.com>
+
+        REGRESSION (r130826 or r130828): Twitter top bar is dysfunctional
+        https://bugs.webkit.org/show_bug.cgi?id=99577
+        <rdar://problem/12518883>
+
+        Reviewed by Mark Hahnenberg.
+
+        * fast/js/dfg-array-pop-value-clearing-expected.txt: Added.
+        * fast/js/dfg-array-pop-value-clearing.html: Added.
+        * fast/js/jsc-test-list:
+        * fast/js/script-tests/dfg-array-pop-value-clearing.js: Added.
+        (foo):
+
+2012-10-17  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: Enforce unsigned long/unsigned long long ranges
+        https://bugs.webkit.org/show_bug.cgi?id=99637
+
+        Reviewed by Tony Chang.
+
+        Additional edge case tests and updated expectations.
+
+        * storage/indexeddb/cursor-advance-expected.txt:
+        * storage/indexeddb/intversion-bad-parameters-expected.txt:
+        * storage/indexeddb/intversion-encoding-expected.txt:
+        * storage/indexeddb/resources/cursor-advance.js:
+        (testBadAdvance.advanceBadly):
+        (testBadAdvance):
+        * storage/indexeddb/resources/intversion-bad-parameters.js:
+        (deleteSuccess):
+        * storage/indexeddb/resources/intversion-encoding.js:
+
+2012-10-17  Tony Chang  <tony@chromium.org>
+
+        fast/forms/range/input-appearance-range-rtl.html off by one pixel
+        https://bugs.webkit.org/show_bug.cgi?id=99625
+
+        Reviewed by Ojan Vafai.
+
+        Run test on GTK+ and Qt now that it is fixed.
+
+        * platform/gtk/TestExpectations:
+        * platform/qt/TestExpectations:
+
+2012-10-17  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, Qt baselines for shadow DOM changes to RenderSlider.
+        There are a couple unexplained failures that I'm still investigating.
+
+        * platform/chromium-mac/fast/dom/HTMLInputElement/input-slider-update-expected.txt: Removed.
+        * platform/chromium-mac/fast/forms/range/range-thumb-height-percentage-expected.txt: Removed.
+        * platform/chromium-mac/fast/forms/range/slider-padding-expected.txt: Removed.
+        * platform/chromium-mac/fast/repaint/slider-thumb-drag-release-expected.txt: Removed.
+        * platform/qt/TestExpectations:
+        * platform/qt/fast/dom/HTMLInputElement/input-slider-update-expected.txt:
+        * platform/qt/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt: Added.
+        * platform/qt/fast/forms/box-shadow-override-expected.txt:
+        * platform/qt/fast/forms/range/input-appearance-range-expected.txt:
+        * platform/qt/fast/forms/range/range-thumb-height-percentage-expected.txt:
+        * platform/qt/fast/forms/range/slider-padding-expected.txt:
+        * platform/qt/fast/multicol/client-rects-expected.txt:
+        * platform/qt/fast/repaint/slider-thumb-drag-release-expected.txt:
+        * platform/qt/fast/repaint/slider-thumb-float-expected.txt: Added.
+
+2012-10-17  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, Apple Mac baselines for shadow DOM changes to RenderSlider.
+
+        * platform/mac/TestExpectations:
+        * platform/mac/fast/dom/HTMLInputElement/input-slider-update-expected.txt:
+        * platform/mac/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt: Added.
+        * platform/mac/fast/forms/box-shadow-override-expected.txt:
+        * platform/mac/fast/forms/range/input-appearance-range-expected.txt:
+        * platform/mac/fast/forms/range/range-thumb-height-percentage-expected.txt:
+        * platform/mac/fast/forms/range/slider-padding-expected.txt:
+        * platform/mac/fast/forms/range/slider-thumb-shared-style-expected.txt:
+        * platform/mac/fast/forms/range/slider-thumb-stylability-expected.txt: Added.
+        * platform/mac/fast/multicol/client-rects-expected.txt:
+        * platform/mac/fast/repaint/slider-thumb-drag-release-expected.txt:
+        * platform/mac/fast/repaint/slider-thumb-float-expected.txt: Added.
+        * platform/mac/media/audio-controls-rendering-expected.txt:
+        * platform/mac/media/controls-after-reload-expected.txt:
+        * platform/mac/media/controls-strict-expected.txt:
+        * platform/mac/media/controls-styling-strict-expected.txt:
+        * platform/mac/media/video-controls-rendering-expected.txt:
+        * platform/mac/media/video-display-toggle-expected.txt:
+        * platform/mac/media/video-no-audio-expected.txt:
+        * platform/mac/media/video-playing-and-pause-expected.txt:
+
+2012-10-17  Filip Pizlo  <fpizlo@apple.com>
+
+        JIT op_get_by_pname should call cti_get_by_val_generic and not cti_get_by_val
+        https://bugs.webkit.org/show_bug.cgi?id=99631
+        <rdar://problem/12483221>
+
+        Reviewed by Mark Hahnenberg.
+
+        * fast/js/get-by-pname-that-looks-like-a-patchable-get-by-val-expected.txt: Added.
+        * fast/js/get-by-pname-that-looks-like-a-patchable-get-by-val.html: Added.
+        * fast/js/jsc-test-list:
+        * fast/js/script-tests/get-by-pname-that-looks-like-a-patchable-get-by-val.js: Added.
+        (foo):
+
+2012-10-17  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, second set of GTK+ baselines for shadow DOM changes to RenderSlider.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/media/audio-controls-rendering-expected.txt:
+        * platform/gtk/media/audio-repaint-expected.txt:
+        * platform/gtk/media/controls-after-reload-expected.txt:
+        * platform/gtk/media/controls-strict-expected.txt:
+        * platform/gtk/media/controls-styling-expected.txt:
+        * platform/gtk/media/controls-styling-strict-expected.txt:
+        * platform/gtk/media/controls-without-preload-expected.txt:
+        * platform/gtk/media/media-controls-clone-expected.txt:
+        * platform/gtk/media/media-document-audio-repaint-expected.txt:
+        * platform/gtk/media/track/track-cue-rendering-horizontal-expected.txt:
+        * platform/gtk/media/track/track-cue-rendering-vertical-expected.txt:
+        * platform/gtk/media/video-controls-rendering-expected.txt:
+        * platform/gtk/media/video-display-toggle-expected.txt:
+        * platform/gtk/media/video-empty-source-expected.txt:
+        * platform/gtk/media/video-no-audio-expected.txt:
+        * platform/gtk/media/video-playing-and-pause-expected.txt:
+        * platform/gtk/media/video-zoom-controls-expected.txt:
+
+2012-10-17  Scott Graham  <scottmg@chromium.org>
+
+        Integer overflows/underflows in all Gamepad controller api calls.
+        https://bugs.webkit.org/show_bug.cgi?id=97262
+
+        Reviewed by Abhishek Arya.
+
+        * gamepad/gamepad-out-of-range-crasher.html: Added.
+        * gamepad/gamepad-out-of-range-crasher-expected.txt: Added.
+
+2012-10-17  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, Chromium baselines for shadow DOM changes to RenderSlider.
+
+        * platform/chromium-linux-x86/fast/multicol/client-rects-expected.txt: Removed.
+        * platform/chromium-linux/fast/forms/datalist/input-appearance-range-with-datalist-zoomed-expected.png:
+        * platform/chromium-mac-snowleopard/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt: Copied from LayoutTests/platform/chromium-win/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt.
+        * platform/chromium-mac-snowleopard/fast/forms/box-shadow-override-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/datalist/input-appearance-range-with-datalist-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/datalist/input-appearance-range-with-datalist-zoomed-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/input-appearance-height-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/range/slider-thumb-stylability-expected.txt: Copied from LayoutTests/platform/chromium-win/fast/forms/range/slider-thumb-stylability-expected.txt.
+        * platform/chromium-mac-snowleopard/fast/repaint/slider-thumb-float-expected.txt: Copied from LayoutTests/platform/chromium-win/fast/repaint/slider-thumb-float-expected.txt.
+        * platform/chromium-mac/fast/dom/HTMLInputElement/input-slider-update-expected.txt: Added.
+        * platform/chromium-mac/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt: Copied from LayoutTests/platform/chromium-win/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt.
+        * platform/chromium-mac/fast/forms/box-shadow-override-expected.png:
+        * platform/chromium-mac/fast/forms/box-shadow-override-expected.txt:
+        * platform/chromium-mac/fast/forms/datalist/input-appearance-range-with-datalist-expected.png:
+        * platform/chromium-mac/fast/forms/datalist/input-appearance-range-with-datalist-zoomed-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-height-expected.png:
+        * platform/chromium-mac/fast/forms/input-appearance-height-expected.txt:
+        * platform/chromium-mac/fast/forms/range/input-appearance-range-expected.txt:
+        * platform/chromium-mac/fast/forms/range/range-thumb-height-percentage-expected.txt: Added.
+        * platform/chromium-mac/fast/forms/range/slider-padding-expected.txt: Added.
+        * platform/chromium-mac/fast/forms/range/slider-thumb-shared-style-expected.txt: Added.
+        * platform/chromium-mac/fast/forms/range/slider-thumb-stylability-expected.txt: Copied from LayoutTests/platform/chromium-win/fast/forms/range/slider-thumb-stylability-expected.txt.
+        * platform/chromium-mac/fast/hidpi/video-controls-in-hidpi-expected.txt:
+        * platform/chromium-mac/fast/layers/video-layer-expected.txt:
+        * platform/chromium-mac/fast/multicol/client-rects-expected.txt:
+        * platform/chromium-mac/fast/repaint/slider-thumb-drag-release-expected.txt: Added.
+        * platform/chromium-mac/fast/repaint/slider-thumb-float-expected.txt: Copied from LayoutTests/platform/chromium-win/fast/repaint/slider-thumb-float-expected.txt.
+        * platform/chromium-mac/media/audio-controls-rendering-expected.txt:
+        * platform/chromium-mac/media/audio-repaint-expected.txt:
+        * platform/chromium-mac/media/controls-after-reload-expected.txt:
+        * platform/chromium-mac/media/controls-strict-expected.txt:
+        * platform/chromium-mac/media/controls-styling-expected.txt:
+        * platform/chromium-mac/media/controls-styling-strict-expected.txt:
+        * platform/chromium-mac/media/controls-without-preload-expected.txt:
+        * platform/chromium-mac/media/media-controls-clone-expected.txt:
+        * platform/chromium-mac/media/media-document-audio-repaint-expected.txt:
+        * platform/chromium-mac/media/track/track-cue-rendering-horizontal-expected.txt:
+        * platform/chromium-mac/media/track/track-cue-rendering-vertical-expected.txt:
+        * platform/chromium-mac/media/video-controls-rendering-expected.txt:
+        * platform/chromium-mac/media/video-display-toggle-expected.txt:
+        * platform/chromium-mac/media/video-empty-source-expected.txt:
+        * platform/chromium-mac/media/video-no-audio-expected.txt:
+        * platform/chromium-mac/media/video-playing-and-pause-expected.txt:
+        * platform/chromium-mac/media/video-zoom-controls-expected.txt:
+        * platform/chromium-mac/platform/chromium/virtual/gpu/fast/hidpi/video-controls-in-hidpi-expected.txt: Copied from LayoutTests/platform/chromium-mac/fast/hidpi/video-controls-in-hidpi-expected.txt.
+        * platform/chromium-win-xp/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt: Copied from LayoutTests/platform/chromium-win/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt.
+        * platform/chromium-win-xp/fast/forms/datalist/input-appearance-range-with-datalist-expected.png: Removed.
+        * platform/chromium-win-xp/fast/forms/range/slider-thumb-stylability-expected.txt: Copied from LayoutTests/platform/chromium-win/fast/forms/range/slider-thumb-stylability-expected.txt.
+        * platform/chromium-win-xp/fast/repaint/slider-thumb-float-expected.txt: Copied from LayoutTests/platform/chromium-win/fast/repaint/slider-thumb-float-expected.txt.
+        * platform/chromium-win/fast/dom/HTMLInputElement/input-slider-update-expected.txt:
+        * platform/chromium-win/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt:
+        * platform/chromium-win/fast/forms/box-shadow-override-expected.txt:
+        * platform/chromium-win/fast/forms/datalist/input-appearance-range-with-datalist-expected.png:
+        * platform/chromium-win/fast/forms/datalist/input-appearance-range-with-datalist-zoomed-expected.png:
+        * platform/chromium-win/fast/forms/input-appearance-height-expected.txt:
+        * platform/chromium-win/fast/forms/range/input-appearance-range-expected.png:
+        * platform/chromium-win/fast/forms/range/input-appearance-range-expected.txt:
+        * platform/chromium-win/fast/forms/range/range-thumb-height-percentage-expected.txt:
+        * platform/chromium-win/fast/forms/range/slider-padding-expected.txt:
+        * platform/chromium-win/fast/forms/range/slider-thumb-shared-style-expected.txt:
+        * platform/chromium-win/fast/forms/range/slider-thumb-stylability-expected.txt:
+        * platform/chromium-win/fast/hidpi/video-controls-in-hidpi-expected.txt:
+        * platform/chromium-win/fast/multicol/client-rects-expected.txt:
+        * platform/chromium-win/fast/repaint/slider-thumb-drag-release-expected.txt:
+        * platform/chromium-win/fast/repaint/slider-thumb-float-expected.txt:
+        * platform/chromium-win/media/track/track-cue-rendering-vertical-expected.txt:
+        * platform/chromium-win/platform/chromium/virtual/gpu/fast/hidpi/video-controls-in-hidpi-expected.txt: Renamed from LayoutTests/platform/chromium-linux/fast/hidpi/video-controls-in-hidpi-expected.txt.
+        * platform/chromium/TestExpectations:
+        * platform/mac-lion/media/audio-repaint-expected.txt: Removed.
+
+2012-10-17  Dana Jansens  <danakj@chromium.org>
+
+        Unreviewed gardening, mark inspector/styles/styles-history.html as flaky on Linux.
+        https://bugs.webkit.org/show_bug.cgi?id=99519
+
+        * platform/chromium/TestExpectations:
+
+2012-10-17  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, first set of GTK+ baselines for shadow DOM changes to RenderSlider.
+
+        * fast/forms/range/slider-thumb-stylability-expected.txt: Renamed from LayoutTests/platform/efl/fast/forms/range/slider-thumb-stylability-expected.txt.
+        * platform/chromium-mac-snowleopard/fast/hidpi/video-controls-in-hidpi-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/multicol/client-rects-expected.txt: Removed.
+        * platform/chromium-win-xp/fast/multicol/client-rects-expected.txt: Removed.
+        * platform/gtk/TestExpectations:
+        * platform/gtk/fast/dom/HTMLInputElement/input-slider-update-expected.txt:
+        * platform/gtk/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt: Added.
+        * platform/gtk/fast/forms/box-shadow-override-expected.txt:
+        * platform/gtk/fast/forms/input-appearance-height-expected.txt:
+        * platform/gtk/fast/forms/range/input-appearance-range-expected.txt:
+        * platform/gtk/fast/forms/range/range-thumb-height-percentage-expected.txt: Added.
+        * platform/gtk/fast/forms/range/slider-padding-expected.txt:
+        * platform/gtk/fast/forms/range/slider-thumb-shared-style-expected.txt:
+        * platform/gtk/fast/forms/range/slider-thumb-stylability-expected.png: Removed.
+        * platform/gtk/fast/forms/range/slider-thumb-stylability-expected.txt:
+        * platform/gtk/fast/hidpi/video-controls-in-hidpi-expected.txt:
+        * platform/gtk/fast/layers/video-layer-expected.txt:
+        * platform/gtk/fast/multicol/client-rects-expected.txt:
+        * platform/gtk/fast/repaint/slider-thumb-drag-release-expected.txt:
+        * platform/gtk/fast/repaint/slider-thumb-float-expected.txt: Added.
+        * platform/mac/fast/forms/range/slider-thumb-stylability-expected.txt: Removed.
+
+2012-10-17  Dana Jansens  <danakj@chromium.org>
+
+        Rebaseline some windows tests now that the bot is providing results in the right place.
+
+        Unreviewed gardening.
+
+        * platform/chromium-win-xp/css1/basic/inheritance-expected.png: Removed.
+        * platform/chromium-win-xp/fast/sub-pixel/selection/selection-rect-in-sub-pixel-table-expected.png: Removed.
+        * platform/chromium-win-xp/ietestcenter/css3/bordersbackgrounds/border-radius-content-edge-001-expected.png: Removed.
+        * platform/chromium-win-xp/svg/zoom/page/zoom-svg-through-object-with-absolute-size-2-expected.png: Removed.
+        * platform/chromium-win-xp/tables/mozilla/bugs/bug73321-expected.png: Removed.
+        * platform/chromium-win/css1/basic/inheritance-expected.png:
+        * platform/chromium-win/fast/sub-pixel/selection/selection-rect-in-sub-pixel-table-expected.png:
+        * platform/chromium-win/ietestcenter/css3/bordersbackgrounds/border-radius-content-edge-001-expected.png:
+        * platform/chromium-win/svg/zoom/page/zoom-svg-through-object-with-absolute-size-2-expected.png:
+        * platform/chromium-win/tables/mozilla/bugs/bug73321-expected.png:
+
+2012-10-17  Philip Rogers  <pdr@google.com>
+
+        Allow lazy initialization of SVG XML animated properties.
+        https://bugs.webkit.org/show_bug.cgi?id=84657
+
+        Reviewed by Tim Horton.
+
+        * platform/mac/svg/animations/use-while-animating-crash-expected.txt: Added.
+        * svg/animations/use-while-animating-crash.html: Added.
+
+2012-10-17  Dan Carney  <dcarney@google.com>
+
+        Bind isolatedWorldSecurityOrigin to world
+        https://bugs.webkit.org/show_bug.cgi?id=99582
+
+        Reviewed by Adam Barth.
+
+        Clean up of isolated worlds added after test completion.
+
+        * http/tests/security/isolatedWorld/cross-origin-xhr.html:
+
+2012-10-17  Simon Fraser  <simon.fraser@apple.com>
+
+        GraphicsLayer visible rect computation needs to use the current animating transform
+        https://bugs.webkit.org/show_bug.cgi?id=99529
+
+        Reviewed by Dean Jackson.
+
+        Tests that exercise visible-rect computation on an animating layer.
+
+        * compositing/visible-rect/animated-expected.txt: Added.
+        * compositing/visible-rect/animated-from-none-expected.txt: Added.
+        * compositing/visible-rect/animated-from-none.html: Added.
+        * compositing/visible-rect/animated.html: Added.
+
+2012-10-17  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        plugins: Allow a plugin to dictate whether it can receive drag events or not.
+        https://bugs.webkit.org/show_bug.cgi?id=99355
+
+        Reviewed by Tony Chang.
+
+        Update test to not set contentEditable on the plugin anymore.
+
+        * platform/chromium/plugins/drag-events-expected.txt:
+        * platform/chromium/plugins/drag-events.html:
+
+2012-10-17  Christophe Dumez  <christophe.dumez@intel.com>
+
+        xss-DENIED-xsl-document-securityOrigin.xml crashes with icon assertion
+        https://bugs.webkit.org/show_bug.cgi?id=99571
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskip http/tests/security/xss-DENIED-xsl-document-securityOrigin.xml
+        for EFL WebKit2 now that it no longer hits an assertion in
+        IconDatabase.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-10-17  Shinya Kawanaka  <shinyak@chromium.org>
+
+        Dynamically added elements do not get re-projected.
+        https://bugs.webkit.org/show_bug.cgi?id=99227
+
+        Reviewed by Dimitri Glazkov.
+
+        * fast/dom/shadow/content-reprojection-dynamic-expected.html: Added.
+        * fast/dom/shadow/content-reprojection-dynamic.html: Added.
+
 2012-10-17  Vsevolod Vlasov  <vsevik@chromium.org>
 
         Unreviewed inspector test fixed and skipped on JSC.

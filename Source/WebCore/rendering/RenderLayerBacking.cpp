@@ -965,7 +965,7 @@ bool RenderLayerBacking::updateScrollingLayers(bool needsScrollingLayers)
     return layerChanged;
 }
 
-void RenderLayerBacking::attachToScrollingCoordinator()
+void RenderLayerBacking::attachToScrollingCoordinator(RenderLayerBacking* parent)
 {
     // If m_scrollLayerID non-zero, then this backing is already attached to the ScrollingCoordinator.
     if (m_scrollLayerID)
@@ -978,8 +978,9 @@ void RenderLayerBacking::attachToScrollingCoordinator()
     ScrollingCoordinator* scrollingCoordinator = page->scrollingCoordinator();
     if (!scrollingCoordinator)
         return;
-    
-    m_scrollLayerID = scrollingCoordinator->attachToStateTree(scrollingCoordinator->uniqueScrollLayerID());
+
+    ScrollingNodeID parentID = parent ? parent->scrollLayerID() : 0;
+    m_scrollLayerID = scrollingCoordinator->attachToStateTree(scrollingCoordinator->uniqueScrollLayerID(), parentID);
 }
 
 void RenderLayerBacking::detachFromScrollingCoordinator()
@@ -1539,6 +1540,18 @@ void RenderLayerBacking::didCommitChangesForLayer(const GraphicsLayer*) const
     compositor()->didFlushChangesForLayer(m_owningLayer);
 }
 
+bool RenderLayerBacking::getCurrentTransform(const GraphicsLayer* graphicsLayer, TransformationMatrix& transform) const
+{
+    if (graphicsLayer != m_graphicsLayer)
+        return false;
+
+    if (m_owningLayer->hasTransform()) {
+        transform = m_owningLayer->currentTransform(RenderStyle::ExcludeTransformOrigin);
+        return true;
+    }
+    return false;
+}
+
 bool RenderLayerBacking::showDebugBorders(const GraphicsLayer*) const
 {
     return compositor() ? compositor()->compositorShowDebugBorders() : false;
@@ -1719,6 +1732,11 @@ void RenderLayerBacking::notifyFlushRequired(const GraphicsLayer*)
 {
     if (!renderer()->documentBeingDestroyed())
         compositor()->scheduleLayerFlush();
+}
+
+void RenderLayerBacking::notifyFlushBeforeDisplayRefresh(const GraphicsLayer* layer)
+{
+    compositor()->notifyFlushBeforeDisplayRefresh(layer);
 }
 
 // This is used for the 'freeze' API, for testing only.

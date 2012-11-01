@@ -170,7 +170,8 @@ if (window.testRunner) {
         runCount = test.runCount || 20;
         logLines = window.testRunner ? [] : null;
         PerfTestRunner.log("Running " + runCount + " times");
-        scheduleNextRun(runner);
+        if (runner)
+            scheduleNextRun(runner);
     }
 
     function scheduleNextRun(runner) {
@@ -234,6 +235,25 @@ if (window.testRunner) {
             testRunner.notifyDone();
     }
 
+    PerfTestRunner.prepareToMeasureValuesAsync = function (test) {
+        PerfTestRunner.unit = test.unit;
+        start(test);
+    }
+
+    PerfTestRunner.measureValueAync = function (measuredValue) {
+        completedRuns++;
+
+        try {
+            ignoreWarmUpAndLog(measuredValue);
+        } catch (exception) {
+            logFatalError("Got an exception while logging the result with name=" + exception.name + ", message=" + exception.message);
+            return;
+        }
+
+        if (completedRuns >= runCount)
+            finish();
+    }
+
     PerfTestRunner.measureTime = function (test) {
         PerfTestRunner.unit = "ms";
         start(test, measureTimeOnce);
@@ -253,7 +273,7 @@ if (window.testRunner) {
         return end - start;
     }
 
-    PerfTestRunner.runPerSecond = function (test) {
+    PerfTestRunner.measureRunsPerSecond = function (test) {
         PerfTestRunner.unit = "runs/s";
         start(test, measureRunsPerSecondOnce);
     }

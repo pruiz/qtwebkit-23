@@ -1346,21 +1346,27 @@ PassRefPtr<Widget> WebFrameLoaderClient::createPlugin(const IntSize&, HTMLPlugIn
     }
 #endif
 
+#if ENABLE(NETSCAPE_PLUGIN_API)
     RefPtr<Plugin> plugin = webPage->createPlugin(m_frame, pluginElement, parameters);
     if (!plugin)
         return 0;
-    
+
     return PluginView::create(pluginElement, plugin.release(), parameters);
+#else
+    return 0;
+#endif
 }
 
 void WebFrameLoaderClient::recreatePlugin(Widget* widget)
 {
+#if ENABLE(NETSCAPE_PLUGIN_API)
     ASSERT(widget && widget->isPluginViewBase());
     ASSERT(m_frame->page());
 
     PluginView* pluginView = static_cast<PluginView*>(widget);
     RefPtr<Plugin> plugin = m_frame->page()->createPlugin(m_frame, pluginView->pluginElement(), pluginView->initialParameters());
     pluginView->recreateAndInitialize(plugin.release());
+#endif
 }
 
 void WebFrameLoaderClient::redirectDataToPlugin(Widget* pluginWidget)
@@ -1531,7 +1537,11 @@ void WebFrameLoaderClient::registerForIconNotification(bool /*listen*/)
     
 RemoteAXObjectRef WebFrameLoaderClient::accessibilityRemoteObject() 
 {
-    return m_frame->page()->accessibilityRemoteObject();
+    WebPage* webPage = m_frame->page();
+    if (!webPage)
+        return 0;
+    
+    return webPage->accessibilityRemoteObject();
 }
     
 NSCachedURLResponse* WebFrameLoaderClient::willCacheResponse(DocumentLoader*, unsigned long identifier, NSCachedURLResponse* response) const

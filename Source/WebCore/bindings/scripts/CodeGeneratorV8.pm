@@ -212,12 +212,14 @@ void V8${implClassName}::visitDOMWrapper(DOMDataStore* store, void* object, v8::
 {
     ${implClassName}* impl = static_cast<${implClassName}*>(object);
 END
-    if (GetGenerateIsReachable($dataNode) eq  "ImplElementRoot" ||
+    if (GetGenerateIsReachable($dataNode) eq  "ImplDocument" ||
+        GetGenerateIsReachable($dataNode) eq  "ImplElementRoot" ||
         GetGenerateIsReachable($dataNode) eq  "ImplOwnerRoot" ||
         GetGenerateIsReachable($dataNode) eq  "ImplOwnerNodeRoot" ||
         GetGenerateIsReachable($dataNode) eq  "ImplBaseRoot") {
 
         my $methodName;
+        $methodName = "document" if (GetGenerateIsReachable($dataNode) eq "ImplDocument");
         $methodName = "element" if (GetGenerateIsReachable($dataNode) eq "ImplElementRoot");
         $methodName = "owner" if (GetGenerateIsReachable($dataNode) eq "ImplOwnerRoot");
         $methodName = "ownerNode" if (GetGenerateIsReachable($dataNode) eq "ImplOwnerNodeRoot");
@@ -382,9 +384,13 @@ END
     }
     inline static v8::Handle<v8::Object> wrap(${nativeType}*, v8::Handle<v8::Object> creationContext = v8::Handle<v8::Object>(), v8::Isolate* = 0);
     static void derefObject(void*);
-    static void visitDOMWrapper(DOMDataStore*, void*, v8::Persistent<v8::Object>);
     static WrapperTypeInfo info;
 END
+
+    if (NeedsToVisitDOMWrapper($dataNode)) {
+        push(@headerContent, "    static void visitDOMWrapper(DOMDataStore*, void*, v8::Persistent<v8::Object>);\n");
+    }
+
     if ($dataNode->extendedAttributes->{"ActiveDOMObject"}) {
         push(@headerContent, "    static ActiveDOMObject* toActiveDOMObject(v8::Handle<v8::Object>);\n");
     }

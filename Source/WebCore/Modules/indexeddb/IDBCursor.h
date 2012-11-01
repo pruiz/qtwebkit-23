@@ -30,6 +30,7 @@
 
 #include "IDBKey.h"
 #include "IDBTransaction.h"
+#include "ScriptValue.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -75,7 +76,7 @@ public:
     IDBAny* source() const;
 
     PassRefPtr<IDBRequest> update(ScriptExecutionContext*, ScriptValue&, ExceptionCode&);
-    void advance(unsigned long, ExceptionCode&);
+    void advance(long, ExceptionCode&);
     void continueFunction(PassRefPtr<IDBKey>, ExceptionCode&);
     PassRefPtr<IDBRequest> deleteFunction(ScriptExecutionContext*, ExceptionCode&);
 

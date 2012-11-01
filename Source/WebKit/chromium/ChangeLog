@@ -1,3 +1,75 @@
+2012-10-17  Keishi Hattori  <keishi@webkit.org>
+
+        Localized date should be based on LDML
+        https://bugs.webkit.org/show_bug.cgi?id=99570
+
+        Reviewed by Kent Tamura.
+
+        * tests/LocaleMacTest.cpp:
+        (TEST_F): Updated expectations.
+        * tests/LocaleWinTest.cpp:
+        (TEST_F): Updated expectations.
+
+2012-10-16  MORITA Hajime  <morrita@google.com>
+
+        [Shadow DOM][V8] WebCore::V8DOMWindow::installPerContextProperties() is slow when shadowDOMEnabled flag is on.
+        https://bugs.webkit.org/show_bug.cgi?id=99428
+
+        Reviewed by Adam Barth.
+
+        * src/ContextFeaturesClientImpl.cpp:
+        (WebKit::ContextFeaturesClientImpl::askIfIsEnabled):
+
+2012-10-16  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: Stub out chromium success handlers for integers and undefined values
+        https://bugs.webkit.org/show_bug.cgi?id=99527
+
+        Reviewed by Adam Barth.
+
+        Add onSuccess stubs so that chromium IPC glue can land.
+
+        * public/WebIDBCallbacks.h:
+        (WebKit::WebIDBCallbacks::onSuccess):
+
+2012-10-16  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-10-16  Jian Li  <jianli@chromium.org>
+
+        Rename feature define ENABLE_WIDGET_REGION to ENABLE_DRAGGBALE_REGION
+        https://bugs.webkit.org/show_bug.cgi?id=98975
+
+        Reviewed by Adam Barth.
+
+        Renaming is needed to better match with the draggable region code.
+
+        * features.gypi:
+        * src/ChromeClientImpl.cpp:
+        (WebKit):
+        * src/ChromeClientImpl.h:
+        (ChromeClientImpl):
+        * src/WebDocument.cpp:
+        (WebKit::WebDocument::draggableRegions):
+
+2012-10-16  Min Qin  <qinmin@chromium.org>
+
+        Fix a bug that we are using scaled damage rect for plugins inside an iframe
+        https://bugs.webkit.org/show_bug.cgi?id=99488
+
+        Reviewed by Adam Barth.
+
+        There is a bug with a previous webkit patch: https://bugs.webkit.org/show_bug.cgi?id=98468
+        In that patch, we incorrectly applied the main frame's scale factor to inner iframes.
+        However, the damageRect is not scaled inside an iFrame. So doing the intersect will retrieve wrong result here.
+        In WebPluginContainerImpl::calculateGeometry, the windowRect also does not apply main frame's scale factor.
+
+        * src/WebPluginContainerImpl.cpp:
+        (WebKit::WebPluginContainerImpl::paint):
+
 2012-10-16  Xianzhu Wang  <wangxianzhu@chromium.org>
 
         [Chromium] Android: Need a way to get appropriate font for some specific characters.

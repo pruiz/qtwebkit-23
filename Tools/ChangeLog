@@ -1,3 +1,167 @@
+2012-10-17  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [WK2][WTR] InjectedBundlePage::decidePolicyForNavigationAction() should print only filename part of local URLs
+        https://bugs.webkit.org/show_bug.cgi?id=99581
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Now InjectedBundlePage::decidePolicyForNavigationAction() prints only filename part of local URLs (URLs where scheme
+        equals to 'file').
+
+        * WebKitTestRunner/InjectedBundle/InjectedBundlePage.cpp:
+        (WTR::InjectedBundlePage::decidePolicyForNavigationAction):
+
+2012-10-17  Harald Alvestrand  <hta@google.com>
+
+        Implement the Selector argument to RTCPeerConnection.getStats
+        https://bugs.webkit.org/show_bug.cgi?id=99460
+
+        Reviewed by Adam Barth.
+
+        The MockWebRTCPeerConnectionHandler will return one object only
+        when it gets a selector, and an even number when there is no selector.
+        This allows to verify that the argument is passed, but not its value.
+
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.cpp:
+        (MockWebRTCPeerConnectionHandler::getStats):
+
+2012-10-17  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        WebKitTestRunner needs layoutTestController.queueReload
+        https://bugs.webkit.org/show_bug.cgi?id=42672
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added implementation of testRunner.queueReload().
+
+        * WebKitTestRunner/InjectedBundle/Bindings/TestRunner.idl:
+        * WebKitTestRunner/InjectedBundle/InjectedBundle.cpp:
+        (WTR::InjectedBundle::queueReload):
+        (WTR):
+        * WebKitTestRunner/InjectedBundle/InjectedBundle.h:
+        (InjectedBundle):
+        * WebKitTestRunner/InjectedBundle/TestRunner.cpp:
+        (WTR::TestRunner::queueReload):
+        (WTR):
+        * WebKitTestRunner/InjectedBundle/TestRunner.h:
+        (TestRunner):
+        * WebKitTestRunner/TestInvocation.cpp:
+        (WTR::TestInvocation::didReceiveMessageFromInjectedBundle):
+        * WebKitTestRunner/WorkQueueManager.cpp:
+        (WTR::WorkQueueManager::queueReload):
+        (WTR):
+        * WebKitTestRunner/WorkQueueManager.h:
+        (WorkQueueManager):
+
+2012-10-17  Mark Rowe  <mrowe@apple.com>
+
+        Fix the build with a newer version of clang.
+
+        Reviewed by Dan Bernstein.
+
+        Update to accommodate the renamed methods in WebCoreStatistics.
+
+        * DumpRenderTree/mac/PixelDumpSupportMac.mm:
+        (createPagedBitmapContext):
+
+2012-10-17  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        WebKitTestRunner needs testRunner.queueLoad
+        https://bugs.webkit.org/show_bug.cgi?id=42674
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added testRunner.queueLoad() and testRunner.queueBackNavigation() implementation to WTR including
+        Work Queue implementation. Work Queue is managed by WorkQueueManager which belongs to UI process
+        (as the needed functionality, like loading initiation, has to be invoked from UI process) and
+        exchanges messages with Injected bundle.
+
+        * WebKitTestRunner/CMakeLists.txt:
+        * WebKitTestRunner/GNUmakefile.am:
+        * WebKitTestRunner/InjectedBundle/Bindings/TestRunner.idl:
+        * WebKitTestRunner/InjectedBundle/InjectedBundle.cpp:
+        (WTR::InjectedBundle::InjectedBundle):
+        (WTR::InjectedBundle::didReceiveMessage):
+        (WTR::InjectedBundle::done):
+        (WTR::InjectedBundle::shouldProcessWorkQueue):
+        (WTR):
+        (WTR::InjectedBundle::processWorkQueue):
+        (WTR::InjectedBundle::queueBackNavigation):
+        (WTR::InjectedBundle::queueLoad):
+        * WebKitTestRunner/InjectedBundle/InjectedBundle.h:
+        (InjectedBundle):
+        * WebKitTestRunner/InjectedBundle/InjectedBundlePage.cpp:
+        (WTR::InjectedBundlePage::didFailProvisionalLoadWithErrorForFrame):
+        (WTR::InjectedBundlePage::didFinishLoadForFrame):
+        (WTR::InjectedBundlePage::didFailLoadWithErrorForFrame):
+        (WTR::InjectedBundlePage::locationChangeForFrame):
+        (WTR):
+        * WebKitTestRunner/InjectedBundle/InjectedBundlePage.h:
+        (InjectedBundlePage):
+        * WebKitTestRunner/InjectedBundle/TestRunner.cpp:
+        (WTR::TestRunner::queueBackNavigation):
+        (WTR):
+        (WTR::TestRunner::queueLoad):
+        * WebKitTestRunner/InjectedBundle/TestRunner.h:
+        (TestRunner):
+        * WebKitTestRunner/Target.pri:
+        * WebKitTestRunner/TestController.cpp:
+        (WTR::TestController::resetStateToConsistentValues):
+        * WebKitTestRunner/TestController.h:
+        (WTR::TestController::workQueueManager):
+        (TestController):
+        * WebKitTestRunner/TestInvocation.cpp:
+        (WTR::TestInvocation::didReceiveMessageFromInjectedBundle):
+        (WTR::TestInvocation::didReceiveSynchronousMessageFromInjectedBundle):
+        * WebKitTestRunner/WebKitTestRunner.xcodeproj/project.pbxproj:
+        * WebKitTestRunner/WorkQueueManager.cpp: Added.
+        (WTR):
+        (WTR::mainPage):
+        (WTR::goToItemAtIndex):
+        (WTR::WorkQueueManager::WorkQueueManager):
+        (WTR::WorkQueueManager::clearWorkQueue):
+        (WTR::WorkQueueManager::processWorkQueue):
+        (WTR::WorkQueueManager::queueLoad):
+        (WTR::WorkQueueManager::queueBackNavigation):
+        (WTR::WorkQueueManager::enqueue):
+        * WebKitTestRunner/WorkQueueManager.h: Added.
+        (WTR):
+        (WorkQueueManager):
+        (WTR::WorkQueueManager::isWorkQueueEmpty):
+        (WorkQueueItem):
+        (WTR::WorkQueueManager::WorkQueueItem::~WorkQueueItem):
+        * WebKitTestRunner/win/WebKitTestRunner.vcproj:
+
+2012-10-16  Andy Estes  <aestes@apple.com>
+
+        [WebKit2] Create Objective-C API for adding and removing user scripts
+        https://bugs.webkit.org/show_bug.cgi?id=99528
+
+        Reviewed by Anders Carlsson.
+
+        Add three new API tests.
+
+        * TestWebKitAPI/Tests/WebKit2ObjC/UserContentTest.mm:
+        (expectScriptValueIsString):
+        (expectScriptValueIsBoolean):
+        (expectScriptValueIsUndefined):
+
+2012-10-16  Dirk Pranke  <dpranke@chromium.org>
+
+        [chromium] add Mountain Lion baselines
+        https://bugs.webkit.org/show_bug.cgi?id=99505
+
+        Reviewed by Ojan Vafai.
+
+        This change adds a temporary 10.8/MountainLion-specific
+        expectations file for Chromium so that the bot can be green
+        while we are updating all the baselines and triaging failures.
+
+        * Scripts/webkitpy/layout_tests/port/chromium_mac.py:
+        (ChromiumMacPort.expectations_files):
+        * Scripts/webkitpy/layout_tests/port/chromium_mac_unittest.py:
+        (ChromiumMacPortTest.test_ml_expectations):
+
 2012-10-16  Dima Gorbik  <dgorbik@apple.com>
 
         Remove Platform.h include from the header files.

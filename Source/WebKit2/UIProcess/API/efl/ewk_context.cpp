@@ -44,6 +44,11 @@
 #include <wtf/HashMap.h>
 #include <wtf/text/WTFString.h>
 
+#if ENABLE(SPELLCHECK)
+#include "ewk_settings.h"
+#include "ewk_text_checker_private.h"
+#endif
+
 using namespace WebCore;
 using namespace WebKit;
 
@@ -68,8 +73,8 @@ struct _Ewk_Context {
     unsigned __ref; /**< the reference count of the object */
     WKRetainPtr<WKContextRef> context;
 
-    Ewk_Cookie_Manager* cookieManager;
-    Ewk_Favicon_Database* faviconDatabase;
+    OwnPtr<Ewk_Cookie_Manager> cookieManager;
+    OwnPtr<Ewk_Favicon_Database> faviconDatabase;
 #if ENABLE(BATTERY_STATUS)
     RefPtr<BatteryProvider> batteryProvider;
 #endif
@@ -89,8 +94,6 @@ struct _Ewk_Context {
     _Ewk_Context(WKRetainPtr<WKContextRef> contextRef)
         : __ref(1)
         , context(contextRef)
-        , cookieManager(0)
-        , faviconDatabase(0)
         , requestManager(WKContextGetSoupRequestManager(contextRef.get()))
         , historyClient()
     {
@@ -119,15 +122,13 @@ struct _Ewk_Context {
         ewk_context_request_manager_client_attach(this);
         ewk_context_download_client_attach(this);
         ewk_context_history_client_attach(this);
-    }
-
-    ~_Ewk_Context()
-    {
-        if (cookieManager)
-            ewk_cookie_manager_free(cookieManager);
-
-        if (faviconDatabase)
-            ewk_favicon_database_free(faviconDatabase);
+#if ENABLE(SPELLCHECK)
+        ewk_text_checker_client_attach();
+        if (ewk_settings_continuous_spell_checking_enabled_get()) {
+            // Load the default language.
+            ewk_settings_spell_checking_languages_set(0);
+        }
+#endif
     }
 };
 
@@ -155,9 +156,9 @@ Ewk_Cookie_Manager* ewk_context_cookie_manager_get(const Ewk_Context* ewkContext
     EINA_SAFETY_ON_NULL_RETURN_VAL(ewkContext, 0);
 
     if (!ewkContext->cookieManager)
-        const_cast<Ewk_Context*>(ewkContext)->cookieManager = ewk_cookie_manager_new(WKContextGetCookieManager(ewkContext->context.get()));
+        const_cast<Ewk_Context*>(ewkContext)->cookieManager = Ewk_Cookie_Manager::create(WKContextGetCookieManager(ewkContext->context.get()));
 
-    return ewkContext->cookieManager;
+    return ewkContext->cookieManager.get();
 }
 
 Ewk_Favicon_Database* ewk_context_favicon_database_get(const Ewk_Context* ewkContext)
@@ -170,10 +171,10 @@ Ewk_Favicon_Database* ewk_context_favicon_database_get(const Ewk_Context* ewkCon
         String databasePath = webContext->iconDatabasePath() + "/" + WebCore::IconDatabase::defaultDatabaseFilename();
         webContext->setIconDatabasePath(databasePath);
 
-        const_cast<Ewk_Context*>(ewkContext)->faviconDatabase = ewk_favicon_database_new(WKContextGetIconDatabase(ewkContext->context.get()));
+        const_cast<Ewk_Context*>(ewkContext)->faviconDatabase = Ewk_Favicon_Database::create(WKContextGetIconDatabase(ewkContext->context.get()));
     }
 
-    return ewkContext->faviconDatabase;
+    return ewkContext->faviconDatabase.get();
 }
 
 WKContextRef ewk_context_WKContext_get(const Ewk_Context* ewkContext)

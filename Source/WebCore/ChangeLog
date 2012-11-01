@@ -1,3 +1,705 @@
+2012-10-17  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Avoid re-creating CSSGrammar.cpp with each (incremental) build
+
+        Reviewed by Tor Arne Vestbø.
+
+        The expected output is CSSGrammar.cpp and the input file used to be CSSGrammar.y,
+        so ${QMAKE_FILE_BASE}.cpp did the correct transformation. Recently the input has
+        changed to CSSGrammar.y.in, in which case the ${QMAKE_FILE_BASE} is CSSGrammar.y
+        unfortunately. The resulting target CSSGrammar.y.cpp will never be created and
+        therefore the target will always run.
+
+        * DerivedSources.pri:
+
+2012-10-17  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Unreviewed fix for ImageSourceCG.
+
+        * platform/graphics/cg/ImageSourceCG.cpp:
+        (WebCore::ImageSource::reportMemoryUsage):
+
+2012-10-17  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Unreviewed fix for compilation on CG bots.
+
+        * platform/graphics/cg/ImageSourceCG.cpp:
+
+2012-10-16  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: NMI instrument ImageDecoder. It owns a buffer that could be quite big.
+        https://bugs.webkit.org/show_bug.cgi?id=99540
+
+        Reviewed by Yury Semikhatsky.
+
+        * platform/graphics/ImageSource.cpp:
+        (WebCore::ImageSource::reportMemoryUsage):
+        (WebCore):
+        * platform/graphics/ImageSource.h:
+        (ImageSource):
+        * platform/image-decoders/ImageDecoder.cpp:
+        (WebCore::ImageFrame::reportMemoryUsage):
+        (WebCore):
+        (WebCore::ImageDecoder::reportMemoryUsage):
+        * platform/image-decoders/ImageDecoder.h:
+        (ImageFrame):
+        (ImageDecoder):
+        * platform/image-decoders/skia/ImageDecoderSkia.cpp:
+        (WebCore::ImageFrame::reportMemoryUsage):
+        (WebCore):
+
+2012-10-17  Zeno Albisser  <zeno@webkit.org>
+
+        [Qt] Fix build on Mac OSX 10.6 and earlier.
+        https://bugs.webkit.org/show_bug.cgi?id=99595
+
+        Reviewed by Simon Hausmann.
+
+        * Target.pri:
+
+2012-10-17  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: display "disconnected" message when remote debugging terminates
+        https://bugs.webkit.org/show_bug.cgi?id=99316
+
+        Reviewed by Yury Semikhatsky.
+
+        Otherwise, it is not clear that the front-end is no longer functional.
+
+        * inspector/front-end/InspectorFrontendHostStub.js:
+        (WebInspector.RemoteDebuggingTerminatedScreen):
+        * inspector/front-end/inspector.js:
+        (WebInspector.loaded.WebInspector.socket.onclose):
+        (WebInspector.loaded):
+
+2012-10-17  Yury Semikhatsky  <yurys@chromium.org>
+
+        Web Inspector: delete watch expression button overlaps with the expression value
+        https://bugs.webkit.org/show_bug.cgi?id=99569
+
+        Reviewed by Vsevolod Vlasov.
+
+        Delete watch expression button now doesn't overlap with the watch expression.
+
+        * inspector/front-end/inspector.css:
+        (.properties-tree.watch-expressions > li > .value):
+
+2012-10-17  Luke Macpherson   <macpherson@chromium.org>
+
+        Move handling of CSSPropertyPointerEvents from StyleResolver into StyleBuilder.
+        https://bugs.webkit.org/show_bug.cgi?id=99536
+
+        Reviewed by Alexis Menard.
+
+        One small step towards removing the giant switch statement in StyleResolver,
+        this patch moves pointer event property into StyleBuilder.
+
+        Covered by fast/events/pointer-events.html and fast/events/pointer-events-2.html.
+
+        * css/StyleBuilder.cpp:
+        (WebCore::StyleBuilder::StyleBuilder):
+        * css/StyleResolver.cpp:
+        (WebCore::StyleResolver::applyProperty):
+
+2012-10-17  Keishi Hattori  <keishi@webkit.org>
+
+        Localized date should be based on LDML
+        https://bugs.webkit.org/show_bug.cgi?id=99570
+
+        Reviewed by Kent Tamura.
+
+        Localized date should be based on LDML to match the format inside DateTimeEditElement.
+
+        No new tests. Covered by LocaleMacTest.formatDate and LocaleWinTest.formatDate.
+
+        * platform/text/LocaleICU.cpp: Removed formatDateTime.
+        * platform/text/LocaleICU.h:
+        (LocaleICU):
+        * platform/text/LocaleNone.cpp: Removed formatDateTime.
+        (LocaleNone):
+        * platform/text/LocaleWin.cpp: Removed formatDateTime and formatDate.
+        (WebCore):
+        * platform/text/LocaleWin.h:
+        (LocaleWin):
+        * platform/text/Localizer.cpp:
+        (WebCore::DateTimeStringBuilder::visitField): Added support for year/month/day.
+        (WebCore::Localizer::formatDateTime): Creates the formatted string based on the format from dateFormat().
+        * platform/text/Localizer.h:
+        * platform/text/mac/LocaleMac.h:
+        (LocaleMac):
+        * platform/text/mac/LocaleMac.mm: Removed formatDateTime.
+
+2012-10-17  Harald Alvestrand  <hta@google.com>
+
+        Implement the Selector argument to RTCPeerConnection.getStats
+        https://bugs.webkit.org/show_bug.cgi?id=99460
+
+        Reviewed by Adam Barth.
+
+        The change adds two new parameters to the RTCStatsRequest object:
+        stream and component. Together these are enough to identify a
+        MediaStreamTrack.
+
+        Test: fast/mediastream/RTCPeerConnection-statsSelector.html
+
+        * Modules/mediastream/MediaStreamTrack.cpp:
+        (WebCore::MediaStreamTrack::streamDescriptor):
+        (WebCore):
+        * Modules/mediastream/MediaStreamTrack.h:
+        * Modules/mediastream/RTCPeerConnection.cpp:
+        (WebCore::RTCPeerConnection::getStats):
+        * Modules/mediastream/RTCStatsRequestImpl.cpp:
+        (WebCore::RTCStatsRequestImpl::create):
+        (WebCore::RTCStatsRequestImpl::RTCStatsRequestImpl):
+        (WebCore::RTCStatsRequestImpl::hasSelector):
+        (WebCore):
+        (WebCore::RTCStatsRequestImpl::stream):
+        (WebCore::RTCStatsRequestImpl::component):
+        * Modules/mediastream/RTCStatsRequestImpl.h:
+        (RTCStatsRequestImpl):
+        * platform/chromium/support/WebRTCStatsRequest.cpp:
+        (WebKit):
+        (WebKit::WebRTCStatsRequest::hasSelector):
+        (WebKit::WebRTCStatsRequest::stream):
+        (WebKit::WebRTCStatsRequest::component):
+        * platform/mediastream/RTCStatsRequest.h:
+        (WebCore):
+        (RTCStatsRequest):
+
+2012-10-17  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Enable use of more AllInOne files
+        https://bugs.webkit.org/show_bug.cgi?id=99579
+
+        Reviewed by Tor Arne Vestbø.
+
+        The AllInOne files reduce pressure during final link time because the object files contain less duplicated
+        symbols.
+
+        * Target.pri: Add HTMLElementsAllInOne, EditingAllInOne and RenderingAllInOne to the build
+        * editing/EditingAllInOne.cpp: Place a #if USE(CF) around the inclusion of SmartReplaceCF.cpp
+        * html/HTMLElementsAllInOne.cpp: Move HTMLPlugInElement.cpp to the top to fix builds on X11 based platforms
+        where the X headers get confused by the "Region" type that's also declared in WebCore.
+        * rendering/RenderingAllInOne.cpp: Fix build on case-sensitive file systems (Plugin -> PlugIn) and added a
+        #if PLATFORM(WIN) around the inclusion of RenderThemeWin.cpp.
+
+2012-10-17  Kent Tamura  <tkent@chromium.org>
+
+        REGRESSION(r131421): Text baseline becomes incorrect after re-layout of input[type=time]
+        https://bugs.webkit.org/show_bug.cgi?id=99572
+
+        Reviewed by Kentaro Hara.
+
+        We use flexible box since r131421, and it seems text baseline becomes
+        incorrect if there are text nodes in a flex container.
+
+        Test: fast/forms/time-multiple-fields/time-multiple-fields-static-relayout.html
+
+        * css/html.css:
+        (input::-webkit-datetime-edit-text): Added.
+        * html/shadow/DateTimeEditElement.cpp:
+        (WebCore::DateTimeEditBuilder::visitLiteral):
+        Wrap text with an element with ::-webkit-datetime-edit-text.
+
+2012-10-17  Grzegorz Czajkowski  <g.czajkowski@samsung.com>, Michal Roj <m.roj@samsung.com>
+
+        [WK2][EFL] Implementation of spellchecking feature.
+        https://bugs.webkit.org/show_bug.cgi?id=91854
+
+        Reviewed by Gyuyoung Kim.
+
+        * PlatformEfl.cmake:
+        Add enchant-related compiler flags: header paths and the library flag.
+
+2012-10-17  Alexander Pavlov  <apavlov@chromium.org>
+
+        Web Inspector: Avoid style updates when retrieving the inline stylesheet text
+        https://bugs.webkit.org/show_bug.cgi?id=99576
+
+        Reviewed by Vsevolod Vlasov.
+
+        Avoid using innerText() to retrieve inline stylesheet text, which may result in style and layout updates.
+
+        * inspector/InspectorStyleSheet.cpp:
+        (WebCore::InspectorStyleSheet::inlineStyleSheetText):
+
+2012-10-17  Patrick Gansterer  <paroga@webkit.org>
+
+        Build fix for WinCE after r131365.
+
+        * platform/graphics/GlyphBuffer.h:
+        (WebCore::GlyphBufferAdvance::width):
+        * platform/graphics/wince/FontWinCE.cpp:
+        (WebCore::cursorToX):
+        * platform/graphics/wince/GraphicsContextWinCE.cpp:
+        (WebCore::GraphicsContext::drawText):
+
+2012-10-17  Mike West  <mkwst@chromium.org>
+
+        V8 should throw a more descriptive exception when blocking 'eval' via CSP.
+        https://bugs.webkit.org/show_bug.cgi?id=94332
+
+        Reviewed by Adam Barth.
+
+        Following up on https://bugs.webkit.org/show_bug.cgi?id=94331, this
+        patch wires up the new error message mechanism to V8, and updates the
+        Chromium test expectations accordingly.
+
+        * bindings/v8/ScriptController.cpp:
+        (WebCore::ScriptController::disableEval):
+            Pass 'errorMessage' through to V8.
+        * bindings/v8/V8DOMWindowShell.cpp:
+        (WebCore::V8DOMWindowShell::initializeIfNeeded):
+            Grab the error message from ContentSecurityPolicy, and pass it
+            through to V8.
+        * bindings/v8/WorkerContextExecutionProxy.cpp:
+        (WebCore::WorkerContextExecutionProxy::WorkerContextExecutionProxy):
+        (WebCore::WorkerContextExecutionProxy::evaluate):
+        (WebCore::WorkerContextExecutionProxy::setEvalAllowed):
+        * bindings/v8/WorkerContextExecutionProxy.h:
+        (WorkerContextExecutionProxy):
+            Convert 'm_disableEvalPending' to a string to store the current
+            error message, and use it to set the eval state.
+        * bindings/v8/WorkerScriptController.cpp:
+        (WebCore::WorkerScriptController::disableEval):
+            Pass 'errorMessage' through to V8.
+
+2012-10-17  MORITA Hajime  <morrita@google.com>
+
+        Assertion failed on HTMLFormControlElement.cpp: updateFromElementCallback()
+        https://bugs.webkit.org/show_bug.cgi?id=99566
+
+        Reviewed by Kent Tamura.
+
+        It had a too optimistic assertion. This change removes it.
+
+        Test: fast/forms/textarea/textarea-autofocus-removal-while-focusing.html
+
+        * html/HTMLFormControlElement.cpp:
+        (WebCore::updateFromElementCallback):
+
+2012-10-17  Vsevolod Vlasov  <vsevik@chromium.org>
+
+        Web Inspector: When dirty uiSourceCode is saved to disk from scripts navigator context menu working copy is not committed.
+        https://bugs.webkit.org/show_bug.cgi?id=99555
+
+        Reviewed by Yury Semikhatsky.
+
+        Save As context menu handler now commits working copy for dirty UISourceCodes.
+
+        * inspector/front-end/HandlerRegistry.js:
+
+2012-10-17  Vsevolod Vlasov  <vsevik@chromium.org>
+
+        Web Inspector: Stylesheets saved with FileManager are not saved to disk when edited from Elements panel.
+        https://bugs.webkit.org/show_bug.cgi?id=99554
+
+        Reviewed by Yury Semikhatsky.
+
+        Moved saving to disk from SourceFrame to UISourceCode.
+
+        * inspector/front-end/SourceFrame.js:
+        (WebInspector.SourceFrame.prototype._commitEditing):
+        * inspector/front-end/UISourceCode.js:
+        (WebInspector.UISourceCode.prototype._commitContent):
+
+2012-10-17  Vsevolod Vlasov  <vsevik@chromium.org>
+
+        Web Inspector: [Regression] SASS sources are not saved to disk.
+        https://bugs.webkit.org/show_bug.cgi?id=99551
+
+        Reviewed by Yury Semikhatsky.
+
+        Added resource null checks.
+
+        * inspector/front-end/StylesSourceMapping.js:
+        (WebInspector.StylesSourceMapping.prototype._uiSourceCodeAddedToWorkspace):
+
+2012-10-17  Elliott Sprehn  <esprehn@chromium.org>
+
+        Clean up ContentData operator overloads
+        https://bugs.webkit.org/show_bug.cgi?id=99556
+
+        Reviewed by Eric Seidel.
+
+        Use virtual dispatch for checking ContentData equality instead
+        of a switch over the type. This the first step in getting rid
+        of the StyleContentType enum and all the switch statements over
+        the type().
+
+        No tests needed, this is just a refactor.        
+
+        * rendering/style/ContentData.cpp:
+        * rendering/style/ContentData.h:
+        (ContentData):
+        (WebCore::operator==):
+        (WebCore):
+        (WebCore::operator!=):
+
+2012-10-17  Gabor Rapcsanyi  <rgabor@webkit.org>
+
+        NEON intrinsics Gauss filter does not work properly
+        https://bugs.webkit.org/show_bug.cgi?id=98875
+
+        Reviewed by Zoltan Herczeg.
+
+        Fixing the NEON intrinsics Gauss filter. The stride parameter
+        was missing from the intrinsics algorithm. Tested with pixel
+        checks, now it's working properly.
+
+        * platform/graphics/filters/arm/FEGaussianBlurNEON.h:
+        (WebCore::boxBlurNEON):
+
+2012-10-17  MORITA Hajime  <morrita@google.com>
+
+        Crash on Frame::inScope() part 2
+        https://bugs.webkit.org/show_bug.cgi?id=99543
+
+        Reviewed by Kent Tamura.
+
+        FrameTree::scopedChildCount() can be called even when the one of child frames
+        is in orphan state. This change added a guard for that case.
+
+        No new tests. A hard-to-test timing issue.
+
+        * page/Frame.cpp:
+        (WebCore::Frame::inScope):
+
+2012-10-17  Shinya Kawanaka  <shinyak@chromium.org>
+
+        Remove shadowAncestorNode() from VisibleSelection
+        https://bugs.webkit.org/show_bug.cgi?id=99544
+
+        Reviewed by Hajime Morita.
+
+        An effort to replace shadowAncestorNode() with shadowHost(), since shadowAncestorNode() is now deprecated.
+
+        No new tests, no change in behavior.
+
+        * editing/VisibleSelection.cpp:
+        (WebCore::VisibleSelection::adjustSelectionToAvoidCrossingEditingBoundaries): Since shadowHost() returns 0 if
+        an element is not in shadowRoot, it's ok to compare shadowAncestor to 0.
+
+2012-10-17  Douglas Stockwell  <dstockwell@chromium.org>
+
+        Content of replaced elements should be trimmed to the content edge curve.
+        https://bugs.webkit.org/show_bug.cgi?id=63899
+
+        Reviewed by Simon Fraser.
+
+        When a border-radius is specified the content of replaced elements needs to be clipped to avoid
+        being painted over the padding or border in the corners. Previously the clip that was applied
+        was set to the border-edge curve, this patch contracts the clip by the size of the border and
+        padding (the content-edge curve) to match the css3 spec.
+        Spec: http://www.w3.org/TR/css3-background/#corner-clipping
+
+        Test: fast/replaced/border-radius-clip-content-edge.html
+
+        * rendering/RenderBoxModelObject.h:
+        (RenderBoxModelObject):
+        * rendering/RenderReplaced.cpp:
+        (WebCore::RenderReplaced::paint):
+        * rendering/RenderWidget.cpp:
+        (WebCore::RenderWidget::paint):
+
+2012-10-17  Kunihiko Sakamoto  <ksakamoto@chromium.org>
+
+        The HTML5 formtarget/formaction/formenctyp/formmethod/formnovalidate attributes don't work in button tags with nested elements
+        https://bugs.webkit.org/show_bug.cgi?id=90539
+
+        Reviewed by Kent Tamura.
+
+        Fix a bug where form(action|enctype|method|target) attributes of <button> are not
+        honored if the target of the click event is an element nested within the button.
+
+        Test: fast/forms/formaction-attribute.html
+
+        * loader/FormSubmission.cpp:
+        (WebCore::FormSubmission::create): Looks for the attributes for form submission
+        from the nearest FormControlElement ancestor of the event target.
+
+2012-10-16  MORITA Hajime  <morrita@google.com>
+
+        [Shadow DOM][V8] WebCore::V8DOMWindow::installPerContextProperties() is slow when shadowDOMEnabled flag is on.
+        https://bugs.webkit.org/show_bug.cgi?id=99428
+
+        Reviewed by Adam Barth.
+
+        A benchmark unveiled that installPerContextProperties() could have made DOMWindow setup slower when
+        - Some properties are added per-context basis by turnin the flag on and
+        - There are bunch of DOMWindow object in the page (that is, there are many iframes.)
+
+        This change eliminates Shadow DOM related per-context properties from DOMWindow for getting rid of that slowness.
+
+        * dom/ContextFeatures.cpp:
+        * dom/ContextFeatures.h: Removed shadowDOMEnabled() method and related enum entry.
+        * dom/Position.cpp:
+        (WebCore::Position::Position):
+        (WebCore::Position::findParent):
+        * dom/TreeScope.cpp:
+        (WebCore::TreeScope::getSelection):
+        * dom/make_names.pl: Re-introduced "runtimeConditional" directive.
+        (defaultTagPropertyHash):
+        (printConstructorInterior):
+        (printFactoryCppFile):
+        (printWrapperFunctions):
+        (printWrapperFactoryCppFile):
+        * html/HTMLTagNames.in:
+        * html/shadow/HTMLContentElement.cpp:
+        (WebCore::contentTagName):
+        * page/DOMWindow.idl:
+
+2012-10-16  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Make RenderObject destruction during detach a top-down operation
+        https://bugs.webkit.org/show_bug.cgi?id=98336
+
+        Reviewed by Eric Seidel.
+
+        detach() is a DOM-driven operation that destroys the renderers bottom-up.
+        While this is correct, it causes extra-work to be done (tree cleaning, ...)
+        as it doesn't know about the render tree's structure.
+
+        The render tree on the other side already supports top-down operations
+        but it was overriden by the DOM side of detach.
+
+        This change only makes ContainerNode::detach do a top-down render tree
+        destruction. This is a required step towards doing smarter destruction.
+
+        Refactoring covered by existing tests.
+
+        * dom/ContainerNode.cpp:
+        (WebCore::ContainerNode::detach):
+        Changed the method to do a top-down destruction.
+
+        * dom/Node.cpp:
+        (WebCore::Node::detach):
+        Added this ASSERT that ensures that we have properly cleaned up the
+        whole DOM subtree. The only exception is child content belonging to a
+        flow-thread as the code will shuffle the renderers under the flow-thread.
+
+        * rendering/RenderObject.cpp:
+        (WebCore::RenderObject::willBeDestroyed):
+        As we don't update the node's renderer on the DOM side, do it here.
+        The upside is that it ensures that we don't left any stray renderer
+        in the tree.
+
+        * rendering/RenderObjectChildList.cpp:
+        (WebCore::RenderObjectChildList::destroyLeftoverChildren):
+        Removed the calls to setRenderer as they are redundant with what we do
+        in willBeDestroyed.
+
+        * rendering/RenderTextFragment.cpp:
+        (WebCore::RenderTextFragment::setText):
+        Removed some now unneeded code, replaced by an ASSERT. This is because
+        destroying m_firstLetter would automatically reset the node's renderer
+        in destroyLeftoverChildren.
+
+2012-10-16  Joseph Pecoraro  <pecoraro@apple.com>
+
+        HTMLSelectElement::optionSelectedByUser confuses listIndex and optionIndex
+        https://bugs.webkit.org/show_bug.cgi?id=99523
+
+        Reviewed by Simon Fraser.
+
+        There was a call site where the optionIndex was being passed to a
+        function that expected the listIndex. Convert appropriately.
+
+        Extends Test: platform/mac/fast/objc/dom-html-select-activate.html
+
+        * html/HTMLSelectElement.cpp:
+        (WebCore::HTMLSelectElement::optionSelectedByUser):
+
+2012-10-16  Jian Li  <jianli@chromium.org>
+
+        Rename feature define ENABLE_WIDGET_REGION to ENABLE_DRAGGBALE_REGION
+        https://bugs.webkit.org/show_bug.cgi?id=98975
+
+        Reviewed by Adam Barth.
+
+        Renaming is needed to better match with the draggable region code.
+
+        No new tests due to no functional change.
+
+        * Configurations/FeatureDefines.xcconfig:
+        * DerivedSources.make:
+        * WebCore.exp.in:
+        * css/CSSComputedStyleDeclaration.cpp:
+        (WebCore):
+        (WebCore::CSSComputedStyleDeclaration::getPropertyCSSValue):
+        * css/CSSParser.cpp:
+        (WebCore::CSSParser::parseValue):
+        * css/CSSProperty.cpp:
+        (WebCore::CSSProperty::isInheritedProperty):
+        * css/CSSPropertyNames.in:
+        * css/CSSValueKeywords.in:
+        * css/StyleResolver.cpp:
+        (WebCore::StyleResolver::applyProperty):
+        * dom/Document.cpp:
+        (WebCore::Document::Document):
+        (WebCore):
+        (WebCore::Document::reportMemoryUsage):
+        * dom/Document.h:
+        (WebCore):
+        (Document):
+        * page/Chrome.cpp:
+        (WebCore):
+        * page/ChromeClient.h:
+        (ChromeClient):
+        * page/FrameView.cpp:
+        (WebCore::FrameView::layout):
+        (WebCore):
+        (WebCore::FrameView::paintContents):
+        * page/FrameView.h:
+        (FrameView):
+        * rendering/RenderInline.cpp:
+        (WebCore):
+        (WebCore::RenderInline::addAnnotatedRegions):
+        * rendering/RenderInline.h:
+        (RenderInline):
+        * rendering/RenderLayer.cpp:
+        (WebCore::RenderLayer::scrollTo):
+        (WebCore::RenderLayer::setHasHorizontalScrollbar):
+        (WebCore::RenderLayer::setHasVerticalScrollbar):
+        (WebCore::RenderLayer::updateScrollbarsAfterLayout):
+        * rendering/RenderListBox.cpp:
+        (WebCore::RenderListBox::setHasVerticalScrollbar):
+        * rendering/RenderObject.cpp:
+        (WebCore::RenderObject::styleWillChange):
+        (WebCore):
+        (WebCore::RenderObject::addAnnotatedRegions):
+        * rendering/RenderObject.h:
+        (WebCore::AnnotatedRegionValue::operator==):
+        (AnnotatedRegionValue):
+        (RenderObject):
+        * rendering/style/RenderStyle.h:
+        * rendering/style/RenderStyleConstants.h:
+        * rendering/style/StyleRareNonInheritedData.cpp:
+        (WebCore::StyleRareNonInheritedData::StyleRareNonInheritedData):
+        (WebCore::StyleRareNonInheritedData::operator==):
+        * rendering/style/StyleRareNonInheritedData.h:
+        (StyleRareNonInheritedData):
+
+2012-10-16  James Simonsen  <simonjam@chromium.org>
+
+        [Page Visibility API] View-less documents should report as hidden
+        https://bugs.webkit.org/show_bug.cgi?id=99410
+
+        Reviewed by Tony Gentilcore.
+
+        Test: fast/events/page-visibility-null-view.html
+
+        * dom/Document.cpp:
+        (WebCore::Document::visibilityState):
+
+2012-10-16  Michael Saboff  <msaboff@apple.com>
+
+        Change WTF_USE_8BIT_TEXTRUN to ENABLE_8BIT_TEXTRUN
+        https://bugs.webkit.org/show_bug.cgi?id=99484
+
+        Reviewed by Eric Seidel.
+
+        Changed macro name to align with it's purpose, therefore changed USE(8BIT_TEXTRUN) to ENABLE(8BIT_TEXTRUN).
+
+        No new tests.  Changed macro name, no functional change.
+
+        * platform/graphics/TextRun.h:
+        (WebCore::TextRun::TextRun):
+        (WebCore::TextRun::subRun):
+        * rendering/RenderBlock.cpp:
+        (WebCore::RenderBlock::constructTextRun):
+        * rendering/RenderBlock.h:
+        (RenderBlock):
+
+2012-10-16  Noam Rosenthal  <noam.rosenthal@nokia.com>
+
+        [Qt] REGRESSION(r131485): It broke the build
+        https://bugs.webkit.org/show_bug.cgi?id=99499
+
+        Unreviewed build (warning) fix.
+
+        * platform/graphics/texmap/TextureMapperShaderManager.cpp:
+        (WebCore::TextureMapperShaderProgram::getLocation):
+
+2012-10-16  David Grogan  <dgrogan@chromium.org>
+
+        Inspector: Don't fire assert when inspecting an empty db
+        https://bugs.webkit.org/show_bug.cgi?id=99370
+
+        Reviewed by Vsevolod Vlasov.
+
+        * inspector/InspectorIndexedDBAgent.cpp:
+        (WebCore):
+
+2012-10-16  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, try to fix the Apple Win build by forcing a rebuild of RenderingAllInOne.cpp.
+
+        * rendering/RenderingAllInOne.cpp:
+
+2012-10-16  Andrew Scherkus  <scherkus@chromium.org>
+
+        Fix crash in WebCore::MediaControlPanelElement::makeTransparent()
+        https://bugs.webkit.org/show_bug.cgi?id=97951
+
+        Reviewed by Simon Fraser.
+
+        No new tests as it's a speculative fix based on crash dump analysis.
+     
+        Despite MediaControlPanelElement checking for document()->page() nullity in other places, it forgot one check in makeTransparent().
+
+        * html/shadow/MediaControlElements.cpp:
+        (WebCore::MediaControlPanelElement::makeTransparent):
+
+2012-10-16  Emil A Eklund  <eae@chromium.org>
+
+        Remove special-case flooring of baselinePosition for replaced elements in InlineFlowBox::placeBoxesInBlockDirection
+        https://bugs.webkit.org/show_bug.cgi?id=99376
+
+        Reviewed by Levi Weintraub.
+
+        In r122769 (bug 91410) we added a special-case handling for
+        replaced elements in InlineFlowBox::placeBoxesInBlockDirection
+        to work around positioning issues in a couple of svg tests.
+        This was needed to compensate for a workaround in the table
+        painting code that was fixed in r131358 (bug 99364). As such the
+        special-case handling for replaced elements is no longer needed
+        in InlineFlowBox::placeBoxesInBlockDirection.
+
+        Furthermore this caused problems with caret repainting leaving
+        residual pixels which motivated this change.
+
+        No new tests, have not been able to write a repaint test to
+        demonstrate the caret repaint issue.
+
+        * rendering/InlineFlowBox.cpp:
+        (WebCore::InlineFlowBox::placeBoxesInBlockDirection):
+
+2012-10-16  Simon Fraser  <simon.fraser@apple.com>
+
+        Some #include hygiene
+        https://bugs.webkit.org/show_bug.cgi?id=99500
+
+        Reviewed by Tony Chang.
+
+        Clean up some #includes, mostly related to GraphicsLayer.h. In many
+        cases this can be replaced by PlatformLayer.h.
+        
+        Remove an #include of PluginViewBase.h from Page.h, which was a source
+        of #include fan-out.
+
+        * html/canvas/CanvasRenderingContext2D.h:
+        * page/Page.h:
+        * page/scrolling/ScrollingCoordinator.h:
+        * page/scrolling/ScrollingStateNode.h:
+        * page/scrolling/mac/ScrollingStateNodeMac.mm:
+        * platform/graphics/GraphicsContext3D.h:
+        * platform/graphics/MediaPlayer.h:
+        * platform/graphics/avfoundation/MediaPlayerPrivateAVFoundation.cpp:
+        * platform/graphics/gpu/DrawingBuffer.h:
+        * platform/graphics/mac/MediaPlayerPrivateQTKit.mm:
+        * plugins/PluginViewBase.h:
+
 2012-10-16  Adam Barth  <abarth@webkit.org>
 
         Document::adoptNode shouldn't special-case <iframe>

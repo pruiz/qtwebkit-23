@@ -1817,7 +1817,7 @@ void RenderObject::styleWillChange(StyleDifference diff, const RenderStyle* newS
             bool visibilityChanged = m_style->visibility() != newStyle->visibility() 
                 || m_style->zIndex() != newStyle->zIndex() 
                 || m_style->hasAutoZIndex() != newStyle->hasAutoZIndex();
-#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(WIDGET_REGION)
+#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(DRAGGABLE_REGION)
             if (visibilityChanged)
                 document()->setAnnotatedRegionsDirty(true);
 #endif
@@ -2336,6 +2336,11 @@ void RenderObject::willBeDestroyed()
 
     remove();
 
+    // Continuation and first-letter can generate several renderers associated with a single node.
+    // We only want to clear the node's renderer if we are the associated renderer.
+    if (node() && node()->renderer() == this)
+        node()->setRenderer(0);
+
 #ifndef NDEBUG
     if (!documentBeingDestroyed() && view() && view()->hasRenderNamedFlowThreads()) {
         // After remove, the object and the associated information should not be in any flow thread.
@@ -2735,7 +2740,7 @@ void RenderObject::getTextDecorationColors(int decorations, Color& underline, Co
     }
 }
 
-#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(WIDGET_REGION)
+#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(DRAGGABLE_REGION)
 void RenderObject::addAnnotatedRegions(Vector<AnnotatedRegionValue>& regions)
 {
     // Convert the style regions to absolute coordinates.
@@ -2774,7 +2779,7 @@ void RenderObject::addAnnotatedRegions(Vector<AnnotatedRegionValue>& regions)
 
         regions.append(region);
     }
-#else // ENABLE(WIDGET_REGION)
+#else // ENABLE(DRAGGABLE_REGION)
     if (style()->getDraggableRegionMode() == DraggableRegionNone)
         return;
     AnnotatedRegionValue region;

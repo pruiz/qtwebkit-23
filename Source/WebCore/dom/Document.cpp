@@ -461,7 +461,7 @@ Document::Document(Frame* frame, const KURL& url, bool isXHTML, bool isHTML)
     , m_hasXMLDeclaration(0)
     , m_savedRenderer(0)
     , m_designMode(inherit)
-#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(WIDGET_REGION)
+#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(DRAGGABLE_REGION)
     , m_hasAnnotatedRegions(false)
     , m_annotatedRegionsDirty(false)
 #endif
@@ -1624,10 +1624,10 @@ PageVisibilityState Document::visibilityState() const
 {
     // The visibility of the document is inherited from the visibility of the
     // page. If there is no page associated with the document, we will assume
-    // that the page is visible i.e. invisibility has to be explicitly
-    // specified by the embedder.
+    // that the page is hidden, as specified by the spec:
+    // http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/PageVisibility/Overview.html#dom-document-hidden
     if (!m_frame || !m_frame->page())
-        return PageVisibilityStateVisible;
+        return PageVisibilityStateHidden;
     return m_frame->page()->visibilityState();
 }
 
@@ -3350,7 +3350,7 @@ void Document::activeChainNodeDetached(Node* node)
         m_activeNode = m_activeNode->parentNode();
 }
 
-#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(WIDGET_REGION)
+#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(DRAGGABLE_REGION)
 const Vector<AnnotatedRegionValue>& Document::annotatedRegions() const
 {
     return m_annotatedRegions;
@@ -5924,7 +5924,7 @@ void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     info.addMember(m_contentLanguage);
     info.addMember(m_documentNamedItemCollections);
     info.addMember(m_windowNamedItemCollections);
-#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(WIDGET_REGION)
+#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(DRAGGABLE_REGION)
     info.addMember(m_annotatedRegions);
 #endif
     info.addMember(m_cssCanvasElements);

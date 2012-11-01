@@ -2867,6 +2867,7 @@ win32-*|wince* {
 mac {
     SOURCES += \
         platform/text/cf/StringCF.cpp \
+        platform/cf/SharedBufferCF.cpp \
         platform/text/cf/StringImplCF.cpp
 }
 
@@ -3220,7 +3221,6 @@ contains(DEFINES, ENABLE_VIDEO=1) {
             platform/mac/DisplaySleepDisabler.cpp \
             platform/graphics/cg/IntRectCG.cpp \
             platform/graphics/cg/FloatSizeCG.cpp \
-            platform/cf/SharedBufferCF.cpp \
             platform/cf/KURLCFNet.cpp
 
          OBJECTIVE_SOURCES += \
@@ -4097,7 +4097,10 @@ ALL_IN_ONE_SOURCES += \
     inspector/InspectorAllInOne.cpp \
     loader/appcache/ApplicationCacheAllInOne.cpp \
     platform/text/TextAllInOne.cpp \
-    rendering/style/StyleAllInOne.cpp
+    rendering/style/StyleAllInOne.cpp \
+    html/HTMLElementsAllInOne.cpp \
+    editing/EditingAllInOne.cpp \
+    rendering/RenderingAllInOne.cpp
 
 contains(DEFINES, ENABLE_XSLT=1):contains(DEFINES, WTF_USE_LIBXML2=1) {
     ALL_IN_ONE_SOURCES += \
@@ -4107,9 +4110,6 @@ contains(DEFINES, ENABLE_XSLT=1):contains(DEFINES, WTF_USE_LIBXML2=1) {
 # These do not compile at the moment:
 #    css/MediaAllInOne.cpp
 #    css/CSSAllInOne.cpp
-#    editing/EditingAllInOne.cpp
-#    html/HTMLElementsAllInOne.cpp
-#    rendering/RenderingAllInOne.cpp
 
 # Make sure the derived sources are built
 include(DerivedSources.pri)

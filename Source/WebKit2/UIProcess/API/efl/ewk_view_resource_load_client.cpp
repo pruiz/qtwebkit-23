@@ -41,6 +41,7 @@
 #include "ewk_url_response_private.h"
 #include "ewk_view_private.h"
 #include "ewk_view_resource_load_client_private.h"
+#include <wtf/OwnPtr.h>
 #include <wtf/text/CString.h>
 
 using namespace WebCore;
@@ -56,22 +57,21 @@ static void didInitiateLoadForResource(WKPageRef, WKFrameRef wkFrame, uint64_t r
     bool isMainResource = (WKFrameIsMainFrame(wkFrame) && pageIsProvisionallyLoading);
     WKRetainPtr<WKURLRef> wkUrl(AdoptWK, WKURLRequestCopyURL(wkRequest));
 
-    Ewk_Resource* resource = ewk_resource_new(toImpl(wkUrl.get())->string().utf8().data(), isMainResource);
-    RefPtr<Ewk_Url_Request> request = adoptRef(ewk_url_request_new(wkRequest));
-    ewk_view_resource_load_initiated(toEwkView(clientInfo), resourceIdentifier, resource, request.get());
-    ewk_resource_unref(resource);
+    RefPtr<Ewk_Resource> resource = Ewk_Resource::create(wkUrl.get(), isMainResource);
+    RefPtr<Ewk_Url_Request> request = Ewk_Url_Request::create(wkRequest);
+    ewk_view_resource_load_initiated(toEwkView(clientInfo), resourceIdentifier, resource.get(), request.get());
 }
 
 static void didSendRequestForResource(WKPageRef, WKFrameRef, uint64_t resourceIdentifier, WKURLRequestRef wkRequest, WKURLResponseRef wkRedirectResponse, const void* clientInfo)
 {
-    RefPtr<Ewk_Url_Request> request = adoptRef(ewk_url_request_new(wkRequest));
-    RefPtr<Ewk_Url_Response> redirectResponse = wkRedirectResponse ? adoptRef(ewk_url_response_new(toImpl(wkRedirectResponse)->resourceResponse())) : 0;
+    RefPtr<Ewk_Url_Request> request = Ewk_Url_Request::create(wkRequest);
+    RefPtr<Ewk_Url_Response> redirectResponse = Ewk_Url_Response::create(wkRedirectResponse);
     ewk_view_resource_request_sent(toEwkView(clientInfo), resourceIdentifier, request.get(), redirectResponse.get());
 }
 
 static void didReceiveResponseForResource(WKPageRef, WKFrameRef, uint64_t resourceIdentifier, WKURLResponseRef wkResponse, const void* clientInfo)
 {
-    RefPtr<Ewk_Url_Response> response = adoptRef(ewk_url_response_new(toImpl(wkResponse)->resourceResponse()));
+    RefPtr<Ewk_Url_Response> response = Ewk_Url_Response::create(wkResponse);
     ewk_view_resource_load_response(toEwkView(clientInfo), resourceIdentifier, response.get());
 }
 
@@ -82,10 +82,9 @@ static void didFinishLoadForResource(WKPageRef, WKFrameRef, uint64_t resourceIde
 
 static void didFailLoadForResource(WKPageRef, WKFrameRef, uint64_t resourceIdentifier, WKErrorRef wkError, const void* clientInfo)
 {
-    Ewk_Error* ewkError = ewk_error_new(wkError);
-    ewk_view_resource_load_failed(toEwkView(clientInfo), resourceIdentifier, ewkError);
+    OwnPtr<Ewk_Error> ewkError = Ewk_Error::create(wkError);
+    ewk_view_resource_load_failed(toEwkView(clientInfo), resourceIdentifier, ewkError.get());
     ewk_view_resource_load_finished(toEwkView(clientInfo), resourceIdentifier);
-    ewk_error_free(ewkError);
 }
 
 void ewk_view_resource_load_client_attach(WKPageRef pageRef, Evas_Object* ewkView)

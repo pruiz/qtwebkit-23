@@ -1,3 +1,549 @@
+2012-10-17  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        [GTK] Don't use the C API internally in WebKitWebInspector
+        https://bugs.webkit.org/show_bug.cgi?id=96786
+
+        Reviewed by Gustavo Noronha Silva.
+
+        Using the C++ classes directly instead of the C API wrappers we
+        avoid a lot of toImpl/toAPI casts, string conversions and
+        allocations. The code is also a lot simpler and easier to read.
+
+        * UIProcess/API/gtk/WebKitWebInspector.cpp:
+        (_WebKitWebInspectorPrivate):
+        (webkitWebInspectorFinalize):
+        (webkitWebInspectorCreate):
+        (webkit_web_inspector_get_web_view):
+        (webkit_web_inspector_is_attached):
+        (webkit_web_inspector_attach):
+        (webkit_web_inspector_detach):
+        (webkit_web_inspector_show):
+        (webkit_web_inspector_close):
+        (webkit_web_inspector_get_attached_height):
+        * UIProcess/API/gtk/WebKitWebInspectorPrivate.h:
+        * UIProcess/API/gtk/WebKitWebView.cpp:
+        (webkit_web_view_get_inspector):
+
+2012-10-17  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        [GTK] Don't use the C API internally in WebKitGeolocation classes
+        https://bugs.webkit.org/show_bug.cgi?id=96778
+
+        Reviewed by Gustavo Noronha Silva.
+
+        Using the C++ classes directly instead of the C API wrappers we
+        avoid a lot of toImpl/toAPI casts, string conversions and
+        allocations. The code is also a lot simpler and easier to read.
+
+        * UIProcess/API/gtk/WebKitGeolocationPermissionRequest.cpp:
+        (_WebKitGeolocationPermissionRequestPrivate):
+        (webkitGeolocationPermissionRequestAllow):
+        (webkitGeolocationPermissionRequestDeny):
+        (webkitGeolocationPermissionRequestFinalize):
+        (webkitGeolocationPermissionRequestCreate):
+        * UIProcess/API/gtk/WebKitGeolocationPermissionRequestPrivate.h:
+        * UIProcess/API/gtk/WebKitGeolocationProvider.cpp:
+        (WebKitGeolocationProvider::create):
+        (WebKitGeolocationProvider::WebKitGeolocationProvider):
+        (WebKitGeolocationProvider::notifyPositionChanged):
+        (WebKitGeolocationProvider::notifyErrorOccurred):
+        * UIProcess/API/gtk/WebKitGeolocationProvider.h:
+        (WebKitGeolocationProvider):
+        * UIProcess/API/gtk/WebKitUIClient.cpp:
+        (decidePolicyForGeolocationPermissionRequest):
+        * UIProcess/API/gtk/WebKitWebContext.cpp:
+        (createDefaultWebContext):
+
+2012-10-17  Grzegorz Czajkowski  <g.czajkowski@samsung.com>
+
+        [WK2][EFL] Add unit tests for Spelling
+        https://bugs.webkit.org/show_bug.cgi?id=95956
+
+        Reviewed by Gyuyoung Kim.
+
+        Add the unit tests which covers API from ewk_text_checker.h
+        and text checker settings from ewk_settings.h
+
+        * PlatformEfl.cmake:
+        * UIProcess/API/efl/tests/resources/spelling_test.html: Added.
+        * UIProcess/API/efl/tests/test_ewk2_text_checker.cpp: Added.
+        (resetCallbacksExecutionStats):
+        (onTimeout):
+        (onSettingChange):
+        (onSpellDocumentTag):
+        (onSpellDocumentTagClose):
+        (onSpellingCheck):
+        (onWordGuesses):
+        (onWordLearn):
+        (onWordIgnore):
+        (TEST_F):
+
+2012-10-17  Mario Sanchez Prada  <msanchez@igalia.com>
+
+        [WK2][GTK] Favicons are incorrectly released before receiving the actual data
+        https://bugs.webkit.org/show_bug.cgi?id=99492
+
+        Reviewed by Carlos Garcia Campos.
+
+        Don't release the icon for a page URL in the first stage of the
+        asynchronous call webkit_favicon_database_get_favicon() but do it
+        later instead, to avoid a race condition with the initial
+        synchronization process the first time we request an icon which is
+        actually in the icon database, but has not made available yet.
+
+        * UIProcess/API/gtk/WebKitFaviconDatabase.cpp:
+        (GetFaviconSurfaceAsyncData::~GetFaviconSurfaceAsyncData): Release
+        here the icon for the page URL if not a valid icon has been found.
+        (GetFaviconSurfaceAsyncData): Add a new boolean parameter to flag
+        when a given icon for a page URL should be released.
+        (getIconSurfaceSynchronously): Don't release the icon, just return 0.
+        (processPendingIconsForPageURL): If a valid icon is got at this
+        point, disable the flag shouldReleaseIconForPageURL not to release
+        the icon later on.
+        (webkit_favicon_database_get_favicon): Make sure we retain the
+        icon for a given page URL before trying to retrieve it from the
+        IconDatabase, and that we flag it to be released in case not a
+        valid icon has been found yet.
+
+2012-10-17  Grzegorz Czajkowski  <g.czajkowski@samsung.com>, Michal Roj <m.roj@samsung.com>
+
+        Implementation of spellchecking feature.
+        https://bugs.webkit.org/show_bug.cgi?id=91854
+
+        Reviewed by Gyuyoung Kim.
+
+        Add spelling implementation for WebKit2-EFL that is based on Enchant library.
+
+        Additionally the patch provides API to overwrite the default WebKit
+        spellchecker implementation as Enchant library doesn't ensure grammar checking.
+        Application is able to overwrite it by defining its own implementation and
+        setting appropriate callback functions.
+
+        * PlatformEfl.cmake:
+        Add enchant-related compiler flags: header paths and the library flag.
+
+        * UIProcess/API/efl/EWebKit2.h:
+        Add ewk_text_checker.h to the main WebKit2-EFL's header to be available for applications.
+
+        * UIProcess/API/efl/WebKitTextChecker.cpp: Added.
+        Implement the callbacks functions of WKTextChecker.
+
+        (WebKit):
+        (WebKit::isContinuousSpellCheckingEnabled):
+        (WebKit::setContinuousSpellCheckingEnabled):
+        (WebKit::uniqueSpellDocumentTag):
+        (WebKit::closeSpellDocumentWithTag):
+        (WebKit::checkSpellingOfString):
+        (WebKit::guessesForWord):
+        (WebKit::learnWord):
+        (WebKit::ignoreWord):
+        Those functions are directly given as callback functions for WKTextChecker's client.
+        They choose between WebKit's spelling implementation and client's ones.
+
+        (WebKit::availableSpellCheckingLanguages):
+        (WebKit::updateSpellCheckingLanguages):
+        (WebKit::loadedSpellCheckingLanguages):
+        They are used by ewk_settings.cpp file and allow to do not
+        expose 'textCheckerEnchant'.
+
+        * UIProcess/API/efl/WebKitTextChecker.h: Added.
+        Define the functions which choose between WebKit's spelling implementation and
+        the client's ones.
+
+        (WebKit):
+        * UIProcess/API/efl/ewk_context.cpp:
+        (_Ewk_Context::_Ewk_Context):
+        Attach the spellchecker feature for the context.
+
+        * UIProcess/API/efl/ewk_text_checker.cpp: Added.
+        (ewk_text_checker_callbacks_get):
+        An internal function to get the client's callback functions.
+
+        * UIProcess/API/efl/ewk_text_checker.h: Added.
+        Define API to set the client's own spelling implementation.
+
+        * UIProcess/API/efl/ewk_text_checker_private.h: Added.
+        (_Ewk_Text_Checker):
+        Define the struct with the client's callbacks responisble for spelling.
+
+        * UIProcess/API/efl/ewk_settings.cpp:
+        (onContinuousSpellCheckingIdler):
+        The application is notified about the spelling setting change on idler
+        to do not block WebKit.
+        The the continuous spell checking may be changed through the context menu option.
+
+        (spellCheckingLanguagesSetUpdate):
+        The dictionaries are requested on 'idler' to do not block WebKit.
+
+        (spellCheckingLanguagesSet):
+        Set the languages.
+
+        (ewk_settings_continuous_spell_checking_change_cb_set):
+        Set the callback function used to notify the client when the spelling
+        setting was changed by WebKit.
+
+        (ewk_settings_continuous_spell_checking_enabled_get):
+        (ewk_settings_continuous_spell_checking_enabled_set):
+        API to set/get the continuous spell checking.
+
+        (ewk_settings_spell_checking_available_languages_get):
+        (ewk_settings_spell_checking_languages_set):
+        (ewk_settings_spell_checking_languages_get):
+        API to get/set languages to use by WebKit implementation based on Enchant library.
+
+        * UIProcess/efl/TextCheckerEfl.cpp:
+        (WebKit::TextChecker::state):
+        (WebKit::TextChecker::isContinuousSpellCheckingAllowed):
+        (WebKit::TextChecker::setContinuousSpellCheckingEnabled):
+        (WebKit::TextChecker::setGrammarCheckingEnabled):
+        (WebKit::TextChecker::continuousSpellCheckingEnabledStateChanged):
+        (WebKit::TextChecker::grammarCheckingEnabledStateChanged):
+        (WebKit::TextChecker::uniqueSpellDocumentTag):
+        (WebKit::TextChecker::closeSpellDocumentWithTag):
+        (WebKit::TextChecker::checkSpellingOfString):
+        (WebKit::TextChecker::checkGrammarOfString): Remove WebCore namaspace as it's already defined for the whole file.
+        (WebKit::TextChecker::spellingUIIsShowing):
+        (WebKit::TextChecker::toggleSpellingUIIsShowing):
+        (WebKit::TextChecker::updateSpellingUIWithMisspelledWord):
+        (WebKit::TextChecker::updateSpellingUIWithGrammarString):
+        (WebKit::TextChecker::getGuessesForWord):
+        (WebKit::TextChecker::learnWord):
+        (WebKit::TextChecker::ignoreWord):
+        Those call WKTextChecker client's methods.
+
+2012-10-17  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL][WK2] Ewk_Url_Scheme_Request has to be refactored
+        https://bugs.webkit.org/show_bug.cgi?id=99549
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Ewk_Url_Scheme_Requestis inherited from RefCounted, WKEinaSharedString is used,
+        removed weird _Ewk_Url_Scheme_Request.
+
+        * UIProcess/API/efl/ewk_context_private.h:
+        * UIProcess/API/efl/ewk_context_request_manager_client.cpp:
+        (didReceiveURIRequest):
+        * UIProcess/API/efl/ewk_url_scheme_request.cpp:
+        (ewk_url_scheme_request_ref):
+        (ewk_url_scheme_request_unref):
+        * UIProcess/API/efl/ewk_url_scheme_request.h:
+        * UIProcess/API/efl/ewk_url_scheme_request_private.h:
+        (Ewk_Url_Scheme_Request):
+        (Ewk_Url_Scheme_Request::create):
+        (Ewk_Url_Scheme_Request::Ewk_Url_Scheme_Request):
+
+2012-10-17  Mario Sanchez Prada  <msanchez@igalia.com>
+
+        [WK2][GTK] Unneeded GError field in internal structure in WebKitFaviconDatabase.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=99564
+
+        Reviewed by Carlos Garcia Campos.
+
+        Removed field 'error' from GetFaviconSurfaceAsyncData and updated
+        the code accordingly, by using g_simple_async_result_take_error().
+
+        * UIProcess/API/gtk/WebKitFaviconDatabase.cpp:
+        (GetFaviconSurfaceAsyncData): Removed unneeded field.
+        (processPendingIconsForPageURL): Avoid using g_propagate_error and
+        use g_simple_async_result_take_error directly instead.
+        (webkit_favicon_database_get_favicon_finish): Remove unneeded code.
+
+2012-10-17  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Start using OwnPtr for non-ref counted ewk types
+        https://bugs.webkit.org/show_bug.cgi?id=99472
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Use OwnPtr internally for non-ref counted Ewk types to avoid
+        manual memory handling.
+
+        Private _new() and _free() functions are removed since they
+        are not needed now that the classes are defined in the
+        private headers instead of the cpp files. The constructor
+        for those classes was made private and factory methods were
+        added to encourage developers to use smart pointers instead
+        of raw ones.
+
+        * UIProcess/API/efl/ewk_back_forward_list.cpp:
+        (ewk_back_forward_list_changed):
+        * UIProcess/API/efl/ewk_back_forward_list_item_private.h:
+        * UIProcess/API/efl/ewk_back_forward_list_private.h:
+        (_Ewk_Back_Forward_List):
+        (_Ewk_Back_Forward_List::create):
+        (_Ewk_Back_Forward_List::_Ewk_Back_Forward_List):
+        * UIProcess/API/efl/ewk_context.cpp:
+        (_Ewk_Context):
+        (_Ewk_Context::_Ewk_Context):
+        (ewk_context_cookie_manager_get):
+        (ewk_context_favicon_database_get):
+        * UIProcess/API/efl/ewk_context_download_client.cpp:
+        (didFail):
+        * UIProcess/API/efl/ewk_cookie_manager.cpp:
+        (_Ewk_Cookie_Manager::_Ewk_Cookie_Manager):
+        (_Ewk_Cookie_Manager::~_Ewk_Cookie_Manager):
+        (getAcceptPolicyCallback):
+        (getHostnamesWithCookiesCallback):
+        (ewk_cookie_manager_changes_watch):
+        * UIProcess/API/efl/ewk_cookie_manager_private.h:
+        (Cookie_Change_Handler):
+        (Cookie_Change_Handler::Cookie_Change_Handler):
+        (_Ewk_Cookie_Manager):
+        (_Ewk_Cookie_Manager::create):
+        * UIProcess/API/efl/ewk_error.cpp:
+        (_Ewk_Error::_Ewk_Error):
+        (ewk_error_cancellation_get):
+        * UIProcess/API/efl/ewk_error_private.h:
+        (_Ewk_Error):
+        (_Ewk_Error::create):
+        * UIProcess/API/efl/ewk_favicon_database.cpp:
+        (_Ewk_Favicon_Database::_Ewk_Favicon_Database):
+        * UIProcess/API/efl/ewk_favicon_database_private.h:
+        (IconChangeCallbackData):
+        (IconChangeCallbackData::IconChangeCallbackData):
+        (IconRequestCallbackData):
+        (IconRequestCallbackData::IconRequestCallbackData):
+        (_Ewk_Favicon_Database):
+        (_Ewk_Favicon_Database::create):
+        * UIProcess/API/efl/ewk_popup_menu_item.cpp:
+        (_Ewk_Popup_Menu_Item::_Ewk_Popup_Menu_Item):
+        * UIProcess/API/efl/ewk_popup_menu_item_private.h:
+        (_Ewk_Popup_Menu_Item):
+        (_Ewk_Popup_Menu_Item::create):
+        * UIProcess/API/efl/ewk_url_scheme_request.cpp:
+        (_Ewk_Url_Scheme_Request::_Ewk_Url_Scheme_Request):
+        * UIProcess/API/efl/ewk_view.cpp:
+        (_Ewk_View_Private_Data):
+        (_Ewk_View_Private_Data::_Ewk_View_Private_Data):
+        (_Ewk_View_Private_Data::~_Ewk_View_Private_Data):
+        (_ewk_view_initialize):
+        (ewk_view_back_forward_list_get):
+        (ewk_view_popup_menu_request):
+        (ewk_view_popup_menu_close):
+        * UIProcess/API/efl/ewk_view_loader_client.cpp:
+        (didFailLoadWithErrorForFrame):
+        (didFailProvisionalLoadWithErrorForFrame):
+        * UIProcess/API/efl/ewk_view_resource_load_client.cpp:
+        (didFailLoadForResource):
+
+2012-10-17  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Use WTF RefCounted and RefPtr for Ewk_Resource and Ewk_Form_Submission_Request
+        https://bugs.webkit.org/show_bug.cgi?id=99542
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Use WTF RefCounted and RefPtr for Ewk_Resource and Ewk_Form_Submission_Request
+        to avoid handling raw pointers internally.
+
+        * UIProcess/API/efl/ewk_form_submission_request.cpp:
+        (ewk_form_submission_request_ref):
+        (ewk_form_submission_request_unref):
+        (ewk_form_submission_request_submit):
+        * UIProcess/API/efl/ewk_form_submission_request_private.h:
+        (_Ewk_Form_Submission_Request):
+        (_Ewk_Form_Submission_Request::~_Ewk_Form_Submission_Request):
+        (_Ewk_Form_Submission_Request::create):
+        (_Ewk_Form_Submission_Request::_Ewk_Form_Submission_Request):
+        * UIProcess/API/efl/ewk_resource.cpp:
+        (ewk_resource_ref):
+        (ewk_resource_unref):
+        * UIProcess/API/efl/ewk_resource_private.h:
+        (_Ewk_Resource):
+        (_Ewk_Resource::create):
+        (_Ewk_Resource::_Ewk_Resource):
+        * UIProcess/API/efl/ewk_view.cpp:
+        (_Ewk_View_Private_Data::~_Ewk_View_Private_Data):
+        (ewk_view_resource_load_initiated):
+        (ewk_view_resource_load_response):
+        (ewk_view_resource_load_failed):
+        (ewk_view_resource_load_finished):
+        (ewk_view_resource_request_sent):
+        (ewk_view_load_provisional_started):
+        * UIProcess/API/efl/ewk_view_form_client.cpp:
+        (willSubmitForm):
+        * UIProcess/API/efl/ewk_view_resource_load_client.cpp:
+        (didInitiateLoadForResource):
+
+2012-10-16  Dongwoo Joshua Im  <dw.im@samsung.com>
+
+        [mac] Fix build break - processPath should be initialized.
+        https://bugs.webkit.org/show_bug.cgi?id=99541
+
+        Unreviewed build fix.
+
+        Initialize processPath as nil.
+
+        * UIProcess/Launcher/mac/ProcessLauncherMac.mm:
+        (WebKit::createProcess):
+
+2012-10-16  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Add factory methods for refcounted Ewk types
+        https://bugs.webkit.org/show_bug.cgi?id=99479
+
+        Reviewed by Gyuyoung Kim.
+
+        Add factory methods to refcounted Ewk types that return
+        a PassRefPtr for refcounted Ewk types. Their constructors
+        were made privates as well, in order to promote the use
+        of smart pointers internally.
+
+        Remove _new() functions for refcounted Ewk types as they
+        are no longer needed now that the classes are defined
+        in the private headers instead of the cpp files.
+
+        * UIProcess/API/efl/PageClientImpl.cpp:
+        (WebKit::PageClientImpl::handleDownloadRequest):
+        * UIProcess/API/efl/ewk_back_forward_list.cpp:
+        (addItemToWrapperCache):
+        * UIProcess/API/efl/ewk_back_forward_list_item.cpp:
+        (ewk_back_forward_list_item_original_url_get):
+        * UIProcess/API/efl/ewk_back_forward_list_item_private.h:
+        (_Ewk_Back_Forward_List_Item):
+        (_Ewk_Back_Forward_List_Item::create):
+        (_Ewk_Back_Forward_List_Item::_Ewk_Back_Forward_List_Item):
+        * UIProcess/API/efl/ewk_context_download_client.cpp:
+        (didReceiveResponse):
+        * UIProcess/API/efl/ewk_context_history_client.cpp:
+        (didNavigateWithNavigationData):
+        * UIProcess/API/efl/ewk_download_job.cpp:
+        (ewk_download_job_request_get):
+        (ewk_download_job_state_set):
+        * UIProcess/API/efl/ewk_download_job_private.h:
+        (_Ewk_Download_Job):
+        (_Ewk_Download_Job::create):
+        (_Ewk_Download_Job::_Ewk_Download_Job):
+        * UIProcess/API/efl/ewk_intent.cpp:
+        (ewk_intent_extra_names_get):
+        * UIProcess/API/efl/ewk_intent_private.h:
+        (_Ewk_Intent):
+        (_Ewk_Intent::create):
+        (_Ewk_Intent::_Ewk_Intent):
+        * UIProcess/API/efl/ewk_intent_service.cpp:
+        (ewk_intent_service_disposition_get):
+        * UIProcess/API/efl/ewk_intent_service_private.h:
+        (_Ewk_Intent_Service):
+        (_Ewk_Intent_Service::create):
+        (_Ewk_Intent_Service::_Ewk_Intent_Service):
+        * UIProcess/API/efl/ewk_navigation_data.cpp:
+        (ewk_navigation_data_url_get):
+        * UIProcess/API/efl/ewk_navigation_data_private.h:
+        (_Ewk_Navigation_Data):
+        (_Ewk_Navigation_Data::create):
+        (_Ewk_Navigation_Data::_Ewk_Navigation_Data):
+        * UIProcess/API/efl/ewk_navigation_policy_decision.cpp:
+        * UIProcess/API/efl/ewk_navigation_policy_decision_private.h:
+        (_Ewk_Navigation_Policy_Decision):
+        (_Ewk_Navigation_Policy_Decision::~_Ewk_Navigation_Policy_Decision):
+        (_Ewk_Navigation_Policy_Decision::create):
+        (_Ewk_Navigation_Policy_Decision::_Ewk_Navigation_Policy_Decision):
+        * UIProcess/API/efl/ewk_url_request.cpp:
+        (ewk_url_request_http_method_get):
+        * UIProcess/API/efl/ewk_url_request_private.h:
+        (_Ewk_Url_Request):
+        (_Ewk_Url_Request::create):
+        (_Ewk_Url_Request::_Ewk_Url_Request):
+        * UIProcess/API/efl/ewk_url_response.cpp:
+        (ewk_url_response_content_length_get):
+        * UIProcess/API/efl/ewk_url_response_private.h:
+        (_Ewk_Url_Response):
+        (_Ewk_Url_Response::create):
+        (_Ewk_Url_Response::_Ewk_Url_Response):
+        * UIProcess/API/efl/ewk_view.cpp:
+        (ewk_view_intent_deliver):
+        * UIProcess/API/efl/ewk_view_loader_client.cpp:
+        (didReceiveIntentForFrame):
+        (registerIntentServiceForFrame):
+        * UIProcess/API/efl/ewk_view_policy_client.cpp:
+        (decidePolicyForNavigationAction):
+        (decidePolicyForNewWindowAction):
+        * UIProcess/API/efl/ewk_view_resource_load_client.cpp:
+        (didInitiateLoadForResource):
+        (didSendRequestForResource):
+        (didReceiveResponseForResource):
+
+2012-10-16  Alexey Proskuryakov  <ap@apple.com>
+
+        <rdar://problem/12462993> Use a sensible fallback for cache directory
+
+        Reviewed by Sam Weinig.
+
+        * UIProcess/WebContext.cpp: (WebKit::WebContext::createNewWebProcess): Cache directory
+        should be created if it doesn't exist yet, so use createHandleForReadWriteDirectory.
+
+        * UIProcess/mac/WebContextMac.mm: (WebKit::WebContext::platformDefaultDiskCacheDirectory):
+        We don't want caches in home directory, they should go to ~/Library/Caches.
+
+2012-10-16  Andy Estes  <aestes@apple.com>
+
+        [WebKit2] Create Objective-C API for adding and removing user scripts
+        https://bugs.webkit.org/show_bug.cgi?id=99528
+
+        Reviewed by Anders Carlsson.
+
+        This patch adds the following API to WKBrowsingContextGroup:
+
+        - (void)addUserScript:(NSString *)source baseURL:(NSURL *)baseURL whitelistedURLPatterns:(NSArray *)whitelist blacklistedURLPatterns:(NSArray *)blacklist injectionTime:(WKUserScriptInjectionTime)injectionTime mainFrameOnly:(BOOL)mainFrameOnly;
+        - (void)removeAllUserScripts;
+
+        * UIProcess/API/C/WKPageGroup.cpp:
+        (WKPageGroupAddUserScript): Define a C SPI equivalent of addUserScript: that calls existing methods in WebPageGroup.
+        (WKPageGroupRemoveAllUserScripts): Ditto for removeAllUserScripts.
+        * UIProcess/API/C/WKPageGroup.h: Declare the above-mentioned functions.
+        * UIProcess/API/mac/WKBrowsingContextGroup.h: Declare the Objective-C API
+        * UIProcess/API/mac/WKBrowsingContextGroup.mm:
+        (-[WKBrowsingContextGroup addUserScript:baseURL:whitelist:blacklist:injectionTime:mainFrameOnly:]): Call WKPageGroupAddUserScript.
+        (-[WKBrowsingContextGroup removeAllUserScripts]): Call WKPageGroupRemoveAllUserScripts.
+        * WebProcess/WebPage/WebPageGroupProxy.cpp:
+        (WebKit::WebPageGroupProxy::removeAllUserScripts): This was calling PageGroup::removeUserStyleSheetsFromWorld() by mistake.
+
+2012-10-16  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][WK2][AC] Url bar should not be covered by the web view
+        https://bugs.webkit.org/show_bug.cgi?id=99485
+
+        Reviewed by Laszlo Gombos.
+
+        When accelerated compositing is enabled, the url bar is covered by the web view.
+        This was caused by 2 issues:
+        - _ewk_view_smart_calculate was called before the first gl surface was created,
+          so an early return caused it to not save the new view position.
+        - When painting the view, we need to take into account the position of
+          the view within the window, i.e. the url bar.
+
+        * UIProcess/API/efl/EflViewportHandler.cpp:
+        (WebKit::EflViewportHandler::display):
+        * UIProcess/API/efl/EflViewportHandler.h:
+        (EflViewportHandler):
+        * UIProcess/API/efl/ewk_view.cpp:
+        (_ewk_view_smart_calculate):
+        (ewk_view_display):
+
+2012-10-16  Jian Li  <jianli@chromium.org>
+
+        Rename feature define ENABLE_WIDGET_REGION to ENABLE_DRAGGBALE_REGION
+        https://bugs.webkit.org/show_bug.cgi?id=98975
+
+        Reviewed by Adam Barth.
+
+        Renaming is needed to better match with the draggable region code.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-10-16  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, revert previous WebKit2.def change. Exports shouldn't matter.
+
+        * win/WebKit2.def:
+
+2012-10-16  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, try to fix the Apple Win build.
+
+        * win/WebKit2.def:
+
 2012-10-16  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
 
         Implement testRunner.dumpSelectionRect() in WebKitTestRunner

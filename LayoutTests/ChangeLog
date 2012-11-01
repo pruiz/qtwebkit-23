@@ -1,3 +1,482 @@
+2012-10-17  Dana Jansens  <danakj@chromium.org>
+
+        Unreviewed rebaseline for ietestcenter/css3/bordersbackgrounds/border-radius-content-edge-001.htm
+
+        * platform/chromium-win-xp/ietestcenter/css3/bordersbackgrounds/border-radius-content-edge-001-expected.png: Added.
+
+2012-10-17  Joanmarie Diggs  <jdiggs@igalia.com>
+
+        [GTK] accessibility/ignore-spacer-elements.html is failing
+        https://bugs.webkit.org/show_bug.cgi?id=98366
+
+        Reviewed by Chris Fleizach.
+
+        The failure was due to platform-specific expectations of childrenCount.
+        The solution was conditionalizing the test.
+
+        * accessibility/ignore-spacer-elements.html: Base expected childrenCount on platform.
+        * platform/gtk/TestExpectations: Unskip previously-failing test.
+
+2012-10-17  Mariusz Grzegorczyk  <mariusz.g@samsung.com>
+
+        Unreviewed EFL gardening.
+        https://bugs.webkit.org/show_bug.cgi?id=99596
+
+        Unskip editing/inserting, editing/selection, editing/spelling and editing/style categories.
+        Mark missing text expectations for these.
+
+        * platform/efl-wk1/TestExpectations:
+        * platform/efl-wk2/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-10-17  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [WK2][WTR] InjectedBundlePage::decidePolicyForNavigationAction() should print only filename part of local URLs
+        https://bugs.webkit.org/show_bug.cgi?id=99581
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskipped fast/loader/reload-policy-delegate.html for WK2.
+
+        * platform/wk2/TestExpectations:
+
+2012-10-17  Harald Alvestrand  <hta@google.com>
+
+        Implement the Selector argument to RTCPeerConnection.getStats
+        https://bugs.webkit.org/show_bug.cgi?id=99460
+
+        Reviewed by Adam Barth.
+
+        * fast/mediastream/RTCPeerConnection-statsSelector-expected.txt: Added.
+        * fast/mediastream/RTCPeerConnection-statsSelector.html: Added.
+
+2012-10-17  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        WebKitTestRunner needs layoutTestController.queueReload
+        https://bugs.webkit.org/show_bug.cgi?id=42672
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskipped the related test cases for WK2.
+
+        * platform/efl-wk2/TestExpectations:
+        * platform/wk2/TestExpectations:
+
+2012-10-17  Kent Tamura  <tkent@chromium.org>
+
+        REGRESSION(r131421): Text baseline becomes incorrect after re-layout of input[type=time]
+        https://bugs.webkit.org/show_bug.cgi?id=99572
+
+        Reviewed by Kentaro Hara.
+
+        * fast/forms/time-multiple-fields/time-multiple-fields-static-relayout-expected.txt: Added.
+        * fast/forms/time-multiple-fields/time-multiple-fields-static-relayout.html: Added.
+
+2012-10-17  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Fixing expectation for fast/forms/range/input-appearance-range-rtl.html,
+        it's a reftest so the failure is actually of pixel nature.
+
+        Also removing some expectations for tests that now consistently pass.
+
+        * platform/gtk/TestExpectations:
+
+2012-10-17  Dominik Röttsches  <dominik.rottsches@intel.com>
+
+        [EFL] Unreviewed gardening.
+
+        Unskipping 4 cases after regression was fixed in r131229,
+        moving out a crash and incorrect console loggin on the wk2 bot.
+
+        * platform/efl-wk2/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-10-17  Mike West  <mkwst@chromium.org>
+
+        V8 should throw a more descriptive exception when blocking 'eval' via CSP.
+        https://bugs.webkit.org/show_bug.cgi?id=94332
+
+        Reviewed by Adam Barth.
+
+        * platform/chromium/TestExpectations:
+            Unskipping these tests, as this patch unbreaks them.
+        * platform/chromium/http/tests/security/contentSecurityPolicy/eval-blocked-expected.txt:
+        * platform/chromium/http/tests/security/contentSecurityPolicy/eval-blocked-in-about-blank-iframe-expected.txt:
+        * platform/chromium/http/tests/security/contentSecurityPolicy/function-constructor-blocked-expected.txt:
+            Updating expectations with the new error message.
+
+2012-10-17  MORITA Hajime  <morrita@google.com>
+
+        Assertion failed on HTMLFormControlElement.cpp: updateFromElementCallback()
+        https://bugs.webkit.org/show_bug.cgi?id=99566
+
+        Reviewed by Kent Tamura.
+
+        * fast/forms/textarea/textarea-autofocus-removal-while-focusing.txt: Added.
+        * fast/forms/textarea/textarea-autofocus-removal-while-focusing.html: Added.
+
+2012-10-17  Anton Muhin  <antonm@chromium.org>
+
+        Unreviewed Chromium rebaselines.
+
+        * platform/chromium-mac-snowleopard/ietestcenter/css3/bordersbackgrounds/border-radius-content-edge-001-expected.png:
+        * platform/chromium-mac/ietestcenter/css3/bordersbackgrounds/border-radius-content-edge-001-expected.png:
+        * platform/chromium-win-xp/ietestcenter/css3/bordersbackgrounds/border-radius-content-edge-001-expected.png: Added.
+
+2012-10-17  Zoltan Arvai  <zarvai@inf.u-szeged.hu>
+
+        [Qt] Unreviwed gardening. Skip failing reftest after r131497.
+        https://bugs.webkit.org/show_bug.cgi?id=98666
+
+        * platform/qt/TestExpectations: Skip fast/forms/range/input-appearance-range-rtl.html.
+
+2012-10-17  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        WebKitTestRunner needs testRunner.queueLoad
+        https://bugs.webkit.org/show_bug.cgi?id=42674
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskipped corresponding tests for WK2 and WK2 EFL, put those which still failing to appropriate groups.
+
+        * platform/efl-wk2/TestExpectations:
+        * platform/wk2/TestExpectations:
+
+2012-10-17  Douglas Stockwell  <dstockwell@chromium.org>
+
+        Content of replaced elements should be trimmed to the content edge curve.
+        https://bugs.webkit.org/show_bug.cgi?id=63899
+
+        Reviewed by Simon Fraser.
+
+        * fast/replaced/border-radius-clip-content-edge-expected.txt: Added.
+        * fast/replaced/border-radius-clip-content-edge.html: Added.
+        * platform/fast/replaced/border-radius-clip-content-edge-expected.png: Added.
+        * platform/chromium/TestExpectations:
+        * platform/chromium-linux/fast/replaced/border-radius-clip-content-edge-expected.png: Added.
+        * platform/chromium-linux/ietestcenter/css3/bordersbackgrounds/border-radius-content-edge-001-expected.png:
+
+2012-10-17  Kunihiko Sakamoto  <ksakamoto@chromium.org>
+
+        The HTML5 formtarget/formaction/formenctyp/formmethod/formnovalidate attributes don't work in button tags with nested elements
+        https://bugs.webkit.org/show_bug.cgi?id=90539
+
+        Reviewed by Kent Tamura.
+
+        Added a test case to verify that formaction attribute of <button> element is
+        used when its child <span> is clicked.
+
+        * fast/forms/formaction-attribute-expected.txt:
+        * fast/forms/formaction-attribute.html: Removed unused doneAction2 variable.
+
+2012-10-16  Csaba Osztrogonác  <ossy@webkit.org>
+
+        Unreviewed, rolling out r131516 and r131550.
+        http://trac.webkit.org/changeset/131516
+        http://trac.webkit.org/changeset/131550
+        https://bugs.webkit.org/show_bug.cgi?id=99349
+
+        It caused zillion different problem on different platforms
+
+        * fast/workers/resources/worker-event-listener.js:
+
+2012-10-16  Keishi Hattori  <keishi@webkit.org>
+
+        Add test that checks if scrolling works inside the suggestion picker
+        https://bugs.webkit.org/show_bug.cgi?id=99409
+
+        Reviewed by Kent Tamura.
+
+        We want to test that scrolling, both by scrollbar and mouse wheel, work inside the suggestion picker.
+
+        * platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-mouse-operations-expected.txt:
+        * platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-mouse-operations.html:
+        * platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-mouse-operations-expected.txt:
+        * platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-mouse-operations.html:
+
+2012-10-16  Kent Tamura  <tkent@chromium.org>
+
+        Re-add a test which was removed mistakenly in r131538.
+        https://bugs.webkit.org/show_bug.cgi?id=98103
+
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-type-change-onclick-expected.txt: Added.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-type-change-onclick.html: Added.
+
+2012-10-16  Kent Tamura  <tkent@chromium.org>
+
+        Move tests for calendar picker to platform/chromium/fast/forms/calendar-picker/
+        https://bugs.webkit.org/show_bug.cgi?id=98103
+
+        Reviewed by Yuta Kitamura.
+
+        Move tests for calendar picker to platform/chromium/fast/forms/
+        calendar-picker/ because
+         - Ease of skipping
+         - We're going to support non-date types in the calendar picker.
+         - Not sure the calendar picker code will be used on other platforms.
+
+        * fast/forms/date/calendar-picker-appearance-expected.txt: Removed.
+        * fast/forms/date/calendar-picker-appearance-pre-100-expected.txt: Removed.
+        * fast/forms/date/calendar-picker-appearance-pre-100.html: Removed.
+        * fast/forms/date/calendar-picker-appearance.html: Removed.
+        * fast/forms/date/calendar-picker-common.js: Removed.
+        * fast/forms/date/calendar-picker-key-operations-expected.txt: Removed.
+        * fast/forms/date/calendar-picker-key-operations.html: Removed.
+        * fast/forms/date/calendar-picker-mouse-operations-expected.txt: Removed.
+        * fast/forms/date/calendar-picker-mouse-operations.html: Removed.
+        * fast/forms/date/calendar-picker-type-change-onclick-expected.txt: Removed.
+        * fast/forms/date/calendar-picker-type-change-onclick.html: Removed.
+        * fast/forms/date/calendar-picker-with-step-expected.txt: Removed.
+        * fast/forms/date/calendar-picker-with-step.html: Removed.
+        * platform/chromium-linux-x86/fast/forms/date/calendar-picker-appearance-expected.png: Removed.
+        * platform/chromium-linux-x86/platform/chromium/fast/forms/calendar-picker: Added.
+        * platform/chromium-linux-x86/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png: Copied from LayoutTests/platform/chromium-linux-x86/fast/forms/date/calendar-picker-appearance-expected.png.
+        * platform/chromium-linux/fast/forms/date/calendar-picker-appearance-expected.png: Removed.
+        * platform/chromium-linux/platform/chromium/fast/forms/calendar-picker: Added.
+        * platform/chromium-linux/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/date/calendar-picker-appearance-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/date/calendar-picker-appearance-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/date/calendar-picker-appearance-expected.png.
+        * platform/chromium-mac/fast/forms/date/calendar-picker-appearance-expected.png: Removed.
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/date/calendar-picker-appearance-expected.png.
+        * platform/chromium-win-xp/fast/forms/date/calendar-picker-appearance-expected.png: Removed.
+        * platform/chromium-win-xp/platform/chromium/fast/forms/calendar-picker: Added.
+        * platform/chromium-win-xp/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png: Copied from LayoutTests/platform/chromium-win-xp/fast/forms/date/calendar-picker-appearance-expected.png.
+        * platform/chromium-win/fast/forms/date/calendar-picker-appearance-expected.png: Removed.
+        * platform/chromium-win/fast/forms/date/calendar-picker-key-operations-expected.txt: Removed.
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker: Added.
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/date/calendar-picker-appearance-expected.png.
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/calendar-picker-key-operations-expected.txt: Copied from LayoutTests/platform/chromium-win/fast/forms/date/calendar-picker-key-operations-expected.txt.
+        * platform/chromium/TestExpectations:
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.txt: Copied from LayoutTests/fast/forms/date/calendar-picker-appearance-expected.txt.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step.html:
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance.html: Copied from LayoutTests/fast/forms/date/calendar-picker-appearance.html.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-key-operations-expected.txt: Copied from LayoutTests/fast/forms/date/calendar-picker-key-operations-expected.txt.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-key-operations.html: Copied from LayoutTests/fast/forms/date/calendar-picker-key-operations.html.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-mouse-operations-expected.txt: Copied from LayoutTests/fast/forms/date/calendar-picker-mouse-operations-expected.txt.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-mouse-operations.html: Copied from LayoutTests/fast/forms/date/calendar-picker-mouse-operations.html.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-pre-100-year-expected.txt: Copied from LayoutTests/fast/forms/date/calendar-picker-appearance-pre-100-expected.txt.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-pre-100-year.html: Copied from LayoutTests/fast/forms/date/calendar-picker-appearance-pre-100.html.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-with-step-expected.txt: Copied from LayoutTests/fast/forms/date/calendar-picker-with-step-expected.txt.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-with-step.html: Copied from LayoutTests/fast/forms/date/calendar-picker-with-step.html.
+        * platform/chromium/fast/forms/calendar-picker/resources: Added.
+        * platform/chromium/fast/forms/calendar-picker/resources/calendar-picker-common.js: Copied from LayoutTests/fast/forms/date/calendar-picker-common.js.
+        * platform/chromium/fast/forms/page-popup/page-popup-adjust-rect.html: Fix calendar-picker-common.js path.
+        * platform/gtk/TestExpectations:
+
+2012-10-16  Dirk Pranke  <dpranke@chromium.org>
+
+        Update Chromium ML expectations
+
+        Unreviewed, expectations change.
+
+        * platform/chromium-mac-mountainlion/TestExpectations:
+
+2012-10-16  Joseph Pecoraro  <pecoraro@apple.com>
+
+        HTMLSelectElement::optionSelectedByUser confuses listIndex and optionIndex
+        https://bugs.webkit.org/show_bug.cgi?id=99523
+
+        Reviewed by Simon Fraser.
+
+        Extend the dom activate test to test calls on a <select multiple> with
+        <optgroup>s. This previously untested case was broken.
+
+        * platform/mac/fast/objc/dom-html-select-activate-expected.txt:
+        * platform/mac/fast/objc/dom-html-select-activate.html:
+
+2012-10-16  Jian Li  <jianli@chromium.org>
+
+        Rename feature define ENABLE_WIDGET_REGION to ENABLE_DRAGGBALE_REGION
+        https://bugs.webkit.org/show_bug.cgi?id=98975
+
+        Reviewed by Adam Barth.
+
+        Renaming is needed to better match with the draggable region code.
+
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+
+2012-10-16  Dana Jansens  <danakj@chromium.org>
+
+        Unreviewed, rebaselines after r131358
+        https://bugs.webkit.org/show_bug.cgi?id=99441
+
+        * platform/chromium-win-xp/svg/zoom/page/zoom-img-preserveAspectRatio-support-1-expected.png:
+        * platform/chromium-win-xp/svg/zoom/page/zoom-replaced-intrinsic-ratio-001-expected.png:
+        * platform/chromium-win-xp/svg/zoom/page/zoom-svg-through-object-with-absolute-size-expected.png:
+        * platform/chromium-win-xp/svg/zoom/page/zoom-svg-through-object-with-percentage-size-expected.png:
+
+2012-10-16  James Simonsen  <simonjam@chromium.org>
+
+        [Page Visibility API] View-less documents should report as hidden
+        https://bugs.webkit.org/show_bug.cgi?id=99410
+
+        Reviewed by Tony Gentilcore.
+
+        * fast/events/page-visibility-null-view-expected.txt: Added.
+        * fast/events/page-visibility-null-view.html: Added.
+
+2012-10-16  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, broaden Chromium TestExpectations to match waterfall.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-16  Dana Jansens  <danakj@chromium.org>
+
+        Rebaseline mac compositing/geometry/fixed-position-transform-composited-page-scale-down.html
+        https://bugs.webkit.org/show_bug.cgi?id=89702
+
+        Unreviewed gardening.
+
+        * platform/chromium-mac-snowleopard/compositing/geometry/fixed-position-transform-composited-page-scale-down-expected.png: Removed.
+        * platform/chromium-mac/compositing/geometry/fixed-position-transform-composited-page-scale-down-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-10-16  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, fix TestExpectations for Qt and GTK after RenderSlider change.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/media/video-volume-slider-expected.txt:
+        * platform/qt/TestExpectations:
+
+2012-10-16  Dana Jansens  <danakj@chromium.org>
+
+        Rebaseline for css1/basic/inheritance.html
+
+        Unreviewed gardening.
+
+        * platform/chromium-mac/css1/basic/inheritance-expected.png:
+
+2012-10-16  Dana Jansens  <danakj@chromium.org>
+
+        Web Inspector: inspector/styles/styles-history.html is failing Text on win7
+        https://bugs.webkit.org/show_bug.cgi?id=99519
+
+        Unreviewed gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-16  Dana Jansens  <danakj@chromium.org>
+
+        Rebaselines for r131503
+        https://bugs.webkit.org/show_bug.cgi?id=99516
+
+        Unreviewed gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-16  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, fix lint error in chromium-android/TestExpectations.
+
+        * platform/chromium-android/TestExpectations:
+
+2012-10-16  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, lint fixes for TestExpectations.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-16  Dana Jansens  <danakj@chromium.org>
+
+        Lint fixes for TestExpectations
+
+        Unreviewed gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-16  Dana Jansens  <danakj@chromium.org>
+
+        Rebaselines for r131503
+        https://bugs.webkit.org/show_bug.cgi?id=99516
+
+        Unreviewed gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-16  Dana Jansens  <danakj@chromium.org>
+
+        Some tests need rebaseline after r131497
+        https://bugs.webkit.org/show_bug.cgi?id=99511
+
+        Unreviewed gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-16  Joanmarie Diggs  <jdiggs@igalia.com>
+
+        [GTK] accessibility/radio-button-title-label.html is failing
+        https://bugs.webkit.org/show_bug.cgi?id=98374
+
+        Unreviewed. Unskipped test, new port-specific baseline.
+
+        New baseline for the GTK port. If there is a proper label tag, we
+        expect the widget to get its name/title from that label. The aria
+        labelledby property is exposed in addition to the label; not instead
+        of the label.
+
+        * platform/gtk/TestExpectations: Unskipped failing test.
+        * platform/gtk/accessibility/radio-button-title-label-expected.txt: Added.
+
+2012-10-16  Dirk Pranke  <dpranke@chromium.org>
+
+        [chromium] add Mountain Lion baselines
+        https://bugs.webkit.org/show_bug.cgi?id=99505
+
+        Reviewed by Ojan Vafai.
+
+        This change adds a temporary 10.8/MountainLion-specific
+        expectations file for Chromium so that the bot can be green
+        while we are updating all the baselines and triaging failures.
+
+        * platform/chromium-mac-mountainlion/TestExpectations: Added.
+
+2012-10-16  Joanmarie Diggs  <jdiggs@igalia.com>
+
+        [GTK] accessibility/inline-continuations.html is failing
+        https://bugs.webkit.org/show_bug.cgi?id=98367
+
+        Unreviewed. Unskipped test, new port-specific expectations.
+
+        ATs for the GTK port are expecting only meaningful text objects, with
+        the text of spans getting folded into the parent object.
+
+        * platform/gtk/TestExpectations: Updated to unskip test.
+        * platform/gtk/accessibility/inline-continuations-expected.txt: Added.
+
+2012-10-16  Emil A Eklund  <eae@chromium.org>
+
+        Remove special-case flooring of baselinePosition for replaced elements in InlineFlowBox::placeBoxesInBlockDirection
+        https://bugs.webkit.org/show_bug.cgi?id=99376
+
+        Reviewed by Levi Weintraub.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-16  Filip Pizlo  <fpizlo@apple.com>
+
+        GetScopedVar CSE matches dead GetScopedVar's leading to IR corruption
+        https://bugs.webkit.org/show_bug.cgi?id=99470
+        <rdar://problem/12363698>
+
+        Rubber stamped by Mark Hahnenberg.
+
+        * fast/js/dfg-cse-dead-get-scoped-var-expected.txt: Added.
+        * fast/js/dfg-cse-dead-get-scoped-var.html: Added.
+        * fast/js/jsc-test-list:
+        * fast/js/script-tests/dfg-cse-dead-get-scoped-var.js: Added.
+        (foo.return.if):
+        (foo):
+
 2012-10-16  Adam Barth  <abarth@webkit.org>
 
         Document::adoptNode shouldn't special-case <iframe>

@@ -33,6 +33,7 @@
 
 #include "LocalizedStrings.h"
 #include <limits>
+#include <unicode/uloc.h>
 #include <wtf/DateMath.h>
 #include <wtf/PassOwnPtr.h>
 #include <wtf/text/StringBuilder.h>
@@ -182,10 +183,10 @@ double LocaleICU::parseDateTime(const String& input, DateComponents::Type type)
     return date;
 }
 
-String LocaleICU::formatDateTime(const DateComponents& dateComponents)
+String LocaleICU::formatDateTime(const DateComponents& dateComponents, FormatType formatType)
 {
     if (dateComponents.type() != DateComponents::Date)
-        return String();
+        return Localizer::formatDateTime(dateComponents, formatType);
     if (!initializeShortDateFormat())
         return String();
     double input = dateComponents.millisecondsSinceEpoch();
@@ -377,6 +378,12 @@ unsigned LocaleICU::firstDayOfWeek()
     initializeCalendar();
     return m_firstDayOfWeek;
 }
+
+bool LocaleICU::isRTL()
+{
+    UErrorCode status = U_ZERO_ERROR;
+    return uloc_getCharacterOrientation(m_locale.data(), &status) == ULOC_LAYOUT_RTL;
+}
 #endif
 
 #if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
@@ -413,8 +420,12 @@ void LocaleICU::initializeDateTimeFormat()
 
 String LocaleICU::dateFormat()
 {
-    // FIXME: We should have real implementation of LocaleICU::dateFormat().
-    return emptyString();
+    if (!m_dateFormat.isEmpty())
+        return m_dateFormat;
+    if (!initializeShortDateFormat())
+        return ASCIILiteral("dd/MM/yyyy");
+    m_dateFormat = getDateFormatPattern(m_shortDateFormat);
+    return m_dateFormat;
 }
 
 String LocaleICU::timeFormat()

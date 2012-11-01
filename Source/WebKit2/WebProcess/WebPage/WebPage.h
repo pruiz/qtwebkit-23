@@ -319,6 +319,8 @@ public:
     void setPageLength(double);
     void setGapBetweenPages(double);
 
+    void postInjectedBundleMessage(const CoreIPC::DataReference& message);
+
     bool drawsBackground() const { return m_drawsBackground; }
     bool drawsTransparentBackground() const { return m_drawsTransparentBackground; }
 
@@ -571,7 +573,7 @@ public:
 
     bool willGoToBackForwardItemCallbackEnabled() const { return m_willGoToBackForwardItemCallbackEnabled; }
 
-#if ENABLE(PAGE_VISIBILITY_API)
+#if ENABLE(PAGE_VISIBILITY_API) || ENABLE(HIDDEN_PAGE_DOM_TIMER_THROTTLING)
     void setVisibilityState(int visibilityState, bool isInitialState);
 #endif
 
@@ -822,7 +824,7 @@ private:
 
     RefPtr<WebCore::Node> m_gestureTargetNode;
 #elif PLATFORM(GTK)
-    WebPageAccessibilityObject* m_accessibilityObject;
+    GRefPtr<WebPageAccessibilityObject> m_accessibilityObject;
 
 #if USE(TEXTURE_MAPPER_GL)
     // Our view's window in the UI process.
@@ -900,6 +902,8 @@ private:
 
     bool m_cachedMainFrameIsPinnedToLeftSide;
     bool m_cachedMainFrameIsPinnedToRightSide;
+    bool m_cachedMainFrameIsPinnedToTopSide;
+    bool m_cachedMainFrameIsPinnedToBottomSide;
     bool m_canShortCircuitHorizontalWheelEvents;
     unsigned m_numWheelEventHandlers;
 

@@ -113,7 +113,7 @@ PassRefPtr<SimpleFontData> CSSFontFaceSource::getFontData(const FontDescription&
     unsigned hashKey = (fontDescription.computedPixelSize() + 1) << 6 | fontDescription.widthVariant() << 4
                        | (fontDescription.textOrientation() == TextOrientationUpright ? 8 : 0) | (fontDescription.orientation() == Vertical ? 4 : 0) | (syntheticBold ? 2 : 0) | (syntheticItalic ? 1 : 0);
 
-    RefPtr<SimpleFontData>& fontData = m_fontDataTable.add(hashKey, 0).iterator->second;
+    RefPtr<SimpleFontData>& fontData = m_fontDataTable.add(hashKey, 0).iterator->value;
     if (fontData)
         return fontData; // No release, because fontData is a reference to a RefPtr that is held in the m_fontDataTable.
 
@@ -183,11 +183,6 @@ PassRefPtr<SimpleFontData> CSSFontFaceSource::getFontData(const FontDescription&
         SimpleFontData* temporaryFont = fontCache()->getNonRetainedLastResortFallbackFont(fontDescription);
         fontData = SimpleFontData::create(temporaryFont->platformData(), true, true);
     }
-
-    if (Document* document = fontSelector->document())
-        document->registerCustomFont(fontData);
-    else
-        fontData.clear();
 
     return fontData; // No release, because fontData is a reference to a RefPtr that is held in the m_fontDataTable.
 }

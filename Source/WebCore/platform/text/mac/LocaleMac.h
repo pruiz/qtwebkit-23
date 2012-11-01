@@ -51,13 +51,14 @@ public:
     static LocaleMac* currentLocale();
     ~LocaleMac();
     virtual double parseDateTime(const String&, DateComponents::Type) OVERRIDE;
-    virtual String formatDateTime(const DateComponents&) OVERRIDE;
+    virtual String formatDateTime(const DateComponents&, FormatType = FormatTypeUnspecified) OVERRIDE;
 
 #if ENABLE(CALENDAR_PICKER)
     virtual String dateFormatText() OVERRIDE;
     virtual const Vector<String>& monthLabels() OVERRIDE;
     virtual const Vector<String>& weekDayShortLabels() OVERRIDE;
     virtual unsigned firstDayOfWeek() OVERRIDE;
+    virtual bool isRTL() OVERRIDE;
 #endif
 
 #if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
@@ -82,6 +83,7 @@ private:
     NSDateFormatter *createTimeFormatter();
     NSDateFormatter *createShortTimeFormatter();
 
+    String m_dateFormat;
     String m_localizedTimeFormatText;
     String m_localizedShortTimeFormatText;
     Vector<String> m_timeAMPMLabels;

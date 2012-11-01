@@ -485,7 +485,7 @@ void DumpRenderTreeSupportEfl::evaluateScriptInIsolatedWorld(const Evas_Object* 
     else {
         WTF::HashMap<int, RefPtr<WebCore::DOMWrapperWorld > >::const_iterator it = worldMap.find(worldID);
         if (it != worldMap.end())
-            scriptWorld = (*it).second;
+            scriptWorld = (*it).value;
         else {
             scriptWorld = WebCore::ScriptController::createWorld();
             worldMap.set(worldID, scriptWorld);
@@ -577,7 +577,7 @@ void DumpRenderTreeSupportEfl::sendWebIntentResponse(Ewk_Intent_Request* request
 {
 #if ENABLE(WEB_INTENTS)
     String responseString = response->string();
-    if (responseString.isNull())
+    if (responseString.isEmpty())
         ewk_intent_request_failure_post(request, WebCore::SerializedScriptValue::create(String::fromUTF8("ERROR")));
     else
         ewk_intent_request_result_post(request, WebCore::SerializedScriptValue::create(String(responseString.impl())));

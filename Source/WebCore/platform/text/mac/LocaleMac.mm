@@ -128,10 +128,10 @@ double LocaleMac::parseDateTime(const String& input, DateComponents::Type type)
     return [date timeIntervalSince1970] * msPerSecond;
 }
 
-String LocaleMac::formatDateTime(const DateComponents& dateComponents)
+String LocaleMac::formatDateTime(const DateComponents& dateComponents, FormatType formatType)
 {
     if (dateComponents.type() != DateComponents::Date)
-        return String();
+        return Localizer::formatDateTime(dateComponents, formatType);
     RetainPtr<NSDateFormatter> formatter(AdoptNS, createShortDateFormatter());
     NSTimeInterval interval = dateComponents.millisecondsSinceEpoch() / msPerSecond;
     return String([formatter.get() stringFromDate:[NSDate dateWithTimeIntervalSince1970:interval]]);
@@ -239,6 +239,11 @@ unsigned LocaleMac::firstDayOfWeek()
     // weekDay, so it can be 1 through 7 and 1 is Sunday.
     return [calendar.get() firstWeekday] - 1;
 }
+
+bool LocaleMac::isRTL()
+{
+    return NSLocaleLanguageDirectionRightToLeft == [NSLocale characterDirectionForLanguage:[NSLocale canonicalLanguageIdentifierFromString:[m_locale.get() localeIdentifier]]];
+}
 #endif
 
 #if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
@@ -254,8 +259,11 @@ NSDateFormatter* LocaleMac::createShortTimeFormatter()
 
 String LocaleMac::dateFormat()
 {
-    // FIXME: We should have real implementation of LocaleMac::dateFormat().
-    return emptyString();
+    if (!m_dateFormat.isEmpty())
+        return m_dateFormat;
+    RetainPtr<NSDateFormatter> formatter(AdoptNS, createShortDateFormatter());
+    m_dateFormat = String([formatter.get() dateFormat]);
+    return m_dateFormat;
 }
 
 String LocaleMac::timeFormat()

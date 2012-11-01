@@ -28,7 +28,6 @@
 
 #include "Arguments.h"
 #include "ImmutableArray.h"
-#include "InjectedBundleMessageKinds.h"
 #include "InjectedBundleScriptWorld.h"
 #include "InjectedBundleUserMessageCoders.h"
 #include "LayerTreeHost.h"
@@ -61,6 +60,7 @@
 #include <WebCore/PageVisibilityState.h>
 #include <WebCore/PrintContext.h>
 #include <WebCore/ResourceHandle.h>
+#include <WebCore/ResourceLoadScheduler.h>
 #include <WebCore/ScriptController.h>
 #include <WebCore/SecurityOrigin.h>
 #include <WebCore/SecurityPolicy.h>
@@ -540,46 +540,9 @@ void InjectedBundle::didReceiveMessageToPage(WebPage* page, const String& messag
     m_client.didReceiveMessageToPage(this, page, messageName, messageBody);
 }
 
-void InjectedBundle::didReceiveMessage(CoreIPC::Connection*, CoreIPC::MessageID messageID, CoreIPC::ArgumentDecoder* arguments)
-{
-    switch (messageID.get<InjectedBundleMessage::Kind>()) {
-        case InjectedBundleMessage::PostMessage: {
-            String messageName;            
-            RefPtr<APIObject> messageBody;
-            InjectedBundleUserMessageDecoder messageDecoder(messageBody);
-            if (!arguments->decode(CoreIPC::Out(messageName, messageDecoder)))
-                return;
-
-            didReceiveMessage(messageName, messageBody.get());
-            return;
-        }
-
-        case InjectedBundleMessage::PostMessageToPage: {
-            uint64_t pageID = arguments->destinationID();
-            if (!pageID)
-                return;
-            
-            WebPage* page = WebProcess::shared().webPage(pageID);
-            if (!page)
-                return;
-
-            String messageName;
-            RefPtr<APIObject> messageBody;
-            InjectedBundleUserMessageDecoder messageDecoder(messageBody);
-            if (!arguments->decode(CoreIPC::Out(messageName, messageDecoder)))
-                return;
-
-            didReceiveMessageToPage(page, messageName, messageBody.get());
-            return;
-        }
-    }
-
-    ASSERT_NOT_REACHED();
-}
-
 void InjectedBundle::setPageVisibilityState(WebPage* page, int state, bool isInitialState)
 {
-#if ENABLE(PAGE_VISIBILITY_API)
+#if ENABLE(PAGE_VISIBILITY_API) || ENABLE(HIDDEN_PAGE_DOM_TIMER_THROTTLING)
     page->corePage()->setVisibilityState(static_cast<PageVisibilityState>(state), isInitialState);
 #endif
 }
@@ -644,6 +607,16 @@ uint64_t InjectedBundle::webNotificationID(JSContextRef jsContext, JSValueRef js
 void InjectedBundle::setTabKeyCyclesThroughElements(WebPage* page, bool enabled)
 {
     page->corePage()->setTabKeyCyclesThroughElements(enabled);
+}
+
+void InjectedBundle::setSerialLoadingEnabled(bool enabled)
+{
+    resourceLoadScheduler()->setSerialLoadingEnabled(enabled);
+}
+
+void InjectedBundle::dispatchPendingLoadRequests()
+{
+    resourceLoadScheduler()->servePendingRequests();
 }
 
 } // namespace WebKit

@@ -152,7 +152,6 @@ public:
     void setScrollPosition(const WebCore::IntPoint&);
     void scrollBy(int deltaX, int deltaY);
 
-    void enqueueRenderingOfClippedContentOfScrollableAreaAfterInRegionScrolling();
     void notifyInRegionScrollStopped();
     void setScrollOriginPoint(const Platform::IntPoint&);
     void setHasInRegionScrollableAreas(bool);
@@ -202,7 +201,7 @@ public:
     virtual int showAlertDialog(WebPageClient::AlertType atype);
     virtual bool isActive() const;
     virtual bool isVisible() const { return m_visible; }
-    virtual void authenticationChallenge(const WebCore::KURL&, const WebCore::ProtectionSpace&, const WebCore::Credential&, WebCore::AuthenticationChallengeClient*);
+    virtual void authenticationChallenge(const WebCore::KURL&, const WebCore::ProtectionSpace&, const WebCore::Credential&);
     virtual SaveCredentialType notifyShouldSaveCredential(bool);
     virtual void syncProxyCredential(const WebCore::Credential&);
 
@@ -398,7 +397,7 @@ public:
 
     // Fallback GraphicsLayerClient implementation, used for various overlay layers.
     virtual void notifyAnimationStarted(const WebCore::GraphicsLayer*, double time) { }
-    virtual void notifySyncRequired(const WebCore::GraphicsLayer*);
+    virtual void notifyFlushRequired(const WebCore::GraphicsLayer*);
     virtual void paintContents(const WebCore::GraphicsLayer*, WebCore::GraphicsContext&, WebCore::GraphicsLayerPaintingPhase, const WebCore::IntRect& inClip) { }
     virtual bool showDebugBorders(const WebCore::GraphicsLayer*) const;
     virtual bool showRepaintCounter(const WebCore::GraphicsLayer*) const;

@@ -42,6 +42,7 @@
 
 namespace JSC { namespace DFG {
 
+class GPRTemporary;
 class JSValueOperand;
 class SlowPathGenerator;
 class SpeculativeJIT;
@@ -325,7 +326,7 @@ public:
     // These methods are used when generating 'unexpected'
     // calls out from JIT code to C++ helper routines -
     // they spill all live values to the appropriate
-    // slots in the RegisterFile without changing any state
+    // slots in the JSStack without changing any state
     // in the GenerationInfo.
     SilentRegisterSavePlan silentSavePlanForGPR(VirtualRegister spillMe, GPRReg source)
     {
@@ -704,7 +705,7 @@ public:
     }
 #endif
 
-    // Spill a VirtualRegister to the RegisterFile.
+    // Spill a VirtualRegister to the JSStack.
     void spill(VirtualRegister spillMe)
     {
         GenerationInfo& info = m_generationInfo[spillMe];
@@ -714,7 +715,7 @@ public:
             return;
 #endif
         // Check the GenerationInfo to see if this value need writing
-        // to the RegisterFile - if not, mark it as spilled & return.
+        // to the JSStack - if not, mark it as spilled & return.
         if (!info.needsSpill()) {
             info.setSpilled(*m_stream, spillMe);
             return;
@@ -829,7 +830,7 @@ public:
         return &m_jit.codeBlock()->identifier(index);
     }
 
-    // Spill all VirtualRegisters back to the RegisterFile.
+    // Spill all VirtualRegisters back to the JSStack.
     void flushRegisters()
     {
         for (gpr_iterator iter = m_gprs.begin(); iter != m_gprs.end(); ++iter) {
@@ -1166,6 +1167,11 @@ public:
         m_jit.setupArgumentsWithExecState(object, TrustedImmPtr(size));
         return appendCallWithExceptionCheckSetResult(operation, result);
     }
+    JITCompiler::Call callOperation(P_DFGOperation_EOZ operation, GPRReg result, GPRReg object, int32_t size)
+    {
+        m_jit.setupArgumentsWithExecState(object, TrustedImmPtr(size));
+        return appendCallWithExceptionCheckSetResult(operation, result);
+    }
     JITCompiler::Call callOperation(P_DFGOperation_EPS operation, GPRReg result, GPRReg old, size_t size)
     {
         m_jit.setupArgumentsWithExecState(old, TrustedImmPtr(size));
@@ -1213,19 +1219,29 @@ public:
         m_jit.setupArgumentsWithExecState(arg1, arg2);
         return appendCallWithExceptionCheckSetResult(operation, result);
     }
-    JITCompiler::Call callOperation(J_DFGOperation_ESt operation, GPRReg result, Structure* structure)
+    JITCompiler::Call callOperation(P_DFGOperation_ESt operation, GPRReg result, Structure* structure)
     {
         m_jit.setupArgumentsWithExecState(TrustedImmPtr(structure));
         return appendCallWithExceptionCheckSetResult(operation, result);
     }
-    JITCompiler::Call callOperation(J_DFGOperation_EStI operation, GPRReg result, Structure* structure, GPRReg arg2)
+    JITCompiler::Call callOperation(P_DFGOperation_EStZ operation, GPRReg result, Structure* structure, GPRReg arg2)
     {
         m_jit.setupArgumentsWithExecState(TrustedImmPtr(structure), arg2);
         return appendCallWithExceptionCheckSetResult(operation, result);
     }
-    JITCompiler::Call callOperation(J_DFGOperation_EStPS operation, GPRReg result, Structure* structure, void* pointer, size_t size)
+    JITCompiler::Call callOperation(P_DFGOperation_EStZ operation, GPRReg result, GPRReg arg1, GPRReg arg2)
+    {
+        m_jit.setupArgumentsWithExecState(arg1, arg2);
+        return appendCallWithExceptionCheckSetResult(operation, result);
+    }
+    JITCompiler::Call callOperation(P_DFGOperation_EStPS operation, GPRReg result, Structure* structure, void* pointer, size_t size)
     {
         m_jit.setupArgumentsWithExecState(TrustedImmPtr(structure), TrustedImmPtr(pointer), TrustedImmPtr(size));
+        return appendCallWithExceptionCheckSetResult(operation, result);
+    }
+    JITCompiler::Call callOperation(P_DFGOperation_EStSS operation, GPRReg result, Structure* structure, size_t index, size_t size)
+    {
+        m_jit.setupArgumentsWithExecState(TrustedImmPtr(structure), TrustedImmPtr(index), TrustedImmPtr(size));
         return appendCallWithExceptionCheckSetResult(operation, result);
     }
     JITCompiler::Call callOperation(J_DFGOperation_EPS operation, GPRReg result, void* pointer, size_t size)
@@ -1468,6 +1484,11 @@ public:
         m_jit.setupArgumentsWithExecState(arg1, TrustedImmPtr(arg2));
         return appendCallWithExceptionCheckSetResult(operation, result);
     }
+    JITCompiler::Call callOperation(P_DFGOperation_EOZ operation, GPRReg result, GPRReg arg1, int32_t arg2)
+    {
+        m_jit.setupArgumentsWithExecState(arg1, TrustedImmPtr(arg2));
+        return appendCallWithExceptionCheckSetResult(operation, result);
+    }
     JITCompiler::Call callOperation(P_DFGOperation_EPS operation, GPRReg result, GPRReg old, size_t size)
     {
         m_jit.setupArgumentsWithExecState(old, TrustedImmPtr(size));
@@ -1526,20 +1547,30 @@ public:
         m_jit.setupArgumentsWithExecState(arg1, arg2);
         return appendCallWithExceptionCheckSetResult(operation, resultPayload, resultTag);
     }
-    JITCompiler::Call callOperation(J_DFGOperation_ESt operation, GPRReg resultTag, GPRReg resultPayload, Structure* structure)
+    JITCompiler::Call callOperation(P_DFGOperation_ESt operation, GPRReg result, Structure* structure)
     {
         m_jit.setupArgumentsWithExecState(TrustedImmPtr(structure));
-        return appendCallWithExceptionCheckSetResult(operation, resultPayload, resultTag);
+        return appendCallWithExceptionCheckSetResult(operation, result);
     }
-    JITCompiler::Call callOperation(J_DFGOperation_EStI operation, GPRReg resultTag, GPRReg resultPayload, Structure* structure, GPRReg arg2)
+    JITCompiler::Call callOperation(P_DFGOperation_EStZ operation, GPRReg result, Structure* structure, GPRReg arg2)
     {
         m_jit.setupArgumentsWithExecState(TrustedImmPtr(structure), arg2);
-        return appendCallWithExceptionCheckSetResult(operation, resultPayload, resultTag);
+        return appendCallWithExceptionCheckSetResult(operation, result);
     }
-    JITCompiler::Call callOperation(J_DFGOperation_EStPS operation, GPRReg resultTag, GPRReg resultPayload, Structure* structure, void* pointer, size_t size)
+    JITCompiler::Call callOperation(P_DFGOperation_EStZ operation, GPRReg result, GPRReg arg1, GPRReg arg2)
+    {
+        m_jit.setupArgumentsWithExecState(arg1, arg2);
+        return appendCallWithExceptionCheckSetResult(operation, result);
+    }
+    JITCompiler::Call callOperation(P_DFGOperation_EStPS operation, GPRReg result, Structure* structure, void* pointer, size_t size)
     {
         m_jit.setupArgumentsWithExecState(TrustedImmPtr(structure), TrustedImmPtr(pointer), TrustedImmPtr(size));
-        return appendCallWithExceptionCheckSetResult(operation, resultPayload, resultTag);
+        return appendCallWithExceptionCheckSetResult(operation, result);
+    }
+    JITCompiler::Call callOperation(P_DFGOperation_EStSS operation, GPRReg result, Structure* structure, size_t index, size_t size)
+    {
+        m_jit.setupArgumentsWithExecState(TrustedImmPtr(structure), TrustedImmPtr(index), TrustedImmPtr(size));
+        return appendCallWithExceptionCheckSetResult(operation, result);
     }
     JITCompiler::Call callOperation(J_DFGOperation_EPS operation, GPRReg resultTag, GPRReg resultPayload, void* pointer, size_t size)
     {
@@ -2149,6 +2180,52 @@ public:
     void compileAllocatePropertyStorage(Node&);
     void compileReallocatePropertyStorage(Node&);
     
+#if USE(JSVALUE64)
+    MacroAssembler::JumpList compileContiguousGetByVal(Node&, GPRReg baseReg, GPRReg propertyReg, GPRReg storageReg, GPRReg resultReg);
+    MacroAssembler::JumpList compileArrayStorageGetByVal(Node&, GPRReg baseReg, GPRReg propertyReg, GPRReg storageReg, GPRReg resultReg);
+#else
+    MacroAssembler::JumpList compileContiguousGetByVal(Node&, GPRReg baseReg, GPRReg propertyReg, GPRReg storageReg, GPRReg resultTagReg, GPRReg resultPayloadReg);
+    MacroAssembler::JumpList compileArrayStorageGetByVal(Node&, GPRReg baseReg, GPRReg propertyReg, GPRReg storageReg, GPRReg resultTagReg, GPRReg resultPayloadReg);
+#endif
+    
+    bool putByValWillNeedExtraRegister(Array::Mode arrayMode)
+    {
+        switch (arrayMode) {
+        // For ArrayStorage, we need an extra reg for stores to holes except if
+        // we're in SlowPut mode.
+        case ARRAY_STORAGE_TO_HOLE_MODES:
+        case OUT_OF_BOUNDS_ARRAY_STORAGE_MODES:
+        case ALL_EFFECTFUL_ARRAY_STORAGE_MODES:
+            return true;
+            
+        // For Contiguous, we need an extra reg for any access that may store
+        // to the tail.
+        case CONTIGUOUS_TO_TAIL_MODES:
+        case OUT_OF_BOUNDS_CONTIGUOUS_MODES:
+        case ALL_EFFECTFUL_CONTIGUOUS_MODES:
+            return true;
+            
+        // All polymorphic modes need an extra reg.
+        case ALL_POLYMORPHIC_MODES:
+            return true;
+            
+        default:
+            return false;
+        }
+    }
+    GPRReg temporaryRegisterForPutByVal(GPRTemporary&, Array::Mode);
+    GPRReg temporaryRegisterForPutByVal(GPRTemporary& temporary, Node& node)
+    {
+        return temporaryRegisterForPutByVal(temporary, node.arrayMode());
+    }
+#if USE(JSVALUE64)
+    MacroAssembler::JumpList compileContiguousPutByVal(Node&, GPRReg baseReg, GPRReg propertyReg, GPRReg storageReg, GPRReg valueReg, GPRReg tempReg);
+    MacroAssembler::JumpList compileArrayStoragePutByVal(Node&, GPRReg baseReg, GPRReg propertyReg, GPRReg storageReg, GPRReg valueReg, GPRReg tempReg);
+#else
+    MacroAssembler::JumpList compileContiguousPutByVal(Node&, GPRReg baseReg, GPRReg propertyReg, GPRReg storageReg, GPRReg valueTagReg, GPRReg valuePayloadReg);
+    MacroAssembler::JumpList compileArrayStoragePutByVal(Node&, GPRReg baseReg, GPRReg propertyReg, GPRReg storageReg, GPRReg valueTagReg, GPRReg valuePayloadReg);
+#endif
+    
     void compileGetCharCodeAt(Node&);
     void compileGetByValOnString(Node&);
 
@@ -2170,14 +2247,6 @@ public:
 #endif
     void compileArithMod(Node&);
     void compileSoftModulo(Node&);
-    enum TypedArraySignedness {
-        SignedTypedArray,
-        UnsignedTypedArray
-    };
-    enum TypedArrayRounding {
-        TruncateRounding,
-        ClampRounding
-    };
     void compileGetIndexedPropertyStorage(Node&);
     void compileGetByValOnIntTypedArray(const TypedArrayDescriptor&, Node&, size_t elementSize, TypedArraySignedness);
     void compilePutByValForIntTypedArray(const TypedArrayDescriptor&, GPRReg base, GPRReg property, Node&, size_t elementSize, TypedArraySignedness, TypedArrayRounding = TruncateRounding);
@@ -2189,14 +2258,17 @@ public:
    
     // It is NOT okay for the structure and the scratch register to be the same thing because if they are then the Structure will 
     // get clobbered. 
-    template <typename ClassType, bool destructor, typename StructureType> 
+    template <typename ClassType, MarkedBlock::DestructorType destructorType, typename StructureType> 
     void emitAllocateBasicJSObject(StructureType structure, GPRReg resultGPR, GPRReg scratchGPR, MacroAssembler::JumpList& slowPath)
     {
+        size_t size = ClassType::allocationSize(INLINE_STORAGE_CAPACITY);
         MarkedAllocator* allocator = 0;
-        if (destructor)
-            allocator = &m_jit.globalData()->heap.allocatorForObjectWithDestructor(sizeof(ClassType));
+        if (destructorType == MarkedBlock::Normal)
+            allocator = &m_jit.globalData()->heap.allocatorForObjectWithNormalDestructor(size);
+        else if (destructorType == MarkedBlock::ImmortalStructure)
+            allocator = &m_jit.globalData()->heap.allocatorForObjectWithImmortalStructureDestructor(size);
         else
-            allocator = &m_jit.globalData()->heap.allocatorForObjectWithoutDestructor(sizeof(ClassType));
+            allocator = &m_jit.globalData()->heap.allocatorForObjectWithoutDestructor(size);
 
         m_jit.loadPtr(&allocator->m_freeList.head, resultGPR);
         slowPath.append(m_jit.branchTestPtr(MacroAssembler::Zero, resultGPR));
@@ -2216,7 +2288,7 @@ public:
     template<typename T>
     void emitAllocateJSFinalObject(T structure, GPRReg resultGPR, GPRReg scratchGPR, MacroAssembler::JumpList& slowPath)
     {
-        return emitAllocateBasicJSObject<JSFinalObject, false>(structure, resultGPR, scratchGPR, slowPath);
+        return emitAllocateBasicJSObject<JSFinalObject, MarkedBlock::None>(structure, resultGPR, scratchGPR, slowPath);
     }
 
 #if USE(JSVALUE64) 

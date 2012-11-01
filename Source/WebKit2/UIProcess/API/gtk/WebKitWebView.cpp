@@ -57,6 +57,7 @@
 #include <WebCore/DragIcon.h>
 #include <WebCore/GOwnPtrGtk.h>
 #include <WebCore/GtkUtilities.h>
+#include <WebCore/RefPtrCairo.h>
 #include <glib/gi18n-lib.h>
 #include <wtf/gobject/GOwnPtr.h>
 #include <wtf/gobject/GRefPtr.h>
@@ -142,6 +143,9 @@ struct _WebKitWebViewPrivate {
     ResourcesMap subresourcesMap;
 
     GRefPtr<WebKitWebInspector> inspector;
+
+    RefPtr<cairo_surface_t> favicon;
+    GRefPtr<GCancellable> faviconCancellable;
 };
 
 static guint signals[LAST_SIGNAL] = { 0, };
@@ -263,13 +267,35 @@ static void userAgentChanged(WebKitSettings* settings, GParamSpec*, WebKitWebVie
     getPage(webView)->setCustomUserAgent(String::fromUTF8(webkit_settings_get_user_agent(settings)));
 }
 
-static void iconReadyCallback(WebKitFaviconDatabase *database, const char *uri, WebKitWebView *webView)
+static void webkitWebViewCancelFaviconRequest(WebKitWebView* webView)
+{
+    if (!webView->priv->faviconCancellable)
+        return;
+
+    g_cancellable_cancel(webView->priv->faviconCancellable.get());
+    webView->priv->faviconCancellable = 0;
+}
+
+static void webkitWebViewUpdateFavicon(WebKitWebView* webView, cairo_surface_t* favicon)
+{
+    if (webView->priv->favicon.get() == favicon)
+        return;
+
+    webView->priv->favicon = favicon;
+    g_object_notify(G_OBJECT(webView), "favicon");
+}
+
+static void iconReadyCallback(WebKitFaviconDatabase* database, const char* uri, WebKitWebView* webView)
 {
     // Consider only the icon matching the active URI for this webview.
     if (webView->priv->activeURI != uri)
         return;
 
-    g_object_notify(G_OBJECT(webView), "favicon");
+    // Update the favicon only if we don't have one already.
+    if (!webView->priv->favicon) {
+        RefPtr<cairo_surface_t> favicon = adoptRef(webkitFaviconDatabaseGetFavicon(database, webView->priv->activeURI));
+        webkitWebViewUpdateFavicon(webView, favicon.get());
+    }
 }
 
 static void webkitWebViewSetSettings(WebKitWebView* webView, WebKitSettings* settings)
@@ -372,7 +398,7 @@ static void webkitWebViewConstructed(GObject* object)
     WebKitWebViewPrivate* priv = webView->priv;
     WebKitWebViewBase* webViewBase = WEBKIT_WEB_VIEW_BASE(webView);
 
-    webkitWebViewBaseCreateWebPage(webViewBase, toImpl(webkitWebContextGetWKContext(priv->context)), 0);
+    webkitWebViewBaseCreateWebPage(webViewBase, webkitWebContextGetContext(priv->context), 0);
 
     attachLoaderClientToView(webView);
     attachUIClientToView(webView);
@@ -449,6 +475,7 @@ static void webkitWebViewFinalize(GObject* object)
     if (priv->modalLoop && g_main_loop_is_running(priv->modalLoop.get()))
         g_main_loop_quit(priv->modalLoop.get());
 
+    webkitWebViewCancelFaviconRequest(webView);
     webkitWebViewDisconnectMainResourceResponseChangedSignalHandler(webView);
     webkitWebViewDisconnectSettingsSignalHandlers(webView);
     webkitWebViewDisconnectFaviconDatabaseSignalHandlers(webView);
@@ -1234,29 +1261,52 @@ static void webkitWebViewEmitDelayedLoadEvents(WebKitWebView* webView)
     priv->waitingForMainResource = false;
 }
 
+static void getFaviconReadyCallback(GObject* object, GAsyncResult* result, gpointer userData)
+{
+    GOwnPtr<GError> error;
+    RefPtr<cairo_surface_t> favicon = adoptRef(webkit_favicon_database_get_favicon_finish(WEBKIT_FAVICON_DATABASE(object), result, &error.outPtr()));
+    if (!g_error_matches(error.get(), G_IO_ERROR, G_IO_ERROR_CANCELLED)) {
+        WebKitWebView* webView = WEBKIT_WEB_VIEW(userData);
+        webkitWebViewUpdateFavicon(webView, favicon.get());
+        webView->priv->faviconCancellable = 0;
+    }
+}
+
+static void webkitWebViewRequestFavicon(WebKitWebView* webView)
+{
+    WebKitWebViewPrivate* priv = webView->priv;
+    WebKitFaviconDatabase* database = webkit_web_context_get_favicon_database(priv->context);
+    priv->faviconCancellable = adoptGRef(g_cancellable_new());
+    webkit_favicon_database_get_favicon(database, priv->activeURI.data(), priv->faviconCancellable.get(), getFaviconReadyCallback, webView);
+}
+
 void webkitWebViewLoadChanged(WebKitWebView* webView, WebKitLoadEvent loadEvent)
 {
+    WebKitWebViewPrivate* priv = webView->priv;
     if (loadEvent == WEBKIT_LOAD_STARTED) {
         // Finish a possible previous load waiting for main resource.
         webkitWebViewEmitDelayedLoadEvents(webView);
 
-        webView->priv->loadingResourcesMap.clear();
-        webView->priv->mainResource = 0;
-        webView->priv->waitingForMainResource = false;
+        webkitWebViewCancelFaviconRequest(webView);
+        priv->loadingResourcesMap.clear();
+        priv->mainResource = 0;
+        priv->waitingForMainResource = false;
     } else if (loadEvent == WEBKIT_LOAD_COMMITTED) {
-        webView->priv->subresourcesMap.clear();
-        if (!webView->priv->mainResource) {
+        webkitWebViewRequestFavicon(webView);
+
+        priv->subresourcesMap.clear();
+        if (!priv->mainResource) {
             // When a page is loaded from the history cache, the main resource load callbacks
             // are called when the main frame load is finished. We want to make sure there's a
             // main resource available when load has been committed, so we delay the emission of
             // load-changed signal until main resource object has been created.
-            webView->priv->waitingForMainResource = true;
+            priv->waitingForMainResource = true;
         } else
             setCertificateToMainResource(webView);
     }
 
-    if (webView->priv->waitingForMainResource)
-        webView->priv->lastDelayedEvent = loadEvent;
+    if (priv->waitingForMainResource)
+        priv->lastDelayedEvent = loadEvent;
     else
         webkitWebViewEmitLoadChanged(webView, loadEvent);
 }
@@ -1909,7 +1959,7 @@ const gchar* webkit_web_view_get_uri(WebKitWebView* webView)
  * connect to notify::favicon signal of @web_view to be notified when
  * the favicon is available.
  *
- * Returns: (transfer full): a pointer to a #cairo_surface_t with the
+ * Returns: (transfer none): a pointer to a #cairo_surface_t with the
  *    favicon or %NULL if there's no icon associated with @web_view.
  */
 cairo_surface_t* webkit_web_view_get_favicon(WebKitWebView* webView)
@@ -1918,8 +1968,7 @@ cairo_surface_t* webkit_web_view_get_favicon(WebKitWebView* webView)
     if (webView->priv->activeURI.isNull())
         return 0;
 
-    WebKitFaviconDatabase* database = webkit_web_context_get_favicon_database(webView->priv->context);
-    return webkitFaviconDatabaseGetFavicon(database, webView->priv->activeURI);
+    return webView->priv->favicon.get();
 }
 
 /**
@@ -2380,6 +2429,94 @@ WebKitJavascriptResult* webkit_web_view_run_javascript_finish(WebKitWebView* web
     return data->scriptResult ? webkit_javascript_result_ref(data->scriptResult) : 0;
 }
 
+static void resourcesStreamReadCallback(GObject* object, GAsyncResult* result, gpointer userData)
+{
+    GOutputStream* outputStream = G_OUTPUT_STREAM(object);
+    GRefPtr<GSimpleAsyncResult> runJavascriptResult = adoptGRef(G_SIMPLE_ASYNC_RESULT(userData));
+
+    GError* error = 0;
+    g_output_stream_splice_finish(outputStream, result, &error);
+    if (error) {
+        g_simple_async_result_take_error(runJavascriptResult.get(), error);
+        g_simple_async_result_complete(runJavascriptResult.get());
+        return;
+    }
+
+    GRefPtr<WebKitWebView> webView = adoptGRef(WEBKIT_WEB_VIEW(g_async_result_get_source_object(G_ASYNC_RESULT(runJavascriptResult.get()))));
+    gpointer outputStreamData = g_memory_output_stream_get_data(G_MEMORY_OUTPUT_STREAM(outputStream));
+    getPage(webView.get())->runJavaScriptInMainFrame(String::fromUTF8(reinterpret_cast<const gchar*>(outputStreamData)),
+                                                     ScriptValueCallback::create(runJavascriptResult.leakRef(), webkitWebViewRunJavaScriptCallback));
+}
+
+/**
+ * webkit_web_view_run_javascript_from_gresource:
+ * @web_view: a #WebKitWebView
+ * @resource: the location of the resource to load
+ * @cancellable: (allow-none): a #GCancellable or %NULL to ignore
+ * @callback: (scope async): a #GAsyncReadyCallback to call when the script finished
+ * @user_data: (closure): the data to pass to callback function
+ *
+ * Asynchronously run the script from @resource in the context of the
+ * current page in @web_view.
+ *
+ * When the operation is finished, @callback will be called. You can
+ * then call webkit_web_view_run_javascript_from_gresource_finish() to get the result
+ * of the operation.
+ */
+void webkit_web_view_run_javascript_from_gresource(WebKitWebView* webView, const gchar* resource, GCancellable* cancellable, GAsyncReadyCallback callback, gpointer userData)
+{
+    g_return_if_fail(WEBKIT_IS_WEB_VIEW(webView));
+    g_return_if_fail(resource);
+
+    GRefPtr<GSimpleAsyncResult> result = adoptGRef(g_simple_async_result_new(G_OBJECT(webView), callback, userData,
+                                                                             reinterpret_cast<gpointer>(webkit_web_view_run_javascript_from_gresource)));
+    RunJavaScriptAsyncData* data = createRunJavaScriptAsyncData();
+    data->cancellable = cancellable;
+    g_simple_async_result_set_op_res_gpointer(result.get(), data, reinterpret_cast<GDestroyNotify>(destroyRunJavaScriptAsyncData));
+
+    GError* error = 0;
+    GRefPtr<GInputStream> inputStream = adoptGRef(g_resources_open_stream(resource, G_RESOURCE_LOOKUP_FLAGS_NONE, &error));
+    if (error) {
+        g_simple_async_result_take_error(result.get(), error);
+        g_simple_async_result_complete_in_idle(result.get());
+        return;
+    }
+
+    GRefPtr<GOutputStream> outputStream = adoptGRef(g_memory_output_stream_new(0, 0, fastRealloc, fastFree));
+    g_output_stream_splice_async(outputStream.get(), inputStream.get(),
+                                 static_cast<GOutputStreamSpliceFlags>(G_OUTPUT_STREAM_SPLICE_CLOSE_SOURCE | G_OUTPUT_STREAM_SPLICE_CLOSE_TARGET),
+                                 G_PRIORITY_DEFAULT,
+                                 cancellable, resourcesStreamReadCallback, result.leakRef());
+}
+
+/**
+ * webkit_web_view_run_javascript_from_gresource_finish:
+ * @web_view: a #WebKitWebView
+ * @result: a #GAsyncResult
+ * @error: return location for error or %NULL to ignore
+ *
+ * Finish an asynchronous operation started with webkit_web_view_run_javascript_from_gresource().
+ *
+ * Check webkit_web_view_run_javascript_finish() for a usage example.
+ *
+ * Returns: (transfer full): a #WebKitJavascriptResult with the result of the last executed statement in @script
+ *    or %NULL in case of error
+ */
+WebKitJavascriptResult* webkit_web_view_run_javascript_from_gresource_finish(WebKitWebView* webView, GAsyncResult* result, GError** error)
+{
+    g_return_val_if_fail(WEBKIT_IS_WEB_VIEW(webView), 0);
+    g_return_val_if_fail(G_IS_ASYNC_RESULT(result), 0);
+
+    GSimpleAsyncResult* simpleResult = G_SIMPLE_ASYNC_RESULT(result);
+    g_warn_if_fail(g_simple_async_result_get_source_tag(simpleResult) == webkit_web_view_run_javascript_from_gresource);
+
+    if (g_simple_async_result_propagate_error(simpleResult, error))
+        return 0;
+
+    RunJavaScriptAsyncData* data = static_cast<RunJavaScriptAsyncData*>(g_simple_async_result_get_op_res_gpointer(simpleResult));
+    return data->scriptResult ? webkit_javascript_result_ref(data->scriptResult) : 0;
+}
+
 /**
  * webkit_web_view_get_main_resource:
  * @web_view: a #WebKitWebView
@@ -2414,7 +2551,7 @@ GList* webkit_web_view_get_subresources(WebKitWebView* webView)
     WebKitWebViewPrivate* priv = webView->priv;
     ResourcesMap::const_iterator end = priv->subresourcesMap.end();
     for (ResourcesMap::const_iterator it = priv->subresourcesMap.begin(); it != end; ++it)
-        subresources = g_list_prepend(subresources, it->second.get());
+        subresources = g_list_prepend(subresources, it->value.get());
 
     return g_list_reverse(subresources);
 }

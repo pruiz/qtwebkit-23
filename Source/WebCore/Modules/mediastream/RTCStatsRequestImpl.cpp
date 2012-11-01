@@ -51,13 +51,16 @@ RTCStatsRequestImpl::~RTCStatsRequestImpl()
 {
 }
 
-void RTCStatsRequestImpl::requestSucceeded()
+PassRefPtr<RTCStatsResponseBase> RTCStatsRequestImpl::createResponse()
+{
+    return RTCStatsResponse::create();
+}
+
+void RTCStatsRequestImpl::requestSucceeded(PassRefPtr<RTCStatsResponseBase> response)
 {
     if (!m_successCallback)
         return;
-    // FIXME: Fill in content of stats parameter.
-    RefPtr<RTCStatsResponse> stats = RTCStatsResponse::create();
-    m_successCallback->handleEvent(stats.get());
+    m_successCallback->handleEvent(static_cast<RTCStatsResponse*>(response.get()));
     clear();
 }
 

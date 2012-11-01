@@ -54,9 +54,6 @@ ViewportUpdateDeferrer::~ViewportUpdateDeferrer()
         return;
 
     m_controller->resumeContent();
-
-    // Make sure that tiles all around the viewport will be requested.
-    m_controller->syncVisibleContents();
 }
 
 PageViewportController::PageViewportController(WebKit::WebPageProxy* proxy, PageViewportControllerClient* client)
@@ -126,8 +123,13 @@ void PageViewportController::didChangeContentsSize(const IntSize& newSize)
 
 void PageViewportController::didRenderFrame(const IntSize& contentsSize, const IntRect& coveredRect)
 {
-    // Only update the viewport's contents dimensions along with its render.
-    m_client->didChangeContentsSize(contentsSize);
+    if (m_clientContentsSize != contentsSize) {
+        m_clientContentsSize = contentsSize;
+        // Only update the viewport's contents dimensions along with its render if the
+        // size actually changed since animations on the page trigger DidRenderFrame
+        // messages without causing dimension changes.
+        m_client->didChangeContentsSize(contentsSize);
+    }
 
     m_lastFrameCoveredRect = coveredRect;
 
@@ -137,7 +139,6 @@ void PageViewportController::didRenderFrame(const IntSize& contentsSize, const I
     // All position and scale changes resulting from a web process event should
     // go through here to be applied on the viewport to avoid showing incomplete
     // tiles to the user during a few milliseconds.
-    ViewportUpdateDeferrer guard(this);
     if (m_effectiveScaleIsLocked) {
         m_client->setContentsScale(m_effectiveScale, false);
         m_effectiveScaleIsLocked = false;
@@ -145,7 +146,7 @@ void PageViewportController::didRenderFrame(const IntSize& contentsSize, const I
     if (m_viewportPosIsLocked) {
         FloatPoint clampedPos = clampViewportToContents(m_viewportPos, m_effectiveScale);
         // There might be rendered frames not covering our requested position yet, wait for it.
-        if (FloatRect(clampedPos, m_viewportSize / m_effectiveScale).intersects(coveredRect)) {
+        if (FloatRect(clampedPos, viewportSizeInContentsCoordinates()).intersects(coveredRect)) {
             m_client->setViewportPosition(clampedPos);
             m_viewportPosIsLocked = false;
         }
@@ -172,7 +173,7 @@ void PageViewportController::pageDidRequestScroll(const IntPoint& cssPosition)
     if (m_activeDeferrerCount)
         return;
 
-    FloatRect endVisibleContentRect(clampViewportToContents(cssPosition, m_effectiveScale), m_viewportSize / m_effectiveScale);
+    FloatRect endVisibleContentRect(clampViewportToContents(cssPosition, m_effectiveScale), viewportSizeInContentsCoordinates());
     if (m_lastFrameCoveredRect.intersects(endVisibleContentRect))
         m_client->setViewportPosition(endVisibleContentRect.location());
     else
@@ -210,7 +211,7 @@ void PageViewportController::syncVisibleContents(const FloatPoint& trajectoryVec
     if (!drawingArea || m_viewportSize.isEmpty() || m_contentsSize.isEmpty())
         return;
 
-    FloatRect visibleContentsRect(clampViewportToContents(m_viewportPos, m_effectiveScale), m_viewportSize / m_effectiveScale);
+    FloatRect visibleContentsRect(clampViewportToContents(m_viewportPos, m_effectiveScale), viewportSizeInContentsCoordinates());
     visibleContentsRect.intersect(FloatRect(FloatPoint::zero(), m_contentsSize));
     drawingArea->setVisibleContentsRect(visibleContentsRect, m_effectiveScale, trajectoryVector);
 
@@ -229,6 +230,11 @@ void PageViewportController::didChangeViewportAttributes(const WebCore::Viewport
     updateMinimumScaleToFit();
 
     m_client->didChangeViewportAttributes();
+}
+
+WebCore::FloatSize PageViewportController::viewportSizeInContentsCoordinates() const
+{
+    return WebCore::FloatSize(m_viewportSize.width() / m_effectiveScale, m_viewportSize.height() / m_effectiveScale);
 }
 
 void PageViewportController::suspendContent()

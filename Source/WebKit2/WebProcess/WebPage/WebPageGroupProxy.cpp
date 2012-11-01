@@ -28,6 +28,8 @@
 
 #include "WebProcess.h"
 #include "InjectedBundle.h"
+#include <WebCore/DOMWrapperWorld.h>
+#include <WebCore/PageGroup.h>
 
 namespace WebKit {
 
@@ -43,6 +45,29 @@ PassRefPtr<WebPageGroupProxy> WebPageGroupProxy::create(const WebPageGroupData& 
 
 WebPageGroupProxy::~WebPageGroupProxy()
 {
+}
+    
+void WebPageGroupProxy::didReceiveMessage(CoreIPC::Connection* connection, CoreIPC::MessageID messageID, CoreIPC::ArgumentDecoder* arguments)
+{
+    didReceiveWebPageGroupProxyMessage(connection, messageID, arguments);
+}
+    
+WebPageGroupProxy::WebPageGroupProxy(const WebPageGroupData& data)
+    : m_data(data)
+    , m_pageGroup(WebCore::PageGroup::pageGroup(m_data.identifer))
+{
+    for (size_t i = 0; i < data.userStyleSheets.size(); ++i)
+        addUserStyleSheet(data.userStyleSheets.at(i));
+}
+
+void WebPageGroupProxy::addUserStyleSheet(const UserContentContainer::Item& styleSheet)
+{
+    m_pageGroup->addUserStyleSheetToWorld(WebCore::mainThreadNormalWorld(), styleSheet.source(), styleSheet.url(), styleSheet.whitelist(), styleSheet.blacklist(), static_cast<WebCore::UserContentInjectedFrames>(styleSheet.injectedFrames()));
+}
+
+void WebPageGroupProxy::removeAllUserStyleSheets()
+{
+    m_pageGroup->removeUserStyleSheetsFromWorld(WebCore::mainThreadNormalWorld());
 }
 
 } // namespace WebKit

@@ -503,9 +503,16 @@ WebInspector.ScriptsPanel.prototype = {
 
     _revealExecutionLine: function(uiLocation)
     {
+        var uiSourceCode = uiLocation.uiSourceCode;
         // Some scripts (anonymous and snippets evaluations) are not added to files select by default.
-        this._editorContainer.addUISourceCode(uiLocation.uiSourceCode);
-        var sourceFrame = this._showFile(uiLocation.uiSourceCode);
+        if (uiSourceCode.isTemporary) {
+            if (this._currentUISourceCode && this._currentUISourceCode.scriptFile() && this._currentUISourceCode.scriptFile().isDivergingFromVM())
+                return;
+            this._editorContainer.addUISourceCode(uiSourceCode);
+            if (uiSourceCode.formatted() !== this._toggleFormatSourceButton.toggled)
+                uiSourceCode.setFormatted(this._toggleFormatSourceButton.toggled, this._uiSourceCodeFormatted.bind(this, uiSourceCode));
+        }
+        var sourceFrame = this._showFile(uiSourceCode);
         sourceFrame.revealLine(uiLocation.lineNumber);
         sourceFrame.focus();
     },
@@ -586,6 +593,7 @@ WebInspector.ScriptsPanel.prototype = {
         }
 
         if (this._paused) {
+            this._updateButtonTitle(this.pauseButton, WebInspector.UIString("Resume script execution (%s)."))
             this.pauseButton.addStyleClass("paused");
 
             this.pauseButton.disabled = false;
@@ -595,6 +603,7 @@ WebInspector.ScriptsPanel.prototype = {
 
             this.debuggerStatusElement.textContent = WebInspector.UIString("Paused");
         } else {
+            this._updateButtonTitle(this.pauseButton, WebInspector.UIString("Pause script execution (%s)."))
             this.pauseButton.removeStyleClass("paused");
 
             this.pauseButton.disabled = this._waitingToPause;
@@ -745,12 +754,11 @@ WebInspector.ScriptsPanel.prototype = {
         var platformSpecificModifier = WebInspector.KeyboardShortcut.Modifiers.CtrlOrMeta;
 
         // Continue.
-        title = WebInspector.UIString("Pause script execution (%s).");
         handler = this._togglePause.bind(this);
         shortcuts = [];
         shortcuts.push(WebInspector.KeyboardShortcut.makeDescriptor(WebInspector.KeyboardShortcut.Keys.F8));
         shortcuts.push(WebInspector.KeyboardShortcut.makeDescriptor(WebInspector.KeyboardShortcut.Keys.Slash, platformSpecificModifier));
-        this.pauseButton = this._createButtonAndRegisterShortcuts(section, "scripts-pause", title, handler, shortcuts, WebInspector.UIString("Pause/Continue"));
+        this.pauseButton = this._createButtonAndRegisterShortcuts(section, "scripts-pause", "", handler, shortcuts, WebInspector.UIString("Pause/Continue"));
         debugToolbar.appendChild(this.pauseButton);
 
         // Step over.
@@ -792,12 +800,23 @@ WebInspector.ScriptsPanel.prototype = {
         return debugToolbar;
     },
 
+    _updateButtonTitle: function(button, buttonTitle)
+    {
+        button.buttonTitle = buttonTitle;
+        var hasShortcuts = button.shortcuts && button.shortcuts.length;
+        if (hasShortcuts)
+            button.title = String.vsprintf(buttonTitle, [button.shortcuts[0].name]);
+        else
+            button.title = buttonTitle;
+    },
+
     _createButtonAndRegisterShortcuts: function(section, buttonId, buttonTitle, handler, shortcuts, shortcutDescription)
     {
         var button = document.createElement("button");
         button.className = "status-bar-item";
         button.id = buttonId;
-        button.title = String.vsprintf(buttonTitle, [shortcuts[0].name]);
+        button.shortcuts = shortcuts;
+        this._updateButtonTitle(button, buttonTitle);
         button.disabled = true;
         button.appendChild(document.createElement("img"));
         button.addEventListener("click", handler, false);

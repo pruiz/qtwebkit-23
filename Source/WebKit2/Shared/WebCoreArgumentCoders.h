@@ -72,6 +72,10 @@ namespace WebCore {
     class FloatPoint3D;
     class TransformationMatrix;
     struct Length;
+
+#if USE(GRAPHICS_SURFACE)
+    struct GraphicsSurfaceToken;
+#endif
 }
 
 #if ENABLE(CSS_FILTERS)
@@ -159,17 +163,42 @@ template<> struct ArgumentCoder<WebCore::Cursor> {
 };
 
 template<> struct ArgumentCoder<WebCore::ResourceRequest> {
+#if PLATFORM(MAC) || PLATFORM(WIN)
+    static const bool kShouldSerializeWebCoreData = false;
+#else
+    static const bool kShouldSerializeWebCoreData = true;
+#endif
+
     static void encode(ArgumentEncoder*, const WebCore::ResourceRequest&);
     static bool decode(ArgumentDecoder*, WebCore::ResourceRequest&);
+    static void encodePlatformData(ArgumentEncoder*, const WebCore::ResourceRequest&);
+    static bool decodePlatformData(ArgumentDecoder*, WebCore::ResourceRequest&);
 };
 
 template<> struct ArgumentCoder<WebCore::ResourceResponse> {
+#if PLATFORM(MAC) || PLATFORM(WIN)
+    static const bool kShouldSerializeWebCoreData = false;
+#else
+    static const bool kShouldSerializeWebCoreData = true;
+#endif
+
     static void encode(ArgumentEncoder*, const WebCore::ResourceResponse&);
     static bool decode(ArgumentDecoder*, WebCore::ResourceResponse&);
+    static void encodePlatformData(ArgumentEncoder*, const WebCore::ResourceResponse&);
+    static bool decodePlatformData(ArgumentDecoder*, WebCore::ResourceResponse&);
 };
+
 template<> struct ArgumentCoder<WebCore::ResourceError> {
+#if PLATFORM(MAC)
+    static const bool kShouldSerializeWebCoreData = false;
+#else
+    static const bool kShouldSerializeWebCoreData = true;
+#endif
+
     static void encode(ArgumentEncoder*, const WebCore::ResourceError&);
     static bool decode(ArgumentDecoder*, WebCore::ResourceError&);
+    static void encodePlatformData(ArgumentEncoder*, const WebCore::ResourceError&);
+    static bool decodePlatformData(ArgumentDecoder*, WebCore::ResourceError&);
 };
 
 template<> struct ArgumentCoder<WebCore::WindowFeatures> {
@@ -249,6 +278,13 @@ template<> struct ArgumentCoder<WebCore::TransformationMatrix> {
 template<> struct ArgumentCoder<WebCore::FilterOperations> {
     static void encode(ArgumentEncoder*, const WebCore::FilterOperations&);
     static bool decode(ArgumentDecoder*, WebCore::FilterOperations&);
+};
+#endif
+
+#if USE(GRAPHICS_SURFACE)
+template<> struct ArgumentCoder<WebCore::GraphicsSurfaceToken> {
+    static void encode(ArgumentEncoder*, const WebCore::GraphicsSurfaceToken&);
+    static bool decode(ArgumentDecoder*, WebCore::GraphicsSurfaceToken&);
 };
 #endif
 #endif

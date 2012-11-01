@@ -59,7 +59,7 @@
 
 void messageHandler(QtMsgType type, const char *message)
 {
-    if (type == QtCriticalMsg) {
+    if (type == QtCriticalMsg || type == QtFatalMsg) {
         fprintf(stderr, "%s\n", message);
         return;
     }

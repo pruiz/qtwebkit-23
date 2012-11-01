@@ -36,9 +36,10 @@ public:
 private:
     virtual void initializeLocalizerData() OVERRIDE FINAL;
     virtual double parseDateTime(const String&, DateComponents::Type) OVERRIDE;
-    virtual String formatDateTime(const DateComponents&) OVERRIDE;
+    virtual String formatDateTime(const DateComponents&, FormatType = FormatTypeUnspecified) OVERRIDE;
 #if ENABLE(CALENDAR_PICKER)
     virtual String dateFormatText() OVERRIDE;
+    virtual bool isRTL() OVERRIDE;
 #endif
 #if ENABLE(INPUT_MULTIPLE_FIELDS_UI)
     virtual String dateFormat() OVERRIDE;
@@ -63,7 +64,7 @@ double LocaleNone::parseDateTime(const String&, DateComponents::Type)
     return std::numeric_limits<double>::quiet_NaN();
 }
 
-String LocaleNone::formatDateTime(const DateComponents&)
+String LocaleNone::formatDateTime(const DateComponents&, FormatType)
 {
     return String();
 }
@@ -72,6 +73,11 @@ String LocaleNone::formatDateTime(const DateComponents&)
 String LocaleNone::dateFormatText()
 {
     return ASCIILiteral("Year-Month-Day");
+}
+
+bool LocaleNone::isRTL()
+{
+    return false;
 }
 #endif
 

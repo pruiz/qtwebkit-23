@@ -38,11 +38,16 @@
 
 namespace WebCore {
 
+class PickerIndicatorElement;
+
 class BaseMultipleFieldsDateAndTimeInputType : public BaseDateAndTimeInputType, protected DateTimeEditElement::EditControlOwner {
 protected:
     BaseMultipleFieldsDateAndTimeInputType(HTMLInputElement*);
     virtual ~BaseMultipleFieldsDateAndTimeInputType();
+
+    int fullYear(const String&) const;
     virtual void setupLayoutParameters(DateTimeEditElement::LayoutParameters&, const DateComponents&) const = 0;
+    bool shouldHaveSecondField(const DateComponents&) const;
 
 private:
     // DateTimeEditElement::EditControlOwner functions
@@ -74,8 +79,20 @@ private:
     virtual bool shouldUseInputMethod() const OVERRIDE FINAL;
     virtual void stepAttributeChanged() OVERRIDE FINAL;
     virtual void updateInnerTextValue() OVERRIDE FINAL;
+    virtual void listAttributeTargetChanged() OVERRIDE FINAL;
+
+    void showPickerIndicator();
+    void hidePickerIndicator();
+    void updatePickerIndicatorVisibility();
 
     DateTimeEditElement* m_dateTimeEditElement;
+#if ENABLE(DATALIST_ELEMENT) || ENABLE(CALENDAR_PICKER)
+    PickerIndicatorElement* m_pickerIndicatorElement;
+    bool m_pickerIndicatorIsVisible;
+#if ENABLE(CALENDAR_PICKER)
+    bool m_pickerIndicatorIsAlwaysVisible;
+#endif
+#endif
 };
 
 } // namespace WebCore

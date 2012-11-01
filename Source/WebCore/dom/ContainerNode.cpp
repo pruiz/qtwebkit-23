@@ -23,6 +23,7 @@
 #include "config.h"
 #include "ContainerNode.h"
 
+#include "AXObjectCache.h"
 #include "ChildListMutationScope.h"
 #include "ContainerNodeAlgorithms.h"
 #include "DeleteButtonController.h"
@@ -44,6 +45,10 @@
 #include "UndoManager.h"
 #include <wtf/CurrentTime.h>
 #include <wtf/Vector.h>
+
+#if USE(JSC)
+#include "JSNode.h"
+#endif
 
 using namespace std;
 
@@ -119,6 +124,9 @@ void ContainerNode::takeAllChildrenFrom(ContainerNode* oldParent)
 
 ContainerNode::~ContainerNode()
 {
+    if (AXObjectCache::accessibilityEnabled() && documentInternal() && documentInternal()->axObjectCacheExists())
+        documentInternal()->axObjectCache()->remove(this);
+
     removeAllChildren();
 }
 
@@ -738,7 +746,7 @@ bool ContainerNode::getUpperLeftCorner(FloatPoint& point) const
     RenderObject* p = o;
 
     if (!o->isInline() || o->isReplaced()) {
-        point = o->localToAbsolute(FloatPoint(), false, true);
+        point = o->localToAbsolute(FloatPoint(), UseTransforms);
         return true;
     }
 
@@ -763,7 +771,7 @@ bool ContainerNode::getUpperLeftCorner(FloatPoint& point) const
         ASSERT(o);
 
         if (!o->isInline() || o->isReplaced()) {
-            point = o->localToAbsolute(FloatPoint(), false, true);
+            point = o->localToAbsolute(FloatPoint(), UseTransforms);
             return true;
         }
 
@@ -777,7 +785,7 @@ bool ContainerNode::getUpperLeftCorner(FloatPoint& point) const
                 RenderBox* box = toRenderBox(o);
                 point.moveBy(box->location());
             }
-            point = o->container()->localToAbsolute(point, false, true);
+            point = o->container()->localToAbsolute(point, UseTransforms | SnapOffsetForTransforms);
             return true;
         }
     }
@@ -799,7 +807,7 @@ bool ContainerNode::getLowerRightCorner(FloatPoint& point) const
     RenderObject* o = renderer();
     if (!o->isInline() || o->isReplaced()) {
         RenderBox* box = toRenderBox(o);
-        point = o->localToAbsolute(LayoutPoint(box->size()), false, true);
+        point = o->localToAbsolute(LayoutPoint(box->size()), UseTransforms);
         return true;
     }
 
@@ -832,7 +840,7 @@ bool ContainerNode::getLowerRightCorner(FloatPoint& point) const
                 RenderBox* box = toRenderBox(o);
                 point.moveBy(box->frameRect().maxXMaxYCorner());
             }
-            point = o->container()->localToAbsolute(point, false, true);
+            point = o->container()->localToAbsolute(point, UseTransforms);
             return true;
         }
     }
@@ -973,6 +981,9 @@ static void dispatchChildRemovalEvents(Node* child)
 
     ASSERT(!NoEventDispatchAssertion::isEventDispatchForbidden());
 
+#if USE(JSC)
+    willCreatePossiblyOrphanedTreeByRemoval(child);
+#endif
     InspectorInstrumentation::willRemoveDOMNode(child->document(), child);
 
     RefPtr<Node> c = child;

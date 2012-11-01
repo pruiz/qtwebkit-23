@@ -151,20 +151,15 @@ String DateTimeLocalInputType::formatDateTimeFieldsState(const DateTimeFieldsSta
 
 void DateTimeLocalInputType::setupLayoutParameters(DateTimeEditElement::LayoutParameters& layoutParameters, const DateComponents& date) const
 {
-    // FIXME: It is better to have Localizer::dateTimeFormat() and use it
-    // here rather than constructing from dateFormat() and timeFormat().
-    StringBuilder builder;
-    builder.append(layoutParameters.localizer.dateFormat());
-    builder.append(' ');
-    if (date.second() || layoutParameters.shouldHaveSecondField()) {
-        builder.append(layoutParameters.localizer.timeFormat());
+    if (shouldHaveSecondField(date)) {
+        layoutParameters.dateTimeFormat = layoutParameters.localizer.dateTimeFormatWithSeconds();
         layoutParameters.fallbackDateTimeFormat = "dd/MM/yyyy HH:mm:ss";
     } else {
-        builder.append(layoutParameters.localizer.shortTimeFormat());
+        layoutParameters.dateTimeFormat = layoutParameters.localizer.dateTimeFormatWithoutSeconds();
         layoutParameters.fallbackDateTimeFormat = "dd/MM/yyyy HH:mm";
     }
-
-    layoutParameters.dateTimeFormat = builder.toString();
+    layoutParameters.minimumYear = fullYear(element()->fastGetAttribute(minAttr));
+    layoutParameters.maximumYear = fullYear(element()->fastGetAttribute(maxAttr));
     layoutParameters.placeholderForDay = placeholderForDayOfMonthField();
     layoutParameters.placeholderForMonth = placeholderForMonthField();
     layoutParameters.placeholderForYear = placeholderForYearField();

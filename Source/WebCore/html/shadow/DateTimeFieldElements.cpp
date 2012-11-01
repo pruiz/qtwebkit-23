@@ -79,7 +79,7 @@ DateTimeDayFieldElement::DateTimeDayFieldElement(Document* document, FieldOwner&
 PassRefPtr<DateTimeDayFieldElement> DateTimeDayFieldElement::create(Document* document, FieldOwner& fieldOwner, const String& placeholder)
 {
     DEFINE_STATIC_LOCAL(AtomicString, dayPsuedoId, ("-webkit-datetime-edit-day-field"));
-    RefPtr<DateTimeDayFieldElement> field = adoptRef(new DateTimeDayFieldElement(document, fieldOwner, placeholder));
+    RefPtr<DateTimeDayFieldElement> field = adoptRef(new DateTimeDayFieldElement(document, fieldOwner, placeholder.isEmpty() ? ASCIILiteral("--") : placeholder));
     field->initialize(dayPsuedoId, AXDayOfMonthFieldText());
     return field.release();
 }
@@ -307,7 +307,7 @@ DateTimeMonthFieldElement::DateTimeMonthFieldElement(Document* document, FieldOw
 PassRefPtr<DateTimeMonthFieldElement> DateTimeMonthFieldElement::create(Document* document, FieldOwner& fieldOwner, const String& placeholder)
 {
     DEFINE_STATIC_LOCAL(AtomicString, monthPsuedoId, ("-webkit-datetime-edit-month-field"));
-    RefPtr<DateTimeMonthFieldElement> field = adoptRef(new DateTimeMonthFieldElement(document, fieldOwner, placeholder));
+    RefPtr<DateTimeMonthFieldElement> field = adoptRef(new DateTimeMonthFieldElement(document, fieldOwner, placeholder.isEmpty() ? ASCIILiteral("--") : placeholder));
     field->initialize(monthPsuedoId, AXMonthFieldText());
     return field.release();
 }
@@ -422,27 +422,29 @@ void DateTimeWeekFieldElement::setValueAsDateTimeFieldsState(const DateTimeField
 
 // ----------------------------
 
-// HTML5 uses ISO-8601 format with year >= 1. Gregorian calendar started in
-// 1582. However, we need to support 0001-01-01 in Gregorian calendar rule.
-static const int minimumYear = 1;
-// Date in ECMAScript can't represent dates later than 275760-09-13T00:00Z.
-// So, we have the same upper limit in HTML5 dates.
-static const int maximumYear = 275760;
-
-DateTimeYearFieldElement::DateTimeYearFieldElement(Document* document, FieldOwner& fieldOwner, const String& placeholder)
-    : DateTimeNumericFieldElement(document, fieldOwner, minimumYear, maximumYear, placeholder)
+DateTimeYearFieldElement::DateTimeYearFieldElement(Document* document, FieldOwner& fieldOwner, const DateTimeYearFieldElement::Parameters& parameters)
+    : DateTimeNumericFieldElement(document, fieldOwner, parameters.minimumYear, parameters.maximumYear, parameters.placeholder.isEmpty() ? ASCIILiteral("----") : parameters.placeholder)
+    , m_minIsSpecified(parameters.minIsSpecified)
+    , m_maxIsSpecified(parameters.maxIsSpecified)
 {
+    ASSERT(parameters.minimumYear >= DateComponents::minimumYear());
+    ASSERT(parameters.maximumYear <= DateComponents::maximumYear());
 }
 
-PassRefPtr<DateTimeYearFieldElement> DateTimeYearFieldElement::create(Document* document, FieldOwner& fieldOwner, const String& placeholder)
+PassRefPtr<DateTimeYearFieldElement> DateTimeYearFieldElement::create(Document* document, FieldOwner& fieldOwner, const DateTimeYearFieldElement::Parameters& parameters)
 {
     DEFINE_STATIC_LOCAL(AtomicString, yearPsuedoId, ("-webkit-datetime-edit-year-field"));
-    RefPtr<DateTimeYearFieldElement> field = adoptRef(new DateTimeYearFieldElement(document, fieldOwner, placeholder));
+    RefPtr<DateTimeYearFieldElement> field = adoptRef(new DateTimeYearFieldElement(document, fieldOwner, parameters));
     field->initialize(yearPsuedoId, AXYearFieldText());
     return field.release();
 }
 
-int DateTimeYearFieldElement::defaultValueForStepDown() const
+int DateTimeYearFieldElement::clampValueForHardLimits(int value) const
+{
+    return Range(DateComponents::minimumYear(), DateComponents::maximumYear()).clampValue(value);
+}
+
+static int currentFullYear()
 {
     double current = currentTimeMS();
     double utcOffset = calculateUTCOffset();
@@ -455,9 +457,14 @@ int DateTimeYearFieldElement::defaultValueForStepDown() const
     return date.fullYear();
 }
 
+int DateTimeYearFieldElement::defaultValueForStepDown() const
+{
+    return m_maxIsSpecified ? DateTimeNumericFieldElement::defaultValueForStepDown() : currentFullYear();
+}
+
 int DateTimeYearFieldElement::defaultValueForStepUp() const
 {
-    return defaultValueForStepDown();
+    return m_minIsSpecified ? DateTimeNumericFieldElement::defaultValueForStepUp() : currentFullYear();
 }
 
 void DateTimeYearFieldElement::populateDateTimeFieldsState(DateTimeFieldsState& dateTimeFieldsState)

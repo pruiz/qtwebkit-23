@@ -346,7 +346,7 @@ int Font::offsetForPositionForSimpleText(const TextRun& run, float position, boo
 }
 
 
-float Font::floatWidthForSimpleText(const TextRun& run, GlyphBuffer* glyphBuffer, HashSet<const SimpleFontData*>* fallbackFonts, GlyphOverflow* glyphOverflow) const
+float Font::floatWidthForSimpleText(const TextRun& run, HashSet<const SimpleFontData*>* fallbackFonts, GlyphOverflow* glyphOverflow) const
 {
     if (!primaryFont()->platformData().size())
         return 0;

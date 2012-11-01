@@ -828,7 +828,7 @@ GENERATORS += arrayBufferViewCustomScript
 cssbison.output = CSSGrammar.cpp
 cssbison.input = CSSBISON
 cssbison.script = $$PWD/css/makegrammar.pl
-cssbison.commands = perl -I $$PWD/bindings/scripts $$cssbison.script --outputDir ${QMAKE_FUNC_FILE_OUT_PATH} --extraDefines \"$${DEFINES} $$configDefines()\" --preprocessor \"$${QMAKE_MOC} -E\" --symbolsPrefix cssyy ${QMAKE_FILE_NAME}
+cssbison.commands = perl -I $$PWD/bindings/scripts $$cssbison.script --outputDir ${QMAKE_FUNC_FILE_OUT_PATH} --extraDefines \"$${DEFINES} $${FEATURE_DEFINES_JAVASCRIPT}\" --symbolsPrefix cssyy ${QMAKE_FILE_NAME}
 cssbison.depends = ${QMAKE_FILE_NAME}
 GENERATORS += cssbison
 

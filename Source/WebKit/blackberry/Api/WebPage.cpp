@@ -333,12 +333,12 @@ protected:
     typedef DeferredTask<isActive> DeferredTaskType;
 };
 
-void WebPage::autofillTextField(const string& item)
+void WebPage::autofillTextField(const BlackBerry::Platform::String& item)
 {
     if (!d->m_webSettings->isFormAutofillEnabled())
         return;
 
-    d->m_autofillManager->autofillTextField(item.c_str());
+    d->m_autofillManager->autofillTextField(item);
 }
 
 void WebPage::enableQnxJavaScriptObject(bool enabled)
@@ -346,10 +346,9 @@ void WebPage::enableQnxJavaScriptObject(bool enabled)
     d->m_enableQnxJavaScriptObject = enabled;
 }
 
-WebString WebPage::renderTreeAsText()
+BlackBerry::Platform::String WebPage::renderTreeAsText()
 {
-    String result = externalRepresentation(d->m_mainFrame);
-    return WebString(result.impl());
+    return externalRepresentation(d->m_mainFrame);
 }
 
 WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const IntRect& rect)
@@ -443,7 +442,7 @@ WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const In
     AuthenticationChallengeManager::instance()->pageCreated(this);
 }
 
-WebPage::WebPage(WebPageClient* client, const WebString& pageGroupName, const Platform::IntRect& rect)
+WebPage::WebPage(WebPageClient* client, const BlackBerry::Platform::String& pageGroupName, const Platform::IntRect& rect)
 {
     globalInitialize();
     d = new WebPagePrivate(this, client, rect);
@@ -511,7 +510,7 @@ Page* WebPagePrivate::core(const WebPage* webPage)
     return webPage->d->m_page;
 }
 
-void WebPagePrivate::init(const WebString& pageGroupName)
+void WebPagePrivate::init(const BlackBerry::Platform::String& pageGroupName)
 {
     ChromeClientBlackBerry* chromeClient = new ChromeClientBlackBerry(this);
     ContextMenuClientBlackBerry* contextMenuClient = 0;
@@ -538,7 +537,7 @@ void WebPagePrivate::init(const WebString& pageGroupName)
 
     m_page = new Page(pageClients);
 #if !defined(PUBLIC_BUILD) || !PUBLIC_BUILD
-    if (getenv("drtRun")) {
+    if (isRunningDrt()) {
         // In case running in DumpRenderTree mode set the controller to mock provider.
         GeolocationClientMock* mock = new GeolocationClientMock();
         WebCore::provideGeolocationTo(m_page, mock);
@@ -665,7 +664,7 @@ private:
     }
 };
 
-void WebPagePrivate::load(const char* url, const char* networkToken, const char* method, Platform::NetworkRequest::CachePolicy cachePolicy, const char* data, size_t dataLength, const char* const* headers, size_t headersLength, bool isInitial, bool mustHandleInternally, bool forceDownload, const char* overrideContentType, const char* suggestedSaveName)
+void WebPagePrivate::load(const BlackBerry::Platform::String& url, const BlackBerry::Platform::String& networkToken, const BlackBerry::Platform::String& method, Platform::NetworkRequest::CachePolicy cachePolicy, const char* data, size_t dataLength, const char* const* headers, size_t headersLength, bool isInitial, bool mustHandleInternally, bool forceDownload, const BlackBerry::Platform::String& overrideContentType, const BlackBerry::Platform::String& suggestedSaveName)
 {
     stopCurrentLoad();
     DeferredTaskLoadManualScript::finishOrCancel(this);
@@ -696,7 +695,7 @@ void WebPagePrivate::load(const char* url, const char* networkToken, const char*
         request.setMustHandleInternally(true);
     request.setHTTPMethod(method);
     request.setCachePolicy(toWebCoreCachePolicy(cachePolicy));
-    if (overrideContentType)
+    if (!overrideContentType.empty())
         request.setOverrideContentType(overrideContentType);
 
     if (data)
@@ -713,7 +712,7 @@ void WebPagePrivate::load(const char* url, const char* networkToken, const char*
     m_mainFrame->loader()->load(request, "" /* name */, false);
 }
 
-void WebPage::load(const char* url, const char* networkToken, bool isInitial)
+void WebPage::load(const BlackBerry::Platform::String& url, const BlackBerry::Platform::String& networkToken, bool isInitial)
 {
     d->load(url, networkToken, "GET", Platform::NetworkRequest::UseProtocolCachePolicy, 0, 0, 0, 0, isInitial, false);
 }
@@ -723,15 +722,15 @@ void WebPage::loadExtended(const char* url, const char* networkToken, const char
     d->load(url, networkToken, method, cachePolicy, data, dataLength, headers, headersLength, false, mustHandleInternally, false, "");
 }
 
-void WebPage::loadFile(const char* path, const char* overrideContentType)
+void WebPage::loadFile(const BlackBerry::Platform::String& path, const BlackBerry::Platform::String& overrideContentType)
 {
-    std::string fileUrl(path);
-    if (!fileUrl.find("/"))
-        fileUrl.insert(0, "file://");
-    else if (fileUrl.find("file:///"))
+    BlackBerry::Platform::String fileUrl(path);
+    if (fileUrl.startsWith("/"))
+        fileUrl = BlackBerry::Platform::String("file://", 7) + fileUrl;
+    else if (!fileUrl.startsWith("file:///"))
         return;
 
-    d->load(fileUrl.c_str(), 0, "GET", Platform::NetworkRequest::UseProtocolCachePolicy, 0, 0, 0, 0, false, false, false, overrideContentType);
+    d->load(fileUrl, BlackBerry::Platform::String::emptyString(), BlackBerry::Platform::String("GET", 3), Platform::NetworkRequest::UseProtocolCachePolicy, 0, 0, 0, 0, false, false, false, overrideContentType.c_str());
 }
 
 void WebPage::download(const Platform::NetworkRequest& request)
@@ -742,30 +741,31 @@ void WebPage::download(const Platform::NetworkRequest& request)
         headers.push_back(list[i].first.c_str());
         headers.push_back(list[i].second.c_str());
     }
-    d->load(request.getUrlRef().c_str(), 0, "GET", Platform::NetworkRequest::UseProtocolCachePolicy, 0, 0, headers.empty() ? 0 : &headers[0], headers.size(), false, false, true, "", request.getSuggestedSaveName().c_str());
+    d->load(request.getUrlRef(), BlackBerry::Platform::String::emptyString(), "GET", Platform::NetworkRequest::UseProtocolCachePolicy, 0, 0, headers.empty() ? 0 : &headers[0], headers.size(), false, false, true, "", request.getSuggestedSaveName().c_str());
 }
 
-void WebPagePrivate::loadString(const char* string, const char* baseURL, const char* contentType, const char* failingURL)
+void WebPagePrivate::loadString(const BlackBerry::Platform::String& string, const BlackBerry::Platform::String& baseURL, const BlackBerry::Platform::String& contentType, const BlackBerry::Platform::String& failingURL)
 {
     KURL kurl = parseUrl(baseURL);
     ResourceRequest request(kurl);
     WTF::RefPtr<SharedBuffer> buffer
-        = SharedBuffer::create(string, strlen(string));
+        = SharedBuffer::create(string.c_str(), string.length());
     SubstituteData substituteData(buffer,
-                                  extractMIMETypeFromMediaType(contentType),
-                                  extractCharsetFromMediaType(contentType),
-                                  failingURL ? parseUrl(failingURL) : KURL());
+        extractMIMETypeFromMediaType(contentType),
+        extractCharsetFromMediaType(contentType),
+        !failingURL.empty() ? parseUrl(failingURL) : KURL());
     m_mainFrame->loader()->load(request, substituteData, false);
 }
 
-void WebPage::loadString(const char* string, const char* baseURL, const char* mimeType, const char* failingURL)
+void WebPage::loadString(const BlackBerry::Platform::String& string, const BlackBerry::Platform::String& baseURL, const BlackBerry::Platform::String& mimeType, const BlackBerry::Platform::String& failingURL)
 {
     d->loadString(string, baseURL, mimeType, failingURL);
 }
 
-bool WebPagePrivate::executeJavaScript(const char* scriptUTF8, JavaScriptDataType& returnType, WebString& returnValue)
+bool WebPagePrivate::executeJavaScript(const BlackBerry::Platform::String& scriptUTF8, JavaScriptDataType& returnType, WebString& returnValue)
 {
-    String script = String::fromUTF8(scriptUTF8);
+    BLACKBERRY_ASSERT(scriptUTF8.isUtf8());
+    String script = scriptUTF8;
 
     if (script.isNull()) {
         returnType = JSException;
@@ -812,20 +812,18 @@ bool WebPagePrivate::executeJavaScript(const char* scriptUTF8, JavaScriptDataTyp
         break;
     }
 
-    if (returnType == JSBoolean || returnType == JSNumber || returnType == JSString || returnType == JSObject) {
-        String str = result.toString(exec);
-        returnValue = WebString(str.impl());
-    }
+    if (returnType == JSBoolean || returnType == JSNumber || returnType == JSString || returnType == JSObject)
+        returnValue = result.toString(exec);
 
     return true;
 }
 
-bool WebPage::executeJavaScript(const char* script, JavaScriptDataType& returnType, WebString& returnValue)
+bool WebPage::executeJavaScript(const BlackBerry::Platform::String& script, JavaScriptDataType& returnType, BlackBerry::Platform::String& returnValue)
 {
     return d->executeJavaScript(script, returnType, returnValue);
 }
 
-bool WebPagePrivate::executeJavaScriptInIsolatedWorld(const ScriptSourceCode& sourceCode, JavaScriptDataType& returnType, WebString& returnValue)
+bool WebPagePrivate::executeJavaScriptInIsolatedWorld(const ScriptSourceCode& sourceCode, JavaScriptDataType& returnType, BlackBerry::Platform::String& returnValue)
 {
     if (!m_isolatedWorld)
         m_isolatedWorld = m_mainFrame->script()->createWorld();
@@ -865,15 +863,13 @@ bool WebPagePrivate::executeJavaScriptInIsolatedWorld(const ScriptSourceCode& so
         break;
     }
 
-    if (returnType == JSBoolean || returnType == JSNumber || returnType == JSString || returnType == JSObject) {
-        String str = result.toString(exec);
-        returnValue = WebString(str.impl());
-    }
+    if (returnType == JSBoolean || returnType == JSNumber || returnType == JSString || returnType == JSObject)
+        returnValue = result.toString(exec);
 
     return true;
 }
 
-bool WebPage::executeJavaScriptInIsolatedWorld(const std::wstring& script, JavaScriptDataType& returnType, WebString& returnValue)
+bool WebPage::executeJavaScriptInIsolatedWorld(const std::wstring& script, JavaScriptDataType& returnType, BlackBerry::Platform::String& returnValue)
 {
     // On our platform wchar_t is unsigned int and UChar is unsigned short
     // so we have to convert using ICU conversion function
@@ -894,13 +890,14 @@ bool WebPage::executeJavaScriptInIsolatedWorld(const std::wstring& script, JavaS
     return d->executeJavaScriptInIsolatedWorld(sourceCode, returnType, returnValue);
 }
 
-bool WebPage::executeJavaScriptInIsolatedWorld(const char* script, JavaScriptDataType& returnType, WebString& returnValue)
+bool WebPage::executeJavaScriptInIsolatedWorld(const BlackBerry::Platform::String& scriptUTF8, JavaScriptDataType& returnType, BlackBerry::Platform::String& returnValue)
 {
-    ScriptSourceCode sourceCode(String::fromUTF8(script), KURL());
+    BLACKBERRY_ASSERT(scriptUTF8.isUtf8());
+    ScriptSourceCode sourceCode(scriptUTF8, KURL());
     return d->executeJavaScriptInIsolatedWorld(sourceCode, returnType, returnValue);
 }
 
-void WebPage::executeJavaScriptFunction(const std::vector<std::string> &function, const std::vector<JavaScriptVariant> &args, JavaScriptVariant& returnValue)
+void WebPage::executeJavaScriptFunction(const std::vector<BlackBerry::Platform::String> &function, const std::vector<JavaScriptVariant> &args, JavaScriptVariant& returnValue)
 {
     if (!d->m_mainFrame) {
         returnValue.setType(JavaScriptVariant::Exception);
@@ -1022,7 +1019,7 @@ void WebPage::enableCrossSiteXHR()
     d->enableCrossSiteXHR();
 }
 
-void WebPagePrivate::addOriginAccessWhitelistEntry(const char* sourceOrigin, const char* destinationOrigin, bool allowDestinationSubdomains)
+void WebPagePrivate::addOriginAccessWhitelistEntry(const BlackBerry::Platform::String& sourceOrigin, const BlackBerry::Platform::String& destinationOrigin, bool allowDestinationSubdomains)
 {
     RefPtr<SecurityOrigin> source = SecurityOrigin::createFromString(sourceOrigin);
     if (source->isUnique())
@@ -1032,12 +1029,12 @@ void WebPagePrivate::addOriginAccessWhitelistEntry(const char* sourceOrigin, con
     SecurityPolicy::addOriginAccessWhitelistEntry(*source, destination.protocol(), destination.host(), allowDestinationSubdomains);
 }
 
-void WebPage::addOriginAccessWhitelistEntry(const char* sourceOrigin, const char* destinationOrigin, bool allowDestinationSubdomains)
+void WebPage::addOriginAccessWhitelistEntry(const BlackBerry::Platform::String& sourceOrigin, const BlackBerry::Platform::String& destinationOrigin, bool allowDestinationSubdomains)
 {
     d->addOriginAccessWhitelistEntry(sourceOrigin, destinationOrigin, allowDestinationSubdomains);
 }
 
-void WebPagePrivate::removeOriginAccessWhitelistEntry(const char* sourceOrigin, const char* destinationOrigin, bool allowDestinationSubdomains)
+void WebPagePrivate::removeOriginAccessWhitelistEntry(const BlackBerry::Platform::String& sourceOrigin, const BlackBerry::Platform::String& destinationOrigin, bool allowDestinationSubdomains)
 {
     RefPtr<SecurityOrigin> source = SecurityOrigin::createFromString(sourceOrigin);
     if (source->isUnique())
@@ -1047,7 +1044,7 @@ void WebPagePrivate::removeOriginAccessWhitelistEntry(const char* sourceOrigin, 
     SecurityPolicy::removeOriginAccessWhitelistEntry(*source, destination.protocol(), destination.host(), allowDestinationSubdomains);
 }
 
-void WebPage::removeOriginAccessWhitelistEntry(const char* sourceOrigin, const char* destinationOrigin, bool allowDestinationSubdomains)
+void WebPage::removeOriginAccessWhitelistEntry(const BlackBerry::Platform::String& sourceOrigin, const BlackBerry::Platform::String& destinationOrigin, bool allowDestinationSubdomains)
 {
     d->removeOriginAccessWhitelistEntry(sourceOrigin, destinationOrigin, allowDestinationSubdomains);
 }
@@ -1066,7 +1063,7 @@ void WebPagePrivate::setLoadState(LoadState state)
     m_loadState = state;
 
 #if DEBUG_WEBPAGE_LOAD
-    Platform::log(Platform::LogLevelInfo, "WebPagePrivate::setLoadState %d", state);
+    BBLOG(Platform::LogLevelInfo, "WebPagePrivate::setLoadState %d", state);
 #endif
 
     switch (m_loadState) {
@@ -1238,7 +1235,7 @@ bool WebPagePrivate::zoomAboutPoint(double unclampedScale, const FloatPoint& anc
 
 #if DEBUG_WEBPAGE_LOAD
     if (loadState() < Finished)
-        Platform::log(Platform::LogLevelInfo, "WebPagePrivate::zoomAboutPoint scale %f anchor (%f, %f)", scale, anchor.x(), anchor.y());
+        BBLOG(Platform::LogLevelInfo, "WebPagePrivate::zoomAboutPoint scale %f anchor (%f, %f)", scale, anchor.x(), anchor.y());
 #endif
 
     // Our current scroll position in float.
@@ -1575,7 +1572,7 @@ void WebPagePrivate::contentsSizeChanged(const IntSize& contentsSize)
     m_contentsSizeChanged = true;
 
 #if DEBUG_WEBPAGE_LOAD
-    Platform::log(Platform::LogLevelInfo, "WebPagePrivate::contentsSizeChanged %dx%d", contentsSize.width(), contentsSize.height());
+    BBLOG(Platform::LogLevelInfo, "WebPagePrivate::contentsSizeChanged %dx%d", contentsSize.width(), contentsSize.height());
 #endif
 }
 
@@ -1646,7 +1643,7 @@ void WebPagePrivate::layoutFinished()
 void WebPagePrivate::zoomToInitialScaleOnLoad()
 {
 #if DEBUG_WEBPAGE_LOAD
-    Platform::log(Platform::LogLevelInfo, "WebPagePrivate::zoomToInitialScaleOnLoad");
+    BBLOG(Platform::LogLevelInfo, "WebPagePrivate::zoomToInitialScaleOnLoad");
 #endif
 
     bool needsLayout = false;
@@ -1664,7 +1661,7 @@ void WebPagePrivate::zoomToInitialScaleOnLoad()
 
     if (contentsSize().isEmpty()) {
 #if DEBUG_WEBPAGE_LOAD
-        Platform::log(Platform::LogLevelInfo, "WebPagePrivate::zoomToInitialScaleOnLoad content is empty!");
+        BBLOG(Platform::LogLevelInfo, "WebPagePrivate::zoomToInitialScaleOnLoad content is empty!");
 #endif
         requestLayoutIfNeeded();
         m_client->resetBitmapZoomScale(currentScale());
@@ -2209,9 +2206,9 @@ bool WebPagePrivate::isActive() const
 
 void WebPagePrivate::authenticationChallenge(const KURL& url, const ProtectionSpace& protectionSpace, const Credential& inputCredential)
 {
-    WebString username;
-    WebString password;
     AuthenticationChallengeManager* authmgr = AuthenticationChallengeManager::instance();
+    BlackBerry::Platform::String username;
+    BlackBerry::Platform::String password;
 
 #if !defined(PUBLIC_BUILD) || !PUBLIC_BUILD
     if (m_dumpRenderTree) {
@@ -2252,14 +2249,14 @@ PageClientBlackBerry::SaveCredentialType WebPagePrivate::notifyShouldSaveCredent
 
 void WebPagePrivate::syncProxyCredential(const WebCore::Credential& credential)
 {
-    m_client->syncProxyCredential(credential.user().utf8().data(), credential.password().utf8().data());
+    m_client->syncProxyCredential(credential.user(), credential.password());
 }
 
 void WebPagePrivate::notifyPopupAutofillDialog(const Vector<String>& candidates, const WebCore::IntRect& screenRect)
 {
-    vector<string> textItems;
+    vector<BlackBerry::Platform::String> textItems;
     for (size_t i = 0; i < candidates.size(); i++)
-        textItems.push_back(candidates[i].utf8().data());
+        textItems.push_back(candidates[i]);
     m_client->notifyPopupAutofillDialog(textItems, screenRect);
 }
 
@@ -2308,10 +2305,10 @@ Platform::WebContext WebPagePrivate::webContext(TargetDetectionStrategy strategy
 
         String pattern = findPatternStringForUrl(href);
         if (!pattern.isEmpty())
-            context.setPattern(pattern.utf8().data());
+            context.setPattern(pattern);
 
         if (!href.string().isEmpty()) {
-            context.setUrl(href.string().utf8().data());
+            context.setUrl(href.string());
 
             // Links are non-selectable by default, but selection should be allowed
             // providing the page is selectable, use the parent to determine it.
@@ -2338,12 +2335,12 @@ Platform::WebContext WebPagePrivate::webContext(TargetDetectionStrategy strategy
             if (CachedResource* cachedResource = imageElement->cachedImage()) {
                 if (cachedResource->isLoaded() && cachedResource->data()) {
                     String url = stripLeadingAndTrailingHTMLSpaces(imageElement->getAttribute(HTMLNames::srcAttr).string());
-                    context.setSrc(node->document()->completeURL(url).string().utf8().data());
+                    context.setSrc(node->document()->completeURL(url).string());
                 }
             }
             String alt = imageElement->altText();
             if (!alt.isNull())
-                context.setAlt(alt.utf8().data());
+                context.setAlt(alt);
         }
 
         if (mediaElement) {
@@ -2353,14 +2350,14 @@ Platform::WebContext WebPagePrivate::webContext(TargetDetectionStrategy strategy
                 context.setFlag(Platform::WebContext::IsVideo);
 
             String src = stripLeadingAndTrailingHTMLSpaces(mediaElement->getAttribute(HTMLNames::srcAttr).string());
-            context.setSrc(node->document()->completeURL(src).string().utf8().data());
+            context.setSrc(node->document()->completeURL(src).string());
         }
     }
 
     if (node->isTextNode()) {
         Text* curText = toText(node.get());
         if (!curText->wholeText().isEmpty())
-            context.setText(curText->wholeText().utf8().data());
+            context.setText(curText->wholeText());
     }
 
     bool canStartSelection = node->canStartSelection();
@@ -2371,7 +2368,7 @@ Platform::WebContext WebPagePrivate::webContext(TargetDetectionStrategy strategy
         String webWorksContext(DOMSupport::webWorksContext(element));
         if (!webWorksContext.stripWhiteSpace().isEmpty()) {
             context.setFlag(Platform::WebContext::IsWebWorksContext);
-            context.setWebWorksContext(webWorksContext.utf8().data());
+            context.setWebWorksContext(webWorksContext);
         }
 
         if (DOMSupport::isTextBasedContentEditableElement(element)) {
@@ -2390,7 +2387,7 @@ Platform::WebContext WebPagePrivate::webContext(TargetDetectionStrategy strategy
 
             String elementText(DOMSupport::inputElementText(element));
             if (!elementText.stripWhiteSpace().isEmpty())
-                context.setText(elementText.utf8().data());
+                context.setText(elementText);
         }
     }
 
@@ -2479,29 +2476,10 @@ IntSize WebPagePrivate::fixedLayoutSize(bool snapToIncrement) const
     return IntSize(defaultLayoutWidth, defaultLayoutHeight);
 }
 
-BackingStoreClient* WebPagePrivate::backingStoreClientForFrame(const Frame* frame) const
+BackingStoreClient* WebPagePrivate::backingStoreClient() const
 {
-    ASSERT(frame);
-    BackingStoreClient* backingStoreClient = 0;
-    if (m_backingStoreClientForFrameMap.contains(frame))
-        backingStoreClient = m_backingStoreClientForFrameMap.get(frame);
-    return backingStoreClient;
+    return m_backingStoreClient;
 }
-
-void WebPagePrivate::addBackingStoreClientForFrame(const Frame* frame, BackingStoreClient* client)
-{
-    ASSERT(frame);
-    ASSERT(client);
-    m_backingStoreClientForFrameMap.add(frame, client);
-}
-
-void WebPagePrivate::removeBackingStoreClientForFrame(const Frame* frame)
-{
-    ASSERT(frame);
-    if (m_backingStoreClientForFrameMap.contains(frame))
-        m_backingStoreClientForFrameMap.remove(frame);
-}
-
 
 void WebPagePrivate::clearDocumentData(const Document* documentGoingAway)
 {
@@ -3125,15 +3103,6 @@ void WebPage::destroy()
 
     FrameLoader* loader = d->m_mainFrame->loader();
 
-    // Remove main frame's backing store client from the map
-    // to prevent FrameLoaderClientBlackyBerry::detachFromParent2(),
-    // which is called by loader->detachFromParent(), deleting it.
-    // We will delete it in ~WebPagePrivate().
-    // Reason: loader->detachFromParent() may ping back to backing store
-    // indirectly through ChromeClientBlackBerry::invalidateContentsAndWindow().
-    // see RIM PR #93256.
-    d->removeBackingStoreClientForFrame(d->m_mainFrame);
-
     // Set m_mainFrame to 0 to avoid calls back in to the backingstore during webpage deletion.
     d->m_mainFrame = 0;
     if (loader)
@@ -3352,7 +3321,7 @@ int WebPage::inputCaretPosition() const
 
 class DeferredTaskPopupListSelectMultiple: public DeferredTask<&WebPagePrivate::m_wouldPopupListSelectMultiple> {
 public:
-    DeferredTaskPopupListSelectMultiple(WebPagePrivate* webPagePrivate, int size, const bool* selecteds) 
+    DeferredTaskPopupListSelectMultiple(WebPagePrivate* webPagePrivate, int size, const bool* selecteds)
         : DeferredTaskType(webPagePrivate)
     {
         webPagePrivate->m_cachedPopupListSelecteds.append(selecteds, size);
@@ -3402,7 +3371,7 @@ void WebPage::popupListClosed(int index)
 
 class DeferredTaskSetDateTimeInput: public DeferredTask<&WebPagePrivate::m_wouldSetDateTimeInput> {
 public:
-    explicit DeferredTaskSetDateTimeInput(WebPagePrivate* webPagePrivate, WebString value)
+    explicit DeferredTaskSetDateTimeInput(WebPagePrivate* webPagePrivate, BlackBerry::Platform::String value)
         : DeferredTaskType(webPagePrivate)
     {
         webPagePrivate->m_cachedDateTimeInput = value;
@@ -3414,19 +3383,19 @@ private:
     }
 };
 
-void WebPage::setDateTimeInput(const WebString& value)
+void WebPage::setDateTimeInput(const BlackBerry::Platform::String& value)
 {
     if (d->m_page->defersLoading()) {
         d->m_deferredTasks.append(adoptPtr(new DeferredTaskSetDateTimeInput(d, value)));
         return;
     }
     DeferredTaskSetDateTimeInput::finishOrCancel(d);
-    d->m_inputHandler->setInputValue(String(value.impl()));
+    d->m_inputHandler->setInputValue(value);
 }
 
 class DeferredTaskSetColorInput: public DeferredTask<&WebPagePrivate::m_wouldSetColorInput> {
 public:
-    explicit DeferredTaskSetColorInput(WebPagePrivate* webPagePrivate, WebString value)
+    explicit DeferredTaskSetColorInput(WebPagePrivate* webPagePrivate, BlackBerry::Platform::String value)
         : DeferredTaskType(webPagePrivate)
     {
         webPagePrivate->m_cachedColorInput = value;
@@ -3438,14 +3407,14 @@ private:
     }
 };
 
-void WebPage::setColorInput(const WebString& value)
+void WebPage::setColorInput(const BlackBerry::Platform::String& value)
 {
     if (d->m_page->defersLoading()) {
         d->m_deferredTasks.append(adoptPtr(new DeferredTaskSetColorInput(d, value)));
         return;
     }
     DeferredTaskSetColorInput::finishOrCancel(d);
-    d->m_inputHandler->setInputValue(String(value.impl()));
+    d->m_inputHandler->setInputValue(value);
 }
 
 void WebPage::setVirtualViewportSize(int width, int height)
@@ -4277,7 +4246,7 @@ void WebPagePrivate::clearFocusNode()
         frame->page()->focusController()->setFocusedNode(0, frame);
 }
 
-WebString WebPage::textEncoding()
+BlackBerry::Platform::String WebPage::textEncoding()
 {
     Frame* frame = d->focusedOrMainFrame();
     if (!frame)
@@ -4290,22 +4259,22 @@ WebString WebPage::textEncoding()
     return document->loader()->writer()->encoding();
 }
 
-WebString WebPage::forcedTextEncoding()
+BlackBerry::Platform::String WebPage::forcedTextEncoding()
 {
     Frame* frame = d->focusedOrMainFrame();
     if (!frame)
-        return "";
+        return BlackBerry::Platform::String::emptyString();
 
     Document* document = frame->document();
     if (!document)
-        return "";
+        return BlackBerry::Platform::String::emptyString();
 
     return document->loader()->overrideEncoding();
 }
 
-void WebPage::setForcedTextEncoding(const char* encoding)
+void WebPage::setForcedTextEncoding(const BlackBerry::Platform::String& encoding)
 {
-    if (encoding && d->focusedOrMainFrame() && d->focusedOrMainFrame()->loader() && d->focusedOrMainFrame()->loader())
+    if (!encoding.empty() && d->focusedOrMainFrame() && d->focusedOrMainFrame()->loader() && d->focusedOrMainFrame()->loader())
         return d->focusedOrMainFrame()->loader()->reloadWithOverrideEncoding(encoding);
 }
 
@@ -4473,27 +4442,27 @@ bool WebPage::selectionContains(const Platform::IntPoint& point)
     return d->m_selectionHandler->selectionContains(d->mapFromTransformed(point));
 }
 
-WebString WebPage::title() const
+BlackBerry::Platform::String WebPage::title() const
 {
     if (d->m_mainFrame->document())
         return d->m_mainFrame->loader()->documentLoader()->title().string();
-    return WebString();
+    return BlackBerry::Platform::String::emptyString();
 }
 
-WebString WebPage::selectedText() const
+BlackBerry::Platform::String WebPage::selectedText() const
 {
     return d->m_selectionHandler->selectedText();
 }
 
-WebString WebPage::cutSelectedText()
+BlackBerry::Platform::String WebPage::cutSelectedText()
 {
-    WebString selectedText = d->m_selectionHandler->selectedText();
-    if (!d->m_page->defersLoading() && !selectedText.isEmpty())
+    BlackBerry::Platform::String selectedText = d->m_selectionHandler->selectedText();
+    if (!d->m_page->defersLoading() && !selectedText.empty())
         d->m_inputHandler->deleteSelection();
     return selectedText;
 }
 
-void WebPage::insertText(const WebString& string)
+void WebPage::insertText(const BlackBerry::Platform::String& string)
 {
     if (d->m_page->defersLoading())
         return;
@@ -5085,6 +5054,7 @@ void WebPage::getBackForwardList(SharedArray<BackForwardEntry>& result) const
         resultEntry.lastVisitWasHTTPNonGet = entry->lastVisitWasHTTPNonGet();
         resultEntry.id = backForwardIdFromHistoryItem(entry.get());
 
+        // FIXME: seems we can remove this now?
         // Make sure the HistoryItem is not disposed while the result list is still being used, to make sure the pointer is not reused
         // will be balanced by deref in releaseBackForwardEntry.
         entry->ref();
@@ -5395,7 +5365,7 @@ void WebPage::onNetworkAvailabilityChanged(bool available)
     updateOnlineStatus(available);
 }
 
-void WebPage::onCertificateStoreLocationSet(const WebString& caPath)
+void WebPage::onCertificateStoreLocationSet(const BlackBerry::Platform::String& caPath)
 {
 #if ENABLE(VIDEO)
     MediaPlayerPrivate::setCertificatePath(caPath);
@@ -5447,10 +5417,9 @@ void WebPage::disablePasswordEcho()
     d->m_page->settings()->setPasswordEchoEnabled(false);
 }
 
-void WebPage::dispatchInspectorMessage(const std::string& message)
+void WebPage::dispatchInspectorMessage(const BlackBerry::Platform::String& message)
 {
-    String stringMessage = String::fromUTF8(message.data(), message.length());
-    d->m_page->inspectorController()->dispatchMessageFromFrontend(stringMessage);
+    d->m_page->inspectorController()->dispatchMessageFromFrontend(message);
 }
 
 void WebPage::inspectCurrentContextElement()
@@ -5499,7 +5468,7 @@ void WebPagePrivate::scheduleRootLayerCommit()
     m_needsCommit = true;
     if (!m_rootLayerCommitTimer->isActive()) {
 #if DEBUG_AC_COMMIT
-        Platform::log(Platform::LogLevelCritical, "%s: m_rootLayerCommitTimer->isActive() = %d", WTF_PRETTY_FUNCTION, m_rootLayerCommitTimer->isActive());
+        BBLOG(Platform::LogLevelCritical, "%s: m_rootLayerCommitTimer->isActive() = %d", WTF_PRETTY_FUNCTION, m_rootLayerCommitTimer->isActive());
 #endif
         m_rootLayerCommitTimer->startOneShot(0);
     }
@@ -5587,7 +5556,7 @@ void WebPagePrivate::commitRootLayer(const IntRect& layoutRectForCompositing,
                                      bool drawsRootLayer)
 {
 #if DEBUG_AC_COMMIT
-    Platform::log(Platform::LogLevelCritical, "%s: m_compositor = 0x%x",
+    BBLOG(Platform::LogLevelCritical, "%s: m_compositor = 0x%x",
             WTF_PRETTY_FUNCTION, m_compositor.get());
 #endif
 
@@ -5626,7 +5595,7 @@ void WebPagePrivate::commitRootLayer(const IntRect& layoutRectForCompositing,
 bool WebPagePrivate::commitRootLayerIfNeeded()
 {
 #if DEBUG_AC_COMMIT
-    Platform::log(Platform::LogLevelCritical, "%s: m_suspendRootLayerCommit = %d, m_needsCommit = %d, m_frameLayers = 0x%x, m_frameLayers->hasLayer() = %d, needsLayoutRecursive() = %d",
+    BBLOG(Platform::LogLevelCritical, "%s: m_suspendRootLayerCommit = %d, m_needsCommit = %d, m_frameLayers = 0x%x, m_frameLayers->hasLayer() = %d, needsLayoutRecursive() = %d",
             WTF_PRETTY_FUNCTION,
             m_suspendRootLayerCommit,
             m_needsCommit,
@@ -5704,7 +5673,7 @@ void WebPagePrivate::rootLayerCommitTimerFired(Timer<WebPagePrivate>*)
         return;
 
 #if DEBUG_AC_COMMIT
-    Platform::log(Platform::LogLevelCritical, "%s", WTF_PRETTY_FUNCTION);
+    BBLOG(Platform::LogLevelCritical, "%s", WTF_PRETTY_FUNCTION);
 #endif
 
     m_backingStore->d->instrumentBeginFrame();
@@ -5731,7 +5700,7 @@ void WebPagePrivate::rootLayerCommitTimerFired(Timer<WebPagePrivate>*)
 
         if (needsOneShotDrawingSynchronization()) {
 #if DEBUG_AC_COMMIT
-            Platform::log(Platform::LogLevelCritical, "%s: OneShotDrawingSynchronization code path!", WTF_PRETTY_FUNCTION);
+            BBLOG(Platform::LogLevelCritical, "%s: OneShotDrawingSynchronization code path!", WTF_PRETTY_FUNCTION);
 #endif
 
             const IntRect windowRect = IntRect(IntPoint::zero(), viewportSize());
@@ -6031,26 +6000,26 @@ void WebPagePrivate::didChangeSettings(WebSettings* webSettings)
     coreSettings->setDefaultFixedFontSize(webSettings->defaultFixedFontSize());
     coreSettings->setDefaultFontSize(webSettings->defaultFontSize());
     coreSettings->setMinimumLogicalFontSize(webSettings->minimumFontSize());
-    if (!webSettings->serifFontFamily().isEmpty())
-        coreSettings->setSerifFontFamily(webSettings->serifFontFamily().impl());
-    if (!webSettings->fixedFontFamily().isEmpty())
-        coreSettings->setFixedFontFamily(webSettings->fixedFontFamily().impl());
-    if (!webSettings->sansSerifFontFamily().isEmpty())
-        coreSettings->setSansSerifFontFamily(webSettings->sansSerifFontFamily().impl());
-    if (!webSettings->standardFontFamily().isEmpty())
-        coreSettings->setStandardFontFamily(webSettings->standardFontFamily().impl());
+    if (!webSettings->serifFontFamily().empty())
+        coreSettings->setSerifFontFamily(String(webSettings->serifFontFamily()));
+    if (!webSettings->fixedFontFamily().empty())
+        coreSettings->setFixedFontFamily(String(webSettings->fixedFontFamily()));
+    if (!webSettings->sansSerifFontFamily().empty())
+        coreSettings->setSansSerifFontFamily(String(webSettings->sansSerifFontFamily()));
+    if (!webSettings->standardFontFamily().empty())
+        coreSettings->setStandardFontFamily(String(webSettings->standardFontFamily()));
     coreSettings->setJavaScriptCanOpenWindowsAutomatically(webSettings->canJavaScriptOpenWindowsAutomatically());
     coreSettings->setAllowScriptsToCloseWindows(webSettings->canJavaScriptOpenWindowsAutomatically()); // Why are we using the same value as setJavaScriptCanOpenWindowsAutomatically()?
     coreSettings->setPluginsEnabled(webSettings->arePluginsEnabled());
-    coreSettings->setDefaultTextEncodingName(webSettings->defaultTextEncodingName().impl());
+    coreSettings->setDefaultTextEncodingName(webSettings->defaultTextEncodingName());
     coreSettings->setDownloadableBinaryFontsEnabled(webSettings->downloadableBinaryFontsEnabled());
     coreSettings->setSpatialNavigationEnabled(m_webSettings->isSpatialNavigationEnabled());
     coreSettings->setAsynchronousSpellCheckingEnabled(m_webSettings->isAsynchronousSpellCheckingEnabled());
 
-    WebString stylesheetURL = webSettings->userStyleSheetString();
-    if (stylesheetURL.isEmpty())
+    BlackBerry::Platform::String stylesheetURL = webSettings->userStyleSheetString();
+    if (stylesheetURL.empty())
         stylesheetURL = webSettings->userStyleSheetLocation();
-    if (!stylesheetURL.isEmpty())
+    if (!stylesheetURL.empty())
         coreSettings->setUserStyleSheetLocation(KURL(KURL(), stylesheetURL));
 
     coreSettings->setFirstScheduledLayoutDelay(webSettings->firstScheduledLayoutDelay());
@@ -6061,14 +6030,14 @@ void WebPagePrivate::didChangeSettings(WebSettings* webSettings)
     // make sense to change database path after DatabaseTracker has
     // already been initialized.
     static bool dbinit = false;
-    if (!dbinit && !webSettings->databasePath().isEmpty()) {
+    if (!dbinit && !webSettings->databasePath().empty()) {
         dbinit = true;
         DatabaseTracker::initializeTracker(webSettings->databasePath());
     }
 
     // The directory of cacheStorage for one page group can only be initialized once.
     static bool acinit = false;
-    if (!acinit && !webSettings->appCachePath().isEmpty()) {
+    if (!acinit && !webSettings->appCachePath().empty()) {
         acinit = true;
         cacheStorage().setCacheDirectory(webSettings->appCachePath());
     }
@@ -6127,7 +6096,7 @@ void WebPagePrivate::didChangeSettings(WebSettings* webSettings)
     m_page->setDeviceScaleFactor(webSettings->devicePixelRatio());
 }
 
-WebString WebPage::textHasAttribute(const WebString& query) const
+BlackBerry::Platform::String WebPage::textHasAttribute(const BlackBerry::Platform::String& query) const
 {
     if (Document* doc = d->m_page->focusController()->focusedOrMainFrame()->document())
         return doc->queryCommandValue(query);
@@ -6135,10 +6104,10 @@ WebString WebPage::textHasAttribute(const WebString& query) const
     return "";
 }
 
-void WebPage::setAllowNotification(const WebString& domain, bool allow)
+void WebPage::setAllowNotification(const BlackBerry::Platform::String& domain, bool allow)
 {
 #if ENABLE(NOTIFICATIONS) || ENABLE(LEGACY_NOTIFICATIONS)
-    static_cast<NotificationPresenterImpl*>(NotificationPresenterImpl::instance())->onPermission(domain.utf8(), allow);
+    static_cast<NotificationPresenterImpl*>(NotificationPresenterImpl::instance())->onPermission(domain.c_str(), allow);
 #else
     UNUSED_PARAM(domain);
     UNUSED_PARAM(allow);
@@ -6193,10 +6162,10 @@ void WebPagePrivate::frameUnloaded(const Frame* frame)
     m_inPageSearchManager->frameUnloaded(frame);
 }
 
-const String& WebPagePrivate::defaultUserAgent()
+const BlackBerry::Platform::String& WebPagePrivate::defaultUserAgent()
 {
-    static String* defaultUserAgent = new String;
-    if (defaultUserAgent->isEmpty()) {
+    static BlackBerry::Platform::String* defaultUserAgent = 0;
+    if (!defaultUserAgent) {
         BlackBerry::Platform::DeviceInfo* info = BlackBerry::Platform::DeviceInfo::instance();
         char uaBuffer[256];
         int uaSize = snprintf(uaBuffer, 256, "Mozilla/5.0 (%s) AppleWebKit/%d.%d+ (KHTML, like Gecko) Version/%s %sSafari/%d.%d+",
@@ -6206,7 +6175,7 @@ const String& WebPagePrivate::defaultUserAgent()
         if (uaSize <= 0 || uaSize >= 256)
             BLACKBERRY_CRASH();
 
-        defaultUserAgent->append(uaBuffer);
+        defaultUserAgent = new BlackBerry::Platform::String(uaBuffer, uaSize);
     }
 
     return *defaultUserAgent;

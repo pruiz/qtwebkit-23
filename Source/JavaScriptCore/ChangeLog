@@ -1,3 +1,254 @@
+2012-10-16  Balazs Kilvady  <kilvadyb@homejinni.com>
+
+        MIPS assembler coding-style fix.
+        https://bugs.webkit.org/show_bug.cgi?id=99359
+
+        Reviewed by Oliver Hunt.
+
+        Coding style fix of existing MIPS assembler header files.
+
+        * assembler/MIPSAssembler.h:
+        (JSC::MIPSAssembler::addiu):
+        (JSC::MIPSAssembler::addu):
+        (JSC::MIPSAssembler::subu):
+        (JSC::MIPSAssembler::mul):
+        (JSC::MIPSAssembler::andInsn):
+        (JSC::MIPSAssembler::andi):
+        (JSC::MIPSAssembler::nor):
+        (JSC::MIPSAssembler::orInsn):
+        (JSC::MIPSAssembler::ori):
+        (JSC::MIPSAssembler::xorInsn):
+        (JSC::MIPSAssembler::xori):
+        (JSC::MIPSAssembler::slt):
+        (JSC::MIPSAssembler::sltu):
+        (JSC::MIPSAssembler::sltiu):
+        (JSC::MIPSAssembler::sll):
+        (JSC::MIPSAssembler::sllv):
+        (JSC::MIPSAssembler::sra):
+        (JSC::MIPSAssembler::srav):
+        (JSC::MIPSAssembler::srl):
+        (JSC::MIPSAssembler::srlv):
+        (JSC::MIPSAssembler::lbu):
+        (JSC::MIPSAssembler::lw):
+        (JSC::MIPSAssembler::lwl):
+        (JSC::MIPSAssembler::lwr):
+        (JSC::MIPSAssembler::lhu):
+        (JSC::MIPSAssembler::sb):
+        (JSC::MIPSAssembler::sh):
+        (JSC::MIPSAssembler::sw):
+        (JSC::MIPSAssembler::addd):
+        (JSC::MIPSAssembler::subd):
+        (JSC::MIPSAssembler::muld):
+        (JSC::MIPSAssembler::divd):
+        (JSC::MIPSAssembler::lwc1):
+        (JSC::MIPSAssembler::ldc1):
+        (JSC::MIPSAssembler::swc1):
+        (JSC::MIPSAssembler::sdc1):
+        (MIPSAssembler):
+        (JSC::MIPSAssembler::relocateJumps):
+        (JSC::MIPSAssembler::linkWithOffset):
+        * assembler/MacroAssemblerMIPS.h:
+        (JSC::MacroAssemblerMIPS::add32):
+        (JSC::MacroAssemblerMIPS::and32):
+        (JSC::MacroAssemblerMIPS::sub32):
+        (MacroAssemblerMIPS):
+        (JSC::MacroAssemblerMIPS::load8):
+        (JSC::MacroAssemblerMIPS::load32):
+        (JSC::MacroAssemblerMIPS::load32WithUnalignedHalfWords):
+        (JSC::MacroAssemblerMIPS::load16):
+        (JSC::MacroAssemblerMIPS::store8):
+        (JSC::MacroAssemblerMIPS::store16):
+        (JSC::MacroAssemblerMIPS::store32):
+        (JSC::MacroAssemblerMIPS::nearCall):
+        (JSC::MacroAssemblerMIPS::test8):
+        (JSC::MacroAssemblerMIPS::test32):
+
+2012-10-16  Yuqiang Xian  <yuqiang.xian@intel.com>
+
+        Refactor MacroAssembler interfaces to differentiate the pointer operands from the 64-bit integer operands
+        https://bugs.webkit.org/show_bug.cgi?id=99154
+
+        Reviewed by Gavin Barraclough.
+
+        In current JavaScriptCore implementation for JSVALUE64 platform (i.e.,
+        the X64 platform), we assume that the JSValue size is same to the
+        pointer size, and thus EncodedJSValue is simply type defined as a
+        "void*". In the JIT compiler, we also take this assumption and invoke
+        the same macro assembler interfaces for both JSValue and pointer
+        operands. We need to differentiate the operations on pointers from the
+        operations on JSValues, and let them invoking different macro
+        assembler interfaces. For example, we now use the interface of
+        "loadPtr" to load either a pointer or a JSValue, and we need to switch
+        to using "loadPtr" to load a pointer and some new "load64" interface
+        to load a JSValue. This would help us supporting other JSVALUE64
+        platforms where pointer size is not necessarily 64-bits, for example
+        x32 (bug #99153).
+
+        The major modification I made is to introduce the "*64" interfaces in
+        the MacroAssembler for those operations on JSValues, keep the "*Ptr"
+        interfaces for those operations on real pointers, and go through all
+        the JIT compiler code to correct the usage.
+
+        This is the first part of the work, i.e, to add the *64 interfaces to
+        the MacroAssembler.
+
+        * assembler/AbstractMacroAssembler.h: Add the Imm64 interfaces.
+        (AbstractMacroAssembler):
+        (JSC::AbstractMacroAssembler::TrustedImm64::TrustedImm64):
+        (TrustedImm64):
+        (JSC::AbstractMacroAssembler::Imm64::Imm64):
+        (Imm64):
+        (JSC::AbstractMacroAssembler::Imm64::asTrustedImm64):
+        * assembler/MacroAssembler.h: map <foo>Ptr methods to <foo>64 for X86_64.
+        (MacroAssembler):
+        (JSC::MacroAssembler::peek64):
+        (JSC::MacroAssembler::poke):
+        (JSC::MacroAssembler::poke64):
+        (JSC::MacroAssembler::addPtr):
+        (JSC::MacroAssembler::andPtr):
+        (JSC::MacroAssembler::negPtr):
+        (JSC::MacroAssembler::orPtr):
+        (JSC::MacroAssembler::rotateRightPtr):
+        (JSC::MacroAssembler::subPtr):
+        (JSC::MacroAssembler::xorPtr):
+        (JSC::MacroAssembler::loadPtr):
+        (JSC::MacroAssembler::loadPtrWithAddressOffsetPatch):
+        (JSC::MacroAssembler::loadPtrWithCompactAddressOffsetPatch):
+        (JSC::MacroAssembler::storePtr):
+        (JSC::MacroAssembler::storePtrWithAddressOffsetPatch):
+        (JSC::MacroAssembler::movePtrToDouble):
+        (JSC::MacroAssembler::moveDoubleToPtr):
+        (JSC::MacroAssembler::comparePtr):
+        (JSC::MacroAssembler::testPtr):
+        (JSC::MacroAssembler::branchPtr):
+        (JSC::MacroAssembler::branchTestPtr):
+        (JSC::MacroAssembler::branchAddPtr):
+        (JSC::MacroAssembler::branchSubPtr):
+        (JSC::MacroAssembler::shouldBlindDouble):
+        (JSC::MacroAssembler::shouldBlind):
+        (JSC::MacroAssembler::RotatedImm64::RotatedImm64):
+        (RotatedImm64):
+        (JSC::MacroAssembler::rotationBlindConstant):
+        (JSC::MacroAssembler::loadRotationBlindedConstant):
+        (JSC::MacroAssembler::move):
+        (JSC::MacroAssembler::and64):
+        (JSC::MacroAssembler::store64):
+        * assembler/MacroAssemblerX86Common.h:
+        (JSC::MacroAssemblerX86Common::shouldBlindForSpecificArch):
+        (MacroAssemblerX86Common):
+        (JSC::MacroAssemblerX86Common::move):
+        * assembler/MacroAssemblerX86_64.h: Add the <foo>64 methods for X86_64.
+        (JSC::MacroAssemblerX86_64::branchAdd32):
+        (JSC::MacroAssemblerX86_64::add64):
+        (MacroAssemblerX86_64):
+        (JSC::MacroAssemblerX86_64::and64):
+        (JSC::MacroAssemblerX86_64::neg64):
+        (JSC::MacroAssemblerX86_64::or64):
+        (JSC::MacroAssemblerX86_64::rotateRight64):
+        (JSC::MacroAssemblerX86_64::sub64):
+        (JSC::MacroAssemblerX86_64::xor64):
+        (JSC::MacroAssemblerX86_64::load64):
+        (JSC::MacroAssemblerX86_64::load64WithAddressOffsetPatch):
+        (JSC::MacroAssemblerX86_64::load64WithCompactAddressOffsetPatch):
+        (JSC::MacroAssemblerX86_64::store64):
+        (JSC::MacroAssemblerX86_64::store64WithAddressOffsetPatch):
+        (JSC::MacroAssemblerX86_64::move64ToDouble):
+        (JSC::MacroAssemblerX86_64::moveDoubleTo64):
+        (JSC::MacroAssemblerX86_64::compare64):
+        (JSC::MacroAssemblerX86_64::branch64):
+        (JSC::MacroAssemblerX86_64::branchTest64):
+        (JSC::MacroAssemblerX86_64::test64):
+        (JSC::MacroAssemblerX86_64::branchAdd64):
+        (JSC::MacroAssemblerX86_64::branchSub64):
+        (JSC::MacroAssemblerX86_64::branchPtrWithPatch):
+        (JSC::MacroAssemblerX86_64::storePtrWithPatch):
+
+2012-10-15  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        Make CopiedSpace and MarkedSpace regions independent
+        https://bugs.webkit.org/show_bug.cgi?id=99222
+
+        Reviewed by Filip Pizlo.
+
+        Right now CopiedSpace and MarkedSpace have the same block size and share the same regions, 
+        but there's no reason that they can't have different block sizes while still sharing the 
+        same underlying regions. We should factor the two "used" lists of regions apart so that 
+        MarkedBlocks and CopiedBlocks can be different sizes. Regions will still be a uniform size 
+        so that when they become empty they may be shared between the CopiedSpace and the MarkedSpace, 
+        since benchmarks indicate that sharing is a boon for performance.
+
+        * heap/BlockAllocator.cpp:
+        (JSC::BlockAllocator::BlockAllocator):
+        * heap/BlockAllocator.h:
+        (JSC):
+        (Region):
+        (JSC::Region::create): We now have a fixed size for Regions so that empty regions can continue to 
+        be shared between the MarkedSpace and CopiedSpace. Once they are used for a specific type of block,
+        however, they can only be used for that type of block until they become empty again.
+        (JSC::Region::createCustomSize):
+        (JSC::Region::Region):
+        (JSC::Region::~Region):
+        (JSC::Region::reset):
+        (BlockAllocator):
+        (JSC::BlockAllocator::RegionSet::RegionSet):
+        (RegionSet):
+        (JSC::BlockAllocator::tryAllocateFromRegion): We change this function so that it correctly 
+        moves blocks between empty, partial, and full lists.
+        (JSC::BlockAllocator::allocate):
+        (JSC::BlockAllocator::allocateCustomSize):
+        (JSC::BlockAllocator::deallocate): Ditto.
+        (JSC::CopiedBlock):
+        (JSC::MarkedBlock):
+        (JSC::BlockAllocator::regionSetFor): We use this so that we can use the same allocate/deallocate
+        functions with different RegionSets. We specialize the function for each type of block that we 
+        want to allocate.
+        * heap/CopiedBlock.h:
+        (CopiedBlock):
+        * heap/CopiedSpace.h:
+        (CopiedSpace):
+        * heap/HeapBlock.h:
+        (HeapBlock):
+        * heap/MarkedBlock.cpp:
+        (JSC::MarkedBlock::MarkedBlock): For oversize MarkedBlocks, if the block size gets too big we can 
+        underflow the endAtom, which will cause us to segfault when we try to sweep a block. If we're a 
+        custom size MarkedBlock we need to calculate endAtom so it doesn't underflow.
+
+2012-10-14  Filip Pizlo  <fpizlo@apple.com>
+
+        JIT::JIT fails to initialize all of its fields
+        https://bugs.webkit.org/show_bug.cgi?id=99283
+
+        Reviewed by Andreas Kling.
+
+        There were two groups of such fields, all of which are eventually initialized
+        prior to use inside of privateCompile(). But it's safer to make sure that they
+        are initialized in the constructor as well, since we may use the JIT to do a
+        stub compile without calling into privateCompile().
+        
+        Unsigned index fields for dynamic repatching meta-data: this change
+        initializes them to UINT_MAX, so we should crash if we try to use those
+        indices without initializing them.
+        
+        Boolean flags for value profiling: this change initializes them to false, so
+        we at worst turn off value profiling.
+
+        * jit/JIT.cpp:
+        (JSC::JIT::JIT):
+
+2012-10-15  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        We should avoid weakCompareAndSwap when parallel GC is disabled
+        https://bugs.webkit.org/show_bug.cgi?id=99331
+
+        Reviewed by Filip Pizlo.
+
+        CopiedBlock::reportLiveBytes and didEvacuateBytes uses weakCompareAndSwap, which some platforms 
+        don't support. For platforms that don't have parallel GC enabled, we should just use a normal store.
+
+        * heap/CopiedBlock.h:
+        (JSC::CopiedBlock::reportLiveBytes):
+        (JSC::CopiedBlock::didEvacuateBytes):
+
 2012-10-15  Carlos Garcia Campos  <cgarcia@igalia.com>
 
         Unreviewed. Fix make distcheck.

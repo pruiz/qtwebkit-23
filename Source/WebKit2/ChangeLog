@@ -1,3 +1,393 @@
+2012-10-16  Szilard Ledan  <szledan@inf.u-szeged.hu>
+
+        Separate WebKit2 instances use the same local storage
+        https://bugs.webkit.org/show_bug.cgi?id=89666
+
+        Reviewed by Simon Hausmann.
+
+        For multi-threaded (parallel) testing, WTRs must not write into the same directory.
+        To avoid that, results need to be stored in the location defined by DUMPRENDERTREE_TEMP
+        environment variable that is created by NRWT. To do that, WebContext needed to be
+        extended with diskCacheDirectory and cookieStorageDirectory APIs.
+
+        * Shared/WebProcessCreationParameters.cpp:
+        (WebKit::WebProcessCreationParameters::encode):
+        (WebKit::WebProcessCreationParameters::decode):
+        * Shared/WebProcessCreationParameters.h:
+        (WebProcessCreationParameters):
+        * UIProcess/API/C/WKContext.cpp:
+        (WKContextSetDiskCacheDirectory):
+        (WKContextSetCookieStorageDirectory):
+        * UIProcess/API/C/WKContextPrivate.h:
+        * UIProcess/WebContext.cpp:
+        (WebKit::WebContext::createNewWebProcess):
+        (WebKit::WebContext::diskCacheDirectory):
+        (WebKit):
+        (WebKit::WebContext::cookieStorageDirectory):
+        * UIProcess/WebContext.h:
+        (WebKit::WebContext::setDiskCacheDirectory):
+        (WebKit::WebContext::setCookieStorageDirectory):
+        (WebContext):
+        * UIProcess/efl/WebContextEfl.cpp:
+        (WebKit::WebContext::platformDefaultDiskCacheDirectory):
+        (WebKit):
+        (WebKit::WebContext::platformDefaultCookieStorageDirectory):
+        * UIProcess/gtk/WebContextGtk.cpp:
+        (WebKit::WebContext::platformDefaultDiskCacheDirectory):
+        (WebKit):
+        (WebKit::WebContext::platformDefaultCookieStorageDirectory):
+        * UIProcess/mac/WebContextMac.mm:
+        (WebKit::WebContext::platformInitializeWebProcess):
+        (WebKit):
+        (WebKit::WebContext::platformDefaultDiskCacheDirectory):
+        (WebKit::WebContext::platformDefaultCookieStorageDirectory):
+        * UIProcess/qt/WebContextQt.cpp:
+        (WebKit):
+        (WebKit::WebContext::platformDefaultDiskCacheDirectory):
+        (WebKit::WebContext::applicationCacheDirectory):
+        (WebKit::WebContext::platformInitializeWebProcess):
+        (WebKit::WebContext::platformDefaultCookieStorageDirectory):
+        * UIProcess/win/WebContextWin.cpp:
+        (WebKit::WebContext::platformInitializeWebProcess):
+        (WebKit::WebContext::platformDefaultDiskCacheDirectory):
+        (WebKit):
+        (WebKit::WebContext::platformDefaultCookieStorageDirectory):
+        * WebProcess/mac/WebProcessMac.mm:
+        (WebKit::WebProcess::platformInitializeWebProcess):
+        * WebProcess/win/WebProcessWin.cpp:
+        (WebKit::WebProcess::platformInitializeWebProcess):
+
+2012-10-16  Jongseok Yang  <js45.yang@samsung.com>
+
+        [EFL][WK2] Fix Cache Model API tests
+        https://bugs.webkit.org/show_bug.cgi?id=99427
+
+        Reviewed by Gyuyoung Kim.
+
+        Cache Model API tests caused "Segmentation fault" because the default value 
+        for cache model was incorrect.
+
+        Fix the default value for cache model.
+        Fix Cache Model API tests.
+
+        * UIProcess/API/efl/ewk_context.h:
+        * UIProcess/API/efl/tests/test_ewk2_context.cpp:
+        (TEST_F):
+
+2012-10-15  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Regression(r131337): Made 3 Cookie Manager API tests fail
+        https://bugs.webkit.org/show_bug.cgi?id=99416
+
+        Reviewed by Gyuyoung Kim.
+
+        After r131337, the favicon database is enabled and it causes new
+        requests to "/favicon.ico" on the http server. The http server used
+        in the cookie manager test was too strict and was calling FAIL() for
+        any unrecognized HTTP request (such as the one to /favicon.ico).
+        This patch makes the http server in cookie manager API tests less
+        strict.
+
+        * UIProcess/API/efl/tests/test_ewk2_cookie_manager.cpp:
+        (serverCallback):
+
+2012-10-15  Gyuyoung Kim  <gyuyoung.kim@samsung.com>
+
+        Unreviewed, rolling out r131349.
+        http://trac.webkit.org/changeset/131349
+        https://bugs.webkit.org/show_bug.cgi?id=97173
+
+        Revert r131349 because API test is broken by this commit.
+
+        * UIProcess/API/efl/ewk_main.cpp:
+        (ewk_init):
+        (ewk_shutdown):
+        * WebProcess/efl/WebProcessMainEfl.cpp:
+        (WebKit::WebProcessMainEfl):
+
+2012-10-15  Jongseok Yang  <js45.yang@samsung.com>
+
+        [EFL][WK2] Add APIs for cache model
+        https://bugs.webkit.org/show_bug.cgi?id=98889
+
+        Reviewed by Gyuyoung Kim.
+
+        Add ewk_context_cache_model_set(), ewk_context_cache_model_get().
+
+        The cache model means the level for the cache capacity.
+        If EWK_CACHE_MODEL_DOCUMENT_BROWSER, the biggest cache capacity will be set.
+
+        * UIProcess/API/efl/ewk_context.cpp:
+        (ewk_context_cache_model_set):
+        (ewk_context_cache_model_get):
+        * UIProcess/API/efl/ewk_context.h:
+        * UIProcess/API/efl/tests/test_ewk2_context.cpp:
+        (TEST_F):
+
+2012-10-15  Byungwoo Lee  <bw80.lee@samsung.com>
+
+        Fix unused parameter build warning.
+        https://bugs.webkit.org/show_bug.cgi?id=99400
+
+        Reviewed by Gyuyoung Kim.
+
+        Remove the name of unused parameters to fix the build warning (-Wunused-parameter).
+
+        * Shared/soup/WebCoreArgumentCodersSoup.cpp:
+        (CoreIPC::::encodePlatformData):
+        (CoreIPC::::decodePlatformData):
+        * UIProcess/WebProcessProxy.cpp:
+        (WebKit::WebProcessProxy::getSharedWorkerProcessConnection):
+        * WebProcess/Plugins/Netscape/NetscapePlugin.cpp:
+        (WebKit::NetscapePlugin::handleEditingCommand):
+        (WebKit::NetscapePlugin::isEditingCommandEnabled):
+
+2012-10-15  Dan Bernstein  <mitz@apple.com>
+
+        WebKit2 part of <rdar://problem/12470680> Font’s fast code path doesn’t support kerning and ligatures
+        https://bugs.webkit.org/show_bug.cgi?id=99113
+
+        Reviewed by Tim Horton.
+
+        * WebProcess/WebCoreSupport/mac/WebSystemInterface.mm:
+        (InitWebCoreSystemInterface): Added wkCTFontTransformGlyphs.
+
+2012-10-15  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [WK2][CAIRO] Use cairo_format_stride_for_width() in ShareableBitmap
+        https://bugs.webkit.org/show_bug.cgi?id=99332
+
+        Reviewed by Martin Robinson.
+
+        Cairo implementation of ShareableBitmap is calling
+        cairo_image_surface_create_for_data() to create an image surface for
+        the provided pixel data. However, it was passing "m_size.width() * 4"
+        for the stride argument instead of calling
+        cairo_format_stride_for_width().
+
+        The Cairo documentation states:
+        "Note that the stride may be larger than width*bytes_per_pixel to
+        provide proper alignment for each pixel and row. This alignment is
+        required to allow high-performance rendering within cairo. The correct
+        way to obtain a legal stride value is to call
+        cairo_format_stride_for_width() with the desired format and maximum
+        image width value, and then use the resulting stride value to allocate
+        the data and to create the image surface."
+
+        This patch calls cairo_format_stride_for_width() is ShareableBitmap
+        in order to obtain a legal stride value to make sure we provide proper
+        alignment for each pixel and row, and allow high-performance rendering
+        within cairo.
+
+        * Shared/ShareableBitmap.h:
+        (ShareableBitmap):
+        * Shared/cairo/ShareableBitmapCairo.cpp:
+        (WebKit):
+        (WebKit::ShareableBitmap::numBytesForSize):
+        (WebKit::createSurfaceFromData):
+        (WebKit::ShareableBitmap::paint):
+        (WebKit::ShareableBitmap::createCairoSurface):
+
+2012-10-15  Eunmi Lee  <eunmi15.lee@samsung.com>
+
+        [EFL][WK2] Refactoring initialization and shutdown codes of EFL libraries.
+        https://bugs.webkit.org/show_bug.cgi?id=97173
+
+        Reviewed by Gyuyoung Kim.
+
+        Initialize and shutdown the EFL libraries in the ewk_main.cpp for ui
+        process and WebProcessMainEfl.cpp for web process.
+
+        * UIProcess/API/efl/ewk_main.cpp:
+        (ewk_init):
+        (ewk_shutdown):
+        * WebProcess/efl/WebProcessMainEfl.cpp:
+        (WebKit::WebProcessMainEfl):
+
+2012-10-15  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL][WK2] Provide implementation for PageClientImpl::toolTipChanged()
+        https://bugs.webkit.org/show_bug.cgi?id=98589
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Implement PageClientImpl::toolTipChanged() to emit signal 'tooltip,text,set' with a tooltip text,
+        or 'tooltip,text,unset' if tooltip was unset.
+
+        * UIProcess/API/efl/PageClientImpl.cpp:
+        (WebKit::PageClientImpl::toolTipChanged):
+        * UIProcess/API/efl/ewk_view.cpp:
+        (ewk_view_tooltip_text_set):
+        * UIProcess/API/efl/ewk_view.h:
+        * UIProcess/API/efl/ewk_view_private.h:
+
+2012-10-15  Roger Fong  <roger_fong@apple.com>
+
+        Unreviewed. Partial build fix for Windows after r131308.
+
+        * WebKit2Prefix.h:
+        * WebProcess/WebKitMain.cpp:
+        (WebKitMain):
+
+2012-10-15  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r131306 and r131307.
+        http://trac.webkit.org/changeset/131306
+        http://trac.webkit.org/changeset/131307
+        https://bugs.webkit.org/show_bug.cgi?id=99354
+
+        It made layout testing extremely slow again (Requested by
+        Ossy_night on #webkit).
+
+        * Shared/API/c/qt/WKImageQt.cpp:
+        (WKImageCreateQImage):
+        * Shared/API/c/qt/WKImageQt.h:
+
+2012-10-15  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Implement Favicons API
+        https://bugs.webkit.org/show_bug.cgi?id=99087
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Add support for favicon API to EFL WK2 port via
+        Ewk_Favicon_Database. The API can be used to
+        retrieve the favicon URL and data for a given
+        page URL.
+
+        * PlatformEfl.cmake:
+        * UIProcess/API/efl/EWebKit2.h:
+        * UIProcess/API/efl/ewk_context.cpp:
+        (_Ewk_Context):
+        (_Ewk_Context::_Ewk_Context):
+        (_Ewk_Context::~_Ewk_Context):
+        (ewk_context_favicon_database_get): Add getter to retrieve the favicon
+        database instance from the context.
+        * UIProcess/API/efl/ewk_context.h:
+        * UIProcess/API/efl/ewk_favicon_database.cpp: Added.
+        (IconChangeCallbackData):
+        (IconChangeCallbackData::IconChangeCallbackData):
+        (IconRequestCallbackData):
+        (IconRequestCallbackData::IconRequestCallbackData):
+        (_Ewk_Favicon_Database):
+        (_Ewk_Favicon_Database::_Ewk_Favicon_Database):
+        (didChangeIconForPageURL):
+        (getIconSurfaceSynchronously):
+        (iconDataReadyForPageURL):
+        (ewk_favicon_database_new):
+        (ewk_favicon_database_free):
+        (ewk_favicon_database_icon_url_get):
+        (AsyncIconRequestResponse):
+        (AsyncIconRequestResponse::AsyncIconRequestResponse):
+        (respond_icon_request_idle):
+        (ewk_favicon_database_async_icon_get):
+        (ewk_favicon_database_icon_change_callback_add):
+        (ewk_favicon_database_icon_change_callback_del):
+        * UIProcess/API/efl/ewk_favicon_database.h: Added.
+        * UIProcess/API/efl/ewk_favicon_database_private.h: Copied from Source/WebKit2/UIProcess/efl/WebContextEfl.cpp.
+        * UIProcess/API/efl/ewk_view.cpp:
+        (_Ewk_View_Private_Data):
+        (_Ewk_View_Private_Data::~_Ewk_View_Private_Data):
+        (_ewk_view_on_favicon_changed):
+        (_ewk_view_initialize):
+        (ewk_view_url_update):
+        (ewk_view_icon_url_get): Add a getter to the view to retrieve the icon URL for
+        the page that is currently shown.
+        (ewk_view_update_icon):
+        * UIProcess/API/efl/ewk_view.h: Emit a new "icon,changed" signal on the view whenever
+        the view's icon has changed.
+        * UIProcess/API/efl/ewk_view_private.h:
+        * UIProcess/API/efl/tests/resources/blank.ico: Added.
+        * UIProcess/API/efl/tests/test_ewk2_context.cpp: Add unit test for new favicon database getter.
+        (TEST_F):
+        * UIProcess/API/efl/tests/test_ewk2_favicon_database.cpp: Added unit tests for the new Ewk_Favicon_Database API.
+        (serverCallback):
+        (onIconChanged):
+        (TEST_F):
+        (onIconDataReady):
+        (IconRequestData):
+        (requestFaviconData):
+        * UIProcess/efl/WebContextEfl.cpp:
+        (WebKit::WebContext::platformDefaultIconDatabasePath): Return a valid default path for the icon database.
+
+2012-10-15  Ryuan Choi  <ryuan.choi@samsung.com>
+
+        [EFL] Share resources installed for inspector
+        https://bugs.webkit.org/show_bug.cgi?id=98991
+
+        Reviewed by Gyuyoung Kim.
+
+        * PlatformEfl.cmake: Removed build script which install resources to share.
+        * UIProcess/efl/WebInspectorProxyEfl.cpp:
+        (WebKit::WebInspectorProxy::inspectorPageURL): Modified not to use makeString.
+        (WebKit::WebInspectorProxy::inspectorBaseURL): Changed resource path.
+
+2012-10-13  Alexey Proskuryakov  <ap@apple.com>
+
+        [WK2] Add SharedWorkerProcess
+        https://bugs.webkit.org/show_bug.cgi?id=99218
+
+        Reviewed by Sam Weinig.
+
+        Not yet functional, just some boilerplate code.
+
+        * Configurations/SharedWorkerProcess.xcconfig: Added.
+
+        * DerivedSources.make: Generate message dispatch for SharedWorkerProcess and
+        SharedWorkerProcessProxy.
+
+        * Platform/CoreIPC/MessageID.h: Added shared worker messages classes.
+
+        * Scripts/webkit2/messages.py: (struct_or_class):
+        SharedWorkerProcessCreationParameters is a struct.
+
+        * Shared/SharedWorkerProcessCreationParameters.cpp: Added.
+        * SharedWorkerProcess/Info.plist: Added.
+        * SharedWorkerProcess/SharedWorkerProcess.cpp: Added.
+        * SharedWorkerProcess/SharedWorkerProcess.h: Added.
+        * SharedWorkerProcess/SharedWorkerProcess.messages.in: Added.
+        * SharedWorkerProcess/SharedWorkerProcessMain.h: Added.
+        * SharedWorkerProcess/mac/SharedWorkerProcessMac.mm: Added.
+        * SharedWorkerProcess/mac/SharedWorkerProcessMainMac.mm: Added.
+        * SharedWorkerProcess/mac/com.apple.WebKit.SharedWorkerProcess.sb: Added.
+        * UIProcess/SharedWorkers/SharedWorkerProcessManager.cpp: Added.
+        * UIProcess/SharedWorkers/SharedWorkerProcessManager.h: Added.
+        * UIProcess/SharedWorkers/SharedWorkerProcessProxy.cpp: Added.
+        * UIProcess/SharedWorkers/SharedWorkerProcessProxy.h: Added.
+        * UIProcess/SharedWorkers/SharedWorkerProcessProxy.messages.in: Added.
+        * WebKit2.xcodeproj/project.pbxproj:
+        Added SharedWorkerProcess boilerplate, modeled after PluginProcess.
+
+        * UIProcess/WebProcessProxy.cpp:
+        * UIProcess/WebProcessProxy.h:
+        * UIProcess/WebProcessProxy.messages.in:
+        Added getSharedWorkerProcessConnection() message.
+
+        * WebProcess/WebKitMain.cpp: (WebKitMain):
+        * UIProcess/Launcher/ProcessLauncher.cpp:
+        (WebKit::ProcessLauncher::processTypeAsString):
+        (WebKit::ProcessLauncher::getProcessTypeFromString):
+        * UIProcess/Launcher/ProcessLauncher.h:
+        * UIProcess/Launcher/mac/ProcessLauncherMac.mm: (WebKit::createProcess):
+        Added branches for SharedWorkerProcess.
+
+        * Platform/CoreIPC/HandleMessage.h: (CoreIPC::callMemberFunction): Added a version
+        for delayed reply messages with two arguments.
+
+2012-10-15  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WTR] Do a forced repaint before generating pixel results
+        https://bugs.webkit.org/show_bug.cgi?id=98654
+
+        Reviewed by Jocelyn Turcotte.
+
+        Added API to convert a QImage to a WKImage so we can
+        pass it to cross-platform code.
+
+        * Shared/API/c/qt/WKImageQt.cpp:
+        (WKImageCreateFromQImage):
+        * Shared/API/c/qt/WKImageQt.h:
+
 2012-10-15  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
 
         [EFL][WK2] Encapsulate ref counting for Ewk objects in a parent class

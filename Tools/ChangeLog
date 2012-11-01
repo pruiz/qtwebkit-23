@@ -1,3 +1,280 @@
+2012-10-16  Szilard Ledan  <szledan@inf.u-szeged.hu>
+
+        Separate WebKit2 instances use the same local storage
+        https://bugs.webkit.org/show_bug.cgi?id=89666
+
+        Reviewed by Simon Hausmann.
+
+        TestController has been modified to get the local storage from
+        DUMPRENDERTREE_TEMP environment variable. If it's undefined
+        then it works with the default directory. The aim is for the parallelly
+        started WTRs to use separate directories. It was implemented for WK1
+        long time ago and it works fine.
+
+        * WebKitTestRunner/TestController.cpp:
+        (WTR::TestController::initialize):
+
+2012-10-15  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Display page favicons in MiniBrowser
+        https://bugs.webkit.org/show_bug.cgi?id=99265
+
+        Reviewed by Gyuyoung Kim.
+
+        Display current page favicon in the URL bar.
+        This uses the new favicon database API in
+        EFL WebKit2.
+
+        * MiniBrowser/efl/main.c:
+        (on_favicon_received):
+        (on_view_icon_changed):
+        (window_create):
+
+2012-10-15  Simon Fraser  <simon.fraser@apple.com>
+
+        Update the url bar in MiniBrowser when getting the committed URL
+        https://bugs.webkit.org/show_bug.cgi?id=99388
+
+        Reviewed by Sam Weinig.
+
+        Fix both WK1 and WK2 window controllers to update the URL in the 
+        text field when transitioning to the committed URL. This fixes
+        the URL when dragging local files into the window.
+
+        * MiniBrowser/mac/WK1BrowserWindowController.m:
+        (-[WK1BrowserWindowController webView:didCommitLoadForFrame:]):
+        * MiniBrowser/mac/WK2BrowserWindowController.m:
+        (-[WK2BrowserWindowController updateTextFieldFromURL:]):
+        (-[WK2BrowserWindowController updateProvisionalURLForFrame:]):
+        (-[WK2BrowserWindowController updateCommittedURLForFrame:]):
+        (-[WK2BrowserWindowController didCommitLoadForFrame:]):
+
+2012-10-15  Ojan Vafai  <ojan@chromium.org>
+
+        Don't show the content shell and android test bots for webkit ToT
+        https://bugs.webkit.org/show_bug.cgi?id=99380
+
+        Reviewed by Dirk Pranke.
+
+        Content shell used to coincidentally be skipped because it spelled WebKit correctly.
+        Now skip it explicitly. The Android bot is up and running, but only has a stub for
+        running tests. Skip it so we don't show a false error.
+        * TestResultServer/static-dashboards/builders.js:
+        (isChromiumWebkitTipOfTreeTestRunner):
+
+2012-10-15  Zoltan Horvath  <zoltan@webkit.org>
+
+        Add MountainLion Performance-bot to the Performance bots waterfall link
+        https://bugs.webkit.org/show_bug.cgi?id=99378
+
+        Reviewed by Dirk Pranke.
+
+        Add MountainLion Performance-bot to the Performance bots waterfall link on the buildbots frontpage.
+
+        * BuildSlaveSupport/build.webkit.org-config/templates/root.html:
+
+2012-10-15  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][WK2] Cannot set evas engine from command line
+        https://bugs.webkit.org/show_bug.cgi?id=99286
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        If an engine name is passed on the command line, pass it along to evas.
+
+        * MiniBrowser/efl/main.c:
+        (elm_main):
+
+2012-10-15  Ojan Vafai  <ojan@chromium.org>
+
+        Lower the minimum time required to keep a test in the test results json
+        https://bugs.webkit.org/show_bug.cgi?id=99346
+
+        Reviewed by Eric Seidel.
+
+        On the run-webkit-tests side, we floor the time. So, 5 seconds is too close to
+        the 6 second timeout. Lower the time so that we can get a better sense of tests
+        that are close to timing out.
+
+        * TestResultServer/model/jsonresults.py:
+        * TestResultServer/model/jsonresults_unittest.py:
+        (JsonResultsTest.test_merge_keep_test_with_all_pass_but_slow_time):
+
+2012-10-15  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r131306 and r131307.
+        http://trac.webkit.org/changeset/131306
+        http://trac.webkit.org/changeset/131307
+        https://bugs.webkit.org/show_bug.cgi?id=99354
+
+        It made layout testing extremely slow again (Requested by
+        Ossy_night on #webkit).
+
+        * WebKitTestRunner/Target.pri:
+        * WebKitTestRunner/TestInvocation.cpp:
+        (WTR::TestInvocation::invoke):
+        (WTR::TestInvocation::didReceiveMessageFromInjectedBundle):
+        * WebKitTestRunner/TestInvocation.h:
+        (TestInvocation):
+        * WebKitTestRunner/qt/PlatformWebViewQt.cpp:
+        (WTR::WrapperWindow::handleStatusChanged):
+        (WTR::PlatformWebView::windowSnapshotImage):
+        * WebKitTestRunner/qt/TestInvocationQt.cpp:
+        (WTR::TestInvocation::dumpPixelsAndCompareWithExpected):
+
+2012-10-15  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r131327.
+        http://trac.webkit.org/changeset/131327
+        https://bugs.webkit.org/show_bug.cgi?id=99353
+
+        broke the build (Requested by danakj|gardening on #webkit).
+
+        * DumpRenderTree/chromium/TestEventPrinter.cpp:
+        * DumpRenderTree/chromium/TestEventPrinter.h:
+        (TestEventPrinter):
+        * DumpRenderTree/chromium/TestShell.cpp:
+        (TestShell::dump):
+
+2012-10-15  Kenichi Ishibashi  <bashi@chromium.org>
+
+        [WebSocket] Update pywebsocket to 0.7.8
+        https://bugs.webkit.org/show_bug.cgi?id=99293
+
+        Reviewed by Yuta Kitamura.
+
+        Version 0.7.8 supports WebSocket frames and messages compression
+        with blocks in which BFINAL bit is set to 1.
+        We need this feature to add a test case of compression extension.
+
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/extensions.py:
+        (DeflateFrameExtensionProcessor.__init__):
+        (DeflateFrameExtensionProcessor.set_bfinal):
+        (DeflateFrameExtensionProcessor._outgoing_filter):
+        (DeflateMessageProcessor.__init__):
+        (DeflateMessageProcessor.set_bfinal):
+        (DeflateMessageProcessor._process_outgoing_message):
+        * Scripts/webkitpy/thirdparty/mod_pywebsocket/util.py:
+        (_Deflater.compress_and_finish):
+        (_RFC1979Deflater.filter):
+
+2012-10-15  Zan Dobersek  <zandobersek@gmail.com>
+
+        [TestResultServer] TestExpectations should only be loaded for the flakiness dashboard
+        https://bugs.webkit.org/show_bug.cgi?id=99245
+
+        Reviewed by Ojan Vafai.
+
+        Only load the TestExpectations when using the flakiness dashboard. Other dashboards
+        don't need them so there's no reason to load them.
+
+        * TestResultServer/static-dashboards/dashboard_base.js:
+        (isFlakinessDashboard):
+        (appendJSONScriptElements):
+
+2012-10-15  Zoltan Horvath  <zoltan@webkit.org>
+
+        [chromium] Provide used JSHeap size in chromium's DRT for pageloadtest memory measurements 
+        https://bugs.webkit.org/show_bug.cgi?id=99288
+
+        Reviewed by Ryosuke Niwa.
+
+        Provide used JSHeap size as we did it for the Apple port.
+
+        * DumpRenderTree/chromium/TestEventPrinter.cpp:
+        (TestEventPrinter::handleDumpMemoryHeader): Add new function to print the JSHeap memory result.
+        * DumpRenderTree/chromium/TestEventPrinter.h:
+        (TestEventPrinter): handleDumpMemoryHeader declaration.
+        * DumpRenderTree/chromium/TestShell.cpp:
+        (TestShell::dump): Dump JSHeap value.
+
+2012-10-15  George Staikos  <staikos@webkit.org>
+
+        [BlackBerry] Adapt to Platform API changes in string handling
+        https://bugs.webkit.org/show_bug.cgi?id=99248
+
+        Reviewed by Yong Li.
+
+        Convert usage of WebString, char* and std::string to BlackBerry::Platform::String.
+
+        * DumpRenderTree/blackberry/DumpRenderTree.cpp:
+        (BlackBerry::WebKit::DumpRenderTree::runTest):
+        * DumpRenderTree/blackberry/WorkQueueItemBlackBerry.cpp:
+        (LoadHTMLStringItem::invoke):
+        (ScriptItem::invoke):
+
+2012-10-15  Kangil Han  <kangil.han@samsung.com>
+
+        [EFL][EWebLauncher] Add encoding detector option.
+        https://bugs.webkit.org/show_bug.cgi?id=98726
+
+        Reviewed by Gyuyoung Kim.
+
+        Added an option to test WebCore's encoding detector functionality on EWebLauncher.
+        With this patch, EWebLauncher would display text correctly even if web page wouldn't specify charset information.
+
+        * EWebLauncher/main.c:
+        (_User_Arguments):
+        (windowCreate):
+        (parseUserArguments):
+
+2012-10-15  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Build fix for Mac debug build.
+
+        * TestWebKitAPI/Tests/WTF/MemoryInstrumentationTest.cpp:
+
+2012-10-15  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] Implement pixel snapshot generation in WTR
+        https://bugs.webkit.org/show_bug.cgi?id=95992
+
+        Reviewed by Jocelyn Turcotte.
+
+        Switch the Qt implementation of the PlatformWebView to use
+        QQuickWindow::grabWindow to generate the pixel results. This way
+        we will go through the scenegraph and test the actual rendering backend.
+        We use QQuickWindowPrivate::setRenderWithoutShowing to avoid the need of
+        showing the window.
+
+        * WebKitTestRunner/Target.pri: Had to added a bunch
+        of modules to be able to use QQuickWindowPrivate.
+        * WebKitTestRunner/qt/PlatformWebViewQt.cpp:
+        (WTR::WrapperWindow::handleStatusChanged):
+        (WTR::PlatformWebView::windowSnapshotImage):
+
+2012-10-15  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WTR] Do a forced repaint before generating pixel results
+        https://bugs.webkit.org/show_bug.cgi?id=98654
+
+        Reviewed by Jocelyn Turcotte.
+
+        Do a forced repaint before grabbing the pixel snapshot. This extra
+        synchronisation is necessary with the CoordinatedGraphics rendering
+        backend because it has a fully asynchronous nature. This patch make
+        us using the window snapshot for pixel results which is necessary to
+        capture animations and other dynamic content. The actual grabbing of
+        the window has not been implemented in this patch. It will come in
+        a follow-up.
+
+        * WebKitTestRunner/TestInvocation.cpp:
+        (WTR::TestInvocation::invoke):
+        (WTR::TestInvocation::dump): Store results in member variables.
+        Don't close output channels yet.
+        (WTR::TestInvocation::dumpResults): Added. This is where we dump
+        the results if no error happened.
+        (WTR):
+        (WTR::TestInvocation::didReceiveMessageFromInjectedBundle):
+        * WebKitTestRunner/TestInvocation.h:
+        (TestInvocation):
+        * WebKitTestRunner/qt/PlatformWebViewQt.cpp:
+        (WTR::PlatformWebView::windowSnapshotImage):
+        * WebKitTestRunner/qt/TestInvocationQt.cpp:
+        (WTR::TestInvocation::forceRepaintDoneCallback):
+        (WTR):
+        (WTR::TestInvocation::dumpPixelsAndCompareWithExpected):
+
 2012-10-11  Kinuko Yasuda  <kinuko@chromium.org>
 
         [chromium] Removes unnecessary dependencies in DumpRenderTree.gyp

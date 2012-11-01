@@ -187,7 +187,7 @@ float Font::width(const TextRun& run, HashSet<const SimpleFontData*>* fallbackFo
         // If the complex text implementation cannot return fallback fonts, avoid
         // returning them for simple text as well.
         static bool returnFallbackFonts = canReturnFallbackFontsForComplexText();
-        return floatWidthForSimpleText(run, 0, returnFallbackFonts ? fallbackFonts : 0, codePathToUse == SimpleWithGlyphOverflow || (glyphOverflow && glyphOverflow->computeBounds) ? glyphOverflow : 0);
+        return floatWidthForSimpleText(run, returnFallbackFonts ? fallbackFonts : 0, codePathToUse == SimpleWithGlyphOverflow || (glyphOverflow && glyphOverflow->computeBounds) ? glyphOverflow : 0);
     }
 
     return floatWidthForComplexText(run, fallbackFonts, glyphOverflow);
@@ -204,7 +204,7 @@ float Font::width(const TextRun& run, int& charsConsumed, String& glyphName) con
     glyphName = "";
 
     if (codePath(run) != Complex)
-        return floatWidthForSimpleText(run, 0);
+        return floatWidthForSimpleText(run);
 
     return floatWidthForComplexText(run);
 }
@@ -319,7 +319,7 @@ Font::CodePath Font::codePath(const TextRun& run) const
     if (m_fontDescription.featureSettings() && m_fontDescription.featureSettings()->size() > 0)
         return Complex;
     
-    if (run.length() > 1 && typesettingFeatures())
+    if (run.length() > 1 && !WidthIterator::supportsTypesettingFeatures(*this))
         return Complex;
 
     if (!run.characterScanForCodePath())

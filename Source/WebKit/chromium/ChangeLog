@@ -1,3 +1,71 @@
+2012-10-15  Peter Beverloo  <peter@chromium.org>
+
+        [Chromium] Enable FAST_MOBILE_SCROLLING for Android
+        https://bugs.webkit.org/show_bug.cgi?id=99401
+
+        Reviewed by Adam Barth.
+
+        * features.gypi: Add the define to the Android-only section.
+
+2012-10-15  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-10-15  Peter Beverloo  <peter@chromium.org>
+
+        [Chromium] The default target for Android builds should be "all" instead of "All"
+        https://bugs.webkit.org/show_bug.cgi?id=98879
+
+        Reviewed by Adam Barth.
+
+        The default gyp target for Android builds is being overridden in Chromium's
+        envsetup_functions.sh to "All" (whereas the rest of Chromium and WebKit use "all"),
+        because Android wants to use a different list of main targets. There is
+        no need to do this for the WebKit project, and it's breaking ninja.
+
+        * gyp_webkit:
+
+2012-10-15  Kent Tamura  <tkent@chromium.org>
+
+        LocaleMacTest.formatDate is failing on Mac 10.8
+        https://bugs.webkit.org/show_bug.cgi?id=99330
+
+        It seems OS X 10.8 and 10.7 return different date formats for ja_JP
+        locale. We should not test such locales.
+
+        * tests/LocaleMacTest.cpp:
+        (TEST_F): Remove a test for ja_JP locale.
+
+2012-10-15  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: Pass type of error causing abort to IDBTransaction::onAbort
+        https://bugs.webkit.org/show_bug.cgi?id=99097
+
+        Reviewed by Tony Chang.
+
+        Plumbing to pass details about the cause of the transaction abort through to the
+        front end.
+
+        * public/WebIDBTransactionCallbacks.h:
+        (WebKit):
+        (WebKit::WebIDBTransactionCallbacks::onAbort):
+        * src/IDBTransactionCallbacksProxy.cpp:
+        (WebKit::IDBTransactionCallbacksProxy::onAbort):
+        * src/IDBTransactionCallbacksProxy.h:
+        (IDBTransactionCallbacksProxy):
+        * src/WebIDBTransactionCallbacksImpl.cpp:
+        (WebKit::WebIDBTransactionCallbacksImpl::onAbort):
+        * src/WebIDBTransactionCallbacksImpl.h:
+        (WebIDBTransactionCallbacksImpl):
+
+2012-10-15  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
 2012-10-14  Sam Weinig  <sam@webkit.org>
 
         Make UserScript and UserStyleSheet value objects that are copyable

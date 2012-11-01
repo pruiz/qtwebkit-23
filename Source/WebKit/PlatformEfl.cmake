@@ -3,6 +3,7 @@ LIST(APPEND WebKit_INCLUDE_DIRECTORIES
     "${WEBKIT_DIR}/efl/ewk"
     "${WEBKIT_DIR}/efl/WebCoreSupport"
     "${JAVASCRIPTCORE_DIR}/ForwardingHeaders"
+    "${WEBCORE_DIR}/Modules/filesystem"
     "${WEBCORE_DIR}/platform/efl"
     "${WEBCORE_DIR}/platform/graphics/cairo"
     "${WEBCORE_DIR}/platform/graphics/efl"
@@ -124,7 +125,6 @@ LIST(APPEND WebKit_SOURCES
     efl/ewk/ewk_tiled_matrix.cpp
     efl/ewk/ewk_tiled_model.cpp
     efl/ewk/ewk_touch_event.cpp
-    efl/ewk/ewk_util.cpp
     efl/ewk/ewk_view.cpp
     efl/ewk/ewk_view_single.cpp
     efl/ewk/ewk_view_tiled.cpp
@@ -255,22 +255,3 @@ IF (ENABLE_API_TESTS)
     ENDFOREACH ()
 ENDIF ()
 
-IF (ENABLE_INSPECTOR)
-    SET(WEB_INSPECTOR_DIR ${CMAKE_BINARY_DIR}/WebKit/efl/webinspector)
-    ADD_DEFINITIONS(-DWEB_INSPECTOR_DIR="${WEB_INSPECTOR_DIR}")
-    ADD_DEFINITIONS(-DWEB_INSPECTOR_INSTALL_DIR="${CMAKE_INSTALL_PREFIX}/${DATA_INSTALL_DIR}/webinspector")
-    ADD_CUSTOM_TARGET(
-        web-inspector-resources ALL
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${WEBCORE_DIR}/inspector/front-end ${WEB_INSPECTOR_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${WEBCORE_DIR}/English.lproj/localizedStrings.js ${WEB_INSPECTOR_DIR}
-        COMMAND ${CMAKE_COMMAND} -E copy ${DERIVED_SOURCES_WEBCORE_DIR}/InspectorBackendCommands.js ${WEB_INSPECTOR_DIR}/InspectorBackendCommands.js
-        DEPENDS ${WebCore_LIBRARY_NAME}
-    )
-    INSTALL(DIRECTORY ${WEB_INSPECTOR_DIR}
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/${DATA_INSTALL_DIR}
-        FILES_MATCHING PATTERN "*.js"
-                       PATTERN "*.html"
-                       PATTERN "*.css"
-                       PATTERN "*.gif"
-                       PATTERN "*.png")
-ENDIF ()

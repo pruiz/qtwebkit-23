@@ -671,6 +671,10 @@ printing/compositing-layer-printing.html [ WontFix ]
 printing/media-queries-print.html [ WontFix ]
 printing/page-rule-in-media-query.html [ WontFix ]
 
+# LAYER_TREE_INCLUDES_VISIBLE_RECTS option to layerTreeAsText is only applicable to Mac.
+compositing/visible-rect [ WontFix ]
+platform/chromium/virtual/softwarecompositing/visible-rect [ WontFix ]
+
 # Chrome doesn't call the willCacheResponse callback (a method
 # of ResourceHandleClient).  That function is Mac-specific.
 http/tests/misc/willCacheResponse-delegate-callback.html [ WontFix ]
@@ -2442,9 +2446,8 @@ webkit.org/b/48034 [ Win ] platform/win/plugins/npn-invalidate-rect-invalidates-
 # Added in WK r71424
 # We should probably just skip this test, everyone else has since
 # https://bugs.webkit.org/show_bug.cgi?id=49182
-crbug.com/62138 [ Mac Win Debug ] animations/stop-animation-on-suspend.html [ Crash Failure Pass ]
-crbug.com/62138 [ Mac Win Release ] animations/stop-animation-on-suspend.html [ Failure Pass ]
-crbug.com/62138 [ Android Linux ] animations/stop-animation-on-suspend.html [ Failure Pass ]
+crbug.com/62138 [ Debug ] animations/stop-animation-on-suspend.html [ Crash Failure Pass ]
+crbug.com/62138 [ Release ] animations/stop-animation-on-suspend.html [ Failure Pass ]
 
 crbug.com/61739 [ Debug ] animations/suspend-resume-animation-events.html [ Failure Pass ]
 crbug.com/61739 [ Win Release ] animations/suspend-resume-animation-events.html [ Failure Pass ]
@@ -2863,8 +2866,6 @@ webkit.org/b/62580 fast/loader/inherit-charset-to-empty-frame.html [ Failure Pas
 webkit.org/b/62754 [ Android Linux Mac Release ] http/tests/misc/object-embedding-svg-delayed-size-negotiation-2.htm [ Failure Timeout ]
 webkit.org/b/62754 [ Android Linux Mac Debug ] http/tests/misc/object-embedding-svg-delayed-size-negotiation-2.htm [ Failure Slow ]
 webkit.org/b/62754 [ Win ] http/tests/misc/object-embedding-svg-delayed-size-negotiation-2.htm [ Failure ]
-
-crbug.com/89282 [ SnowLeopard ] fast/forms/range/input-appearance-range.html [ ImageOnlyFailure Pass ]
 
 crbug.com/87732 fast/regex/toString.html [ Failure ]
 
@@ -3438,7 +3439,7 @@ webkit.org/b/81416 fast/dom/wrapper-scope.html [ Failure ]
 webkit.org/b/86439 [ Linux Win ] inspector/extensions/extensions-events.html [ Pass Timeout ]
 webkit.org/b/86439 [ Linux Win Debug ] inspector/extensions/extensions-sidebar.html [ Pass Timeout ]
 
-webkit.org/b/86114 [ Mac Debug ] animations/combo-transform-translate+scale.html [ Failure Pass ]
+webkit.org/b/86114 [ Mac Win Debug ] animations/combo-transform-translate+scale.html [ Failure Pass ]
 
 webkit.org/b/92279 [ Linux Win ] http/tests/inspector/resource-har-pages.html [ Failure Pass Slow ]
 
@@ -3542,10 +3543,6 @@ webkit.org/b/89702 platform/chromium/virtual/softwarecompositing/scaling/tiled-l
 
 webkit.org/b/89789 [ Mac ] plugins/embed-attributes-style.html [ ImageOnlyFailure Pass ]
 webkit.org/b/89789 [ Mac ] userscripts/user-script-video-document.html [ Crash Pass ]
-
-# Need rebaseline after bots cycle.
-webkit.org/b/98571 [ Win Mac ] fast/sub-pixel/sub-pixel-iframe-copy-on-scroll.html [ Failure Pass ]
-webkit.org/b/98571 [ Win Mac ] fast/repaint/repaint-across-writing-mode-boundary.html [ ImageOnlyFailure Pass ]
 
 # Flaky
 webkit.org/b/89794 [ Mac ] fast/regions/get-regions-by-content2.html [ Crash Pass ]

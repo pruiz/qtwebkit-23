@@ -182,6 +182,10 @@ fast/regions/style-scoped-in-flow.html
 # Accelerated compositing is disabled for elements in a RenderFlowThread webkit.org/b/84900
 compositing/regions/webkit-flow-renderer-layer-compositing.html
 
+# LAYER_TREE_INCLUDES_VISIBLE_RECTS option to layerTreeAsText is only applicable to Mac.
+compositing/visible-rect [ Skip ]
+
+
 # ENABLE(SHADOW_DOM) is disabled.
 editing/shadow
 fast/dom/shadow/access-key.html
@@ -310,26 +314,7 @@ fast/dom/shadow/shadowroot-clonenode.html
 
 # Fail until SUBPIXEL_LAYOUT is enabled
 # https://bugs.webkit.org/show_bug.cgi?id=85532
-fast/sub-pixel/client-rect-has-subpixel-precision.html
-fast/sub-pixel/client-width-height-snapping.html
-fast/sub-pixel/file-upload-control-at-fractional-offset.html
-fast/sub-pixel/float-containing-block-with-margin.html
-fast/sub-pixel/float-with-right-margin-zoom.html
-fast/sub-pixel/float-wrap-with-subpixel-top.html
-fast/sub-pixel/inline-block-should-not-wrap.html
-fast/sub-pixel/inline-block-with-margin.html
-fast/sub-pixel/inline-block-with-padding.html
-fast/sub-pixel/large-sizes.html
-fast/sub-pixel/layout-boxes-with-zoom.html
-fast/sub-pixel/position-right-aligns-with-container.html
-fast/sub-pixel/selection/selection-gaps-at-fractional-offsets.html
-fast/sub-pixel/size-of-box-with-zoom.html
-fast/sub-pixel/table-rows-no-gaps.html
-fast/sub-pixel/sub-pixel-accumulates-to-layers.html
-fast/sub-pixel/selection/selection-rect-in-sub-pixel-table.html
-fast/sub-pixel/snap-negative-location.html
-fast/sub-pixel/sub-pixel-iframe-copy-on-scroll.html
-fast/sub-pixel/zoomed-image-tiles.html
+fast/sub-pixel
 
 # USE(V8)
 
@@ -854,7 +839,6 @@ editing/selection/drag-to-contenteditable-iframe.html
 editing/selection/fake-drag.html
 editing/selection/select-from-textfield-outwards.html
 editing/selection/move-left-right.html
-editing/selection/move-past-trailing-space.html
 
 # [Qt] editing tests fails after r54980
 # https://bugs.webkit.org/show_bug.cgi?id=35145
@@ -866,11 +850,6 @@ editing/selection/drag-text-delay.html
 
 # https://bugs.webkit.org/show_bug.cgi?id=38656
 editing/selection/shift-click.html
-
-# -- pass with --platform mac --ignore-metrics
-editing/selection/extend-selection-bidi.html
-editing/selection/caret-rtl-2.html
-editing/selection/caret-rtl.html
 
 # https://bugs.webkit.org/show_bug.cgi?id=41918
 editing/selection/5195166-1.html

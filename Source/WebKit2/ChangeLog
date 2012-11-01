@@ -1,3 +1,590 @@
+2012-10-15  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL][WK2] Encapsulate ref counting for Ewk objects in a parent class
+        https://bugs.webkit.org/show_bug.cgi?id=99174
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Ewk objects can be inherited from RefCounted class, so that ref counting is encapsulated and RefPtr can be used.
+        Applied the new approach for Ewk_Navigation_Data and Ewk_Url_Request objects as an example.
+        The requirement of adoption can be satisfied as long as we keep dealing with smart pointers only. 
+        In case external client provides an already referenced object as a raw pointer, relaxAdoptionRequirement() can be set
+        explicitly in this specific place.
+
+        * UIProcess/API/efl/ewk_context_history_client.cpp:
+        (didNavigateWithNavigationData):
+        * UIProcess/API/efl/ewk_download_job.cpp:
+        (_Ewk_Download_Job):
+        (_Ewk_Download_Job::_Ewk_Download_Job):
+        (_Ewk_Download_Job::~_Ewk_Download_Job):
+        (ewk_download_job_request_get):
+        * UIProcess/API/efl/ewk_navigation_data.cpp:
+        (ewk_navigation_data_ref):
+        (ewk_navigation_data_unref):
+        (ewk_navigation_data_original_request_get):
+        * UIProcess/API/efl/ewk_navigation_data_private.h:
+        (_Ewk_Navigation_Data):
+        (_Ewk_Navigation_Data::_Ewk_Navigation_Data):
+        * UIProcess/API/efl/ewk_navigation_policy_decision.cpp:
+        (_Ewk_Navigation_Policy_Decision):
+        (_Ewk_Navigation_Policy_Decision::_Ewk_Navigation_Policy_Decision):
+        (_Ewk_Navigation_Policy_Decision::~_Ewk_Navigation_Policy_Decision):
+        (ewk_navigation_policy_request_get):
+        (ewk_navigation_policy_decision_new):
+        * UIProcess/API/efl/ewk_url_request.cpp:
+        (ewk_url_request_ref):
+        (ewk_url_request_unref):
+        * UIProcess/API/efl/ewk_url_request_private.h:
+        (_Ewk_Url_Request):
+        (_Ewk_Url_Request::_Ewk_Url_Request):
+        * UIProcess/API/efl/ewk_view_resource_load_client.cpp:
+        (didInitiateLoadForResource):
+        (didSendRequestForResource):
+
+2012-10-15  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Regression(r130031) coverRect is used in wrong coordinates.
+        https://bugs.webkit.org/show_bug.cgi?id=97777
+
+        Reviewed by Jocelyn Turcotte.
+
+        Convert coverRect from screen coordinates to content coordinates before using it
+        outside tiled-backing store.
+
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (WebCore::CoordinatedGraphicsLayer::coverRect):
+
+2012-10-15  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        Unreviewed. Fix make distcheck.
+
+        * GNUmakefile.am: Add .in files in WebKit2/Shared to EXTRA_DIST.
+        * GNUmakefile.list.am: Remove deleted file.
+
+2012-10-14  Anders Carlsson  <andersca@apple.com>
+
+        Fix the world.
+
+        Add back a forgotten !.
+
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::postInjectedBundleMessage):
+
+2012-10-14  Sam Weinig  <sam@webkit.org>
+
+        Stop all the crashing!
+
+        The WebProcessProxy is not the Connection::Client, the WebConnectionToWebProcess is.
+
+        * UIProcess/WebConnectionToWebProcess.h:
+        (WebKit::WebConnectionToWebProcess::webProcessProxy):
+        * UIProcess/WebProcessProxy.cpp:
+        (WebKit::WebProcessProxy::fromConnection):
+
+2012-10-14  Anders Carlsson  <andersca@apple.com>
+
+        Re-land of "WebContext should be a MessageReceiver"
+        https://bugs.webkit.org/show_bug.cgi?id=98958
+
+        Reviewed by Sam Weinig.
+
+        Make WebContext be a MessageReceiver that lives in its own map. This allows us to get rid of the
+        knowsHowToHandleMessage functions on MessageReceiverMap and WebContext.
+
+        * Platform/CoreIPC/Connection.h:
+        (CoreIPC::Connection::client):
+        (Connection):
+        * Platform/CoreIPC/MessageReceiverMap.cpp:
+        (CoreIPC::MessageReceiverMap::addMessageReceiver):
+        (CoreIPC::MessageReceiverMap::invalidate):
+        (CoreIPC::MessageReceiverMap::knowsHowToHandleMessage):
+        (CoreIPC::MessageReceiverMap::dispatchMessage):
+        (CoreIPC::MessageReceiverMap::dispatchSyncMessage):
+        * Platform/CoreIPC/MessageReceiverMap.h:
+        (MessageReceiverMap):
+        * UIProcess/WebContext.cpp:
+        (WebKit::WebContext::WebContext):
+        (WebKit::WebContext::~WebContext):
+        (WebKit::WebContext::dispatchMessage):
+        (WebKit::WebContext::dispatchSyncMessage):
+        (WebKit::WebContext::didReceiveMessage):
+        (WebKit::WebContext::didReceiveSyncMessage):
+        * UIProcess/WebContext.h:
+        (WebContext):
+        * UIProcess/WebProcessProxy.cpp:
+        (WebKit::WebProcessProxy::fromConnection):
+        (WebKit):
+        (WebKit::WebProcessProxy::didReceiveMessage):
+        (WebKit::WebProcessProxy::didReceiveSyncMessage):
+        * UIProcess/WebProcessProxy.h:
+        (WebProcessProxy):
+
+2012-10-14  Anders Carlsson  <andersca@apple.com>
+
+        WebPage::PostInjectedBundleMessage should be a variadic message
+        https://bugs.webkit.org/show_bug.cgi?id=99277
+
+        Reviewed by Sam Weinig.
+
+        Don't use a data reference for messages posted to the injected bundle; they could contain data that requires attachments
+        (such as shared memory).
+
+        * UIProcess/WebPageProxy.cpp:
+        (WebKit::WebPageProxy::postMessageToInjectedBundle):
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::postInjectedBundleMessage):
+        * WebProcess/WebPage/WebPage.h:
+        (WebPage):
+        * WebProcess/WebPage/WebPage.messages.in:
+
+2012-10-14  Sam Weinig  <sam@webkit.org>
+
+        Simplify user content in WebKit2 by using WebCore::UserStyleSheet and WebCore::UserScript directly
+        https://bugs.webkit.org/show_bug.cgi?id=99276
+
+        Reviewed by Anders Carlsson.
+
+        - Removes UserContentContainer in favor of Vector<UserStyleSheet> and Vector<UserScript> right on WebPageGroupData.
+        - Adds support for UserScripts, but does not expose API for it just yet.
+
+        * CMakeLists.txt:
+        * GNUmakefile.list.am:
+        * Target.pri:
+        * WebKit2.xcodeproj/project.pbxproj:
+        * win/WebKit2.vcproj:
+        * Shared/UserContentContainer.cpp: Removed.
+        * Shared/UserContentContainer.h: Removed.
+        Remove UserContentContainer.h/cpp.
+
+        * Shared/API/c/WKBase.h:
+        * Shared/API/c/WKSharedAPICast.h:
+        (WebKit::toUserScriptInjectionTime):
+        (WebKit::toUserContentInjectedFrames):
+        * WebProcess/InjectedBundle/API/c/WKBundleAPICast.h:
+        * WebProcess/InjectedBundle/API/c/WKBundlePrivate.h:
+        Move UserContent enums to WKBase.h so they can be used from both processes, and move the
+        casts to WKSharedAPICast.
+
+        * Shared/WebCoreArgumentCoders.cpp:
+        * Shared/WebCoreArgumentCoders.h:
+        Add coders for UserStyleSheet and UserScript.
+
+        * Shared/WebPageGroupData.cpp:
+        (WebKit::WebPageGroupData::encode):
+        (WebKit::WebPageGroupData::decode):
+        * Shared/WebPageGroupData.h:
+        (WebPageGroupData):
+        Replace UserContentContainer with Vector<UserStyleSheet> and Vector<UserScript>. Stop using
+        CoreIPC::In() and CoreIPC::Out(), and instead just call encode/decode multiple times.
+
+        * UIProcess/API/C/WKPageGroup.cpp:
+        (WKPageGroupAddUserStyleSheet):
+        Pass the parameters with as little conversion as possible to the C++ to avoid doing too much
+        work in the API layer.
+
+        * UIProcess/WebPageGroup.cpp:
+        (WebKit::toStringVector):
+        (WebKit::WebPageGroup::addUserStyleSheet):
+        (WebKit::WebPageGroup::addUserScript):
+        (WebKit::WebPageGroup::removeAllUserStyleSheets):
+        (WebKit::WebPageGroup::removeAllUserScripts):
+        (WebKit::WebPageGroup::removeAllUserContent):
+        * UIProcess/WebPageGroup.h:
+        * WebProcess/WebPage/WebPageGroupProxy.cpp:
+        (WebKit::WebPageGroupProxy::WebPageGroupProxy):
+        (WebKit::WebPageGroupProxy::addUserStyleSheet):
+        (WebKit::WebPageGroupProxy::addUserScript):
+        (WebKit::WebPageGroupProxy::removeAllUserScripts):
+        (WebKit::WebPageGroupProxy::removeAllUserContent):
+        * WebProcess/WebPage/WebPageGroupProxy.h:
+        (WebPageGroupProxy):
+        * WebProcess/WebPage/WebPageGroupProxy.messages.in:
+        Add support for user scripts and update to use UserScript and UserStyleSheet directly.
+
+2012-10-14  Jon Lee  <jonlee@apple.com>
+
+        Allow notification origin permission request when no js callback is provided
+        https://bugs.webkit.org/show_bug.cgi?id=63615
+        <rdar://problem/11059590>
+
+        Reviewed by Sam Weinig.
+
+        Null checks already exist for both standard and legacy API callbacks, so no changes are needed here
+        like there are in WebKit 1. The checks existed because the callbacks are held in a hash map used to keep
+        track of pending requests.
+
+        Also, add a check for a null callback when short circuiting.
+
+        * WebProcess/Notifications/NotificationPermissionRequestManager.cpp:
+        (WebKit::NotificationPermissionRequestManager::startRequest):
+
+2012-10-14  Anders Carlsson  <andersca@apple.com>
+
+        Move QDataStream functions into HistoryItemQt.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=99203
+
+        Reviewed by Andreas Kling.
+
+        Forward declare QTransform.
+
+        * Shared/qt/WebEventFactoryQt.h:
+
+2012-10-12  Anders Carlsson  <andersca@apple.com>
+
+        Explicitly mark messages variadic
+        https://bugs.webkit.org/show_bug.cgi?id=99229
+
+        Reviewed by Dan Bernstein.
+
+        Instead of deciding whether messages are variadic based on their type, decide it based on the existence of a 'Variadic' message attribute.
+
+        * Scripts/webkit2/messages.py:
+        (messages_to_kind_enum):
+        (decode_type):
+        (async_case_statement):
+        (sync_case_statement):
+        * UIProcess/WebPageProxy.messages.in:
+        * WebProcess/WebProcess.messages.in:
+
+2012-10-14  Sam Weinig  <sam@webkit.org>
+
+        Make UserScript and UserStyleSheet value objects that are copyable
+        https://bugs.webkit.org/show_bug.cgi?id=99275
+
+        Reviewed by Tim Horton.
+
+        * Shared/UserContentContainer.cpp:
+        (WebKit::toStringVector):
+        (WebKit::UserContentContainer::Item::Item):
+        (WebKit::UserContentContainer::Item::encode):
+        (WebKit::UserContentContainer::Item::decode):
+        * Shared/UserContentContainer.h:
+        (WebKit::UserContentContainer::Item::whitelist):
+        (WebKit::UserContentContainer::Item::blacklist):
+        Switch UserContentContainer::Item to store Vector<String> instead of ImmutableArray, easing
+        transition to new PageGroup function signatures.
+
+        * WebProcess/InjectedBundle/InjectedBundle.cpp:
+        (WebKit::toStringVector):
+        * WebProcess/WebPage/qt/WebPageQt.cpp:
+        (WebKit::WebPage::setUserScripts):
+        Update for new PageGroup function signatures.
+
+2012-10-14  Tim Horton  <timothy_horton@apple.com>
+
+        [wk2] Implement PDFPlugin
+        https://bugs.webkit.org/show_bug.cgi?id=99206
+
+        Unreviewed build fix, hand ivar name to @synthesize since it doesn't match the property name.
+
+        * WebProcess/Plugins/PDF/PDFPlugin.mm:
+
+2012-10-14  Tim Horton  <timothy_horton@apple.com>
+
+        [wk2] Implement PDFPlugin
+        https://bugs.webkit.org/show_bug.cgi?id=99206
+
+        Unreviewed, attempt to manipuate SVN to retain the history of SimplePDFPlugin.
+
+        * WebProcess/Plugins/PDF/SimplePDFPlugin.h: Replaced with Source/WebKit2/WebProcess/Plugins/PDF/BuiltInPDFView.h.
+        * WebProcess/Plugins/PDF/SimplePDFPlugin.mm: Replaced with Source/WebKit2/WebProcess/Plugins/PDF/BuiltInPDFView.mm.
+
+2012-10-14  Tim Horton  <timothy_horton@apple.com>
+
+        [wk2] Implement PDFPlugin
+        https://bugs.webkit.org/show_bug.cgi?id=99206
+
+        Reviewed by Dan Bernstein.
+
+        Add PDFPlugin, which uses PDFKit to display PDFs, instead of using PDFKit in the
+        UIProcess for full-page PDFs. This new plugin will also be used for inline PDFs
+        in place of SimplePDFPlugin (née BuiltInPDFView).
+
+        * Configurations/FeatureDefines.xcconfig: Add ENABLE_PDF_PLUGIN.
+
+        Support three new Plugin methods:
+            - handleEditingCommand, which hands editing commands to the Plugin
+            - isEditingCommandEnabled, which validates editing commands via the Plugin
+            - handlesPageScaleFactor, which asks the plugin whether it wants to
+            opt into a mode where the WebPage doesn't scale in the ordinary fashion,
+            but instead proxies the Plugin's scale factor, so full-page plugins
+            can handle scale factor changes however they need to.
+
+        * PluginProcess/PluginControllerProxy.cpp:
+        (WebKit::PluginControllerProxy::handleEditingCommand): Proxy handleEditingCommand to the Plugin.
+        (WebKit::PluginControllerProxy::isEditingCommandEnabled): Proxy isEditingCommandEnabled to the Plugin.
+        (WebKit::PluginControllerProxy::handlesPageScaleFactor): Proxy handlesPageScaleFactor to the Plugin.
+        * PluginProcess/PluginControllerProxy.h:
+        (PluginControllerProxy): Add handleEditingCommand, isEditingCommandEnabled, and handlesPageScaleFactor.
+        * PluginProcess/PluginControllerProxy.messages.in: Add HandleEditingCommand, IsEditingCommandEnabled, and HandlesPageScaleFactor.
+        * WebProcess/Plugins/Netscape/NetscapePlugin.cpp:
+        (WebKit::NetscapePlugin::handleEditingCommand): NPAPI plugins support no editing commands by default.
+        (WebKit::NetscapePlugin::isEditingCommandEnabled): NPAPI plugins enable no editing commands by default.
+        (WebKit::NetscapePlugin::handlesPageScaleFactor): NPAPI plugins do not handle page scale factor changes themselves by default.
+        * WebProcess/Plugins/Netscape/NetscapePlugin.h: Add handleEditingCommand, isEditingCommandEnabled, and handlesPageScaleFactor.
+
+        Add PDFPluginEnabled preference. If it is not enabled, or the plugin is
+        not built, behavior will be the same as before (the UIProcess PDFView will
+        handle full-page PDFs, and SimplePDFPlugin will handle inline ones).
+
+        * Shared/WebPreferencesStore.h: Add PDFPluginEnabled preference.
+        * UIProcess/API/C/WKPreferences.cpp:
+        (WKPreferencesSetPDFPluginEnabled): Setter for PDFPluginEnabled preference.
+        (WKPreferencesGetPDFPluginEnabled): Getter for PDFPluginEnabled preference.
+        * UIProcess/API/C/WKPreferencesPrivate.h: Expose WKPreferences(Set|Get)PDFPluginEnabled as a private preference.
+
+        Move support for MIME types with custom representations onto WebPage instead of WebProcess.
+        This allows us to use preferences to control the use of custom representations (for example,
+        it allows us to have a preference to toggle between UIProcess's PDFView and PDFPlugin).
+
+        * Shared/WebProcessCreationParameters.cpp:
+        (WebKit::WebProcessCreationParameters::encode): Don't pass mimeTypesWithCustomRepresentation
+        into the WebProcess, as we can compute it later.
+        (WebKit::WebProcessCreationParameters::decode): Same, on the decode side.
+        * Shared/WebProcessCreationParameters.h: Remove mimeTypesWithCustomRepresentation.
+        * UIProcess/mac/WebContextMac.mm:
+        (WebKit::WebContext::platformInitializeWebProcess): Don't add pdfAndPostScriptMIMETypes to mimeTypesWithCustomRepresentation here, as we're now computing it on WebPage instead.
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::canPluginHandleResponse): Move to WebPage from WebProcess so we can use WebPage's new notion of mimeTypesWithCustomRepresentation.
+        (WebKit::WebPage::shouldUseCustomRepresentationForResponse): Move to WebPage from WebProcess so we can use WebPage's new notion of mimeTypesWithCustomRepresentation.
+        * WebProcess/WebPage/mac/WebPageMac.mm:
+        (WebKit::WebPage::pdfAndPostScriptMIMETypes): Return the set of MIME types used for PDF and PostScript, which are handled with PDFView if PDFPlugin is not available or enabled.
+        * WebProcess/WebProcess.cpp:
+        (WebKit::WebProcess::initializeWebProcess): Don't keep m_mimeTypesWithCustomRepresentations on WebProcess, it's owned by WebPage now.
+        * WebProcess/WebProcess.h: Move canPluginHandleResponse and shouldUseCustomRepresentationForResponse to WebPage.
+
+        Add PDFLayerController to the set of classes returned by PDFKitImports.
+
+        * Shared/mac/PDFKitImports.h: Add pdfLayerControllerClass.
+        * Shared/mac/PDFKitImports.mm:
+        (WebKit::pdfLayerControllerClass): Find and return the PDFLayerController class.
+
+        Add PDFPlugin, which inherits from SimplePDFPlugin, but uses PDFKit instead
+        of CoreGraphics, to provide additional interactive functionality.
+
+        * UIProcess/WebProcessProxy.cpp:
+        (WebKit::WebProcessProxy::sendDidGetPlugins): Add PDFPlugin to the set of supported plugins.
+        * WebKit2.xcodeproj/project.pbxproj: Add PDFPlugin, rename BuiltInPDFView to SimplePDFPlugin.
+        * WebProcess/Plugins/PDF/PDFPlugin.h: Added.
+        * WebProcess/Plugins/PDF/PDFPlugin.mm: Added.
+
+        PDFPlugin uses layers for scrollbars.
+
+        (-[WKPDFPluginScrollbarLayer initWithPDFPlugin:WebKit::]): Initialize our CALayer subclass,
+        storing its parent PDFPlugin so it can delegate drawing there.
+        (-[WKPDFPluginScrollbarLayer actionForKey:]): Disable CoreAnimation implicit actions.
+        (-[WKPDFPluginScrollbarLayer drawInContext:]): Delegate scrollbar drawing to PDFPlugin.
+
+        Implement the PDFLayerController delegate, eventually forwarding calls back to PDFPlugin.
+
+        (-[WKPDFLayerControllerDelegate initWithPDFPlugin:WebKit::]): Initialize our delegate,
+        storing its parent PDFPlugin so it can forward delegate calls there.
+        (-[WKPDFLayerControllerDelegate updateScrollPosition:]): Update PDFPlugin's notion of the
+        current scroll position, when PDFKit changes the scroll position itself.
+        (-[WKPDFLayerControllerDelegate writeItemsToPasteboard:withTypes:]): Write the given
+        array of NSData objects to the pasteboard with the given types.
+
+        The following PDFLayerController delegate methods will be implemented in the future.
+
+        (-[WKPDFLayerControllerDelegate showDefinitionForAttributedString:atPoint:]):
+        (-[WKPDFLayerControllerDelegate performWebSearch:]):
+        (-[WKPDFLayerControllerDelegate openWithPreview]):
+        (-[WKPDFLayerControllerDelegate saveToPDF]):
+
+        (WebKit::PDFPlugin::PDFPlugin): Set up the requisite layer hierarchy, and create a PDFLayerController (and its delegate proxy).
+        (WebKit::PDFPlugin::updateScrollbars): Update the frame of the layers hosting our scrollbars.
+        (WebKit::PDFPlugin::createScrollbar): Create a scrollbar and hosting layer, attaching its layer
+        to PDFPlugin's container layer.
+        (WebKit::PDFPlugin::destroyScrollbar): Destroy a scrollbar, detaching and destroying its hosting layer in the process.
+        (WebKit::PDFPlugin::pdfDocumentDidLoad): Called when the document finishes loading; hand
+        the loaded document to PDFKit, update all of our state (cached document size, scrollbars, etc.), and then execute any scripts in the document (to allow for automatic printing).
+        (WebKit::PDFPlugin::calculateSizes): Determine the size of the PDF and its pages.
+        (WebKit::PDFPlugin::destroy): Tear down the layer hierarchy.
+        (WebKit::PDFPlugin::paint): PDFPlugin is layer-based, so we paint nothing into the tiles.
+        (WebKit::PDFPlugin::paintControlForLayerInContext): Scrollbar controls are drawn into layers, but their painting is delegated here from WKPDFPluginScrollbarLayer.
+        (WebKit::PDFPlugin::snapshot): Perform a paint into a bitmap context.
+        (WebKit::PDFPlugin::pluginLayer): Return PDFPlugin's root layer.
+        (WebKit::PDFPlugin::geometryDidChange): The size or scale of the plugin changed; update
+        PDFLayerController's notion of the size and page scale, and invalidate the scrollbars.
+
+        Mouse and keyboard events are converted back into NSEvents, but with
+        locationInWindow actually in terms of the PDFPlugin's layer, not
+        the window (since there is no window).
+
+        (WebKit::modifierFlagsFromWebEvent): Construct an AppKit-style modifier bitmask from WebEvent's modifier key getters.
+        (WebKit::eventTypeFromWebEvent): Return the NSEventType equivalent to the given WebEvent. Only supports keyboard and mouse events, and only the left and right mouse button.
+        (WebKit::PDFPlugin::handleMouseEvent): Construct an NSEvent from the given WebMouseEvent and hand it to PDFLayerController. Mouse coordinates are in terms of m_contentLayer's origin.
+        (WebKit::PDFPlugin::handleKeyboardEvent): Construct an NSEvent from the given WebKeyboardEvent and hand it to PDFLayerController. PDFLayerController currently only handles keyDown events.
+
+        (WebKit::PDFPlugin::handleEditingCommand): Handle copy and select-all commands, and forward them to PDFLayerController.
+        (WebKit::PDFPlugin::isEditingCommandEnabled): The 'copy' command should be enabled if
+        the user has selected a part of the PDF. The 'select all' command should always be enabled.
+
+        (WebKit::PDFPlugin::setScrollOffset): Update both PDFPlugin and PDFLayerController's notion
+        of the current scroll position.
+        (WebKit::PDFPlugin::invalidateScrollbarRect): Invalidate the whole scrollbar layer.
+        (WebKit::PDFPlugin::invalidateScrollCornerRect): Invalidate the whole scroll corner layer.
+
+        Rename BuiltInPDFView to SimplePDFPlugin, to differentiate it from PDFPlugin
+        and to better denote its inheritance from Plugin.
+
+        * WebProcess/Plugins/PDF/SimplePDFPlugin.h: Renamed from WebProcess/Plugins/PDF/BuiltInPDFView.h.
+        (WebKit::SimplePDFPlugin): Make methods protected so PDFPlugin can override them. Rename m_pluginSize -> m_size, and m_dataBuffer->m_data.
+        (WebKit::SimplePDFPlugin::size): Retrieve the size of the plugin.
+        (WebKit::SimplePDFPlugin::setSize): Set the size of the plugin.
+        (WebKit::SimplePDFPlugin::pdfDocument): Retrieve the currently represented PDF document.
+        (WebKit::SimplePDFPlugin::setPDFDocument): Set the currently represented PDF document.
+        (WebKit::SimplePDFPlugin::pdfDocumentSize): Retrieve the current size of the PDF.
+        (WebKit::SimplePDFPlugin::setPDFDocumentSize): Set the current size of the PDF.
+        (WebKit::SimplePDFPlugin::data): Retrieve the accumulated document data.
+        * WebProcess/Plugins/PDF/SimplePDFPlugin.mm: Renamed from WebProcess/Plugins/PDF/BuiltInPDFView.mm.
+        (WebKit::SimplePDFPlugin::computePageBoxes): Copied out of calculateSizes() so PDFPlugin can use it too.
+        (WebKit::SimplePDFPlugin::runScriptsInPDFDocument): Factored out of pdfDocumentDidLoad() so PDFPlugin can use it too.
+        (WebKit::SimplePDFPlugin::convertFromScrollbarToContainingView): Implement the remaining scrollbar point conversion functions.
+        (WebKit::SimplePDFPlugin::convertFromContainingViewToScrollbar): Implement the remaining scrollbar point conversion functions.
+
+        * WebProcess/Plugins/Plugin.h:
+        (Plugin): Add handleEditingCommand, isEditingCommandEnabled, and handlesPageScaleFactor.
+        * WebProcess/Plugins/PluginProxy.cpp:
+        (WebKit::PluginProxy::handleEditingCommand): Proxy handleEditingCommand to the PluginProcess.
+        (WebKit::PluginProxy::isEditingCommandEnabled): Proxy isEditingCommandEnabled
+        to the PluginProcess.
+        (WebKit::PluginProxy::handlesPageScaleFactor): Proxy handlesPageScaleFactor
+        to the PluginProcess.
+        * WebProcess/Plugins/PluginProxy.h: Add handleEditingCommand, isEditingCommandEnabled,
+        and handlesPageScaleFactor.
+        * WebProcess/Plugins/PluginView.cpp:
+        (WebKit::PluginView::setPageScaleFactor): Set the plugin's current page scale factor. Also,
+        update WebPageProxy's notion of the current pageScaleFactor when this is called.
+        (WebKit::PluginView::pageScaleFactor): Return the plugin's current page scale factor.
+        (WebKit::PluginView::handleEditingCommand): Proxy handleEditingCommand to the plugin.
+        (WebKit::PluginView::isEditingCommandEnabled): Proxy isEditingCommandEnabled to the plugin.
+        * WebProcess/Plugins/PluginView.h:
+        (PluginView): Add handleEditingCommand, isEditingCommandEnabled,
+        setPageScaleFactor/pageScaleFactor, and handlesPageScaleFactor. Add m_pageScaleFactor.
+        (WebKit::PluginView::handlesPageScaleFactor): Proxy handlesPageScaleFactor to the plugin.
+        * WebProcess/WebCoreSupport/WebFrameLoaderClient.cpp:
+        (WebKit::WebFrameLoaderClient::restoreViewState): Don't update WebPageProxy's notion of the scale factor if it should be the default.
+        (WebKit::WebFrameLoaderClient::transitionToCommittedFromCachedFrame): Make use of shouldUseCustomRepresentationForResponse on WebPage instead of WebProcess.
+        (WebKit::WebFrameLoaderClient::transitionToCommittedForNewPage): Make use of shouldUseCustomRepresentationForResponse on WebPage instead of WebProcess.
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::createPlugin): Create a PDFPlugin if appropriate (if it is built and the setting is enabled).
+        (WebKit::pluginViewForFrame): Return the PluginView for the given frame if its document is a PluginDocument.
+        (WebKit::WebPage::executeEditingCommand): Attempt to execute editing commands on the
+        currently focused (or main-frame) plugin.
+        (WebKit::WebPage::isEditingCommandEnabled): Validate editing commands against the
+        currently focused (or main-frame) plugin.
+        (WebKit::WebPage::scalePage): If the plugin reports that it handles page scale factor
+        itself, hand it the new scale instead of WebCore.
+        (WebKit::WebPage::pageScaleFactor): If the plugin reports that it handles page scale
+        factor itself, return its notion of the current scale instead of WebCore's.
+        (WebKit::WebPage::validateCommand): Validate editing commands against the
+        currently focused (or main-frame) plugin.
+        (WebKit::WebPage::updatePreferences): Update m_pdfPluginEnabled given the relevant WebPreference.
+        * WebProcess/WebPage/WebPage.h:
+        (WebKit::WebPage::pdfPluginEnabled): Return whether or not PDFPlugin should be used.
+        (WebKit::WebPage::setPDFPluginEnabled): Set whether or not PDFPlugin should be used.
+
+2012-10-13  Sam Weinig  <sam@webkit.org>
+
+        Use class extension rather than a void* member for new Objective-C WebProcessPlugIn SPI
+        https://bugs.webkit.org/show_bug.cgi?id=99256
+
+        Reviewed by Dan Bernstein.
+
+        A bit of good old fashion cleanup.
+
+        * WebProcess/InjectedBundle/API/mac/WKWebProcessPlugIn.h:
+        Remove the void* member.
+
+        * WebProcess/InjectedBundle/API/mac/WKWebProcessPlugIn.mm:
+        Move members from the WKWebProcessPlugInControllerData struct to a class extension.
+
+        (didCreatePage):
+        (willDestroyPage):
+        (-[WKWebProcessPlugInController _initWithPrincipalClassInstance:bundleRef:]):
+        Directly access the members instead of using properties, now that it is not inconvenient.
+
+        * WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextController.h:
+        Remove the void* member.
+
+        * WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextController.mm:
+        Move members from the WKWebProcessPlugInBrowserContextControllerData struct to a class extension.
+        
+        (-[WKWebProcessPlugInBrowserContextController _initWithBundlePageRef:]):
+        (-[WKWebProcessPlugInBrowserContextController _bundlePageRef]):
+        Remove unnecessary casts..
+
+        * WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextControllerInternal.h:
+        * WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextControllerPrivate.h:
+        Add space before the parenthesis of a category to be consistent.
+ 
+        * WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInInternal.h:
+        Remove unnecessary forward declare.
+
+2012-10-13  Andy Estes  <aestes@apple.com>
+
+        Add a private header for WKWebProcessPlugInBrowserContextController that defines a property for getting the WKBundlePageRef
+        https://bugs.webkit.org/show_bug.cgi?id=99252
+
+        Reviewed by Sam Weinig.
+
+        * WebKit2.xcodeproj/project.pbxproj:
+        * WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextController.mm:
+        (-[WKWebProcessPlugInBrowserContextController _bundlePageRef]):
+        * WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInBrowserContextControllerPrivate.h: Added.
+
+2012-10-12  Brady Eidson  <beidson@apple.com>
+
+        Setup basic NetworkProcess messaging and initialization.
+        https://bugs.webkit.org/show_bug.cgi?id=99198
+
+        Reviewed by Sam Weinig.
+
+        Project file/build system stuff:
+        * DerivedSources.make:
+        * WebKit2.xcodeproj/project.pbxproj:
+        * Scripts/webkit2/messages.py:
+        (struct_or_class):
+
+        Add basic initialization parameters for the NetworkProcess:
+        * Shared/Network/NetworkProcessCreationParameters.cpp: 
+        (WebKit):
+        (WebKit::NetworkProcessCreationParameters::NetworkProcessCreationParameters):
+        (WebKit::NetworkProcessCreationParameters::encode):
+        (WebKit::NetworkProcessCreationParameters::decode):
+        * Shared/Network/NetworkProcessCreationParameters.h:
+        (CoreIPC):
+        (WebKit):
+        (NetworkProcessCreationParameters):
+
+        Use them to message the NetworkProcess what it's application name should be:
+        * UIProcess/Network/NetworkProcessProxy.cpp:
+        (WebKit::NetworkProcessProxy::didFinishLaunching):
+        * UIProcess/Network/NetworkProcessProxy.h:
+        (WebKit):
+        (NetworkProcessProxy):
+        * UIProcess/Network/mac/NetworkProcessProxyMac.mm:
+        (WebKit):
+        (WebKit::NetworkProcessProxy::platformInitializeNetworkProcess):        
+
+        Add basic message handling and initialization to the NetworkProcess itself:
+        * NetworkProcess/NetworkProcess.messages.in: Added.
+        * Platform/CoreIPC/MessageID.h:
+        * NetworkProcess/NetworkProcess.cpp:
+        (WebKit::NetworkProcess::didReceiveMessage):
+        (WebKit::NetworkProcess::initializeNetworkProcess):
+        (WebKit):
+        * NetworkProcess/NetworkProcess.h:
+        (WebKit):
+        (NetworkProcess):
+
+        Set a reasonable application name to be revealed in UI:
+        * NetworkProcess/mac/NetworkProcessMac.mm:
+        (WebKit):
+        (WebKit::NetworkProcess::platformInitialize):
+
+
 2012-10-12  Ada Chan  <adachan@apple.com>
 
         Add WKPage API to get whether the main frame is pinned to the top or bottom edge

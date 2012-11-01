@@ -1,3 +1,310 @@
+2012-10-15  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        Unreviewed. Fix make distcheck.
+
+        * GNUmakefile.list.am: Add missing header file.
+
+2012-10-14  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG should handle polymorphic array modes by eagerly transforming arrays into the most general applicable form
+        https://bugs.webkit.org/show_bug.cgi?id=99269
+
+        Reviewed by Geoffrey Garen.
+
+        This kills off a bunch of code for "polymorphic" array modes in the DFG. It should
+        also be a performance win for code that uses a lot of array storage arrays.
+
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::execute):
+        * dfg/DFGArrayMode.cpp:
+        (JSC::DFG::fromObserved):
+        (JSC::DFG::modeAlreadyChecked):
+        (JSC::DFG::modeToString):
+        * dfg/DFGArrayMode.h:
+        (DFG):
+        (JSC::DFG::modeUsesButterfly):
+        (JSC::DFG::modeIsJSArray):
+        (JSC::DFG::mayStoreToTail):
+        (JSC::DFG::mayStoreToHole):
+        (JSC::DFG::canCSEStorage):
+        (JSC::DFG::modeSupportsLength):
+        (JSC::DFG::benefitsFromStructureCheck):
+        * dfg/DFGFixupPhase.cpp:
+        (JSC::DFG::FixupPhase::checkArray):
+        (JSC::DFG::FixupPhase::blessArrayOperation):
+        * dfg/DFGGraph.h:
+        (JSC::DFG::Graph::byValIsPure):
+        * dfg/DFGSpeculativeJIT.cpp:
+        (JSC::DFG::SpeculativeJIT::jumpSlowForUnwantedArrayMode):
+        (JSC::DFG::SpeculativeJIT::checkArray):
+        (JSC::DFG::SpeculativeJIT::arrayify):
+        (DFG):
+        (JSC::DFG::SpeculativeJIT::compileGetArrayLength):
+        * dfg/DFGSpeculativeJIT.h:
+        (JSC::DFG::SpeculativeJIT::putByValWillNeedExtraRegister):
+        (SpeculativeJIT):
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGSpeculativeJIT64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+
+2012-10-14  Filip Pizlo  <fpizlo@apple.com>
+
+        REGRESSION(126886): Fat binary builds don't know how to handle architecture variants to which the LLInt is agnostic
+        https://bugs.webkit.org/show_bug.cgi?id=99270
+
+        Reviewed by Geoffrey Garen.
+
+        The fix is to hash cons the offsets based on configuration index, not the offsets
+        themselves.
+
+        * offlineasm/offsets.rb:
+
+2012-10-13  Filip Pizlo  <fpizlo@apple.com>
+
+        IndexingType should not have a bit for each type
+        https://bugs.webkit.org/show_bug.cgi?id=98997
+
+        Reviewed by Oliver Hunt.
+
+        Somewhat incidentally, the introduction of butterflies led to each indexing
+        type being represented by a unique bit. This is superficially nice since it
+        allows you to test if a structure corresponds to a particular indexing type
+        by saying !!(structure->indexingType() & TheType). But the downside is that
+        given the 8 bits we have for the m_indexingType field, that leaves only a
+        small number of possible indexing types if we have one per bit.
+        
+        This changeset changes the indexing type to be:
+        
+        Bit #1: Tells you if you're an array.
+        
+        Bits #2 - #5: 16 possible indexing types, including the blank type for
+            objects that don't have indexed properties.
+        
+        Bits #6-8: Auxiliary bits that we could use for other things. Currently we
+            just use one of those bits, for MayHaveIndexedAccessors.
+        
+        This is performance-neutral, and is primarily intended to give us more
+        breathing room for introducing new inferred array modes.
+
+        * assembler/AbstractMacroAssembler.h:
+        (JSC::AbstractMacroAssembler::JumpList::jumps):
+        * assembler/MacroAssembler.h:
+        (MacroAssembler):
+        (JSC::MacroAssembler::patchableBranch32):
+        * assembler/MacroAssemblerARMv7.h:
+        (JSC::MacroAssemblerARMv7::patchableBranch32):
+        (MacroAssemblerARMv7):
+        * dfg/DFGArrayMode.cpp:
+        (JSC::DFG::modeAlreadyChecked):
+        * dfg/DFGRepatch.cpp:
+        (JSC::DFG::tryCacheGetByID):
+        * dfg/DFGSpeculativeJIT.cpp:
+        (JSC::DFG::SpeculativeJIT::speculationCheck):
+        (JSC::DFG::SpeculativeJIT::forwardSpeculationCheck):
+        (JSC::DFG::SpeculativeJIT::jumpSlowForUnwantedArrayMode):
+        (DFG):
+        (JSC::DFG::SpeculativeJIT::checkArray):
+        (JSC::DFG::SpeculativeJIT::arrayify):
+        * dfg/DFGSpeculativeJIT.h:
+        (SpeculativeJIT):
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGSpeculativeJIT64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * jit/JITInlineMethods.h:
+        (JSC::JIT::emitAllocateJSArray):
+        (JSC::JIT::chooseArrayMode):
+        * jit/JITPropertyAccess.cpp:
+        (JSC::JIT::emit_op_get_by_val):
+        (JSC::JIT::emitContiguousGetByVal):
+        (JSC::JIT::emitArrayStorageGetByVal):
+        (JSC::JIT::emit_op_put_by_val):
+        (JSC::JIT::emitContiguousPutByVal):
+        (JSC::JIT::emitArrayStoragePutByVal):
+        (JSC::JIT::privateCompilePatchGetArrayLength):
+        * jit/JITPropertyAccess32_64.cpp:
+        (JSC::JIT::emit_op_get_by_val):
+        (JSC::JIT::emitContiguousGetByVal):
+        (JSC::JIT::emitArrayStorageGetByVal):
+        (JSC::JIT::emit_op_put_by_val):
+        (JSC::JIT::emitContiguousPutByVal):
+        (JSC::JIT::emitArrayStoragePutByVal):
+        (JSC::JIT::privateCompilePatchGetArrayLength):
+        * llint/LowLevelInterpreter.asm:
+        * llint/LowLevelInterpreter32_64.asm:
+        * llint/LowLevelInterpreter64.asm:
+        * runtime/IndexingType.h:
+        (JSC):
+        (JSC::hasIndexedProperties):
+        (JSC::hasContiguous):
+        (JSC::hasFastArrayStorage):
+        (JSC::hasArrayStorage):
+        (JSC::shouldUseSlowPut):
+        * runtime/JSGlobalObject.cpp:
+        (JSC):
+        * runtime/StructureTransitionTable.h:
+        (JSC::newIndexingType):
+
+2012-10-14  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG structure check hoisting should attempt to ignore side effects and make transformations that are sound even in their presence
+        https://bugs.webkit.org/show_bug.cgi?id=99262
+
+        Reviewed by Oliver Hunt.
+
+        This hugely simplifies the structure check hoisting phase. It will no longer be necessary
+        to modify it when the effectfulness of operations changes. This also enables the hoister
+        to hoist effectful things in the future.
+        
+        The downside is that the hoister may end up adding strictly more checks than were present
+        in the original code, if the code truly has a lot of side-effects. I don't see evidence
+        of this happening. This patch does have some speed-ups and some slow-downs, but is
+        neutral in the average, and the slow-downs do not appear to have more structure checks
+        than ToT.
+
+        * dfg/DFGStructureCheckHoistingPhase.cpp:
+        (JSC::DFG::StructureCheckHoistingPhase::run):
+        (JSC::DFG::StructureCheckHoistingPhase::noticeStructureCheck):
+        (StructureCheckHoistingPhase):
+        (CheckData):
+        (JSC::DFG::StructureCheckHoistingPhase::CheckData::CheckData):
+
+2012-10-14  Filip Pizlo  <fpizlo@apple.com>
+
+        Fix the build of universal binary with ARMv7s of JavaScriptCore
+
+        * llint/LLIntOfflineAsmConfig.h:
+        * llint/LowLevelInterpreter.asm:
+
+2012-10-13  Filip Pizlo  <fpizlo@apple.com>
+
+        Array length array profiling is broken in the baseline JIT
+        https://bugs.webkit.org/show_bug.cgi?id=99258
+
+        Reviewed by Oliver Hunt.
+
+        The code generator for array length stubs calls into
+        emitArrayProfilingSiteForBytecodeIndex(), which emits profiling only if
+        canBeOptimized() returns true. But m_canBeOptimized is only initialized during
+        full method compiles, so in a stub compile it may (or may not) be false, meaning
+        that we may, or may not, get meaningful profiling info.
+        
+        This appeared to not affect too many programs since the LLInt has good array
+        length array profiling.
+
+        * jit/JIT.h:
+        (JSC::JIT::compilePatchGetArrayLength):
+
+2012-10-14  Patrick Gansterer  <paroga@webkit.org>
+
+        Build fix for WinCE after r131089.
+
+        WinCE does not support getenv().
+
+        * runtime/Options.cpp:
+        (JSC::overrideOptionWithHeuristic):
+
+2012-10-12  Kangil Han  <kangil.han@samsung.com>
+
+        Fix build error on DFGSpeculativeJIT32_64.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=99234
+
+        Reviewed by Anders Carlsson.
+
+        Seems BUG 98608 causes build error on 32bit machine so fix it.
+
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+
+2012-10-12  Filip Pizlo  <fpizlo@apple.com>
+
+        Contiguous array allocation should always be inlined
+        https://bugs.webkit.org/show_bug.cgi?id=98608
+
+        Reviewed by Oliver Hunt and Mark Hahnenberg.
+
+        This inlines contiguous array allocation in the most obvious way possible.
+
+        * JavaScriptCore.xcodeproj/project.pbxproj:
+        * assembler/MacroAssembler.h:
+        (JSC::MacroAssembler::branchSubPtr):
+        (MacroAssembler):
+        * assembler/MacroAssemblerX86_64.h:
+        (JSC::MacroAssemblerX86_64::branchSubPtr):
+        (MacroAssemblerX86_64):
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::execute):
+        * dfg/DFGCCallHelpers.h:
+        (JSC::DFG::CCallHelpers::setupArgumentsWithExecState):
+        (CCallHelpers):
+        * dfg/DFGCallArrayAllocatorSlowPathGenerator.h: Added.
+        (DFG):
+        (CallArrayAllocatorSlowPathGenerator):
+        (JSC::DFG::CallArrayAllocatorSlowPathGenerator::CallArrayAllocatorSlowPathGenerator):
+        (JSC::DFG::CallArrayAllocatorSlowPathGenerator::generateInternal):
+        (CallArrayAllocatorWithVariableSizeSlowPathGenerator):
+        (JSC::DFG::CallArrayAllocatorWithVariableSizeSlowPathGenerator::CallArrayAllocatorWithVariableSizeSlowPathGenerator):
+        (JSC::DFG::CallArrayAllocatorWithVariableSizeSlowPathGenerator::generateInternal):
+        * dfg/DFGSpeculativeJIT.cpp:
+        (JSC::DFG::SpeculativeJIT::emitAllocateJSArray):
+        (DFG):
+        (JSC::DFG::SpeculativeJIT::compileAllocatePropertyStorage):
+        (JSC::DFG::SpeculativeJIT::compileReallocatePropertyStorage):
+        * dfg/DFGSpeculativeJIT.h:
+        (JSC::DFG::SpeculativeJIT::callOperation):
+        (SpeculativeJIT):
+        (JSC::DFG::SpeculativeJIT::emitAllocateBasicStorage):
+        (JSC::DFG::SpeculativeJIT::emitAllocateBasicJSObject):
+        (JSC::DFG::SpeculativeJIT::emitAllocateJSFinalObject):
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGSpeculativeJIT64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+
+2012-10-12  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        Race condition during CopyingPhase can lead to deadlock
+        https://bugs.webkit.org/show_bug.cgi?id=99226
+
+        Reviewed by Filip Pizlo.
+
+        The main thread calls startCopying() for each of the GCThreads at the beginning of the copy phase. 
+        It then proceeds to start copying. If copying completes before one of the GCThreads wakes up, the 
+        main thread will set m_currentPhase back to NoPhase, the GCThread will wake up, see that there's 
+        nothing to do, and then it will go back to sleep without ever calling CopyVisitor::doneCopying() 
+        to return its borrowed block to the CopiedSpace. CopiedSpace::doneCopying() will then sleep forever 
+        waiting on the block.
+
+        The fix for this is to make sure we call CopiedSpace::doneCopying() on the main thread before we 
+        call GCThreadSharedData::didFinishCopying(), which sets the m_currentPhase flag to NoPhase. This 
+        way we will wait until all threads have woken up and given back their borrowed blocks before 
+        clearing the flag.
+
+        * heap/Heap.cpp:
+        (JSC::Heap::copyBackingStores):
+
+2012-10-12  Anders Carlsson  <andersca@apple.com>
+
+        Move macros from Parser.h to Parser.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=99217
+
+        Reviewed by Andreas Kling.
+
+        There are a bunch of macros in Parser.h that are only used in Parser.cpp. Move them to Parser.cpp
+        so they won't pollute the global namespace.
+        * parser/Parser.cpp:
+        * parser/Parser.h:
+        (JSC):
+
+2012-10-12  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        Another build fix after r131213
+
+        Added some symbol magic to placate the linker on some platforms.
+
+        * JavaScriptCore.order:
+
 2012-10-12  Mark Hahnenberg  <mhahnenberg@apple.com>
 
         Build fix after r131213

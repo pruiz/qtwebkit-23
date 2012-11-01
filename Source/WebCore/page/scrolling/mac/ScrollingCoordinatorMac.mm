@@ -247,7 +247,7 @@ ScrollingNodeID ScrollingCoordinatorMac::attachToStateTree(ScrollingNodeID scrol
     // FIXME: In the future, this function will have to take a parent ID so that it can
     // append the node in the appropriate spot in the state tree. For now we always assume
     // this is the root node.
-    m_scrollingStateTree->setRootStateNode(ScrollingStateScrollingNode::create(m_scrollingStateTree.get()));
+    m_scrollingStateTree->setRootStateNode(ScrollingStateScrollingNode::create(m_scrollingStateTree.get(), scrollLayerID));
     m_stateNodeMap.set(scrollLayerID, m_scrollingStateTree->rootStateNode());
     return scrollLayerID;
 }
@@ -258,10 +258,14 @@ void ScrollingCoordinatorMac::detachFromStateTree(ScrollingNodeID scrollLayerID)
         return;
 
     ScrollingStateNode* node = m_stateNodeMap.take(scrollLayerID);
-
-    // FIXME: removeNode() will destroy children, and those children might still be in the HashMap.
-    // This will be a big problem once there are actually children in the tree.
     m_scrollingStateTree->removeNode(node);
+
+    // ScrollingStateTree::removeNode() will destroy children, so we have to make sure we remove those children
+    // from the HashMap.
+   const Vector<ScrollingNodeID>& removedNodes = m_scrollingStateTree->removedNodes();
+    size_t size = removedNodes.size();
+    for (size_t i = 0; i < size; ++i)
+        m_stateNodeMap.remove(removedNodes[i]);
 }
 
 void ScrollingCoordinatorMac::clearStateTree()

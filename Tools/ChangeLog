@@ -1,3 +1,176 @@
+2012-10-11  Kinuko Yasuda  <kinuko@chromium.org>
+
+        [chromium] Removes unnecessary dependencies in DumpRenderTree.gyp
+        https://bugs.webkit.org/show_bug.cgi?id=99132
+
+        Reviewed by Kent Tamura.
+
+        Removing webkit_support:blob dependency for DumpRenderTree target as it doesn't seem necessary.
+
+        * DumpRenderTree/DumpRenderTree.gyp/DumpRenderTree.gyp:
+
+2012-10-15  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt][WK2] Buildfix for newer Qt5.
+        https://bugs.webkit.org/show_bug.cgi?id=99303
+
+        Reviewed by Simon Hausmann.
+
+        * WebKitTestRunner/qt/PlatformWebViewQt.cpp:
+        (WTR::PlatformWebView::resizeTo):
+
+2012-10-14  Jon Lee  <jonlee@apple.com>
+
+        Allow notification origin permission request when no js callback is provided
+        https://bugs.webkit.org/show_bug.cgi?id=63615
+        <rdar://problem/11059590>
+
+        Reviewed by Sam Weinig.
+
+        Teach DRT to look at the existing entries in the permission hash map when permission is requested.
+
+        * DumpRenderTree/mac/MockWebNotificationProvider.h: Expose policyForOrigin.
+        * DumpRenderTree/mac/MockWebNotificationProvider.mm:
+        (-[MockWebNotificationProvider setWebNotificationOrigin:permission:]):
+        * DumpRenderTree/mac/UIDelegate.mm:
+        (-[UIDelegate webView:decidePolicyForNotificationRequestFromOrigin:listener:]): Look at whether a
+        policy for the origin already exists. If so, accept or deny the request as appropriate. Otherwise,
+        accept by default.
+
+2012-10-13  Zan Dobersek  <zandobersek@gmail.com>
+
+        [TestResultServer] Unit tests require an update after r131239
+        https://bugs.webkit.org/show_bug.cgi?id=99236
+
+        Reviewed by Ojan Vafai.
+
+        Replacing 'Webkit' with 'WebKit' in builder names througout the unit tests
+        after the Chromium builders have been renamed recently.
+
+        * TestResultServer/static-dashboards/flakiness_dashboard_unittests.js:
+
+2012-10-12  Zan Dobersek  <zandobersek@gmail.com>
+
+        [TestResultServer] Add support for non-Chromium TestExpectations files
+        https://bugs.webkit.org/show_bug.cgi?id=98422
+
+        Reviewed by Ojan Vafai.
+
+        Loads TestExpectations files for several other non-Chromium ports, parses them and
+        properly distributes them per various platforms.
+
+        * TestResultServer/static-dashboards/dashboard_base.js: g_expectations is replaced by
+        g_expectationsByPlatform, an object that holds raw TestExpectations file contents for
+        various platforms.
+        (requestExpectationsFiles): First traverses through the platforms tree to gather all
+        the TestExpectations files that should be loaded, then loads them in parallel.
+        (appendJSONScriptElements):
+        * TestResultServer/static-dashboards/flakiness_dashboard.js: The platforms tree is reorganized
+        to describe each platform and possible subplatforms plainly yet in detail. The PLATFORM_FALLBACKS
+        object is removed as it's not used anywhere. g_allTestsByPlatformAndBuildType is now filled by
+        traversing the platforms tree.
+        (traversePlatformsTree.traverse):
+        (traversePlatformsTree): A helper function that traverses the platforms tree, invoking
+        callback on each leaf node.
+        (determineWKPlatform): A helper function to determine whether the builder is running WebKit1 or
+        WebKit2 layer of a given platform.
+        (chromiumPlatform): Chromium-specific platforms are now properly prefixed with 'CHROMIUM_'.
+        (TestTrie): A new class that holds all the tests in a trie. The trie is constructed by iterating
+        through the tests for each builder, adding each test to the trie.
+        (TestTrie.prototype.forEach.traverse):
+        (TestTrie.prototype.forEach): A helper function that traverses the tests trie, invoking callback on each leaf.
+        (TestTrie.prototype._addTest): Aligns the test into the specified trie based on the test's path.
+        (getAllTestsTrie): Instead of in list, the problematic tests from each builder are now stored in a trie.
+        (individualTestsForSubstringList): Modified to traverse the trie instead of iterating the list.
+        (allTestsWithResult): Ditto.
+        (platformObjectForName): Splits the platform name by underscores and finds the appropriate platform object.
+        (getParsedExpectations): Now operates on the passed-in parameter rather than on a global variable.
+        (addTestToAllExpectationsForPlatform): Links expectations and modifiers to the test on the specified platform
+        and any build type the modifiers might apply to (or all build types if there are no such modifiers).
+        (processExpectationsForPlatform): Determines if the expectation should actually be processed for the given
+        platform by checking if any platform's fallback platforms support platform modifier unions and if any modifiers
+        represent such an union. If so, the expectation is then only processed if the given platform is in the union
+        the modifier presents or there are no such modifiers.
+        (processExpectations): Processes all acquired expectations by traversing the platforms tree and taking into
+        account possible fallback platforms.
+        (processTestRunsForBuilder):
+        (realModifiers.return.modifiers.filter):
+        (realModifiers): Modifiers other than build configurations and bug handles are now filtered out only if they
+        are present in the platform's platform modifier unions or represent subplatforms of a platform that supports
+        platform modifier unions.
+        * TestResultServer/static-dashboards/flakiness_dashboard_unittests.js: The test cases are updated and expanded
+        where necessary to cover the changes.
+        (resetGlobals):
+        (test): Added a TestTrie test.
+
+2012-10-12  Dirk Pranke  <dpranke@chromium.org>
+
+        Update chromium bot names in garden-o-matic.
+
+        Unreviewed, build fix.
+
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/config.js:
+
+2012-10-12  Ojan Vafai  <ojan@chromium.org>
+
+        Fix bot name filters now that the Chromium bots have been renamed.
+        * TestResultServer/static-dashboards/builders.js:
+        (isChromiumWebkitTipOfTreeTestRunner):
+        (isChromiumWebkitDepsTestRunner):
+        (isChromiumTipOfTreeGTestRunner):
+
+2012-10-12  Dirk Pranke  <dpranke@chromium.org>
+
+        [chromium] add ML bot and update bot names
+        https://bugs.webkit.org/show_bug.cgi?id=99209
+
+        Reviewed by Eric Seidel.
+
+        This change adds proper baseline support for Mac10.8 (Mountain
+        Lion or ML) to chromium and updates the bot names from "Webkit" 
+        to "WebKit" and ensures that all the bots have the OS version in
+        the name on Mac and Win.
+
+        We don't yet include a ML bot in garden-o-matic since it isn't
+        green yet.
+
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/builders_unittests.js:
+        (.):
+        * Scripts/webkitpy/layout_tests/port/builders.py:
+        * Scripts/webkitpy/layout_tests/port/chromium.py:
+        (ChromiumPort):
+        * Scripts/webkitpy/layout_tests/port/factory_unittest.py:
+        (FactoryTest.test_get_from_builder_name):
+        * Scripts/webkitpy/tool/commands/rebaseline_unittest.py:
+        (TestRebaseline.test_baseline_directory):
+        (TestRebaseline.test_rebaseline_updates_expectations_file_noop):
+        (test_rebaseline_updates_expectations_file):
+        (test_rebaseline_does_not_include_overrides):
+        (test_rebaseline_test):
+        (test_rebaseline_test_and_print_scm_changes):
+        (test_rebaseline_and_copy_test):
+        (test_rebaseline_and_copy_test_with_lion_result):
+        (test_rebaseline_and_copy_no_overwrite_test):
+        (test_rebaseline_expectations):
+        * Scripts/webkitpy/tool/servers/gardeningserver_unittest.py:
+        (BuildCoverageExtrapolatorTest.test_extrapolate):
+
+2012-10-12  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [Qt][WK2] REGRESSION(r131057): It made plugins/plugin-document-back-forward.html timeout
+        https://bugs.webkit.org/show_bug.cgi?id=99152
+
+        Reviewed by Simon Fraser.
+
+        Even though Response was already checked in WTR WKBundlePagePolicyClient decidePolicyForResponse callback,
+        this check did not take plugins into consideration when deciding whether we can show the given MIME type or not
+        so added another check in WTR UI process which also includes plugins.
+
+        * WebKitTestRunner/TestController.cpp:
+        (WTR::TestController::decidePolicyForResponse):
+        * WebKitTestRunner/TestController.h:
+        (TestController):
+
 2012-10-12  Rob Buis  <rbuis@rim.com>
 
         [BlackBerry] Add tests of WebSocketEnabled preference

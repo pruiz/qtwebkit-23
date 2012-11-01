@@ -253,6 +253,11 @@ public:
     {
         return PatchableJump(branchTest32(cond, reg, mask));
     }
+    
+    PatchableJump patchableBranch32(RelationalCondition cond, RegisterID reg, TrustedImm32 imm)
+    {
+        return PatchableJump(branch32(cond, reg, imm));
+    }
 #endif
 
     void jump(Label target)
@@ -498,6 +503,11 @@ public:
     Jump branchPtr(RelationalCondition cond, AbsoluteAddress left, TrustedImmPtr right)
     {
         return branch32(cond, left, TrustedImm32(right));
+    }
+
+    Jump branchSubPtr(ResultCondition cond, RegisterID src, RegisterID dest)
+    {
+        return branchSub32(cond, src, dest);
     }
 
     Jump branchTestPtr(ResultCondition cond, RegisterID reg, RegisterID mask)

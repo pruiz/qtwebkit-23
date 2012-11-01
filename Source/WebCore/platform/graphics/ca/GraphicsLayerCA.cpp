@@ -914,39 +914,72 @@ TiledBacking* GraphicsLayerCA::tiledBacking()
     return m_layer->tiledBacking();
 }
 
-void GraphicsLayerCA::recursiveCommitChanges(const TransformState& state, float pageScaleFactor, const FloatPoint& positionRelativeToBase, bool affectedByPageScale)
+void GraphicsLayerCA::computeVisibleRect(TransformState& state)
 {
-    // Save the state before sending down to kids and restore it after
-    TransformState localState = state;
-    
-    TransformState::TransformAccumulation accumulation = preserves3D() ? TransformState::AccumulateTransform : TransformState::FlattenTransform;
-    localState.move(m_position.x(), m_position.y(), accumulation);
+    bool preserve3D = preserves3D() || (parent() ? parent()->preserves3D() : false);
+    TransformState::TransformAccumulation accumulation = preserve3D ? TransformState::AccumulateTransform : TransformState::FlattenTransform;
+
+    TransformationMatrix layerTransform;
+    layerTransform.translate(m_position.x(), m_position.y());
     
     if (!transform().isIdentity()) {
-        TransformationMatrix transformWithAnchorPoint;
         FloatPoint3D absoluteAnchorPoint(anchorPoint());
         absoluteAnchorPoint.scale(size().width(), size().height(), 1);
-        transformWithAnchorPoint.translate3d(absoluteAnchorPoint.x(), absoluteAnchorPoint.y(), absoluteAnchorPoint.z());
-        transformWithAnchorPoint.multiply(transform());
-        transformWithAnchorPoint.translate3d(-absoluteAnchorPoint.x(), -absoluteAnchorPoint.y(), -absoluteAnchorPoint.z());
-        localState.applyTransform(transformWithAnchorPoint, accumulation);
+        layerTransform.translate3d(absoluteAnchorPoint.x(), absoluteAnchorPoint.y(), absoluteAnchorPoint.z());
+        layerTransform.multiply(transform());
+        layerTransform.translate3d(-absoluteAnchorPoint.x(), -absoluteAnchorPoint.y(), -absoluteAnchorPoint.z());
     }
+
+    if (GraphicsLayer* parentLayer = parent()) {
+        if (!parentLayer->childrenTransform().isIdentity()) {
+            FloatPoint3D parentAnchorPoint(parentLayer->anchorPoint());
+            parentAnchorPoint.scale(parentLayer->size().width(), parentLayer->size().height(), 1);
+
+            layerTransform.translateRight3d(-parentAnchorPoint.x(), -parentAnchorPoint.y(), -parentAnchorPoint.z());
+            layerTransform = parentLayer->childrenTransform() * layerTransform;
+            layerTransform.translateRight3d(parentAnchorPoint.x(), parentAnchorPoint.y(), parentAnchorPoint.z());
+        }
+    }
+
+    state.applyTransform(layerTransform, accumulation);
     
-    FloatRect clipRectForChildren = localState.lastPlanarQuad().boundingBox();
+    FloatRect clipRectForChildren = state.mappedQuad().boundingBox();
     FloatRect clipRectForSelf(0, 0, m_size.width(), m_size.height());
     clipRectForSelf.intersect(clipRectForChildren);
     
     if (masksToBounds()) {
         ASSERT(accumulation == TransformState::FlattenTransform);
         // Replace the quad in the TransformState with one that is clipped to this layer's bounds
-        localState.setQuad(clipRectForSelf);
+        state.setQuad(clipRectForSelf);
     }
 
     m_visibleRect = clipRectForSelf;
-    
+}
+
+void GraphicsLayerCA::recursiveCommitChanges(const TransformState& state, float pageScaleFactor, const FloatPoint& positionRelativeToBase, bool affectedByPageScale)
+{
+    TransformState localState = state;
+    computeVisibleRect(localState);
+
 #ifdef VISIBLE_TILE_WASH
+    // Use having a transform as a key to making the tile wash layer. If every layer gets a wash,
+    // they start to obscure useful information.
+    if (!m_transform.isIdentity() && !m_visibleTileWashLayer) {
+        static Color washFillColor(255, 0, 0, 50);
+        static Color washBorderColor(255, 0, 0, 100);
+        
+        m_visibleTileWashLayer = PlatformCALayer::create(PlatformCALayer::LayerTypeLayer, this);
+        String name = String::format("Visible Tile Wash Layer %p", m_visibleTileWashLayer->platformLayer());
+        m_visibleTileWashLayer->setName(name);
+        m_visibleTileWashLayer->setAnchorPoint(FloatPoint3D(0, 0, 0));
+        m_visibleTileWashLayer->setBorderColor(washBorderColor);
+        m_visibleTileWashLayer->setBorderWidth(8);
+        m_visibleTileWashLayer->setBackgroundColor(washFillColor);
+        noteSublayersChanged();
+    }
+
     if (m_visibleTileWashLayer)
-        m_visibleTileWashLayer->setFrame(clipRectForSelf);
+        m_visibleTileWashLayer->setFrame(m_visibleRect);
 #endif
 
     bool hadChanges = m_uncommittedChanges;
@@ -968,9 +1001,6 @@ void GraphicsLayerCA::recursiveCommitChanges(const TransformState& state, float 
 
     const Vector<GraphicsLayer*>& childLayers = children();
     size_t numChildren = childLayers.size();
-    
-    if (!childrenTransform().isIdentity())    
-        localState.applyTransform(childrenTransform(), accumulation);
     
     for (size_t i = 0; i < numChildren; ++i) {
         GraphicsLayerCA* curChild = static_cast<GraphicsLayerCA*>(childLayers[i]);
@@ -2470,27 +2500,6 @@ void GraphicsLayerCA::swapFromOrToTiledLayer(bool useTiledLayer, float pageScale
     m_layer = PlatformCALayer::create(useTiledLayer ? PlatformCALayer::LayerTypeWebTiledLayer : PlatformCALayer::LayerTypeWebLayer, this);
     m_usingTiledLayer = useTiledLayer;
     
-#ifdef VISIBLE_TILE_WASH
-    if (useTiledLayer) {
-        if (!m_visibleTileWashLayer) {
-            static Color washFillColor(255, 0, 0, 50);
-            static Color washBorderColor(255, 0, 0, 100);
-            
-            m_visibleTileWashLayer = PlatformCALayer::create(PlatformCALayer::LayerTypeLayer, this);
-            String name = String::format("Visible Tile Wash Layer %p", m_visibleTileWashLayer->platformLayer());
-            m_visibleTileWashLayer->setName(name);
-            m_visibleTileWashLayer->setAnchorPoint(FloatPoint3D(0, 0, 0));
-            m_visibleTileWashLayer->setBorderColor(washBorderColor);
-            m_visibleTileWashLayer->setBorderWidth(8);
-            m_visibleTileWashLayer->setBackgroundColor(washFillColor);
-        }
-    } else {
-        if (m_visibleTileWashLayer)
-            m_visibleTileWashLayer->removeFromSuperlayer();
-        m_visibleTileWashLayer = 0;
-    }
-#endif
-
     m_layer->adoptSublayers(oldLayer.get());
 
 #ifdef VISIBLE_TILE_WASH

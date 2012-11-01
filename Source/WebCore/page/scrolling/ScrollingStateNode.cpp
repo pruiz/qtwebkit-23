@@ -32,8 +32,9 @@
 
 namespace WebCore {
 
-ScrollingStateNode::ScrollingStateNode(ScrollingStateTree* scrollingStateTree)
+ScrollingStateNode::ScrollingStateNode(ScrollingStateTree* scrollingStateTree, ScrollingNodeID nodeID)
     : m_scrollingStateTree(scrollingStateTree)
+    , m_nodeID(nodeID)
     , m_parent(0)
     , m_scrollLayerDidChange(false)
 {
@@ -44,6 +45,7 @@ ScrollingStateNode::ScrollingStateNode(ScrollingStateTree* scrollingStateTree)
 // node.
 ScrollingStateNode::ScrollingStateNode(ScrollingStateNode* stateNode)
     : m_scrollingStateTree(0)
+    , m_nodeID(stateNode->scrollingNodeID())
     , m_parent(0)
     , m_scrollLayerDidChange(stateNode->scrollLayerDidChange())
 {
@@ -80,6 +82,7 @@ void ScrollingStateNode::removeChild(ScrollingStateNode* node)
         return;
 
     if (size_t index = m_children->find(node)) {
+        m_scrollingStateTree->didRemoveNode(node->scrollingNodeID());
         m_children->remove(index);
         return;
     }

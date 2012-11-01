@@ -1,3 +1,224 @@
+2012-10-15  Tullio Lucena  <tullio.lucena@openbossa.org>
+
+        [Qt] Unskip and rebase now passing tests.
+        https://bugs.webkit.org/show_bug.cgi?id=98824
+
+        Reviewed by Csaba Osztrogonác.
+
+        Updating tests results.
+
+        * platform/qt/TestExpectations:
+        * platform/qt/editing/selection/caret-rtl-2-expected.png: Added.
+        * platform/qt/editing/selection/caret-rtl-2-expected.txt:
+        * platform/qt/editing/selection/caret-rtl-expected.png: Added.
+        * platform/qt/editing/selection/caret-rtl-expected.txt:
+        * platform/qt/editing/selection/extend-selection-bidi-expected.png: Added.
+        * platform/qt/editing/selection/extend-selection-bidi-expected.txt: Added.
+        * platform/qt/editing/selection/move-past-trailing-space-expected.png: Added.
+        * platform/qt/editing/selection/move-past-trailing-space-expected.txt: Added.
+
+2012-10-15  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Chromium] Unreviewed gardening, TestExpectations updated.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-14  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Chromium] Unreviewed gardening, TestExpectations updated.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-14  Jon Lee  <jonlee@apple.com>
+
+        Allow notification origin permission request when no js callback is provided
+        https://bugs.webkit.org/show_bug.cgi?id=63615
+        <rdar://problem/11059590>
+
+        Reviewed by Sam Weinig.
+
+        * http/tests/notifications/legacy/request-expected.txt:
+        * http/tests/notifications/legacy/request-no-callback-expected.txt: Added.
+        * http/tests/notifications/legacy/request-no-callback.html: Calls webkitNotifications.requestPermission()
+        with no callback, with default and denied permission. For WebKit2, if the permission is not default, it
+        will short circuit instead of creating a pending request.
+        * http/tests/notifications/legacy/request.html: The test mistakenly uses the standard API instead of
+        the legacy API. The results don't change, but we make sure that we call
+        webkitNotifications.requestPermission() with a callback to test full coverage of the legacy API. We also
+        expand the test to cover both default and denied permissions.
+        * http/tests/notifications/request-expected.txt:
+        * http/tests/notifications/request.html: Expand test to cover both default and denied permissions.
+
+2012-10-12  Adam Barth  <abarth@webkit.org>
+
+        Unreviewed gardening.
+
+        * platform/chromium-linux/fast/forms/form-associated-element-crash3-expected.txt: Removed.
+        * platform/chromium-linux/transforms/3d/point-mapping/3d-point-mapping-3-expected.png:
+        * platform/chromium-linux/transforms/3d/point-mapping/3d-point-mapping-expected.png:
+        * platform/chromium-linux/transforms/3d/point-mapping/3d-point-mapping-origins-expected.png:
+        * platform/chromium-linux/transforms/3d/point-mapping/3d-point-mapping-overlapping-expected.png:
+        * platform/chromium-linux/transforms/3d/point-mapping/3d-point-mapping-preserve-3d-expected.png:
+
+2012-10-12  Adam Barth  <abarth@webkit.org>
+
+        Fix lint error in TestExpectations.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-12  Simon Fraser  <simon.fraser@apple.com>
+
+        Fix GraphicsLayerCA visible rect computation in the face of perspective and preserve-3d
+        https://bugs.webkit.org/show_bug.cgi?id=99212
+
+        Reviewed by Tim Horton.
+
+        Layer tree tests that include visible rect information, to test visible rect
+        computation for more complex layer trees.
+
+        * compositing/visible-rect/3d-transform-style-expected.txt: Added.
+        * compositing/visible-rect/3d-transform-style.html: Added.
+        * compositing/visible-rect/3d-transformed-expected.txt: Added.
+        * compositing/visible-rect/3d-transformed.html: Added.
+        * compositing/visible-rect/nested-transform-expected.txt: Added.
+        * compositing/visible-rect/nested-transform.html: Added.
+
+2012-10-12  Simon Fraser  <simon.fraser@apple.com>
+
+        Add some initial visible rect tests and tweak the visible wash layer
+        https://bugs.webkit.org/show_bug.cgi?id=99095
+
+        Reviewed by Tim Horton.
+
+        Add some tests of the GraphicsLayerCA visibleRect for simple cases.
+        
+        Skip these tests on platforms that don't log layer visible rects
+        (all non-Mac).
+
+        * compositing/visible-rect/2d-transformed-expected.txt: Added.
+        * compositing/visible-rect/2d-transformed.html: Added.
+        * compositing/visible-rect/clipped-by-viewport-expected.txt: Added.
+        * compositing/visible-rect/clipped-by-viewport.html: Added.
+        * compositing/visible-rect/clipped-visible-rect-expected.txt: Added.
+        * compositing/visible-rect/clipped-visible-rect.html: Added.
+        * platform/chromium-android/TestExpectations:
+        * platform/chromium/TestExpectations:
+        * platform/chromium/virtual/softwarecompositing/TestExpectations: Added.
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+
+2012-10-12  Roger Fong  <roger_fong@apple.com>
+
+        Unreviewed. Windows rebaseline afer r130411.
+
+        * platform/win/editing/pasteboard/paste-text-008-expected.txt:
+
+2012-10-12  Roger Fong  <roger_fong@apple.com>
+
+        Unreviewed. Test passes, unskip, update results.
+
+        * platform/win/TestExpectations:
+        * platform/win/fast/text/international/float-as-only-child-of-isolate-crash-expected.txt:
+
+2012-10-12  Jeffrey Pfau  <jpfau@apple.com>
+
+        Unreviewed. Checking in fast/js/random-array-gc-stress.html as timing out.
+
+        * platform/mac/TestExpectations:
+
+2012-10-12  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, chromium-mac-snowleopard rebaseline for a slider.
+        The thumb moved a small amount (maybe during shadow dom refactor?).
+        This matches the Apple Lion result.
+
+        * platform/chromium-mac-snowleopard/fast/forms/range/input-appearance-range-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-10-12  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, remove duplicate TestExpectation entries.
+
+        * platform/efl-wk1/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-10-12  Roger Fong  <roger_fong@apple.com>
+
+        Unreviewed. Skipping tests involving CSS_COMPOSITING on Windows. Feature isn't and should not be enabled.
+
+        * platform/win/TestExpectations:
+
+2012-10-12  Emil A Eklund  <eae@chromium.org>
+
+        Unreviewed cleanup, remove unneeded XP specific rebaselines for chromium.
+
+        * platform/chromium-win-xp/fast/speech: Removed.
+        * platform/chromium-win-xp/svg/custom/object-sizing-width-50p-height-75p-on-target-svg-absolute-expected.txt: Removed.
+        * platform/chromium-win-xp/svg/zoom/page/zoom-replaced-intrinsic-ratio-001-expected.png: Removed.
+
+2012-10-12  Levi Weintraub  <leviw@chromium.org>
+
+        Unreviewed gardening. Updating expectations for fast/repaint/repaint-across-writing-mode-boundary.html
+        and switching the TestExpectations files for ports with SUBPIXEL_LAYOUT disabled to skip the entire
+        sub-pixel test folder.
+
+        * platform/chromium-mac/fast/repaint/repaint-across-writing-mode-boundary-expected.png:
+        * platform/chromium-win-xp/fast/repaint/repaint-across-writing-mode-boundary-expected.png:
+        * platform/chromium-win/fast/repaint/repaint-across-writing-mode-boundary-expected.png:
+        * platform/chromium/TestExpectations:
+        * platform/mac-lion/TestExpectations:
+        * platform/mac-snowleopard/TestExpectations:
+        * platform/mac-wk2/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt-4.8/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win-wk2/TestExpectations:
+        * platform/win-xp/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+        * platform/wk2/TestExpectations:
+
+2012-10-12  Emil A Eklund  <eae@chromium.org>
+
+        Unreviewed chromium windows rebaseline for r131202.
+
+        * platform/chromium-linux/fast/repaint/repaint-during-scroll-with-zoom-expected.txt: Removed.
+        * platform/chromium-linux/transforms/3d/point-mapping/3d-point-mapping-3-expected.png:
+        * platform/chromium-linux/transforms/3d/point-mapping/3d-point-mapping-expected.png:
+        * platform/chromium-linux/transforms/3d/point-mapping/3d-point-mapping-origins-expected.png:
+        * platform/chromium-linux/transforms/3d/point-mapping/3d-point-mapping-overlapping-expected.png:
+        * platform/chromium-linux/transforms/3d/point-mapping/3d-point-mapping-preserve-3d-expected.png:
+        * platform/chromium-win/fast/repaint/repaint-during-scroll-with-zoom-expected.txt:
+        * platform/chromium-win/fast/speech/input-appearance-searchandspeech-expected.png:
+        * platform/chromium-win/fast/speech/input-appearance-searchandspeech-expected.txt:
+        * platform/chromium-win/fast/writing-mode/fieldsets-expected.png:
+
+2012-10-12  Emil A Eklund  <eae@chromium.org>
+
+        Unreviewed chromium rebaseline for r131216.
+
+        * fast/box-sizing/box-sizing-expected.txt: Replaced.
+        * fast/repaint/repaint-during-scroll-with-zoom-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/fast/repaint/repaint-during-scroll-with-zoom-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/writing-mode/fieldsets-expected.png:
+        * platform/chromium-mac/compositing/shadows/shadow-drawing-expected.txt:
+        * platform/chromium-mac/fast/block/positioning/replaced-inside-fixed-top-bottom-expected.png:
+        * platform/chromium-mac/fast/box-sizing/box-sizing-expected.txt:
+        * platform/chromium-mac/fast/repaint/repaint-during-scroll-with-zoom-expected.txt:
+        * platform/chromium-mac/fast/writing-mode/fieldsets-expected.png:
+        * platform/chromium-mac/fast/writing-mode/fieldsets-expected.txt:
+        * platform/chromium-mac/media/media-document-audio-repaint-expected.txt:
+        * platform/chromium-win-xp/fast/repaint/repaint-during-scroll-with-zoom-expected.txt: Removed.
+        * platform/efl/fast/box-sizing/box-sizing-expected.txt: Removed.
+        * platform/efl/fast/repaint/repaint-during-scroll-with-zoom-expected.txt: Removed.
+        * platform/gtk/fast/box-sizing/box-sizing-expected.txt: Removed.
+        * platform/gtk/fast/repaint/repaint-during-scroll-with-zoom-expected.txt: Removed.
+        * platform/win-future/fast/box-sizing: Added.
+        * platform/win-future/fast/box-sizing/box-sizing-expected.txt: Added.
+
 2012-10-12  Emil A Eklund  <eae@chromium.org>
 
         Unreviewed chromium windows rebaseline for vertical-rl-ltr test.

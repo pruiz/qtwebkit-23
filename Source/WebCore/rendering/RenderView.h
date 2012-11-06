@@ -60,7 +60,7 @@ public:
 
     virtual void layout() OVERRIDE;
     virtual void updateLogicalWidth() OVERRIDE;
-    virtual void updateLogicalHeight() OVERRIDE;
+    virtual void computeLogicalHeight(LayoutUnit logicalHeight, LayoutUnit logicalTop, LogicalExtentComputedValues&) const OVERRIDE;
     // FIXME: This override is not needed and should be removed
     // it only exists to make computePreferredLogicalWidths public.
     virtual void computePreferredLogicalWidths() OVERRIDE;
@@ -188,6 +188,10 @@ public:
     bool hasRenderNamedFlowThreads() const;
     FlowThreadController* flowThreadController();
 
+    enum RenderViewLayoutPhase { RenderViewNormalLayout, ConstrainedFlowThreadsLayoutInAutoLogicalHeightRegions };
+    bool normalLayoutPhase() const { return m_layoutPhase == RenderViewNormalLayout; }
+    bool constrainedFlowThreadsLayoutPhase() const { return m_layoutPhase == ConstrainedFlowThreadsLayoutInAutoLogicalHeightRegions; }
+
     void styleDidChange(StyleDifference, const RenderStyle* oldStyle);
 
     IntervalArena* intervalArena();
@@ -206,9 +210,9 @@ public:
     bool hasRenderCounters() { return m_renderCounterCount; }
 
 protected:
-    virtual void mapLocalToContainer(RenderLayerModelObject* repaintContainer, TransformState&, MapCoordinatesFlags mode = ApplyContainerFlip | SnapOffsetForTransforms, bool* wasFixed = 0) const OVERRIDE;
+    virtual void mapLocalToContainer(RenderLayerModelObject* repaintContainer, TransformState&, MapCoordinatesFlags = ApplyContainerFlip | SnapOffsetForTransforms, bool* wasFixed = 0) const OVERRIDE;
     virtual const RenderObject* pushMappingToContainer(const RenderLayerModelObject* ancestorToStopAt, RenderGeometryMap&) const OVERRIDE;
-    virtual void mapAbsoluteToLocalPoint(MapCoordinatesFlags mode, TransformState&) const;
+    virtual void mapAbsoluteToLocalPoint(MapCoordinatesFlags, TransformState&) const;
     virtual bool requiresColumns(int desiredColumnCount) const OVERRIDE;
 
 private:
@@ -248,6 +252,11 @@ private:
     // These functions may only be accessed by LayoutStateMaintainer or LayoutStateDisabler.
     void disableLayoutState() { m_layoutStateDisableCount++; }
     void enableLayoutState() { ASSERT(m_layoutStateDisableCount > 0); m_layoutStateDisableCount--; }
+
+    void layoutContent(const LayoutState&);
+#ifndef NDEBUG
+    void checkLayoutState(const LayoutState&);
+#endif
 
     size_t getRetainedWidgets(Vector<RenderWidget*>&);
     void releaseWidgets(Vector<RenderWidget*>&);
@@ -307,6 +316,7 @@ private:
 
     RenderQuote* m_renderQuoteHead;
     unsigned m_renderCounterCount;
+    RenderViewLayoutPhase m_layoutPhase;
 };
 
 inline RenderView* toRenderView(RenderObject* object)

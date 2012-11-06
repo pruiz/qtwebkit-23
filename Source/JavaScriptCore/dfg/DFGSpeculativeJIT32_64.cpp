@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2011, 2012 Apple Inc. All rights reserved.
  * Copyright (C) 2011 Intel Corporation. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,7 @@
 
 #if ENABLE(DFG_JIT)
 
+#include "DFGCallArrayAllocatorSlowPathGenerator.h"
 #include "DFGSlowPathGenerator.h"
 #include "JSActivation.h"
 
@@ -2781,56 +2782,6 @@ void SpeculativeJIT::compile(Node& node)
             jsValueResult(resultTagReg, resultPayloadReg, m_compileIndex);
             break;
         }
-        case ALL_POLYMORPHIC_MODES: {
-            SpeculateCellOperand base(this, node.child1());
-            SpeculateStrictInt32Operand property(this, node.child2());
-            
-            GPRReg baseReg = base.gpr();
-            GPRReg propertyReg = property.gpr();
-            
-            if (!m_compileOkay)
-                return;
-            
-            GPRTemporary storage(this);
-            GPRTemporary resultTag(this);
-            GPRTemporary resultPayload(this);
-            GPRReg storageReg = storage.gpr();
-            GPRReg resultTagReg = resultTag.gpr();
-            GPRReg resultPayloadReg = resultPayload.gpr();
-            
-            MacroAssembler::JumpList slowCases;
-            MacroAssembler::JumpList doneCases;
-            MacroAssembler::Jump fallThrough;
-            m_jit.loadPtr(MacroAssembler::Address(baseReg, JSCell::structureOffset()), resultTagReg);
-            m_jit.loadPtr(MacroAssembler::Address(baseReg, JSObject::butterflyOffset()), storageReg);
-            m_jit.load8(MacroAssembler::Address(resultTagReg, Structure::indexingTypeOffset()), resultTagReg);
-            if (polymorphicIncludesContiguous(node.arrayMode())) {
-                if (fallThrough.isSet()) {
-                    doneCases.append(m_jit.jump());
-                    fallThrough.link(&m_jit);
-                }
-                fallThrough = m_jit.branchTest32(MacroAssembler::Zero, resultTagReg, MacroAssembler::TrustedImm32(HasContiguous));
-                slowCases.append(compileContiguousGetByVal(node, baseReg, propertyReg, storageReg, resultTagReg, resultPayloadReg));
-            }
-            if (polymorphicIncludesArrayStorage(node.arrayMode())) {
-                if (fallThrough.isSet()) {
-                    doneCases.append(m_jit.jump());
-                    fallThrough.link(&m_jit);
-                }
-                fallThrough = m_jit.branchTest32(MacroAssembler::Zero, resultTagReg, MacroAssembler::TrustedImm32(HasArrayStorage));
-                slowCases.append(compileArrayStorageGetByVal(node, baseReg, propertyReg, storageReg, resultTagReg, resultPayloadReg));
-            }
-            ASSERT(fallThrough.isSet());
-            doneCases.link(&m_jit);
-            slowCases.append(fallThrough);
-            addSlowPathGenerator(
-                slowPathCall(
-                    slowCases, this, operationGetByValArrayInt,
-                    JSValueRegs(resultTagReg, resultPayloadReg), baseReg, propertyReg));
-            
-            jsValueResult(resultTagReg, resultPayloadReg, m_compileIndex);
-            break;
-        }
         case Array::String:
             compileGetByValOnString(node);
             break;
@@ -3016,63 +2967,6 @@ void SpeculativeJIT::compile(Node& node)
                         NoResult, baseReg, propertyReg, valueTagReg, valuePayloadReg));
             }
 
-            noResult(m_compileIndex, UseChildrenCalledExplicitly);
-            break;
-        }
-            
-        case ALL_POLYMORPHIC_MODES: {
-            ASSERT(node.op() == PutByVal);
-            
-            JSValueOperand value(this, child3);
-            
-            GPRReg valueTagReg = value.tagGPR();
-            GPRReg valuePayloadReg = value.payloadGPR();
-            
-            if (!m_compileOkay)
-                return;
-            
-            GPRTemporary storage(this);
-            GPRReg storageReg = storage.gpr();
-            
-            MacroAssembler::JumpList slowCases;
-            MacroAssembler::JumpList doneCases;
-            MacroAssembler::Jump fallThrough;
-            m_jit.loadPtr(MacroAssembler::Address(baseReg, JSCell::structureOffset()), storageReg);
-            m_jit.load8(MacroAssembler::Address(storageReg, Structure::indexingTypeOffset()), storageReg);
-            if (polymorphicIncludesContiguous(node.arrayMode())) {
-                if (fallThrough.isSet()) {
-                    doneCases.append(m_jit.jump());
-                    fallThrough.link(&m_jit);
-                }
-                fallThrough = m_jit.branchTest32(MacroAssembler::Zero, storageReg, MacroAssembler::TrustedImm32(HasContiguous));
-                m_jit.loadPtr(MacroAssembler::Address(baseReg, JSObject::butterflyOffset()), storageReg);
-                slowCases.append(compileContiguousPutByVal(node, baseReg, propertyReg, storageReg, valueTagReg, valuePayloadReg));
-            }
-            if (polymorphicIncludesArrayStorage(node.arrayMode())) {
-                if (fallThrough.isSet()) {
-                    doneCases.append(m_jit.jump());
-                    fallThrough.link(&m_jit);
-                }
-                fallThrough = m_jit.branchTest32(MacroAssembler::Zero, storageReg, MacroAssembler::TrustedImm32(HasArrayStorage));
-                m_jit.loadPtr(MacroAssembler::Address(baseReg, JSObject::butterflyOffset()), storageReg);
-                slowCases.append(compileArrayStoragePutByVal(node, baseReg, propertyReg, storageReg, valueTagReg, valuePayloadReg));
-            }
-            ASSERT(fallThrough.isSet());
-            doneCases.link(&m_jit);
-            slowCases.append(fallThrough);
-
-            base.use();
-            property.use();
-            value.use();
-
-            // FIXME: the decision of whether or not we're in strict mode should be made
-            // based on the inline call frame, not the machine code block.
-            addSlowPathGenerator(
-                slowPathCall(
-                    slowCases, this,
-                    m_jit.codeBlock()->isStrictMode() ? operationPutByValBeyondArrayBoundsStrict : operationPutByValBeyondArrayBoundsNonStrict,
-                    NoResult, baseReg, propertyReg, valueTagReg, valuePayloadReg));
-            
             noResult(m_compileIndex, UseChildrenCalledExplicitly);
             break;
         }
@@ -3510,8 +3404,42 @@ void SpeculativeJIT::compile(Node& node)
 
     case NewArray: {
         JSGlobalObject* globalObject = m_jit.graph().globalObjectFor(node.codeOrigin);
-        if (!globalObject->isHavingABadTime())
+        if (!globalObject->isHavingABadTime()) {
             globalObject->havingABadTimeWatchpoint()->add(speculationWatchpoint());
+            
+            ASSERT(hasContiguous(globalObject->arrayStructure()->indexingType()));
+            
+            unsigned numElements = node.numChildren();
+            
+            GPRTemporary result(this);
+            GPRTemporary storage(this);
+            
+            GPRReg resultGPR = result.gpr();
+            GPRReg storageGPR = storage.gpr();
+
+            emitAllocateJSArray(globalObject->arrayStructure(), resultGPR, storageGPR, numElements);
+            
+            // At this point, one way or another, resultGPR and storageGPR have pointers to
+            // the JSArray and the Butterfly, respectively.
+            
+            for (unsigned operandIdx = 0; operandIdx < node.numChildren(); ++operandIdx) {
+                JSValueOperand operand(this, m_jit.graph().m_varArgChildren[node.firstChild() + operandIdx]);
+                GPRReg opTagGPR = operand.tagGPR();
+                GPRReg opPayloadGPR = operand.payloadGPR();
+                m_jit.store32(opTagGPR, MacroAssembler::Address(storageGPR, sizeof(JSValue) * operandIdx + OBJECT_OFFSETOF(JSValue, u.asBits.tag)));
+                m_jit.store32(opPayloadGPR, MacroAssembler::Address(storageGPR, sizeof(JSValue) * operandIdx + OBJECT_OFFSETOF(JSValue, u.asBits.payload)));
+            }
+            
+            // Yuck, we should *really* have a way of also returning the storageGPR. But
+            // that's the least of what's wrong with this code. We really shouldn't be
+            // allocating the array after having computed - and probably spilled to the
+            // stack - all of the things that will go into the array. The solution to that
+            // bigger problem will also likely fix the redundancy in reloading the storage
+            // pointer that we currently have.
+            
+            cellResult(resultGPR, m_compileIndex);
+            break;
+        }
         
         if (!node.numChildren()) {
             flushRegisters();
@@ -3565,8 +3493,46 @@ void SpeculativeJIT::compile(Node& node)
 
     case NewArrayWithSize: {
         JSGlobalObject* globalObject = m_jit.graph().globalObjectFor(node.codeOrigin);
-        if (!globalObject->isHavingABadTime())
+        if (!globalObject->isHavingABadTime()) {
             globalObject->havingABadTimeWatchpoint()->add(speculationWatchpoint());
+            
+            SpeculateStrictInt32Operand size(this, node.child1());
+            GPRTemporary result(this);
+            GPRTemporary storage(this);
+            GPRTemporary scratch(this);
+            
+            GPRReg sizeGPR = size.gpr();
+            GPRReg resultGPR = result.gpr();
+            GPRReg storageGPR = storage.gpr();
+            GPRReg scratchGPR = scratch.gpr();
+            
+            MacroAssembler::JumpList slowCases;
+            slowCases.append(m_jit.branch32(MacroAssembler::AboveOrEqual, sizeGPR, TrustedImm32(MIN_SPARSE_ARRAY_INDEX)));
+            
+            ASSERT((1 << 3) == sizeof(JSValue));
+            m_jit.move(sizeGPR, scratchGPR);
+            m_jit.lshift32(TrustedImm32(3), scratchGPR);
+            m_jit.add32(TrustedImm32(sizeof(IndexingHeader)), scratchGPR, resultGPR);
+            slowCases.append(
+                emitAllocateBasicStorage(resultGPR, storageGPR));
+            m_jit.subPtr(scratchGPR, storageGPR);
+            emitAllocateBasicJSObject<JSArray, MarkedBlock::None>(
+                TrustedImmPtr(globalObject->arrayStructure()), resultGPR, scratchGPR,
+                storageGPR, sizeof(JSArray), slowCases);
+            
+            m_jit.store32(sizeGPR, MacroAssembler::Address(storageGPR, Butterfly::offsetOfPublicLength()));
+            m_jit.store32(sizeGPR, MacroAssembler::Address(storageGPR, Butterfly::offsetOfVectorLength()));
+            
+            addSlowPathGenerator(adoptPtr(
+                new CallArrayAllocatorWithVariableSizeSlowPathGenerator(
+                    slowCases, this, operationNewArrayWithSize, resultGPR,
+                    globalObject->arrayStructure(),
+                    globalObject->arrayStructureWithArrayStorage(),
+                    sizeGPR)));
+            
+            cellResult(resultGPR, m_compileIndex);
+            break;
+        }
         
         SpeculateStrictInt32Operand size(this, node.child1());
         GPRReg sizeGPR = size.gpr();
@@ -3580,8 +3546,28 @@ void SpeculativeJIT::compile(Node& node)
         
     case NewArrayBuffer: {
         JSGlobalObject* globalObject = m_jit.graph().globalObjectFor(node.codeOrigin);
-        if (!globalObject->isHavingABadTime())
+        if (!globalObject->isHavingABadTime()) {
             globalObject->havingABadTimeWatchpoint()->add(speculationWatchpoint());
+            
+            unsigned numElements = node.numConstants();
+            
+            GPRTemporary result(this);
+            GPRTemporary storage(this);
+            
+            GPRReg resultGPR = result.gpr();
+            GPRReg storageGPR = storage.gpr();
+
+            emitAllocateJSArray(globalObject->arrayStructure(), resultGPR, storageGPR, numElements);
+            
+            int32_t* data = bitwise_cast<int32_t*>(m_jit.codeBlock()->constantBuffer(node.startConstant()));
+            for (unsigned index = 0; index < node.numConstants() * 2; ++index) {
+                m_jit.store32(
+                    Imm32(data[index]), MacroAssembler::Address(storageGPR, sizeof(int32_t) * index));
+            }
+            
+            cellResult(resultGPR, m_compileIndex);
+            break;
+        }
         
         flushRegisters();
         GPRResult result(this);

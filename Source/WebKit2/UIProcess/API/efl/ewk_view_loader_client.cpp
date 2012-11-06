@@ -35,6 +35,7 @@
 #include "ewk_intent_service_private.h"
 #include "ewk_view_loader_client_private.h"
 #include "ewk_view_private.h"
+#include <wtf/OwnPtr.h>
 #include <wtf/text/CString.h>
 
 using namespace WebKit;
@@ -52,9 +53,8 @@ static void didReceiveTitleForFrame(WKPageRef, WKStringRef title, WKFrameRef fra
 static void didReceiveIntentForFrame(WKPageRef, WKFrameRef, WKIntentDataRef intent, WKTypeRef, const void* clientInfo)
 {
     Evas_Object* ewkView = static_cast<Evas_Object*>(const_cast<void*>(clientInfo));
-    Ewk_Intent* ewkIntent = ewk_intent_new(intent);
-    ewk_view_intent_request_new(ewkView, ewkIntent);
-    ewk_intent_unref(ewkIntent);
+    RefPtr<Ewk_Intent> ewkIntent = Ewk_Intent::create(intent);
+    ewk_view_intent_request_new(ewkView, ewkIntent.get());
 }
 #endif
 
@@ -62,9 +62,8 @@ static void didReceiveIntentForFrame(WKPageRef, WKFrameRef, WKIntentDataRef inte
 static void registerIntentServiceForFrame(WKPageRef, WKFrameRef, WKIntentServiceInfoRef serviceInfo, WKTypeRef, const void *clientInfo)
 {
     Evas_Object* ewkView = static_cast<Evas_Object*>(const_cast<void*>(clientInfo));
-    Ewk_Intent_Service* ewkIntentService = ewk_intent_service_new(serviceInfo);
-    ewk_view_intent_service_register(ewkView, ewkIntentService);
-    ewk_intent_service_unref(ewkIntentService);
+    RefPtr<Ewk_Intent_Service> ewkIntentService = Ewk_Intent_Service::create(serviceInfo);
+    ewk_view_intent_service_register(ewkView, ewkIntentService.get());
 }
 #endif
 
@@ -89,10 +88,9 @@ static void didFailLoadWithErrorForFrame(WKPageRef, WKFrameRef frame, WKErrorRef
         return;
 
     Evas_Object* ewkView = static_cast<Evas_Object*>(const_cast<void*>(clientInfo));
-    Ewk_Error* ewkError = ewk_error_new(error);
-    ewk_view_load_error(ewkView, ewkError);
+    OwnPtr<Ewk_Error> ewkError = Ewk_Error::create(error);
+    ewk_view_load_error(ewkView, ewkError.get());
     ewk_view_load_finished(ewkView);
-    ewk_error_free(ewkError);
 }
 
 static void didStartProvisionalLoadForFrame(WKPageRef, WKFrameRef frame, WKTypeRef /*userData*/, const void* clientInfo)
@@ -119,9 +117,8 @@ static void didFailProvisionalLoadWithErrorForFrame(WKPageRef, WKFrameRef frame,
         return;
 
     Evas_Object* ewkView = static_cast<Evas_Object*>(const_cast<void*>(clientInfo));
-    Ewk_Error* ewkError = ewk_error_new(error);
-    ewk_view_load_provisional_failed(ewkView, ewkError);
-    ewk_error_free(ewkError);
+    OwnPtr<Ewk_Error> ewkError = Ewk_Error::create(error);
+    ewk_view_load_provisional_failed(ewkView, ewkError.get());
 }
 
 static void didChangeBackForwardList(WKPageRef, WKBackForwardListItemRef addedItem, WKArrayRef removedItems, const void* clientInfo)

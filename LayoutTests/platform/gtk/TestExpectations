@@ -74,7 +74,7 @@ media/unsupported-rtsp.html [ WontFix ]
 fast/canvas/canvas-gradient-addStop-error.html [ WontFix ]
 http/tests/xmlhttprequest/default-content-type-dashboard.html [ WontFix ]
 
-# ENABLE(WIDGET_REGION) is disabled
+# ENABLE(DRAGGABLE_REGION) is disabled
 fast/css/draggable-region-parser.html [ WontFix ]
 
 # These test -apple- and -khtml- prefixed CSS properties, which we don't support.
@@ -186,12 +186,7 @@ webkit.org/b/98935 fast/forms/color [ Skip ]
 # ENABLE_INPUT_TYPE_* are not enabled.
 webkit.org/b/98936 fast/forms/date [ Failure ]
 webkit.org/b/98936 fast/forms/date/date-interactive-validation-required.html [ Pass ]
-webkit.org/b/98936 fast/forms/date/calendar-picker-appearance-pre-100.html [ Skip ]
-webkit.org/b/98936 fast/forms/date/calendar-picker-appearance.html [ Skip ]
-webkit.org/b/98936 fast/forms/date/calendar-picker-key-operations.html [ Skip ]
-webkit.org/b/98936 fast/forms/date/calendar-picker-mouse-operations.html [ Skip ]
-webkit.org/b/98936 fast/forms/date/calendar-picker-type-change-onclick.html [ Pass ]
-webkit.org/b/98936 fast/forms/date/calendar-picker-with-step.html [ Skip ]
+webkit.org/b/98936 fast/forms/date/date-reset-value.html [ Pass ]
 webkit.org/b/98936 fast/forms/date/date-stepup-stepdown-from-renderer.html [ Pass ]
 webkit.org/b/98936 fast/forms/date/no-page-popup-controller.html [ Pass ]
 webkit.org/b/98936 fast/forms/input-in-table-cell-no-value.html [ ImageOnlyFailure ]
@@ -268,6 +263,7 @@ webkit.org/b/98942 storage/storageinfo-request-quota.html [ Skip ]
 webkit.org/b/97324 fast/events/page-visibility-iframe-delete-test.html [ Skip ]
 webkit.org/b/97324 fast/events/page-visibility-iframe-move-test.html [ Skip ]
 webkit.org/b/97324 fast/events/page-visibility-iframe-propagation-test.html [ Skip ]
+webkit.org/b/97324 fast/events/page-visibility-null-view.html [ Skip ]
 webkit.org/b/97324 fast/events/page-visibility-transition-test.html [ Skip ]
 
 # GTK doesn't support smart replace.
@@ -312,6 +308,9 @@ webkit.org/b/71849 http/tests/security/webgl-remote-read-remote-image-allowed.ht
 webkit.org/b/71849 http/tests/security/webgl-remote-read-remote-image-allowed-with-credentials.html [ Skip ]
 webkit.org/b/71849 http/tests/security/webgl-remote-read-remote-image-blocked-no-crossorigin.html [ Skip ]
 webkit.org/b/71849 transforms/3d [ Skip ]
+
+# LAYER_TREE_INCLUDES_VISIBLE_RECTS option to layerTreeAsText is only applicable to Mac.
+Bug(GTK) compositing/visible-rect [ Skip ]
 
 # Vibration API support not yet.
 webkit.org/b/99029 fast/dom/navigator-vibration.html [ Failure ]
@@ -448,6 +447,11 @@ webkit.org/b/90957 [ Release ] fast/js/random-array-gc-stress.html [ Crash Pass 
 webkit.org/b/94458 [ Debug ] http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-in-body.html [ Crash Failure ]
 webkit.org/b/94458 [ Debug ] fast/events/message-port-context-destroyed.html [ Crash Pass ]
 
+webkit.org/b/99020 [ Debug ] fast/css/style-scoped/style-scoped-apply-author-styles.html [ Crash Pass ]
+webkit.org/b/99020 [ Debug ] fast/css/style-scoped/style-scoped-attach.html [ Crash Pass ]
+
+webkit.org/b/99452 [ Debug ] platform/gtk/fonts/font-face-with-complex-text.html [ Crash ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Crashing tests
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -458,7 +462,6 @@ webkit.org/b/94458 [ Debug ] fast/events/message-port-context-destroyed.html [ C
 
 webkit.org/b/44199 perf [ Skip ]
 
-webkit.org/b/68878 media/video-playing-and-pause.html [ Failure Pass ]
 webkit.org/b/55126 media/video-aspect-ratio.html [ Failure Pass ]
 
 webkit.org/b/56561 svg/custom/clip-path-referencing-use2.svg [ Failure Pass ]
@@ -618,10 +621,6 @@ Bug(GTK) http/tests/xmlhttprequest/redirect-cross-origin-tripmine.html [ Skip ]
 Bug(GTK) [ Debug ] fast/css/user-drag-none.html [ Timeout ]
 
 webkit.org/b/61118 fullscreen/full-screen-keyboard-enabled.html [ Timeout ]
-webkit.org/b/61118 fullscreen/full-screen-element-stack.html [ Timeout ]
-webkit.org/b/61118 fullscreen/full-screen-restrictions.html [ Timeout ]
-
-webkit.org/b/85700 fullscreen/non-ancestor-iframe.html [ Timeout ]
 
 webkit.org/b/95530 http/tests/security/inactive-document-with-empty-security-origin.html [ Timeout ]
 
@@ -692,15 +691,12 @@ webkit.org/b/98362 accessibility/canvas-fallback-content.html [ Failure ]
 webkit.org/b/98363 accessibility/canvas-fallback-content-2.html [ Failure ]
 webkit.org/b/98364 accessibility/editable-webarea-context-menu-point.html [ Failure ]
 webkit.org/b/98365 accessibility/ellipsis-text.html [ Failure ]
-webkit.org/b/98366 accessibility/ignore-spacer-elements.html [ Failure ]
-webkit.org/b/98367 accessibility/inline-continuations.html [ Failure ]
 webkit.org/b/98368 accessibility/label-for-control-hittest.html [ Failure ]
 webkit.org/b/98369 accessibility/language-attribute.html [ Failure ]
 webkit.org/b/98370 accessibility/loading-iframe-sends-notification.html [ Failure ]
 webkit.org/b/98371 accessibility/loading-iframe-updates-axtree.html [ Failure ]
 webkit.org/b/98372 accessibility/onclick-handlers.html [ Failure ]
 webkit.org/b/98373 accessibility/placeholder.html [ Failure ]
-webkit.org/b/98374 accessibility/radio-button-title-label.html [ Failure ]
 webkit.org/b/98375 accessibility/secure-textfield-title-ui.html [ Failure ]
 webkit.org/b/98376 accessibility/selection-states.html [ Failure ]
 webkit.org/b/98377 accessibility/textarea-insertion-point-line-number.html [ Failure ]
@@ -887,6 +883,7 @@ webkit.org/b/43332 inspector/debugger/event-listener-breakpoints.html [ Skip ]
 webkit.org/b/43332 inspector/debugger/step-through-event-listeners.html [ Skip ]
 webkit.org/b/43332 inspector/debugger/xhr-breakpoints.html [ Skip ]
 webkit.org/b/40300 inspector/debugger/live-edit.html [ Skip ]
+webkit.org/b/40300 inspector/debugger/live-edit-breakpoints.html [ Skip ]
 webkit.org/b/89652 inspector/debugger/debugger-compile-and-run.html [ Skip ]
 webkit.org/b/50868 inspector/debugger/debugger-step-out.html [ Skip ]
 webkit.org/b/50868 inspector/styles/styles-source-lines-inline.html [ Skip ]
@@ -982,9 +979,21 @@ Bug(GTK) canvas/philip/tests/2d.text.draw.space.collapse.start.html [ Failure ]
 Bug(GTK) canvas/philip/tests/2d.text.measure.width.space.html [ Failure ]
 Bug(GTK) canvas/philip/tests/type.prototype.html [ Failure ]
 
+# The following canvas test failures are fixed by using Cairo 1.12.4.
 
-# These tests are failing for us, but not for Mac. This likely
-# indicates platform specific problems.
+# A testcase for this failure is already in cairo tree, but has not yet been fixed.
+# http://cgit.freedesktop.org/cairo/commit/?id=4d4056872db94573183473610ad1d81d5439fdc6
+webkit.org/b/54471 canvas/philip/tests/2d.path.arc.selfintersect.1.html [ Failure ]
+webkit.org/b/54471 canvas/philip/tests/2d.path.arc.shape.3.html [ Failure ]
+
+# A testcase for this failure is already in cairo tree, but has not yet been fixed.
+# http://cgit.freedesktop.org/cairo/commit/?id=303f56a2d34a23d933a02fa625873211fb51eb3b
+Bug(GTK) canvas/philip/tests/2d.path.rect.selfintersect.html [ Failure ]
+
+# Strangely set miter limit - calculations suggest it should be 1.414 (and the test passes
+# with miter limit set to that) but perhaps there are special steps to be taken because the
+# rectangle has zero height.
+Bug(GTK) canvas/philip/tests/2d.path.rect.zero.6.html [ Failure ]
 
 # pastes a space instead of a tab
 webkit.org/b/38437 editing/pasteboard/5761530-1.html [ Failure ]
@@ -1306,8 +1315,6 @@ webkit.org/b/80129 fast/frames/flattening/frameset-flattening-advanced.html [ Fa
 
 webkit.org/b/89663 editing/deleting/delete-3800834-fix.html [ Failure ]
 
-webkit.org/b/88727 [ Release ] http/tests/xmlhttprequest/origin-exact-matching.html [ Failure ]
-
 webkit.org/b/94952 [ Debug ] platform/gtk/scrollbars/overflow-scrollbar-horizontal-wheel-scroll.html [ Failure ]
 webkit.org/b/94952 [ Debug ] scrollbars/scroll-rtl-or-bt-layer.html [ Failure ]
 
@@ -1345,6 +1352,39 @@ webkit.org/b/49142 fast/regions/style-scoped-in-flow-override-region-styling-mul
 Bug(GTK) fast/dom/Geolocation/coordinates-interface-attributes.html [ Failure ]
 
 webkit.org/b/98585 fast/exclusions/shape-inside/shape-inside-rounded-rectangle-003.html [ ImageOnlyFailure ]
+
+webkit.org/b/98666 fast/dom/HTMLInputElement/input-slider-update.html [ Failure ]
+webkit.org/b/98666 fast/dom/HTMLInputElement/input-slider-update-styled.html [ Failure ]
+webkit.org/b/98666 fast/forms/box-shadow-override.html [ Failure ]
+webkit.org/b/98666 fast/forms/input-appearance-height.html [ Failure ]
+webkit.org/b/98666 fast/forms/range/input-appearance-range.html [ Failure ]
+webkit.org/b/98666 fast/forms/range/input-appearance-range-rtl.html [ ImageOnlyFailure ]
+webkit.org/b/98666 fast/forms/range/range-thumb-height-percentage.html [ Failure ]
+webkit.org/b/98666 fast/forms/range/slider-padding.html [ Failure ]
+webkit.org/b/98666 fast/forms/range/slider-thumb-shared-style.html [ Failure ]
+webkit.org/b/98666 fast/forms/range/slider-thumb-stylability.html [ Failure ]
+webkit.org/b/98666 fast/hidpi/video-controls-in-hidpi.html [ Failure ]
+webkit.org/b/98666 fast/multicol/client-rects.html [ Failure ]
+webkit.org/b/98666 fast/repaint/slider-thumb-drag-release.html [ Failure ]
+webkit.org/b/98666 fast/repaint/slider-thumb-float.html [ Failure ]
+webkit.org/b/98666 media/track/track-cue-rendering-vertical.html [ Failure ]
+webkit.org/b/98666 fast/layers/video-layer.html [ Failure ]
+webkit.org/b/98666 media/audio-controls-rendering.html [ Failure ]
+webkit.org/b/98666 media/audio-repaint.html [ Failure ]
+webkit.org/b/98666 media/controls-after-reload.html [ Failure ]
+webkit.org/b/98666 media/controls-strict.html [ Failure ]
+webkit.org/b/98666 media/controls-styling.html [ Failure ]
+webkit.org/b/98666 media/controls-styling-strict.html [ Failure ]
+webkit.org/b/98666 media/controls-without-preload.html [ Failure ]
+webkit.org/b/98666 media/media-controls-clone.html [ Failure ]
+webkit.org/b/98666 media/media-document-audio-repaint.html [ Failure ]
+webkit.org/b/98666 media/track/track-cue-rendering-horizontal.html [ Failure ]
+webkit.org/b/98666 media/video-controls-rendering.html [ Failure ]
+webkit.org/b/98666 media/video-display-toggle.html [ Failure ]
+webkit.org/b/98666 media/video-empty-source.html [ Failure ]
+webkit.org/b/98666 media/video-no-audio.html [ Failure ]
+webkit.org/b/68878 webkit.org/b/98666 media/video-playing-and-pause.html [ Failure Pass ]
+webkit.org/b/98666 media/video-zoom-controls.html [ Failure ]
 
 webkit.org/b/98587 fast/writing-mode/vertical-subst-font-vert-no-dflt.html [ ImageOnlyFailure ]
 

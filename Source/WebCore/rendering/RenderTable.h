@@ -143,8 +143,16 @@ public:
         recalcSections();
     }
 
-    Vector<ColumnStruct>& columns() { return m_columns; }
-    Vector<int>& columnPositions() { return m_columnPos; }
+    const Vector<ColumnStruct>& columns() const { return m_columns; }
+    const Vector<int>& columnPositions() const { return m_columnPos; }
+    void setColumnPosition(unsigned index, int position)
+    {
+        // Note that if our horizontal border-spacing changed, our position will change but not
+        // our column's width. In practice, horizontal border-spacing won't change often.
+        m_columnLogicalWidthChanged |= m_columnPos[index] != position;
+        m_columnPos[index] = position;
+    }
+
     RenderTableSection* header() const { return m_head; }
     RenderTableSection* footer() const { return m_foot; }
     RenderTableSection* firstBody() const { return m_firstBody; }
@@ -278,8 +286,6 @@ private:
     virtual RenderBlock* firstLineBlock() const;
     virtual void updateFirstLetter();
     
-    virtual void setCellLogicalWidths();
-
     virtual void updateLogicalWidth() OVERRIDE;
 
     LayoutUnit convertStyleLogicalWidthToComputedWidth(const Length& styleLogicalWidth, LayoutUnit availableWidth);
@@ -312,7 +318,8 @@ private:
     
     mutable bool m_hasColElements : 1;
     mutable bool m_needsSectionRecalc : 1;
-    
+    bool m_columnLogicalWidthChanged : 1;
+
     short m_hSpacing;
     short m_vSpacing;
     int m_borderStart;

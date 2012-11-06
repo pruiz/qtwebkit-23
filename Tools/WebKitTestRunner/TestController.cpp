@@ -317,12 +317,12 @@ void TestController::initialize(int argc, const char* argv[])
     m_context.adopt(WKContextCreateWithInjectedBundlePath(injectedBundlePath()));
     m_geolocationProvider = adoptPtr(new GeolocationProviderMock(m_context.get()));
 
-    const char* path = libraryPathForTesting();
-    if (path) {
-        Vector<char> databaseDirectory(strlen(path) + strlen("/Databases") + 1);
-        sprintf(databaseDirectory.data(), "%s%s", path, "/Databases");
-        WKRetainPtr<WKStringRef> databaseDirectoryWK(AdoptWK, WKStringCreateWithUTF8CString(databaseDirectory.data()));
-        WKContextSetDatabaseDirectory(m_context.get(), databaseDirectoryWK.get());
+    if (const char* dumpRenderTreeTemp = libraryPathForTesting()) {
+        WKRetainPtr<WKStringRef> dumpRenderTreeTempWK(AdoptWK, WKStringCreateWithUTF8CString(dumpRenderTreeTemp));
+        WKContextSetDatabaseDirectory(m_context.get(), dumpRenderTreeTempWK.get());
+        WKContextSetLocalStorageDirectory(m_context.get(), dumpRenderTreeTempWK.get());
+        WKContextSetDiskCacheDirectory(m_context.get(), dumpRenderTreeTempWK.get());
+        WKContextSetCookieStorageDirectory(m_context.get(), dumpRenderTreeTempWK.get());
     }
 
     platformInitializeContext();
@@ -529,6 +529,8 @@ bool TestController::resetStateToConsistentValues()
 
     // Reset Custom Policy Delegate.
     setCustomPolicyDelegate(false, false);
+
+    m_workQueueManager.clearWorkQueue();
 
     // Reset main page back to about:blank
     m_doneResetting = false;
@@ -1070,14 +1072,21 @@ void TestController::decidePolicyForNavigationAction(WKFramePolicyListenerRef li
     WKFramePolicyListenerUse(listener);
 }
 
-void TestController::decidePolicyForResponse(WKPageRef, WKFrameRef, WKURLResponseRef, WKURLRequestRef, WKFramePolicyListenerRef listener, WKTypeRef, const void* clientInfo)
+void TestController::decidePolicyForResponse(WKPageRef, WKFrameRef frame, WKURLResponseRef response, WKURLRequestRef, WKFramePolicyListenerRef listener, WKTypeRef, const void* clientInfo)
 {
-    static_cast<TestController*>(const_cast<void*>(clientInfo))->decidePolicyForResponse(listener);
+    static_cast<TestController*>(const_cast<void*>(clientInfo))->decidePolicyForResponse(frame, response, listener);
 }
 
-void TestController::decidePolicyForResponse(WKFramePolicyListenerRef listener)
+void TestController::decidePolicyForResponse(WKFrameRef frame, WKURLResponseRef response, WKFramePolicyListenerRef listener)
 {
-    // Response was already checked by WKBundlePagePolicyClient, so if we are here we're supposed to ignore.
+    // Even though Response was already checked by WKBundlePagePolicyClient, the check did not include plugins
+    // so we have to re-check again.
+    WKRetainPtr<WKStringRef> wkMIMEType(AdoptWK, WKURLResponseCopyMIMEType(response));
+    if (WKFrameCanShowMIMEType(frame, wkMIMEType.get())) {
+        WKFramePolicyListenerUse(listener);
+        return;
+    }
+
     WKFramePolicyListenerIgnore(listener);
 }
 

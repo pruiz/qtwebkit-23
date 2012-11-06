@@ -29,6 +29,7 @@
 
 #import "WKWebProcessPlugInBrowserContextController.h"
 #import "WKWebProcessPlugInBrowserContextControllerInternal.h"
+#import "WKWebProcessPlugInBrowserContextControllerPrivate.h"
 
 #import "WKBundleAPICast.h"
 #import "WKBundlePage.h"
@@ -39,15 +40,10 @@
 #import <WebCore/Document.h>
 #import <WebCore/Frame.h>
 
-struct WKWebProcessPlugInBrowserContextControllerData {
+@interface WKWebProcessPlugInBrowserContextController () {
     // Underlying WKBundlePageRef.
     WKRetainPtr<WKBundlePageRef> _bundlePageRef;
-};
-
-@interface WKWebProcessPlugInBrowserContextController ()
-
-@property(readonly) WKBundlePageRef _bundlePageRef;
-
+}
 @end
 
 @implementation WKWebProcessPlugInBrowserContextController (Internal)
@@ -58,26 +54,14 @@ struct WKWebProcessPlugInBrowserContextControllerData {
     if (!self)
         return nil;
 
-    _data = new WKWebProcessPlugInBrowserContextControllerData;
-    static_cast<WKWebProcessPlugInBrowserContextControllerData*>(_data)->_bundlePageRef = bundlePageRef;
+    _bundlePageRef = bundlePageRef;
 
     return self;
-}
-
-- (void)dealloc
-{
-    delete static_cast<WKWebProcessPlugInBrowserContextControllerData*>(_data);
-    [super dealloc];
 }
 
 @end
 
 @implementation WKWebProcessPlugInBrowserContextController
-
-- (WKBundlePageRef)_bundlePageRef
-{
-    return static_cast<WKWebProcessPlugInBrowserContextControllerData*>(_data)->_bundlePageRef.get();
-}
 
 - (WKDOMDocument *)mainFrameDocument
 {
@@ -86,6 +70,15 @@ struct WKWebProcessPlugInBrowserContextControllerData {
         return nil;
 
     return WebKit::toWKDOMDocument(webCoreMainFrame->document());
+}
+
+@end
+
+@implementation WKWebProcessPlugInBrowserContextController (Private)
+
+- (WKBundlePageRef)_bundlePageRef
+{
+    return _bundlePageRef.get();
 }
 
 @end

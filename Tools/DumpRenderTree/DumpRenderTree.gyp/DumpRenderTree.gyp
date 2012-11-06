@@ -132,20 +132,22 @@
                     'dependencies': [
                         'LayoutTestHelper',
                     ],
-                    'mac_bundle_resources': [
-                        '<(ahem_path)',
-                        '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher100.ttf',
-                        '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher200.ttf',
-                        '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher300.ttf',
-                        '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher400.ttf',
-                        '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher500.ttf',
-                        '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher600.ttf',
-                        '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher700.ttf',
-                        '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher800.ttf',
-                        '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher900.ttf',
-                        '<(SHARED_INTERMEDIATE_DIR)/webkit/missingImage.png',
-                        '<(SHARED_INTERMEDIATE_DIR)/webkit/textAreaResizeCorner.png',
-                    ],
+                    'all_dependent_settings': {
+                        'mac_bundle_resources': [
+                            '<(ahem_path)',
+                            '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher100.ttf',
+                            '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher200.ttf',
+                            '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher300.ttf',
+                            '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher400.ttf',
+                            '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher500.ttf',
+                            '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher600.ttf',
+                            '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher700.ttf',
+                            '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher800.ttf',
+                            '<(tools_dir)/DumpRenderTree/fonts/WebKitWeightWatcher900.ttf',
+                            '<(SHARED_INTERMEDIATE_DIR)/webkit/missingImage.png',
+                            '<(SHARED_INTERMEDIATE_DIR)/webkit/textAreaResizeCorner.png',
+                        ],
+                    },
                 }],
                 ['use_x11 == 1', {
                     'copies': [{
@@ -191,7 +193,6 @@
                 '<(chromium_src_dir)/third_party/icu/icu.gyp:icuuc',
                 '<(chromium_src_dir)/third_party/mesa/mesa.gyp:osmesa',
                 '<(chromium_src_dir)/v8/tools/gyp/v8.gyp:v8',
-                '<(chromium_src_dir)/webkit/support/webkit_support.gyp:blob',
                 '<(chromium_src_dir)/webkit/support/webkit_support.gyp:webkit_support',
             ],
             'include_dirs': [

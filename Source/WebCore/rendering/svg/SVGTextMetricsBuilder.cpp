@@ -65,7 +65,8 @@ void SVGTextMetricsBuilder::advanceSimpleText()
 #if PLATFORM(QT) && !HAVE(QRAWFONT)
     ASSERT_NOT_REACHED();
 #else
-    unsigned metricsLength = m_simpleWidthIterator->advance(m_textPosition + 1);
+    GlyphBuffer glyphBuffer;
+    unsigned metricsLength = m_simpleWidthIterator->advance(m_textPosition + 1, &glyphBuffer);
     if (!metricsLength) {
         m_currentMetrics = SVGTextMetrics();
         return;

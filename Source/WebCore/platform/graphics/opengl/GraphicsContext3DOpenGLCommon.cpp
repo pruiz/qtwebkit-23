@@ -477,9 +477,9 @@ void GraphicsContext3D::compileShader(Platform3DObject shader)
     
     // ASSERT that ANGLE generated GLSL will be accepted by OpenGL.
     ASSERT(GLCompileSuccess == GL_TRUE);
-#if PLATFORM(BLACKBERRY)
+#if PLATFORM(BLACKBERRY) && !defined(NDEBUG)
     if (GLCompileSuccess != GL_TRUE)
-        BlackBerry::Platform::log(BlackBerry::Platform::LogLevelWarn, "The shader validated, but didn't compile.\n");
+        BBLOG(BlackBerry::Platform::LogLevelWarn, "The shader validated, but didn't compile.\n");
 #endif
 }
 

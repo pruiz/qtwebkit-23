@@ -264,6 +264,7 @@ StyleResolver::StyleResolver(Document* document, bool matchAuthorAndUserStyles)
     : m_hasUAAppearance(false)
     , m_backgroundData(BackgroundFillLayer)
     , m_matchedPropertiesCacheAdditionsSinceLastSweep(0)
+    , m_matchedPropertiesCacheSweepTimer(this, &StyleResolver::sweepMatchedPropertiesCache)
     , m_checker(document, !document->inQuirksMode())
     , m_parentStyle(0)
     , m_rootElementStyle(0)
@@ -490,11 +491,11 @@ StyleResolver::~StyleResolver()
     m_fontSelector->clearDocument();
 }
 
-void StyleResolver::sweepMatchedPropertiesCache()
+void StyleResolver::sweepMatchedPropertiesCache(Timer<StyleResolver>*)
 {
     // Look for cache entries containing a style declaration with a single ref and remove them.
-    // This may happen when an element attribute mutation causes it to swap out its Attribute::decl()
-    // for another CSSMappedAttributeDeclaration, potentially leaving this cache with the last ref.
+    // This may happen when an element attribute mutation causes it to generate a new attributeStyle(),
+    // potentially leaving this cache with the last ref on the old one.
     Vector<unsigned, 16> toRemove;
     MatchedPropertiesCache::iterator it = m_matchedPropertiesCache.begin();
     MatchedPropertiesCache::iterator end = m_matchedPropertiesCache.end();
@@ -509,6 +510,8 @@ void StyleResolver::sweepMatchedPropertiesCache()
     }
     for (size_t i = 0; i < toRemove.size(); ++i)
         m_matchedPropertiesCache.remove(toRemove[i]);
+
+    m_matchedPropertiesCacheAdditionsSinceLastSweep = 0;
 }
 
 static StyleSheetContents* parseUASheet(const String& str)
@@ -1540,6 +1543,13 @@ PassRefPtr<RenderStyle> StyleResolver::styleForElement(Element* element, RenderS
         cloneForParent = RenderStyle::clone(style());
         m_parentStyle = cloneForParent.get();
     }
+    // contenteditable attribute (implemented by -webkit-user-modify) should
+    // be propagated from shadow host to distributed node.
+    if (m_distributedToInsertionPoint) {
+        ASSERT(element->parentElement());
+        ASSERT(element->parentElement()->renderStyle());
+        m_style->setUserModify(element->parentElement()->renderStyle()->userModify());
+    }
 
     if (element->isLink()) {
         m_style->setIsLink(true);
@@ -2377,10 +2387,10 @@ const StyleResolver::MatchedPropertiesCacheItem* StyleResolver::findFromMatchedP
 
 void StyleResolver::addToMatchedPropertiesCache(const RenderStyle* style, const RenderStyle* parentStyle, unsigned hash, const MatchResult& matchResult)
 {
-    static unsigned matchedDeclarationCacheAdditionsBetweenSweeps = 100;
+    static const unsigned matchedDeclarationCacheAdditionsBetweenSweeps = 100;
     if (++m_matchedPropertiesCacheAdditionsSinceLastSweep >= matchedDeclarationCacheAdditionsBetweenSweeps) {
-        sweepMatchedPropertiesCache();
-        m_matchedPropertiesCacheAdditionsSinceLastSweep = 0;
+        static const unsigned matchedDeclarationCacheSweepTimeInSeconds = 60;
+        m_matchedPropertiesCacheSweepTimer.startOneShot(matchedDeclarationCacheSweepTimeInSeconds);
     }
 
     ASSERT(hash);
@@ -3232,9 +3242,6 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
         m_style->setBoxReflect(reflection.release());
         return;
     }
-    case CSSPropertyOpacity:
-        HANDLE_INHERIT_AND_INITIAL_AND_PRIMITIVE(opacity, Opacity)
-        return;
     case CSSPropertySrc: // Only used in @font-face rules.
         return;
     case CSSPropertyUnicodeRange: // Only used in @font-face rules.
@@ -3378,7 +3385,7 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
         return;
     }
 #endif
-#if ENABLE(WIDGET_REGION)
+#if ENABLE(DRAGGABLE_REGION)
     case CSSPropertyWebkitAppRegion: {
         if (!primitiveValue || !primitiveValue->getIdent())
             return;
@@ -3452,11 +3459,6 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
         else if (isInherit)
             m_style->inheritTransitions(m_parentStyle->transitions());
         return;
-    case CSSPropertyPointerEvents:
-    {
-        HANDLE_INHERIT_AND_INITIAL_AND_PRIMITIVE(pointerEvents, PointerEvents)
-        return;
-    }
 #if ENABLE(TOUCH_EVENTS)
     case CSSPropertyWebkitTapHighlightColor: {
         HANDLE_INHERIT_AND_INITIAL(tapHighlightColor, TapHighlightColor);
@@ -3721,6 +3723,7 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
     case CSSPropertyMaxWidth:
     case CSSPropertyMinHeight:
     case CSSPropertyMinWidth:
+    case CSSPropertyOpacity:
     case CSSPropertyOrphans:
     case CSSPropertyOutline:
     case CSSPropertyOutlineColor:
@@ -3739,6 +3742,7 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
     case CSSPropertyPageBreakAfter:
     case CSSPropertyPageBreakBefore:
     case CSSPropertyPageBreakInside:
+    case CSSPropertyPointerEvents:
     case CSSPropertyPosition:
     case CSSPropertyResize:
     case CSSPropertyRight:
@@ -4800,11 +4804,12 @@ PassRefPtr<CustomFilterOperation> StyleResolver::createCustomFilterOperation(Web
     RefPtr<StyleShader> vertexShader = styleShader(shadersList->itemWithoutBoundsCheck(0));
 
     RefPtr<StyleShader> fragmentShader;
+    CustomFilterProgramType programType = PROGRAM_TYPE_NO_ELEMENT_TEXTURE;
     CustomFilterProgramMixSettings mixSettings;
     if (shadersList->length() > 1) {
         CSSValue* fragmentShaderOrMixFunction = shadersList->itemWithoutBoundsCheck(1);
         if (fragmentShaderOrMixFunction->isWebKitCSSMixFunctionValue()) {
-            mixSettings.enabled = true;
+            programType = PROGRAM_TYPE_BLENDS_ELEMENT_TEXTURE;
             WebKitCSSMixFunctionValue* mixFunction = static_cast<WebKitCSSMixFunctionValue*>(fragmentShaderOrMixFunction);
             CSSValueListIterator iterator(mixFunction);
 
@@ -4894,7 +4899,7 @@ PassRefPtr<CustomFilterOperation> StyleResolver::createCustomFilterOperation(Web
     if (parametersValue && !parseCustomFilterParameterList(parametersValue, parameterList))
         return 0;
     
-    RefPtr<StyleCustomFilterProgram> program = StyleCustomFilterProgram::create(vertexShader.release(), fragmentShader.release(), mixSettings);
+    RefPtr<StyleCustomFilterProgram> program = StyleCustomFilterProgram::create(vertexShader.release(), fragmentShader.release(), programType, mixSettings);
     return CustomFilterOperation::create(program.release(), parameterList, meshRows, meshColumns, meshBoxType, meshType);
 }
 #endif

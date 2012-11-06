@@ -2867,6 +2867,7 @@ win32-*|wince* {
 mac {
     SOURCES += \
         platform/text/cf/StringCF.cpp \
+        platform/cf/SharedBufferCF.cpp \
         platform/text/cf/StringImplCF.cpp
 }
 
@@ -3220,7 +3221,6 @@ contains(DEFINES, ENABLE_VIDEO=1) {
             platform/mac/DisplaySleepDisabler.cpp \
             platform/graphics/cg/IntRectCG.cpp \
             platform/graphics/cg/FloatSizeCG.cpp \
-            platform/cf/SharedBufferCF.cpp \
             platform/cf/KURLCFNet.cpp
 
          OBJECTIVE_SOURCES += \
@@ -3279,17 +3279,17 @@ contains(DEFINES, ENABLE_WEB_AUDIO=1) {
         Modules/webaudio/AudioBufferCallback.h \
         Modules/webaudio/AudioBuffer.h \
         Modules/webaudio/AudioBufferSourceNode.h \
-        Modules/webaudio/AudioChannelMerger.h \
-        Modules/webaudio/AudioChannelSplitter.h \
+        Modules/webaudio/ChannelMergerNode.h \
+        Modules/webaudio/ChannelSplitterNode.h \
         Modules/webaudio/AudioContext.h \
         Modules/webaudio/AudioDestinationNode.h \
         Modules/webaudio/AudioGain.h \
-        Modules/webaudio/AudioGainNode.h \
+        Modules/webaudio/GainNode.h \
         Modules/webaudio/AudioListener.h \
         Modules/webaudio/AudioNode.h \
         Modules/webaudio/AudioNodeInput.h \
         Modules/webaudio/AudioNodeOutput.h \
-        Modules/webaudio/AudioPannerNode.h \
+        Modules/webaudio/PannerNode.h \
         Modules/webaudio/AudioParam.h \
         Modules/webaudio/AudioParamTimeline.h \
         Modules/webaudio/AudioProcessingEvent.h \
@@ -3305,14 +3305,14 @@ contains(DEFINES, ENABLE_WEB_AUDIO=1) {
         Modules/webaudio/DelayNode.h \
         Modules/webaudio/DelayProcessor.h \
         Modules/webaudio/DynamicsCompressorNode.h \
-        Modules/webaudio/JavaScriptAudioNode.h \
+        Modules/webaudio/ScriptProcessorNode.h \
         Modules/webaudio/MediaElementAudioSourceNode.h \
         Modules/webaudio/MediaStreamAudioSourceNode.h \
         Modules/webaudio/OfflineAudioCompletionEvent.h \
         Modules/webaudio/OfflineAudioDestinationNode.h \
-        Modules/webaudio/Oscillator.h \
+        Modules/webaudio/OscillatorNode.h \
         Modules/webaudio/RealtimeAnalyser.h \
-        Modules/webaudio/RealtimeAnalyserNode.h \
+        Modules/webaudio/AnalyserNode.h \
         Modules/webaudio/WaveShaperDSPKernel.h \
         Modules/webaudio/WaveShaperNode.h \
         Modules/webaudio/WaveShaperProcessor.h \
@@ -3363,22 +3363,22 @@ contains(DEFINES, ENABLE_WEB_AUDIO=1) {
         bindings/js/JSAudioBufferSourceNodeCustom.cpp \
         bindings/js/JSAudioContextCustom.cpp \
         bindings/js/JSDOMWindowWebAudioCustom.cpp \
-        bindings/js/JSJavaScriptAudioNodeCustom.cpp \
+        bindings/js/JSScriptProcessorNodeCustom.cpp \
         Modules/webaudio/AsyncAudioDecoder.cpp \
         Modules/webaudio/AudioBasicInspectorNode.cpp \
         Modules/webaudio/AudioBasicProcessorNode.cpp \
         Modules/webaudio/AudioBuffer.cpp \
         Modules/webaudio/AudioBufferSourceNode.cpp \
-        Modules/webaudio/AudioChannelMerger.cpp \
-        Modules/webaudio/AudioChannelSplitter.cpp \
+        Modules/webaudio/ChannelMergerNode.cpp \
+        Modules/webaudio/ChannelSplitterNode.cpp \
         Modules/webaudio/AudioContext.cpp \
         Modules/webaudio/AudioDestinationNode.cpp \
-        Modules/webaudio/AudioGainNode.cpp \
+        Modules/webaudio/GainNode.cpp \
         Modules/webaudio/AudioListener.cpp \
         Modules/webaudio/AudioNode.cpp \
         Modules/webaudio/AudioNodeInput.cpp \
         Modules/webaudio/AudioNodeOutput.cpp \
-        Modules/webaudio/AudioPannerNode.cpp \
+        Modules/webaudio/PannerNode.cpp \
         Modules/webaudio/AudioParam.cpp \
         Modules/webaudio/AudioParamTimeline.cpp \
         Modules/webaudio/AudioProcessingEvent.cpp \
@@ -3393,14 +3393,14 @@ contains(DEFINES, ENABLE_WEB_AUDIO=1) {
         Modules/webaudio/DelayNode.cpp \
         Modules/webaudio/DelayProcessor.cpp \
         Modules/webaudio/DynamicsCompressorNode.cpp \
-        Modules/webaudio/JavaScriptAudioNode.cpp \
+        Modules/webaudio/ScriptProcessorNode.cpp \
         Modules/webaudio/MediaElementAudioSourceNode.cpp \
         Modules/webaudio/MediaStreamAudioSourceNode.cpp \
         Modules/webaudio/OfflineAudioCompletionEvent.cpp \
         Modules/webaudio/OfflineAudioDestinationNode.cpp \
-        Modules/webaudio/Oscillator.cpp \
+        Modules/webaudio/OscillatorNode.cpp \
         Modules/webaudio/RealtimeAnalyser.cpp \
-        Modules/webaudio/RealtimeAnalyserNode.cpp \
+        Modules/webaudio/AnalyserNode.cpp \
         Modules/webaudio/WaveShaperDSPKernel.cpp \
         Modules/webaudio/WaveShaperNode.cpp \
         Modules/webaudio/WaveShaperProcessor.cpp \
@@ -4097,7 +4097,10 @@ ALL_IN_ONE_SOURCES += \
     inspector/InspectorAllInOne.cpp \
     loader/appcache/ApplicationCacheAllInOne.cpp \
     platform/text/TextAllInOne.cpp \
-    rendering/style/StyleAllInOne.cpp
+    rendering/style/StyleAllInOne.cpp \
+    html/HTMLElementsAllInOne.cpp \
+    editing/EditingAllInOne.cpp \
+    rendering/RenderingAllInOne.cpp
 
 contains(DEFINES, ENABLE_XSLT=1):contains(DEFINES, WTF_USE_LIBXML2=1) {
     ALL_IN_ONE_SOURCES += \
@@ -4107,9 +4110,6 @@ contains(DEFINES, ENABLE_XSLT=1):contains(DEFINES, WTF_USE_LIBXML2=1) {
 # These do not compile at the moment:
 #    css/MediaAllInOne.cpp
 #    css/CSSAllInOne.cpp
-#    editing/EditingAllInOne.cpp
-#    html/HTMLElementsAllInOne.cpp
-#    rendering/RenderingAllInOne.cpp
 
 # Make sure the derived sources are built
 include(DerivedSources.pri)

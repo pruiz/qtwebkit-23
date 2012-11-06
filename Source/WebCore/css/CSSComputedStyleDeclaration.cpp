@@ -351,7 +351,7 @@ static const CSSPropertyID computedProperties[] = {
     CSSPropertyWebkitRegionBreakBefore,
     CSSPropertyWebkitRegionBreakInside,
 #endif
-#if ENABLE(WIDGET_REGION)
+#if ENABLE(DRAGGABLE_REGION)
     CSSPropertyWebkitAppRegion,
 #endif
 #if ENABLE(CSS_EXCLUSIONS)
@@ -921,7 +921,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::valueForFilter(const RenderObj
                 shadersList->append(cssValuePool().createIdentifierValue(CSSValueNone));
 
             const CustomFilterProgramMixSettings mixSettings = program->mixSettings();
-            if (mixSettings.enabled) {
+            if (program->programType() == PROGRAM_TYPE_BLENDS_ELEMENT_TEXTURE) {
                 RefPtr<WebKitCSSMixFunctionValue> mixFunction = WebKitCSSMixFunctionValue::create();
                 mixFunction->append(program->fragmentShader()->cssValue());
                 mixFunction->append(cssValuePool().createValue(mixSettings.blendMode));
@@ -2201,7 +2201,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(CSSPropert
             return cssValuePool().createValue(firstRegion.release());
         }
 #endif
-#if ENABLE(WIDGET_REGION)
+#if ENABLE(DRAGGABLE_REGION)
         case CSSPropertyWebkitAppRegion:
             return cssValuePool().createIdentifierValue(style->getDraggableRegionMode() == DraggableRegionDrag ? CSSValueDrag : CSSValueNoDrag);
 #endif

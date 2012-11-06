@@ -35,6 +35,8 @@
 
 namespace WebKit {
 
+struct NetworkProcessCreationParameters;
+
 class NetworkProcessProxy : public RefCounted<NetworkProcessProxy>, CoreIPC::Connection::Client, ProcessLauncher::Client {
 public:
     static PassRefPtr<NetworkProcessProxy> create();
@@ -42,6 +44,8 @@ public:
 
 private:
     NetworkProcessProxy();
+
+    void platformInitializeNetworkProcess(NetworkProcessCreationParameters&);
 
     // CoreIPC::Connection::Client
     virtual void didReceiveMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::ArgumentDecoder*);

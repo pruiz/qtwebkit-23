@@ -192,6 +192,8 @@ WebInspector.UISourceCode.prototype = {
         delete this._workingCopy;
         this.dispatchEventToListeners(WebInspector.UISourceCode.Events.WorkingCopyCommitted, {oldWorkingCopy: oldWorkingCopy, workingCopy: this.workingCopy()});
         WebInspector.workspace.dispatchEventToListeners(WebInspector.Workspace.Events.UISourceCodeContentCommitted, { uiSourceCode: this, content: this._content });
+        if (this._url && WebInspector.fileManager.isURLSaved(this._url))
+            WebInspector.fileManager.save(this._url, this._content, false);
     },
 
     /**
@@ -302,17 +304,14 @@ WebInspector.UISourceCode.prototype = {
      */
     setWorkingCopy: function(newWorkingCopy)
     {
+        var wasDirty = this.isDirty();        
         this._mimeType = this.canonicalMimeType();
         var oldWorkingCopy = this._workingCopy;
         if (this._content === newWorkingCopy)
             delete this._workingCopy;
         else
             this._workingCopy = newWorkingCopy;
-        if (this.scriptFile())
-            this.scriptFile().workingCopyChanged();
-        else if (this.styleFile())
-            this.styleFile().workingCopyChanged();
-        this.dispatchEventToListeners(WebInspector.UISourceCode.Events.WorkingCopyChanged, {oldWorkingCopy: oldWorkingCopy, workingCopy: this.workingCopy()});
+        this.dispatchEventToListeners(WebInspector.UISourceCode.Events.WorkingCopyChanged, {oldWorkingCopy: oldWorkingCopy, workingCopy: this.workingCopy(), wasDirty: wasDirty});
     },
 
     /**
@@ -325,11 +324,8 @@ WebInspector.UISourceCode.prototype = {
             return;
         }
 
-        if (this.scriptFile())
-            this.scriptFile().workingCopyCommitted(callback);
-        else if (this.styleFile())
-            this.styleFile().workingCopyCommitted(callback);
         this._commitContent(this._workingCopy);
+        callback(null);
     },
 
     /**

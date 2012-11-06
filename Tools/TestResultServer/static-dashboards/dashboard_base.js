@@ -494,7 +494,7 @@ function initBuilders()
 }
 
 var g_resultsByBuilder = {};
-var g_expectations;
+var g_expectationsByPlatform = {};
 var g_staleBuilders = [];
 var g_buildersThatFailedToLoad = [];
 
@@ -551,31 +551,45 @@ function pathToBuilderResultsFile(builderName)
             '&testtype=' + g_crossDashboardState.testType + '&name=';
 }
 
-// FIXME: Make the dashboard understand different ports' expectations files.
-var CHROMIUM_EXPECTATIONS_URL = 'http://svn.webkit.org/repository/webkit/trunk/LayoutTests/platform/chromium/TestExpectations';
-var LEGACY_CHROMIUM_EXPECTATIONS_URL = 'http://svn.webkit.org/repository/webkit/trunk/LayoutTests/platform/chromium/test_expectations.txt';
-
-function requestExpectationsFile()
+function requestExpectationsFiles()
 {
-    request(CHROMIUM_EXPECTATIONS_URL, function(xhr) {
-        g_waitingOnExpectations = false;
-        g_expectations = xhr.responseText;
-        handleResourceLoad();
-    },
-    function() {
-        request(LEGACY_CHROMIUM_EXPECTATIONS_URL, function(xhr) {
-            g_waitingOnExpectations = false;
-            g_expectations = xhr.responseText;
-            handleResourceLoad();
-        }, function() {
-            console.error('Could not load expectations file from ' + CHROMIUM_EXPECTATIONS_URL + ' or ' + LEGACY_CHROMIUM_EXPECTATIONS_URL);
-        });
+    var expectationsFilesToRequest = {};
+    traversePlatformsTree(function(platform, platformName) {
+        if (platform.fallbackPlatforms)
+            platform.fallbackPlatforms.forEach(function(fallbackPlatform) {
+                var fallbackPlatformObject = platformObjectForName(fallbackPlatform);
+                if (fallbackPlatformObject.expectationsDirectory && !(fallbackPlatform in expectationsFilesToRequest))
+                    expectationsFilesToRequest[fallbackPlatform] = EXPECTATIONS_URL_BASE_PATH + fallbackPlatformObject.expectationsDirectory + '/TestExpectations';
+            });
+
+        if (platform.expectationsDirectory)
+            expectationsFilesToRequest[platformName] = EXPECTATIONS_URL_BASE_PATH + platform.expectationsDirectory + '/TestExpectations';
     });
+
+    for (platformWithExpectations in expectationsFilesToRequest)
+        request(expectationsFilesToRequest[platformWithExpectations],
+                partial(function(platformName, xhr) {
+                    g_expectationsByPlatform[platformName] = getParsedExpectations(xhr.responseText);
+
+                    delete expectationsFilesToRequest[platformName];
+                    if (!Object.keys(expectationsFilesToRequest).length) {
+                        g_waitingOnExpectations = false;
+                        handleResourceLoad();
+                    }
+                }, platformWithExpectations),
+                partial(function(platformName, xhr) {
+                    console.error('Could not load expectations file for ' + platformName);
+                }, platformWithExpectations));
 }
 
 function isTreeMap()
 {
     return endsWith(window.location.pathname, 'treemap.html');
+}
+
+function isFlakinessDashboard()
+{
+    return endsWith(window.location.pathname, 'flakiness_dashboard.html');
 }
 
 function appendJSONScriptElementFor(builderName)
@@ -608,9 +622,9 @@ function appendJSONScriptElements()
     for (var builderName in g_builders)
         appendJSONScriptElementFor(builderName);
 
-    var g_waitingOnExpectations = isLayoutTestResults() && !isTreeMap();
+    g_waitingOnExpectations = isLayoutTestResults() && isFlakinessDashboard();
     if (g_waitingOnExpectations)
-        requestExpectationsFile();
+        requestExpectationsFiles();
 }
 
 var g_hasDoneInitialPageGeneration = false;

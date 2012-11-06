@@ -36,6 +36,7 @@
 
 #include "MediaConstraints.h"
 #include "RTCConfiguration.h"
+#include "RTCDataChannelDescriptor.h"
 #include "RTCIceCandidateDescriptor.h"
 #include "RTCPeerConnectionHandlerClient.h"
 #include "RTCSessionDescriptionDescriptor.h"
@@ -46,6 +47,7 @@
 #include <public/WebMediaConstraints.h>
 #include <public/WebMediaStreamDescriptor.h>
 #include <public/WebRTCConfiguration.h>
+#include <public/WebRTCDataChannel.h>
 #include <public/WebRTCICECandidate.h>
 #include <public/WebRTCSessionDescription.h>
 #include <public/WebRTCSessionDescriptionRequest.h>
@@ -172,6 +174,38 @@ void RTCPeerConnectionHandlerChromium::getStats(PassRefPtr<RTCStatsRequest> requ
         return;
 
     m_webHandler->getStats(request);
+}
+
+bool RTCPeerConnectionHandlerChromium::openDataChannel(PassRefPtr<RTCDataChannelDescriptor> dataChannel)
+{
+    if (!m_webHandler)
+        return false;
+
+    return m_webHandler->openDataChannel(dataChannel);
+}
+
+bool RTCPeerConnectionHandlerChromium::sendStringData(PassRefPtr<RTCDataChannelDescriptor> dataChannel, const String& data)
+{
+    if (!m_webHandler)
+        return false;
+
+    return m_webHandler->sendStringData(dataChannel, data);
+}
+
+bool RTCPeerConnectionHandlerChromium::sendRawData(PassRefPtr<RTCDataChannelDescriptor> dataChannel, const char* data, size_t dataLength)
+{
+    if (!m_webHandler)
+        return false;
+
+    return m_webHandler->sendRawData(dataChannel, data, dataLength);
+}
+
+void RTCPeerConnectionHandlerChromium::closeDataChannel(PassRefPtr<RTCDataChannelDescriptor> dataChannel)
+{
+    if (!m_webHandler)
+        return;
+
+    return m_webHandler->closeDataChannel(dataChannel);
 }
 
 void RTCPeerConnectionHandlerChromium::stop()

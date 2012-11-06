@@ -94,7 +94,6 @@ LIST(APPEND WebKit_SOURCES
     blackberry/Api/WebPageCompositor.cpp
     blackberry/Api/WebPageGroupLoadDeferrer.cpp
     blackberry/Api/WebSettings.cpp
-    blackberry/Api/WebString.cpp
     blackberry/Api/WebViewportArguments.cpp
     blackberry/Api/JavaScriptVariant.cpp
     blackberry/WebCoreSupport/AutofillManager.cpp
@@ -125,6 +124,7 @@ LIST(APPEND WebKit_SOURCES
     blackberry/WebKitSupport/AboutData.cpp
     blackberry/WebKitSupport/BackingStoreTile.cpp
     blackberry/WebKitSupport/BackingStoreClient.cpp
+    blackberry/WebKitSupport/BackingStoreVisualizationViewportAccessor.cpp
     blackberry/WebKitSupport/DefaultTapHighlight.cpp
     blackberry/WebKitSupport/DOMSupport.cpp
     blackberry/WebKitSupport/FrameLayers.cpp
@@ -138,6 +138,7 @@ LIST(APPEND WebKit_SOURCES
     blackberry/WebKitSupport/SurfacePool.cpp
     blackberry/WebKitSupport/TouchEventHandler.cpp
     blackberry/WebKitSupport/FatFingers.cpp
+    blackberry/WebKitSupport/WebKitThreadViewportAccessor.cpp
 )
 
 IF (ENABLE_WEBGL)

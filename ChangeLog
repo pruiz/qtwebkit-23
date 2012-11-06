@@ -1,3 +1,100 @@
+2012-10-17  Grzegorz Czajkowski  <g.czajkowski@samsung.com>, Michal Roj <m.roj@sasmung.com>
+
+        [WK2][EFL] Implementation of spellchecking feature.
+        https://bugs.webkit.org/show_bug.cgi?id=91854
+
+        Reviewed by Gyuyoung Kim.
+
+        Define SPELLCHECK macro and enable it for WK2-Efl.
+        The spellchecking implementation is based on the Enchant library.
+        It can be used by other WebKit ports.
+
+        * Source/cmake/FindEnchant.cmake: Added.
+        * Source/cmake/OptionsEfl.cmake: Enable spellchecking feature for WebKit2-EFL.
+        * Source/cmake/WebKitFeatures.cmake: Define the SPELLCHECK macro.
+        * Source/cmakeconfig.h.cmake: Add the feature.
+
+2012-10-16  Pablo Flouret  <pablof@motorola.com>
+
+        Pre-process CSSGrammar.y before running through bison.
+        https://bugs.webkit.org/show_bug.cgi?id=94290
+
+        Reviewed by Tony Chang.
+
+        * Source/cmake/WebKitMacros.cmake:
+            Use WebCore/css/makegrammar.pl to generate bison grammar files.
+
+2012-10-15  Jer Noble  <jer.noble@apple.com>
+
+        WebAudio: limit output level to 0db
+        https://bugs.webkit.org/show_bug.cgi?id=95792
+        <rdar://problem/11966135>
+
+        Reviewed by Chris Rogers.
+
+        Add a manual test to determine that output volume has been limited to 0db.
+
+        * ManualTests/webaudio/limit-level-0db.html: Added.
+
+2012-10-16  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Fix support for silent builds
+
+        Reviewed by Tor Arne Vestbø.
+
+        The .qmake.conf file in Qt modules usually contains a load(qt_build_config), which
+        ends up loading qmodule.pri, which contains the CONFIG += silent if Qt was configured
+        with -silent.
+
+        * .qmake.conf:
+
+2012-10-16  Simon Hausmann  <simon.hausmann@digia.com>
+
+        Unreviewed, rolling out r131436.
+        http://trac.webkit.org/changeset/131436
+
+        Broke various Qt bots strangely
+
+        * .qmake.conf:
+
+2012-10-16  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Fix support for silent builds
+
+        Reviewed by Tor Arne Vestbø.
+
+        The .qmake.conf file in Qt modules usually contains a load(qt_build_config), which
+        ends up loading qmodule.pri, which contains the CONFIG += silent if Qt was configured
+        with -silent.
+
+        * .qmake.conf:
+
+2012-10-15  Ryuan Choi  <ryuan.choi@samsung.com>
+
+        [EFL] Share resources installed for inspector
+        https://bugs.webkit.org/show_bug.cgi?id=98991
+
+        Reviewed by Gyuyoung Kim.
+
+        Now, WebKit1/Efl and WebKit2/Efl install same resources to different directory
+        when INSPECTOR is enabled.
+
+        This patch changes to install resources one time and share it.
+
+        * Source/PlatformEfl.cmake:
+        Extracted build scripts which install resources from WebKit/PlatformEfl.cmake.
+        * Source/cmake/OptionsEfl.cmake:
+
+2012-10-14  Patrick Gansterer  <paroga@webkit.org>
+
+        Unreviewed, rolling out r130656.
+        http://trac.webkit.org/changeset/130656
+        https://bugs.webkit.org/show_bug.cgi?id=97592
+
+        Broke CMake build on Windows
+
+        * CMakeLists.txt:
+
 2012-10-12  Sheriff Bot  <webkit.review.bot@gmail.com>
 
         Unreviewed, rolling out r131189.

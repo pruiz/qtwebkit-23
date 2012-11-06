@@ -58,6 +58,7 @@
       'ENABLE_DIALOG_ELEMENT=1',
       'ENABLE_DIRECTORY_UPLOAD=1',
       'ENABLE_DOWNLOAD_ATTRIBUTE=1',
+      'ENABLE_DRAGGABLE_REGION=1',
       'ENABLE_ENCRYPTED_MEDIA=1',
       'ENABLE_FILE_SYSTEM=1',
       'ENABLE_FILTERS=1',
@@ -116,7 +117,6 @@
       'ENABLE_WEB_INTENTS=1',
       'ENABLE_WEB_SOCKETS=1',
       'ENABLE_WEB_TIMING=1',
-      'ENABLE_WIDGET_REGION=1',
       'ENABLE_WORKERS=1',
       'ENABLE_XHR_RESPONSE_BLOB=1',
       'ENABLE_XSLT=1',
@@ -151,6 +151,7 @@
           'ENABLE_ACCELERATED_OVERFLOW_SCROLLING=1',
           'ENABLE_CALENDAR_PICKER=0',
           'ENABLE_DATALIST_ELEMENT=0',
+          'ENABLE_FAST_MOBILE_SCROLLING=1',
           'ENABLE_INPUT_SPEECH=0',
           'ENABLE_INPUT_TYPE_COLOR=0',
           'ENABLE_JAVASCRIPT_I18N_API=0',
@@ -201,7 +202,7 @@
           'WTF_USE_WEBAUDIO_FFMPEG=1',
         ],
       }],
-      ['OS=="win" or use_x11==1', {
+      ['OS=="win" or OS=="android" or use_x11==1', {
         'feature_defines': [
           'ENABLE_OPENTYPE_VERTICAL=1',
         ],

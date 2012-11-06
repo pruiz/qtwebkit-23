@@ -204,8 +204,12 @@ bool DateTimeEditBuilder::shouldSecondFieldReadOnly() const
 
 void DateTimeEditBuilder::visitLiteral(const String& text)
 {
+    DEFINE_STATIC_LOCAL(AtomicString, textPseudoId, ("-webkit-datetime-edit-text", AtomicString::ConstructFromLiteral));
     ASSERT(text.length());
-    m_editElement.appendChild(Text::create(m_editElement.document(), text));
+    RefPtr<HTMLDivElement> element = HTMLDivElement::create(m_editElement.document());
+    element->setShadowPseudoId(textPseudoId);
+    element->appendChild(Text::create(m_editElement.document(), text));
+    m_editElement.appendChild(element);
 }
 
 // ----------------------------
@@ -396,6 +400,10 @@ void DateTimeEditElement::layout(const LayoutParameters& layoutParameters, const
         }
     }
 
+    DEFINE_STATIC_LOCAL(AtomicString, gapPseudoId, ("-webkit-datetime-edit-gap", AtomicString::ConstructFromLiteral));
+    RefPtr<HTMLDivElement> gapElement = HTMLDivElement::create(document());
+    gapElement->setShadowPseudoId(gapPseudoId);
+    appendChild(gapElement);
     RefPtr<SpinButtonElement> spinButton = SpinButtonElement::create(document(), *this);
     m_spinButton = spinButton.get();
     appendChild(spinButton);

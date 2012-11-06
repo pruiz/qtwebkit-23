@@ -47,12 +47,10 @@ namespace WebCore {
 class LocaleICU : public Localizer {
 public:
     static PassOwnPtr<LocaleICU> create(const char* localeString);
-    static LocaleICU* currentLocale();
     virtual ~LocaleICU();
 
     // For LocalizedDate
     virtual double parseDateTime(const String&, DateComponents::Type) OVERRIDE;
-    virtual String formatDateTime(const DateComponents&, FormatType = FormatTypeUnspecified) OVERRIDE;
 #if ENABLE(CALENDAR_PICKER)
     virtual String dateFormatText() OVERRIDE;
 
@@ -70,7 +68,6 @@ public:
 #endif
 
 private:
-    static PassOwnPtr<LocaleICU> createForCurrentLocale();
     explicit LocaleICU(const char*);
     String decimalSymbol(UNumberFormatSymbol);
     String decimalTextAttribute(UNumberFormatTextAttribute);

@@ -148,6 +148,7 @@ private:
             
         case ArrayPop: {
             blessArrayOperation(node.child1(), node.child2(), 1);
+            break;
         }
             
         case ValueToInt32: {
@@ -382,8 +383,8 @@ private:
         m_graph.ref(array);
 
         if (isEffectful(arrayMode)) {
-            ASSERT(index != NoNode);
-            m_graph.ref(index);
+            if (index != NoNode)
+                m_graph.ref(index);
             Node arrayify(Arrayify, codeOrigin, OpInfo(arrayMode), array, index);
             arrayify.ref(); // Once because it's used as a butterfly.
             arrayify.ref(); // And twice because it's must-generate.
@@ -391,11 +392,12 @@ private:
             m_graph.append(arrayify);
             m_insertionSet.append(m_indexInBlock, arrayifyIndex);
             
-            ASSERT(storageCheck == canCSEStorage);
             ASSERT(shouldGenerate);
             ASSERT(canCSEStorage(arrayMode));
             ASSERT(modeUsesButterfly(arrayMode));
-            
+
+            if (!storageCheck(arrayMode))
+                return NoNode;
             return arrayifyIndex;
         }
         
@@ -440,7 +442,6 @@ private:
             return;
             
         case Array::Generic:
-        case ALL_POLYMORPHIC_MODES:
             return;
             
         default: {

@@ -382,9 +382,9 @@ float InlineFlowBox::placeBoxesInInlineDirection(float logicalLeft, bool& needsW
             InlineTextBox* text = toInlineTextBox(curr);
             RenderText* rt = toRenderText(text->renderer());
             if (rt->textLength()) {
-                if (needsWordSpacing && isSpaceOrNewline(rt->characters()[text->start()]))
+                if (needsWordSpacing && isSpaceOrNewline(rt->characterAt(text->start())))
                     logicalLeft += rt->style(isFirstLineStyle())->font().wordSpacing();
-                needsWordSpacing = !isSpaceOrNewline(rt->characters()[text->end()]);
+                needsWordSpacing = !isSpaceOrNewline(rt->characterAt(text->end()));
             }
             text->setLogicalLeft(logicalLeft);
             if (knownToHaveNoOverflow())
@@ -625,10 +625,6 @@ void InlineFlowBox::placeBoxesInBlockDirection(LayoutUnit top, LayoutUnit maxHei
             curr->adjustBlockDirectionPosition(adjustmentForChildrenWithSameLineHeightAndBaseline);
             continue;
         }
-        
-        LayoutUnit baselinePosition = curr->baselinePosition(baselineType);
-        if (curr->renderer()->isReplaced())
-            baselinePosition = baselinePosition.floor();
 
         InlineFlowBox* inlineFlowBox = curr->isInlineFlowBox() ? toInlineFlowBox(curr) : 0;
         bool childAffectsTopBottomPos = true;
@@ -640,7 +636,7 @@ void InlineFlowBox::placeBoxesInBlockDirection(LayoutUnit top, LayoutUnit maxHei
             if (!strictMode && inlineFlowBox && !inlineFlowBox->hasTextChildren() && !curr->boxModelObject()->hasInlineDirectionBordersOrPadding()
                 && !(inlineFlowBox->descendantsHaveSameLineHeightAndBaseline() && inlineFlowBox->hasTextDescendants()))
                 childAffectsTopBottomPos = false;
-            LayoutUnit posAdjust = maxAscent - baselinePosition;
+            LayoutUnit posAdjust = maxAscent - curr->baselinePosition(baselineType);
             curr->setLogicalTop(curr->logicalTop() + top + posAdjust);
         }
         
@@ -651,7 +647,7 @@ void InlineFlowBox::placeBoxesInBlockDirection(LayoutUnit top, LayoutUnit maxHei
             
         if (curr->isText() || curr->isInlineFlowBox()) {
             const FontMetrics& fontMetrics = curr->renderer()->style(isFirstLineStyle())->fontMetrics();
-            newLogicalTop += baselinePosition - fontMetrics.ascent(baselineType);
+            newLogicalTop += curr->baselinePosition(baselineType) - fontMetrics.ascent(baselineType);
             if (curr->isInlineFlowBox()) {
                 RenderBoxModelObject* boxObject = toRenderBoxModelObject(curr->renderer());
                 newLogicalTop -= boxObject->style(isFirstLineStyle())->isHorizontalWritingMode() ? boxObject->borderTop() + boxObject->paddingTop() : 

@@ -80,17 +80,6 @@ PassOwnPtr<LocaleICU> LocaleICU::create(const char* localeString)
     return adoptPtr(new LocaleICU(localeString));
 }
 
-PassOwnPtr<LocaleICU> LocaleICU::createForCurrentLocale()
-{
-    return adoptPtr(new LocaleICU(0));
-}
-
-LocaleICU* LocaleICU::currentLocale()
-{
-    static LocaleICU* currentLocale = LocaleICU::createForCurrentLocale().leakPtr();
-    return currentLocale;
-}
-
 String LocaleICU::decimalSymbol(UNumberFormatSymbol symbol)
 {
     UErrorCode status = U_ZERO_ERROR;
@@ -181,25 +170,6 @@ double LocaleICU::parseDateTime(const String& input, DateComponents::Type type)
         return numeric_limits<double>::quiet_NaN();
     // UDate, which is an alias of double, is compatible with our expectation.
     return date;
-}
-
-String LocaleICU::formatDateTime(const DateComponents& dateComponents, FormatType formatType)
-{
-    if (dateComponents.type() != DateComponents::Date)
-        return Localizer::formatDateTime(dateComponents, formatType);
-    if (!initializeShortDateFormat())
-        return String();
-    double input = dateComponents.millisecondsSinceEpoch();
-    UErrorCode status = U_ZERO_ERROR;
-    int32_t length = udat_format(m_shortDateFormat, input, 0, 0, 0, &status);
-    if (status != U_BUFFER_OVERFLOW_ERROR)
-        return String();
-    Vector<UChar> buffer(length);
-    status = U_ZERO_ERROR;
-    udat_format(m_shortDateFormat, input, buffer.data(), length, 0, &status);
-    if (U_FAILURE(status))
-        return String();
-    return String::adopt(buffer);
 }
 
 #if ENABLE(CALENDAR_PICKER) || ENABLE(INPUT_MULTIPLE_FIELDS_UI)

@@ -63,6 +63,8 @@ public:
     static PassRefPtr<WebProcessProxy> create(PassRefPtr<WebContext>);
     ~WebProcessProxy();
 
+    static WebProcessProxy* fromConnection(CoreIPC::Connection*);
+
     void terminate();
 
     template<typename T> bool send(const T& message, uint64_t destinationID, unsigned messageSendFlags = 0);
@@ -150,6 +152,8 @@ private:
 
     void handleGetPlugins(uint64_t requestID, bool refresh);
     void sendDidGetPlugins(uint64_t requestID, PassOwnPtr<Vector<WebCore::PluginInfo> >);
+
+    void getSharedWorkerProcessConnection(const String& url, const String& name, PassRefPtr<Messages::WebProcessProxy::GetSharedWorkerProcessConnection::DelayedReply>);
 
 #if USE(SECURITY_FRAMEWORK)
     void secItemRequest(CoreIPC::Connection*, uint64_t requestID, const SecItemRequestData&);

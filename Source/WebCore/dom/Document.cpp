@@ -461,7 +461,7 @@ Document::Document(Frame* frame, const KURL& url, bool isXHTML, bool isHTML)
     , m_hasXMLDeclaration(0)
     , m_savedRenderer(0)
     , m_designMode(inherit)
-#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(WIDGET_REGION)
+#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(DRAGGABLE_REGION)
     , m_hasAnnotatedRegions(false)
     , m_annotatedRegionsDirty(false)
 #endif
@@ -1050,10 +1050,9 @@ PassRefPtr<Node> Document::adoptNode(PassRefPtr<Node> source, ExceptionCode& ec)
             return 0;
         }
 
-        // FIXME: What about <frame> and <object>?
-        if (source->hasTagName(iframeTag)) {
-            HTMLIFrameElement* iframe = static_cast<HTMLIFrameElement*>(source.get());
-            if (frame() && frame()->tree()->isDescendantOf(iframe->contentFrame())) {
+        if (source->isFrameOwnerElement()) {
+            HTMLFrameOwnerElement* frameOwnerElement = toFrameOwnerElement(source.get());
+            if (frame() && frame()->tree()->isDescendantOf(frameOwnerElement->contentFrame())) {
                 ec = HIERARCHY_REQUEST_ERR;
                 return 0;
             }
@@ -1625,10 +1624,10 @@ PageVisibilityState Document::visibilityState() const
 {
     // The visibility of the document is inherited from the visibility of the
     // page. If there is no page associated with the document, we will assume
-    // that the page is visible i.e. invisibility has to be explicitly
-    // specified by the embedder.
+    // that the page is hidden, as specified by the spec:
+    // http://dvcs.w3.org/hg/webperf/raw-file/tip/specs/PageVisibility/Overview.html#dom-document-hidden
     if (!m_frame || !m_frame->page())
-        return PageVisibilityStateVisible;
+        return PageVisibilityStateHidden;
     return m_frame->page()->visibilityState();
 }
 
@@ -3351,7 +3350,7 @@ void Document::activeChainNodeDetached(Node* node)
         m_activeNode = m_activeNode->parentNode();
 }
 
-#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(WIDGET_REGION)
+#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(DRAGGABLE_REGION)
 const Vector<AnnotatedRegionValue>& Document::annotatedRegions() const
 {
     return m_annotatedRegions;
@@ -3923,6 +3922,19 @@ String Document::lastModified() const
     return String::format("%02d/%02d/%04d %02d:%02d:%02d", date.month() + 1, date.monthDay(), date.fullYear(), date.hour(), date.minute(), date.second());
 }
 
+static bool isValidNameNonASCII(const LChar* characters, unsigned length)
+{
+    if (!isValidNameStart(characters[0]))
+        return false;
+
+    for (unsigned i = 1; i < length; ++i) {
+        if (!isValidNamePart(characters[i]))
+            return false;
+    }
+
+    return true;
+}
+
 static bool isValidNameNonASCII(const UChar* characters, unsigned length)
 {
     unsigned i = 0;
@@ -3963,16 +3975,20 @@ bool Document::isValidName(const String& name)
     if (!length)
         return false;
 
-    const UChar* characters;
     if (name.is8Bit()) {
-        if (isValidNameASCII(name.characters8(), length))
-            return true;
-        characters = name.characters();
-    } else {
-        characters = name.characters16();
+        const LChar* characters = name.characters8();
+
         if (isValidNameASCII(characters, length))
             return true;
+
+        return isValidNameNonASCII(characters, length);
     }
+
+    const UChar* characters = name.characters16();
+
+    if (isValidNameASCII(characters, length))
+        return true;
+
     return isValidNameNonASCII(characters, length);
 }
 
@@ -5908,7 +5924,7 @@ void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     info.addMember(m_contentLanguage);
     info.addMember(m_documentNamedItemCollections);
     info.addMember(m_windowNamedItemCollections);
-#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(WIDGET_REGION)
+#if ENABLE(DASHBOARD_SUPPORT) || ENABLE(DRAGGABLE_REGION)
     info.addMember(m_annotatedRegions);
 #endif
     info.addMember(m_cssCanvasElements);

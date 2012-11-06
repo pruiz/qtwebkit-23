@@ -145,6 +145,9 @@ namespace WebCore {
             return m_bytes + (y * width()) + x;
 #endif
         }
+
+        void reportMemoryUsage(MemoryObjectInfo*) const;
+
     private:
         int width() const;
         int height() const;
@@ -177,10 +180,10 @@ namespace WebCore {
         Vector<PixelData> m_backingStore;
         PixelData* m_bytes; // The memory is backed by m_backingStore.
         IntSize m_size;
-        bool m_hasAlpha;
         // FIXME: Do we need m_colorProfile anymore?
         ColorProfile m_colorProfile;
 #endif
+        bool m_hasAlpha;
         IntRect m_originalFrameRect; // This will always just be the entire
                                      // buffer except for GIF frames whose
                                      // original rect was smaller than the
@@ -358,6 +361,8 @@ namespace WebCore {
 #if ENABLE(IMAGE_DECODER_DOWN_SAMPLING)
         void setMaxNumPixels(int m) { m_maxNumPixels = m; }
 #endif
+
+        virtual void reportMemoryUsage(MemoryObjectInfo*) const;
 
     protected:
         void prepareScaleDataIfNecessary();

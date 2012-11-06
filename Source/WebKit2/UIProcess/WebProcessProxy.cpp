@@ -46,7 +46,10 @@
 #include <wtf/text/WTFString.h>
 
 #if PLATFORM(MAC)
-#include "BuiltInPDFView.h"
+#include "SimplePDFPlugin.h"
+#if ENABLE(PDFKIT_PLUGIN)
+#include "PDFPlugin.h"
+#endif
 #endif
 
 using namespace WebCore;
@@ -100,6 +103,16 @@ WebProcessProxy::~WebProcessProxy()
         m_processLauncher->invalidate();
         m_processLauncher = 0;
     }
+}
+
+WebProcessProxy* WebProcessProxy::fromConnection(CoreIPC::Connection* connection)
+{
+    ASSERT(connection);
+    WebConnectionToWebProcess* webConnection = static_cast<WebConnectionToWebProcess*>(connection->client());
+
+    WebProcessProxy* webProcessProxy = webConnection->webProcessProxy();
+    ASSERT(webProcessProxy->connection() == connection);
+    return webProcessProxy;
 }
 
 void WebProcessProxy::connect()
@@ -305,8 +318,12 @@ void WebProcessProxy::sendDidGetPlugins(uint64_t requestID, PassOwnPtr<Vector<Pl
 #if PLATFORM(MAC)
     // Add built-in PDF last, so that it's not used when a real plug-in is installed.
     // NOTE: This has to be done on the main thread as it calls localizedString().
-    if (!m_context->omitPDFSupport())
-        plugins->append(BuiltInPDFView::pluginInfo());
+    if (!m_context->omitPDFSupport()) {
+#if ENABLE(PDFKIT_PLUGIN)
+        plugins->append(PDFPlugin::pluginInfo());
+#endif
+        plugins->append(SimplePDFPlugin::pluginInfo());
+    }
 #endif
 
     send(Messages::WebProcess::DidGetPlugins(requestID, *plugins), 0);
@@ -373,13 +390,15 @@ void WebProcessProxy::didClearPluginSiteData(uint64_t callbackID)
 
 #endif
 
+void WebProcessProxy::getSharedWorkerProcessConnection(const String& /* url */, const String& /* name */, PassRefPtr<Messages::WebProcessProxy::GetSharedWorkerProcessConnection::DelayedReply>)
+{
+    // FIXME: Implement
+}
+
 void WebProcessProxy::didReceiveMessage(CoreIPC::Connection* connection, CoreIPC::MessageID messageID, CoreIPC::ArgumentDecoder* arguments)
 {
-    // FIXME: Come up with a better way to chain to the WebContext.
-    if (m_context->knowsHowToHandleMessage(messageID)) {
-        m_context->didReceiveMessage(this, messageID, arguments);
+    if (m_context->dispatchMessage(connection, messageID, arguments))
         return;
-    }
 
     if (messageID.is<CoreIPC::MessageClassWebProcessProxy>()) {
         didReceiveWebProcessProxyMessage(connection, messageID, arguments);
@@ -399,11 +418,8 @@ void WebProcessProxy::didReceiveMessage(CoreIPC::Connection* connection, CoreIPC
 
 void WebProcessProxy::didReceiveSyncMessage(CoreIPC::Connection* connection, CoreIPC::MessageID messageID, CoreIPC::ArgumentDecoder* arguments, OwnPtr<CoreIPC::ArgumentEncoder>& reply)
 {
-    // FIXME: Come up with a better way to chain to the WebContext.
-    if (m_context->knowsHowToHandleMessage(messageID)) {
-        m_context->didReceiveSyncMessage(this, messageID, arguments, reply);
+    if (m_context->dispatchSyncMessage(connection, messageID, arguments, reply))
         return;
-    }
 
     if (messageID.is<CoreIPC::MessageClassWebProcessProxy>()) {
         didReceiveSyncWebProcessProxyMessage(connection, messageID, arguments, reply);

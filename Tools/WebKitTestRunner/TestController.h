@@ -27,6 +27,7 @@
 #define TestController_h
 
 #include "WebNotificationProvider.h"
+#include "WorkQueueManager.h"
 #include <GeolocationProviderMock.h>
 #include <WebKit2/WKRetainPtr.h>
 #include <string>
@@ -78,6 +79,8 @@ public:
 
     bool resetStateToConsistentValues();
 
+    WorkQueueManager& workQueueManager() { return m_workQueueManager; }
+
 private:
     void initialize(int argc, const char* argv[]);
     void run();
@@ -118,7 +121,7 @@ private:
     void decidePolicyForNavigationAction(WKFramePolicyListenerRef);
 
     static void decidePolicyForResponse(WKPageRef, WKFrameRef, WKURLResponseRef, WKURLRequestRef, WKFramePolicyListenerRef, WKTypeRef, const void*);
-    void decidePolicyForResponse(WKFramePolicyListenerRef);
+    void decidePolicyForResponse(WKFrameRef, WKURLResponseRef, WKFramePolicyListenerRef);
 
     static WKPageRef createOtherPage(WKPageRef oldPage, WKURLRequestRef, WKDictionaryRef, WKEventModifiers, WKEventMouseButton, const void*);
 
@@ -172,6 +175,8 @@ private:
     bool m_policyDelegatePermissive;
 
     EventSenderProxy* m_eventSenderProxy;
+
+    WorkQueueManager m_workQueueManager;
 };
 
 } // namespace WTR

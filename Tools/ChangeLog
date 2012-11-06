@@ -1,3 +1,121 @@
+2012-10-19  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WTR] renderToOffscreenBuffer should not be set if the real render loop is active
+        https://bugs.webkit.org/show_bug.cgi?id=99831
+
+        Reviewed by Jocelyn Turcotte.
+
+        Do not set renderToOffscreenBuffer if we have called setRenderWithoutShowing.
+        We do not need it in this case and these things are actually conflicting.
+
+        * WebKitTestRunner/qt/PlatformWebViewQt.cpp:
+        (WTR::WrapperWindow::handleStatusChanged):
+        (WTR::PlatformWebView::PlatformWebView):
+        (WTR::PlatformWebView::windowShapshotEnabled): Added a comment
+        describing why this workaround is needed.
+
+2012-10-19  Zan Dobersek  <zandobersek@gmail.com>
+
+        [WK2][GTK] Fullscreen tests timing out in bots
+        https://bugs.webkit.org/show_bug.cgi?id=93973
+
+        Reviewed by Philippe Normand.
+
+        Add webcore_cppflags to the CPPFLAGS for WebKitTestRunner and the
+        injected bundle library. webcore_cppflags contains all the feature
+        defines' macros so the ENABE(*) compilation guards should now work
+        properly (i.e. enable the code behind them when the feature is enabled).
+
+        * WebKitTestRunner/GNUmakefile.am:
+
+2012-10-19  Simon Hausmann  <simon.hausmann@digia.com>
+
+        Unreviewed, rolling out r131734.
+        http://trac.webkit.org/changeset/131734
+
+        Broke ANGLE build where we end up with @echo foo && @echo -n
+
+        * qmake/mkspecs/features/default_post.prf:
+
+2012-10-19  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        REGRESSION (r130640 - r130644): TestCookieManager API test is failing
+        https://bugs.webkit.org/show_bug.cgi?id=98738
+
+        Reviewed by Philippe Normand.
+
+        * Scripts/run-gtk-tests:
+        (TestRunner): Unskip /webkit2/WebKitCookieManager/accept-policy.
+
+2012-10-19  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Update the RuntimeEnabledFeatures flags
+        https://bugs.webkit.org/show_bug.cgi?id=99714
+
+        Reviewed by Adam Barth.
+
+        Enabling the DeprecatedPeerConnection so that all tests still run.
+
+        * DumpRenderTree/chromium/TestShell.cpp:
+        (TestShell::TestShell):
+
+2012-10-18  Dominic Mazzoni  <dmazzoni@google.com>
+
+        AX: labelForElement is slow when there are a lot of DOM elements
+        https://bugs.webkit.org/show_bug.cgi?id=97825
+
+        Reviewed by Ryosuke Niwa.
+
+        Implement titleUIElement in the chromium port of DRT, and
+        fix getAccessibleElementById so that it ensures the backing store
+        is up-to-date.
+
+        * DumpRenderTree/chromium/TestRunner/AccessibilityControllerChromium.cpp:
+        (AccessibilityController::getAccessibleElementById):
+        * DumpRenderTree/chromium/TestRunner/AccessibilityUIElementChromium.cpp:
+        (AccessibilityUIElement::titleUIElementCallback):
+
+2012-10-17  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: NMI provide data for mixing with tcmalloc heap dumps.
+        https://bugs.webkit.org/show_bug.cgi?id=99457
+
+        Reviewed by Yury Semikhatsky.
+
+        countObjectSize now requires pointer to object as the first argument.
+
+        * TestWebKitAPI/Tests/WTF/MemoryInstrumentationTest.cpp:
+
+2012-10-18  Dirk Pranke  <dpranke@chromium.org>
+
+        make move_overwritten_baselines_to work again while rebaselining
+        https://bugs.webkit.org/show_bug.cgi?id=99793
+
+        Reviewed by Ojan Vafai.
+
+        We used to have code that would help when rebaselining results
+        for new ports (e.g., when moving from Lion to Mountain Lion) but
+        it appears that code bitrotted during all the refactoring since
+        the last time we needed this. This patch makes things work
+        again, adds more tests that will hopefully make clearer what
+        is supposed to work, and renames various parameters to be
+        consistent.
+
+        * Scripts/webkitpy/layout_tests/port/builders.py:
+        (move_overwritten_baselines_to):
+        (builder_path_for_port_name):
+        * Scripts/webkitpy/tool/commands/rebaseline.py:
+        (RebaselineTest.__init__):
+        (RebaselineTest._copy_existing_baseline):
+        (RebaselineTest._rebaseline_test):
+        (RebaselineTest.execute):
+        (AbstractParallelRebaselineCommand._rebaseline_commands):
+        * Scripts/webkitpy/tool/commands/rebaseline_unittest.py:
+        (test_rebaseline_json_with_move_overwritten_baselines_to):
+        (test_rebaseline_test_internal_with_move_overwritten_baselines_to):
+        * Scripts/webkitpy/tool/servers/gardeningserver_unittest.py:
+        (GardeningServerTest.test_rebaselineall):
+
 2012-10-18  Roger Fong  <roger_fong@apple.com>
 
         Unreviewed. Skip really old flaky failing jscore date test. 

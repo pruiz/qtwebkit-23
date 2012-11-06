@@ -1,3 +1,402 @@
+2012-10-19  Kent Tamura  <tkent@chromium.org>
+
+        Use Localizer::monthFormat to construct input[type=month] UI
+        https://bugs.webkit.org/show_bug.cgi?id=99818
+
+        Reviewed by Kentaro Hara.
+
+        Use an LDML format returned by Localizer::monthFormat for
+        input[type=month] UI.
+
+        Because the format may contain symbolic month names and symbolic
+        stand-alone month names, we need to add:
+         - Symbolic/numeric detection in DateTimeEditBuilder
+         - Normal/stand-alone detection in DateTimeEditBuilder
+         - Symbolic edit field for months
+
+        Test: fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n.html,
+              fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events.html
+
+        * html/MonthInputType.cpp:
+        (WebCore::MonthInputType::setupLayoutParameters):
+        Use Localizer::monthFormat.
+
+        * html/shadow/DateTimeEditElement.cpp:
+        (WebCore::DateTimeEditBuilder::visitField):
+        - If the number of continuous field character is greater than 2, use
+        DateTimeSymbolicMonthFieldElement.
+        - Supports stand-alone month field.
+
+        * html/shadow/DateTimeFieldElements.h:
+        (DateTimeSymbolicMonthFieldElement): Added. A subclass of DateTimeSymbolicFieldElement.
+        * html/shadow/DateTimeFieldElements.cpp:
+        (WebCore::DateTimeSymbolicMonthFieldElement::DateTimeSymbolicMonthFieldElement):
+        Added.
+        (WebCore::DateTimeSymbolicMonthFieldElement::create): Added.
+        (WebCore::DateTimeSymbolicMonthFieldElement::populateDateTimeFieldsState):
+        We need to add 1 because the internal integer representation is 0-based
+        and DateTimeFieldsState uses 1-based month.
+        (WebCore::DateTimeSymbolicMonthFieldElement::setValueAsDate):
+        DateComponents::month is 0-based.
+        (WebCore::DateTimeSymbolicMonthFieldElement::setValueAsDateTimeFieldsState):
+        We need to subtract 1 because the internal integer representation is 0-based
+        and DateTimeFieldsState uses 1-based month.
+
+        * html/shadow/DateTimeSymbolicFieldElement.h:
+        (WebCore::DateTimeSymbolicFieldElement::symbolsSize):
+        Added for DateTimeSymbolicMonthFieldElement::setValueAsDateTimeFieldsState.
+
+2012-10-19  Vsevolod Vlasov  <vsevik@chromium.org>
+
+        Web Inspector: inspector/styles/styles-history.html is failing Text on Windows and Linux
+        https://bugs.webkit.org/show_bug.cgi?id=99519
+
+        Reviewed by Alexander Pavlov.
+
+        Extracted _styleContentSet callback in a class method to make it sniffable by tests.
+
+        * inspector/front-end/StylesSourceMapping.js:
+        (WebInspector.StyleFile.prototype._commitIncrementalEdit):
+        (WebInspector.StyleFile.prototype._styleContentSet):
+
+2012-10-19  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: add object-src 'none' to the inspector.html
+        https://bugs.webkit.org/show_bug.cgi?id=99728
+
+        Reviewed by Vsevolod Vlasov.
+
+        * inspector/front-end/inspector.html:
+
+2012-10-19  Vsevolod Vlasov  <vsevik@chromium.org>
+
+        Web Inspector: Get rid of isSnippetEvaluation flag on UISourceCode
+        https://bugs.webkit.org/show_bug.cgi?id=99823
+
+        Reviewed by Yury Semikhatsky.
+
+        Replaced isSnippetEvaluation flag with a pair of isSnippet and isTemporary set.
+
+        * inspector/front-end/ResourceScriptMapping.js:
+        (WebInspector.ResourceScriptMapping.prototype._getOrCreateTemporaryUISourceCode):
+        * inspector/front-end/ScriptSnippetModel.js:
+        (WebInspector.ScriptSnippetModel.prototype._releasedUISourceCodes):
+        (WebInspector.ScriptSnippetModel.prototype._createUISourceCodeForScript):
+        * inspector/front-end/ScriptsNavigator.js:
+        (WebInspector.ScriptsNavigator.prototype._snippetsNavigatorViewForUISourceCode):
+        (WebInspector.ScriptsNavigator.prototype.revealUISourceCode):
+        * inspector/front-end/ScriptsPanel.js:
+        (WebInspector.ScriptsPanel.prototype._createSourceFrame):
+        * inspector/front-end/Workspace.js:
+        (WebInspector.Project.prototype.addTemporaryUISourceCode):
+
+2012-10-19  Alexander Pavlov  <apavlov@chromium.org>
+
+        Web Inspector: Invalid Regex in SASSSourceMapping/didRequestContent, breaks Support for Sass experiment
+        https://bugs.webkit.org/show_bug.cgi?id=99729
+
+        Reviewed by Vsevolod Vlasov.
+
+        Decode only the first line number digit written in a six-character escaped Unicode format.
+
+        * inspector/front-end/SASSSourceMapping.js:
+        (WebInspector.SASSSourceMapping.prototype._resourceAdded.didRequestContent):
+        (WebInspector.SASSSourceMapping.prototype._resourceAdded):
+
+2012-10-19  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Update the RuntimeEnabledFeatures flags
+        https://bugs.webkit.org/show_bug.cgi?id=99714
+
+        Reviewed by Adam Barth.
+
+        Updating the RuntimeEnabledFeatures flags to match reality:
+        isMediaStreamEnabled and isPeerConnectionEnabled should be true by default and
+        isDeprecatedPeerConnectionEnabled false.
+
+        Patch covered by existing tests.
+
+        * bindings/generic/RuntimeEnabledFeatures.cpp:
+        (WebCore):
+
+2012-10-19  Adam Barth  <abarth@webkit.org>
+
+        [V8] Simplify GCPrologueVisitor
+        https://bugs.webkit.org/show_bug.cgi?id=99819
+
+        Reviewed by Kentaro Hara.
+
+        Previously, GCPrologueVisitor used a complicated traits-based template
+        design. That's not necessary. We can just implement it directly without
+        template magic.
+
+        The one subtly here is that MessagePort is not actually a subclass of
+        ActiveDOMObject. The next stage of this cleanup is to make MessagePort
+        inherit from ActiveDOMObject and remove this special case entirely.
+
+        * bindings/v8/V8GCController.cpp:
+        (WebCore::EnsureWeakDOMNodeVisitor::visitDOMWrapper):
+        (WebCore):
+        (WebCore::ActiveDOMObjectPrologueVisitor::visitDOMWrapper):
+        (WebCore::NodeVisitor::visitDOMWrapper):
+        (WebCore::V8GCController::gcPrologue):
+
+2012-10-19  Eugene Klyuchnikov  <eustas.bug@gmail.com>
+
+        Web Inspector: Saving HAR, snapshots and timeline data do not work in remote debugging mode
+        https://bugs.webkit.org/show_bug.cgi?id=99179
+
+        Reviewed by Yury Semikhatsky.
+
+        Added method "close" to InspectorFrontendHost.
+        Symantically, this method forces to flush all unsaved buffers for
+        specified file. In native implementation this turns to be no-op.
+
+        In stub implementation "close" causes compilation of blob object an
+        navigating to blob-schema url.
+
+        Removed "canAppend", as appending in now suppurted
+        by all implementations.
+
+        Repaced schema "data" with "blob" in InspectorFrontendHostStub "save"
+        to avoid out-of-memory errors.
+
+        * inspector/InspectorFrontendHost.cpp:
+        (WebCore::InspectorFrontendHost::close): Compiles blob object and
+        navigates to blob-object url.
+        (WebCore):
+        * inspector/InspectorFrontendHost.h: Added "close" method.
+        * inspector/InspectorFrontendHost.idl: Ditto.
+        * inspector/front-end/FileManager.js:
+        (WebInspector.FileManager.prototype.close): Proxy to InspectorFrontend.
+        * inspector/front-end/FileUtils.js:
+        (WebInspector.FileOutputStream.prototype.close):
+        Invoke "close" on FileManager.
+        (WebInspector.FileOutputStream.prototype._onAppendDone): Ditto.
+        * inspector/front-end/HandlerRegistry.js: Added mandatory "close" call.
+        * inspector/front-end/HeapSnapshotView.js:
+        (WebInspector.HeapProfileHeader.prototype.canSaveToFile): Fixed check.
+        * inspector/front-end/InspectorFrontendHostStub.js:
+        (.WebInspector.InspectorFrontendHostStub):
+        Added "appendable" behaviour emulation.
+        * inspector/front-end/SourceFrame.js: Added mandatory "close" call.
+        * inspector/front-end/externs.js: Replaced "canAppend" with "close"
+
+2012-10-18  Dominic Mazzoni  <dmazzoni@google.com>
+
+        AX: labelForElement is slow when there are a lot of DOM elements
+        https://bugs.webkit.org/show_bug.cgi?id=97825
+
+        Reviewed by Ryosuke Niwa.
+
+        Adds a DocumentOrderedMap to TreeScope that allows accessibility to
+        quickly map from an id to the label for that id. This speeds up
+        AccessibilityNode::labelForElement, which was a bottleneck in Chromium
+        when accessibility was on.
+
+        Tests: accessibility/title-ui-element-correctness.html
+               perf/accessibility-title-ui-element.html
+
+        * accessibility/AccessibilityNodeObject.cpp:
+        (WebCore::AccessibilityNodeObject::labelForElement):
+        * dom/DocumentOrderedMap.cpp:
+        (WebCore::keyMatchesLabelForAttribute):
+        (WebCore):
+        (WebCore::DocumentOrderedMap::get):
+        (WebCore::DocumentOrderedMap::getElementByLabelForAttribute):
+        * dom/DocumentOrderedMap.h:
+        (DocumentOrderedMap):
+        * dom/Element.cpp:
+        (WebCore::Element::insertedInto):
+        (WebCore::Element::removedFrom):
+        (WebCore::Element::updateLabel):
+        (WebCore):
+        (WebCore::Element::willModifyAttribute):
+        * dom/Element.h:
+        (Element):
+        * dom/TreeScope.cpp:
+        (WebCore::TreeScope::TreeScope):
+        (WebCore::TreeScope::destroyTreeScopeData):
+        (WebCore::TreeScope::addLabel):
+        (WebCore):
+        (WebCore::TreeScope::removeLabel):
+        (WebCore::TreeScope::labelElementForId):
+        * dom/TreeScope.h:
+        (WebCore):
+        (TreeScope):
+        (WebCore::TreeScope::shouldCacheLabelsByForAttribute):
+
+2012-10-19  Eugene Klyuchnikov  <eustas.bug@gmail.com>
+
+        Web Inspector: Update localizedStrings.js
+        https://bugs.webkit.org/show_bug.cgi?id=99701
+
+        Reviewed by Yury Semikhatsky.
+
+        Fixed most of missing strings and orphans.
+
+        * English.lproj/localizedStrings.js:
+        * inspector/front-end/SettingsScreen.js:
+
+2012-10-17  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: NMI provide data for mixing with tcmalloc heap dumps.
+        https://bugs.webkit.org/show_bug.cgi?id=99457
+
+        Reviewed by Yury Semikhatsky.
+
+        countObjectSize now accepts ptr as the first argument and saves it into HashMap if the binary was ran with HEAPPROFILE env variable.
+        getProcessMemoryDistribution does snapshot and calls the downstream code with the map of counted objects.
+
+        * inspector/InspectorClient.h:
+        (WebCore::InspectorClient::dumpUncountedAllocatedObjects):
+        * inspector/InspectorMemoryAgent.cpp:
+        (WebCore::reportJSHeapInfo):
+        (WebCore::reportRenderTreeInfo):
+        (WebCore):
+        (WebCore::InspectorMemoryAgent::getProcessMemoryDistribution):
+        * inspector/MemoryInstrumentationImpl.cpp:
+        (WebCore::MemoryInstrumentationClientImpl::countObjectSize):
+        (WebCore::MemoryInstrumentationClientImpl::reportMemoryUsage):
+        * inspector/MemoryInstrumentationImpl.h:
+        (MemoryInstrumentationClientImpl):
+        (WebCore::MemoryInstrumentationClientImpl::countedObjects):
+
+2012-10-19  Adam Barth  <abarth@webkit.org>
+
+        [V8] DOMObjectVisitor does nothing
+        https://bugs.webkit.org/show_bug.cgi?id=99812
+
+        Reviewed by Kentaro Hara.
+
+        This code doesn't do anything, even in Debug! We should just remove it.
+
+        * bindings/v8/V8GCController.cpp:
+        (WebCore):
+        (WebCore::V8GCController::gcPrologue):
+        (WebCore::V8GCController::gcEpilogue):
+
+2012-10-19  Adam Barth  <abarth@webkit.org>
+
+        [V8] Remove unused typedef from V8GCController.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=99808
+
+        Reviewed by Kentaro Hara.
+
+        This typedef is not used.
+
+        * bindings/v8/V8GCController.cpp:
+
+2012-10-18  Alexander Pavlov  <apavlov@chromium.org>
+
+        Web Inspector: [Styles] Property considered overridden if it is non-inherited important property in inherited style
+        https://bugs.webkit.org/show_bug.cgi?id=99720
+
+        Reviewed by Yury Semikhatsky.
+
+        Non-inherited properties are now disregarded in inherited styles.
+
+        * inspector/front-end/StylesSidebarPane.js:
+        (WebInspector.StylesSidebarPane.prototype._refreshStyleRules):
+        (WebInspector.StylesSidebarPane.prototype._markUsedProperties):
+
+2012-10-18  Adam Barth  <abarth@webkit.org>
+
+        [V8] GrouperVisitor is secretly two entirely separate objects
+        https://bugs.webkit.org/show_bug.cgi?id=99810
+
+        Reviewed by Kentaro Hara.
+
+        We can separate out the two things that GrouperVisitor is trying to do
+        because they have nothing to do with each other.
+
+        * bindings/v8/V8GCController.cpp:
+        (ObjectVisitor):
+        (WebCore::ObjectVisitor::visitDOMWrapper):
+        (WebCore):
+        (WebCore::V8GCController::gcPrologue):
+
+2012-10-18  Kiran Muppala  <cmuppala@apple.com>
+
+        Automatically start plugins created within a user gesture, skipping snapshotting
+        https://bugs.webkit.org/show_bug.cgi?id=99778
+
+        Reviewed by Alexey Proskuryakov.
+
+        If a user gesture is being processed, do not set the display state of
+        HTMLPluginImageElement to WaitingForSnapshot.
+
+        No new tests, since it only affects when plugins switch from snapshot to running
+        state.  Does not affect rendering of other elements.
+
+        * html/HTMLPlugInImageElement.cpp:
+        (WebCore::HTMLPlugInImageElement::HTMLPlugInImageElement):
+
+2012-10-18  Kent Tamura  <tkent@chromium.org>
+
+        Add shortMonthLabels and shortStandAloneMonthLabels to Localizer
+        https://bugs.webkit.org/show_bug.cgi?id=99787
+
+        Reviewed by Kentaro Hara.
+
+        This is going to be used for input[type=month] UI. This doesn't affect
+        any bahevior yet.
+
+        Tests: Add some tests to Source/WebKit/chromium/tests/, and will add
+        layout tests later.
+
+        * platform/text/Localizer.h:
+        (Localizer): Add shortMonthLabels and shortStandAloneMonthLabels as pure
+        virtual member functions.
+
+        * platform/text/LocaleICU.h:
+        (LocaleICU): Declare shortMonthLabels and shortStandAloneMonthLabels.
+        * platform/text/LocaleICU.cpp:
+        (WebCore::LocaleICU::shortMonthLabels): Added.
+        (WebCore::LocaleICU::shortStandAloneMonthLabels): Added.
+
+        * platform/text/LocaleNone.cpp:
+        (LocaleNone): Declare shortMonthLabels and shortStandAloneMonthLabels.
+        (WebCore::LocaleNone::shortMonthLabels):
+        Added. Always returns English labels.
+        (WebCore::LocaleNone::shortStandAloneMonthLabels):
+        Addes. Just calls shortMonthLabels.
+
+        * platform/text/LocaleWin.h:
+        (LocaleWin): Declare shortMonthLabels and shortStandAloneMonthLabels.
+        * platform/text/LocaleWin.cpp:
+        (WebCore::LocaleWin::shortMonthLabels): Added.
+        (WebCore::LocaleWin::shortStandAloneMonthLabels):
+        Added. Always returns shortMonthLabels.
+
+        * platform/text/mac/LocaleMac.h:
+        (LocaleMac): Declare shortMonthLabels and shortStandAloneMonthLabels.
+        * platform/text/mac/LocaleMac.mm:
+        (WebCore::LocaleMac::shortMonthLabels): Added.
+        (WebCore::LocaleMac::shortStandAloneMonthLabels): Added.
+
+2012-10-18  Kunihiko Sakamoto  <ksakamoto@chromium.org>
+
+        Implement value sanitization algorithm for type=datetime
+        https://bugs.webkit.org/show_bug.cgi?id=76893
+
+        Reviewed by Kent Tamura.
+
+        Implement the value sanitization algorithm for type=datetime that adjusts
+        the value to a valid normalized forced-UTC global date and time string.
+        See http://www.whatwg.org/specs/web-apps/current-work/multipage/common-microsyntaxes.html#valid-normalized-forced-utc-global-date-and-time-string
+
+        Test: fast/forms/datetime/datetime-value-sanitization.html
+
+        * html/DateTimeInputType.cpp:
+        (WebCore::DateTimeInputType::sanitizeValue): Implemented.
+        (WebCore):
+        * html/DateTimeInputType.h:
+        (DateTimeInputType): Add sanitizeValue.
+        * platform/DateComponents.cpp:
+        (WebCore::DateComponents::addMinute): Fixed a bug that caused wrong adjustment
+        of timezone offset (e.g. 2012-10-17T01:00+01:00 -> 2012-10-17T01:-60Z).
+
 2012-10-18  Byungwoo Lee  <bw80.lee@samsung.com>
 
         Fix build warning.

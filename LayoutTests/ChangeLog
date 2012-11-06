@@ -1,3 +1,1109 @@
+2012-10-19  Zan Dobersek  <zandobersek@gmail.com>
+
+        [WK2][GTK] Fullscreen tests timing out in bots
+        https://bugs.webkit.org/show_bug.cgi?id=93973
+
+        Reviewed by Philippe Normand.
+
+        Remove failure expectations for the fullscreen tests. They all pass now,
+        with a pass expectation needed for one test to aknowledge that.
+
+        * platform/gtk-wk2/TestExpectations:
+
+2012-10-19  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Test expectation update
+        http://webkit.org/b/99818
+
+        month-multiple-fields-keyboard-events.html is failing on SnowLeopard too.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-19  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] Pixel tests need rebaseline
+        https://bugs.webkit.org/show_bug.cgi?id=99323
+
+        Unreviewed pixel rebaseline.
+
+        Part 7.
+        Rebaseline the rest of pixel results. All of these tests producing correct results,
+        only the expectations were outdated. Most of the differenes was not detectable by
+        looking at the expected and actual results, only ImageDiff sees the difference.
+
+        * platform/qt/http/tests/misc/acid2-expected.png:
+        * platform/qt/ietestcenter/css3/bordersbackgrounds/background-size-aspect-ratio-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug101674-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug10269-2-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug10633-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug1067-2-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug113235-1-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug1188-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug126742-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug1302-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug137388-2-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug1430-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug17130-1-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug17130-2-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug22019-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug23235-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug2479-1-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug2479-3-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug2479-4-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug2886-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug2947-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug2962-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug6404-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug73321-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug86708-expected.png:
+        * platform/qt/tables/mozilla/bugs/bug8950-expected.png:
+        * platform/qt/tables/mozilla/collapsing_borders/bug41262-3-expected.png:
+        * platform/qt/tables/mozilla/core/bloomberg-expected.png:
+        * platform/qt/tables/mozilla/core/col_widths_auto_autoFix-expected.png:
+        * platform/qt/tables/mozilla/core/one_row-expected.png:
+        * platform/qt/tables/mozilla/marvin/backgr_index-expected.png:
+        * platform/qt/tables/mozilla/marvin/backgr_layers-opacity-expected.png:
+        * platform/qt/tables/mozilla/marvin/backgr_position-table-expected.png:
+        * platform/qt/tables/mozilla/marvin/backgr_simple-table-cell-expected.png:
+        * platform/qt/tables/mozilla/marvin/backgr_simple-table-column-expected.png:
+        * platform/qt/tables/mozilla/marvin/backgr_simple-table-column-group-expected.png:
+        * platform/qt/tables/mozilla/marvin/backgr_simple-table-expected.png:
+        * platform/qt/tables/mozilla/marvin/backgr_simple-table-row-expected.png:
+        * platform/qt/tables/mozilla/marvin/backgr_simple-table-row-group-expected.png:
+        * platform/qt/tables/mozilla/marvin/tbody_valign_baseline-expected.png:
+        * platform/qt/tables/mozilla/marvin/tbody_valign_bottom-expected.png:
+        * platform/qt/tables/mozilla/marvin/tbody_valign_middle-expected.png:
+        * platform/qt/tables/mozilla/marvin/tbody_valign_top-expected.png:
+        * platform/qt/tables/mozilla/marvin/td_valign_baseline-expected.png:
+        * platform/qt/tables/mozilla/marvin/td_valign_bottom-expected.png:
+        * platform/qt/tables/mozilla/marvin/td_valign_middle-expected.png:
+        * platform/qt/tables/mozilla/marvin/td_valign_top-expected.png:
+        * platform/qt/tables/mozilla/marvin/tfoot_valign_baseline-expected.png:
+        * platform/qt/tables/mozilla/marvin/tfoot_valign_bottom-expected.png:
+        * platform/qt/tables/mozilla/marvin/tfoot_valign_middle-expected.png:
+        * platform/qt/tables/mozilla/marvin/tfoot_valign_top-expected.png:
+        * platform/qt/tables/mozilla/marvin/th_valign_baseline-expected.png:
+        * platform/qt/tables/mozilla/marvin/th_valign_bottom-expected.png:
+        * platform/qt/tables/mozilla/marvin/th_valign_middle-expected.png:
+        * platform/qt/tables/mozilla/marvin/th_valign_top-expected.png:
+        * platform/qt/tables/mozilla/marvin/thead_valign_baseline-expected.png:
+        * platform/qt/tables/mozilla/marvin/thead_valign_bottom-expected.png:
+        * platform/qt/tables/mozilla/marvin/thead_valign_middle-expected.png:
+        * platform/qt/tables/mozilla/marvin/thead_valign_top-expected.png:
+        * platform/qt/tables/mozilla/marvin/tr_valign_baseline-expected.png:
+        * platform/qt/tables/mozilla/marvin/tr_valign_bottom-expected.png:
+        * platform/qt/tables/mozilla/marvin/tr_valign_middle-expected.png:
+        * platform/qt/tables/mozilla/marvin/tr_valign_top-expected.png:
+        * platform/qt/tables/mozilla/other/cell_widths-expected.png:
+        * platform/qt/tables/mozilla/other/wa_table_thtd_rowspan-expected.png:
+        * platform/qt/tables/mozilla/other/wa_table_tr_align-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/bugs/bug1010-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/bugs/bug1055-2-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/bugs/bug80762-2-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_border-table-cell-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_border-table-column-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_border-table-column-group-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_border-table-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_border-table-quirks-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_border-table-row-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_border-table-row-group-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_fixed-bg-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_layers-hide-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_position-table-cell-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_position-table-column-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_position-table-column-group-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_position-table-row-expected.png:
+        * platform/qt/tables/mozilla_expected_failures/marvin/backgr_position-table-row-group-expected.png:
+        * platform/qt/transforms/3d/general/matrix-with-zoom-3d-expected.png: Copied from LayoutTests/platform/qt/tables/mozilla/bugs/bug1067-2-expected.png.
+        * platform/qt/transforms/3d/point-mapping/3d-point-mapping-2-expected.png:
+        * platform/qt/transforms/3d/point-mapping/3d-point-mapping-coplanar-expected.png: Added.
+        * platform/qt/transforms/3d/point-mapping/3d-point-mapping-deep-expected.png:
+        * platform/qt/transforms/3d/point-mapping/3d-point-mapping-expected.png:
+        * platform/qt/transforms/3d/point-mapping/3d-point-mapping-overlapping-expected.png: Added.
+        * platform/qt/transforms/3d/point-mapping/3d-point-mapping-preserve-3d-expected.png:
+        * platform/qt/transitions/suspend-transform-transition-expected.png: Copied from LayoutTests/platform/qt/tables/mozilla/bugs/bug1067-2-expected.png.
+
+2012-10-19  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] Pixel tests need rebaseline
+        https://bugs.webkit.org/show_bug.cgi?id=99323
+
+        Unreviewed pixel rebaseline.
+
+        Part 6.
+        Rebaseline pixel results in the svg directory.
+        All of these tests producing correct results, only the expectations
+        were outdated. Most of the differenes was not detectable by looking
+        at the expected and actual results, only ImageDiff sees the difference.
+
+        * platform/qt/svg/W3C-SVG-1.1-SE/filters-image-03-f-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1-SE/paths-dom-02-f-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1-SE/pservers-pattern-04-f-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1-SE/text-tspan-02-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-04-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-05-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-06-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-07-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-09-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-10-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-11-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-12-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-14-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-15-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-16-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-17-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-18-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/animate-elem-19-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/coords-viewattr-02-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/coords-viewattr-03-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/filters-blend-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/filters-color-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/filters-comptran-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/filters-gauss-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/filters-light-01-f-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/filters-morph-01-f-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/interact-events-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/interact-order-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/interact-order-02-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/interact-order-03-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/masking-opacity-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/masking-path-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/masking-path-02-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/masking-path-03-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/masking-path-04-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/painting-fill-02-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/painting-fill-03-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/painting-stroke-01-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/painting-stroke-02-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/painting-stroke-03-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/painting-stroke-04-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/pservers-grad-06-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/pservers-grad-07-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/pservers-grad-09-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/pservers-pattern-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/render-groups-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/render-groups-03-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/script-handle-04-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/struct-dom-04-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/struct-dom-05-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/struct-image-02-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/struct-image-10-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/struct-symbol-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-align-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-align-02-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-align-03-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-align-04-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-align-06-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-altglyph-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-fonts-02-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-path-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-spacing-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-text-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-text-03-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-text-07-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-tselect-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-tspan-01-b-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-ws-01-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/text-ws-02-t-expected.png:
+        * platform/qt/svg/W3C-SVG-1.1/types-basicDOM-01-b-expected.png:
+        * platform/qt/svg/animations/animateMotion-additive-2c-expected.png: Added.
+        * platform/qt/svg/animations/animateMotion-additive-2d-expected.png: Added.
+        * platform/qt/svg/as-border-image/svg-as-border-image-expected.png:
+        * platform/qt/svg/as-image/img-preserveAspectRatio-support-1-expected.png:
+        * platform/qt/svg/as-image/img-preserveAspectRatio-support-2-expected.png:
+        * platform/qt/svg/as-object/embedded-svg-immediate-offsetWidth-query-expected.png:
+        * platform/qt/svg/css/text-shadow-multiple-expected.png:
+        * platform/qt/svg/custom/absolute-sized-content-with-resources-expected.png:
+        * platform/qt/svg/custom/altglyph-expected.png:
+        * platform/qt/svg/custom/focus-ring-expected.png:
+        * platform/qt/svg/custom/glyph-selection-lang-attribute-expected.png:
+        * platform/qt/svg/custom/gradient-stroke-width-expected.png:
+        * platform/qt/svg/custom/grayscale-gradient-mask-2-expected.png:
+        * platform/qt/svg/custom/grayscale-gradient-mask-expected.png:
+        * platform/qt/svg/custom/image-rescale-expected.png:
+        * platform/qt/svg/custom/image-small-width-height-expected.png:
+        * platform/qt/svg/custom/relative-sized-image-expected.png:
+        * platform/qt/svg/custom/text-rotation-expected.png:
+        * platform/qt/svg/dom/css-transforms-expected.png:
+        * platform/qt/svg/filters/feDropShadow-expected.png:
+        * platform/qt/svg/filters/filterRes1-expected.png:
+        * platform/qt/svg/filters/filterRes3-expected.png:
+        * platform/qt/svg/hixie/perf/004-expected.png:
+        * platform/qt/svg/hixie/use/002-expected.png:
+        * platform/qt/svg/text/multichar-glyph-expected.png:
+        * platform/qt/svg/text/select-textLength-spacing-squeeze-1-expected.png:
+        * platform/qt/svg/text/select-textLength-spacing-squeeze-2-expected.png:
+        * platform/qt/svg/text/select-textLength-spacing-squeeze-4-expected.png:
+        * platform/qt/svg/text/select-textLength-spacing-stretch-2-expected.png:
+        * platform/qt/svg/text/select-textLength-spacing-stretch-3-expected.png:
+        * platform/qt/svg/text/select-textLength-spacing-stretch-4-expected.png:
+        * platform/qt/svg/text/select-textLength-spacingAndGlyphs-stretch-4-expected.png:
+        * platform/qt/svg/text/select-x-list-2-expected.png:
+        * platform/qt/svg/text/select-x-list-3-expected.png:
+        * platform/qt/svg/text/select-x-list-4-expected.png:
+        * platform/qt/svg/text/select-x-list-with-tspans-2-expected.png:
+        * platform/qt/svg/text/select-x-list-with-tspans-3-expected.png:
+        * platform/qt/svg/text/select-x-list-with-tspans-4-expected.png:
+        * platform/qt/svg/text/selection-doubleclick-expected.png:
+        * platform/qt/svg/transforms/text-with-pattern-inside-transformed-html-expected.png:
+        * platform/qt/svg/transforms/text-with-pattern-with-svg-transform-expected.png:
+        * platform/qt/svg/zoom/page/zoom-img-preserveAspectRatio-support-1-expected.png:
+        * platform/qt/svg/zoom/page/zoom-mask-with-percentages-expected.png:
+        * platform/qt/svg/zoom/page/zoom-svg-through-object-with-auto-size-expected.png:
+        * platform/qt/svg/zoom/page/zoom-svg-through-object-with-percentage-size-expected.png:
+
+2012-10-19  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] Pixel tests need rebaseline
+        https://bugs.webkit.org/show_bug.cgi?id=99323
+
+        Unreviewed pixel rebaseline.
+
+        Part 5.
+        Rebaseline pixel results the rest of the fast directory.
+        All of these tests producing correct results, only the expectations
+        were outdated. Most of the differenes was not detectable by looking
+        at the expected and actual results, only ImageDiff sees the difference.
+
+        * platform/qt/fast/dom/Element/class-attribute-whitespace-expected.png:
+        * platform/qt/fast/dom/HTMLLinkElement/pending-stylesheet-count-expected.png:
+        * platform/qt/fast/dom/children-nodes-expected.png:
+        * platform/qt/fast/dom/clone-node-dynamic-style-expected.png:
+        * platform/qt/fast/dynamic/create-renderer-for-whitespace-only-text-expected.png:
+        * platform/qt/fast/dynamic/float-in-trailing-whitespace-after-last-line-break-expected.png:
+        * platform/qt/fast/dynamic/insert-before-table-part-in-continuation-expected.png:
+        * platform/qt/fast/dynamic/selection-highlight-adjust-expected.png:
+        * platform/qt/fast/dynamic/staticY-marking-parents-regression-expected.png:
+        * platform/qt/fast/dynamic/window-resize-scrollbars-test-expected.png:
+        * platform/qt/fast/events/pointer-events-2-expected.png:
+        * platform/qt/fast/forms/listbox-scrollbar-incremental-load-expected.png:
+        * platform/qt/fast/forms/select-change-listbox-size-expected.png:
+        * platform/qt/fast/images/color-jpeg-with-color-profile-expected.png:
+        * platform/qt/fast/images/imagemap-focus-ring-zero-outline-width-expected.png:
+        * platform/qt/fast/inline/br-text-decoration-expected.png:
+        * platform/qt/fast/inline/continuation-outlines-expected.png:
+        * platform/qt/fast/inline/inline-borders-with-bidi-override-expected.png:
+        * platform/qt/fast/inline/inline-box-background-expected.png:
+        * platform/qt/fast/inline/inline-box-background-long-image-expected.png:
+        * platform/qt/fast/inline/inline-box-background-repeat-x-expected.png:
+        * platform/qt/fast/inline/inline-box-background-repeat-y-expected.png:
+        * platform/qt/fast/layers/normal-flow-hit-test-expected.png:
+        * platform/qt/fast/layers/opacity-outline-expected.png:
+        * platform/qt/fast/layers/scroll-rect-to-visible-expected.png:
+        * platform/qt/fast/line-grid/line-grid-contains-value-expected.png:
+        * platform/qt/fast/line-grid/line-grid-inside-columns-expected.png:
+        * platform/qt/fast/line-grid/line-grid-into-columns-expected.png:
+        * platform/qt/fast/lists/003-expected.png:
+        * platform/qt/fast/lists/003-vertical-expected.png:
+        * platform/qt/fast/lists/marker-before-empty-inline-expected.png:
+        * platform/qt/fast/lists/marker-image-error-expected.png:
+        * platform/qt/fast/lists/markers-in-selection-expected.png:
+        * platform/qt/fast/lists/ordered-list-with-no-ol-tag-expected.png:
+        * platform/qt/fast/lists/scrolled-marker-paint-expected.png:
+        * platform/qt/fast/multicol/column-rules-expected.png:
+        * platform/qt/fast/multicol/column-rules-stacking-expected.png:
+        * platform/qt/fast/multicol/columns-shorthand-parsing-expected.png:
+        * platform/qt/fast/multicol/float-multicol-expected.png:
+        * platform/qt/fast/multicol/nested-columns-expected.png:
+        * platform/qt/fast/multicol/overflow-across-columns-percent-height-expected.png:
+        * platform/qt/fast/multicol/positioned-with-constrained-height-expected.png:
+        * platform/qt/fast/multicol/span/anonymous-style-inheritance-expected.png:
+        * platform/qt/fast/multicol/span/span-as-immediate-child-complex-splitting-expected.png:
+        * platform/qt/fast/multicol/span/span-as-immediate-child-generated-content-expected.png:
+        * platform/qt/fast/multicol/span/span-as-immediate-child-property-removal-expected.png:
+        * platform/qt/fast/multicol/span/span-as-immediate-columns-child-dynamic-expected.png:
+        * platform/qt/fast/multicol/span/span-as-immediate-columns-child-expected.png:
+        * platform/qt/fast/multicol/span/span-as-immediate-columns-child-removal-expected.png:
+        * platform/qt/fast/multicol/span/span-as-nested-columns-child-dynamic-expected.png:
+        * platform/qt/fast/multicol/span/span-as-nested-columns-child-expected.png:
+        * platform/qt/fast/multicol/span/span-margin-collapsing-expected.png:
+        * platform/qt/fast/multicol/vertical-lr/column-rules-expected.png:
+        * platform/qt/fast/multicol/vertical-lr/float-paginate-complex-expected.png:
+        * platform/qt/fast/multicol/vertical-lr/nested-columns-expected.png:
+        * platform/qt/fast/multicol/vertical-rl/column-rules-expected.png:
+        * platform/qt/fast/multicol/vertical-rl/float-paginate-complex-expected.png:
+        * platform/qt/fast/multicol/vertical-rl/nested-columns-expected.png:
+        * platform/qt/fast/overflow/hit-test-overflow-controls-expected.png:
+        * platform/qt/fast/overflow/image-selection-highlight-expected.png:
+        * platform/qt/fast/overflow/overflow-focus-ring-expected.png:
+        * platform/qt/fast/overflow/overflow-rtl-inline-scrollbar-expected.png:
+        * platform/qt/fast/overflow/paged-x-div-expected.png:
+        * platform/qt/fast/overflow/paged-x-on-root-expected.png:
+        * platform/qt/fast/overflow/paged-y-div-expected.png:
+        * platform/qt/fast/overflow/paged-y-on-root-expected.png:
+        * platform/qt/fast/overflow/position-fixed-transform-clipping-expected.png:
+        * platform/qt/fast/reflections/reflection-direction-expected.png:
+        * platform/qt/fast/reflections/reflection-with-zoom-expected.png:
+        * platform/qt/fast/regions/percentage-margins-mixed-ltr-dominant-regions-expected.png:
+        * platform/qt/fast/regions/percentage-margins-mixed-rtl-dominant-regions-expected.png:
+        * platform/qt/fast/regions/percentage-margins-rtl-variable-width-regions-expected.png:
+        * platform/qt/fast/regions/percentage-margins-variable-width-regions-expected.png:
+        * platform/qt/fast/repaint/float-overflow-expected.png:
+        * platform/qt/fast/repaint/float-overflow-right-expected.png:
+        * platform/qt/fast/repaint/overflow-scroll-body-appear-expected.png:
+        * platform/qt/fast/replaced/001-expected.png:
+        * platform/qt/fast/replaced/002-expected.png:
+        * platform/qt/fast/replaced/003-expected.png:
+        * platform/qt/fast/replaced/absolute-image-sizing-expected.png:
+        * platform/qt/fast/replaced/image-sizing-expected.png:
+        * platform/qt/fast/replaced/inline-box-wrapper-handover-expected.png:
+        * platform/qt/fast/replaced/selection-rect-in-table-cell-expected.png:
+        * platform/qt/fast/ruby/ruby-block-style-not-updated-expected.png: Added.
+        * platform/qt/fast/ruby/ruby-block-style-not-updated-with-before-after-content-expected.png: Added.
+        * platform/qt/fast/ruby/ruby-inline-style-not-updated-expected.png: Added.
+        * platform/qt/fast/ruby/ruby-inline-style-not-updated-with-before-after-content-expected.png: Added.
+        * platform/qt/fast/selectors/166-expected.png:
+        * platform/qt/fast/table/border-collapsing/004-expected.png:
+        * platform/qt/fast/table/border-collapsing/004-vertical-expected.png:
+        * platform/qt/fast/table/border-collapsing/rtl-border-collapsing-expected.png:
+        * platform/qt/fast/table/border-collapsing/rtl-border-collapsing-vertical-expected.png:
+        * platform/qt/fast/table/edge-offsets-expected.png:
+        * platform/qt/fast/table/fixed-with-auto-with-colspan-vertical-expected.png:
+        * platform/qt/fast/table/frame-and-rules-expected.png:
+        * platform/qt/fast/table/prepend-in-anonymous-table-expected.png:
+        * platform/qt/fast/table/table-row-style-not-updated-expected.png: Added.
+        * platform/qt/fast/table/table-row-style-not-updated-with-before-content-expected.png: Added.
+        * platform/qt/fast/table/table-style-not-updated-expected.png: Added.
+        * platform/qt/fast/text/backslash-to-yen-sign-euc-expected.png:
+        * platform/qt/fast/text/break-word-expected.png:
+        * platform/qt/fast/text/capitalize-empty-generated-string-expected.png:
+        * platform/qt/fast/text/capitalize-preserve-nbsp-expected.png:
+        * platform/qt/fast/text/delete-hard-break-character-expected.png:
+        * platform/qt/fast/text/hyphenate-limit-lines-expected.png:
+        * platform/qt/fast/text/midword-break-hang-expected.png:
+        * platform/qt/fast/text/reset-emptyRun-expected.png:
+        * platform/qt/fast/text/selection-hard-linebreak-expected.png:
+        * platform/qt/fast/text/stroking-decorations-expected.png:
+        * platform/qt/fast/text/text-letter-spacing-expected.png:
+        * platform/qt/fast/text/wbr-expected.png:
+        * platform/qt/fast/text/whitespace/018-expected.png:
+        * platform/qt/fast/text/whitespace/normal-after-nowrap-breaking-expected.png:
+        * platform/qt/fast/text/whitespace/pre-wrap-overflow-selection-expected.png:
+        * platform/qt/fast/transforms/shadows-expected.png:
+        * platform/qt/fast/transforms/transformed-caret-expected.png:
+        * platform/qt/fast/transforms/transforms-with-zoom-expected.png:
+        * platform/qt/fast/writing-mode/box-shadow-vertical-rl-expected.png:
+        * platform/qt/fast/writing-mode/english-lr-text-expected.png:
+
+2012-10-19  Kent Tamura  <tkent@chromium.org>
+
+        Use Localizer::monthFormat to construct input[type=month] UI
+        https://bugs.webkit.org/show_bug.cgi?id=99818
+
+        Reviewed by Kentaro Hara.
+
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.txt: Added.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n.html: Added.
+        * fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events-expected.txt:
+        * fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events.html:
+        Updated because symbolic month fields don't support digit-key input.
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png: Added.
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-10-19  Vsevolod Vlasov  <vsevik@chromium.org>
+
+        Web Inspector: inspector/styles/styles-history.html is failing Text on Windows and Linux
+        https://bugs.webkit.org/show_bug.cgi?id=99519
+
+        Reviewed by Alexander Pavlov.
+
+        * inspector/styles/styles-history.html:
+        * platform/chromium/TestExpectations:
+
+2012-10-19  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] Pixel tests need rebaseline
+        https://bugs.webkit.org/show_bug.cgi?id=99323
+
+        Unreviewed pixel rebase.
+
+        Part 4.
+        Rebaseline pixel results in first part of fast (backgrounds, block, borders,
+        box-shadow, css). All of these tests producing correct results, only the expectations
+        were outdated. Most of the differenes was not detectable by looking at the expected
+        and actual results, only ImageDiff sees the difference.
+
+        * platform/qt/fast/backgrounds/background-inherit-color-bug-expected.png:
+        * platform/qt/fast/backgrounds/background-position-parsing-expected.png:
+        * platform/qt/fast/backgrounds/body-generated-image-propagated-to-root-expected.png:
+        * platform/qt/fast/backgrounds/repeat/mask-negative-offset-repeat-expected.png:
+        * platform/qt/fast/backgrounds/repeat/negative-offset-repeat-expected.png:
+        * platform/qt/fast/backgrounds/repeat/negative-offset-repeat-transformed-expected.png:
+        * platform/qt/fast/backgrounds/size/backgroundSize15-expected.png:
+        * platform/qt/fast/backgrounds/size/backgroundSize16-expected.png:
+        * platform/qt/fast/backgrounds/size/contain-and-cover-expected.png: Added.
+        * platform/qt/fast/backgrounds/size/contain-and-cover-zoomed-expected.png:
+        * platform/qt/fast/block/basic/adding-near-anonymous-block-expected.png:
+        * platform/qt/fast/block/basic/truncation-rtl-expected.png:
+        * platform/qt/fast/block/float/002-expected.png:
+        * platform/qt/fast/block/float/020-expected.png:
+        * platform/qt/fast/block/float/centered-float-avoidance-complexity-expected.png:
+        * platform/qt/fast/block/float/float-in-float-painting-expected.png:
+        * platform/qt/fast/block/float/intruding-painted-twice-expected.png:
+        * platform/qt/fast/block/float/nopaint-after-layer-destruction-expected.png:
+        * platform/qt/fast/block/float/nopaint-after-layer-destruction2-expected.png:
+        * platform/qt/fast/block/float/table-relayout-expected.png:
+        * platform/qt/fast/block/float/vertical-move-relayout-expected.png:
+        * platform/qt/fast/block/margin-collapse/055-expected.png:
+        * platform/qt/fast/block/positioning/absolute-in-inline-ltr-3-expected.png:
+        * platform/qt/fast/block/positioning/absolute-in-inline-short-ltr-expected.png:
+        * platform/qt/fast/block/positioning/absolute-in-inline-short-rtl-expected.png:
+        * platform/qt/fast/block/positioning/auto/007-expected.png:
+        * platform/qt/fast/block/positioning/auto/vertical-lr/007-expected.png:
+        * platform/qt/fast/block/positioning/auto/vertical-rl/007-expected.png:
+        * platform/qt/fast/borders/border-image-01-expected.png:
+        * platform/qt/fast/borders/border-image-border-radius-expected.png:
+        * platform/qt/fast/borders/border-image-longhand-expected.png:
+        * platform/qt/fast/borders/border-image-massive-scale-expected.png:
+        * platform/qt/fast/borders/border-image-outset-expected.png:
+        * platform/qt/fast/borders/border-image-outset-in-shorthand-expected.png:
+        * platform/qt/fast/borders/border-image-repeat-expected.png:
+        * platform/qt/fast/borders/border-image-rotate-transform-expected.png:
+        * platform/qt/fast/borders/border-image-scale-transform-expected.png:
+        * platform/qt/fast/borders/border-image-scaled-expected.png:
+        * platform/qt/fast/borders/border-image-scrambled-expected.png:
+        * platform/qt/fast/borders/border-image-side-reduction-expected.png:
+        * platform/qt/fast/borders/border-image-source-expected.png:
+        * platform/qt/fast/borders/border-mixed-alpha-expected.png:
+        * platform/qt/fast/borders/border-radius-complex-inner-expected.png:
+        * platform/qt/fast/borders/border-radius-different-width-001-expected.png:
+        * platform/qt/fast/borders/rtl-border-01-expected.png:
+        * platform/qt/fast/borders/rtl-border-02-expected.png:
+        * platform/qt/fast/borders/rtl-border-03-expected.png:
+        * platform/qt/fast/borders/rtl-border-04-expected.png:
+        * platform/qt/fast/box-shadow/spread-expected.png:
+        * platform/qt/fast/canvas/arc360-expected.png:
+        * platform/qt/fast/canvas/canvas-before-css-expected.png:
+        * platform/qt/fast/canvas/canvas-composite-expected.png:
+        * platform/qt/fast/canvas/canvas-text-alignment-expected.png:
+        * platform/qt/fast/canvas/canvas-text-baseline-expected.png:
+        * platform/qt/fast/canvas/canvasDrawingIntoSelf-expected.png:
+        * platform/qt/fast/canvas/check-stale-putImageData-expected.png: Added.
+        * platform/qt/fast/canvas/drawImage-expected.png:
+        * platform/qt/fast/canvas/drawImage-with-globalAlpha-expected.png:
+        * platform/qt/fast/canvas/fill-stroke-clip-reset-path-expected.png:
+        * platform/qt/fast/canvas/fillrect-gradient-zero-stops-expected.png:
+        * platform/qt/fast/canvas/fillrect_gradient-expected.png:
+        * platform/qt/fast/canvas/image-object-in-canvas-expected.png:
+        * platform/qt/fast/canvas/patternfill-repeat-expected.png:
+        * platform/qt/fast/canvas/quadraticCurveTo-expected.png:
+        * platform/qt/fast/canvas/shadow-offset-1-expected.png:
+        * platform/qt/fast/canvas/shadow-offset-2-expected.png:
+        * platform/qt/fast/canvas/shadow-offset-3-expected.png:
+        * platform/qt/fast/canvas/shadow-offset-4-expected.png:
+        * platform/qt/fast/canvas/shadow-offset-5-expected.png:
+        * platform/qt/fast/canvas/shadow-offset-6-expected.png:
+        * platform/qt/fast/canvas/shadow-offset-7-expected.png:
+        * platform/qt/fast/canvas/zero-size-fill-rect-expected.png:
+        * platform/qt/fast/css/absolute-child-with-percent-height-inside-relative-parent-expected.png:
+        * platform/qt/fast/css/acid2-expected.png:
+        * platform/qt/fast/css/clip-zooming-expected.png:
+        * platform/qt/fast/css/css1_forward_compatible_parsing-expected.png:
+        * platform/qt/fast/css/css2-system-fonts-expected.png:
+        * platform/qt/fast/css/empty-pseudo-class-expected.png:
+        * platform/qt/fast/css/find-next-layer-expected.png:
+        * platform/qt/fast/css/first-child-pseudo-class-expected.png:
+        * platform/qt/fast/css/first-letter-capitalized-expected.png:
+        * platform/qt/fast/css/first-letter-detach-expected.png:
+        * platform/qt/fast/css/first-letter-hover-expected.png:
+        * platform/qt/fast/css/first-line-text-decoration-expected.png:
+        * platform/qt/fast/css/first-line-text-decoration-inherited-from-parent-expected.png:
+        * platform/qt/fast/css/first-of-type-pseudo-class-expected.png:
+        * platform/qt/fast/css/focus-ring-multiline-expected.png:
+        * platform/qt/fast/css/font-face-opentype-expected.png:
+        * platform/qt/fast/css/font-face-synthetic-bold-italic-expected.png:
+        * platform/qt/fast/css/font-face-weight-matching-expected.png:
+        * platform/qt/fast/css/font-shorthand-weight-only-expected.png:
+        * platform/qt/fast/css/hover-subselector-expected.png:
+        * platform/qt/fast/css/hsl-color-expected.png:
+        * platform/qt/fast/css/last-child-pseudo-class-expected.png:
+        * platform/qt/fast/css/last-of-type-pseudo-class-expected.png:
+        * platform/qt/fast/css/line-height-font-order-expected.png:
+        * platform/qt/fast/css/margin-top-bottom-dynamic-expected.png:
+        * platform/qt/fast/css/min-width-with-spanned-cell-expected.png: Added.
+        * platform/qt/fast/css/min-width-with-spanned-cell-fixed-expected.png: Added.
+        * platform/qt/fast/css/nth-child-dynamic-expected.png:
+        * platform/qt/fast/css/only-child-pseudo-class-expected.png:
+        * platform/qt/fast/css/only-of-type-pseudo-class-expected.png:
+        * platform/qt/fast/css/outline-auto-empty-rects-expected.png:
+        * platform/qt/fast/css/outline-auto-location-expected.png:
+        * platform/qt/fast/css/percent-top-value-with-relative-position-expected.png:
+        * platform/qt/fast/css/text-rendering-expected.png:
+        * platform/qt/fast/css/universal-hover-quirk-expected.png:
+
+2012-10-19  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] Pixel tests need rebaseline
+        https://bugs.webkit.org/show_bug.cgi?id=99323
+
+        Unreviewed rebaseline.
+
+        Part 3.
+        Rebase pixel results in editing. All of these tests producing correct results,
+        only the expectations were outdated.
+
+        * platform/qt/editing/deleting/4922367-expected.png:
+        * platform/qt/editing/deleting/5099303-expected.png:
+        * platform/qt/editing/deleting/5144139-2-expected.png:
+        * platform/qt/editing/deleting/5483370-expected.png:
+        * platform/qt/editing/deleting/collapse-whitespace-3587601-fix-expected.png:
+        * platform/qt/editing/deleting/delete-3608462-fix-expected.png:
+        * platform/qt/editing/deleting/delete-4083333-fix-expected.png:
+        * platform/qt/editing/deleting/delete-and-undo-expected.png:
+        * platform/qt/editing/deleting/delete-at-paragraph-boundaries-003-expected.png:
+        * platform/qt/editing/deleting/delete-at-paragraph-boundaries-004-expected.png:
+        * platform/qt/editing/deleting/delete-at-paragraph-boundaries-005-expected.png:
+        * platform/qt/editing/deleting/delete-at-paragraph-boundaries-006-expected.png:
+        * platform/qt/editing/deleting/delete-at-paragraph-boundaries-008-expected.png:
+        * platform/qt/editing/deleting/delete-at-paragraph-boundaries-010-expected.png:
+        * platform/qt/editing/deleting/delete-at-paragraph-boundaries-011-expected.png:
+        * platform/qt/editing/deleting/delete-block-contents-001-expected.png:
+        * platform/qt/editing/deleting/delete-block-contents-002-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-001-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-002-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-003-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-004-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-009-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-010-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-011-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-012-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-013-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-014-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-015-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-016-expected.png:
+        * platform/qt/editing/deleting/delete-block-merge-contents-017-expected.png:
+        * platform/qt/editing/deleting/delete-br-001-expected.png:
+        * platform/qt/editing/deleting/delete-br-007-expected.png:
+        * platform/qt/editing/deleting/delete-br-013-expected.png:
+        * platform/qt/editing/deleting/delete-character-001-expected.png:
+        * platform/qt/editing/deleting/delete-contiguous-ws-001-expected.png:
+        * platform/qt/editing/deleting/delete-first-list-item-expected.png:
+        * platform/qt/editing/deleting/delete-image-001-expected.png:
+        * platform/qt/editing/deleting/delete-image-003-expected.png:
+        * platform/qt/editing/deleting/delete-image-004-expected.png:
+        * platform/qt/editing/deleting/delete-leading-ws-001-expected.png:
+        * platform/qt/editing/deleting/delete-line-015-expected.png:
+        * platform/qt/editing/deleting/delete-line-016-expected.png:
+        * platform/qt/editing/deleting/delete-line-017-expected.png:
+        * platform/qt/editing/deleting/delete-listitem-002-expected.png:
+        * platform/qt/editing/deleting/delete-selection-001-expected.png:
+        * platform/qt/editing/deleting/delete-to-select-table-expected.png:
+        * platform/qt/editing/deleting/delete-trailing-ws-001-expected.png:
+        * platform/qt/editing/deleting/delete-trailing-ws-002-expected.png:
+        * platform/qt/editing/deleting/delete-ws-fixup-001-expected.png:
+        * platform/qt/editing/deleting/delete-ws-fixup-002-expected.png:
+        * platform/qt/editing/deleting/delete-ws-fixup-003-expected.png:
+        * platform/qt/editing/deleting/delete-ws-fixup-004-expected.png:
+        * platform/qt/editing/deleting/list-item-1-expected.png:
+        * platform/qt/editing/deleting/merge-endOfParagraph-expected.png:
+        * platform/qt/editing/deleting/merge-no-br-expected.png:
+        * platform/qt/editing/deleting/merge-unrendered-space-expected.png:
+        * platform/qt/editing/deleting/merge-whitespace-pre-expected.png:
+        * platform/qt/editing/deleting/non-smart-delete-expected.png:
+        * platform/qt/editing/deleting/smart-delete-001-expected.png:
+        * platform/qt/editing/deleting/smart-delete-002-expected.png:
+        * platform/qt/editing/deleting/table-cells-expected.png:
+        * platform/qt/editing/execCommand/4580583-2-expected.png:
+        * platform/qt/editing/execCommand/4641880-1-expected.png:
+        * platform/qt/editing/execCommand/4641880-2-expected.png:
+        * platform/qt/editing/execCommand/4747450-expected.png:
+        * platform/qt/editing/execCommand/4916402-expected.png:
+        * platform/qt/editing/execCommand/4916541-expected.png:
+        * platform/qt/editing/execCommand/5080333-1-expected.png:
+        * platform/qt/editing/execCommand/5080333-2-expected.png:
+        * platform/qt/editing/execCommand/5136770-expected.png:
+        * platform/qt/editing/execCommand/5138441-expected.png:
+        * platform/qt/editing/execCommand/5142012-1-expected.png:
+        * platform/qt/editing/execCommand/5142012-2-expected.png:
+        * platform/qt/editing/execCommand/5190926-expected.png:
+        * platform/qt/editing/execCommand/5481523-expected.png:
+        * platform/qt/editing/execCommand/5569741-expected.png:
+        * platform/qt/editing/execCommand/create-list-with-hr-expected.png:
+        * platform/qt/editing/execCommand/indent-list-item-expected.png:
+        * platform/qt/editing/execCommand/indent-selection-expected.png:
+        * platform/qt/editing/execCommand/insert-list-and-stitch-expected.png:
+        * platform/qt/editing/execCommand/print-expected.png:
+        * platform/qt/editing/execCommand/remove-list-from-range-selection-expected.png:
+        * platform/qt/editing/execCommand/selectAll-expected.png:
+        * platform/qt/editing/input/caret-at-the-edge-of-input-expected.png:
+        * platform/qt/editing/inserting/12882-expected.png:
+        * platform/qt/editing/inserting/4278698-expected.png:
+        * platform/qt/editing/inserting/4840662-expected.png:
+        * platform/qt/editing/inserting/4960120-2-expected.png:
+        * platform/qt/editing/inserting/5002441-expected.png:
+        * platform/qt/editing/inserting/5058163-1-expected.png:
+        * platform/qt/editing/inserting/5058163-2-expected.png:
+        * platform/qt/editing/inserting/5156401-2-expected.png:
+        * platform/qt/editing/inserting/5510537-expected.png:
+        * platform/qt/editing/inserting/5549929-2-expected.png:
+        * platform/qt/editing/inserting/5549929-3-expected.png:
+        * platform/qt/editing/inserting/6703873-expected.png:
+        * platform/qt/editing/inserting/editing-empty-divs-expected.png:
+        * platform/qt/editing/inserting/insert-3775316-fix-expected.png:
+        * platform/qt/editing/inserting/insert-after-delete-001-expected.png:
+        * platform/qt/editing/inserting/insert-at-end-01-expected.png:
+        * platform/qt/editing/inserting/insert-at-end-02-expected.png:
+        * platform/qt/editing/inserting/insert-br-001-expected.png:
+        * platform/qt/editing/inserting/insert-br-003-expected.png:
+        * platform/qt/editing/inserting/insert-br-006-expected.png:
+        * platform/qt/editing/inserting/insert-br-007-expected.png:
+        * platform/qt/editing/inserting/insert-br-008-expected.png:
+        * platform/qt/editing/inserting/insert-br-009-expected.png:
+        * platform/qt/editing/inserting/insert-br-at-tabspan-001-expected.png:
+        * platform/qt/editing/inserting/insert-br-at-tabspan-002-expected.png:
+        * platform/qt/editing/inserting/insert-br-at-tabspan-003-expected.png:
+        * platform/qt/editing/inserting/insert-br-quoted-001-expected.png:
+        * platform/qt/editing/inserting/insert-br-quoted-002-expected.png:
+        * platform/qt/editing/inserting/insert-br-quoted-003-expected.png:
+        * platform/qt/editing/inserting/insert-br-quoted-004-expected.png:
+        * platform/qt/editing/inserting/insert-br-quoted-005-expected.png:
+        * platform/qt/editing/inserting/insert-br-quoted-006-expected.png:
+        * platform/qt/editing/inserting/insert-div-022-expected.png:
+        * platform/qt/editing/inserting/insert-div-023-expected.png:
+        * platform/qt/editing/inserting/insert-div-024-expected.png:
+        * platform/qt/editing/inserting/insert-div-026-expected.png:
+        * platform/qt/editing/inserting/insert-paragraph-01-expected.png:
+        * platform/qt/editing/inserting/insert-paragraph-03-expected.png:
+        * platform/qt/editing/inserting/insert-paragraph-04-expected.png:
+        * platform/qt/editing/inserting/insert-paragraph-05-expected.png:
+        * platform/qt/editing/inserting/insert-space-in-empty-doc-expected.png:
+        * platform/qt/editing/inserting/insert-tab-001-expected.png:
+        * platform/qt/editing/inserting/insert-tab-002-expected.png:
+        * platform/qt/editing/inserting/insert-tab-004-expected.png:
+        * platform/qt/editing/inserting/insert-text-at-tabspan-001-expected.png:
+        * platform/qt/editing/inserting/insert-text-at-tabspan-002-expected.png:
+        * platform/qt/editing/inserting/insert-text-at-tabspan-003-expected.png:
+        * platform/qt/editing/inserting/insert-text-with-newlines-expected.png:
+        * platform/qt/editing/inserting/line-break-expected.png:
+        * platform/qt/editing/inserting/paragraph-separator-01-expected.png:
+        * platform/qt/editing/inserting/paragraph-separator-02-expected.png:
+        * platform/qt/editing/inserting/paragraph-separator-in-table-1-expected.png:
+        * platform/qt/editing/inserting/paragraph-separator-in-table-2-expected.png:
+        * platform/qt/editing/inserting/return-key-with-selection-001-expected.png:
+        * platform/qt/editing/inserting/return-key-with-selection-002-expected.png:
+        * platform/qt/editing/inserting/return-key-with-selection-003-expected.png:
+        * platform/qt/editing/inserting/typing-001-expected.png:
+        * platform/qt/editing/inserting/typing-002-expected.png:
+        * platform/qt/editing/inserting/typing-003-expected.png:
+        * platform/qt/editing/inserting/typing-around-br-001-expected.png:
+        * platform/qt/editing/inserting/typing-around-image-001-expected.png:
+        * platform/qt/editing/pasteboard/3976872-expected.png:
+        * platform/qt/editing/pasteboard/4076267-2-expected.png:
+        * platform/qt/editing/pasteboard/4076267-3-expected.png:
+        * platform/qt/editing/pasteboard/4631972-expected.png:
+        * platform/qt/editing/pasteboard/4806874-expected.png:
+        * platform/qt/editing/pasteboard/5006779-expected.png:
+        * platform/qt/editing/pasteboard/5071074-2-expected.png:
+        * platform/qt/editing/pasteboard/5071074-expected.png:
+        * platform/qt/editing/pasteboard/5075944-expected.png:
+        * platform/qt/editing/pasteboard/5156401-1-expected.png:
+        * platform/qt/editing/pasteboard/5247341-expected.png:
+        * platform/qt/editing/pasteboard/5387578-expected.png:
+        * platform/qt/editing/pasteboard/5478250-expected.png:
+        * platform/qt/editing/pasteboard/5601583-1-expected.png:
+        * platform/qt/editing/pasteboard/8145-1-expected.png:
+        * platform/qt/editing/pasteboard/8145-2-expected.png:
+        * platform/qt/editing/pasteboard/8145-3-expected.png:
+        * platform/qt/editing/pasteboard/bad-placeholder-expected.png:
+        * platform/qt/editing/pasteboard/cut-text-001-expected.png:
+        * platform/qt/editing/pasteboard/displaced-generic-placeholder-expected.png:
+        * platform/qt/editing/pasteboard/displaced-placeholder-expected.png:
+        * platform/qt/editing/pasteboard/merge-after-delete-1-expected.png:
+        * platform/qt/editing/pasteboard/merge-after-delete-2-expected.png:
+        * platform/qt/editing/pasteboard/merge-end-blockquote-expected.png:
+        * platform/qt/editing/pasteboard/merge-start-blockquote-expected.png:
+        * platform/qt/editing/pasteboard/paste-4035648-fix-expected.png:
+        * platform/qt/editing/pasteboard/paste-4038267-fix-expected.png:
+        * platform/qt/editing/pasteboard/paste-blockquote-after-blockquote-expected.png:
+        * platform/qt/editing/pasteboard/paste-blockquote-into-blockquote-4-expected.png:
+        * platform/qt/editing/pasteboard/paste-line-endings-001-expected.png:
+        * platform/qt/editing/pasteboard/paste-line-endings-002-expected.png:
+        * platform/qt/editing/pasteboard/paste-line-endings-003-expected.png:
+        * platform/qt/editing/pasteboard/paste-line-endings-004-expected.png:
+        * platform/qt/editing/pasteboard/paste-line-endings-005-expected.png:
+        * platform/qt/editing/pasteboard/paste-line-endings-006-expected.png:
+        * platform/qt/editing/pasteboard/paste-line-endings-007-expected.png:
+        * platform/qt/editing/pasteboard/paste-line-endings-008-expected.png:
+        * platform/qt/editing/pasteboard/paste-line-endings-009-expected.png:
+        * platform/qt/editing/pasteboard/paste-line-endings-010-expected.png:
+        * platform/qt/editing/pasteboard/paste-match-style-001-expected.png:
+        * platform/qt/editing/pasteboard/paste-match-style-002-expected.png:
+        * platform/qt/editing/pasteboard/paste-text-019-expected.png:
+        * platform/qt/editing/pasteboard/paste-text-at-tabspan-003-expected.png:
+        * platform/qt/editing/pasteboard/pasting-object-expected.png:
+        * platform/qt/editing/pasteboard/quirks-mode-br-1-expected.png:
+        * platform/qt/editing/pasteboard/smart-paste-007-expected.png:
+        * platform/qt/editing/pasteboard/smart-paste-008-expected.png:
+        * platform/qt/editing/pasteboard/undoable-fragment-removes-expected.png:
+        * platform/qt/editing/pasteboard/unrendered-br-expected.png:
+        * platform/qt/editing/selection/3690703-2-expected.png:
+        * platform/qt/editing/selection/3690703-expected.png:
+        * platform/qt/editing/selection/3690719-expected.png:
+        * platform/qt/editing/selection/4397952-expected.png:
+        * platform/qt/editing/selection/4818145-expected.png:
+        * platform/qt/editing/selection/4932260-1-expected.png:
+        * platform/qt/editing/selection/4932260-2-expected.png:
+        * platform/qt/editing/selection/4932260-3-expected.png:
+        * platform/qt/editing/selection/5007143-2-expected.png:
+        * platform/qt/editing/selection/5007143-expected.png:
+        * platform/qt/editing/selection/5057506-2-expected.png:
+        * platform/qt/editing/selection/5057506-expected.png:
+        * platform/qt/editing/selection/5076323-2-expected.png:
+        * platform/qt/editing/selection/5076323-3-expected.png:
+        * platform/qt/editing/selection/5131716-1-expected.png:
+        * platform/qt/editing/selection/5131716-2-expected.png:
+        * platform/qt/editing/selection/5131716-3-expected.png:
+        * platform/qt/editing/selection/5131716-4-expected.png:
+        * platform/qt/editing/selection/5234383-1-expected.png:
+        * platform/qt/editing/selection/5234383-2-expected.png:
+        * platform/qt/editing/selection/6476-expected.png:
+        * platform/qt/editing/selection/after-line-wrap-expected.png:
+        * platform/qt/editing/selection/caret-before-select-expected.png:
+        * platform/qt/editing/selection/click-start-of-line-expected.png:
+        * platform/qt/editing/selection/editable-non-editable-crash-expected.png:
+        * platform/qt/editing/selection/end-of-document-expected.png:
+        * platform/qt/editing/selection/extend-by-character-001-expected.png:
+        * platform/qt/editing/selection/extend-by-character-006-expected.png:
+        * platform/qt/editing/selection/extend-by-sentence-001-expected.png:
+        * platform/qt/editing/selection/extend-by-word-001-expected.png:
+        * platform/qt/editing/selection/extend-by-word-002-expected.png:
+        * platform/qt/editing/selection/extend-selection-bidi-expected.png:
+        * platform/qt/editing/selection/iframe-expected.png:
+        * platform/qt/editing/selection/image-before-linebreak-expected.png:
+        * platform/qt/editing/selection/inline-closest-leaf-child-expected.png:
+        * platform/qt/editing/selection/leave-requested-block-expected.png:
+        * platform/qt/editing/selection/mixed-editability-6-expected.png:
+        * platform/qt/editing/selection/mixed-editability-7-expected.png:
+        * platform/qt/editing/selection/move-backwords-by-word-001-expected.png:
+        * platform/qt/editing/selection/move-between-blocks-no-001-expected.png:
+        * platform/qt/editing/selection/move-by-character-001-expected.png:
+        * platform/qt/editing/selection/move-by-line-001-expected.png:
+        * platform/qt/editing/selection/move-by-line-002-expected.png:
+        * platform/qt/editing/selection/move-by-sentence-001-expected.png:
+        * platform/qt/editing/selection/move-by-sentence-linebreak-expected.png:
+        * platform/qt/editing/selection/move-by-word-001-expected.png:
+        * platform/qt/editing/selection/previous-line-position-expected.png:
+        * platform/qt/editing/selection/replaced-boundaries-1-expected.png:
+        * platform/qt/editing/selection/replaced-boundaries-2-expected.png:
+        * platform/qt/editing/selection/replaced-boundaries-3-expected.png:
+        * platform/qt/editing/selection/select-all-001-expected.png:
+        * platform/qt/editing/selection/select-all-002-expected.png:
+        * platform/qt/editing/selection/table-caret-1-expected.png:
+        * platform/qt/editing/selection/table-caret-2-expected.png:
+        * platform/qt/editing/selection/unrendered-space-expected.png:
+        * platform/qt/editing/style/5017613-1-expected.png:
+        * platform/qt/editing/style/5017613-2-expected.png:
+        * platform/qt/editing/style/5046875-1-expected.png:
+        * platform/qt/editing/style/5046875-2-expected.png:
+        * platform/qt/editing/style/5065910-expected.png:
+        * platform/qt/editing/style/5228141-expected.png:
+        * platform/qt/editing/style/5279521-expected.png:
+        * platform/qt/editing/style/block-styles-007-expected.png:
+        * platform/qt/editing/style/font-family-with-space-expected.png:
+        * platform/qt/editing/style/style-3681552-fix-001-expected.png:
+        * platform/qt/editing/style/style-3681552-fix-002-expected.png:
+        * platform/qt/editing/style/style-3998892-fix-expected.png:
+        * platform/qt/editing/style/style-boundary-001-expected.png:
+        * platform/qt/editing/style/style-boundary-002-expected.png:
+        * platform/qt/editing/style/style-boundary-003-expected.png:
+        * platform/qt/editing/style/style-boundary-004-expected.png:
+        * platform/qt/editing/style/typing-style-001-expected.png:
+        * platform/qt/editing/style/typing-style-002-expected.png:
+        * platform/qt/editing/style/unbold-in-bold-expected.png:
+        * platform/qt/editing/undo/4063751-expected.png:
+        * platform/qt/editing/undo/5378473-expected.png:
+        * platform/qt/editing/undo/redo-typing-001-expected.png:
+        * platform/qt/editing/undo/undo-combined-delete-boundary-expected.png:
+        * platform/qt/editing/undo/undo-combined-delete-expected.png:
+        * platform/qt/editing/undo/undo-delete-boundary-expected.png:
+        * platform/qt/editing/undo/undo-delete-expected.png:
+        * platform/qt/editing/undo/undo-forward-delete-boundary-expected.png:
+        * platform/qt/editing/undo/undo-forward-delete-expected.png:
+        * platform/qt/editing/undo/undo-misspellings-expected.png:
+        * platform/qt/editing/undo/undo-typing-001-expected.png:
+        * platform/qt/editing/unsupported-content/list-delete-001-expected.png:
+        * platform/qt/editing/unsupported-content/list-delete-003-expected.png:
+        * platform/qt/editing/unsupported-content/list-type-after-expected.png:
+        * platform/qt/editing/unsupported-content/list-type-before-expected.png:
+        * platform/qt/editing/unsupported-content/table-delete-001-expected.png:
+        * platform/qt/editing/unsupported-content/table-delete-002-expected.png:
+        * platform/qt/editing/unsupported-content/table-delete-003-expected.png:
+        * platform/qt/editing/unsupported-content/table-type-after-expected.png:
+        * platform/qt/editing/unsupported-content/table-type-before-expected.png:
+
+2012-10-19  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] Pixel tests need rebaseline
+        https://bugs.webkit.org/show_bug.cgi?id=99323
+
+        Unreviewed rebaseline.
+
+        Part 2.
+        Rebase pixel results in animations, compositing, css1, css2.1 and css3.
+
+        * platform/qt/animations/cross-fade-border-image-source-expected.png:
+        * platform/qt/compositing/direct-image-compositing-expected.png:
+        * platform/qt/compositing/geometry/bounds-ignores-hidden-dynamic-negzindex-expected.png: Added.
+        * platform/qt/css1/basic/containment-expected.png:
+        * platform/qt/css1/basic/inheritance-expected.png:
+        * platform/qt/css1/box_properties/border-expected.png:
+        * platform/qt/css1/box_properties/border_bottom-expected.png:
+        * platform/qt/css1/box_properties/border_left-expected.png:
+        * platform/qt/css1/box_properties/border_left_width-expected.png:
+        * platform/qt/css1/box_properties/border_right_inline-expected.png:
+        * platform/qt/css1/box_properties/border_right_width-expected.png:
+        * platform/qt/css1/box_properties/border_style-expected.png:
+        * platform/qt/css1/box_properties/border_top-expected.png:
+        * platform/qt/css1/box_properties/clear_float-expected.png:
+        * platform/qt/css1/box_properties/float_margin-expected.png:
+        * platform/qt/css1/box_properties/float_on_text_elements-expected.png:
+        * platform/qt/css1/box_properties/margin_inline-expected.png:
+        * platform/qt/css1/box_properties/margin_left-expected.png:
+        * platform/qt/css1/box_properties/margin_right-expected.png:
+        * platform/qt/css1/box_properties/padding_bottom-expected.png:
+        * platform/qt/css1/box_properties/padding_bottom_inline-expected.png:
+        * platform/qt/css1/box_properties/padding_inline-expected.png:
+        * platform/qt/css1/box_properties/padding_left-expected.png:
+        * platform/qt/css1/box_properties/padding_right-expected.png:
+        * platform/qt/css1/cascade/cascade_order-expected.png:
+        * platform/qt/css1/cascade/important-expected.png:
+        * platform/qt/css1/classification/display-expected.png:
+        * platform/qt/css1/color_and_background/background_position-expected.png:
+        * platform/qt/css1/color_and_background/background_repeat-expected.png:
+        * platform/qt/css1/conformance/forward_compatible_parsing-expected.png:
+        * platform/qt/css1/font_properties/font-expected.png:
+        * platform/qt/css1/formatting_model/inline_elements-expected.png:
+        * platform/qt/css1/formatting_model/vertical_formatting-expected.png:
+        * platform/qt/css1/pseudo/anchor-expected.png:
+        * platform/qt/css1/pseudo/firstletter-expected.png:
+        * platform/qt/css1/pseudo/firstline-expected.png:
+        * platform/qt/css1/pseudo/multiple_pseudo_elements-expected.png:
+        * platform/qt/css1/pseudo/pseudo_elements_in_selectors-expected.png:
+        * platform/qt/css1/text_properties/text_decoration-expected.png:
+        * platform/qt/css1/text_properties/text_indent-expected.png:
+        * platform/qt/css1/text_properties/text_transform-expected.png:
+        * platform/qt/css1/units/urls-expected.png:
+        * platform/qt/css2.1/20110323/c543-txt-decor-000-expected.png:
+        * platform/qt/css2.1/20110323/margin-collapse-clear-016-expected.png: Added.
+        * platform/qt/css2.1/20110323/replaced-min-max-001-expected.png:
+        * platform/qt/css2.1/t051201-c23-first-line-00-b-expected.png:
+        * platform/qt/css2.1/t0602-c13-inh-underlin-00-e-expected.png:
+        * platform/qt/css2.1/t0805-c5517-brdr-s-00-c-expected.png:
+        * platform/qt/css2.1/t1002-c5523-width-02-b-g-expected.png:
+        * platform/qt/css2.1/t170602-bdr-conflct-w-54-d-expected.png:
+        * platform/qt/css2.1/t170602-bdr-conflct-w-64-d-expected.png:
+        * platform/qt/css2.1/t170602-bdr-conflct-w-74-d-expected.png:
+        * platform/qt/css2.1/t170602-bdr-conflct-w-84-d-expected.png:
+        * platform/qt/css3/filters/crash-hw-sw-switch-expected.png:
+        * platform/qt/css3/selectors3/html/css3-modsel-17-expected.png:
+        * platform/qt/css3/selectors3/html/css3-modsel-18a-expected.png:
+        * platform/qt/css3/selectors3/xhtml/css3-modsel-17-expected.png:
+        * platform/qt/css3/selectors3/xhtml/css3-modsel-18a-expected.png:
+        * platform/qt/css3/selectors3/xml/css3-modsel-17-expected.png:
+        * platform/qt/css3/selectors3/xml/css3-modsel-18a-expected.png:
+
+2012-10-19  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [EFL] Gardening to make the bots green
+        https://bugs.webkit.org/show_bug.cgi?id=99828
+
+        Unreviewed EFL gardening.
+
+        Adding test expectations for failures caused by
+        r131836 and r131824.
+
+        * platform/efl-wk1/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-10-19  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] Pixel tests need rebaseline
+        https://bugs.webkit.org/show_bug.cgi?id=99323
+
+        Unreviewed rebaseline.
+
+        Part I.
+        Identifying wrong results, and rebasing some expected png's.
+
+        * platform/qt-5.0-wk1/TestExpectations:
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt-5.0-wk2/fast/borders/border-image-01-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-border-radius-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-longhand-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-massive-scale-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-outset-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-outset-in-shorthand-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-repeat-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-rotate-transform-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-scale-transform-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-scaled-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-scrambled-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-side-reduction-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-image-source-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-mixed-alpha-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-radius-complex-inner-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/borders/border-radius-different-width-001-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/box-shadow/shadow-tiling-artifact-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/box-shadow/spread-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/canvas/arc360-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/css/absolute-child-with-percent-height-inside-relative-parent-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/repaint/iframe-scroll-repaint-expected.png:
+        * platform/qt-5.0-wk2/fast/repaint/selection-after-delete-expected.png:
+        * platform/qt-5.0-wk2/fast/repaint/selection-after-remove-expected.png:
+        * platform/qt-5.0-wk2/fast/repaint/selection-clear-expected.png:
+        * platform/qt-5.0-wk2/fast/repaint/selection-gap-overflow-scroll-2-expected.png:
+        * platform/qt-5.0-wk2/fast/replaced/absolute-image-sizing-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/replaced/image-sizing-expected.png: Added.
+        * platform/qt-5.0-wk2/svg/custom/mask-invalidation-expected.png: Copied from LayoutTests/platform/qt/svg/custom/mask-invalidation-expected.png.
+        * platform/qt-5.0-wk2/svg/custom/relative-sized-image-expected.png: Added.
+        * platform/qt-5.0-wk2/svg/zoom/page/zoom-mask-with-percentages-expected.png: Added.
+        * platform/qt-5.0-wk2/transforms/3d/point-mapping/3d-point-mapping-coplanar-expected.png: Added.
+        * platform/qt-5.0-wk2/transforms/3d/point-mapping/3d-point-mapping-deep-expected.png: Added.
+        * platform/qt-5.0-wk2/transforms/3d/point-mapping/3d-point-mapping-expected.png: Added.
+        * platform/qt-5.0-wk2/transforms/3d/point-mapping/3d-point-mapping-overlapping-expected.png: Added.
+        * platform/qt-5.0-wk2/transforms/3d/point-mapping/3d-point-mapping-preserve-3d-expected.png: Added.
+        * platform/qt-5.0-wk2/transitions/suspend-transform-transition-expected.png: Copied from LayoutTests/platform/qt-5.0-wk2/fast/repaint/iframe-scroll-repaint-expected.png.
+        * platform/qt/TestExpectations:
+        * platform/qt/animations/cross-fade-background-image-expected.png:
+        * platform/qt/animations/cross-fade-border-image-source-expected.png:
+        * platform/qt/animations/cross-fade-list-style-image-expected.png:
+        * platform/qt/animations/cross-fade-webkit-mask-image-expected.png:
+        * platform/qt/fast/repaint/line-flow-with-floats-in-regions-expected.png:
+        * platform/qt/fast/repaint/renderer-destruction-by-invalidateSelection-crash-expected.png:
+        * platform/qt/svg/custom/mask-invalidation-expected.png:
+        * platform/qt/svg/text/remove-text-node-from-tspan-expected.png:
+        * platform/qt/svg/text/remove-tspan-from-text-expected.png:
+        * platform/qt/transforms/3d/point-mapping/3d-point-mapping-coplanar-expected.png: Removed.
+        * platform/qt/transforms/3d/point-mapping/3d-point-mapping-overlapping-expected.png: Removed.
+
+2012-10-19  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Rebaseline pixel expectation that is rendered correctly now.
+
+        * platform/efl/ietestcenter/css3/bordersbackgrounds/border-radius-content-edge-001-expected.png:
+
+2012-10-19  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Adding a platform-specific baseline for a new Shadow DOM test
+        that was introduced in r131758, the new baseline differs from
+        the original one just by an annoying newline at the end of the
+        document.
+
+        Adding test expectations for list styles test failure caused by
+        r131836. Adding a test expectation for a new a11y test introduced
+        in r131871.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/fast/dom/shadow/user-modify-in-datalist-crash-expected.txt: Added.
+
+2012-10-19  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Unskip a few passing tests.
+
+        * platform/efl-wk1/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-10-19  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Rebaseline a few pixel expectations now that WK1 also shows the resizer in textareas.
+
+        * platform/efl/fast/forms/basic-textareas-expected.png:
+        * platform/efl/fast/forms/basic-textareas-quirks-expected.png:
+
+2012-10-18  Dominic Mazzoni  <dmazzoni@google.com>
+
+        AX: labelForElement is slow when there are a lot of DOM elements
+        https://bugs.webkit.org/show_bug.cgi?id=97825
+
+        Reviewed by Ryosuke Niwa.
+
+        Adds two new tests for titleUIElement that run on both Mac and
+        Chromium. One tests correctness, the other tests speed.
+
+        Fixes one test so that it passes on Chromium.
+        Enables other tests that now pass on Chromium.
+
+        * accessibility/secure-textfield-title-ui.html:
+        * accessibility/title-ui-element-correctness-expected.txt: Added.
+        * accessibility/title-ui-element-correctness.html: Added.
+        * perf/accessibility-title-ui-element-expected.txt: Added.
+        * perf/accessibility-title-ui-element.html: Added.
+        * platform/chromium/TestExpectations:
+
+2012-10-18  Alexander Pavlov  <apavlov@chromium.org>
+
+        Web Inspector: [Styles] Property considered overridden if it is non-inherited important property in inherited style
+        https://bugs.webkit.org/show_bug.cgi?id=99720
+
+        Reviewed by Yury Semikhatsky.
+
+        * inspector/elements/elements-panel-styles-expected.txt:
+        * inspector/elements/resources/elements-panel-styles.css:
+        (#container):
+        (.foo):
+
+2012-10-18  Dongwoo Joshua Im  <dw.im@samsung.com>
+
+        quirk-orphaned-units.html should be removed from TestExpectations.
+        https://bugs.webkit.org/show_bug.cgi?id=99807
+
+        Reviewed by Csaba Osztrogonác.
+
+        quirk-orphaned-units.html is no more existed, so it should be removed from TestExpectations.
+
+        * platform/qt-mac/TestExpectations: Remove quirk-orphaned-units.html.
+
+2012-10-18  Dirk Pranke  <dpranke@chromium.org>
+
+        Remove entries for now-passing tests in chroum-mac-mountainlion.
+
+        Unreviewed, expectations change.
+
+        * platform/chromium-mac-mountainlion/TestExpectations:
+
+2012-10-18  Kunihiko Sakamoto  <ksakamoto@chromium.org>
+
+        Implement value sanitization algorithm for type=datetime
+        https://bugs.webkit.org/show_bug.cgi?id=76893
+
+        Reviewed by Kent Tamura.
+
+        Added a test for the value sanitization algorithm for type=datetime.
+        Also updated affected tests.
+
+        * fast/forms/datetime/ValidityState-typeMismatch-datetime-expected.txt:
+        * fast/forms/datetime/ValidityState-typeMismatch-datetime.html:
+        '0001-01-01T00:00+01:00' is an invalid value because that is before
+        0001-01-01 00:00 UTC. '0001-01-01T00:00-01:00' is a valid value.
+        * fast/forms/datetime/datetime-value-sanitization-expected.txt: Added.
+        * fast/forms/datetime/datetime-value-sanitization.html: Added.
+        * fast/forms/datetime/input-valueasdate-datetime-expected.txt:
+        * fast/forms/datetime/input-valueasdate-datetime.html:
+        Setting valueAsDate should run the algorithm to convert a Date object to a
+        string, that returns valid normalized forced-UTC global date and time string.
+        See http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#dom-input-valueasdate
+        * fast/forms/datetime/input-valueasnumber-datetime-expected.txt:
+        * fast/forms/datetime/input-valueasnumber-datetime.html:
+        Setting valueAsNumber should run the algorithm to convert a number to a
+        string, that returns valid normalized forced-UTC global date and time string.
+        See http://www.whatwg.org/specs/web-apps/current-work/multipage/common-input-element-attributes.html#dom-input-valueasnumber
+
+2012-10-18  Dirk Pranke  <dpranke@chromium.org>
+
+        Unreviewed, expectations and baselines for chromium-mac-mountainlion
+
+        * platform/chromium-mac-lion/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.png: Copied from LayoutTests/platform/chromium-mac/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.png.
+        * platform/chromium-mac-lion/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.txt: Copied from LayoutTests/platform/chromium-mac/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.txt.
+        * platform/chromium-mac/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.png:
+        * platform/chromium-mac/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.txt:
+        * platform/chromium/TestExpectations:
+
 2012-10-18  Dirk Pranke  <dpranke@chromium.org>
 
         Land first batch of Chromium Mac 10.8-specific baselines.

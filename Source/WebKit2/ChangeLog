@@ -1,3 +1,167 @@
+2012-10-19  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WTR] renderToOffscreenBuffer should not be set if the real render loop is active
+        https://bugs.webkit.org/show_bug.cgi?id=99831
+
+        Reviewed by Jocelyn Turcotte.
+
+        Update the comment about renderToOffscreenBuffer to better describe its role.
+
+        * UIProcess/API/qt/qquickwebview.cpp:
+        (QQuickWebViewPrivate::setNeedsDisplay):
+
+2012-10-19  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][WK2] Rename EflViewportHandler to PageViewportControllerClientEfl
+        https://bugs.webkit.org/show_bug.cgi?id=99101
+
+        Reviewed by Gyuyoung Kim.
+
+        Rename EFlViewportHandler to PageViewportControllerClientEfl.
+        Also, make it inherit from PageViewportControllerClient. The actual implementation
+        of PageViewportControllerClient for Efl port will come in a separate patch.
+
+        * CMakeLists.txt:
+        * PlatformEfl.cmake:
+        * UIProcess/API/efl/EflViewportHandler.cpp: Removed.
+        * UIProcess/API/efl/EflViewportHandler.h: Removed.
+        * UIProcess/API/efl/PageViewportControllerClientEfl.cpp: Copied from Source/WebKit2/UIProcess/API/efl/EflViewportHandler.cpp.
+        (WebKit::PageViewportControllerClientEfl::PageViewportControllerClientEfl):
+        (WebKit::PageViewportControllerClientEfl::~PageViewportControllerClientEfl):
+        (WebKit::PageViewportControllerClientEfl::drawingArea):
+        (WebKit::PageViewportControllerClientEfl::setRendererActive):
+        (WebKit::PageViewportControllerClientEfl::display):
+        (WebKit::PageViewportControllerClientEfl::updateViewportSize):
+        (WebKit::PageViewportControllerClientEfl::setVisibleContentsRect):
+        (WebKit::PageViewportControllerClientEfl::didChangeContentsSize):
+        (WebKit):
+        (WebKit::PageViewportControllerClientEfl::setViewportPosition):
+        (WebKit::PageViewportControllerClientEfl::setContentsScale):
+        (WebKit::PageViewportControllerClientEfl::didResumeContent):
+        (WebKit::PageViewportControllerClientEfl::didChangeVisibleContents):
+        (WebKit::PageViewportControllerClientEfl::didChangeViewportAttributes):
+        (WebKit::PageViewportControllerClientEfl::setController):
+        * UIProcess/API/efl/PageViewportControllerClientEfl.h: Copied from Source/WebKit2/UIProcess/API/efl/EflViewportHandler.h.
+        (WebKit::PageViewportControllerClientEfl::create):
+        (PageViewportControllerClientEfl):
+        * UIProcess/API/efl/ewk_view.cpp:
+        (Ewk_View_Private_Data):
+        (_ewk_view_initialize):
+        (ewk_view_scale_set):
+        * UIProcess/PageViewportController.cpp:
+        * UIProcess/PageViewportController.h:
+
+2012-10-19  Csaba Osztrogonác  <ossy@webkit.org>
+
+        REGRESSION(r131844): It broke the build on !ENABLE(NETSCAPE_PLUGIN_API) platforms
+        https://bugs.webkit.org/show_bug.cgi?id=99820
+
+        Reviewed by Jocelyn Turcotte.
+
+        * UIProcess/Launcher/qt/ProcessLauncherQt.cpp:
+        (WebKit::ProcessLauncher::launchProcess): Add missing ENABLE(PLUGIN_PROCESS) guard.
+        * UIProcess/Plugins/unix/PluginInfoStoreUnix.cpp: The whole file should be ENABLE(NETSCAPE_PLUGIN_API) guarded as the PluginInfoStore class.
+        (WebKit::PluginInfoStore::getPluginInfo):
+        * WebProcess/WebCoreSupport/WebFrameLoaderClient.cpp:
+        (WebKit::WebFrameLoaderClient::createPlugin): Eliminate the unused webPage variable (build fail with -Werror) if !(PLATFORM(MAC)||ENABLE(NETSCAPE_PLUGIN_API)).
+
+2012-10-19  Huang Dongsung  <luxtella@company100.net>
+
+        Build fix after r131741 for !ENABLE(CSS_SHADERS) platforms.
+        https://bugs.webkit.org/show_bug.cgi?id=99775
+
+        Reviewed by Csaba Osztrogonác.
+
+        A class in WebKit namespace is only used when ENABLE(CSS_SHADERS), so we
+        must guard "using namespace WebKit" by ENABLE(CSS_SHADERS). Otherwise,
+        it brokes the Qt --minimal build.
+
+        * Shared/CoordinatedGraphics/CoordinatedGraphicsArgumentCoders.cpp:
+        (CoreIPC::::decode):
+
+2012-10-19  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        REGRESSION (r130640 - r130644): TestCookieManager API test is failing
+        https://bugs.webkit.org/show_bug.cgi?id=98738
+
+        Reviewed by Philippe Normand.
+
+        For some reason the order of the domains in the array has changed,
+        but it doesn't really matter, what we want to check is that both
+        cookies have been accepted and the array contains both domains.
+
+        * UIProcess/API/gtk/tests/TestCookieManager.cpp:
+        (testCookieManagerAcceptPolicy): Check that first and third party
+        domains are present in the domains array.
+
+2012-10-18  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        WebPageProxy::canShowMIMEType() should return false for plugins when they are disabled
+        https://bugs.webkit.org/show_bug.cgi?id=99449
+
+        Reviewed by Anders Carlsson.
+
+        * UIProcess/API/gtk/tests/GNUmakefile.am:
+        * UIProcess/API/gtk/tests/TestWebKitWebView.cpp:
+        (testWebViewCanShowMIMEType): Test that
+        webkit_web_view_can_show_mime_type() returns FALSE if plugins are
+        disabled.
+        * UIProcess/WebPageProxy.cpp:
+        (WebKit::WebPageProxy::canShowMIMEType): Return false for
+        MIME-Type of plugins if they are disabled.
+
+2012-10-18  Brady Eidson  <beidson@apple.com>
+
+        Move ConnectionStack out of WebProcessConnection into its own files.
+        https://bugs.webkit.org/show_bug.cgi?id=99813
+
+        Reviewed by Andreas Kling.
+
+        ConnectionStack will need to be used in a few upcoming areas, so it needs to be in its own header and implementation files.
+
+        Project file stuff:
+        * CMakeLists.txt:
+        * GNUmakefile.list.am:
+        * Target.pri:
+        * WebKit2.xcodeproj/project.pbxproj:
+
+        Move it from here:
+        * PluginProcess/WebProcessConnection.cpp:
+        (WebKit::WebProcessConnection::setGlobalException):
+        (WebKit::WebProcessConnection::didReceiveMessage):
+        (WebKit::WebProcessConnection::didReceiveSyncMessage):
+
+        Into here:
+        * Shared/ConnectionStack.cpp: Added.
+        (WebKit):
+        (WebKit::ConnectionStack::shared):
+        * Shared/ConnectionStack.h: Added.
+        (CoreIPC):
+        (WebKit):
+        (ConnectionStack):
+        (WebKit::ConnectionStack::current):
+        (CurrentConnectionPusher):
+        (WebKit::ConnectionStack::CurrentConnectionPusher::CurrentConnectionPusher):
+        (WebKit::ConnectionStack::CurrentConnectionPusher::~CurrentConnectionPusher):
+
+2012-10-18  Eunmi Lee  <eunmi15.lee@samsung.com>
+
+        [EFL][WK2] Move ewk_{init,shutdown}() to the main() function of EFL API test.
+        https://bugs.webkit.org/show_bug.cgi?id=99681
+
+        Reviewed by Gyuyoung Kim.
+
+        The ewk_{init,shutdown}() is called whenever processing the each test,
+        so tests can be failed if EFL libraries APIs are called between
+        ewk_shutdown() and next ewk_init().
+        The ewk_{init,shutdown}() should be called once per application.
+
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestBase.cpp:
+        (EWK2UnitTest::EWK2UnitTestBase::SetUp):
+        (EWK2UnitTest::EWK2UnitTestBase::TearDown):
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestMain.cpp:
+        (main):
+
 2012-10-18  Byungwoo Lee  <bw80.lee@samsung.com>
 
         Fix build warning.

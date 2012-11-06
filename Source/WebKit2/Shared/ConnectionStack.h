@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2012 Samsung Electronics. All rights reserved.
+ * Copyright (C) 2011, 2012 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,44 +23,57 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef EflViewportHandler_h
-#define EflViewportHandler_h
+#ifndef ConnectionStack_h
+#define ConnectionStack_h
 
-#if USE(COORDINATED_GRAPHICS)
+#include <wtf/Vector.h>
 
-#include "PageClientImpl.h"
-#include <wtf/PassOwnPtr.h>
+namespace CoreIPC {
+    class Connection;
+}
 
 namespace WebKit {
 
-class EflViewportHandler {
+class ConnectionStack {
 public:
-    static PassOwnPtr<EflViewportHandler> create(Evas_Object* viewWidget)
+    static ConnectionStack& shared();
+
+    CoreIPC::Connection* current()
     {
-        return adoptPtr(new EflViewportHandler(viewWidget));
+        return m_connectionStack.last();
     }
-    ~EflViewportHandler();
 
-    DrawingAreaProxy* drawingArea() const;
-    WebCore::IntSize viewSize() { return m_viewportSize; }
+    class CurrentConnectionPusher {
+    public:
+        CurrentConnectionPusher(ConnectionStack& connectionStack, CoreIPC::Connection* connection)
+            : m_connectionStack(connectionStack)
+#if !ASSERT_DISABLED
+            , m_connection(connection)
+#endif
+        {
+            m_connectionStack.m_connectionStack.append(connection);
+        }
 
-    void display(const WebCore::IntRect& rect, const WebCore::IntPoint& viewPosition);
-    void updateViewportSize(const WebCore::IntSize& viewportSize);
-    void setVisibleContentsRect(const WebCore::IntPoint&, float, const WebCore::FloatPoint&);
-    void didChangeContentsSize(const WebCore::IntSize& size);
-    void setRendererActive(bool);
+        ~CurrentConnectionPusher()
+        {
+            ASSERT(m_connectionStack.current() == m_connection);
+            m_connectionStack.m_connectionStack.removeLast();
+        }
+
+    private:
+        ConnectionStack& m_connectionStack;
+#if !ASSERT_DISABLED
+        CoreIPC::Connection* m_connection;
+#endif
+    };
+
 private:
-    explicit EflViewportHandler(Evas_Object*);
-
-    Evas_Object* m_viewWidget;
-    WebCore::IntRect m_visibleContentRect;
-    WebCore::IntSize m_contentsSize;
-    WebCore::IntSize m_viewportSize;
-    float m_scaleFactor;
+    // It's OK for these to be weak pointers because we only push object on the stack
+    // from within didReceiveMessage and didReceiveSyncMessage and the Connection objects are
+    // already ref'd for the duration of those functions.
+    Vector<CoreIPC::Connection*, 4> m_connectionStack;
 };
 
 } // namespace WebKit
 
-#endif
-
-#endif // EflViewportHandler_h
+#endif // ConnectionStack_h

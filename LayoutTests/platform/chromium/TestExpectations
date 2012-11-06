@@ -1402,14 +1402,11 @@ crbug.com/10322 accessibility/language-attribute.html [ Skip ]
 crbug.com/10322 accessibility/legend.html [ Skip ]
 crbug.com/10322 accessibility/lists.html [ Skip ]
 crbug.com/10322 accessibility/media-element.html [ Skip ]
-crbug.com/10322 accessibility/non-data-table-cell-title-ui-element.html [ Skip ]
 crbug.com/10322 accessibility/onclick-handlers.html [ Skip ]
 crbug.com/10322 accessibility/placeholder.html [ Skip ]
 crbug.com/10322 accessibility/plugin.html [ Skip ]
 crbug.com/10322 accessibility/radio-button-checkbox-size.html [ Skip ]
 crbug.com/10322 accessibility/radio-button-group-members.html [ Skip ]
-crbug.com/10322 accessibility/radio-button-title-label.html [ Skip ]
-crbug.com/10322 accessibility/secure-textfield-title-ui.html [ Skip ]
 crbug.com/10322 accessibility/table-attributes.html [ Skip ]
 crbug.com/10322 accessibility/table-cell-spans.html [ Skip ]
 crbug.com/10322 accessibility/table-cells.html [ Skip ]
@@ -1418,7 +1415,6 @@ crbug.com/10322 accessibility/table-one-cell.html [ Skip ]
 crbug.com/10322 accessibility/table-sections.html [ Skip ]
 crbug.com/10322 accessibility/table-with-aria-role.html [ Skip ]
 crbug.com/10322 accessibility/table-with-rules.html [ Skip ]
-crbug.com/10322 accessibility/th-as-title-ui.html [ Skip ]
 crbug.com/10322 accessibility/transformed-element.html [ Skip ]
 crbug.com/10322 accessibility/visible-elements.html [ Skip ]
 
@@ -2799,6 +2795,14 @@ crbug.com/83290 [ Win ] http/tests/misc/link-rel-prefetch-and-subresource.html [
 crbug.com/83504 [ Win ] fast/css/custom-font-xheight.html [ Failure Pass Slow ]
 crbug.com/83504 [ Mac ] fast/css/custom-font-xheight.html [ Failure Pass ]
 
+# Need rebaseline
+webkit.org/b/99818 fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n.html [ Pass ImageOnlyFailure Missing ]
+webkit.org/b/99818 fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic.html [ Pass ImageOnlyFailure ] 
+webkit.org/b/99818 fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes.html [ Pass ImageOnlyFailure ] 
+webkit.org/b/99818 fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements.html [ Pass ImageOnlyFailure ] 
+webkit.org/b/99818 fast/forms/month-multiple-fields/month-multiple-fields-appearance-style.html [ Pass ImageOnlyFailure ] 
+webkit.org/b/99818 [ SNOWLEOPARD XP ] fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events.html [ Failure ]
+
 # New tests added in r87121
 webkit.org/b/61169 [ Android Linux Win ] css3/images/optimize-contrast-canvas.html [ ImageOnlyFailure ]
 webkit.org/b/61169 [ Android Linux Win ] css3/images/optimize-contrast-image.html [ ImageOnlyFailure ]
@@ -2840,11 +2844,6 @@ webkit.org/b/84900 compositing/regions/webkit-flow-renderer-layer-compositing.ht
 webkit.org/b/84900 platform/chromium/virtual/softwarecompositing/regions/webkit-flow-renderer-layer-compositing.html [ ImageOnlyFailure ]
 
 webkit.org/b/92131 inspector/styles/region-style-crash.html
-
-# New failure with a large regression range.
-webkit.org/b/99519 [ Win ] inspector/styles/styles-history.html [ Text ]
-# Flaky on Linux.
-webkit.org/b/99519 [ Linux ] inspector/styles/styles-history.html [ Pass Text ]
 
 crbug.com/85755 fast/js/exception-properties.html [ Failure ]
 
@@ -3126,8 +3125,8 @@ webkit.org/b/80801 fast/js/function-constructor-error.html [ Failure ]
 
 webkit.org/b/81050 fast/forms/file/recover-file-input-in-unposted-form.html [ Failure Pass ]
 
-webkit.org/b/81145 [ Lion ] compositing/plugins/composited-plugin.html [ Failure ]
-webkit.org/b/81145 [ Lion ] platform/chromium/virtual/softwarecompositing/plugins/composited-plugin.html [ Failure ]
+webkit.org/b/81145 [ Lion MountainLion ] compositing/plugins/composited-plugin.html [ Failure ]
+webkit.org/b/81145 [ Lion MountainLion ] platform/chromium/virtual/softwarecompositing/plugins/composited-plugin.html [ Failure ]
 webkit.org/b/81145 [ Lion ] fast/repaint/transform-absolute-in-positioned-container.html [ Failure ]
 webkit.org/b/81145 [ Lion ] animations/cross-fade-webkit-mask-box-image.html [ ImageOnlyFailure ]
 webkit.org/b/81145 [ Lion ] compositing/iframes/iframe-content-flipping.html [ ImageOnlyFailure ]
@@ -4199,3 +4198,5 @@ webkit.org/b/98257 platform/chromium/virtual/gpu/fast/canvas/webgl/oes-element-i
 
 # Resource Timing is not enable yet, skip it.
 webkit.org/b/61138 http/tests/w3c/webperf/submission/Intel/resource-timing [ Skip ]
+
+webkit.org/b/99802 [ MountainLion ] fast/forms/text-control-intrinsic-widths.html [ Failure ]

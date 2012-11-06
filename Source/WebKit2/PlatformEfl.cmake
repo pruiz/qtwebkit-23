@@ -50,9 +50,7 @@ LIST(APPEND WebKit2_SOURCES
     UIProcess/API/efl/ewk_back_forward_list.cpp
     UIProcess/API/efl/ewk_back_forward_list_item.cpp
     UIProcess/API/efl/ewk_context.cpp
-    UIProcess/API/efl/ewk_context_download_client.cpp
     UIProcess/API/efl/ewk_context_history_client.cpp
-    UIProcess/API/efl/ewk_context_request_manager_client.cpp
     UIProcess/API/efl/ewk_cookie_manager.cpp
     UIProcess/API/efl/ewk_download_job.cpp
     UIProcess/API/efl/ewk_error.cpp
@@ -73,13 +71,15 @@ LIST(APPEND WebKit2_SOURCES
     UIProcess/API/efl/ewk_view.cpp
     UIProcess/API/efl/ewk_view_find_client.cpp
     UIProcess/API/efl/ewk_view_form_client.cpp
-    UIProcess/API/efl/ewk_view_loader_client.cpp
-    UIProcess/API/efl/ewk_view_policy_client.cpp
-    UIProcess/API/efl/ewk_view_resource_load_client.cpp
-    UIProcess/API/efl/ewk_view_ui_client.cpp
 
     UIProcess/cairo/BackingStoreCairo.cpp
 
+    UIProcess/efl/DownloadManagerEfl.cpp
+    UIProcess/efl/PageLoadClientEfl.cpp
+    UIProcess/efl/PagePolicyClientEfl.cpp
+    UIProcess/efl/PageUIClientEfl.cpp
+    UIProcess/efl/RequestManagerClientEfl.cpp
+    UIProcess/efl/ResourceLoadClientEfl.cpp
     UIProcess/efl/TextCheckerEfl.cpp
     UIProcess/efl/WebContextEfl.cpp
     UIProcess/efl/WebFullScreenManagerProxyEfl.cpp
@@ -207,6 +207,7 @@ LIST (APPEND WebProcess_SOURCES
 
 LIST (APPEND WebProcess_LIBRARIES
     ${CAIRO_LIBRARIES}
+    ${ECORE_IMF_LIBRARIES}
     ${ECORE_X_LIBRARIES}
     ${EDJE_LIBRARIES}
     ${EFLDEPS_LIBRARIES}

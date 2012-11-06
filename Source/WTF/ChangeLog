@@ -1,3 +1,124 @@
+2012-10-22  Michael Saboff  <msaboff@apple.com>
+
+        Regression(r131655): Crash in StringImpl::findIgnoringCase
+        https://bugs.webkit.org/show_bug.cgi?id=99753
+
+        Reviewed by Geoffrey Garen.
+
+        Fixed to use the searchLength to take into account the start index.
+
+        Added LayoutTests/fast/js/find-ignoring-case-regress-99753.html
+
+        * wtf/text/StringImpl.cpp:
+        (WTF::StringImpl::findIgnoringCase):
+
+2012-10-22  Simon Hausmann  <simon.hausmann@digia.com>
+
+        Unreviewed: Re-enable LLINT on Qt/Linux after r131932.
+
+        * wtf/Platform.h:
+
+2012-10-22  Yury Semikhatsky  <yurys@chromium.org>
+
+        Web Inspector: do not double count memory of objects with multiple ancestors
+        https://bugs.webkit.org/show_bug.cgi?id=99958
+
+        Reviewed by Alexander Pavlov.
+
+        Make sure memory occupied by objects of classes with multiple inheritance is
+        not double counted.
+
+        * wtf/MemoryInstrumentation.h:
+        (WTF::MemoryObjectInfo::MemoryObjectInfo):
+        (WTF::MemoryObjectInfo::reportedPointer):
+        (WTF::MemoryObjectInfo::reportObjectInfo): 1) Store actual pointer to the instrumented
+        object as it may differ from the original pointer by which it was reported. 2) Make
+        the method non-template and calculate object size on the caller side.
+        (MemoryObjectInfo):
+        (WTF::MemoryInstrumentation::reportObjectMemoryUsage):
+        (WTF::MemoryClassInfo::MemoryClassInfo):
+        (WTF::MemoryInstrumentation::InstrumentedPointer::process): use adjusted pointer
+        returned by reportMemoryUsage to check if the object has already been visited when
+        the pointer differs from the orinal one(it may happen if the object was reported
+        by a pointer to one of its base classes).
+
+2012-10-20  Martin Robinson  <mrobinson@igalia.com>
+
+        Fix 'make dist' for the GTK+ port
+
+        * GNUmakefile.list.am: Add missing files to the source list.
+
+2012-10-19  Mark Lam  <mark.lam@apple.com>
+
+        Added WTF::StackStats mechanism.
+        https://bugs.webkit.org/show_bug.cgi?id=99805.
+
+        Reviewed by Geoffrey Garen.
+
+        Disabled by default. Should have no performance and memory cost when
+        disabled. To enable, #define ENABLE_STACK_STATS 1 in StackStats.h.
+        The output is currently hardcoded to be dumped in /tmp/stack-stats.log,
+        and is in the form of stack sample events. By default, it only logs
+        a sample event when a new high watermark value is encountered.
+
+        Also renamed StackBounds::recursiveCheck() to isSafeToRecurse().
+
+        * WTF.xcodeproj/project.pbxproj:
+        * wtf/StackBounds.h:
+        (StackBounds):
+        (WTF::StackBounds::size):
+        (WTF::StackBounds::isSafeToRecurse):
+        * wtf/StackStats.cpp: Added.
+        (WTF):
+        (WTF::StackStats::initialize):
+        (WTF::StackStats::PerThreadStats::PerThreadStats):
+        (WTF::StackStats::CheckPoint::CheckPoint):
+        (WTF::StackStats::CheckPoint::~CheckPoint):
+        (WTF::StackStats::probe):
+        (WTF::StackStats::LayoutCheckPoint::LayoutCheckPoint):
+        (WTF::StackStats::LayoutCheckPoint::~LayoutCheckPoint):
+        * wtf/StackStats.h: Added.
+        (WTF):
+        (StackStats):
+        (CheckPoint):
+        (WTF::StackStats::CheckPoint::CheckPoint):
+        (PerThreadStats):
+        (WTF::StackStats::PerThreadStats::PerThreadStats):
+        (LayoutCheckPoint):
+        (WTF::StackStats::LayoutCheckPoint::LayoutCheckPoint):
+        (WTF::StackStats::initialize):
+        (WTF::StackStats::probe):
+        * wtf/ThreadingPthreads.cpp:
+        (WTF::initializeThreading):
+        * wtf/WTFThreadData.cpp:
+        (WTF::WTFThreadData::WTFThreadData):
+        * wtf/WTFThreadData.h:
+        (WTFThreadData):
+        (WTF::WTFThreadData::stackStats):
+
+2012-10-19  Anders Carlsson  <andersca@apple.com>
+
+        Deque can use std::reverse_iterator for its reverse iterators
+        https://bugs.webkit.org/show_bug.cgi?id=99789
+
+        Reviewed by Andreas Kling.
+
+        Remove DequeReverseIterator and DequeConstReverseIterator and just use std::reverse_iterator directly.
+        Also, remove the DequeIteratorBase<T, inlineCapacity> to Base typedef - We can already use DequeIteratorBase since it's
+        equivalent to the full class template type.
+
+        * wtf/Deque.h:
+        (WTF::Deque::rbegin):
+        (WTF::Deque::rend):
+        (DequeIteratorBase):
+        (WTF::DequeIteratorBase::assign):
+        (DequeIterator):
+        (DequeConstIterator):
+        (WTF::::checkValidity):
+        (WTF::::DequeIteratorBase):
+        (WTF::=):
+        (WTF::::isEqual):
+
 2012-10-19  Csaba Osztrogonác  <ossy@webkit.org>
 
         Unreviewed buildfix, use C-style comment instead of C++

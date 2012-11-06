@@ -86,6 +86,10 @@
 #include "WebNetworkInfoManagerMessages.h"
 #endif
 
+#if ENABLE(NETWORK_PROCESS)
+#include "NetworkProcessConnection.h"
+#endif
+
 #if !OS(WINDOWS)
 #include <unistd.h>
 #endif
@@ -158,6 +162,9 @@ WebProcess::WebProcess()
     , m_notificationManager(this)
 #endif
     , m_iconDatabaseProxy(this)
+#if ENABLE(NETWORK_PROCESS)
+    , m_usesNetworkProcess(false)
+#endif
 #if USE(SOUP)
     , m_soupRequestManager(this)
 #endif
@@ -185,6 +192,11 @@ void WebProcess::initialize(CoreIPC::Connection::Identifier serverIdentifier, Ru
     m_runLoop = runLoop;
 
     startRandomCrashThreadIfRequested();
+}
+
+void WebProcess::addMessageReceiver(CoreIPC::StringReference messageReceiverName, CoreIPC::MessageReceiver* messageReceiver)
+{
+    m_messageReceiverMap.addMessageReceiver(messageReceiverName, messageReceiver);
 }
 
 void WebProcess::initializeWebProcess(const WebProcessCreationParameters& parameters, CoreIPC::MessageDecoder& decoder)
@@ -256,8 +268,39 @@ void WebProcess::initializeWebProcess(const WebProcessCreationParameters& parame
     WebCore::ResourceHandle::setPrivateBrowsingStorageSessionIdentifierBase(parameters.uiProcessBundleIdentifier);
 #endif
 
+#if ENABLE(NETWORK_PROCESS)
+    m_usesNetworkProcess = parameters.usesNetworkProcess;
+    ensureNetworkProcessConnection();
+#endif
     setTerminationTimeout(parameters.terminationTimeout);
 }
+
+#if ENABLE(NETWORK_PROCESS)
+void WebProcess::ensureNetworkProcessConnection()
+{
+    if (!m_usesNetworkProcess)
+        return;
+
+    if (m_networkProcessConnection)
+        return;
+
+    CoreIPC::Attachment encodedConnectionIdentifier;
+
+    if (!connection()->sendSync(Messages::WebProcessProxy::GetNetworkProcessConnection(),
+        Messages::WebProcessProxy::GetNetworkProcessConnection::Reply(encodedConnectionIdentifier), 0))
+        return;
+
+#if PLATFORM(MAC)
+    CoreIPC::Connection::Identifier connectionIdentifier(encodedConnectionIdentifier.port());
+    if (CoreIPC::Connection::identifierIsNull(connectionIdentifier))
+        return;
+#else
+    ASSERT_NOT_REACHED();
+#endif
+
+    RefPtr<NetworkProcessConnection> m_networkProcessConnection = NetworkProcessConnection::create(connectionIdentifier);
+}
+#endif // ENABLE(NETWORK_PROCESS)
 
 void WebProcess::setShouldTrackVisitedLinks(bool shouldTrackVisitedLinks)
 {
@@ -607,7 +650,10 @@ void WebProcess::terminate()
 }
 
 void WebProcess::didReceiveSyncMessage(CoreIPC::Connection* connection, CoreIPC::MessageID messageID, CoreIPC::MessageDecoder& decoder, OwnPtr<CoreIPC::MessageEncoder>& replyEncoder)
-{   
+{
+    if (m_messageReceiverMap.dispatchSyncMessage(connection, messageID, decoder, replyEncoder))
+        return;
+
     uint64_t pageID = decoder.destinationID();
     if (!pageID)
         return;
@@ -621,6 +667,9 @@ void WebProcess::didReceiveSyncMessage(CoreIPC::Connection* connection, CoreIPC:
 
 void WebProcess::didReceiveMessage(CoreIPC::Connection* connection, CoreIPC::MessageID messageID, CoreIPC::MessageDecoder& decoder)
 {
+    if (m_messageReceiverMap.dispatchMessage(connection, messageID, decoder))
+        return;
+
     if (messageID.is<CoreIPC::MessageClassWebProcess>()) {
         didReceiveWebProcessMessage(connection, messageID, decoder);
         return;
@@ -1020,11 +1069,29 @@ void WebProcess::postInjectedBundleMessage(const CoreIPC::DataReference& message
         return;
 
     RefPtr<APIObject> messageBody;
-    if (!decoder->decode(InjectedBundleUserMessageDecoder(messageBody)))
+    InjectedBundleUserMessageDecoder messageBodyDecoder(messageBody);
+    if (!decoder->decode(messageBodyDecoder))
         return;
 
     injectedBundle->didReceiveMessage(messageName, messageBody.get());
 }
+
+#if ENABLE(NETWORK_PROCESS)
+void WebProcess::networkProcessConnectionClosed(NetworkProcessConnection* connection)
+{
+    ASSERT(m_networkProcessConnection);
+    ASSERT(m_networkProcessConnection == connection);
+
+    m_networkProcessConnection = 0;
+}
+
+void WebProcess::networkProcessCrashed(CoreIPC::Connection*)
+{
+    ASSERT(m_networkProcessConnection);
+    
+    networkProcessConnectionClosed(m_networkProcessConnection.get());
+}
+#endif
 
 #if ENABLE(PLUGIN_PROCESS)
 void WebProcess::pluginProcessCrashed(CoreIPC::Connection*, const String& pluginPath)

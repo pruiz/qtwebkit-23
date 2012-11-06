@@ -153,6 +153,9 @@ private:
     void didGetSitesWithPluginData(const Vector<String>& sites, uint64_t callbackID);
     void didClearPluginSiteData(uint64_t callbackID);
 #endif
+#if ENABLE(NETWORK_PROCESS)
+    void getNetworkProcessConnection(PassRefPtr<Messages::WebProcessProxy::GetNetworkProcessConnection::DelayedReply>);
+#endif
 #if ENABLE(SHARED_WORKER_PROCESS)
     void getSharedWorkerProcessConnection(const String& url, const String& name, PassRefPtr<Messages::WebProcessProxy::GetSharedWorkerProcessConnection::DelayedReply>);
 #endif
@@ -218,7 +221,7 @@ private:
 template<typename E, typename T>
 bool WebProcessProxy::deprecatedSend(E messageID, uint64_t destinationID, const T& arguments)
 {
-    OwnPtr<CoreIPC::MessageEncoder> encoder = CoreIPC::MessageEncoder::create("", "", destinationID);
+    OwnPtr<CoreIPC::MessageEncoder> encoder = CoreIPC::MessageEncoder::create(CoreIPC::MessageKindTraits<E>::messageReceiverName(), "", destinationID);
     encoder->encode(arguments);
 
     return sendMessage(CoreIPC::MessageID(messageID), encoder.release(), 0);
@@ -227,7 +230,7 @@ bool WebProcessProxy::deprecatedSend(E messageID, uint64_t destinationID, const 
 template<typename T>
 bool WebProcessProxy::send(const T& message, uint64_t destinationID, unsigned messageSendFlags)
 {
-    OwnPtr<CoreIPC::MessageEncoder> encoder = CoreIPC::MessageEncoder::create("", "", destinationID);
+    OwnPtr<CoreIPC::MessageEncoder> encoder = CoreIPC::MessageEncoder::create(T::receiverName(), "", destinationID);
     encoder->encode(message);
 
     return sendMessage(CoreIPC::MessageID(T::messageID), encoder.release(), messageSendFlags);

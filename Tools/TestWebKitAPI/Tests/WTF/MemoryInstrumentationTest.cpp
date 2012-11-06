@@ -734,5 +734,37 @@ TEST(MemoryInstrumentationTest, arrayBuffer)
     EXPECT_EQ(2u, helper.visitedObjects());
 }
 
+class AncestorWithVirtualMethod {
+public:
+    virtual char* data() { return m_data; }
+
+private:
+    char m_data[10];
+};
+
+class ClassWithTwoAncestors : public AncestorWithVirtualMethod, public Instrumented {
+public:
+    virtual void reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
+    {
+        MemoryClassInfo info(memoryObjectInfo, this, TestType);
+    }
+};
+
+
+TEST(MemoryInstrumentationTest, instrumentedWithMultipleAncestors)
+{
+    InstrumentationTestHelper helper;
+    OwnPtr<ClassWithTwoAncestors> instance = adoptPtr(new ClassWithTwoAncestors());
+    ClassWithTwoAncestors* descendantPointer = instance.get();
+    InstrumentedOwner<ClassWithTwoAncestors*> descendantPointerOwner(descendantPointer);
+    Instrumented* ancestorPointer = descendantPointer;
+    InstrumentedOwner<Instrumented*> ancestorPointerOwner(ancestorPointer);
+    EXPECT_NE(static_cast<void*>(ancestorPointer), static_cast<void*>(descendantPointer));
+    helper.addRootObject(descendantPointerOwner);
+    helper.addRootObject(ancestorPointerOwner);
+    EXPECT_EQ(sizeof(ClassWithTwoAncestors), helper.reportedSizeForAllTypes());
+    EXPECT_EQ(2u, helper.visitedObjects());
+}
+
 } // namespace
 

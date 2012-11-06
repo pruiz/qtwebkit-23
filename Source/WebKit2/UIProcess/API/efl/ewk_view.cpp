@@ -25,7 +25,11 @@
 #include "NativeWebMouseEvent.h"
 #include "NativeWebWheelEvent.h"
 #include "PageClientImpl.h"
+#include "PageLoadClientEfl.h"
+#include "PagePolicyClientEfl.h"
+#include "PageUIClientEfl.h"
 #include "RefPtrEfl.h"
+#include "ResourceLoadClientEfl.h"
 #include "WKAPICast.h"
 #include "WKColorPickerResultListener.h"
 #include "WKEinaSharedString.h"
@@ -41,6 +45,7 @@
 #include "ewk_back_forward_list_private.h"
 #include "ewk_context.h"
 #include "ewk_context_private.h"
+#include "ewk_favicon_database_private.h"
 #include "ewk_intent_private.h"
 #include "ewk_popup_menu_item.h"
 #include "ewk_popup_menu_item_private.h"
@@ -50,14 +55,13 @@
 #include "ewk_settings_private.h"
 #include "ewk_view_find_client_private.h"
 #include "ewk_view_form_client_private.h"
-#include "ewk_view_loader_client_private.h"
-#include "ewk_view_policy_client_private.h"
 #include "ewk_view_private.h"
-#include "ewk_view_resource_load_client_private.h"
-#include "ewk_view_ui_client_private.h"
 #include <Ecore_Evas.h>
+#include <Ecore_IMF.h>
+#include <Ecore_IMF_Evas.h>
 #include <Edje.h>
 #include <WebCore/Cursor.h>
+#include <WebCore/Editor.h>
 #include <WebCore/EflScreenUtilities.h>
 #include <WebKit2/WKPageGroup.h>
 #include <wtf/text/CString.h>
@@ -74,7 +78,8 @@
 #include <Evas_GL.h>
 #endif
 
-#if USE(COORDINATED_GRAPHICS)
+#if USE(TILED_BACKING_STORE)
+#include "PageViewportController.h"
 #include "PageViewportControllerClientEfl.h"
 #endif
 
@@ -85,8 +90,9 @@ static const char EWK_VIEW_TYPE_STR[] = "EWK2_View";
 
 static const int defaultCursorSize = 16;
 
-typedef HashMap< uint64_t, RefPtr<Ewk_Resource> > LoadingResourcesMap;
 static void _ewk_view_on_favicon_changed(const char* pageURL, void* eventInfo);
+static Ecore_IMF_Context* _ewk_view_imf_context_create(Ewk_View_Smart_Data* smartData);
+static void _ewk_view_imf_context_destroy(Ecore_IMF_Context* imfContext);
 
 typedef HashMap<const WebPageProxy*, const Evas_Object*> PageViewMap;
 
@@ -114,10 +120,15 @@ static inline void removeFromPageViewMap(const Evas_Object* ewkView)
 
 struct Ewk_View_Private_Data {
     OwnPtr<PageClientImpl> pageClient;
-#if USE(COORDINATED_GRAPHICS)
+#if USE(TILED_BACKING_STORE)
     OwnPtr<PageViewportControllerClientEfl> pageViewportControllerClient;
+    OwnPtr<PageViewportController> pageViewportController;
 #endif
     RefPtr<WebPageProxy> pageProxy;
+    OwnPtr<PageLoadClientEfl> pageLoadClient;
+    OwnPtr<PagePolicyClientEfl> pagePolicyClient;
+    OwnPtr<PageUIClientEfl> pageUIClient;
+    OwnPtr<ResourceLoadClientEfl> resourceLoadClient;
 
     WKEinaSharedString url;
     WKEinaSharedString title;
@@ -126,18 +137,20 @@ struct Ewk_View_Private_Data {
     WKEinaSharedString cursorGroup;
     WKEinaSharedString faviconURL;
     RefPtr<Evas_Object> cursorObject;
-    LoadingResourcesMap loadingResourcesMap;
     OwnPtr<Ewk_Back_Forward_List> backForwardList;
     OwnPtr<Ewk_Settings> settings;
     bool areMouseEventsEnabled;
     WKRetainPtr<WKColorPickerResultListenerRef> colorPickerResultListener;
-    Ewk_Context* context;
+    RefPtr<Ewk_Context> context;
 #if ENABLE(TOUCH_EVENTS)
     bool areTouchEventsEnabled;
 #endif
 
     WebPopupMenuProxyEfl* popupMenuProxy;
     Eina_List* popupMenuItems;
+
+    Ecore_IMF_Context* imfContext;
+    bool isImfFocused;
 
 #ifdef HAVE_ECORE_X
     bool isUsingEcoreX;
@@ -151,12 +164,13 @@ struct Ewk_View_Private_Data {
 
     Ewk_View_Private_Data()
         : areMouseEventsEnabled(false)
-        , context(0)
 #if ENABLE(TOUCH_EVENTS)
         , areTouchEventsEnabled(false)
 #endif
         , popupMenuProxy(0)
         , popupMenuItems(0)
+        , imfContext(0)
+        , isImfFocused(false)
 #ifdef HAVE_ECORE_X
         , isUsingEcoreX(false)
 #endif
@@ -169,9 +183,11 @@ struct Ewk_View_Private_Data {
 
     ~Ewk_View_Private_Data()
     {
+        _ewk_view_imf_context_destroy(imfContext);
+
         /* Unregister icon change callback */
-        Ewk_Favicon_Database* iconDatabase = ewk_context_favicon_database_get(context);
-        ewk_favicon_database_icon_change_callback_del(iconDatabase, _ewk_view_on_favicon_changed);
+        Ewk_Favicon_Database* iconDatabase = context->faviconDatabase();
+        iconDatabase->unwatchChanges(_ewk_view_on_favicon_changed);
 
         void* item;
         EINA_LIST_FREE(popupMenuItems, item)
@@ -275,12 +291,30 @@ static Eina_Bool _ewk_view_smart_focus_out(Ewk_View_Smart_Data* smartData)
     return true;
 }
 
+#if USE(TILED_BACKING_STORE)
+static Evas_Coord_Point mapToWebContent(Ewk_View_Smart_Data* smartData, Evas_Coord_Point point)
+{
+    Evas_Coord_Point result;
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, result);
+
+    result.x = (point.x  - smartData->view.x) / priv->pageViewportControllerClient->scaleFactor() + smartData->view.x + priv->pageViewportControllerClient->scrollPosition().x();
+    result.y = (point.y - smartData->view.y) / priv->pageViewportControllerClient->scaleFactor() + smartData->view.y + priv->pageViewportControllerClient->scrollPosition().y();
+    return result;
+}
+#endif
+
 static Eina_Bool _ewk_view_smart_mouse_wheel(Ewk_View_Smart_Data* smartData, const Evas_Event_Mouse_Wheel* wheelEvent)
 {
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     Evas_Point position = {smartData->view.x, smartData->view.y};
+#if USE(TILED_BACKING_STORE)
+    Evas_Event_Mouse_Wheel event(*wheelEvent);
+    event.canvas = mapToWebContent(smartData, event.canvas);
+    priv->pageProxy->handleWheelEvent(NativeWebWheelEvent(&event, &position));
+#else
     priv->pageProxy->handleWheelEvent(NativeWebWheelEvent(wheelEvent, &position));
+#endif
     return true;
 }
 
@@ -289,7 +323,13 @@ static Eina_Bool _ewk_view_smart_mouse_down(Ewk_View_Smart_Data* smartData, cons
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     Evas_Point position = {smartData->view.x, smartData->view.y};
+#if USE(TILED_BACKING_STORE)
+    Evas_Event_Mouse_Down event(*downEvent);
+    event.canvas = mapToWebContent(smartData, event.canvas);
+    priv->pageProxy->handleMouseEvent(NativeWebMouseEvent(&event, &position));
+#else
     priv->pageProxy->handleMouseEvent(NativeWebMouseEvent(downEvent, &position));
+#endif
     return true;
 }
 
@@ -298,7 +338,17 @@ static Eina_Bool _ewk_view_smart_mouse_up(Ewk_View_Smart_Data* smartData, const 
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     Evas_Point position = {smartData->view.x, smartData->view.y};
+#if USE(TILED_BACKING_STORE)
+    Evas_Event_Mouse_Up event(*upEvent);
+    event.canvas = mapToWebContent(smartData, event.canvas);
+    priv->pageProxy->handleMouseEvent(NativeWebMouseEvent(&event, &position));
+#else
     priv->pageProxy->handleMouseEvent(NativeWebMouseEvent(upEvent, &position));
+#endif
+
+    if (priv->imfContext)
+        ecore_imf_context_reset(priv->imfContext);
+
     return true;
 }
 
@@ -307,7 +357,13 @@ static Eina_Bool _ewk_view_smart_mouse_move(Ewk_View_Smart_Data* smartData, cons
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     Evas_Point position = {smartData->view.x, smartData->view.y};
+#if USE(TILED_BACKING_STORE)
+    Evas_Event_Mouse_Move event(*moveEvent);
+    event.cur.canvas = mapToWebContent(smartData, event.cur.canvas);
+    priv->pageProxy->handleMouseEvent(NativeWebMouseEvent(&event, &position));
+#else
     priv->pageProxy->handleMouseEvent(NativeWebMouseEvent(moveEvent, &position));
+#endif
     return true;
 }
 
@@ -315,7 +371,15 @@ static Eina_Bool _ewk_view_smart_key_down(Ewk_View_Smart_Data* smartData, const 
 {
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
-    priv->pageProxy->handleKeyboardEvent(NativeWebKeyboardEvent(downEvent));
+    bool isFiltered = false;
+    if (priv->imfContext) {
+        Ecore_IMF_Event imfEvent;
+        ecore_imf_evas_event_key_down_wrap(const_cast<Evas_Event_Key_Down*>(downEvent), &imfEvent.key_down);
+
+        isFiltered = ecore_imf_context_filter_event(priv->imfContext, ECORE_IMF_EVENT_KEY_DOWN, &imfEvent);
+    }
+
+    priv->pageProxy->handleKeyboardEvent(NativeWebKeyboardEvent(downEvent, isFiltered));
     return true;
 }
 
@@ -457,6 +521,35 @@ static void _ewk_view_on_touch_move(void* /* data */, Evas* /* canvas */, Evas_O
 }
 #endif
 
+static void _ewk_view_preedit_changed(void* data, Ecore_IMF_Context* context, void*)
+{
+    Ewk_View_Smart_Data* smartData = static_cast<Ewk_View_Smart_Data*>(data);
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
+
+    if (!priv->pageProxy->focusedFrame() || !priv->isImfFocused)
+        return;
+
+    char* buffer = 0;
+    ecore_imf_context_preedit_string_get(context, &buffer, 0);
+    if (!buffer)
+        return;
+
+    String preeditString = String::fromUTF8(buffer);
+    Vector<CompositionUnderline> underlines;
+    underlines.append(CompositionUnderline(0, preeditString.length(), Color(0, 0, 0), false));
+    priv->pageProxy->setComposition(preeditString, underlines, 0);
+}
+
+static void _ewk_view_commit(void* data, Ecore_IMF_Context*, void* eventInfo)
+{
+    Ewk_View_Smart_Data* smartData = static_cast<Ewk_View_Smart_Data*>(data);
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
+    if (!eventInfo || !priv->isImfFocused)
+        return;
+
+    priv->pageProxy->confirmComposition(String::fromUTF8(static_cast<char*>(eventInfo)));
+}
+
 static Evas_Smart_Class g_parentSmartClass = EVAS_SMART_CLASS_INIT_NULL;
 
 static Ewk_View_Private_Data* _ewk_view_priv_new(Ewk_View_Smart_Data* smartData)
@@ -467,6 +560,8 @@ static Ewk_View_Private_Data* _ewk_view_priv_new(Ewk_View_Smart_Data* smartData)
         return 0;
     }
 
+    priv->imfContext = _ewk_view_imf_context_create(smartData);
+
 #ifdef HAVE_ECORE_X
     priv->isUsingEcoreX = WebCore::isUsingEcoreX(smartData->base.evas);
 #endif
@@ -476,7 +571,6 @@ static Ewk_View_Private_Data* _ewk_view_priv_new(Ewk_View_Smart_Data* smartData)
 
 static void _ewk_view_priv_del(Ewk_View_Private_Data* priv)
 {
-    ewk_context_unref(priv->context);
     delete priv;
 }
 
@@ -794,7 +888,7 @@ static inline Evas_Smart* _ewk_view_smart_class_new(void)
     return smart;
 }
 
-static void _ewk_view_initialize(Evas_Object* ewkView, Ewk_Context* context, WKPageGroupRef pageGroupRef)
+static void _ewk_view_initialize(Evas_Object* ewkView, PassRefPtr<Ewk_Context> context, WKPageGroupRef pageGroupRef)
 {
     EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
@@ -806,9 +900,9 @@ static void _ewk_view_initialize(Evas_Object* ewkView, Ewk_Context* context, WKP
     priv->pageClient = PageClientImpl::create(ewkView);
 
     if (pageGroupRef)
-        priv->pageProxy = toImpl(ewk_context_WKContext_get(context))->createWebPage(priv->pageClient.get(), toImpl(pageGroupRef));
+        priv->pageProxy = toImpl(context->wkContext())->createWebPage(priv->pageClient.get(), toImpl(pageGroupRef));
     else
-        priv->pageProxy = toImpl(ewk_context_WKContext_get(context))->createWebPage(priv->pageClient.get(), WebPageGroup::create().get());
+        priv->pageProxy = toImpl(context->wkContext())->createWebPage(priv->pageClient.get(), WebPageGroup::create().get());
 
     addToPageViewMap(ewkView);
 
@@ -821,27 +915,30 @@ static void _ewk_view_initialize(Evas_Object* ewkView, Ewk_Context* context, WKP
 
     priv->backForwardList = Ewk_Back_Forward_List::create(toAPI(priv->pageProxy->backForwardList()));
     priv->settings = adoptPtr(new Ewk_Settings(WKPageGroupGetPreferences(WKPageGetPageGroup(toAPI(priv->pageProxy.get())))));
-    priv->context = ewk_context_ref(context);
+    priv->context = context;
 
-#if USE(COORDINATED_GRAPHICS)
+#if USE(TILED_BACKING_STORE)
     priv->pageViewportControllerClient = PageViewportControllerClientEfl::create(ewkView);
+    priv->pageViewportController = adoptPtr(new PageViewportController(priv->pageProxy.get(), priv->pageViewportControllerClient.get()));
+    priv->pageClient->setPageViewportController(priv->pageViewportController.get());
 #endif
 
+    // Initialize page clients.
     WKPageRef wkPage = toAPI(priv->pageProxy.get());
     ewk_view_find_client_attach(wkPage, ewkView);
     ewk_view_form_client_attach(wkPage, ewkView);
-    ewk_view_loader_client_attach(wkPage, ewkView);
-    ewk_view_policy_client_attach(wkPage, ewkView);
-    ewk_view_resource_load_client_attach(wkPage, ewkView);
-    ewk_view_ui_client_attach(wkPage, ewkView);
 #if ENABLE(FULLSCREEN_API)
     priv->pageProxy->fullScreenManager()->setWebView(ewkView);
     ewk_settings_fullscreen_enabled_set(priv->settings.get(), true);
 #endif
+    priv->pageLoadClient = PageLoadClientEfl::create(ewkView);
+    priv->pagePolicyClient = PagePolicyClientEfl::create(ewkView);
+    priv->pageUIClient = PageUIClientEfl::create(ewkView);
+    priv->resourceLoadClient = ResourceLoadClientEfl::create(ewkView);
 
     /* Listen for favicon changes */
-    Ewk_Favicon_Database* iconDatabase = ewk_context_favicon_database_get(priv->context);
-    ewk_favicon_database_icon_change_callback_add(iconDatabase, _ewk_view_on_favicon_changed, ewkView);
+    Ewk_Favicon_Database* iconDatabase = priv->context->faviconDatabase();
+    iconDatabase->watchChanges(IconChangeCallbackData(_ewk_view_on_favicon_changed, ewkView));
 }
 
 static Evas_Object* _ewk_view_add_with_smart(Evas* canvas, Evas_Smart* smart)
@@ -880,7 +977,7 @@ Evas_Object* ewk_view_base_add(Evas* canvas, WKContextRef contextRef, WKPageGrou
     if (!ewkView)
         return 0;
 
-    _ewk_view_initialize(ewkView, ewk_context_new_from_WKContext(contextRef), pageGroupRef);
+    _ewk_view_initialize(ewkView, Ewk_Context::create(contextRef), pageGroupRef);
 
     return ewkView;
 }
@@ -902,6 +999,7 @@ Evas_Object* ewk_view_smart_add(Evas* canvas, Evas_Smart* smart, Ewk_Context* co
 
 Evas_Object* ewk_view_add_with_context(Evas* canvas, Ewk_Context* context)
 {
+    EINA_SAFETY_ON_NULL_RETURN_VAL(context, 0);
     return ewk_view_smart_add(canvas, _ewk_view_smart_class_new(), context);
 }
 
@@ -915,7 +1013,7 @@ Ewk_Context* ewk_view_context_get(const Evas_Object* ewkView)
     EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData, 0);
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, 0);
 
-    return priv->context;
+    return priv->context.get();
 }
 
 /**
@@ -1014,19 +1112,25 @@ Ewk_Settings* ewk_view_settings_get(const Evas_Object* ewkView)
 
 /**
  * @internal
+ * Retrieves the internal WKPage for this view.
+ */
+WKPageRef ewk_view_wkpage_get(const Evas_Object* ewkView)
+{
+    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData, 0);
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, 0);
+
+    return toAPI(priv->pageProxy.get());
+}
+
+/**
+ * @internal
  * Load was initiated for a resource in the view.
  *
  * Emits signal: "resource,request,new" with pointer to resource request.
  */
-void ewk_view_resource_load_initiated(Evas_Object* ewkView, uint64_t resourceIdentifier, Ewk_Resource* resource, Ewk_Url_Request* request)
+void ewk_view_resource_load_initiated(Evas_Object* ewkView, Ewk_Resource* resource, Ewk_Url_Request* request)
 {
-    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
-
     Ewk_Resource_Request resourceRequest = {resource, request, 0};
-
-    // Keep the resource internally to reuse it later.
-    priv->loadingResourcesMap.add(resourceIdentifier, resource);
 
     evas_object_smart_callback_call(ewkView, "resource,request,new", &resourceRequest);
 }
@@ -1037,16 +1141,9 @@ void ewk_view_resource_load_initiated(Evas_Object* ewkView, uint64_t resourceIde
  *
  * Emits signal: "resource,request,response" with pointer to resource response.
  */
-void ewk_view_resource_load_response(Evas_Object* ewkView, uint64_t resourceIdentifier, Ewk_Url_Response* response)
+void ewk_view_resource_load_response(Evas_Object* ewkView, Ewk_Resource* resource, Ewk_Url_Response* response)
 {
-    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
-
-    if (!priv->loadingResourcesMap.contains(resourceIdentifier))
-        return;
-
-    RefPtr<Ewk_Resource> resource = priv->loadingResourcesMap.get(resourceIdentifier);
-    Ewk_Resource_Load_Response resourceLoadResponse = {resource.get(), response};
+    Ewk_Resource_Load_Response resourceLoadResponse = {resource, response};
     evas_object_smart_callback_call(ewkView, "resource,request,response", &resourceLoadResponse);
 }
 
@@ -1056,16 +1153,9 @@ void ewk_view_resource_load_response(Evas_Object* ewkView, uint64_t resourceIden
  *
  * Emits signal: "resource,request,finished" with pointer to the resource load error.
  */
-void ewk_view_resource_load_failed(Evas_Object* ewkView, uint64_t resourceIdentifier, Ewk_Error* error)
+void ewk_view_resource_load_failed(Evas_Object* ewkView, Ewk_Resource* resource, Ewk_Error* error)
 {
-    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
-
-    if (!priv->loadingResourcesMap.contains(resourceIdentifier))
-        return;
-
-    RefPtr<Ewk_Resource> resource = priv->loadingResourcesMap.get(resourceIdentifier);
-    Ewk_Resource_Load_Error resourceLoadError = {resource.get(), error};
+    Ewk_Resource_Load_Error resourceLoadError = {resource, error};
     evas_object_smart_callback_call(ewkView, "resource,request,failed", &resourceLoadError);
 }
 
@@ -1075,16 +1165,9 @@ void ewk_view_resource_load_failed(Evas_Object* ewkView, uint64_t resourceIdenti
  *
  * Emits signal: "resource,request,finished" with pointer to the resource.
  */
-void ewk_view_resource_load_finished(Evas_Object* ewkView, uint64_t resourceIdentifier)
+void ewk_view_resource_load_finished(Evas_Object* ewkView, Ewk_Resource* resource)
 {
-    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
-
-    if (!priv->loadingResourcesMap.contains(resourceIdentifier))
-        return;
-
-    RefPtr<Ewk_Resource> resource = priv->loadingResourcesMap.take(resourceIdentifier);
-    evas_object_smart_callback_call(ewkView, "resource,request,finished", resource.get());
+    evas_object_smart_callback_call(ewkView, "resource,request,finished", resource);
 }
 
 /**
@@ -1093,17 +1176,9 @@ void ewk_view_resource_load_finished(Evas_Object* ewkView, uint64_t resourceIden
  *
  * Emits signal: "resource,request,sent" with pointer to resource request and possible redirect response.
  */
-void ewk_view_resource_request_sent(Evas_Object* ewkView, uint64_t resourceIdentifier, Ewk_Url_Request* request, Ewk_Url_Response* redirectResponse)
+void ewk_view_resource_request_sent(Evas_Object* ewkView, Ewk_Resource* resource, Ewk_Url_Request* request, Ewk_Url_Response* redirectResponse)
 {
-    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
-
-    if (!priv->loadingResourcesMap.contains(resourceIdentifier))
-        return;
-
-    RefPtr<Ewk_Resource> resource = priv->loadingResourcesMap.get(resourceIdentifier);
-    Ewk_Resource_Request resourceRequest = {resource.get(), request, redirectResponse};
-
+    Ewk_Resource_Request resourceRequest = {resource, request, redirectResponse};
     evas_object_smart_callback_call(ewkView, "resource,request,sent", &resourceRequest);
 }
 
@@ -1127,6 +1202,70 @@ const char* ewk_view_title_get(const Evas_Object* ewkView)
 void ewk_view_text_found(Evas_Object* ewkView, unsigned int matchCount)
 {
     evas_object_smart_callback_call(ewkView, "text,found", &matchCount);
+}
+
+static Ecore_IMF_Context* _ewk_view_imf_context_create(Ewk_View_Smart_Data* smartData)
+{
+    const char* defaultContextID = ecore_imf_context_default_id_get();
+    if (!defaultContextID)
+        return 0;
+
+    Ecore_IMF_Context* imfContext = ecore_imf_context_add(defaultContextID);
+    if (!imfContext)
+        return 0;
+
+    ecore_imf_context_event_callback_add(imfContext, ECORE_IMF_CALLBACK_PREEDIT_CHANGED, _ewk_view_preedit_changed, smartData);
+    ecore_imf_context_event_callback_add(imfContext, ECORE_IMF_CALLBACK_COMMIT, _ewk_view_commit, smartData);
+
+    Ecore_Evas* ecoreEvas = ecore_evas_ecore_evas_get(smartData->base.evas);
+    ecore_imf_context_client_window_set(imfContext, (void*)ecore_evas_window_get(ecoreEvas));
+    ecore_imf_context_client_canvas_set(imfContext, smartData->base.evas);
+
+    return imfContext;
+}
+
+static void _ewk_view_imf_context_destroy(Ecore_IMF_Context* imfContext)
+{
+    if (!imfContext)
+        return;
+
+    ecore_imf_context_event_callback_del(imfContext, ECORE_IMF_CALLBACK_PREEDIT_CHANGED, _ewk_view_preedit_changed);
+    ecore_imf_context_event_callback_del(imfContext, ECORE_IMF_CALLBACK_COMMIT, _ewk_view_commit);
+    ecore_imf_context_del(imfContext);
+}
+
+/**
+ * @internal
+ * The view was requested to update text input state
+ */
+void ewk_view_text_input_state_update(Evas_Object* ewkView)
+{
+    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
+
+    if (!priv->imfContext)
+        return;
+
+    const EditorState& editor = priv->pageProxy->editorState();
+
+    if (editor.isContentEditable) {
+        if (priv->isImfFocused)
+            return;
+
+        ecore_imf_context_reset(priv->imfContext);
+        ecore_imf_context_focus_in(priv->imfContext);
+        priv->isImfFocused = true;
+    } else {
+        if (!priv->isImfFocused)
+            return;
+
+        if (editor.hasComposition)
+            priv->pageProxy->cancelComposition();
+
+        priv->isImfFocused = false;
+        ecore_imf_context_reset(priv->imfContext);
+        ecore_imf_context_focus_out(priv->imfContext);
+    }
 }
 
 /**
@@ -1429,7 +1568,7 @@ Eina_Bool ewk_view_intent_deliver(Evas_Object* ewkView, Ewk_Intent* intent)
     EINA_SAFETY_ON_NULL_RETURN_VAL(intent, false);
 
     WebPageProxy* page = priv->pageProxy.get();
-    page->deliverIntentToFrame(page->mainFrame(), toImpl(intent->wkIntent.get()));
+    page->deliverIntentToFrame(page->mainFrame(), intent->webIntentData());
 
     return true;
 #else
@@ -1517,6 +1656,16 @@ void ewk_view_load_provisional_failed(Evas_Object* ewkView, const Ewk_Error* err
     evas_object_smart_callback_call(ewkView, "load,provisional,failed", const_cast<Ewk_Error*>(error));
 }
 
+#if USE(TILED_BACKING_STORE)
+void ewk_view_load_committed(Evas_Object* ewkView)
+{
+    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
+    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
+
+    priv->pageViewportController->didCommitLoad();
+}
+#endif
+
 /**
  * @internal
  * Reports view received redirect for provisional load.
@@ -1537,13 +1686,6 @@ void ewk_view_load_provisional_redirect(Evas_Object* ewkView)
  */
 void ewk_view_load_provisional_started(Evas_Object* ewkView)
 {
-    EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
-    EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
-
-    // The main frame started provisional load, we should clear
-    // the loadingResources HashMap to start clean.
-    priv->loadingResourcesMap.clear();
-
     ewk_view_url_update(ewkView);
     evas_object_smart_callback_call(ewkView, "load,provisional,started", 0);
 }
@@ -1572,7 +1714,7 @@ void ewk_view_update_icon(Evas_Object* ewkView)
     EWK_VIEW_SD_GET_OR_RETURN(ewkView, smartData);
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv);
 
-    Ewk_Favicon_Database* iconDatabase = ewk_context_favicon_database_get(priv->context);
+    Ewk_Favicon_Database* iconDatabase = priv->context->faviconDatabase();
     ASSERT(iconDatabase);
 
     priv->faviconURL = ewk_favicon_database_icon_url_get(iconDatabase, priv->url);
@@ -1941,8 +2083,8 @@ Eina_Bool ewk_view_color_picker_color_set(Evas_Object* ewkView, int r, int g, in
     EINA_SAFETY_ON_NULL_RETURN_VAL(priv->colorPickerResultListener, false);
 
     WebCore::Color color = WebCore::Color(r, g, b, a);
-    const WKStringRef colorString = WKStringCreateWithUTF8CString(color.serialized().utf8().data());
-    WKColorPickerResultListenerSetColor(priv->colorPickerResultListener.get(), colorString);
+    WKRetainPtr<WKStringRef> colorString(AdoptWK, WKStringCreateWithUTF8CString(color.serialized().utf8().data()));
+    WKColorPickerResultListenerSetColor(priv->colorPickerResultListener.get(), colorString.get());
     priv->colorPickerResultListener.clear();
 
     return true;
@@ -1959,6 +2101,8 @@ Eina_Bool ewk_view_feed_touch_event(Evas_Object* ewkView, Ewk_Touch_Event_Type t
     EWK_VIEW_PRIV_GET_OR_RETURN(smartData, priv, false);
 
     Evas_Point position = { smartData->view.x, smartData->view.y };
+    // FIXME: Touch points do not take scroll position and scale into account when 
+    // TILED_BACKING_STORE is enabled.
     priv->pageProxy->handleTouchEvent(NativeWebTouchEvent(type, points, modifiers, &position, ecore_time_get()));
 
     return true;

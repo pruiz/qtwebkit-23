@@ -59,6 +59,11 @@ public:
         SupportsAlpha = 0x01
     };
 
+    enum UpdateContentsFlag {
+        UpdateCanModifyOriginalImageData,
+        UpdateCannotModifyOriginalImageData
+    };
+
     typedef unsigned Flags;
 
     BitmapTexture()
@@ -70,8 +75,8 @@ public:
     virtual bool isBackedByOpenGL() const { return false; }
 
     virtual IntSize size() const = 0;
-    virtual void updateContents(Image*, const IntRect&, const IntPoint& offset) = 0;
-    virtual void updateContents(const void*, const IntRect& target, const IntPoint& offset, int bytesPerLine) = 0;
+    virtual void updateContents(Image*, const IntRect&, const IntPoint& offset, UpdateContentsFlag) = 0;
+    virtual void updateContents(const void*, const IntRect& target, const IntPoint& offset, int bytesPerLine, UpdateContentsFlag) = 0;
     virtual bool isValid() const = 0;
     inline Flags flags() const { return m_flags; }
 

@@ -355,8 +355,10 @@ public:
     
     bool maintainsInactiveSelection() const { return m_maintainsInactiveSelection; }
     void setMaintainsInactiveSelection(bool);
-#if PLATFORM(QT)
+#if USE(TILED_BACKING_STORE) 
     void didRenderFrame(const WebCore::IntSize& contentsSize, const WebCore::IntRect& coveredRect);
+#endif
+#if PLATFORM(QT)
     void registerApplicationScheme(const String& scheme);
     void resolveApplicationSchemeRequest(QtNetworkRequestData);
     void sendApplicationSchemeReply(const QQuickNetworkReply*);
@@ -413,6 +415,12 @@ public:
     void setGestureReachedScrollingLimit(bool);
 
     HWND nativeWindow() const;
+#endif
+#if PLATFORM(EFL)
+    void handleInputMethodKeydown(bool& handled);
+    void confirmComposition(const String&);
+    void setComposition(const String&, Vector<WebCore::CompositionUnderline>&, int);
+    void cancelComposition();
 #endif
 #if USE(CAIRO) && !PLATFORM(WIN_CAIRO)
     PlatformWidget viewWidget();
@@ -852,10 +860,9 @@ private:
     
 #if USE(TILED_BACKING_STORE)
     void pageDidRequestScroll(const WebCore::IntPoint&);
-#endif
-
-#if PLATFORM(QT)
     void pageTransitionViewportReady();
+#endif
+#if PLATFORM(QT)
     void didFindZoomableArea(const WebCore::IntPoint&, const WebCore::IntRect&);
 #endif
 

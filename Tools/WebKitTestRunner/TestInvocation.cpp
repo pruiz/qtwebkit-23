@@ -447,6 +447,13 @@ void TestInvocation::didReceiveMessageFromInjectedBundle(WKStringRef messageName
         return;
     }
 
+    if (WKStringIsEqualToUTF8CString(messageName, "QueueForwardNavigation")) {
+        ASSERT(WKGetTypeID(messageBody) == WKUInt64GetTypeID());
+        uint64_t stepCount = WKUInt64GetValue(static_cast<WKUInt64Ref>(messageBody));
+        TestController::shared().workQueueManager().queueForwardNavigation(stepCount);
+        return;
+    }
+
     if (WKStringIsEqualToUTF8CString(messageName, "QueueLoad")) {
         ASSERT(WKGetTypeID(messageBody) == WKDictionaryGetTypeID());
         WKDictionaryRef loadDataDictionary = static_cast<WKDictionaryRef>(messageBody);
@@ -463,6 +470,20 @@ void TestInvocation::didReceiveMessageFromInjectedBundle(WKStringRef messageName
 
     if (WKStringIsEqualToUTF8CString(messageName, "QueueReload")) {
         TestController::shared().workQueueManager().queueReload();
+        return;
+    }
+
+    if (WKStringIsEqualToUTF8CString(messageName, "QueueLoadingScript")) {
+        ASSERT(WKGetTypeID(messageBody) == WKStringGetTypeID());
+        WKStringRef script = static_cast<WKStringRef>(messageBody);
+        TestController::shared().workQueueManager().queueLoadingScript(toWTFString(script));
+        return;
+    }
+
+    if (WKStringIsEqualToUTF8CString(messageName, "QueueNonLoadingScript")) {
+        ASSERT(WKGetTypeID(messageBody) == WKStringGetTypeID());
+        WKStringRef script = static_cast<WKStringRef>(messageBody);
+        TestController::shared().workQueueManager().queueNonLoadingScript(toWTFString(script));
         return;
     }
 

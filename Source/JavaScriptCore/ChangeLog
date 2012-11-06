@@ -1,3 +1,413 @@
+2012-10-23  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        Unreviewed. Fix make distcheck.
+
+        * GNUmakefile.list.am: Add missing header file.
+
+2012-10-23  Mark Lam  <mark.lam@apple.com>
+
+        Make topCallFrame reliable.
+        https://bugs.webkit.org/show_bug.cgi?id=98928.
+
+        Reviewed by Geoffrey Garen.
+
+        - VM entry points and the GC now uses topCallFrame.
+        - The callerFrame value in CallFrames are now always the previous
+          frame on the stack, except for the first frame which has a
+          callerFrame of 0 (not counting the HostCallFrameFlag).
+          Hence, we can now traverse every frame on the stack all the way
+          back to the first frame.
+        - GlobalExec's will no longer be used as the callerFrame values in
+          call frames.
+        - Added fences and traps for debugging the JSStack in debug builds.
+
+        * bytecode/SamplingTool.h:
+        (SamplingTool):
+        (JSC::SamplingTool::CallRecord::CallRecord):
+        * dfg/DFGOperations.cpp:
+        - Fixed 2 DFG helper functions to flush topCallFrame as expected.
+        * dfg/DFGSpeculativeJIT.h:
+        (JSC::DFG::SpeculativeJIT::prepareForExternalCall):
+        * interpreter/CallFrame.h:
+        (JSC::ExecState::callerFrameNoFlags):
+        (ExecState):
+        (JSC::ExecState::argIndexForRegister):
+        (JSC::ExecState::getArgumentUnsafe):
+        * interpreter/CallFrameClosure.h:
+        (CallFrameClosure):
+        * interpreter/Interpreter.cpp:
+        (JSC):
+        (JSC::eval):
+        (JSC::Interpreter::Interpreter):
+        (JSC::Interpreter::throwException):
+        (JSC::Interpreter::execute):
+        (JSC::Interpreter::executeCall):
+        (JSC::Interpreter::executeConstruct):
+        (JSC::Interpreter::prepareForRepeatCall):
+        (JSC::Interpreter::endRepeatCall):
+        * interpreter/Interpreter.h:
+        (JSC):
+        (Interpreter):
+        * interpreter/JSStack.cpp:
+        (JSC::JSStack::JSStack):
+        (JSC::JSStack::gatherConservativeRoots):
+        (JSC::JSStack::disableErrorStackReserve):
+        * interpreter/JSStack.h:
+        (JSC):
+        (JSStack):
+        (JSC::JSStack::installFence):
+        (JSC::JSStack::validateFence):
+        (JSC::JSStack::installTrapsAfterFrame):
+        * interpreter/JSStackInlines.h: Added.
+        (JSC):
+        (JSC::JSStack::getTopOfFrame):
+        (JSC::JSStack::getTopOfStack):
+        (JSC::JSStack::getStartOfFrame):
+        (JSC::JSStack::pushFrame):
+        (JSC::JSStack::popFrame):
+        (JSC::JSStack::generateFenceValue):
+        (JSC::JSStack::installFence):
+        (JSC::JSStack::validateFence):
+        (JSC::JSStack::installTrapsAfterFrame):
+        * jit/JITStubs.cpp:
+        (JSC::jitCompileFor):
+        (JSC::lazyLinkFor):
+        - Set frame->codeBlock to 0 for both the above because they are called
+          with partially intitialized frames (cb uninitialized), but may
+          trigger a GC.
+        (JSC::DEFINE_STUB_FUNCTION):
+        * runtime/JSGlobalData.cpp:
+        (JSC::JSGlobalData::JSGlobalData):
+
+2012-10-22  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG::Array::Undecided should be called DFG::Array::SelectUsingPredictions
+        https://bugs.webkit.org/show_bug.cgi?id=100052
+
+        Reviewed by Oliver Hunt.
+
+        No functional change, just renaming. It's a clearer name that more accurately
+        reflects the meaning, and it eliminates the namespace confusion that will happen
+        with the Undecided indexing type in https://bugs.webkit.org/show_bug.cgi?id=98606
+
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::execute):
+        * dfg/DFGArrayMode.cpp:
+        (JSC::DFG::fromObserved):
+        (JSC::DFG::refineArrayMode):
+        (JSC::DFG::modeAlreadyChecked):
+        (JSC::DFG::modeToString):
+        * dfg/DFGArrayMode.h:
+        (JSC::DFG::canCSEStorage):
+        (JSC::DFG::modeIsSpecific):
+        (JSC::DFG::modeSupportsLength):
+        (JSC::DFG::benefitsFromStructureCheck):
+        * dfg/DFGFixupPhase.cpp:
+        (JSC::DFG::FixupPhase::fixupNode):
+        (JSC::DFG::FixupPhase::blessArrayOperation):
+        * dfg/DFGSpeculativeJIT.cpp:
+        (JSC::DFG::SpeculativeJIT::arrayify):
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGSpeculativeJIT64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+
+2012-10-22  Mark Lam  <mark.lam@apple.com>
+
+        Change stack recursion checks to be based on stack availability.
+        https://bugs.webkit.org/show_bug.cgi?id=99872.
+
+        Reviewed by Filip Pizlo and Geoffrey Garen.
+
+        - Remove m_reentryDepth, ThreadStackType which are now obsolete.
+        - Replaced the reentryDepth checks with a StackBounds check.
+        - Added the Interpreter::StackPolicy class to compute a reasonable
+          stack capacity requirement given the native stack that the
+          interpreter is executing on at that time.
+        - Reserved an amount of JSStack space for the use of error handling
+          and enable its use (using Interpreter::ErrorHandlingMode) when
+          we're about to throw or report an exception.
+        - Interpreter::StackPolicy also allows more native stack space
+          to be used when in ErrorHandlingMode. This is needed in the case
+          of native stack overflows.
+        - Fixed the parser so that it throws a StackOverflowError instead of
+          a SyntaxError when it encounters a stack overflow.
+
+        * API/JSContextRef.cpp:
+        (JSContextGroupCreate):
+        (JSGlobalContextCreateInGroup):
+        * JavaScriptCore.order:
+        * JavaScriptCore.vcproj/JavaScriptCore/JavaScriptCore.def:
+        * interpreter/Interpreter.cpp:
+        (JSC::Interpreter::ErrorHandlingMode::ErrorHandlingMode):
+        (JSC):
+        (JSC::Interpreter::ErrorHandlingMode::~ErrorHandlingMode):
+        (JSC::Interpreter::StackPolicy::StackPolicy):
+        (JSC::Interpreter::Interpreter):
+        (JSC::Interpreter::execute):
+        (JSC::Interpreter::executeCall):
+        (JSC::Interpreter::executeConstruct):
+        (JSC::Interpreter::prepareForRepeatCall):
+        * interpreter/Interpreter.h:
+        (JSC):
+        (Interpreter):
+        (ErrorHandlingMode):
+        (StackPolicy):
+        (JSC::Interpreter::StackPolicy::requiredCapacity):
+        * interpreter/JSStack.cpp:
+        (JSC):
+        (JSC::JSStack::JSStack):
+        (JSC::JSStack::growSlowCase):
+        (JSC::JSStack::enableErrorStackReserve):
+        (JSC::JSStack::disableErrorStackReserve):
+        * interpreter/JSStack.h:
+        (JSStack):
+        (JSC::JSStack::reservationEnd):
+        (JSC):
+        * jsc.cpp:
+        (jscmain):
+        * parser/Parser.cpp:
+        (JSC::::Parser):
+        * parser/Parser.h:
+        (Parser):
+        (JSC::::parse):
+        * runtime/ExceptionHelpers.cpp:
+        (JSC::throwStackOverflowError):
+        * runtime/JSGlobalData.cpp:
+        (JSC::JSGlobalData::JSGlobalData):
+        (JSC::JSGlobalData::createContextGroup):
+        (JSC::JSGlobalData::create):
+        (JSC::JSGlobalData::createLeaked):
+        (JSC::JSGlobalData::sharedInstance):
+        * runtime/JSGlobalData.h:
+        (JSC):
+        (JSGlobalData):
+        * runtime/StringRecursionChecker.h:
+        (JSC::StringRecursionChecker::performCheck):
+        * testRegExp.cpp:
+        (realMain):
+
+2012-10-20  Martin Robinson  <mrobinson@igalia.com>
+
+        Fix 'make dist' for the GTK+ port
+
+        * GNUmakefile.list.am: Add missing files to the source list.
+
+2012-10-21  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [CMake][JSC] Depend on risc.rb to decide when to run the LLInt scripts.
+        https://bugs.webkit.org/show_bug.cgi?id=99917
+
+        Reviewed by Geoffrey Garen.
+
+        Depend on the newly-added risc.rb to make sure we always run the
+        LLInt scripts when one of them changes.
+
+        * CMakeLists.txt:
+
+2012-10-20  Filip Pizlo  <fpizlo@apple.com>
+
+        LLInt backends of non-ARM RISC platforms should be able to share code with the existing ARMv7 backend
+        https://bugs.webkit.org/show_bug.cgi?id=99745
+
+        Reviewed by Geoffrey Garen.
+
+        This moves all of the things in armv7.rb that I thought are generally useful out
+        into risc.rb. It also separates some phases (branch ops is separated into one
+        phase that does sensible things, and another that does things that are painfully
+        ARM-specific), and removes ARM assumptions from others by using a callback to
+        drive exactly what lowering must happen. The goal here is to minimize the future
+        maintenance burden of LLInt by ensuring that the various platforms share as much
+        lowering code as possible.
+
+        * offlineasm/armv7.rb:
+        * offlineasm/risc.rb: Added.
+
+2012-10-19  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG should have some facility for recognizing redundant CheckArrays and Arrayifies
+        https://bugs.webkit.org/show_bug.cgi?id=99287
+
+        Reviewed by Mark Hahnenberg.
+
+        Adds reasoning about indexing type sets (i.e. ArrayModes) to AbstractValue, which
+        then enables us to fold away CheckArray's and Arrayify's that are redundant.
+
+        * bytecode/ArrayProfile.cpp:
+        (JSC::arrayModesToString):
+        (JSC):
+        * bytecode/ArrayProfile.h:
+        (JSC):
+        (JSC::mergeArrayModes):
+        (JSC::arrayModesAlreadyChecked):
+        * bytecode/StructureSet.h:
+        (JSC::StructureSet::arrayModesFromStructures):
+        (StructureSet):
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::execute):
+        * dfg/DFGAbstractValue.h:
+        (JSC::DFG::AbstractValue::AbstractValue):
+        (JSC::DFG::AbstractValue::clear):
+        (JSC::DFG::AbstractValue::isClear):
+        (JSC::DFG::AbstractValue::makeTop):
+        (JSC::DFG::AbstractValue::clobberStructures):
+        (AbstractValue):
+        (JSC::DFG::AbstractValue::setMostSpecific):
+        (JSC::DFG::AbstractValue::set):
+        (JSC::DFG::AbstractValue::operator==):
+        (JSC::DFG::AbstractValue::merge):
+        (JSC::DFG::AbstractValue::filter):
+        (JSC::DFG::AbstractValue::filterArrayModes):
+        (JSC::DFG::AbstractValue::validate):
+        (JSC::DFG::AbstractValue::checkConsistency):
+        (JSC::DFG::AbstractValue::dump):
+        (JSC::DFG::AbstractValue::clobberArrayModes):
+        (JSC::DFG::AbstractValue::clobberArrayModesSlow):
+        (JSC::DFG::AbstractValue::setFuturePossibleStructure):
+        (JSC::DFG::AbstractValue::filterFuturePossibleStructure):
+        * dfg/DFGArrayMode.cpp:
+        (JSC::DFG::modeAlreadyChecked):
+        * dfg/DFGArrayMode.h:
+        (JSC::DFG::arrayModesFor):
+        (DFG):
+        * dfg/DFGConstantFoldingPhase.cpp:
+        (JSC::DFG::ConstantFoldingPhase::foldConstants):
+        * dfg/DFGSpeculativeJIT.cpp:
+        (JSC::DFG::SpeculativeJIT::arrayify):
+
+2012-10-19  Filip Pizlo  <fpizlo@apple.com>
+
+        Baseline JIT should not inline array allocations, to make them easier to instrument
+        https://bugs.webkit.org/show_bug.cgi?id=99905
+
+        Reviewed by Mark Hahnenberg.
+
+        This will make it easier to instrument array allocations for the purposes of profiling.
+        It also allows us to kill off a bunch of code. And, this doesn't appear to hurt
+        performance at all. That's expected because these days any hot allocation will end up
+        in the DFG JIT, which does inline these allocations.
+
+        * jit/JIT.cpp:
+        (JSC::JIT::privateCompileSlowCases):
+        * jit/JIT.h:
+        (JIT):
+        * jit/JITInlineMethods.h:
+        (JSC):
+        * jit/JITOpcodes.cpp:
+        (JSC::JIT::emit_op_new_array):
+
+2012-10-19  Oliver Hunt  <oliver@apple.com>
+
+        Fix some of the regression cause by the non-local variable reworking
+        https://bugs.webkit.org/show_bug.cgi?id=99896
+
+        Reviewed by Filip Pizlo.
+
+        The non0local variable reworking led to some of the optimisations performed by
+        the bytecode generator being dropped.  This in turn put more pressure on the DFG
+        optimisations.  This exposed a short coming in our double speculation propogation.
+        Now we try to distinguish between places where we should SpecDoubleReal vs generic
+        SpecDouble.
+
+        * dfg/DFGPredictionPropagationPhase.cpp:
+        (PredictionPropagationPhase):
+        (JSC::DFG::PredictionPropagationPhase::speculatedDoubleTypeForPrediction):
+        (JSC::DFG::PredictionPropagationPhase::speculatedDoubleTypeForPredictions):
+        (JSC::DFG::PredictionPropagationPhase::propagate):
+
+2012-10-19  Michael Saboff  <msaboff@apple.com>
+
+        Lexer should create 8 bit Identifiers for RegularExpressions and ASCII identifiers
+        https://bugs.webkit.org/show_bug.cgi?id=99855
+
+        Reviewed by Filip Pizlo.
+
+        Added makeIdentifier helpers that will always make an 8 bit Identifier or make an
+        Identifier that is the same size as the template parameter.  Used the first in the fast
+        path when looking for a JS identifier and the second when scanning regular expressions.
+
+        * parser/Lexer.cpp:
+        (JSC::::scanRegExp):
+        * parser/Lexer.h:
+        (Lexer):
+        (JSC::::makeIdentifierSameType):
+        (JSC::::makeLCharIdentifier):
+        (JSC::::lexExpectIdentifier):
+
+2012-10-19  Mark Lam  <mark.lam@apple.com>
+
+        Added WTF::StackStats mechanism.
+        https://bugs.webkit.org/show_bug.cgi?id=99805.
+
+        Reviewed by Geoffrey Garen.
+
+        Added StackStats checkpoints and probes.
+
+        * bytecompiler/BytecodeGenerator.h:
+        (JSC::BytecodeGenerator::emitNode):
+        (JSC::BytecodeGenerator::emitNodeInConditionContext):
+        * heap/SlotVisitor.cpp:
+        (JSC::SlotVisitor::append):
+        (JSC::visitChildren):
+        (JSC::SlotVisitor::donateKnownParallel):
+        (JSC::SlotVisitor::drain):
+        (JSC::SlotVisitor::drainFromShared):
+        (JSC::SlotVisitor::mergeOpaqueRoots):
+        (JSC::SlotVisitor::internalAppend):
+        (JSC::SlotVisitor::harvestWeakReferences):
+        (JSC::SlotVisitor::finalizeUnconditionalFinalizers):
+        * interpreter/Interpreter.cpp:
+        (JSC::Interpreter::execute):
+        (JSC::Interpreter::executeCall):
+        (JSC::Interpreter::executeConstruct):
+        (JSC::Interpreter::prepareForRepeatCall):
+        * parser/Parser.h:
+        (JSC::Parser::canRecurse):
+        * runtime/StringRecursionChecker.h:
+        (StringRecursionChecker):
+
+2012-10-19  Oliver Hunt  <oliver@apple.com>
+
+        REGRESSION(r131822): It made 500+ tests crash on 32 bit platforms
+        https://bugs.webkit.org/show_bug.cgi?id=99814
+
+        Reviewed by Filip Pizlo.
+
+        Call the correct macro in 32bit. 
+
+        * llint/LowLevelInterpreter.asm:
+
+2012-10-19  Dongwoo Joshua Im  <dw.im@samsung.com>
+
+        Rename ENABLE_CSS3_TEXT_DECORATION to ENABLE_CSS3_TEXT
+        https://bugs.webkit.org/show_bug.cgi?id=99804
+
+        Reviewed by Julien Chaffraix.
+
+        CSS3 text related properties will be implemented under this flag,
+        including text decoration, text-align-last, and text-justify.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-10-18  Anders Carlsson  <andersca@apple.com>
+
+        Clean up RegExpKey
+        https://bugs.webkit.org/show_bug.cgi?id=99798
+
+        Reviewed by Darin Adler.
+
+        RegExpHash doesn't need to be a class template specialization when the class template is specialized
+        for JSC::RegExpKey only. Make it a nested class of RegExp instead. Also, make operator== a friend function
+        so Hash::equal can see it.
+
+        * runtime/RegExpKey.h:
+        (JSC::RegExpKey::RegExpKey):
+        (JSC::RegExpKey::operator==):
+        (RegExpKey):
+        (JSC::RegExpKey::Hash::hash):
+        (JSC::RegExpKey::Hash::equal):
+        (Hash):
+
 2012-10-19  Mark Lam  <mark.lam@apple.com>
 
         Bot greening: Follow up to r131877 to fix the Windows build.

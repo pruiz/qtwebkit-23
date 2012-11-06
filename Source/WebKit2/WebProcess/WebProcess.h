@@ -30,6 +30,7 @@
 #include "ChildProcess.h"
 #include "DrawingArea.h"
 #include "EventDispatcher.h"
+#include "MessageReceiverMap.h"
 #include "PluginInfoStore.h"
 #include "ResourceCachesToClear.h"
 #include "SandboxExtension.h"
@@ -95,6 +96,10 @@ struct WebPageGroupData;
 struct WebPreferencesStore;
 struct WebProcessCreationParameters;
 
+#if ENABLE(NETWORK_PROCESS)
+class NetworkProcessConnection;
+#endif
+
 #if USE(SECURITY_FRAMEWORK)
 class SecItemResponseData;
 class SecKeychainItemResponseData;
@@ -108,6 +113,8 @@ public:
 
     CoreIPC::Connection* connection() const { return m_connection->connection(); }
     WebCore::RunLoop* runLoop() const { return m_runLoop; }
+
+    void addMessageReceiver(CoreIPC::StringReference messageReceiverName, CoreIPC::MessageReceiver*);
 
     WebConnectionToUIProcess* webConnectionToUIProcess() const { return m_connection.get(); }
 
@@ -188,6 +195,10 @@ public:
     WebSoupRequestManager& soupRequestManager() { return m_soupRequestManager; }
 #endif
 
+#if ENABLE(NETWORK_PROCESS)
+    void networkProcessConnectionClosed(NetworkProcessConnection*);
+#endif
+
 private:
     WebProcess();
 
@@ -228,7 +239,10 @@ private:
     void getSitesWithPluginData(const Vector<String>& pluginPaths, uint64_t callbackID);
     void clearPluginSiteData(const Vector<String>& pluginPaths, const Vector<String>& sites, uint64_t flags, uint64_t maxAgeInSeconds, uint64_t callbackID);
 #endif
-    
+
+#if ENABLE(NETWORK_PROCESS)
+    void networkProcessCrashed(CoreIPC::Connection*);
+#endif
 #if ENABLE(PLUGIN_PROCESS)
     void pluginProcessCrashed(CoreIPC::Connection*, const String& pluginPath);
 #endif
@@ -281,6 +295,7 @@ private:
 #endif
 
     RefPtr<WebConnectionToUIProcess> m_connection;
+    CoreIPC::MessageReceiverMap m_messageReceiverMap;
 
     HashMap<uint64_t, RefPtr<WebPage> > m_pageMap;
     HashMap<uint64_t, RefPtr<WebPageGroupProxy> > m_pageGroupMap;
@@ -334,6 +349,12 @@ private:
     WebIconDatabaseProxy m_iconDatabaseProxy;
     
     String m_localStorageDirectory;
+
+#if ENABLE(NETWORK_PROCESS)
+    void ensureNetworkProcessConnection();
+    RefPtr<NetworkProcessConnection> m_networkProcessConnection;
+    bool m_usesNetworkProcess;
+#endif
 
 #if ENABLE(PLUGIN_PROCESS)
     PluginProcessConnectionManager m_pluginProcessConnectionManager;

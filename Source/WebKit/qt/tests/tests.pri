@@ -16,7 +16,7 @@ INCLUDEPATH += \
     $$PWD \
     $$PWD/../Api
 
-QT += testlib network webkit
+QT += testlib network webkit webkit-private
 haveQt(5): QT += widgets
 
 haveQt(4): haveQtModule(declarative): QT += declarative

@@ -27,6 +27,7 @@
 #include "WebContext.h"
 
 #include "DownloadProxy.h"
+#include "DownloadProxyMessages.h"
 #include "ImmutableArray.h"
 #include "Logging.h"
 #include "MutableDictionary.h"
@@ -36,6 +37,7 @@
 #include "WKContextPrivate.h"
 #include "WebApplicationCacheManagerProxy.h"
 #include "WebContextMessageKinds.h"
+#include "WebContextMessages.h"
 #include "WebContextUserMessageCoders.h"
 #include "WebCookieManagerProxy.h"
 #include "WebCoreArgumentCoders.h"
@@ -67,6 +69,10 @@
 
 #if ENABLE(NETWORK_INFO)
 #include "WebNetworkInfoManagerProxy.h"
+#endif
+
+#if ENABLE(NETWORK_PROCESS)
+#include "NetworkProcessManager.h"
 #endif
 
 #if USE(SOUP)
@@ -129,9 +135,9 @@ WebContext::WebContext(ProcessModel processModel, const String& injectedBundlePa
     , m_usesNetworkProcess(false)
 #endif
 {
-    deprecatedAddMessageReceiver(CoreIPC::MessageClassWebContext, this);
-    deprecatedAddMessageReceiver(CoreIPC::MessageClassDownloadProxy, this);
-    deprecatedAddMessageReceiver(CoreIPC::MessageClassWebContextLegacy, this);
+    addMessageReceiver(Messages::WebContext::messageReceiverName(), this);
+    addMessageReceiver(Messages::DownloadProxy::messageReceiverName(), this);
+    addMessageReceiver(CoreIPC::MessageKindTraits<WebContextLegacyMessage::Kind>::messageReceiverName(), this);
 
     // NOTE: These sub-objects must be initialized after m_messageReceiverMap..
     m_applicationCacheManagerProxy = WebApplicationCacheManagerProxy::create(this);
@@ -336,7 +342,7 @@ PassRefPtr<WebProcessProxy> WebContext::createNewWebProcess()
 {
 #if ENABLE(NETWORK_PROCESS)
     if (m_usesNetworkProcess)
-        ensureNetworkProcess();
+        NetworkProcessManager::shared().ensureNetworkProcess();
 #endif
 
     RefPtr<WebProcessProxy> process = WebProcessProxy::create(this);
@@ -396,6 +402,10 @@ PassRefPtr<WebProcessProxy> WebContext::createNewWebProcess()
     m_notificationManagerProxy->populateCopyOfNotificationPermissions(parameters.notificationPermissions);
 #endif
 
+#if ENABLE(NETWORK_PROCESS)
+    parameters.usesNetworkProcess = m_usesNetworkProcess;
+#endif
+
     // Add any platform specific parameters
     platformInitializeWebProcess(parameters);
 
@@ -434,16 +444,6 @@ void WebContext::warmInitialProcess()
     createNewWebProcess();
     m_haveInitialEmptyProcess = true;
 }
-
-#if ENABLE(NETWORK_PROCESS)
-void WebContext::ensureNetworkProcess()
-{
-    if (m_networkProcess)
-        return;
-
-    m_networkProcess = NetworkProcessProxy::create();
-}
-#endif
 
 void WebContext::enableProcessTermination()
 {
@@ -749,7 +749,7 @@ void WebContext::addVisitedLink(const String& visitedURL)
     if (visitedURL.isEmpty())
         return;
 
-    LinkHash linkHash = visitedLinkHash(visitedURL.characters(), visitedURL.length());
+    LinkHash linkHash = visitedLinkHash(visitedURL);
     addVisitedLinkHash(linkHash);
 }
 
@@ -785,9 +785,9 @@ HashSet<String, CaseFoldingHash> WebContext::pdfAndPostScriptMIMETypes()
     return mimeTypes;
 }
 
-void WebContext::deprecatedAddMessageReceiver(CoreIPC::MessageClass messageClass, CoreIPC::MessageReceiver* messageReceiver)
+void WebContext::addMessageReceiver(CoreIPC::StringReference messageReceiverName, CoreIPC::MessageReceiver* messageReceiver)
 {
-    m_messageReceiverMap.deprecatedAddMessageReceiver(messageClass, messageReceiver);
+    m_messageReceiverMap.addMessageReceiver(messageReceiverName, messageReceiver);
 }
 
 bool WebContext::dispatchMessage(CoreIPC::Connection* connection, CoreIPC::MessageID messageID, CoreIPC::MessageDecoder& decoder)
@@ -818,10 +818,12 @@ void WebContext::didReceiveMessage(CoreIPC::Connection* connection, CoreIPC::Mes
         case WebContextLegacyMessage::PostMessage: {
             String messageName;
             RefPtr<APIObject> messageBody;
-            WebContextUserMessageDecoder messageDecoder(messageBody, WebProcessProxy::fromConnection(connection));
-            if (!decoder.decode(CoreIPC::Out(messageName, messageDecoder)))
+            WebContextUserMessageDecoder messageBodyDecoder(messageBody, WebProcessProxy::fromConnection(connection));
+            if (!decoder.decode(messageName))
                 return;
-
+            if (!decoder.decode(messageBodyDecoder))
+                return;
+            
             didReceiveMessageFromInjectedBundle(messageName, messageBody.get());
             return;
         }
@@ -851,13 +853,15 @@ void WebContext::didReceiveSyncMessage(CoreIPC::Connection* connection, CoreIPC:
 
             String messageName;
             RefPtr<APIObject> messageBody;
-            WebContextUserMessageDecoder messageDecoder(messageBody, WebProcessProxy::fromConnection(connection));
-            if (!decoder.decode(CoreIPC::Out(messageName, messageDecoder)))
+            WebContextUserMessageDecoder messageBodyDecoder(messageBody, WebProcessProxy::fromConnection(connection));
+            if (!decoder.decode(messageName))
+                return;
+            if (!decoder.decode(messageBodyDecoder))
                 return;
 
             RefPtr<APIObject> returnData;
             didReceiveSynchronousMessageFromInjectedBundle(messageName, messageBody.get(), returnData);
-            replyEncoder->encode(CoreIPC::In(WebContextUserMessageEncoder(returnData.get())));
+            replyEncoder->encode(WebContextUserMessageEncoder(returnData.get()));
             return;
         }
         case WebContextLegacyMessage::PostMessage:

@@ -148,7 +148,7 @@ void RenderView::layoutContent(const LayoutState& state)
 #ifndef NDEBUG
 void RenderView::checkLayoutState(const LayoutState& state)
 {
-    ASSERT(layoutDelta() == LayoutSize());
+    ASSERT(layoutDeltaMatches(LayoutSize()));
     ASSERT(!m_layoutStateDisableCount);
     ASSERT(m_layoutState == &state);
 }
@@ -156,6 +156,7 @@ void RenderView::checkLayoutState(const LayoutState& state)
 
 void RenderView::layout()
 {
+    StackStats::LayoutCheckPoint layoutCheckPoint;
     if (!document()->paginated())
         setPageLogicalHeight(0);
 

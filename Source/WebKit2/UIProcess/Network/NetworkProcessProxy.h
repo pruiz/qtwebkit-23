@@ -35,17 +35,22 @@
 
 namespace WebKit {
 
+class NetworkProcessManager;
 struct NetworkProcessCreationParameters;
 
 class NetworkProcessProxy : public RefCounted<NetworkProcessProxy>, CoreIPC::Connection::Client, ProcessLauncher::Client {
 public:
-    static PassRefPtr<NetworkProcessProxy> create();
+    static PassRefPtr<NetworkProcessProxy> create(NetworkProcessManager*);
     ~NetworkProcessProxy();
 
+    void getNetworkProcessConnection(PassRefPtr<Messages::WebProcessProxy::GetNetworkProcessConnection::DelayedReply>);
+
 private:
-    NetworkProcessProxy();
+    NetworkProcessProxy(NetworkProcessManager*);
 
     void platformInitializeNetworkProcess(NetworkProcessCreationParameters&);
+
+    void networkProcessCrashedOrFailedToLaunch();
 
     // CoreIPC::Connection::Client
     virtual void didReceiveMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&);
@@ -53,6 +58,10 @@ private:
     virtual void didReceiveInvalidMessage(CoreIPC::Connection*, CoreIPC::MessageID);
     virtual void syncMessageSendTimedOut(CoreIPC::Connection*);
 
+    // Message handlers
+    void didReceiveNetworkProcessProxyMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&);
+    void didCreateNetworkConnectionToWebProcess(const CoreIPC::Attachment&);
+    
     // ProcessLauncher::Client
     virtual void didFinishLaunching(ProcessLauncher*, CoreIPC::Connection::Identifier);
 
@@ -62,6 +71,10 @@ private:
     // The process launcher for the network process.
     RefPtr<ProcessLauncher> m_processLauncher;
 
+    NetworkProcessManager* m_networkProcessManager;
+    
+    unsigned m_numPendingConnectionRequests;
+    Deque<RefPtr<Messages::WebProcessProxy::GetNetworkProcessConnection::DelayedReply> > m_pendingConnectionReplies;
 };
 
 } // namespace WebKit

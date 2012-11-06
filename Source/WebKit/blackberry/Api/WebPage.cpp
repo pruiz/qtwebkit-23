@@ -55,6 +55,7 @@
 #endif
 #include "EditorClientBlackBerry.h"
 #include "FocusController.h"
+#include "Frame.h"
 #include "FrameLoaderClientBlackBerry.h"
 #if !defined(PUBLIC_BUILD) || !PUBLIC_BUILD
 #include "GeolocationClientMock.h"
@@ -491,11 +492,6 @@ WebPagePrivate::~WebPagePrivate()
 #if !defined(PUBLIC_BUILD) || !PUBLIC_BUILD
     delete m_dumpRenderTree;
     m_dumpRenderTree = 0;
-#endif
-
-#if USE(ACCELERATED_COMPOSITING)
-    deleteGuardedObject(m_selectionOverlay);
-    m_selectionOverlay = 0;
 #endif
 }
 
@@ -3199,12 +3195,21 @@ void WebPagePrivate::setPageVisibilityState()
 
 void WebPagePrivate::setVisible(bool visible)
 {
-    m_visible = visible;
+    if (visible != m_visible) {
+        if (visible) {
+            if (m_mainFrame)
+                m_mainFrame->animation()->resumeAnimations();
+            if (m_page->scriptedAnimationsSuspended())
+                m_page->resumeScriptedAnimations();
+        } else {
+            if (m_mainFrame)
+                m_mainFrame->animation()->suspendAnimations();
+            if (!m_page->scriptedAnimationsSuspended())
+                m_page->suspendScriptedAnimations();
+        }
 
-    if (visible && m_page->scriptedAnimationsSuspended())
-        m_page->resumeScriptedAnimations();
-    if (!visible && !m_page->scriptedAnimationsSuspended())
-        m_page->suspendScriptedAnimations();
+        m_visible = visible;
+    }
 
 #if ENABLE(PAGE_VISIBILITY_API)
     setPageVisibilityState();
@@ -3435,16 +3440,17 @@ IntSize WebPagePrivate::recomputeVirtualViewportFromViewportArguments()
     int desktopWidth = DEFAULT_MAX_LAYOUT_WIDTH;
     int deviceWidth = Platform::Graphics::Screen::primaryScreen()->width();
     int deviceHeight = Platform::Graphics::Screen::primaryScreen()->height();
-    ViewportAttributes result = computeViewportAttributes(m_viewportArguments, desktopWidth, deviceWidth, deviceHeight, m_webSettings->devicePixelRatio(), m_defaultLayoutSize);
-    m_page->setDeviceScaleFactor(result.devicePixelRatio);
+    float devicePixelRatio = m_webSettings->devicePixelRatio();
+    ViewportAttributes result = computeViewportAttributes(m_viewportArguments, desktopWidth, deviceWidth, deviceHeight, devicePixelRatio, m_defaultLayoutSize);
+    m_page->setDeviceScaleFactor(devicePixelRatio);
 
     setUserScalable(m_webSettings->isUserScalable() && result.userScalable);
     if (result.initialScale > 0)
-        setInitialScale(result.initialScale * result.devicePixelRatio);
+        setInitialScale(result.initialScale * devicePixelRatio);
     if (result.minimumScale > 0)
-        setMinimumScale(result.minimumScale * result.devicePixelRatio);
+        setMinimumScale(result.minimumScale * devicePixelRatio);
     if (result.maximumScale > 0)
-        setMaximumScale(result.maximumScale * result.devicePixelRatio);
+        setMaximumScale(result.maximumScale * devicePixelRatio);
 
     return IntSize(result.layoutSize.width(), result.layoutSize.height());
 }
@@ -5452,6 +5458,10 @@ void WebPagePrivate::setCompositorDrawsRootLayer(bool compositorDrawsRootLayer)
     // When the BlackBerry port forces compositing mode, the root layer stops
     // painting to window and starts painting to layer instead.
     m_page->settings()->setForceCompositingMode(compositorDrawsRootLayer);
+
+    if (!m_mainFrame)
+        return;
+
     if (FrameView* view = m_mainFrame->view())
         view->updateCompositingLayers();
 #endif
@@ -6182,16 +6192,6 @@ const BlackBerry::Platform::String& WebPagePrivate::defaultUserAgent()
 WebTapHighlight* WebPage::tapHighlight() const
 {
     return d->m_tapHighlight.get();
-}
-
-void WebPage::setTapHighlight(WebTapHighlight* tapHighlight)
-{
-    d->m_tapHighlight = adoptPtr(tapHighlight);
-}
-
-WebSelectionOverlay* WebPage::selectionOverlay() const
-{
-    return d->m_selectionOverlay;
 }
 
 void WebPage::addOverlay(WebOverlay* overlay)

@@ -78,6 +78,11 @@ win_cmd_shell {
 MAKEFILE_NOOP_COMMAND = @echo -n
 win32-msvc*: MAKEFILE_NOOP_COMMAND = @echo >NUL
 
+# Help keep the build tree clean
+MOC_DIR = moc
+RCC_DIR = rcc
+OBJECTS_DIR = obj/$$activeBuildConfig()
+
 # Set up a default python version
 scratchbox: PYTHON = python2.6
 else: PYTHON = python

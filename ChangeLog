@@ -1,3 +1,79 @@
+2012-10-23  Kenneth Rohde Christiansen  <kenneth@webkit.org>
+
+        Add support for resolution media query
+        https://bugs.webkit.org/show_bug.cgi?id=99077
+
+        Reviewed by Antti Koivisto.
+
+        * Source/cmake/OptionsEfl.cmake:
+        * Source/cmake/WebKitFeatures.cmake:
+        * Source/cmakeconfig.h.cmake:
+
+            Add support for the RESOLUTION_MEDIA_QUERY feature flag.
+
+        * Source/autotools/symbols.filter:
+
+            Export the WebCore::Settings setting.
+
+2012-10-23  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        Unreviewed. Update NEWS and configure.ac for 1.11.1 release
+
+        * configure.ac: Bump version numbers.
+
+2012-10-23  Ryuan Choi  <ryuan.choi@samsung.com>
+
+        [EFL][WK2] Add support for IMF composition
+        https://bugs.webkit.org/show_bug.cgi?id=89552
+
+        Reviewed by Gyuyoung Kim.
+
+        * Source/cmake/FindEcore.cmake: Checked Ecore_IMF.
+
+2012-10-23  Andras Becsi  <andras.becsi@digia.com>
+
+        Remove devicePixelRatio from ViewportAttributes
+        https://bugs.webkit.org/show_bug.cgi?id=99845
+
+        Reviewed by Adam Barth.
+
+        * Source/autotools/symbols.filter: Update symbol.
+
+2012-10-22  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: merge "docked" state into the "dock side" enum.
+        https://bugs.webkit.org/show_bug.cgi?id=99717
+
+        Reviewed by Vsevolod Vlasov.
+
+        Otherwise, it is hard to manage these inter-dependent flags.
+
+        * Source/autotools/symbols.filter:
+
+2012-10-19  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, rolling out r131936.
+        http://trac.webkit.org/changeset/131936
+        https://bugs.webkit.org/show_bug.cgi?id=99717
+
+        Broke the clang build
+
+        * Source/autotools/symbols.filter:
+
+2012-10-19  Dongwoo Joshua Im  <dw.im@samsung.com>
+
+        Rename ENABLE_CSS3_TEXT_DECORATION to ENABLE_CSS3_TEXT
+        https://bugs.webkit.org/show_bug.cgi?id=99804
+
+        Reviewed by Julien Chaffraix.
+
+        CSS3 text related properties will be implemented under this flag,
+        including text decoration, text-align-last, and text-justify.
+
+        * Source/cmake/OptionsEfl.cmake:
+        * Source/cmake/WebKitFeatures.cmake:
+        * Source/cmakeconfig.h.cmake:
+
 2012-10-18  Laszlo Gombos  <l.gombos@samsung.com>
 
         [EFL] Buildfix if Netscape plugin support is disabled

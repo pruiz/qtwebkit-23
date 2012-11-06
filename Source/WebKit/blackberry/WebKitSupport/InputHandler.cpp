@@ -188,7 +188,7 @@ static BlackBerryInputType convertInputType(const HTMLInputElement* inputElement
     return InputTypeText;
 }
 
-static int inputStyle(BlackBerryInputType type, const Element* element)
+static int64_t inputStyle(BlackBerryInputType type, const Element* element)
 {
     switch (type) {
     case InputTypeEmail:
@@ -229,7 +229,6 @@ static int inputStyle(BlackBerryInputType type, const Element* element)
             // with autocorrect disabled explicitly. Only enable predictions.
             return NO_AUTO_TEXT | NO_AUTO_CORRECTION;
         }
-    case InputTypeIsIndex:
     case InputTypePassword:
     case InputTypeNumber:
     case InputTypeTelephone:
@@ -240,6 +239,26 @@ static int inputStyle(BlackBerryInputType type, const Element* element)
         break;
     }
     return DEFAULT_STYLE;
+}
+
+static VirtualKeyboardType convertInputTypeToVKBType(BlackBerryInputType inputType)
+{
+    switch (inputType) {
+    case InputTypeURL:
+        return VKBTypeUrl;
+    case InputTypeEmail:
+        return VKBTypeEmail;
+    case InputTypeTelephone:
+        return VKBTypePhone;
+    case InputTypePassword:
+        return VKBTypePassword;
+    case InputTypeNumber:
+    case InputTypeHexadecimal:
+        return VKBTypePin;
+    default:
+        // All other types are text based use default keyboard.
+        return VKBTypeDefault;
+    }
 }
 
 static VirtualKeyboardType convertStringToKeyboardType(const AtomicString& string)
@@ -374,12 +393,6 @@ WTF::String InputHandler::elementText()
 
 BlackBerryInputType InputHandler::elementType(Element* element) const
 {
-    // <isIndex> is bundled with input so we need to check the formControlName
-    // first to differentiate it from input which is essentially the same as
-    // isIndex has been deprecated.
-    if (element->formControlName() == HTMLNames::isindexTag)
-        return InputTypeIsIndex;
-
     if (const HTMLInputElement* inputElement = static_cast<const HTMLInputElement*>(element->toInputElement()))
         return convertInputType(inputElement);
 
@@ -812,6 +825,9 @@ void InputHandler::setElementFocused(Element* element)
     m_currentFocusElementTextEditMask = inputStyle(type, element);
 
     VirtualKeyboardType keyboardType = keyboardTypeAttribute(element);
+    if (keyboardType == VKBTypeNotSet)
+        keyboardType = convertInputTypeToVKBType(type);
+
     VirtualKeyboardEnterKeyType enterKeyType = keyboardEnterKeyTypeAttribute(element);
 
     if (enterKeyType == VKBEnterKeyNotSet && type != InputTypeTextArea) {
@@ -823,7 +839,7 @@ void InputHandler::setElementFocused(Element* element)
     }
 
     FocusLog(LogLevelInfo, "InputHandler::setElementFocused, Type=%d, Style=%d, Keyboard Type=%d, Enter Key=%d", type, m_currentFocusElementTextEditMask, keyboardType, enterKeyType);
-    m_webPage->m_client->inputFocusGained(type, m_currentFocusElementTextEditMask, keyboardType, enterKeyType);
+    m_webPage->m_client->inputFocusGained(m_currentFocusElementTextEditMask, keyboardType, enterKeyType);
 
     handleInputLocaleChanged(m_webPage->m_webSettings->isWritingDirectionRTL());
 
@@ -1036,6 +1052,10 @@ void InputHandler::ensureFocusTextElementVisible(CaretScrollType scrollType)
     if (!(Platform::Settings::instance()->allowedScrollAdjustmentForInputFields() & scrollType))
         return;
 
+    // Fixed position elements cannot be scrolled into view.
+    if (DOMSupport::isFixedPositionOrHasFixedPositionAncestor(m_currentFocusElement->renderer()))
+        return;
+
     Frame* elementFrame = m_currentFocusElement->document()->frame();
     if (!elementFrame)
         return;
@@ -1084,7 +1104,9 @@ void InputHandler::ensureFocusTextElementVisible(CaretScrollType scrollType)
             m_focusZoomScale = m_webPage->currentScale();
             m_focusZoomLocation = selectionFocusRect.location();
         }
-        m_webPage->zoomAboutPoint(s_minimumTextHeightInPixels / fontHeight, m_focusZoomLocation);
+        double zoomScaleRequired = static_cast<double>(s_minimumTextHeightInPixels) / fontHeight;
+        m_webPage->zoomAboutPoint(zoomScaleRequired, m_focusZoomLocation);
+        InputLog(LogLevelInfo, "InputHandler::ensureFocusTextElementVisible zooming in to %f at point %d, %d", zoomScaleRequired, m_focusZoomLocation.x(), m_focusZoomLocation.y());
     } else {
         m_focusZoomScale = 0.0;
         m_focusZoomLocation = WebCore::IntPoint();
@@ -1157,6 +1179,7 @@ void InputHandler::ensureFocusTextElementVisible(CaretScrollType scrollType)
             scrollLocation = scrollLocation.shrunkTo(maximumScrollPosition);
             mainFrameView->setScrollPosition(scrollLocation);
             mainFrameView->setConstrainsScrollingToContentEdge(true);
+            InputLog(LogLevelInfo, "InputHandler::ensureFocusTextElementVisible scrolling to point %d, %d", scrollLocation.x(), scrollLocation.y());
         }
     }
     m_webPage->resumeBackingStore();

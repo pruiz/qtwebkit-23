@@ -584,6 +584,9 @@ void EventSender::gestureTap(int x, int y)
     m_gestures.clear();
     m_gestures.append(&m_tapGesture);
     QGestureEvent event(m_gestures);
+#if !HAVE(QT5)
+    event.setWidget(m_page->view());
+#endif
     sendEvent(m_page, &event);
 }
 
@@ -593,6 +596,9 @@ void EventSender::gestureLongPress(int x, int y)
     m_gestures.clear();
     m_gestures.append(&m_tapAndHoldGesture);
     QGestureEvent event(m_gestures);
+#if !HAVE(QT5)
+    event.setWidget(m_page->view());
+#endif
     sendEvent(m_page, &event);
 }
 #endif

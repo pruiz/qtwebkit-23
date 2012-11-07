@@ -230,12 +230,11 @@ haveQt(5):linux-*:config_libXrender: DEFINES += HAVE_XRENDER=1
 haveQt(5):linux-*:config_glx:!contains(QT_CONFIG, opengles2): DEFINES += HAVE_GLX=1
 
 # Support for Graphics Surface
-!contains(DEFINES, WTF_USE_GRAPHICS_SURFACE=.) {
-    haveQt(5) {
-        mac: DEFINES += WTF_USE_GRAPHICS_SURFACE=1
-        # On linux we require GLX, libXcomposite and libXrender to enable graphics surface.
-        linux-*:contains(DEFINES, HAVE_GLX=1):contains(DEFINES, HAVE_XCOMPOSITE=1):contains(DEFINES, HAVE_XRENDER=1): DEFINES += WTF_USE_GRAPHICS_SURFACE=1
-    }
+# GraphicsSurface requires GraphicsContext3D and hence use_3d_graphics
+contains(DEFINES, WTF_USE_3D_GRAPHICS=1) {
+    mac: DEFINES += WTF_USE_GRAPHICS_SURFACE=1
+    # On linux we require GLX, libXcomposite and libXrender to enable graphics surface.
+    linux-*:contains(DEFINES, HAVE_GLX=1):contains(DEFINES, HAVE_XCOMPOSITE=1):contains(DEFINES, HAVE_XRENDER=1): DEFINES += WTF_USE_GRAPHICS_SURFACE=1
 }
 
 # -------------- Fill in static defaults --------------

@@ -4096,6 +4096,9 @@ contains(DEFINES, WTF_USE_GRAPHICS_SURFACE=1) {
         SOURCES += platform/graphics/surfaces/mac/GraphicsSurfaceMac.cpp
         INCLUDEPATH += /System/Library/Frameworks/CoreFoundation.framework/Headers
     }
+    win32 {
+        SOURCES += platform/graphics/surfaces/win/GraphicsSurfaceWin.cpp
+    }
     contains(DEFINES, HAVE_XCOMPOSITE=1)  {
         SOURCES += platform/graphics/surfaces/qt/GraphicsSurfaceGLX.cpp
     }

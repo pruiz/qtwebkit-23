@@ -60,7 +60,7 @@
 #if !defined(PUBLIC_BUILD) || !PUBLIC_BUILD
 #include "GeolocationClientMock.h"
 #endif
-#include "GeolocationControllerClientBlackBerry.h"
+#include "GeolocationClientBlackBerry.h"
 #include "GroupSettings.h"
 #include "HTMLAreaElement.h"
 #include "HTMLFrameOwnerElement.h"
@@ -398,11 +398,9 @@ WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const In
     , m_cursorEventMode(ProcessedCursorEvents)
     , m_touchEventMode(ProcessedTouchEvents)
 #endif
-#if ENABLE(FULLSCREEN_API)
-#if ENABLE(VIDEO)
+#if ENABLE(FULLSCREEN_API) && ENABLE(VIDEO)
     , m_scaleBeforeFullScreen(-1.0)
-#endif
-    , m_isTogglingFullScreenState(false)
+    , m_xScrollOffsetBeforeFullScreen(-1)
 #endif
     , m_currentCursor(Platform::CursorNone)
     , m_dumpRenderTree(0) // Lazy initialization.
@@ -432,6 +430,8 @@ WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const In
     , m_deferredTasksTimer(this, &WebPagePrivate::deferredTasksTimerFired)
     , m_selectPopup(0)
     , m_autofillManager(AutofillManager::create(this))
+    , m_documentStyleRecalcPostponed(false)
+    , m_documentChildNeedsStyleRecalc(false)
 {
     static bool isInitialized = false;
     if (!isInitialized) {
@@ -441,6 +441,7 @@ WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const In
     }
 
     AuthenticationChallengeManager::instance()->pageCreated(this);
+    clearCachedHitTestResult();
 }
 
 WebPage::WebPage(WebPageClient* client, const BlackBerry::Platform::String& pageGroupName, const Platform::IntRect& rect)
@@ -539,9 +540,8 @@ void WebPagePrivate::init(const BlackBerry::Platform::String& pageGroupName)
         WebCore::provideGeolocationTo(m_page, mock);
         mock->setController(WebCore::GeolocationController::from(m_page));
     } else
-#else
-        WebCore::provideGeolocationTo(m_page, new GeolocationControllerClientBlackBerry(this));
 #endif
+        WebCore::provideGeolocationTo(m_page, new GeolocationClientBlackBerry(this));
 #if !defined(PUBLIC_BUILD) || !PUBLIC_BUILD
     if (getenv("drtRun"))
         WebCore::provideDeviceOrientationTo(m_page, new DeviceOrientationClientMock);
@@ -1286,6 +1286,8 @@ bool WebPagePrivate::zoomAboutPoint(double unclampedScale, const FloatPoint& anc
         m_backingStore->d->clearVisibleZoom();
     }
 
+    m_client->zoomChanged(m_webPage->isMinZoomed(), m_webPage->isMaxZoomed(), !shouldZoomOnEscape(), currentScale());
+
     // Clear window to make sure there are no artifacts.
     if (shouldRender) {
         // Resume all screen updates to the backingstore and render+blit visible contents to screen.
@@ -1294,8 +1296,6 @@ bool WebPagePrivate::zoomAboutPoint(double unclampedScale, const FloatPoint& anc
         // Resume all screen updates to the backingstore but do not blit to the screen because we not rendering.
         m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::None);
     }
-
-    m_client->zoomChanged(m_webPage->isMinZoomed(), m_webPage->isMaxZoomed(), !shouldZoomOnEscape(), currentScale());
 
     return true;
 }
@@ -1728,7 +1728,7 @@ double WebPage::initialScale() const
 
 void WebPage::initializeIconDataBase()
 {
-    IconDatabaseClientBlackBerry::getInstance()->initIconDatabase(d->m_webSettings);
+    IconDatabaseClientBlackBerry::instance()->initIconDatabase(d->m_webSettings);
 }
 
 bool WebPage::isUserScalable() const
@@ -3051,8 +3051,8 @@ void WebPagePrivate::zoomBlock()
     }
 
     notifyTransformChanged();
-    m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
     m_client->zoomChanged(m_webPage->isMinZoomed(), m_webPage->isMaxZoomed(), !shouldZoomOnEscape(), currentScale());
+    m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
 }
 
 void WebPage::blockZoomAnimationFinished()
@@ -3846,30 +3846,6 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
         // If we need layout then render and blit, otherwise just blit as our viewport has changed.
         m_backingStore->d->resumeScreenAndBackingStoreUpdates(needsLayout ? BackingStore::RenderAndBlit : BackingStore::Blit);
     }
-
-#if ENABLE(FULLSCREEN_API)
-    if (m_isTogglingFullScreenState) {
-        if (!m_fullscreenVideoNode) {
-            // When leaving fullscreen mode, we need to restore the scroll position and
-            // zoom level it was at before fullscreen.
-            // FIXME: The cached values might get imprecise if user have rotated the
-            // device while in fullscreen.
-            if (m_scaleBeforeFullScreen > 0) {
-                // Restore the scale when leaving fullscreen. We can't use TransformationMatrix::scale(double) here, as it
-                // will multiply the scale rather than set the scale.
-                // FIXME: We can refactor this into setCurrentScale(double) if it is useful in the future.
-                m_transformationMatrix->setM11(m_scaleBeforeFullScreen);
-                m_transformationMatrix->setM22(m_scaleBeforeFullScreen);
-                m_scaleBeforeFullScreen = -1.0;
-            }
-            m_mainFrame->view()->setScrollPosition(m_scrollOffsetBeforeFullScreen);
-            notifyTransformChanged();
-        }
-
-        m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
-        m_isTogglingFullScreenState = false;
-    }
-#endif
 }
 
 void WebPage::setViewportSize(const Platform::IntSize& viewportSize, bool ensureFocusElementVisible)
@@ -4074,6 +4050,9 @@ bool WebPage::touchEvent(const Platform::TouchEvent& event)
     else if (tEvent.m_type == Platform::TouchEvent::TouchStart || tEvent.m_type == Platform::TouchEvent::TouchCancel)
         d->m_pluginMayOpenNewTab = false;
 
+    if (tEvent.m_type == Platform::TouchEvent::TouchStart)
+        d->clearCachedHitTestResult();
+
     bool handled = false;
 
     if (d->m_needTouchEvents && !event.hasGesture(Platform::Gesture::Injected))
@@ -4110,9 +4089,11 @@ void WebPagePrivate::setScrollOriginPoint(const Platform::IntPoint& point)
     if (!m_hasInRegionScrollableAreas)
         return;
 
+    postponeDocumentStyleRecalc();
     m_inRegionScroller->d->calculateInRegionScrollableAreasForPoint(point);
     if (!m_inRegionScroller->d->activeInRegionScrollableAreas().empty())
         m_client->notifyInRegionScrollableAreasChanged(m_inRegionScroller->d->activeInRegionScrollableAreas());
+    resumeDocumentStyleRecalc();
 }
 
 void WebPage::setScrollOriginPoint(const Platform::IntPoint& point)
@@ -5959,7 +5940,8 @@ void WebPagePrivate::enterFullScreenForElement(Element* element)
         // When an element goes fullscreen, the viewport size changes and the scroll
         // position might change. So we keep track of it here, in order to restore it
         // once element leaves fullscreen.
-        m_scrollOffsetBeforeFullScreen = m_mainFrame->view()->scrollPosition();
+        WebCore::IntPoint scrollPosition = m_mainFrame->view()->scrollPosition();
+        m_xScrollOffsetBeforeFullScreen = scrollPosition.x();
 
         // The current scale can be clamped to a greater minimum scale when we relayout contents during
         // the change of the viewport size. Cache the current scale so that we can restore it when
@@ -5986,6 +5968,24 @@ void WebPagePrivate::exitFullScreenForElement(Element* element)
         // The Browser chrome has its own fullscreen video widget.
         exitFullscreenForNode(element);
     } else {
+        // When leaving fullscreen mode, we need to restore the 'x' scroll position
+        // before fullscreen.
+        // FIXME: We may need to respect 'y' position as well, because the web page always scrolls to
+        // the top when leaving fullscreen mode.
+        WebCore::IntPoint scrollPosition = m_mainFrame->view()->scrollPosition();
+        m_mainFrame->view()->setScrollPosition(
+            WebCore::IntPoint(m_xScrollOffsetBeforeFullScreen, scrollPosition.y()));
+        m_xScrollOffsetBeforeFullScreen = -1;
+
+        if (m_scaleBeforeFullScreen > 0) {
+            // Restore the scale when leaving fullscreen. We can't use TransformationMatrix::scale(double) here, as it
+            // will multiply the scale rather than set the scale.
+            // FIXME: We can refactor this into setCurrentScale(double) if it is useful in the future.
+            m_transformationMatrix->setM11(m_scaleBeforeFullScreen);
+            m_transformationMatrix->setM22(m_scaleBeforeFullScreen);
+            m_scaleBeforeFullScreen = -1.0;
+        }
+
         // This is where we would restore the browser's chrome
         // if hidden above.
         client()->fullscreenStop();
@@ -6325,6 +6325,46 @@ void WebPagePrivate::restoreHistoryViewState(Platform::IntSize contentsSize, Pla
 IntSize WebPagePrivate::screenSize() const
 {
     return Platform::Graphics::Screen::primaryScreen()->size();
+}
+
+bool WebPagePrivate::postponeDocumentStyleRecalc()
+{
+    if (Document* document = m_mainFrame->document()) {
+        m_documentChildNeedsStyleRecalc = document->childNeedsStyleRecalc();
+        document->clearChildNeedsStyleRecalc();
+
+        m_documentStyleRecalcPostponed = document->isPendingStyleRecalc();
+        document->unscheduleStyleRecalc();
+    }
+}
+
+void WebPagePrivate::resumeDocumentStyleRecalc()
+{
+    if (Document* document = m_mainFrame->document()) {
+        if (m_documentChildNeedsStyleRecalc)
+            document->setChildNeedsStyleRecalc();
+
+        if (m_documentStyleRecalcPostponed)
+            document->scheduleStyleRecalc();
+    }
+
+    m_documentChildNeedsStyleRecalc = false;
+    m_documentStyleRecalcPostponed = false;
+}
+
+const HitTestResult& WebPagePrivate::hitTestResult(const IntPoint& contentPos)
+{
+    if (m_cachedHitTestContentPos != contentPos) {
+        m_cachedHitTestContentPos = contentPos;
+        m_cachedHitTestResult = m_mainFrame->eventHandler()->hitTestResultAtPoint(m_cachedHitTestContentPos, HitTestRequest::ReadOnly | HitTestRequest::Active | HitTestRequest::AllowShadowContent);
+    }
+
+    return m_cachedHitTestResult;
+}
+
+void WebPagePrivate::clearCachedHitTestResult()
+{
+    m_cachedHitTestContentPos = WebCore::IntPoint(-1, -1);
 }
 
 }

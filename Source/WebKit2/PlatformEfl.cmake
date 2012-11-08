@@ -42,6 +42,7 @@ LIST(APPEND WebKit2_SOURCES
     UIProcess/API/C/soup/WKSoupRequestManager.cpp
 
     UIProcess/API/efl/BatteryProvider.cpp
+    UIProcess/API/efl/EwkViewImpl.cpp
     UIProcess/API/efl/PageViewportControllerClientEfl.cpp
     UIProcess/API/efl/NetworkInfoProvider.cpp
     UIProcess/API/efl/PageClientImpl.cpp
@@ -50,7 +51,6 @@ LIST(APPEND WebKit2_SOURCES
     UIProcess/API/efl/ewk_back_forward_list.cpp
     UIProcess/API/efl/ewk_back_forward_list_item.cpp
     UIProcess/API/efl/ewk_context.cpp
-    UIProcess/API/efl/ewk_context_history_client.cpp
     UIProcess/API/efl/ewk_cookie_manager.cpp
     UIProcess/API/efl/ewk_download_job.cpp
     UIProcess/API/efl/ewk_error.cpp
@@ -69,12 +69,13 @@ LIST(APPEND WebKit2_SOURCES
     UIProcess/API/efl/ewk_url_response.cpp
     UIProcess/API/efl/ewk_url_scheme_request.cpp
     UIProcess/API/efl/ewk_view.cpp
-    UIProcess/API/efl/ewk_view_find_client.cpp
-    UIProcess/API/efl/ewk_view_form_client.cpp
 
     UIProcess/cairo/BackingStoreCairo.cpp
 
+    UIProcess/efl/ContextHistoryClientEfl.cpp
     UIProcess/efl/DownloadManagerEfl.cpp
+    UIProcess/efl/FindClientEfl.cpp
+    UIProcess/efl/FormClientEfl.cpp
     UIProcess/efl/PageLoadClientEfl.cpp
     UIProcess/efl/PagePolicyClientEfl.cpp
     UIProcess/efl/PageUIClientEfl.cpp
@@ -208,7 +209,6 @@ LIST (APPEND WebProcess_SOURCES
 LIST (APPEND WebProcess_LIBRARIES
     ${CAIRO_LIBRARIES}
     ${ECORE_IMF_LIBRARIES}
-    ${ECORE_X_LIBRARIES}
     ${EDJE_LIBRARIES}
     ${EFLDEPS_LIBRARIES}
     ${EVAS_LIBRARIES}
@@ -217,6 +217,12 @@ LIST (APPEND WebProcess_LIBRARIES
     ${OPENGL_LIBRARIES}
     ${SQLITE_LIBRARIES}
 )
+
+IF (ENABLE_ECORE_X)
+    LIST(APPEND WebProcess_LIBRARIES
+        ${ECORE_X_LIBRARIES}
+        ${X11_Xext_LIB})
+ENDIF ()
 
 ADD_CUSTOM_TARGET(forwarding-headerEfl
     COMMAND ${PERL_EXECUTABLE} ${WEBKIT2_DIR}/Scripts/generate-forwarding-headers.pl ${WEBKIT2_DIR} ${DERIVED_SOURCES_WEBKIT2_DIR}/include efl

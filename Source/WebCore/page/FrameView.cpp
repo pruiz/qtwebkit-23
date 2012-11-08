@@ -3173,7 +3173,7 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect)
     if (!frame())
         return;
 
-    InspectorInstrumentationCookie cookie = InspectorInstrumentation::willPaint(m_frame.get(), p, rect);
+    InspectorInstrumentationCookie cookie = InspectorInstrumentation::willPaint(m_frame.get());
 
     Document* document = m_frame->document();
 
@@ -3242,6 +3242,10 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect)
     RenderObject* eltRenderer = m_nodeToDraw ? m_nodeToDraw->renderer() : 0;
     RenderLayer* rootLayer = root->layer();
 
+#ifndef NDEBUG
+    RenderObject::SetLayoutNeededForbiddenScope forbidSetNeedsLayout(rootLayer->renderer());
+#endif
+
     rootLayer->paint(p, rect, m_paintBehavior, eltRenderer);
 
     if (rootLayer->containsDirtyOverlayScrollbars())
@@ -3264,7 +3268,7 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect)
     if (isTopLevelPainter)
         sCurrentPaintTimeStamp = 0;
 
-    InspectorInstrumentation::didPaint(cookie);
+    InspectorInstrumentation::didPaint(cookie, p, rect);
 }
 
 void FrameView::setPaintBehavior(PaintBehavior behavior)

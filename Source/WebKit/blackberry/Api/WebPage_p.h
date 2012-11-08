@@ -20,6 +20,7 @@
 #define WebPage_p_h
 
 #include "ChromeClient.h"
+#include "HitTestResult.h"
 #include "InRegionScroller.h"
 #include "InspectorClientBlackBerry.h"
 #include "InspectorOverlay.h"
@@ -52,7 +53,7 @@ class DOMWrapperWorld;
 class Document;
 class Element;
 class Frame;
-class GeolocationControllerClientBlackBerry;
+class GeolocationClientBlackBerry;
 class GraphicsLayerBlackBerry;
 class JavaScriptDebuggerBlackBerry;
 class LayerWebKitThread;
@@ -460,6 +461,12 @@ public:
     void applySizeOverride(int overrideWidth, int overrideHeight);
     void setTextZoomFactor(float);
 
+    bool postponeDocumentStyleRecalc();
+    void resumeDocumentStyleRecalc();
+
+    const WebCore::HitTestResult& hitTestResult(const WebCore::IntPoint& contentPos);
+    void clearCachedHitTestResult();
+
     WebCore::IntSize screenSize() const;
 
     WebPage* m_webPage;
@@ -523,9 +530,8 @@ public:
 #if ENABLE(FULLSCREEN_API)
 #if ENABLE(VIDEO)
     double m_scaleBeforeFullScreen;
-    WebCore::IntPoint m_scrollOffsetBeforeFullScreen;
+    int m_xScrollOffsetBeforeFullScreen;
 #endif
-    bool m_isTogglingFullScreenState;
 #endif
 
     Platform::BlackBerryCursor m_currentCursor;
@@ -637,6 +643,12 @@ public:
     WebCore::PagePopupBlackBerry* m_selectPopup;
 
     RefPtr<WebCore::AutofillManager> m_autofillManager;
+
+    bool m_documentStyleRecalcPostponed;
+    bool m_documentChildNeedsStyleRecalc;
+
+    WebCore::IntPoint m_cachedHitTestContentPos;
+    WebCore::HitTestResult m_cachedHitTestResult;
 protected:
     virtual ~WebPagePrivate();
 };

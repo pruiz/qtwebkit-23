@@ -128,6 +128,7 @@ void SubresourceLoader::willSendRequest(ResourceRequest& newRequest, const Resou
 {
     // Store the previous URL because the call to ResourceLoader::willSendRequest will modify it.
     KURL previousURL = request().url();
+    RefPtr<SubresourceLoader> protect(this);
 
     ASSERT(!newRequest.isNull());
     if (!previousURL.isNull() && previousURL != newRequest.url()) {
@@ -283,7 +284,10 @@ void SubresourceLoader::didFail(const ResourceError& error)
     RefPtr<SubresourceLoader> protect(this);
     CachedResourceHandle<CachedResource> protectResource(m_resource);
     m_state = Finishing;
-    m_resource->error(CachedResource::LoadError);
+    if (error.isTimeout())
+        m_resource->error(CachedResource::TimeoutError);
+    else
+        m_resource->error(CachedResource::LoadError);
     if (!m_resource->isPreloaded())
         memoryCache()->remove(m_resource);
     ResourceLoader::didFail(error);

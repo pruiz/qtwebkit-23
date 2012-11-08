@@ -72,6 +72,14 @@ bool QWebPreferencesPrivate::testAttribute(QWebPreferencesPrivate::WebAttribute 
     case WebAudioEnabled:
         return preferences()->webAudioEnabled();
 #endif
+#if ENABLE(SMOOTH_SCROLLING)
+    case ScrollAnimatorEnabled:
+        return preferences()->scrollAnimatorEnabled();
+#endif
+    case CaretBrowsingEnabled:
+        return preferences()->caretBrowsingEnabled();
+    case NotificationsEnabled:
+        return preferences()->notificationsEnabled();
     default:
         ASSERT_NOT_REACHED();
         return false;
@@ -130,6 +138,18 @@ void QWebPreferencesPrivate::setAttribute(QWebPreferencesPrivate::WebAttribute a
         preferences()->setWebAudioEnabled(enable);
         break;
 #endif
+#if ENABLE(SMOOTH_SCROLLING)
+    case ScrollAnimatorEnabled:
+        preferences()->setScrollAnimatorEnabled(enable);
+        break;
+#endif
+    case CaretBrowsingEnabled:
+        // FIXME: Caret browsing doesn't make much sense in touch mode.
+        preferences()->setCaretBrowsingEnabled(enable);
+        break;
+    case NotificationsEnabled:
+        preferences()->setNotificationsEnabled(enable);
+        break;
     default:
         ASSERT_NOT_REACHED();
     }
@@ -524,6 +544,47 @@ void QWebPreferences::setWebAudioEnabled(bool enable)
 #else
     UNUSED_PARAM(enable);
 #endif
+}
+
+bool QWebPreferences::scrollAnimatorEnabled() const
+{
+#if ENABLE(SMOOTH_SCROLLING)
+    return d->testAttribute(QWebPreferencesPrivate::ScrollAnimatorEnabled);
+#else
+    return false;
+#endif
+}
+
+void QWebPreferences::setScrollAnimatorEnabled(bool enable)
+{
+#if ENABLE(SMOOTH_SCROLLING)
+    d->setAttribute(QWebPreferencesPrivate::ScrollAnimatorEnabled, enable);
+    emit scrollAnimatorEnabledChanged();
+#else
+    UNUSED_PARAM(enable);
+#endif
+}
+
+bool QWebPreferences::caretBrowsingEnabled() const
+{
+    return d->testAttribute(QWebPreferencesPrivate::CaretBrowsingEnabled);
+}
+
+void QWebPreferences::setCaretBrowsingEnabled(bool enable)
+{
+    d->setAttribute(QWebPreferencesPrivate::CaretBrowsingEnabled, enable);
+    emit caretBrowsingEnabledChanged();
+}
+
+bool QWebPreferences::notificationsEnabled() const
+{
+    return d->testAttribute(QWebPreferencesPrivate::NotificationsEnabled);
+}
+
+void QWebPreferences::setNotificationsEnabled(bool enable)
+{
+    d->setAttribute(QWebPreferencesPrivate::NotificationsEnabled, enable);
+    emit notificationsEnabledChanged();
 }
 
 WebKit::WebPreferences* QWebPreferencesPrivate::preferences() const

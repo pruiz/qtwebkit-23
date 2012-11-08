@@ -4869,8 +4869,10 @@ void Document::addMessage(MessageSource source, MessageType type, MessageLevel l
         return;
     }
 
-    if (DOMWindow* window = domWindow())
-        window->console()->addMessage(source, type, level, message, sourceURL, lineNumber, callStack);
+    if (DOMWindow* window = domWindow()) {
+        if (Console* console = window->console())
+            console->addMessage(source, type, level, message, sourceURL, lineNumber, callStack);
+    }
 }
 
 struct PerformTaskContext {
@@ -4975,8 +4977,10 @@ void Document::windowScreenDidChange(PlatformDisplayID displayID)
 #endif
 
 #if USE(ACCELERATED_COMPOSITING)
-    if (renderView()->usesCompositing())
-        renderView()->compositor()->windowScreenDidChange(displayID);
+    if (RenderView* view = renderView()) {
+        if (view->usesCompositing())
+            view->compositor()->windowScreenDidChange(displayID);
+    }
 #endif
 }
 
@@ -5013,6 +5017,9 @@ void Document::enqueueHashchangeEvent(const String& oldURL, const String& newURL
 
 void Document::enqueuePopstateEvent(PassRefPtr<SerializedScriptValue> stateObject)
 {
+    if (!ContextFeatures::pushStateEnabled(this))
+        return;
+
     // FIXME: https://bugs.webkit.org/show_bug.cgi?id=36202 Popstate event needs to fire asynchronously
     dispatchWindowEvent(PopStateEvent::create(stateObject, domWindow() ? domWindow()->history() : 0));
 }

@@ -1528,11 +1528,6 @@ bool Node::isBlockFlow() const
     return renderer() && renderer()->isBlockFlow();
 }
 
-bool Node::isBlockFlowOrBlockTable() const
-{
-    return renderer() && (renderer()->isBlockFlow() || (renderer()->isTable() && !renderer()->isInline()));
-}
-
 Element *Node::enclosingBlockFlowElement() const
 {
     Node *n = const_cast<Node *>(this);
@@ -2839,6 +2834,14 @@ void Node::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     info.addMember(m_previous);
     if (m_renderer)
         info.addMember(m_renderer->style());
+}
+
+void Node::textRects(Vector<IntRect>& rects) const
+{
+    RefPtr<Range> range = Range::create(document());
+    WebCore::ExceptionCode ec = 0;
+    range->selectNodeContents(const_cast<Node*>(this), ec);
+    range->textRects(rects);
 }
 
 } // namespace WebCore

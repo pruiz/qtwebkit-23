@@ -422,6 +422,17 @@ webkit.org/b/99059 fast/dom/timer-throttling-hidden-page.html [ Skip ]
 # css3-conditionals support is not yet enabled.
 webkit.org/b/86146 css3/supports.html
 
+# MathML layout is being tuned/reworked.
+webkit.org/b/99921 mathml/presentation/fenced.xhtml [ Failure ]
+webkit.org/b/99921 mathml/presentation/mo.xhtml [ Failure ]
+webkit.org/b/99921 mathml/presentation/mo-stretch.html [ Failure ]
+webkit.org/b/99921 mathml/presentation/over.xhtml [ Failure ]
+webkit.org/b/99921 mathml/presentation/row.xhtml [ Failure ]
+webkit.org/b/99921 mathml/presentation/row-alignment.xhtml [ Failure ]
+
+# Requires Resolution Media Query support
+webkit.org/b/100137 fast/media/mq-resolution.html [ Failure ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Expected failures
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -460,6 +471,19 @@ webkit.org/b/99452 [ Debug ] platform/gtk/fonts/font-face-with-complex-text.html
 
 webkit.org/b/98722 [ Debug ] fast/dom/gc-acid3.html [ Crash Pass ]
 webkit.org/b/98722 [ Debug ] http/tests/misc/acid3.html [ Crash Failure ]
+
+webkit.org/b/100236 [ Debug ] http/tests/loading/basic-auth-resend-wrong-credentials.html [ Crash ]
+webkit.org/b/100236 [ Debug ] http/tests/loading/basic-credentials-sent-automatically.html [ Crash ]
+webkit.org/b/100236 [ Debug ] http/tests/xmlhttprequest/access-control-preflight-credential-async.html [ Crash ]
+webkit.org/b/100236 [ Debug ] http/tests/xmlhttprequest/basic-auth-nopassword.html [ Crash ]
+webkit.org/b/100236 [ Debug ] http/tests/xmlhttprequest/basic-auth-nouser.html [ Crash ]
+webkit.org/b/100236 [ Debug ] http/tests/xmlhttprequest/cross-origin-no-credential-prompt.html [ Crash ]
+webkit.org/b/100236 [ Debug ] http/tests/xmlhttprequest/failed-auth.html [ Crash ]
+webkit.org/b/100236 [ Debug ] http/tests/xmlhttprequest/remember-bad-password.html [ Crash ]
+webkit.org/b/100236 [ Debug ] http/tests/misc/401-alternative-content.php [ Crash ]
+webkit.org/b/100236 [ Debug ] http/tests/misc/authentication-redirect-1/authentication-sent-to-redirect-cross-origin.html [ Crash ]
+webkit.org/b/100236 [ Debug ] http/tests/misc/authentication-redirect-2/authentication-sent-to-redirect-same-origin.html [ Crash ]
+webkit.org/b/100236 [ Debug ] http/tests/misc/authentication-redirect-3/authentication-sent-to-redirect-same-origin-with-location-credentials.html [ Crash ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Crashing tests
@@ -562,6 +586,8 @@ webkit.org/b/98133 fast/css/sticky/sticky-writing-mode-vertical-rl.html [ ImageO
 
 webkit.org/b/68878 media/video-playing-and-pause.html [ Failure Pass ]
 
+webkit.org/b/100117 fast/xmlhttprequest/xmlhttprequest-recursive-sync-event.html [ Failure Pass ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Flaky tests
 #////////////////////////////////////////////////////////////////////////////////////////
@@ -612,6 +638,18 @@ Bug(GTK) [ Debug ] sputnik/Conformance/07_Lexical_Conventions/7.8_Literals/7.8.5
 Bug(GTK) [ Debug ] sputnik/Unicode/Unicode_218/S7.6_A5.3_T1.html [ Pass Slow ]
 Bug(GTK) [ Debug ] sputnik/Unicode/Unicode_218/S7.6_A5.3_T2.html [ Pass Slow ]
 Bug(GTK) tables/mozilla/other/slashlogo.html [ Pass Slow ]
+
+Bug(GTK) http/tests/xmlhttprequest/timeout/xmlhttprequest-timeout-aborted.html [ Pass Slow ] 
+Bug(GTK) http/tests/xmlhttprequest/timeout/xmlhttprequest-timeout-abortedonmain.html [ Pass Slow ] 
+Bug(GTK) http/tests/xmlhttprequest/timeout/xmlhttprequest-timeout-overridesexpires.html [ Pass Slow ] 
+Bug(GTK) http/tests/xmlhttprequest/timeout/xmlhttprequest-timeout-simple.html [ Pass Slow ] 
+Bug(GTK) http/tests/xmlhttprequest/timeout/xmlhttprequest-timeout-synconmain.html [ Pass Slow ] 
+Bug(GTK) http/tests/xmlhttprequest/timeout/xmlhttprequest-timeout-twice.html [ Pass Slow ] 
+Bug(GTK) http/tests/xmlhttprequest/timeout/xmlhttprequest-timeout-worker-aborted.html [ Pass Slow ] 
+Bug(GTK) http/tests/xmlhttprequest/timeout/xmlhttprequest-timeout-worker-overridesexpires.html [ Pass Slow ] 
+Bug(GTK) http/tests/xmlhttprequest/timeout/xmlhttprequest-timeout-worker-simple.html [ Pass Slow ] 
+Bug(GTK) http/tests/xmlhttprequest/timeout/xmlhttprequest-timeout-worker-synconworker.html [ Pass Slow ] 
+Bug(GTK) http/tests/xmlhttprequest/timeout/xmlhttprequest-timeout-worker-twice.html [ Pass Slow ] 
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of slow tests
@@ -819,15 +857,15 @@ webkit.org/b/53986 svg/text/caret-in-svg-text.xhtml [ Failure ]
 
 # No authentication challenge handling
 webkit.org/b/51104 http/tests/loading/authentication-after-redirect-stores-wrong-credentials/authentication-after-redirect-stores-wrong-credentials.html [ Skip ]
-webkit.org/b/51104 http/tests/loading/basic-auth-resend-wrong-credentials.html [ Failure ]
-webkit.org/b/51104 http/tests/loading/basic-credentials-sent-automatically.html [ Failure ]
-webkit.org/b/51104 http/tests/misc/authentication-redirect-1/authentication-sent-to-redirect-cross-origin.html [ Failure ]
-webkit.org/b/51104 http/tests/misc/authentication-redirect-2/authentication-sent-to-redirect-same-origin.html [ Failure ]
-webkit.org/b/51104 http/tests/misc/authentication-redirect-3/authentication-sent-to-redirect-same-origin-with-location-credentials.html [ Failure ]
+webkit.org/b/51104 [ Release ] http/tests/loading/basic-auth-resend-wrong-credentials.html [ Failure ]
+webkit.org/b/51104 [ Release ] http/tests/loading/basic-credentials-sent-automatically.html [ Failure ]
+webkit.org/b/51104 [ Release ] http/tests/misc/authentication-redirect-1/authentication-sent-to-redirect-cross-origin.html [ Failure ]
+webkit.org/b/51104 [ Release ] http/tests/misc/authentication-redirect-2/authentication-sent-to-redirect-same-origin.html [ Failure ]
+webkit.org/b/51104 [ Release ] http/tests/misc/authentication-redirect-3/authentication-sent-to-redirect-same-origin-with-location-credentials.html [ Failure ]
 webkit.org/b/51104 http/tests/security/401-logout/401-logout.php [ Skip ]
-webkit.org/b/51104 http/tests/xmlhttprequest/basic-auth-nouser.html [ Failure ]
-webkit.org/b/51104 http/tests/xmlhttprequest/basic-auth-nopassword.html [ Failure ]
-webkit.org/b/51104 http/tests/xmlhttprequest/remember-bad-password.html [ Failure ]
+webkit.org/b/51104 [ Release ] http/tests/xmlhttprequest/basic-auth-nouser.html [ Failure ]
+webkit.org/b/51104 [ Release ] http/tests/xmlhttprequest/basic-auth-nopassword.html [ Failure ]
+webkit.org/b/51104 [ Release ] http/tests/xmlhttprequest/remember-bad-password.html [ Failure ]
 
 # This port doesn't have a global history delegate yet
 Bug(GTK) http/tests/globalhistory [ Failure ]
@@ -1017,7 +1055,7 @@ Bug(GTK) fast/events/drag-in-frames.html [ Failure ]
 Bug(GTK) http/tests/misc/bubble-drag-events.html [ Failure ]
 
 # Fails with "Received error from worker: ReferenceError: Can't find variable: revokeObjectURL
-Bug(GTK) fast/files/workers/worker-apply-blob-url-to-xhr.html [ Failure ]
+webkit.org/b/100136 fast/files/workers/worker-apply-blob-url-to-xhr.html [ Failure ]
 
 # Dragging images and links results in a DataTransfer object containing a non-empty files array
 webkit.org/b/52094 editing/pasteboard/files-during-page-drags.html [ Failure ]

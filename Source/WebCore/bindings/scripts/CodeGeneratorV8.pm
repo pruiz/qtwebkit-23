@@ -556,8 +556,11 @@ inline v8::Handle<v8::Value> toV8Fast(Node* node, const v8::AccessorInfo& info, 
     // whether the holder's inline wrapper is the same wrapper we see in the
     // v8::AccessorInfo.
     v8::Handle<v8::Object> holderWrapper = info.Holder();
-    if (holder->wrapper() && *holder->wrapper() == holderWrapper && node->wrapper())
-        return *node->wrapper();
+    if (holder->wrapper() == holderWrapper) {
+        v8::Handle<v8::Object> wrapper = node->wrapper();
+        if (!wrapper.IsEmpty())
+            return wrapper;
+    }
     return toV8Slow(node, holderWrapper, info.GetIsolate());
 }
 END
@@ -3455,19 +3458,9 @@ END
         return wrapper;
 
     installPerContextProperties(wrapper, impl.get());
-END
-
-    push(@implContent, <<END);
     v8::Persistent<v8::Object> wrapperHandle = V8DOMWrapper::setJSWrapperFor${domMapName}(impl, wrapper, isolate);
     if (!hasDependentLifetime)
         wrapperHandle.MarkIndependent();
-END
-    if (IsNodeSubType($dataNode)) {
-        push(@implContent, <<END);
-    wrapperHandle.SetWrapperClassId(v8DOMSubtreeClassId);
-END
-    }
-    push(@implContent, <<END);
     return wrapper;
 }
 END

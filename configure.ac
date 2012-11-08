@@ -865,15 +865,15 @@ AC_ARG_ENABLE([introspection],
   [],[enable_introspection=no])
 AC_MSG_RESULT([$enable_introspection])
 
-# Enable css shaders if unstable_features, css_filters and
-# accelerated_compositing are turned on.
-AC_MSG_CHECKING([whether to enable CSS Shaders])
+# Enable CSS Filters and Shaders if unstable_features and accelerated_compositing are turned on.
+enable_css_filters=no;
+enable_css_shaders=no;
+AC_MSG_CHECKING([whether to enable CSS Filters and Shaders])
 if test "$enable_unstable_features" = "yes" && test "$enable_accelerated_compositing" = "yes" && test "$with_acceleration_backend" = "opengl"; then
-    enable_css_shaders=yes;
     enable_css_filters=yes;
+    enable_css_shaders=yes;
 fi
 AC_MSG_RESULT([$enable_css_filters])
-AC_MSG_RESULT([$enable_css_shaders])
 
 G_IR_SCANNER=
 G_IR_COMPILER=
@@ -1044,16 +1044,6 @@ if test "$with_acceleration_backend" = "opengl"; then
 fi
 AC_SUBST([OPENGL_LIBS])
 
-# check if atspi2 is available (only needed for Webkit2 unit tests)
-if test "$enable_webkit2" = "yes"; then
-   PKG_CHECK_MODULES([ATSPI2],
-                     [atspi-2 >= $ATSPI2_REQUIRED_VERSION],
-                     [have_atspi2=yes], [have_atspi2=no])
-
-   AC_SUBST([ATSPI2_CFLAGS])
-   AC_SUBST([ATSPI2_LIBS])
-fi
-
 if test "$enable_gamepad" = "yes"; then
    PKG_CHECK_MODULES([GAMEPAD], [gio-unix-2.0 gudev-1.0])
 
@@ -1113,6 +1103,16 @@ AC_SUBST(GTK2_CFLAGS)
 AC_SUBST(GTK2_LIBS)
 
 GTK_DOC_CHECK([1.10])
+
+# We need atspi2 for Webkit2 unit tests
+if test "$enable_webkit2" = "yes"; then
+   PKG_CHECK_MODULES([ATSPI2],
+                     [atspi-2 >= $ATSPI2_REQUIRED_VERSION],
+                     [have_atspi2=yes], [have_atspi2=no])
+
+   AC_SUBST([ATSPI2_CFLAGS])
+   AC_SUBST([ATSPI2_LIBS])
+fi
 
 # OS conditionals
 AM_CONDITIONAL([OS_WIN32],[test "$os_win32" = "yes"])
@@ -1194,6 +1194,7 @@ GNUmakefile
 
 AC_CONFIG_FILES([
 Source/WebKit/gtk/webkit/webkitversion.h
+Source/WebKit/gtk/po/POTFILES
 DerivedSources/WebCore/UserAgentGtk.h:Source/WebCore/platform/gtk/UserAgentGtk.h.in
 ])
 

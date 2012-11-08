@@ -21,7 +21,9 @@ SUBDIRS += api
 
 declarative.file = WebKit/qt/declarative/declarative.pro
 declarative.makefile = Makefile.declarative
-contains(DEFINES, HAVE_QTQUICK=1): SUBDIRS += declarative
+
+haveQt(4):contains(DEFINES, HAVE_QQUICK1=1): SUBDIRS += declarative
+haveQt(5):contains(DEFINES, HAVE_QTQUICK=1): SUBDIRS += declarative
 
 !no_webkit1 {
     contains(DEFINES, HAVE_QTTESTLIB=1) {

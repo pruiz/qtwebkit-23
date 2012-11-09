@@ -136,9 +136,9 @@ WebInspector.StylesSidebarPane.prototype = {
     {
         // We start editing upon click -> default navigation to resources panel is not available
         // Hence we add a soft context menu for hrefs.
-        var contextMenu = new WebInspector.ContextMenu();
+        var contextMenu = new WebInspector.ContextMenu(event);
         contextMenu.appendApplicableItems(event.target);
-        contextMenu.show(event);
+        contextMenu.show();
     },
 
     get _forcedPseudoClasses()
@@ -1231,7 +1231,7 @@ WebInspector.StylePropertiesSection.prototype = {
         if (!this.editable)
             return;
 
-        if (!getSelection().isCollapsed)
+        if (!window.getSelection().isCollapsed)
             return;
 
         if (this._checkWillCancelEditing())
@@ -2048,7 +2048,7 @@ WebInspector.StylePropertyTreeElement.prototype = {
 
     _mouseClick: function(event)
     {
-        if (!getSelection().isCollapsed)
+        if (!window.getSelection().isCollapsed)
             return;
 
         event.consume(true);

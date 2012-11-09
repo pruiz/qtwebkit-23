@@ -24,12 +24,18 @@
 #include "RefPtrEfl.h"
 #include "WKEinaSharedString.h"
 #include "WKRetainPtr.h"
-#include <Ecore_IMF.h>
-#include <Ecore_IMF_Evas.h>
 #include <Evas.h>
+#include <WebCore/TextDirection.h>
+#include <WebCore/Timer.h>
+#include <WebKit2/WKBase.h>
+#include <wtf/HashMap.h>
 #include <wtf/OwnPtr.h>
 #include <wtf/RefPtr.h>
 #include <wtf/text/WTFString.h>
+
+#if ENABLE(TOUCH_EVENTS)
+#include "ewk_touch.h"
+#endif
 
 #if USE(ACCELERATED_COMPOSITING)
 #include <Evas_GL.h>
@@ -55,6 +61,7 @@
 namespace WebKit {
 class FindClientEfl;
 class FormClientEfl;
+class InputMethodContextEfl;
 class PageClientImpl;
 class PageLoadClientEfl;
 class PagePolicyClientEfl;
@@ -62,17 +69,21 @@ class PageUIClientEfl;
 class PageViewportControllerClientEfl;
 class PageViewportController;
 class ResourceLoadClientEfl;
+class WebPageGroup;
 class WebPageProxy;
+class WebPopupItem;
 class WebPopupMenuProxyEfl;
 }
 
 namespace WebCore {
+class Color;
 class Cursor;
 class IntRect;
 class IntSize;
 }
 
 class Ewk_Back_Forward_List;
+class Ewk_Color_Picker;
 class Ewk_Context;
 class Ewk_Download_Job;
 class Ewk_Error;
@@ -81,6 +92,7 @@ class Ewk_Intent;
 class Ewk_Intent_Service;
 class Ewk_Navigation_Policy_Decision;
 class Ewk_Resource;
+class Ewk_Popup_Menu;
 class Ewk_Settings;
 class Ewk_Url_Request;
 class Ewk_Url_Response;
@@ -89,20 +101,46 @@ typedef struct Ewk_View_Smart_Data Ewk_View_Smart_Data;
 
 class EwkViewImpl {
 public:
-    explicit EwkViewImpl(Evas_Object* view);
+    EwkViewImpl(Evas_Object* view, PassRefPtr<Ewk_Context> context, PassRefPtr<WebKit::WebPageGroup> pageGroup);
     ~EwkViewImpl();
 
-    static EwkViewImpl* fromEvasObject(Evas_Object* view);
+    static EwkViewImpl* fromEvasObject(const Evas_Object* view);
 
-    inline Evas_Object* view() { return m_view; }
+    Evas_Object* view() { return m_view; }
     WKPageRef wkPage();
-    inline WebKit::WebPageProxy* page() { return pageProxy.get(); }
+    WebKit::WebPageProxy* page() { return m_pageProxy.get(); }
+    Ewk_Context* ewkContext() { return m_context.get(); }
+    Ewk_Settings* settings() { return m_settings.get(); }
+    Ewk_Back_Forward_List* backForwardList() { return m_backForwardList.get(); }
 
     WebCore::IntSize size() const;
+    bool isFocused() const;
+    bool isVisible() const;
+
+    const char* url() const { return m_url; }
+    const char* faviconURL() const { return m_faviconURL; }
+    const char* title() const;
+    WebKit::InputMethodContextEfl* inputMethodContext();
+
+    const char* themePath() const;
+    void setThemePath(const char* theme);
+    const char* customTextEncodingName() const;
+    void setCustomTextEncodingName(const char* encoding);
+
+    bool mouseEventsEnabled() const { return m_mouseEventsEnabled; }
+    void setMouseEventsEnabled(bool enabled);
+#if ENABLE(TOUCH_EVENTS)
+    bool touchEventsEnabled() const { return m_touchEventsEnabled; }
+    void setTouchEventsEnabled(bool enabled);
+#endif
 
     void setCursor(const WebCore::Cursor& cursor);
     void redrawRegion(const WebCore::IntRect& rect);
     void setImageData(void* imageData, const WebCore::IntSize& size);
+
+    static void addToPageViewMap(EwkViewImpl* viewImpl);
+    static void removeFromPageViewMap(EwkViewImpl* viewImpl);
+    static const Evas_Object* viewFromPageViewMap(const WKPageRef);
 
 #if ENABLE(FULLSCREEN_API)
     void enterFullScreen();
@@ -116,9 +154,21 @@ public:
 #endif
 
 #if ENABLE(INPUT_TYPE_COLOR)
-    void requestColorPicker(int r, int g, int b, int a, WKColorPickerResultListenerRef listener);
+    void requestColorPicker(WKColorPickerResultListenerRef listener, const WebCore::Color&);
     void dismissColorPicker();
 #endif
+
+    WKPageRef createNewPage();
+    void closePage();
+
+    void requestPopupMenu(WebKit::WebPopupMenuProxyEfl*, const WebCore::IntRect&, WebCore::TextDirection, double pageScaleFactor, const Vector<WebKit::WebPopupItem>& items, int32_t selectedIndex);
+    void closePopupMenu();
+
+    void updateTextInputState();
+
+    void requestJSAlertPopup(const WKEinaSharedString& message);
+    bool requestJSConfirmPopup(const WKEinaSharedString& message);
+    WKEinaSharedString requestJSPromptPopup(const WKEinaSharedString& message, const WKEinaSharedString& defaultValue);
 
     void informDownloadJobCancelled(Ewk_Download_Job* download);
     void informDownloadJobFailed(Ewk_Download_Job* download, Ewk_Error* error);
@@ -150,6 +200,10 @@ public:
     void informTooltipTextChange(const String& text);
     void informTextFound(unsigned matchCount);
     void informIconChange();
+    void informWebProcessCrashed();
+    void informContentsSizeChange(const WebCore::IntSize& size);
+    unsigned long long informDatabaseQuotaReached(const String& databaseName, const String& displayName, unsigned long long currentQuota, unsigned long long currentOriginUsage, unsigned long long currentDatabaseUsage, unsigned long long expectedUsage);
+    void informURLChange();
 
 #if ENABLE(WEB_INTENTS)
     void informIntentRequest(Ewk_Intent* ewkIntent);
@@ -157,57 +211,70 @@ public:
 #if ENABLE(WEB_INTENTS_TAG)
     void informIntentServiceRegistration(Ewk_Intent_Service* ewkIntentService);
 #endif
-
-    // FIXME: Make members private for encapsulation.
-    OwnPtr<WebKit::PageClientImpl> pageClient;
 #if USE(TILED_BACKING_STORE)
-    OwnPtr<WebKit::PageViewportControllerClientEfl> pageViewportControllerClient;
-    OwnPtr<WebKit::PageViewportController> pageViewportController;
+    WebKit::PageViewportControllerClientEfl* pageViewportControllerClient() { return m_pageViewportControllerClient.get(); }
+    WebKit::PageViewportController* pageViewportController() { return m_pageViewportController.get(); }
 #endif
-    RefPtr<WebKit::WebPageProxy> pageProxy;
-    OwnPtr<WebKit::PageLoadClientEfl> pageLoadClient;
-    OwnPtr<WebKit::PagePolicyClientEfl> pagePolicyClient;
-    OwnPtr<WebKit::PageUIClientEfl> pageUIClient;
-    OwnPtr<WebKit::ResourceLoadClientEfl> resourceLoadClient;
-    OwnPtr<WebKit::FindClientEfl> findClient;
-    OwnPtr<WebKit::FormClientEfl> formClient;
-
-    WKEinaSharedString url;
-    WKEinaSharedString title;
-    WKEinaSharedString theme;
-    WKEinaSharedString customEncoding;
-    WKEinaSharedString cursorGroup;
-    WKEinaSharedString faviconURL;
-    RefPtr<Evas_Object> cursorObject;
-    OwnPtr<Ewk_Back_Forward_List> backForwardList;
-    OwnPtr<Ewk_Settings> settings;
-    bool areMouseEventsEnabled;
-    WKRetainPtr<WKColorPickerResultListenerRef> colorPickerResultListener;
-    RefPtr<Ewk_Context> context;
-#if ENABLE(TOUCH_EVENTS)
-    bool areTouchEventsEnabled;
-#endif
-
-    WebKit::WebPopupMenuProxyEfl* popupMenuProxy;
-    Eina_List* popupMenuItems;
-
-    Ecore_IMF_Context* imfContext;
-    bool isImfFocused;
-
-#ifdef HAVE_ECORE_X
-    bool isUsingEcoreX;
-#endif
-
 #if USE(ACCELERATED_COMPOSITING)
-    Evas_GL* evasGl;
-    Evas_GL_Context* evasGlContext;
-    Evas_GL_Surface* evasGlSurface;
+    Evas_GL* evasGl() { return m_evasGl; }
+    Evas_GL_Context* evasGlContext() { return m_evasGlContext; }
+    Evas_GL_Surface* evasGlSurface() { return m_evasGlSurface; }
+    void resetEvasGlSurface() { m_evasGlSurface = 0; }
 #endif
 
 private:
-    Ewk_View_Smart_Data* smartData();
+    inline Ewk_View_Smart_Data* smartData();
+    void displayTimerFired(WebCore::Timer<EwkViewImpl>*);
 
+    static void onMouseDown(void* data, Evas*, Evas_Object*, void* eventInfo);
+    static void onMouseUp(void* data, Evas*, Evas_Object*, void* eventInfo);
+    static void onMouseMove(void* data, Evas*, Evas_Object*, void* eventInfo);
+#if ENABLE(TOUCH_EVENTS)
+    void feedTouchEvents(Ewk_Touch_Event_Type type);
+    static void onTouchDown(void* /* data */, Evas* /* canvas */, Evas_Object* ewkView, void* /* eventInfo */);
+    static void onTouchUp(void* /* data */, Evas* /* canvas */, Evas_Object* ewkView, void* /* eventInfo */);
+    static void onTouchMove(void* /* data */, Evas* /* canvas */, Evas_Object* ewkView, void* /* eventInfo */);
+#endif
+    static void onFaviconChanged(const char* pageURL, void* eventInfo);
+
+    // Note, initialization matters.
     Evas_Object* m_view;
+    RefPtr<Ewk_Context> m_context;
+    OwnPtr<WebKit::PageClientImpl> m_pageClient;
+    RefPtr<WebKit::WebPageProxy> m_pageProxy;
+    OwnPtr<WebKit::PageLoadClientEfl> m_pageLoadClient;
+    OwnPtr<WebKit::PagePolicyClientEfl> m_pagePolicyClient;
+    OwnPtr<WebKit::PageUIClientEfl> m_pageUIClient;
+    OwnPtr<WebKit::ResourceLoadClientEfl> m_resourceLoadClient;
+    OwnPtr<WebKit::FindClientEfl> m_findClient;
+    OwnPtr<WebKit::FormClientEfl> m_formClient;
+    OwnPtr<Ewk_Back_Forward_List> m_backForwardList;
+#if USE(TILED_BACKING_STORE)
+    OwnPtr<WebKit::PageViewportControllerClientEfl> m_pageViewportControllerClient;
+    OwnPtr<WebKit::PageViewportController> m_pageViewportController;
+#endif
+#if USE(ACCELERATED_COMPOSITING)
+    Evas_GL* m_evasGl;
+    Evas_GL_Context* m_evasGlContext;
+    Evas_GL_Surface* m_evasGlSurface;
+#endif
+    OwnPtr<Ewk_Settings> m_settings;
+    RefPtr<Evas_Object> m_cursorObject;
+    WKEinaSharedString m_cursorGroup;
+    WKEinaSharedString m_faviconURL;
+    WKEinaSharedString m_url;
+    mutable WKEinaSharedString m_title;
+    WKEinaSharedString m_theme;
+    mutable WKEinaSharedString m_customEncoding;
+    bool m_mouseEventsEnabled;
+#if ENABLE(TOUCH_EVENTS)
+    bool m_touchEventsEnabled;
+#endif
+    WebCore::Timer<EwkViewImpl> m_displayTimer;
+    WTF::Vector <WebCore::IntRect> m_dirtyRects;
+    OwnPtr<Ewk_Popup_Menu> m_popupMenu;
+    OwnPtr<WebKit::InputMethodContextEfl> m_inputMethodContext;
+    OwnPtr<Ewk_Color_Picker> m_colorPicker;
 };
 
 #endif // EwkViewImpl_h

@@ -695,6 +695,13 @@ inline void Element::setAttributeInternal(size_t index, const QualifiedName& nam
         didModifyAttribute(name, newValue);
 }
 
+static inline AtomicString makeIdForStyleResolution(const AtomicString& value, bool inQuirksMode)
+{
+    if (inQuirksMode)
+        return value.lower();
+    return value;
+}
+
 void Element::attributeChanged(const QualifiedName& name, const AtomicString& newValue)
 {
     parseAttribute(Attribute(name, newValue));
@@ -702,14 +709,13 @@ void Element::attributeChanged(const QualifiedName& name, const AtomicString& ne
     document()->incDOMTreeVersion();
 
     if (isIdAttributeName(name)) {
-        if (newValue != attributeData()->idForStyleResolution()) {
-            if (newValue.isNull())
-                attributeData()->setIdForStyleResolution(nullAtom);
-            else if (document()->inQuirksMode())
-                attributeData()->setIdForStyleResolution(newValue.lower());
-            else
-                attributeData()->setIdForStyleResolution(newValue);
-            setNeedsStyleRecalc();
+        AtomicString oldId = attributeData()->idForStyleResolution();
+        AtomicString newId = makeIdForStyleResolution(newValue, document()->inQuirksMode());
+        if (newId != oldId) {
+            attributeData()->setIdForStyleResolution(newId);
+            StyleResolver* styleResolver = document()->styleResolverIfExists();
+            if (attached() && (!styleResolver || (styleResolver->hasSelectorForId(newId) || styleResolver->hasSelectorForId(oldId))))
+                setNeedsStyleRecalc();
         }
     } else if (name == HTMLNames::nameAttr)
         setHasName(!newValue.isNull());
@@ -722,31 +728,8 @@ void Element::attributeChanged(const QualifiedName& name, const AtomicString& ne
 
     invalidateNodeListCachesInAncestors(&name, this);
 
-    if (!AXObjectCache::accessibilityEnabled())
-        return;
-
-    if (name == aria_activedescendantAttr) {
-        // any change to aria-activedescendant attribute triggers accessibility focus change, but document focus remains intact
-        document()->axObjectCache()->handleActiveDescendantChanged(this);
-    } else if (name == roleAttr) {
-        // the role attribute can change at any time, and the AccessibilityObject must pick up these changes
-        document()->axObjectCache()->handleAriaRoleChanged(this);
-    } else if (name == aria_valuenowAttr) {
-        // If the valuenow attribute changes, AX clients need to be notified.
-        document()->axObjectCache()->postNotification(this, AXObjectCache::AXValueChanged, true);
-    } else if (name == aria_labelAttr || name == aria_labeledbyAttr || name == altAttr || name == titleAttr) {
-        // If the content of an element changes due to an attribute change, notify accessibility.
-        document()->axObjectCache()->contentChanged(this);
-    } else if (name == aria_checkedAttr)
-        document()->axObjectCache()->checkedStateChanged(this);
-    else if (name == aria_selectedAttr)
-        document()->axObjectCache()->selectedChildrenChanged(this);
-    else if (name == aria_expandedAttr)
-        document()->axObjectCache()->handleAriaExpandedChange(this);
-    else if (name == aria_hiddenAttr)
-        document()->axObjectCache()->childrenChanged(this);
-    else if (name == aria_invalidAttr)
-        document()->axObjectCache()->postNotification(this, AXObjectCache::AXInvalidStatusChanged, true);
+    if (AXObjectCache::accessibilityEnabled())
+        document()->axObjectCache()->handleAttributeChanged(name, this);
 }
 
 void Element::parseAttribute(const Attribute& attribute)
@@ -1062,8 +1045,9 @@ void Element::detach()
 bool Element::pseudoStyleCacheIsInvalid(const RenderStyle* currentStyle, RenderStyle* newStyle)
 {
     ASSERT(currentStyle == renderStyle());
+    ASSERT(renderer());
 
-    if (!renderer() || !currentStyle)
+    if (!currentStyle)
         return false;
 
     const PseudoStyleCache* pseudoStyleCache = currentStyle->cachedPseudoStyles();
@@ -1113,7 +1097,7 @@ void Element::recalcStyle(StyleChange change)
             return;
     }
 
-    // Ref currentStyle in case it would otherwise be deleted when setRenderStyle() is called.
+    // Ref currentStyle in case it would otherwise be deleted when setting the new style in the renderer.
     RefPtr<RenderStyle> currentStyle(renderStyle());
     bool hasParentStyle = parentNodeForRenderingAndStyle() ? static_cast<bool>(parentNodeForRenderingAndStyle()->renderStyle()) : false;
     bool hasDirectAdjacentRules = currentStyle && currentStyle->childrenAffectedByDirectAdjacentRules();
@@ -1162,17 +1146,15 @@ void Element::recalcStyle(StyleChange change)
                 newStyle->setChildrenAffectedByDirectAdjacentRules();
         }
 
-        if (ch != NoChange || pseudoStyleCacheIsInvalid(currentStyle.get(), newStyle.get()) || (change == Force && renderer() && renderer()->requiresForcedStyleRecalcPropagation())) {
-            setRenderStyle(newStyle);
-        } else if (needsStyleRecalc() && styleChangeType() != SyntheticStyleChange) {
-            // Although no change occurred, we use the new style so that the cousin style sharing code won't get
-            // fooled into believing this style is the same.
-            if (renderer())
-                renderer()->setStyleInternal(newStyle.get());
-            else
-                setRenderStyle(newStyle);
-        } else if (styleChangeType() == SyntheticStyleChange)
-             setRenderStyle(newStyle);
+        if (RenderObject* renderer = this->renderer()) {
+            if (ch != NoChange || pseudoStyleCacheIsInvalid(currentStyle.get(), newStyle.get()) || (change == Force && renderer->requiresForcedStyleRecalcPropagation()) || styleChangeType() == SyntheticStyleChange)
+                renderer->setAnimatableStyle(newStyle.get());
+            else if (needsStyleRecalc()) {
+                // Although no change occurred, we use the new style so that the cousin style sharing code won't get
+                // fooled into believing this style is the same.
+                renderer->setStyleInternal(newStyle.get());
+            }
+        }
 
         // If "rem" units are used anywhere in the document, and if the document element's font size changes, then go ahead and force font updating
         // all the way down the tree. This is simpler than having to maintain a cache of objects (and such font size changes should be rare anyway).

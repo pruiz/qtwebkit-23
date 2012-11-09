@@ -52,6 +52,7 @@ my (
     $css3ConditionalRulesSupport,
     $css3TextSupport,
     $cssBoxDecorationBreakSupport,
+    $cssDeviceAdaptation,
     $cssExclusionsSupport,
     $cssFiltersSupport,
     $cssHierarchiesSupport,
@@ -139,6 +140,7 @@ my (
     $webTimingSupport,
     $workersSupport,
     $xhrResponseBlobSupport,
+    $xhrTimeoutSupport,
     $xsltSupport,
 );
 
@@ -163,6 +165,9 @@ my @features = (
 
     { option => "csp-next", desc => "Toggle Content Security Policy 1.1 support",
       define => "ENABLE_CSP_NEXT", default => 0, value => \$cspNextSupport },
+
+    { option => "css-device-adaptation", desc => "Toggle CSS Device Adaptation support",
+      define => "ENABLE_CSS_DEVICE_ADAPTATION", default => 0, value => \$cssDeviceAdaptation },
 
     { option => "css-exclusions", desc => "Toggle CSS Exclusions support",
       define => "ENABLE_CSS_EXCLUSIONS", default => 1, value => \$cssExclusionsSupport },
@@ -430,6 +435,9 @@ my @features = (
 
     { option => "xhr-response-blob", desc => "Toggle XHR Response BLOB support",
       define => "ENABLE_XHR_RESPONSE_BLOB", default => isBlackBerry(), value => \$xhrResponseBlobSupport },
+
+    { option => "xhr-timeout", desc => "Toggle XHR Timeout support",
+      define => "ENABLE_XHR_TIMEOUT", default => (isEfl() || isGtk() || isAppleMacWebKit()), value => \$xhrTimeoutSupport },
 
     { option => "xslt", desc => "Toggle XSLT support",
       define => "ENABLE_XSLT", default => 1, value => \$xsltSupport },

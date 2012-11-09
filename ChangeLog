@@ -1,3 +1,99 @@
+2012-10-26  Rob Buis  <rbuis@rim.com>
+
+        [BlackBerry] Platform Abstraction for WebKit Resource/Image Loading
+        https://bugs.webkit.org/show_bug.cgi?id=100518
+
+        PR 231732
+
+        Reviewed by Yong Li.
+
+        Remove RESOURCE_PATH from webkit, this is now abstracted in our platform layer.
+
+        * Source/cmake/OptionsBlackBerry.cmake:
+
+2012-10-26  Regina Chung  <heejin.r.chung@samsung.com>
+
+        [EFL][WK2] Enable WebGL
+        https://bugs.webkit.org/show_bug.cgi?id=97652
+
+        Reviewed by Gyuyoung Kim.
+
+        Use Graphics Surface to enable WebGL for WebKit2 EFL.
+
+        * Source/cmake/OptionsEfl.cmake:
+
+2012-10-26  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r132601.
+        http://trac.webkit.org/changeset/132601
+        https://bugs.webkit.org/show_bug.cgi?id=100494
+
+        It broke the Qt build (Requested by Ossy on #webkit).
+
+        * Source/cmake/OptionsEfl.cmake:
+
+2012-10-26  Regina Chung  <heejin.r.chung@samsung.com>
+
+        [EFL][WK2] Enable WebGL
+        https://bugs.webkit.org/show_bug.cgi?id=97652
+
+        Reviewed by Gyuyoung Kim.
+
+        Use Graphics Surface to enable WebGL for WebKit2 EFL.
+
+        * Source/cmake/OptionsEfl.cmake:
+
+2012-10-26  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        Add feature flags for CSS Device Adaptation
+        https://bugs.webkit.org/show_bug.cgi?id=95960
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        * Source/cmake/WebKitFeatures.cmake:
+        * Source/cmakeconfig.h.cmake:
+        * configure.ac:
+
+2012-10-25  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][WK2][AC] Enable 3D_RENDERING flag
+        https://bugs.webkit.org/show_bug.cgi?id=99535
+
+        Reviewed by Laszlo Gombos.
+
+        Turn on the flag ENABLE_3D_RENDERING when WTF_USE_TILE_BACKING_STORE flag is on.
+        This flag controls perspective and preserves-3d behavior.
+
+        * Source/cmake/OptionsEfl.cmake:
+
+2012-10-25  Dominik Röttsches  <dominik.rottsches@intel.com>
+
+        Adding feature for XHR_TIMEOUT
+
+        Conditionalize XHR timeout support
+        https://bugs.webkit.org/show_bug.cgi?id=100356
+
+        Reviewed by Adam Barth.
+
+        Adding feature for XHR_TIMEOUT to disable it on ports that don't have
+        network backend support for setTimeoutInterval.
+
+        * Source/cmake/OptionsEfl.cmake: Default ON on EFL.
+        * Source/cmake/WebKitFeatures.cmake: Default OFF for any CMAKE based port.
+        * Source/cmakeconfig.h.cmake: Adding define.
+        * configure.ac: Make autogen.sh support the --enable/--disable-xhr-timeout parameter.
+
+2012-10-25  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        Add setMediaTypeOverride to window.internals.settings
+        https://bugs.webkit.org/show_bug.cgi?id=100249
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Exported WebCore::Settings::setMediaTypeOverride(WTF::String const&) for GTK port.
+
+        * Source/autotools/symbols.filter:
+
 2012-10-24  Michael Carmody  <mcarmody@rim.com>
 
         [BlackBerry] change CMAKE_<CCXX|C>_FLAGS_<RELEASE|DEBUG> from enviroment flags

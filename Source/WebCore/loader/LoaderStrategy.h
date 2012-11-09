@@ -29,16 +29,21 @@
 #if USE(PLATFORM_STRATEGIES)
 
 namespace WebCore {
-    
+
+class ResourceLoadScheduler;
+
 class LoaderStrategy {
 public:
+    virtual ResourceLoadScheduler* resourceLoadScheduler();
+
 protected:
     virtual ~LoaderStrategy()
     {
     }
 };
 
-}
+} // namespace WebCore
+
 #endif // USE(PLATFORM_STRATEGIES)
 
 #endif // LoaderStrategy_h

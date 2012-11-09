@@ -127,11 +127,11 @@ DragImageRef createDragImageFromImage(Image* image, RespectImageOrientationEnum 
                 SkBitmap::kARGB_8888_Config, sizeRespectingOrientation.width(), sizeRespectingOrientation.height());
             dragImageChromium->bitmap->allocPixels();
 
-            SkCanvas canvas(*dragImageChromium->bitmap);
-            SkMatrix transform = orientation.transformFromDefault(sizeRespectingOrientation);
-            canvas.concat(transform);
-
             FloatRect destRect(FloatPoint(), sizeRespectingOrientation);
+            SkCanvas canvas(*dragImageChromium->bitmap);
+
+            canvas.concat(orientation.transformFromDefault(sizeRespectingOrientation));
+
             if (orientation.usesWidthAsHeight())
                 destRect = FloatRect(destRect.x(), destRect.y(), destRect.height(), destRect.width());
 

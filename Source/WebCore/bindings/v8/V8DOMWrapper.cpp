@@ -72,19 +72,8 @@ v8::Persistent<v8::Object> V8DOMWrapper::setJSWrapperForDOMNode(PassRefPtr<Node>
 {
     v8::Persistent<v8::Object> wrapperHandle = v8::Persistent<v8::Object>::New(wrapper);
     ASSERT(maybeDOMWrapper(wrapperHandle));
-    ASSERT(!node->isActiveNode());
     wrapperHandle.SetWrapperClassId(v8DOMSubtreeClassId);
     getDOMNodeMap(isolate).set(node.leakRef(), wrapperHandle);
-    return wrapperHandle;
-}
-
-v8::Persistent<v8::Object> V8DOMWrapper::setJSWrapperForActiveDOMNode(PassRefPtr<Node> node, v8::Handle<v8::Object> wrapper, v8::Isolate* isolate)
-{
-    v8::Persistent<v8::Object> wrapperHandle = v8::Persistent<v8::Object>::New(wrapper);
-    ASSERT(maybeDOMWrapper(wrapperHandle));
-    ASSERT(node->isActiveNode());
-    wrapperHandle.SetWrapperClassId(v8DOMSubtreeClassId);
-    getActiveDOMNodeMap(isolate).set(node.leakRef(), wrapperHandle);
     return wrapperHandle;
 }
 

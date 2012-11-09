@@ -96,10 +96,7 @@ namespace WebCore {
 
         template<typename T>
         static v8::Persistent<v8::Object> setJSWrapperForDOMObject(PassRefPtr<T>, v8::Handle<v8::Object>, v8::Isolate* = 0);
-        template<typename T>
-        static v8::Persistent<v8::Object> setJSWrapperForActiveDOMObject(PassRefPtr<T>, v8::Handle<v8::Object>, v8::Isolate* = 0);
         static v8::Persistent<v8::Object> setJSWrapperForDOMNode(PassRefPtr<Node>, v8::Handle<v8::Object>, v8::Isolate* = 0);
-        static v8::Persistent<v8::Object> setJSWrapperForActiveDOMNode(PassRefPtr<Node>, v8::Handle<v8::Object>, v8::Isolate* = 0);
 
         static bool isValidDOMObject(v8::Handle<v8::Value>);
 
@@ -124,7 +121,7 @@ namespace WebCore {
                 return node->wrapper();
 
             DOMDataStore* store = context->world()->domDataStore();
-            DOMWrapperMap<Node>& domNodeMap = node->isActiveNode() ? store->activeDomNodeMap() : store->domNodeMap();
+            DOMWrapperMap<Node>& domNodeMap = store->domNodeMap();
             return domNodeMap.get(node);
         }
     };
@@ -134,20 +131,10 @@ namespace WebCore {
     {
         v8::Persistent<v8::Object> wrapperHandle = v8::Persistent<v8::Object>::New(wrapper);
         ASSERT(maybeDOMWrapper(wrapperHandle));
-        ASSERT(!domWrapperType(wrapperHandle)->toActiveDOMObjectFunction);
         getDOMObjectMap(isolate).set(object.leakRef(), wrapperHandle);
         return wrapperHandle;
     }
 
-    template<typename T>
-    v8::Persistent<v8::Object> V8DOMWrapper::setJSWrapperForActiveDOMObject(PassRefPtr<T> object, v8::Handle<v8::Object> wrapper, v8::Isolate* isolate)
-    {
-        v8::Persistent<v8::Object> wrapperHandle = v8::Persistent<v8::Object>::New(wrapper);
-        ASSERT(maybeDOMWrapper(wrapperHandle));
-        ASSERT(domWrapperType(wrapperHandle)->toActiveDOMObjectFunction);
-        getActiveDOMObjectMap(isolate).set(object.leakRef(), wrapperHandle);
-        return wrapperHandle;
-    }
 }
 
 #endif // V8DOMWrapper_h

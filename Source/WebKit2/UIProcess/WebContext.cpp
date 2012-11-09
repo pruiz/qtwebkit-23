@@ -136,7 +136,6 @@ WebContext::WebContext(ProcessModel processModel, const String& injectedBundlePa
 #endif
 {
     addMessageReceiver(Messages::WebContext::messageReceiverName(), this);
-    addMessageReceiver(Messages::DownloadProxy::messageReceiverName(), this);
     addMessageReceiver(CoreIPC::MessageKindTraits<WebContextLegacyMessage::Kind>::messageReceiverName(), this);
 
     // NOTE: These sub-objects must be initialized after m_messageReceiverMap..
@@ -498,7 +497,7 @@ void WebContext::processDidFinishLaunching(WebProcessProxy* process)
     if (m_memorySamplerEnabled) {
         SandboxExtension::Handle sampleLogSandboxHandle;        
         double now = WTF::currentTime();
-        String sampleLogFilePath = String::format("WebProcess%llu", static_cast<unsigned long long>(now));
+        String sampleLogFilePath = String::format("WebProcess%llupid%d", static_cast<unsigned long long>(now), process->processIdentifier());
         sampleLogFilePath = SandboxExtension::createHandleForTemporaryFile(sampleLogFilePath, SandboxExtension::WriteOnly, sampleLogSandboxHandle);
         
         process->send(Messages::WebProcess::StartMemorySampler(sampleLogSandboxHandle, sampleLogFilePath, m_memorySamplerInterval), 0);
@@ -762,6 +761,7 @@ DownloadProxy* WebContext::createDownloadProxy()
 {
     RefPtr<DownloadProxy> downloadProxy = DownloadProxy::create(this);
     m_downloads.set(downloadProxy->downloadID(), downloadProxy);
+    addMessageReceiver(Messages::DownloadProxy::messageReceiverName(), downloadProxy->downloadID(), this);
     return downloadProxy.get();
 }
 
@@ -770,6 +770,7 @@ void WebContext::downloadFinished(DownloadProxy* downloadProxy)
     ASSERT(m_downloads.contains(downloadProxy->downloadID()));
 
     downloadProxy->invalidate();
+    removeMessageReceiver(Messages::DownloadProxy::messageReceiverName(), downloadProxy->downloadID());
     m_downloads.remove(downloadProxy->downloadID());
 }
 
@@ -788,6 +789,16 @@ HashSet<String, CaseFoldingHash> WebContext::pdfAndPostScriptMIMETypes()
 void WebContext::addMessageReceiver(CoreIPC::StringReference messageReceiverName, CoreIPC::MessageReceiver* messageReceiver)
 {
     m_messageReceiverMap.addMessageReceiver(messageReceiverName, messageReceiver);
+}
+
+void WebContext::addMessageReceiver(CoreIPC::StringReference messageReceiverName, uint64_t destinationID, CoreIPC::MessageReceiver* messageReceiver)
+{
+    m_messageReceiverMap.addMessageReceiver(messageReceiverName, destinationID, messageReceiver);
+}
+
+void WebContext::removeMessageReceiver(CoreIPC::StringReference messageReceiverName, uint64_t destinationID)
+{
+    m_messageReceiverMap.removeMessageReceiver(messageReceiverName, destinationID);
 }
 
 bool WebContext::dispatchMessage(CoreIPC::Connection* connection, CoreIPC::MessageID messageID, CoreIPC::MessageDecoder& decoder)

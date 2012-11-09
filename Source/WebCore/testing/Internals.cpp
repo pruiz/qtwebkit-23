@@ -204,6 +204,15 @@ Internals::~Internals()
 {
 }
 
+void Internals::resetToConsistentState(Page* page)
+{
+    ASSERT(page);
+#if ENABLE(INSPECTOR) && ENABLE(JAVASCRIPT_DEBUGGER)
+    if (page->inspectorController())
+        page->inspectorController()->setProfilerEnabled(false);
+#endif
+}
+
 Internals::Internals(Document* document)
     : ContextDestructionObserver(document)
 {
@@ -994,16 +1003,6 @@ void Internals::setUserPreferredLanguages(const Vector<String>& languages)
     settings()->setUserPreferredLanguages(languages);
 }
 
-void Internals::setShouldDisplayTrackKind(Document*, const String& kind, bool enabled, ExceptionCode& ec)
-{
-    settings()->setShouldDisplayTrackKind(kind, enabled, ec);
-}
-
-bool Internals::shouldDisplayTrackKind(Document*, const String& kind, ExceptionCode& ec)
-{
-    return settings()->shouldDisplayTrackKind(kind, ec);
-}
-
 unsigned Internals::wheelEventHandlerCount(Document* document, ExceptionCode& ec)
 {
     if (!document) {
@@ -1158,6 +1157,27 @@ void Internals::closeDummyInspectorFrontend()
 
     m_frontendWindow->close(m_frontendWindow->scriptExecutionContext());
     m_frontendWindow.release();
+}
+
+void Internals::setInspectorResourcesDataSizeLimits(int maximumResourcesContentSize, int maximumSingleResourceContentSize, ExceptionCode& ec)
+{
+    Page* page = contextDocument()->frame()->page();
+    if (!page || !page->inspectorController()) {
+        ec = INVALID_ACCESS_ERR;
+        return;
+    }
+    page->inspectorController()->setResourcesDataSizeLimitsFromInternals(maximumResourcesContentSize, maximumSingleResourceContentSize);
+}
+
+void Internals::setJavaScriptProfilingEnabled(bool enabled, ExceptionCode& ec)
+{
+    Page* page = contextDocument()->frame()->page();
+    if (!page || !page->inspectorController()) {
+        ec = INVALID_ACCESS_ERR;
+        return;
+    }
+
+    page->inspectorController()->setProfilerEnabled(enabled);
 }
 #endif // ENABLE(INSPECTOR)
 

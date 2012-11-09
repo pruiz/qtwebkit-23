@@ -1636,6 +1636,7 @@ SET(WebCore_SOURCES
     loader/HistoryController.cpp
     loader/ImageLoader.cpp
     loader/LinkLoader.cpp
+    loader/LoaderStrategy.cpp
     loader/MainResourceLoader.cpp
     loader/MixedContentChecker.cpp
     loader/NavigationAction.cpp
@@ -2150,6 +2151,7 @@ SET(WebCore_SOURCES
     rendering/RenderWordBreak.cpp
     rendering/RootInlineBox.cpp
     rendering/ScrollBehavior.cpp
+    rendering/TextAutosizer.cpp
     rendering/break_lines.cpp
 
     rendering/mathml/RenderMathMLBlock.cpp

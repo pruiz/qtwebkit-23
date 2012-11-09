@@ -1,3 +1,84 @@
+2012-10-27  Dan Bernstein  <mitz@apple.com>
+
+        REAL_PLATFORM_NAME build setting is no longer needed
+        https://bugs.webkit.org/show_bug.cgi?id=100587
+
+        Reviewed by Mark Rowe.
+
+        Removed the definition of REAL_PLATFORM_NAME and replaced references to it with references
+        to PLATFORM_NAME.
+
+        * Configurations/Base.xcconfig:
+        * Configurations/CompilerVersion.xcconfig:
+        * Configurations/DebugRelease.xcconfig:
+
+2012-10-26  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r132689.
+        http://trac.webkit.org/changeset/132689
+        https://bugs.webkit.org/show_bug.cgi?id=100574
+
+        Broke HashMaps containing RetainPtrs (Requested by andersca on
+        #webkit).
+
+        * wtf/RetainPtr.h:
+
+2012-10-26  Anders Carlsson  <andersca@apple.com>
+
+        Add an operator& to RetainPtr
+        https://bugs.webkit.org/show_bug.cgi?id=100549
+
+        Reviewed by Dan Bernstein.
+
+        This is useful for APIs that return references using out parameters.
+
+        * wtf/RetainPtr.h:
+        (WTF::RetainPtr::operator&):
+
+2012-10-26  Gabor Ballabas  <gaborb@inf.u-szeged.hu>
+
+        [Qt] Enable JSC's disassembler on x86, x86_64 Linux
+        https://bugs.webkit.org/show_bug.cgi?id=100386
+
+        Reviewed by Simon Hausmann.
+
+        It works fine on Linux x86, x86_64 just needs to be enabled in the
+        QtWebKit build system.
+
+        * wtf/Platform.h:
+
+2012-10-25  Michael Saboff  <msaboff@apple.com>
+
+        REGRESSION (r131836): failures in list styles tests on EFL, GTK
+        https://bugs.webkit.org/show_bug.cgi?id=99824
+
+        Reviewed by Oliver Hunt.
+
+        Fixed ASCII check.
+        Added placeholder argument for new argument added to convertUTF8ToUTF16() in http://trac.webkit.org/changeset/131836.
+
+        * wtf/unicode/UTF8.cpp:
+        (WTF::Unicode::convertUTF8ToUTF16):
+        * wtf/unicode/glib/UnicodeGLib.cpp:
+        (WTF::Unicode::convertCase):
+
+2012-10-25  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Remove some C'ism from EwkView
+        https://bugs.webkit.org/show_bug.cgi?id=100370
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Make OwnPtr useable for Ecore_IMF_Context to avoid
+        using raw pointers in EFL port.
+
+        * wtf/OwnPtrCommon.h:
+        (WTF):
+        * wtf/PlatformEfl.cmake:
+        * wtf/efl/OwnPtrEfl.cpp:
+        (WTF::deleteOwnedPtr):
+        (WTF):
+
 2012-09-27  Yury Semikhatsky  <yurys@chromium.org>
 
         Web Inspector: provide memory instrumentation for ListHashSet

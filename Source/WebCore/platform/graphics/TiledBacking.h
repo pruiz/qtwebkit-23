@@ -43,12 +43,15 @@ public:
         CoverageForVisibleArea = 0,
         CoverageForVerticalScrolling = 1 << 0,
         CoverageForHorizontalScrolling = 1 << 1,
+        CoverageForSlowScrolling = 1 << 2, // Indicates that we expect to paint a lot on scrolling.
         CoverageForScrolling = CoverageForVerticalScrolling | CoverageForHorizontalScrolling
     };
     typedef unsigned TileCoverage;
 
     virtual void setTileCoverage(TileCoverage) = 0;
     virtual TileCoverage tileCoverage() const = 0;
+
+    virtual IntSize tileSize() const = 0;
 
     virtual void forceRepaint() = 0;
 

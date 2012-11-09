@@ -677,7 +677,7 @@ static String convertWindowsTimeFormatToLDML(const String& windowsTimeFormat)
 
 String LocaleWin::dateFormat()
 {
-    if (!m_dateFormat.isEmpty())
+    if (!m_dateFormat.isNull())
         return m_dateFormat;
     ensureShortDateTokens();
     m_dateFormat = convertWindowsDateFormatToLDML(m_shortDateTokens);
@@ -699,16 +699,28 @@ String LocaleWin::monthFormat()
 
 String LocaleWin::timeFormat()
 {
-    if (m_localizedTimeFormatText.isEmpty())
-        m_localizedTimeFormatText = convertWindowsTimeFormatToLDML(getLocaleInfoString(LOCALE_STIMEFORMAT));
-    return m_localizedTimeFormatText;
+    if (m_timeFormatWithSeconds.isNull())
+        m_timeFormatWithSeconds = convertWindowsTimeFormatToLDML(getLocaleInfoString(LOCALE_STIMEFORMAT));
+    return m_timeFormatWithSeconds;
 }
 
-// Note: To make XP/Vista and Windows 7/later same behavior, we don't use
-// LOCALE_SSHORTTIME.
 String LocaleWin::shortTimeFormat()
 {
-    return timeFormat();
+    if (!m_timeFormatWithoutSeconds.isNull())
+        return m_timeFormatWithoutSeconds;
+    String format = getLocaleInfoString(LOCALE_SSHORTTIME);
+    // Vista or older Windows doesn't support LOCALE_SSHORTTIME.
+    if (format.isEmpty()) {
+        format = timeFormat();
+        StringBuilder builder;
+        builder.append(getLocaleInfoString(LOCALE_STIME));
+        builder.append("ss");
+        size_t pos = format.reverseFind(builder.toString());
+        if (pos != notFound)
+            format.remove(pos, builder.length());
+    }
+    m_timeFormatWithoutSeconds = convertWindowsTimeFormatToLDML(format);
+    return m_timeFormatWithoutSeconds;
 }
 
 const Vector<String>& LocaleWin::shortMonthLabels()

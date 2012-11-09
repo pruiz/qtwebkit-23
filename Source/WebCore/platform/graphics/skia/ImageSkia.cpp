@@ -449,6 +449,8 @@ bool FrameData::clear(bool clearMetadata)
     if (clearMetadata)
         m_haveMetadata = false;
 
+    m_orientation = DefaultImageOrientation;
+
     if (m_frame) {
         // ImageSource::createFrameAtIndex() allocated |m_frame| and passed
         // ownership to BitmapImage; we must delete it here.
@@ -614,7 +616,13 @@ void BitmapImage::draw(GraphicsContext* ctxt, const FloatRect& dstRect, const Fl
     GraphicsContextStateSaver saveContext(*ctxt, false);
     if (orientation != DefaultImageOrientation) {
         saveContext.save();
+
+        // ImageOrientation expects the origin to be at (0, 0)
+        ctxt->translate(normDstRect.x(), normDstRect.y());
+        normDstRect.setLocation(FloatPoint());
+
         ctxt->concatCTM(orientation.transformFromDefault(normDstRect.size()));
+
         if (orientation.usesWidthAsHeight()) {
             // The destination rect will have it's width and height already reversed for the orientation of
             // the image, as it was needed for page layout, so we need to reverse it back here.

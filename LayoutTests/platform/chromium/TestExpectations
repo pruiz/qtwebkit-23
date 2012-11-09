@@ -1862,8 +1862,6 @@ webkit.org/b/98781 [ Android ] fast/block/float/shrink-to-avoid-float-complexity
 webkit.org/b/98782 [ Android ] fast/css/getComputedStyle/computed-style-select-overflow.html [ Failure ]
 
 # [Chromium-Android] Date and time input fields don't have equal functionaliy on Android
-webkit.org/b/98783 [ Android ] fast/forms/week/week-stepup-stepdown-from-renderer.html [ Failure ]
-webkit.org/b/98783 [ Android ] fast/forms/week/week-input-visible-string.html [ Failure ]
 webkit.org/b/98783 [ Android ] fast/forms/time/time-input-visible-string.html [ Failure ]
 webkit.org/b/98783 [ Android ] fast/forms/month/month-stepup-stepdown-from-renderer.html [ Failure ]
 webkit.org/b/98783 [ Android ] fast/forms/month/month-input-visible-string.html [ Failure ]
@@ -1871,6 +1869,9 @@ webkit.org/b/98783 [ Android ] fast/forms/datetimelocal/datetimelocal-stepup-ste
 webkit.org/b/98783 [ Android ] fast/forms/datetimelocal/datetimelocal-input-visible-string.html [ Failure ]
 webkit.org/b/98783 [ Android ] fast/forms/datetime/datetime-stepup-stepdown-from-renderer.html [ Failure ]
 webkit.org/b/98783 [ Android ] fast/forms/datetime/datetime-input-visible-string.html [ Failure ]
+
+# [Chromium-Android] No <input type=week> implementation.
+crbug.com/135938 [ Android ] fast/forms/week/ [ Failure Pass ]
 
 # [Chromium-Android] image-inside-nested-blocks-with-border.html crashes
 webkit.org/b/98901 [ Android ] fast/multicol/image-inside-nested-blocks-with-border.html [ Crash Pass ]
@@ -1924,16 +1925,10 @@ crbug.com/144536 [ Android ] scrollbars/custom-scrollbar-with-incomplete-style.h
 crbug.com/7482 [ Mac ] http/tests/misc/timer-vs-loading.html [ Failure Pass Timeout ]
 crbug.com/7482 [ Android Linux Win ] http/tests/misc/timer-vs-loading.html [ Pass Timeout ]
 
-# It's not clear that the test isn't wrong here. It believes that middle
-# aligning 15px Ahem should end up in a certain spot. But we have the
-# x-height correct and we're still one px off.
-crbug.com/10429 [ Android Linux ] css2.1/t100801-c544-valgn-01-d-ag.html [ Failure ]
-
 # Flakey. Not clear when it started, but it was before 3/9/09.
 # This test also started failing with the merge of March 25th 2009
 crbug.com/10441 [ Mac Win ] transitions/transition-end-event-transform.html [ Failure Pass ]
 
-crbug.com/27486 [ Android Linux Win ] fast/forms/listbox-hit-test-zoomed.html [ Failure ]
 crbug.com/27486 [ Android Linux Win ] fast/forms/range/slider-zoomed.html [ Failure ]
 
 # This test isn't just slow -- sometimes it times out indefinitely.
@@ -1960,7 +1955,6 @@ crbug.com/11001 http/tests/history/back-to-post.php [ Timeout ]
 
 # Regressions from WebKit Merge 42932:42994 due to text metric changes.
 crbug.com/11251 [ Android Linux Win ] svg/custom/svg-fonts-in-text-controls.html [ Failure ]
-crbug.com/11251 [ Android Linux Win ] fast/forms/textarea-metrics.html [ Failure ]
 
 # WebKit 45086:45111
 crbug.com/15270 fast/js/excessive-comma-usage.html [ Failure ]
@@ -2064,7 +2058,7 @@ crbug.com/156097  fast/borders/border-image-rotate-transform.html [ ImageOnlyFai
 crbug.com/156097  svg/custom/clip-mask-negative-scale.svg [ ImageOnlyFailure ] 
 crbug.com/156097  svg/custom/focus-ring.svg [ ImageOnlyFailure ] 
 crbug.com/156097  svg/transforms/animated-path-inside-transformed-html.xhtml [ ImageOnlyFailure ] 
-crbug.com/156097  fast/forms/select-style.html [ ImageOnlyFailure ] 
+crbug.com/156097 [ Mac ] fast/forms/select-style.html [ ImageOnlyFailure ]
 
 # Flakiness documented around Webkit Roll 51681:51711
 crbug.com/2844 http/tests/appcache/404-manifest.html [ Skip ]
@@ -2542,13 +2536,6 @@ crbug.com/75238 [ Win ] fast/text/large-text-composed-char.html [ Failure ]
 crbug.com/70686 [ Mac ] fast/text/international/cjk-segmentation.html [ Failure ]
 crbug.com/144529 [ Android ] fast/text/international/cjk-segmentation.html [ Failure ]
 
-# These will pass once 149943 is fixed
-crbug.com/149943 compositing/text-on-scaled-layer.html [ ImageOnlyFailure ]
-crbug.com/149943 compositing/text-on-scaled-surface.html [ ImageOnlyFailure ]
-# These should pass too, but the latter might fail due to Skia blending differences.
-crbug.com/149943 platform/chromium/virtual/softwarecompositing/text-on-scaled-layer.html [ ImageOnlyFailure ]
-crbug.com/149943 platform/chromium/virtual/softwarecompositing/text-on-scaled-surface.html [ ImageOnlyFailure ]
-
 # Added by http://trac.webkit.org/changeset/76674
 crbug.com/70882 [ Win ] fast/text/offsetForPosition-complex-fallback.html [ Failure ]
 
@@ -2796,12 +2783,6 @@ crbug.com/83290 [ Win ] http/tests/misc/link-rel-prefetch-and-subresource.html [
 crbug.com/83504 [ Win ] fast/css/custom-font-xheight.html [ Failure Pass Slow ]
 crbug.com/83504 [ Mac ] fast/css/custom-font-xheight.html [ Failure Pass ]
 
-# Need rebaselining after 99874
-webkit.org/b/99874 svg/custom/object-sizing-width-50p-height-75p-on-target-svg-absolute.xhtml [ Pass ImageOnlyFailure ]
-webkit.org/b/99874 svg/custom/object-sizing-width-50p-height-75p-on-target-svg.xhtml [ Pass ImageOnlyFailure ]
-webkit.org/b/99874 svg/zoom/page/zoom-svg-float-border-padding.xml [ Pass ImageOnlyFailure ]
-webkit.org/b/99874 svg/zoom/text/zoom-svg-float-border-padding.xml [ Pass ImageOnlyFailure ]
-
 # New tests added in r87121
 webkit.org/b/61169 [ Android Linux Win ] css3/images/optimize-contrast-canvas.html [ ImageOnlyFailure ]
 webkit.org/b/61169 [ Android Linux Win ] css3/images/optimize-contrast-image.html [ ImageOnlyFailure ]
@@ -2811,6 +2792,11 @@ webkit.org/b/96720 fast/forms/time-multiple-fields/time-multiple-fields-preserve
 webkit.org/b/96720 fast/forms/date-multiple-fields/date-multiple-fields-preserve-value-after-history-back.html [ Pass Timeout ]
 webkit.org/b/98906 platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-mouse-operations.html [ Pass Failure ]
 
+# Need rebaseline 
+webkit.org/b/100128 fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic.html [ Pass ImageOnlyFailure ]
+webkit.org/b/100128 fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes.html [ Pass ImageOnlyFailure ]
+webkit.org/b/100128 fast/forms/week-multiple-fields/week-multiple-fields-appearance-style.html [ Pass ImageOnlyFailure ]
+
 # New test added in r87324
 crbug.com/83994 [ Win ] platform/win/plugins/call-javascript-that-destroys-plugin.html [ Failure ]
 
@@ -2819,8 +2805,6 @@ crbug.com/84032 [ Win ] fast/dom/object-plugin-hides-properties.html [ Pass Time
 #new test added. Still fails on chrome
 webkit.org/b/98315 css3/compositing/blend-mode-property.html [ Failure ]
 webkit.org/b/98315 css3/compositing/should-have-compositing-layer.html [ Failure ]
-webkit.org/b/100205 compositing/tiling/backface-preserve-3d-tiled.html [ Failure ]
-webkit.org/b/100205 platform/chromium/virtual/softwarecompositing/tiling/backface-preserve-3d-tiled.html [ Failure ]
 
 # two regions reftests failing on Chromium
 webkit.org/b/74219 fast/regions/positioned-objects-block-static-spanning-regions-rtl.html [ ImageOnlyFailure Pass ]
@@ -3042,6 +3026,9 @@ webkit.org/b/75716 [ Linux Mac Win ] fullscreen/video-controls-drag.html [ Failu
 
 webkit.org/b/75786 compositing/tiled-layers-hidpi.html [ Skip ]
 webkit.org/b/75786 platform/chromium/virtual/softwarecompositing/tiled-layers-hidpi.html [ Skip ]
+
+webkit.org/b/48454 compositing/tiling/huge-layer-img.html [ Skip ]
+webkit.org/b/48454 platform/chromium/virtual/softwarecompositing/tiling/huge-layer-img.html [ Skip ]
 
 webkit.org/b/75932 fast/js/array-defineOwnProperty.html [ Failure ]
 webkit.org/b/75932 fast/js/mozilla/strict/15.4.4.6.html [ Failure ]
@@ -3320,7 +3307,6 @@ webkit.org/b/83219 [ Lion ] fonts/cursive.html [ Failure Pass ]
 webkit.org/b/83324 [ Win Debug ] fast/js/cross-global-object-inline-global-var.html [ Failure Pass ]
 
 # EXIF orientation support has not yet been implemented for this platform
-webkit.org/b/19688 fast/images/exif-orientation.html
 webkit.org/b/19688 fast/images/exif-orientation-css.html
 
 crbug.com/122462 [ Linux Win ] http/tests/inspector/inspect-element.html [ Failure Slow ]
@@ -3908,6 +3894,9 @@ webkit.org/b/97672 http/tests/security/xss-eval.html [ Failure ]
 webkit.org/b/96961 fast/canvas/webgl/oes-vertex-array-object.html [ Failure Pass ]
 webkit.org/b/96961 platform/chromium/virtual/gpu/fast/canvas/webgl/oes-vertex-array-object.html [ Failure Pass ]
 
+# These tests appear to be making the EWS bots flaky. See bug for details. 
+webkit.org/b/96951 platform/chromium-linux/compositing/gestures [ Skip ] 
+
 # Numerous failures in software compositing.
 crbug.com/152953 [ Mac ] platform/chromium/virtual/softwarecompositing/geometry/fixed-position-iframe-composited-page-scale-down.html [ ImageOnlyFailure ]
 crbug.com/152953 [ Mac ] platform/chromium/virtual/softwarecompositing/images/direct-image-background-color.html [ ImageOnlyFailure ]
@@ -4004,7 +3993,6 @@ webkit.org/b/86146 css3/supports.html
 # Require rebaselining after webkit.org/b/97800
 webkit.org/b/89167 media/track/track-cue-rendering-horizontal.html [ Failure ]
 webkit.org/b/89167 media/track/track-cue-rendering-vertical.html [ Failure ]
-webkit.org/b/89167 media/track/track-cue-rendering.html [ Failure ]
 # [Chromium-Android] Subtitles (and video) do not work on Android (Disabled to make linter happy)
 #webkit.org/b/98766 [ Android ] media/track/track-cue-rendering-vertical.html [ Failure ]
 #webkit.org/b/98766 [ Android ] media/track/track-cue-rendering-horizontal.html [ Failure ]
@@ -4084,4 +4072,9 @@ Bug(dpranke) [ Win ] webaudio/codec-tests/vorbis/vbr-128kbps-44khz.html [ Failur
 
 webkit.org/b/100023 [ Mac ] fast/sub-pixel/file-upload-control-at-fractional-offset.html [ Failure ImageOnlyFailure ]
 
-Bug(thakis) [ Mac ] css3/filters/custom/effect-custom.html [ Pass ImageOnlyFailure ]
+webkit.org/b/100478  [ Mac ] css3/filters/custom/effect-custom.html [ Pass ImageOnlyFailure ]
+
+webkit.org/b/100475 compositing/tiling/tile-cache-zoomed.html [ Failure ]
+webkit.org/b/100475 platform/chromium/virtual/softwarecompositing/tiling/tile-cache-zoomed.html [ Failure ]
+webkit.org/b/100477 [ Win ] platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-key-operations.html [ Failure ]
+

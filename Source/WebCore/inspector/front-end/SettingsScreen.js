@@ -390,9 +390,9 @@ WebInspector.UserAgentSettingsTab = function()
     p.appendChild(this._createUserAgentControl());
     if (Capabilities.canOverrideDeviceMetrics)
         p.appendChild(this._createDeviceMetricsControl());
-    if (Capabilities.canOverrideGeolocation && WebInspector.experimentsSettings.geolocationOverride.isEnabled())
+    if (Capabilities.canOverrideGeolocation)
         p.appendChild(this._createGeolocationOverrideControl());
-    if (Capabilities.canOverrideDeviceOrientation && WebInspector.experimentsSettings.deviceOrientationOverride.isEnabled())
+    if (Capabilities.canOverrideDeviceOrientation)
         p.appendChild(this._createDeviceOrientationOverrideControl());
     p.appendChild(this._createCheckboxSetting(WebInspector.UIString("Emulate touch events"), WebInspector.settings.emulateTouchEvents));
 }
@@ -406,7 +406,7 @@ WebInspector.UserAgentSettingsTab.prototype = {
         var labelElement = p.createChild("label");
         var checkboxElement = labelElement.createChild("input");
         checkboxElement.type = "checkbox";
-        checkboxElement.checked = !!userAgent;
+        checkboxElement.checked = false;
         labelElement.appendChild(document.createTextNode(WebInspector.UIString("User Agent")));
         p.appendChild(this._createUserAgentSelectRowElement(checkboxElement));
         return p;
@@ -496,8 +496,8 @@ WebInspector.UserAgentSettingsTab.prototype = {
             } else {
                 this._selectElement.disabled = true;
                 this._otherUserAgentElement.disabled = true;
-                WebInspector.settings.userAgent.set("");
             }
+            WebInspector.userAgentSupport.toggleUserAgentOverride(checkboxElement.checked);
         }
         checkboxElement.addEventListener("click", checkboxClicked.bind(this), false);
 
@@ -792,11 +792,14 @@ WebInspector.UserAgentSettingsTab.prototype = {
         var cellElement = rowElement.createChild("td");
         cellElement.appendChild(document.createTextNode(WebInspector.UIString("Geolocation Position") + ":"));
         cellElement = rowElement.createChild("td");
+        cellElement.appendChild(document.createTextNode(WebInspector.UIString("Lat = ")));
         this._latitudeElement = this._createInput(cellElement, "geolocation-override-latitude", String(geolocation.latitude), this._applyGeolocationUserInput.bind(this));
         cellElement.appendChild(document.createTextNode(" , "));
+        cellElement.appendChild(document.createTextNode(WebInspector.UIString("Lon = ")));
         this._longitudeElement = this._createInput(cellElement, "geolocation-override-longitude", String(geolocation.longitude), this._applyGeolocationUserInput.bind(this));
         rowElement = tableElement.createChild("tr");
         cellElement = rowElement.createChild("td");
+        cellElement.colSpan = 2;
         var geolocationErrorLabelElement = document.createElement("label");
         var geolocationErrorCheckboxElement = geolocationErrorLabelElement.createChild("input");
         geolocationErrorCheckboxElement.id = "geolocation-error";

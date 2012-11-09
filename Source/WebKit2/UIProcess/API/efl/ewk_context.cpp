@@ -62,22 +62,21 @@ static inline ContextMap& contextMap()
 
 Ewk_Context::Ewk_Context(WKContextRef context)
     : m_context(context)
+#if ENABLE(BATTERY_STATUS)
+    , m_batteryProvider(BatteryProvider::create(context))
+#endif
+#if ENABLE(NETWORK_INFO)
+    , m_networkInfoProvider(NetworkInfoProvider::create(context))
+#endif
+#if ENABLE(VIBRATION)
+    , m_vibrationProvider(VibrationProvider::create(context))
+#endif
+    , m_downloadManager(DownloadManagerEfl::create(this))
+    , m_requestManagerClient(RequestManagerClientEfl::create(this))
     , m_historyClient(ContextHistoryClientEfl::create(context))
 {
     ContextMap::AddResult result = contextMap().add(context, this);
     ASSERT_UNUSED(result, result.isNewEntry);
-
-#if ENABLE(BATTERY_STATUS)
-    m_batteryProvider = BatteryProvider::create(context);
-#endif
-
-#if ENABLE(NETWORK_INFO)
-    m_networkInfoProvider = NetworkInfoProvider::create(context);
-#endif
-
-#if ENABLE(VIBRATION)
-    m_vibrationProvider = VibrationProvider::create(context);
-#endif
 
 #if ENABLE(MEMORY_SAMPLER)
     static bool initializeMemorySampler = false;
@@ -91,16 +90,12 @@ Ewk_Context::Ewk_Context(WKContextRef context)
 #endif
 
 #if ENABLE(SPELLCHECK)
-    ewk_text_checker_client_attach();
+    Ewk_Text_Checker::initialize();
     if (ewk_settings_continuous_spell_checking_enabled_get()) {
         // Load the default language.
         ewk_settings_spell_checking_languages_set(0);
     }
 #endif
-
-    // Initialize WKContext clients.
-    m_downloadManager = DownloadManagerEfl::create(this);
-    m_requestManagerClient = RequestManagerClientEfl::create(this);
 }
 
 Ewk_Context::~Ewk_Context()

@@ -65,9 +65,6 @@ public:
         bool m_originalUnifiedSpellCheckerEnabled;
         bool m_originalFixedPositionCreatesStackingContext;
         bool m_originalSyncXHRInDocumentsEnabled;
-#if ENABLE(INSPECTOR) && ENABLE(JAVASCRIPT_DEBUGGER)
-        bool m_originalJavaScriptProfilingEnabled;
-#endif
         bool m_originalWindowFocusRestricted;
         bool m_originalDeviceSupportsTouch;
         bool m_originalDeviceSupportsMouse;
@@ -77,6 +74,7 @@ public:
         float m_originalTextAutosizingFontScaleFactor;
 #endif
         IntSize m_originalResolutionOverride;
+        String m_originalMediaTypeOverride;
 #if ENABLE(DIALOG_ELEMENT)
         bool m_originalDialogElementEnabled;
 #endif
@@ -84,6 +82,11 @@ public:
         bool m_originalMockScrollbarsEnabled;
         bool m_langAttributeAwareFormControlUIEnabled;
         bool m_imagesEnabled;
+#if ENABLE(VIDEO_TRACK)
+        bool m_shouldDisplaySubtitles;
+        bool m_shouldDisplayCaptions;
+        bool m_shouldDisplayTextDescriptions;
+#endif
     };
 
     typedef RefCountedSupplement<Page, InternalSettings> SuperType;
@@ -95,7 +98,6 @@ public:
 #endif
     void reset();
 
-    void setInspectorResourcesDataSizeLimits(int maximumResourcesContentSize, int maximumSingleResourceContentSize, ExceptionCode&);
     void setForceCompositingMode(bool enabled, ExceptionCode&);
     void setEnableCompositingForFixedPosition(bool enabled, ExceptionCode&);
     void setEnableCompositingForScrollableFrames(bool enabled, ExceptionCode&);
@@ -126,6 +128,7 @@ public:
     void setTextAutosizingWindowSizeOverride(int width, int height, ExceptionCode&);
     void setTextAutosizingFontScaleFactor(float fontScaleFactor, ExceptionCode&);
     void setResolutionOverride(int dotsPerCSSInchHorizontally, int dotsPerCSSInchVertically, ExceptionCode&);
+    void setMediaTypeOverride(const String& mediaType, ExceptionCode&);
     void setEnableScrollAnimator(bool enabled, ExceptionCode&);
     bool scrollAnimatorEnabled(ExceptionCode&);
     void setCSSExclusionsEnabled(bool enabled, ExceptionCode&);
@@ -138,7 +141,6 @@ public:
     void setSyncXHRInDocumentsEnabled(bool, ExceptionCode&);
     void setWindowFocusRestricted(bool, ExceptionCode&);
     void setDialogElementEnabled(bool, ExceptionCode&);
-    void setJavaScriptProfilingEnabled(bool enabled, ExceptionCode&);
     Vector<String> userPreferredLanguages() const;
     void setUserPreferredLanguages(const Vector<String>&);
     void setPagination(const String& mode, int gap, ExceptionCode& ec) { setPagination(mode, gap, 0, ec); }

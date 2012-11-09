@@ -318,7 +318,7 @@ IntRect TileCache::computeTileCoverageRect() const
     // If the page is not in a window (for example if it's in a background tab), we limit the tile coverage rect to the visible rect.
     // Furthermore, if the page can't have scrollbars (for example if its body element has overflow:hidden) it's very unlikely that the
     // page will ever be scrolled so we limit the tile coverage rect as well.
-    if (m_isInWindow) {
+    if (m_isInWindow && !(m_tileCoverage & CoverageForSlowScrolling)) {
         // Inflate the coverage rect so that it covers 2x of the visible width and 3x of the visible height.
         // These values were chosen because it's more common to have tall pages and to scroll vertically,
         // so we keep more tiles above and below the current area.
@@ -334,7 +334,7 @@ IntRect TileCache::computeTileCoverageRect() const
 
 IntSize TileCache::tileSizeForCoverageRect(const IntRect& coverageRect) const
 {
-    if (m_tileCoverage == CoverageForVisibleArea)
+    if (m_tileCoverage & CoverageForSlowScrolling)
         return coverageRect.size();
     return IntSize(defaultTileCacheWidth, defaultTileCacheHeight);
 }
@@ -392,6 +392,8 @@ void TileCache::revalidateTiles()
         return;
 
     IntRect tileCoverageRect = computeTileCoverageRect();
+    IntRect coverageRectInTileCoords(tileCoverageRect);
+    coverageRectInTileCoords.scale(m_scale);
 
     IntSize oldTileSize = m_tileSize;
     m_tileSize = tileSizeForCoverageRect(tileCoverageRect);
@@ -404,7 +406,7 @@ void TileCache::revalidateTiles()
 
         WebTileLayer* tileLayer = it->value.get();
 
-        if (!rectForTileIndex(tileIndex).intersects(tileCoverageRect) || tileSizeChanged) {
+        if (!rectForTileIndex(tileIndex).intersects(coverageRectInTileCoords) || tileSizeChanged) {
             // Remove this layer.
             [tileLayer removeFromSuperlayer];
             [tileLayer setTileCache:0];
@@ -421,7 +423,7 @@ void TileCache::revalidateTiles()
 
     TileIndex topLeft;
     TileIndex bottomRight;
-    getTileIndexRangeForRect(tileCoverageRect, topLeft, bottomRight);
+    getTileIndexRangeForRect(coverageRectInTileCoords, topLeft, bottomRight);
 
     Vector<FloatRect> dirtyRects;
 
@@ -458,6 +460,14 @@ void TileCache::revalidateTiles()
     if (dirtyRects.isEmpty())
         return;
     platformLayer->owner()->platformCALayerDidCreateTiles(dirtyRects);
+}
+
+// Return the rect in layer coords, not tile coords.
+IntRect TileCache::tileCoverageRect() const
+{
+    IntRect coverageRectInLayerCoords(m_tileCoverageRect);
+    coverageRectInLayerCoords.scale(1 / m_scale);
+    return coverageRectInLayerCoords;
 }
 
 WebTileLayer* TileCache::tileLayerAtIndex(const TileIndex& index) const

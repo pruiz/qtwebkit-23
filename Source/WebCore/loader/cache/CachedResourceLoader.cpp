@@ -44,9 +44,11 @@
 #include "FrameLoader.h"
 #include "FrameLoaderClient.h"
 #include "HTMLElement.h"
+#include "LoaderStrategy.h"
 #include "Logging.h"
 #include "MemoryCache.h"
 #include "PingLoader.h"
+#include "PlatformStrategies.h"
 #include "ResourceLoadScheduler.h"
 #include "SecurityOrigin.h"
 #include "Settings.h"
@@ -85,7 +87,8 @@ static CachedResource* createResource(CachedResource::Type type, ResourceRequest
     case CachedResource::FontResource:
         return new CachedFont(request);
     case CachedResource::RawResource:
-        return new CachedRawResource(request);
+    case CachedResource::MainResource:
+        return new CachedRawResource(request, type);
 #if ENABLE(XSLT)
     case CachedResource::XSLStyleSheet:
         return new CachedXSLStyleSheet(request);
@@ -244,6 +247,11 @@ CachedResourceHandle<CachedRawResource> CachedResourceLoader::requestRawResource
     return static_cast<CachedRawResource*>(requestResource(CachedResource::RawResource, request).get());
 }
 
+CachedResourceHandle<CachedRawResource> CachedResourceLoader::requestMainResource(CachedResourceRequest& request)
+{
+    return static_cast<CachedRawResource*>(requestResource(CachedResource::MainResource, request).get());
+}
+
 bool CachedResourceLoader::checkInsecureContent(CachedResource::Type type, const KURL& url) const
 {
     switch (type) {
@@ -278,6 +286,7 @@ bool CachedResourceLoader::checkInsecureContent(CachedResource::Type type, const
         }
         break;
     }
+    case CachedResource::MainResource:
 #if ENABLE(LINK_PREFETCH)
     case CachedResource::LinkPrefetch:
     case CachedResource::LinkSubresource:
@@ -290,11 +299,7 @@ bool CachedResourceLoader::checkInsecureContent(CachedResource::Type type, const
 
 bool CachedResourceLoader::canRequest(CachedResource::Type type, const KURL& url, bool forPreload)
 {
-    // FIXME: When we can load main resources through CachedResourceLoader, we'll need to allow for null document() here.
-    if (!document())
-        return false;
-
-    if (!document()->securityOrigin()->canDisplay(url)) {
+    if (document() && !document()->securityOrigin()->canDisplay(url)) {
         if (!forPreload)
             FrameLoader::reportLocalLoadFailed(document()->frame(), url.string());
         LOG(ResourceLoading, "CachedResourceLoader::requestResource URL was not allowed by SecurityOrigin::canDisplay");
@@ -305,6 +310,7 @@ bool CachedResourceLoader::canRequest(CachedResource::Type type, const KURL& url
     // types of resources, like Images, Scripts, and CSS, can be loaded from
     // any URL.
     switch (type) {
+    case CachedResource::MainResource:
     case CachedResource::ImageResource:
     case CachedResource::CSSStyleSheet:
     case CachedResource::Script:
@@ -372,6 +378,7 @@ bool CachedResourceLoader::canRequest(CachedResource::Type type, const KURL& url
             return false;
         break;
     }
+    case CachedResource::MainResource:
     case CachedResource::RawResource:
 #if ENABLE(LINK_PREFETCH)
     case CachedResource::LinkPrefetch:
@@ -516,8 +523,11 @@ CachedResourceLoader::RevalidationPolicy CachedResourceLoader::determineRevalida
         return Reload;
     }
 
+    if (existingResource->type() == CachedResource::MainResource)
+        return Reload;
+
     if (existingResource->type() == CachedResource::RawResource && !static_cast<CachedRawResource*>(existingResource)->canReuse(request))
-         return Reload;
+        return Reload;
 
     // Certain requests (e.g., XHRs) might have manually set headers that require revalidation.
     // FIXME: In theory, this should be a Revalidate case. In practice, the MemoryCache revalidation path assumes a whole bunch
@@ -719,7 +729,12 @@ void CachedResourceLoader::garbageCollectDocumentResources()
 void CachedResourceLoader::performPostLoadActions()
 {
     checkForPendingPreloads();
+
+#if USE(PLATFORM_STRATEGIES)
+    platformStrategies()->loaderStrategy()->resourceLoadScheduler()->servePendingRequests();
+#else
     resourceLoadScheduler()->servePendingRequests();
+#endif
 }
 
 void CachedResourceLoader::notifyLoadedFromMemoryCache(CachedResource* resource)

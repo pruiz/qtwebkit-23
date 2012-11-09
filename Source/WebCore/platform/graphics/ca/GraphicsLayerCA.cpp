@@ -1593,10 +1593,13 @@ FloatRect GraphicsLayerCA::adjustTiledLayerVisibleRect(TiledBacking* tiledBackin
 
 void GraphicsLayerCA::updateVisibleRect(const FloatRect& oldVisibleRect)
 {
-    if (m_layer->layerType() != PlatformCALayer::LayerTypeTileCacheLayer)
+    if (!m_layer->usesTileCacheLayer())
         return;
 
-    FloatRect tileArea = adjustTiledLayerVisibleRect(tiledBacking(), oldVisibleRect, m_sizeAtLastVisibleRectUpdate);
+    FloatRect tileArea = m_visibleRect;
+    if (m_layer->layerType() == PlatformCALayer::LayerTypeTileCacheLayer)
+        tileArea = adjustTiledLayerVisibleRect(tiledBacking(), oldVisibleRect, m_sizeAtLastVisibleRectUpdate);
+
     tiledBacking()->setVisibleRect(enclosingIntRect(tileArea));
 
     m_sizeAtLastVisibleRectUpdate = m_size;
@@ -2517,9 +2520,13 @@ void GraphicsLayerCA::dumpAdditionalProperties(TextStream& textStream, int inden
     }
 
     if (tiledBacking() && (behavior & LayerTreeAsTextIncludeTileCaches)) {
-        writeIndent(textStream, indent + 1);
         IntRect tileCoverageRect = tiledBacking()->tileCoverageRect();
+        writeIndent(textStream, indent + 1);
         textStream << "(tile cache coverage " << tileCoverageRect.x() << ", " << tileCoverageRect.y() << " " << tileCoverageRect.width() << " x " << tileCoverageRect.height() << ")\n";
+
+        IntSize tileSize = tiledBacking()->tileSize();
+        writeIndent(textStream, indent + 1);
+        textStream << "(tile size " << tileSize.width() << " x " << tileSize.height() << ")\n";
     }
 }
 

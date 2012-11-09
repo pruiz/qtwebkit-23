@@ -326,6 +326,10 @@ void GraphicsContext::drawNativeImage(NativeImagePtr imagePtr, const FloatSize& 
 
     setPlatformCompositeOperation(op);
 
+    // ImageOrientation expects the origin to be at (0, 0)
+    CGContextTranslateCTM(context, adjustedDestRect.x(), adjustedDestRect.y());
+    adjustedDestRect.setLocation(FloatPoint());
+
     if (orientation != DefaultImageOrientation) {
         CGContextConcatCTM(context, orientation.transformFromDefault(adjustedDestRect.size()));
         if (orientation.usesWidthAsHeight()) {
@@ -336,9 +340,8 @@ void GraphicsContext::drawNativeImage(NativeImagePtr imagePtr, const FloatSize& 
     }
     
     // Flip the coords.
-    CGContextTranslateCTM(context, adjustedDestRect.x(), adjustedDestRect.maxY());
+    CGContextTranslateCTM(context, 0, adjustedDestRect.height());
     CGContextScaleCTM(context, 1, -1);
-    adjustedDestRect.setLocation(FloatPoint());
 
     // Adjust the color space.
     image = Image::imageWithColorSpace(image.get(), styleColorSpace);
@@ -1057,7 +1060,7 @@ void GraphicsContext::clipOut(const IntRect& rect)
     if (paintingDisabled())
         return;
 
-    CGRect rects[2] = { CGContextGetClipBoundingBox(platformContext()), rect };
+    CGRect rects[2] = { CGRectInfinite, rect };
     CGContextBeginPath(platformContext());
     CGContextAddRects(platformContext(), rects, 2);
     CGContextEOClip(platformContext());

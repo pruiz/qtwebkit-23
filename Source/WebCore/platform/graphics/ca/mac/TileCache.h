@@ -87,10 +87,10 @@ private:
     virtual void setTileCoverage(TileCoverage) OVERRIDE;
     virtual TileCoverage tileCoverage() const OVERRIDE { return m_tileCoverage; }
     virtual void forceRepaint() OVERRIDE;
+    virtual IntSize tileSize() const OVERRIDE { return m_tileSize; }
     virtual void setScrollingPerformanceLoggingEnabled(bool flag) OVERRIDE { m_scrollingPerformanceLoggingEnabled = flag; }
     virtual bool scrollingPerformanceLoggingEnabled() const OVERRIDE { return m_scrollingPerformanceLoggingEnabled; }
-
-    virtual IntRect tileCoverageRect() const { return m_tileCoverageRect; }
+    virtual IntRect tileCoverageRect() const;
     
     IntRect bounds() const;
 

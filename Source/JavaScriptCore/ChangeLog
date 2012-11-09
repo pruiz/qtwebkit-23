@@ -1,3 +1,311 @@
+2012-10-28  Mark Rowe  <mrowe@apple.com>
+
+        Simplify Xcode configuration settings that used to vary between OS versions.
+
+        Reviewed by Dan Bernstein.
+
+        * Configurations/Base.xcconfig:
+        * Configurations/DebugRelease.xcconfig:
+        * Configurations/JavaScriptCore.xcconfig:
+
+2012-10-28  Mark Rowe  <mrowe@apple.com>
+
+        Remove references to unsupported OS and Xcode versions.
+
+        Reviewed by Anders Carlsson.
+
+        * Configurations/Base.xcconfig:
+        * Configurations/CompilerVersion.xcconfig: Removed.
+        * Configurations/DebugRelease.xcconfig:
+        * Configurations/Version.xcconfig:
+        * JavaScriptCore.xcodeproj/project.pbxproj:
+
+2012-10-29  Michael Saboff  <msaboff@apple.com>
+
+        Non-special escape character sequences cause JSC::Lexer::parseString to create 16 bit strings
+        https://bugs.webkit.org/show_bug.cgi?id=100576
+
+        Reviewed by Darin Adler.
+
+        Changed singleEscape() processing to be based on a lookup of a static table.  The table
+        covers ASCII characters SPACE through DEL.  If a character can be a single character escape,
+        then the table provides the non-zero result of that escape.  Updated the result of
+        singleEscape to be an LChar to make the table as small as possible.
+        Added a new test fast/js/normal-character-escapes-in-string-literals.html to validated
+        the behavior.
+
+        * parser/Lexer.cpp:
+        (JSC::singleEscape):
+        (JSC::Lexer::parseString):
+        (JSC::Lexer::parseStringSlowCase):
+
+2012-10-29  Enrica Casucci  <enrica@apple.com>
+
+        Add ENABLE_USERSELECT_ALL feature flag.
+        https://bugs.webkit.org/show_bug.cgi?id=100559
+
+        Reviewed by Eric Seidel.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-10-28  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG should be able to emit effectful structure checks
+        https://bugs.webkit.org/show_bug.cgi?id=99260
+
+        Reviewed by Oliver Hunt.
+
+        This change allows us to find out if an array access that has gone polymorphic
+        is operating over known structures - i.e. the primordial array structures of the
+        global object that the code block containing the array access belongs to. We
+        term this state "OriginalArray" for short. The fact that the access has gone
+        polymorphic means that the array profile will not be able to report the set of
+        structures it had seen - but if it can tell us that all of the structures were
+        primordial then it just so happens that we can deduce what the structure set
+        would have been by just querying the code block's global object. This allows us
+        to emit an ArrayifyToStructure instead of an Arrayify if we find that we need to
+        do conversions. The fast path of an ArrayifyToStructure is exactly like the fast
+        path of a CheckStructure and is mostly subject to the same optimizations. It
+        also burns one fewer registers.
+        
+        Essentially the notion of OriginalArray is a super cheap way of getting the
+        array profile to tell us a structure set instead of a singleton structure.
+        Currently, the array profile can only tell us the structure seen at an array
+        access if there was exactly one structure. If there were multiple structures, it
+        won't tell us anything other than the array modes and other auxiliary profiling
+        data (whether there were stores to holes, for example). With OriginalArray, we
+        cheaply get a structure set if all of the structures were primordial for the
+        code block's global object, since in that case the array mode set (ArrayModes)
+        can directly tell us the structure set. In the future, we might consider adding
+        complete structure sets to the array profiles, but I suspect that we would hit
+        diminishing returns if we did so - it would only help if we have array accesses
+        that are both polymorphic and are cross-global-object accesses (rare) or if the
+        arrays had named properties or other structure transitions that are unrelated to
+        indexing type (also rare).
+        
+        This also does away with Arrayify (and the new ArrayifyToStructure) returning
+        the butterfly pointer. This turns out to be faster and easier to CSE.
+        
+        And, this also changes constant folding to be able to eliminate CheckStructure,
+        ForwardCheckStructure, and ArrayifyToStructure in addition to being able to
+        transform them into structure transition watchpoints. This is great for
+        ArrayifyToStructure because then CSE and CFA know that there is no side effect.
+        Converting CheckStructure and ForwardCheckStructure to also behave this way is
+        just a matter of elegance.
+        
+        This has no performance impact right now. It's intended to alleviate some of the
+        regressions seen in the early implementation of
+        https://bugs.webkit.org/show_bug.cgi?id=98606.
+
+        * bytecode/ArrayProfile.cpp:
+        (JSC::ArrayProfile::computeUpdatedPrediction):
+        * bytecode/ArrayProfile.h:
+        (JSC):
+        (JSC::ArrayProfile::ArrayProfile):
+        (ArrayProfile):
+        (JSC::ArrayProfile::usesOriginalArrayStructures):
+        * bytecode/CodeBlock.cpp:
+        (JSC::CodeBlock::updateAllPredictionsAndCountLiveness):
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::execute):
+        * dfg/DFGArrayMode.cpp:
+        (JSC::DFG::ArrayMode::fromObserved):
+        (JSC::DFG::ArrayMode::alreadyChecked):
+        (JSC::DFG::arrayClassToString):
+        * dfg/DFGArrayMode.h:
+        (JSC::DFG::ArrayMode::withProfile):
+        (JSC::DFG::ArrayMode::isJSArray):
+        (ArrayMode):
+        (JSC::DFG::ArrayMode::isJSArrayWithOriginalStructure):
+        (JSC::DFG::ArrayMode::supportsLength):
+        (JSC::DFG::ArrayMode::arrayModesWithIndexingShape):
+        * dfg/DFGByteCodeParser.cpp:
+        (JSC::DFG::ByteCodeParser::getArrayMode):
+        (JSC::DFG::ByteCodeParser::getArrayModeAndEmitChecks):
+        (JSC::DFG::ByteCodeParser::handleGetByOffset):
+        * dfg/DFGCSEPhase.cpp:
+        (JSC::DFG::CSEPhase::checkStructureElimination):
+        (JSC::DFG::CSEPhase::structureTransitionWatchpointElimination):
+        (JSC::DFG::CSEPhase::getPropertyStorageLoadElimination):
+        (JSC::DFG::CSEPhase::checkArrayElimination):
+        (JSC::DFG::CSEPhase::getScopeRegistersLoadElimination):
+        * dfg/DFGConstantFoldingPhase.cpp:
+        (JSC::DFG::ConstantFoldingPhase::foldConstants):
+        * dfg/DFGFixupPhase.cpp:
+        (JSC::DFG::FixupPhase::fixupNode):
+        (JSC::DFG::FixupPhase::checkArray):
+        * dfg/DFGNode.h:
+        (JSC::DFG::Node::hasStructure):
+        (JSC::DFG::Node::hasArrayMode):
+        (JSC::DFG::Node::arrayMode):
+        * dfg/DFGNodeType.h:
+        (DFG):
+        * dfg/DFGPredictionPropagationPhase.cpp:
+        (JSC::DFG::PredictionPropagationPhase::propagate):
+        * dfg/DFGSpeculativeJIT.cpp:
+        (JSC::DFG::SpeculativeJIT::jumpSlowForUnwantedArrayMode):
+        (JSC::DFG::SpeculativeJIT::arrayify):
+        * dfg/DFGSpeculativeJIT.h:
+        (SpeculativeJIT):
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGSpeculativeJIT64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * runtime/JSGlobalObject.h:
+        (JSC::JSGlobalObject::isOriginalArrayStructure):
+        * runtime/Structure.cpp:
+        (JSC::Structure::nonPropertyTransition):
+
+2012-10-28  Filip Pizlo  <fpizlo@apple.com>
+
+        There should not be blind spots in array length array profiling
+        https://bugs.webkit.org/show_bug.cgi?id=100620
+
+        Reviewed by Oliver Hunt.
+
+        I don't think this has any performance impact. But it's good to not have random
+        programs occasionally emit a GetById for array length accesses.
+
+        * jit/JITPropertyAccess.cpp:
+        (JSC::JIT::compileGetByIdHotPath):
+        (JSC::JIT::privateCompilePatchGetArrayLength):
+        * jit/JITPropertyAccess32_64.cpp:
+        (JSC::JIT::compileGetByIdHotPath):
+        (JSC::JIT::privateCompilePatchGetArrayLength):
+
+2012-10-28  Filip Pizlo  <fpizlo@apple.com>
+
+        Unreviewed, make always-true enum-to-int comparisons use casts.
+
+        * dfg/DFGFPRInfo.h:
+        (JSC::DFG::FPRInfo::debugName):
+        * dfg/DFGGPRInfo.h:
+        (JSC::DFG::JSValueSource::tagGPR):
+        (JSC::DFG::GPRInfo::toIndex):
+        (JSC::DFG::GPRInfo::debugName):
+        * runtime/JSTypeInfo.h:
+        (JSC::TypeInfo::TypeInfo):
+
+2012-10-27  Filip Pizlo  <fpizlo@apple.com>
+
+        OSR exit compilation should defend against argument recoveries from code blocks that are no longer on the inline stack
+        https://bugs.webkit.org/show_bug.cgi?id=100601
+
+        Reviewed by Oliver Hunt.
+
+        This happened to me while I was fixing bugs for https://bugs.webkit.org/show_bug.cgi?id=100599.
+        I'm not sure how to reproduce this.
+
+        * dfg/DFGAssemblyHelpers.h:
+        (JSC::DFG::AssemblyHelpers::baselineCodeBlockFor):
+        (AssemblyHelpers):
+        * dfg/DFGOSRExitCompiler32_64.cpp:
+        (JSC::DFG::OSRExitCompiler::compileExit):
+        * dfg/DFGOSRExitCompiler64.cpp:
+        (JSC::DFG::OSRExitCompiler::compileExit):
+
+2012-10-27  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG::Array::Mode needs to be cleaned up
+        https://bugs.webkit.org/show_bug.cgi?id=100599
+
+        Reviewed by Oliver Hunt.
+
+        Turn the previous massive Array::Mode enum into a class that contains four
+        fields, the type, whether it's a JSArray, the level of speculation, and the
+        kind of conversion to perform.
+        
+        No performance or behavioral change.
+
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::execute):
+        * dfg/DFGArgumentsSimplificationPhase.cpp:
+        (JSC::DFG::ArgumentsSimplificationPhase::run):
+        * dfg/DFGArrayMode.cpp:
+        (JSC::DFG::ArrayMode::fromObserved):
+        (JSC::DFG::ArrayMode::refine):
+        (JSC::DFG::ArrayMode::alreadyChecked):
+        (JSC::DFG::arrayTypeToString):
+        (JSC::DFG::arrayClassToString):
+        (DFG):
+        (JSC::DFG::arraySpeculationToString):
+        (JSC::DFG::arrayConversionToString):
+        (JSC::DFG::ArrayMode::toString):
+        * dfg/DFGArrayMode.h:
+        (DFG):
+        (ArrayMode):
+        (JSC::DFG::ArrayMode::ArrayMode):
+        (JSC::DFG::ArrayMode::type):
+        (JSC::DFG::ArrayMode::arrayClass):
+        (JSC::DFG::ArrayMode::speculation):
+        (JSC::DFG::ArrayMode::conversion):
+        (JSC::DFG::ArrayMode::asWord):
+        (JSC::DFG::ArrayMode::fromWord):
+        (JSC::DFG::ArrayMode::withSpeculation):
+        (JSC::DFG::ArrayMode::usesButterfly):
+        (JSC::DFG::ArrayMode::isJSArray):
+        (JSC::DFG::ArrayMode::isInBounds):
+        (JSC::DFG::ArrayMode::mayStoreToHole):
+        (JSC::DFG::ArrayMode::isOutOfBounds):
+        (JSC::DFG::ArrayMode::isSlowPut):
+        (JSC::DFG::ArrayMode::canCSEStorage):
+        (JSC::DFG::ArrayMode::lengthNeedsStorage):
+        (JSC::DFG::ArrayMode::modeForPut):
+        (JSC::DFG::ArrayMode::isSpecific):
+        (JSC::DFG::ArrayMode::supportsLength):
+        (JSC::DFG::ArrayMode::benefitsFromStructureCheck):
+        (JSC::DFG::ArrayMode::doesConversion):
+        (JSC::DFG::ArrayMode::arrayModesThatPassFiltering):
+        (JSC::DFG::ArrayMode::operator==):
+        (JSC::DFG::ArrayMode::operator!=):
+        (JSC::DFG::ArrayMode::arrayModesWithIndexingShape):
+        (JSC::DFG::canCSEStorage):
+        (JSC::DFG::lengthNeedsStorage):
+        * dfg/DFGByteCodeParser.cpp:
+        (JSC::DFG::ByteCodeParser::getArrayMode):
+        (JSC::DFG::ByteCodeParser::getArrayModeAndEmitChecks):
+        (JSC::DFG::ByteCodeParser::handleIntrinsic):
+        (JSC::DFG::ByteCodeParser::parseBlock):
+        * dfg/DFGCSEPhase.cpp:
+        (JSC::DFG::CSEPhase::getArrayLengthElimination):
+        (JSC::DFG::CSEPhase::checkArrayElimination):
+        (JSC::DFG::CSEPhase::getIndexedPropertyStorageLoadElimination):
+        (JSC::DFG::CSEPhase::performNodeCSE):
+        * dfg/DFGConstantFoldingPhase.cpp:
+        (JSC::DFG::ConstantFoldingPhase::foldConstants):
+        * dfg/DFGFixupPhase.cpp:
+        (JSC::DFG::FixupPhase::fixupNode):
+        (JSC::DFG::FixupPhase::checkArray):
+        (JSC::DFG::FixupPhase::blessArrayOperation):
+        * dfg/DFGGraph.cpp:
+        (JSC::DFG::Graph::dump):
+        * dfg/DFGGraph.h:
+        (JSC::DFG::Graph::byValIsPure):
+        * dfg/DFGNode.h:
+        (JSC::DFG::Node::arrayMode):
+        (JSC::DFG::Node::setArrayMode):
+        * dfg/DFGSpeculativeJIT.cpp:
+        (JSC::DFG::SpeculativeJIT::typedArrayDescriptor):
+        (JSC::DFG::SpeculativeJIT::jumpSlowForUnwantedArrayMode):
+        (JSC::DFG::SpeculativeJIT::checkArray):
+        (JSC::DFG::SpeculativeJIT::arrayify):
+        (JSC::DFG::SpeculativeJIT::compileGetByValOnString):
+        (JSC::DFG::SpeculativeJIT::compileGetByValOnIntTypedArray):
+        (JSC::DFG::SpeculativeJIT::compileGetByValOnFloatTypedArray):
+        (JSC::DFG::SpeculativeJIT::compilePutByValForFloatTypedArray):
+        (JSC::DFG::SpeculativeJIT::compileGetIndexedPropertyStorage):
+        (JSC::DFG::SpeculativeJIT::compileGetByValOnArguments):
+        (JSC::DFG::SpeculativeJIT::compileGetArgumentsLength):
+        (JSC::DFG::SpeculativeJIT::compileGetArrayLength):
+        (JSC::DFG::SpeculativeJIT::temporaryRegisterForPutByVal):
+        * dfg/DFGSpeculativeJIT.h:
+        (JSC::DFG::SpeculativeJIT::putByValWillNeedExtraRegister):
+        (SpeculativeJIT):
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGSpeculativeJIT64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+
 2012-10-27  Dan Bernstein  <mitz@apple.com>
 
         REAL_PLATFORM_NAME build setting is no longer needed

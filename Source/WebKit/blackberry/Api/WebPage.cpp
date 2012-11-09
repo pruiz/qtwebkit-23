@@ -6335,7 +6335,7 @@ IntSize WebPagePrivate::screenSize() const
     return Platform::Graphics::Screen::primaryScreen()->size();
 }
 
-bool WebPagePrivate::postponeDocumentStyleRecalc()
+void WebPagePrivate::postponeDocumentStyleRecalc()
 {
     if (Document* document = m_mainFrame->document()) {
         m_documentChildNeedsStyleRecalc = document->childNeedsStyleRecalc();
@@ -6364,7 +6364,7 @@ const HitTestResult& WebPagePrivate::hitTestResult(const IntPoint& contentPos)
 {
     if (m_cachedHitTestContentPos != contentPos) {
         m_cachedHitTestContentPos = contentPos;
-        m_cachedHitTestResult = m_mainFrame->eventHandler()->hitTestResultAtPoint(m_cachedHitTestContentPos, HitTestRequest::ReadOnly | HitTestRequest::Active | HitTestRequest::AllowShadowContent);
+        m_cachedHitTestResult = m_mainFrame->eventHandler()->hitTestResultAtPoint(m_cachedHitTestContentPos, true /*allowShadowContent*/);
     }
 
     return m_cachedHitTestResult;

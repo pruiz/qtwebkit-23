@@ -1,3 +1,123 @@
+2012-10-30  Mark Rowe  <mrowe@apple.com>
+
+        Fix WTF to not install a few header files in bogus locations.
+
+        * WTF.xcodeproj/project.pbxproj:
+
+2012-10-28  Mark Rowe  <mrowe@apple.com>
+
+        Simplify Xcode configuration settings that used to vary between OS versions.
+
+        Reviewed by Dan Bernstein.
+
+        * Configurations/Base.xcconfig:
+        * Configurations/DebugRelease.xcconfig:
+
+2012-10-28  Mark Rowe  <mrowe@apple.com>
+
+        Remove references to unsupported OS and Xcode versions.
+
+        Reviewed by Anders Carlsson.
+
+        * Configurations/Base.xcconfig:
+        * Configurations/CompilerVersion.xcconfig: Removed.
+        * Configurations/DebugRelease.xcconfig:
+        * WTF.xcodeproj/project.pbxproj:
+
+2012-10-29  Anders Carlsson  <andersca@apple.com>
+
+        AtomicString(CFStringRef) shouldn't unconditionally create a StringImpl
+        https://bugs.webkit.org/show_bug.cgi?id=100701
+
+        Reviewed by Dan Bernstein.
+
+        * wtf/text/AtomicString.h:
+        (WTF::AtomicString::AtomicString):
+        Change the constructors that take a CFStringRef and an NSString * to call AtomicString::add(CFStringRef)
+        and remove AtomicString::createCFString.
+
+        (WTF::AtomicString::add):
+        Add new member function declaration. The definition is in a new file in WebCore, AtomicStringCF.cpp.
+        Also, fix the overload of add that takes a const char* to call the right other overload instead of itself.
+
+2012-10-29  Adam Barth  <abarth@webkit.org>
+
+        Unreviewed. Correct my previous patch to disable external SVG
+        references only on PLATFORM(CHROMIUM).
+
+        * wtf/Platform.h:
+
+2012-10-29  Adam Barth  <abarth@webkit.org>
+
+        Block SVG external references pending a security review
+        https://bugs.webkit.org/show_bug.cgi?id=100635
+
+        Reviewed by Eric Seidel.
+
+        We need to do a security review of loading external SVG references
+        before we're sure that it is safe.
+
+        * wtf/Platform.h:
+
+2012-10-29  Michael Saboff  <msaboff@apple.com>
+
+        String::split(UChar, Vector<String>&) shouldn't create a temporary String
+        https://bugs.webkit.org/show_bug.cgi?id=100578
+
+        Reviewed by Anders Carlsson.
+
+        Changed split(UChar, Vector<String>&) to call split(UChar, bool, Vector<String>&) instead of creating a
+        string and calling the split(String,...) version and moved it to WTFString.h.  Also moved
+        split(const String& separator, Vector<String>& result) to WTFString.h.
+
+        * wtf/text/WTFString.cpp:
+        (WTF::String::split):
+        * wtf/text/WTFString.h:
+        (WTF::String::split):
+
+2012-10-29  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r132736.
+        http://trac.webkit.org/changeset/132736
+        https://bugs.webkit.org/show_bug.cgi?id=100652
+
+        It broke all plugin related tests on GTK and on Qt (Requested
+        by Ossy on #webkit).
+
+        * wtf/text/WTFString.cpp:
+        (WTF::String::fromUTF8):
+
+2012-10-27  Michael Saboff  <msaboff@apple.com>
+
+        Try to create AtomicString as 8 bit where possible
+        https://bugs.webkit.org/show_bug.cgi?id=100575
+
+        Reviewed by Oliver Hunt.
+
+        Added StringImpl::create8BitIfPossible() that first tries to create an 8 bit string.  If it finds a 16 bit character
+        during processing, it calls the standard create() method.  The assumption is that this will be used on mostly 8 bit
+        strings and ones that are shorter (in the tens of characters).  Changed AtomicString to use the new creation method
+        for UChar based construction.
+
+        * wtf/text/AtomicString.cpp:
+        (WTF::UCharBufferTranslator::translate):
+        * wtf/text/StringImpl.cpp:
+        (WTF::StringImpl::create8BitIfPossible):
+        * wtf/text/StringImpl.h:
+        (WTF::StringImpl::create8BitIfPossible):
+
+2012-10-27  Michael Saboff  <msaboff@apple.com>
+
+        String::fromUTF8() should take advantage of the ASCII check in convertUTF8ToUTF16()
+        https://bugs.webkit.org/show_bug.cgi?id=100577
+
+        Reviewed by Oliver Hunt.
+
+        Passed is ASCII flag to convertUTF8ToUTF16() and if try, create an 8 bit string from the original arguments.
+
+        * wtf/text/WTFString.cpp:
+        (WTF::String::fromUTF8):
+
 2012-10-27  Dan Bernstein  <mitz@apple.com>
 
         REAL_PLATFORM_NAME build setting is no longer needed

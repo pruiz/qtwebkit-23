@@ -111,6 +111,7 @@ EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<Ewk_Context> context, Pas
     , m_evasGlSurface(0)
 #endif
     , m_settings(Ewk_Settings::create(this))
+    , m_cursorGroup(0)
     , m_mouseEventsEnabled(false)
 #if ENABLE(TOUCH_EVENTS)
     , m_touchEventsEnabled(false)
@@ -187,19 +188,16 @@ WKPageRef EwkViewImpl::wkPage()
 
 void EwkViewImpl::setCursor(const Cursor& cursor)
 {
-    Ewk_View_Smart_Data* sd = smartData();
-
     const char* group = cursor.platformCursor();
     if (!group || group == m_cursorGroup)
         return;
 
     m_cursorGroup = group;
-    m_cursorObject = adoptRef(edje_object_add(sd->base.evas));
+    Ewk_View_Smart_Data* sd = smartData();
+    RefPtr<Evas_Object> cursorObject = adoptRef(edje_object_add(sd->base.evas));
 
     Ecore_Evas* ecoreEvas = ecore_evas_ecore_evas_get(sd->base.evas);
-    if (!m_theme || !edje_object_file_set(m_cursorObject.get(), m_theme, group)) {
-        m_cursorObject.clear();
-
+    if (!m_theme || !edje_object_file_set(cursorObject.get(), m_theme, group)) {
         ecore_evas_object_cursor_set(ecoreEvas, 0, 0, 0, 0);
 #ifdef HAVE_ECORE_X
         if (WebCore::isUsingEcoreX(sd->base.evas))
@@ -208,28 +206,31 @@ void EwkViewImpl::setCursor(const Cursor& cursor)
         return;
     }
 
+    // Set cursor size.
     Evas_Coord width, height;
-    edje_object_size_min_get(m_cursorObject.get(), &width, &height);
+    edje_object_size_min_get(cursorObject.get(), &width, &height);
     if (width <= 0 || height <= 0)
-        edje_object_size_min_calc(m_cursorObject.get(), &width, &height);
+        edje_object_size_min_calc(cursorObject.get(), &width, &height);
     if (width <= 0 || height <= 0) {
         width = defaultCursorSize;
         height = defaultCursorSize;
     }
-    evas_object_resize(m_cursorObject.get(), width, height);
+    evas_object_resize(cursorObject.get(), width, height);
 
+    // Get cursor hot spot.
     const char* data;
     int hotspotX = 0;
-    data = edje_object_data_get(m_cursorObject.get(), "hot.x");
+    data = edje_object_data_get(cursorObject.get(), "hot.x");
     if (data)
         hotspotX = atoi(data);
 
     int hotspotY = 0;
-    data = edje_object_data_get(m_cursorObject.get(), "hot.y");
+    data = edje_object_data_get(cursorObject.get(), "hot.y");
     if (data)
         hotspotY = atoi(data);
 
-    ecore_evas_object_cursor_set(ecoreEvas, m_cursorObject.get(), EVAS_LAYER_MAX, hotspotX, hotspotY);
+    // ecore_evas takes care of freeing the cursor object.
+    ecore_evas_object_cursor_set(ecoreEvas, cursorObject.release().leakRef(), EVAS_LAYER_MAX, hotspotX, hotspotY);
 }
 
 void EwkViewImpl::displayTimerFired(WebCore::Timer<EwkViewImpl>*)
@@ -238,10 +239,6 @@ void EwkViewImpl::displayTimerFired(WebCore::Timer<EwkViewImpl>*)
 
     if (!sd->image)
         return;
-
-#if USE(COORDINATED_GRAPHICS)
-    EWK_VIEW_IMPL_GET_OR_RETURN(sd, viewImpl);
-#endif
 
     Region dirtyRegion;
     for (Vector<IntRect>::iterator it = m_dirtyRects.begin(); it != m_dirtyRects.end(); ++it)
@@ -255,8 +252,8 @@ void EwkViewImpl::displayTimerFired(WebCore::Timer<EwkViewImpl>*)
     for (Vector<IntRect>::iterator it = rects.begin(); it != end; ++it) {
         IntRect rect = *it;
 #if USE(COORDINATED_GRAPHICS)
-        evas_gl_make_current(viewImpl->m_evasGl, viewImpl->m_evasGlSurface, viewImpl->m_evasGlContext);
-        viewImpl->m_pageViewportControllerClient->display(rect, IntPoint(sd->view.x, sd->view.y));
+        evas_gl_make_current(m_evasGl, m_evasGlSurface, m_evasGlContext);
+        m_pageViewportControllerClient->display(rect, IntPoint(sd->view.x, sd->view.y));
 #endif
 
         evas_object_image_data_update_add(sd->image, rect.x(), rect.y(), rect.width(), rect.height());
@@ -268,62 +265,6 @@ void EwkViewImpl::redrawRegion(const IntRect& rect)
     if (!m_displayTimer.isActive())
         m_displayTimer.startOneShot(0);
     m_dirtyRects.append(rect);
-}
-
-/**
- * @internal
- * A download for that view was cancelled.
- *
- * Emits signal: "download,cancelled" with pointer to a Ewk_Download_Job.
- */
-void EwkViewImpl::informDownloadJobCancelled(Ewk_Download_Job* download)
-{
-    evas_object_smart_callback_call(m_view, "download,cancelled", download);
-}
-
-/**
- * @internal
- * A download for that view has failed.
- *
- * Emits signal: "download,failed" with pointer to a Ewk_Download_Job_Error.
- */
-void EwkViewImpl::informDownloadJobFailed(Ewk_Download_Job* download, Ewk_Error* error)
-{
-    Ewk_Download_Job_Error downloadError = { download, error };
-    evas_object_smart_callback_call(m_view, "download,failed", &downloadError);
-}
-
-/**
- * @internal
- * A download for that view finished successfully.
- *
- * Emits signal: "download,finished" with pointer to a Ewk_Download_Job.
- */
-void EwkViewImpl::informDownloadJobFinished(Ewk_Download_Job* download)
-{
-    evas_object_smart_callback_call(m_view, "download,finished", download);
-}
-
-/**
- * @internal
- * A new download has been requested for that view.
- *
- * Emits signal: "download,request" with pointer to a Ewk_Download_Job.
- */
-void EwkViewImpl::informDownloadJobRequested(Ewk_Download_Job* download)
-{
-    evas_object_smart_callback_call(m_view, "download,request", download);
-}
-
-/**
- * @internal
- * informs that a form request is about to be submitted.
- *
- * Emits signal: "form,submission,request" with pointer to Ewk_Form_Submission_Request.
- */
-void EwkViewImpl::informNewFormSubmissionRequest(Ewk_Form_Submission_Request* request)
-{
-    evas_object_smart_callback_call(m_view, "form,submission,request", request);
 }
 
 #if ENABLE(FULLSCREEN_API)
@@ -367,197 +308,12 @@ void EwkViewImpl::setImageData(void* imageData, const IntSize& size)
     evas_object_image_data_copy_set(sd->image, imageData);
 }
 
-/**
- * @internal
- * informs load failed with error information.
- *
- * Emits signal: "load,error" with pointer to Ewk_Error.
- */
-void EwkViewImpl::informLoadError(Ewk_Error* error)
-{
-    evas_object_smart_callback_call(m_view, "load,error", error);
-}
-
-/**
- * @internal
- * informs load finished.
- *
- * Emits signal: "load,finished".
- */
-void EwkViewImpl::informLoadFinished()
-{
-    informURLChange();
-    evas_object_smart_callback_call(m_view, "load,finished", 0);
-}
-
-/**
- * @internal
- * informs load progress changed.
- *
- * Emits signal: "load,progress" with pointer to a double from 0.0 to 1.0.
- */
-void EwkViewImpl::informLoadProgress(double progress)
-{
-    evas_object_smart_callback_call(m_view, "load,progress", &progress);
-}
-
-/**
- * @internal
- * informs view provisional load failed with error information.
- *
- * Emits signal: "load,provisional,failed" with pointer to Ewk_Error.
- */
-void EwkViewImpl::informProvisionalLoadFailed(Ewk_Error* error)
-{
-    evas_object_smart_callback_call(m_view, "load,provisional,failed", error);
-}
-
 #if USE(TILED_BACKING_STORE)
 void EwkViewImpl::informLoadCommitted()
 {
     m_pageViewportController->didCommitLoad();
 }
 #endif
-
-/**
- * @internal
- * informs view received redirect for provisional load.
- *
- * Emits signal: "load,provisional,redirect".
- */
-void EwkViewImpl::informProvisionalLoadRedirect()
-{
-    informURLChange();
-    evas_object_smart_callback_call(m_view, "load,provisional,redirect", 0);
-}
-
-/**
- * @internal
- * informs view provisional load started.
- *
- * Emits signal: "load,provisional,started".
- */
-void EwkViewImpl::informProvisionalLoadStarted()
-{
-    informURLChange();
-    evas_object_smart_callback_call(m_view, "load,provisional,started", 0);
-}
-
-/**
- * @internal
- * informs that a navigation policy decision should be taken.
- *
- * Emits signal: "policy,decision,navigation".
- */
-void EwkViewImpl::informNavigationPolicyDecision(Ewk_Navigation_Policy_Decision* decision)
-{
-    evas_object_smart_callback_call(m_view, "policy,decision,navigation", decision);
-}
-
-/**
- * @internal
- * informs that a new window policy decision should be taken.
- *
- * Emits signal: "policy,decision,new,window".
- */
-void EwkViewImpl::informNewWindowPolicyDecision(Ewk_Navigation_Policy_Decision* decision)
-{
-    evas_object_smart_callback_call(m_view, "policy,decision,new,window", decision);
-}
-
-/**
- * @internal
- * Load was initiated for a resource in the view.
- *
- * Emits signal: "resource,request,new" with pointer to resource request.
- */
-void EwkViewImpl::informResourceLoadStarted(Ewk_Resource* resource, Ewk_Url_Request* request)
-{
-    Ewk_Resource_Request resourceRequest = {resource, request, 0};
-
-    evas_object_smart_callback_call(m_view, "resource,request,new", &resourceRequest);
-}
-
-/**
- * @internal
- * Received a response to a resource load request in the view.
- *
- * Emits signal: "resource,request,response" with pointer to resource response.
- */
-void EwkViewImpl::informResourceLoadResponse(Ewk_Resource* resource, Ewk_Url_Response* response)
-{
-    Ewk_Resource_Load_Response resourceLoadResponse = {resource, response};
-    evas_object_smart_callback_call(m_view, "resource,request,response", &resourceLoadResponse);
-}
-
-/**
- * @internal
- * Failed loading a resource in the view.
- *
- * Emits signal: "resource,request,finished" with pointer to the resource load error.
- */
-void EwkViewImpl::informResourceLoadFailed(Ewk_Resource* resource, Ewk_Error* error)
-{
-    Ewk_Resource_Load_Error resourceLoadError = {resource, error};
-    evas_object_smart_callback_call(m_view, "resource,request,failed", &resourceLoadError);
-}
-
-/**
- * @internal
- * Finished loading a resource in the view.
- *
- * Emits signal: "resource,request,finished" with pointer to the resource.
- */
-void EwkViewImpl::informResourceLoadFinished(Ewk_Resource* resource)
-{
-    evas_object_smart_callback_call(m_view, "resource,request,finished", resource);
-}
-
-/**
- * @internal
- * Request was sent for a resource in the view.
- *
- * Emits signal: "resource,request,sent" with pointer to resource request and possible redirect response.
- */
-void EwkViewImpl::informResourceRequestSent(Ewk_Resource* resource, Ewk_Url_Request* request, Ewk_Url_Response* redirectResponse)
-{
-    Ewk_Resource_Request resourceRequest = {resource, request, redirectResponse};
-    evas_object_smart_callback_call(m_view, "resource,request,sent", &resourceRequest);
-}
-
-/**
- * @internal
- * The view title was changed by the frame loader.
- *
- * Emits signal: "title,changed" with pointer to new title string.
- */
-void EwkViewImpl::informTitleChange(const String& title)
-{
-    evas_object_smart_callback_call(m_view, "title,changed", const_cast<char*>(title.utf8().data()));
-}
-
-/**
- * @internal
- */
-void EwkViewImpl::informTooltipTextChange(const String& text)
-{
-    if (text.isEmpty())
-        evas_object_smart_callback_call(m_view, "tooltip,text,unset", 0);
-    else
-        evas_object_smart_callback_call(m_view, "tooltip,text,set", const_cast<char*>(text.utf8().data()));
-
-}
-
-/**
- * @internal
- * informs that the requested text was found.
- *
- * Emits signal: "text,found" with the number of matches.
- */
-void EwkViewImpl::informTextFound(unsigned matchCount)
-{
-    evas_object_smart_callback_call(m_view, "text,found", &matchCount);
-}
 
 IntSize EwkViewImpl::size() const
 {
@@ -616,10 +372,9 @@ const char* EwkViewImpl::customTextEncodingName() const
     return m_customEncoding;
 }
 
-void EwkViewImpl::setCustomTextEncodingName(const char* encoding)
+void EwkViewImpl::setCustomTextEncodingName(const String& encoding)
 {
-    m_customEncoding = encoding;
-    m_pageProxy->setCustomTextEncodingName(encoding ? encoding : String());
+    m_pageProxy->setCustomTextEncodingName(encoding);
 }
 
 void EwkViewImpl::setMouseEventsEnabled(bool enabled)
@@ -689,32 +444,6 @@ void EwkViewImpl::informIconChange()
     evas_object_smart_callback_call(m_view, "icon,changed", 0);
 }
 
-#if ENABLE(WEB_INTENTS)
-/**
- * @internal
- * The view received a new intent request.
- *
- * Emits signal: "intent,request,new" with pointer to a Ewk_Intent.
- */
-void EwkViewImpl::informIntentRequest(Ewk_Intent* ewkIntent)
-{
-    evas_object_smart_callback_call(m_view, "intent,request,new", ewkIntent);
-}
-#endif
-
-#if ENABLE(WEB_INTENTS_TAG)
-/**
- * @internal
- * The view received a new intent service registration.
- *
- * Emits signal: "intent,service,register" with pointer to a Ewk_Intent_Service.
- */
-void EwkViewImpl::informIntentServiceRegistration(Ewk_Intent_Service* ewkIntentService)
-{
-    evas_object_smart_callback_call(m_view, "intent,service,register", ewkIntentService);
-}
-#endif // ENABLE(WEB_INTENTS_TAG)
-
 #if USE(ACCELERATED_COMPOSITING)
 bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
 {
@@ -736,6 +465,11 @@ bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
     Evas_Native_Surface nativeSurface;
     evas_gl_native_surface_get(m_evasGl, m_evasGlSurface, &nativeSurface);
     evas_object_image_native_surface_set(sd->image, &nativeSurface);
+
+    evas_gl_make_current(m_evasGl, m_evasGlSurface, m_evasGlContext);
+
+    Evas_GL_API* gl = evas_gl_api_get(evasGl());
+    gl->glViewport(0, 0, viewSize.width() + sd->view.x, viewSize.height() + sd->view.y);
 
     return true;
 }
@@ -832,37 +566,6 @@ void EwkViewImpl::dismissColorPicker()
     m_colorPicker.clear();
 }
 #endif
-
-/**
- * @internal
- * informs that the view's back / forward list has changed.
- *
- * Emits signal: "back,forward,list,changed".
- */
-void EwkViewImpl::informBackForwardListChange()
-{
-    evas_object_smart_callback_call(m_view, "back,forward,list,changed", 0);
-}
-
-/**
- * @internal
- * Web process has crashed.
- *
- * Emits signal: "webprocess,crashed" with pointer to crash handling boolean.
- */
-void EwkViewImpl::informWebProcessCrashed()
-{
-    bool handled = false;
-    evas_object_smart_callback_call(m_view, "webprocess,crashed", &handled);
-
-    if (!handled) {
-        CString url = m_pageProxy->urlAtProcessExit().utf8();
-        WARN("WARNING: The web process experienced a crash on '%s'.\n", url.data());
-
-        // Display an error page
-        ewk_view_html_string_load(m_view, "The web process has crashed.", 0, url.data());
-    }
-}
 
 void EwkViewImpl::informContentsSizeChange(const IntSize& size)
 {

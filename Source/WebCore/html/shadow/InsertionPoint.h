@@ -86,9 +86,6 @@ private:
 
 inline bool isInsertionPoint(const Node* node)
 {
-    if (!node)
-        return false;
-
     if (node->isHTMLElement() && toHTMLElement(node)->isInsertionPoint())
         return true;
 
@@ -97,13 +94,13 @@ inline bool isInsertionPoint(const Node* node)
 
 inline InsertionPoint* toInsertionPoint(Node* node)
 {
-    ASSERT(isInsertionPoint(node));
+    ASSERT(!node || isInsertionPoint(node));
     return static_cast<InsertionPoint*>(node);
 }
 
 inline const InsertionPoint* toInsertionPoint(const Node* node)
 {
-    ASSERT(isInsertionPoint(node));
+    ASSERT(!node || isInsertionPoint(node));
     return static_cast<const InsertionPoint*>(node);
 }
 
@@ -114,19 +111,29 @@ inline bool isActiveInsertionPoint(const Node* node)
 
 inline bool isLowerEncapsulationBoundary(Node* node)
 {
-    if (!isInsertionPoint(node))
+    if (!node || !isInsertionPoint(node))
         return false;
     return toInsertionPoint(node)->isShadowBoundary();
 }
 
-inline Element* parentElementForDistribution(const Node* node)
+inline Node* parentNodeForDistribution(const Node* node)
 {
     ASSERT(node);
-    if (Element* parent = node->parentElement()) {
-        if (isInsertionPoint(parent) && toInsertionPoint(parent)->shouldUseFallbackElements())
-            return parent->parentElement();
 
+    if (Node* parent = node->parentNode()) {
+        if (isInsertionPoint(parent) && toInsertionPoint(parent)->shouldUseFallbackElements())
+            return parent->parentNode();
         return parent;
+    }
+
+    return 0;
+}
+
+inline Element* parentElementForDistribution(const Node* node)
+{
+    if (Node* parent = parentNodeForDistribution(node)) {
+        if (parent->isElementNode())
+            return toElement(parent);
     }
 
     return 0;

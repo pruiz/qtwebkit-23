@@ -495,15 +495,7 @@ void ChromeClientImpl::invalidateContentsAndRootView(const IntRect& updateRect, 
 {
     if (updateRect.isEmpty())
         return;
-#if USE(ACCELERATED_COMPOSITING)
-    if (!m_webView->isAcceleratedCompositingActive()) {
-#endif
-        if (m_webView->client())
-            m_webView->client()->didInvalidateRect(updateRect);
-#if USE(ACCELERATED_COMPOSITING)
-    } else
-        m_webView->invalidateRootLayerRect(updateRect);
-#endif
+    m_webView->invalidateRect(updateRect);
 }
 
 void ChromeClientImpl::invalidateContentsForSlowScroll(const IntRect& updateRect, bool immediate)
@@ -701,9 +693,9 @@ PassOwnPtr<WebColorChooser> ChromeClientImpl::createWebColorChooser(WebColorChoo
 #endif
 
 #if ENABLE(CALENDAR_PICKER)
-PassOwnPtr<WebCore::DateTimeChooser> ChromeClientImpl::openDateTimeChooser(WebCore::DateTimeChooserClient* pickerClient, const WebCore::DateTimeChooserParameters& parameters)
+PassRefPtr<DateTimeChooser> ChromeClientImpl::openDateTimeChooser(DateTimeChooserClient* pickerClient, const DateTimeChooserParameters& parameters)
 {
-    return adoptPtr(new DateTimeChooserImpl(this, pickerClient, parameters));
+    return DateTimeChooserImpl::create(this, pickerClient, parameters);
 }
 #endif
 

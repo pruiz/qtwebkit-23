@@ -1,3 +1,309 @@
+2012-10-30  Kangil Han  <kangil.han@samsung.com>
+
+        [EFL][DRT] Bitmap should show whole view area.
+        https://bugs.webkit.org/show_bug.cgi?id=100642
+
+        Reviewed by Gyuyoung Kim.
+
+        css sticky position test cases haven't been passed even though implementation has been landed by BUG 95182.
+        This is because current create bitmap implementation refers to geometry position that considers scroll movement even though
+        paint does it. Therefore, this patch always reflects current view size and remove duplicated graphic operation to dump correct bitmap image.
+
+        * DumpRenderTree/efl/PixelDumpSupportEfl.cpp:
+        (createBitmapContextFromWebView):
+
+2012-10-30  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL] Refactor tooltip callback signal in WebKit1
+        https://bugs.webkit.org/show_bug.cgi?id=100571
+
+        Reviewed by Gyuyoung Kim.
+
+        Separate tooltip callback signal into 'tooltip,text,set'
+        and 'tooltip,text,unset' to be consistent with WebKit2.
+
+        * EWebLauncher/main.c:
+        (on_tooltip_text_set):
+        (on_tooltip_text_unset):
+        (browserCreate):
+
+2012-10-29  Csaba Osztrogonác  <ossy@webkit.org>
+
+        Unreviewed, rolling out r132819.
+        http://trac.webkit.org/changeset/132819
+        https://bugs.webkit.org/show_bug.cgi?id=100388
+
+        It made layout testing 40% slower and storage tests assert
+
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::DumpRenderTree):
+        (WebCore::DumpRenderTree::resetToConsistentStateBeforeTesting):
+        (WebCore::DumpRenderTree::dump):
+        * DumpRenderTree/qt/DumpRenderTreeQt.h:
+        (DumpRenderTree):
+        * DumpRenderTree/qt/TestRunnerQt.cpp:
+        (TestRunner::reset):
+        * DumpRenderTree/qt/TestRunnerQt.h:
+        (TestRunner):
+
+2012-10-29  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] TestRunner needs to compile ChromiumCurrentTime and ChromiumThreading in components build
+        https://bugs.webkit.org/show_bug.cgi?id=100658
+
+        Reviewed by Tony Chang.
+
+        Before, this was compiled into DumpRenderTree. I also dropped the
+        include_dirs and dependencies block as TestRunner already has them.
+
+        * DumpRenderTree/DumpRenderTree.gyp/DumpRenderTree.gyp:
+
+2012-10-29  Takashi Sakamoto  <tasak@google.com>
+
+        Unreviewed. Adding myself as a committer.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-10-28  Mark Rowe  <mrowe@apple.com>
+
+        Simplify Xcode configuration settings that used to vary between OS versions.
+
+        Reviewed by Dan Bernstein.
+
+        * DumpRenderTree/mac/Configurations/Base.xcconfig:
+        * DumpRenderTree/mac/Configurations/DebugRelease.xcconfig:
+        * MiniBrowser/Configurations/Base.xcconfig:
+        * MiniBrowser/Configurations/DebugRelease.xcconfig:
+        * TestWebKitAPI/Configurations/Base.xcconfig:
+        * TestWebKitAPI/Configurations/DebugRelease.xcconfig:
+        * WebKitTestRunner/Configurations/Base.xcconfig:
+        * WebKitTestRunner/Configurations/DebugRelease.xcconfig:
+
+2012-10-28  Mark Rowe  <mrowe@apple.com>
+
+        Remove references to unsupported OS and Xcode versions.
+
+        Reviewed by Anders Carlsson.
+
+        * DumpRenderTree/DumpRenderTree.xcodeproj/project.pbxproj:
+        * DumpRenderTree/mac/Configurations/Base.xcconfig:
+        * DumpRenderTree/mac/Configurations/CompilerVersion.xcconfig: Removed.
+        * DumpRenderTree/mac/Configurations/DebugRelease.xcconfig:
+        * MiniBrowser/Configurations/Base.xcconfig:
+        * MiniBrowser/Configurations/CompilerVersion.xcconfig: Removed.
+        * MiniBrowser/Configurations/DebugRelease.xcconfig:
+        * TestWebKitAPI/Configurations/Base.xcconfig:
+        * TestWebKitAPI/Configurations/CompilerVersion.xcconfig: Removed.
+        * TestWebKitAPI/Configurations/DebugRelease.xcconfig:
+        * TestWebKitAPI/TestWebKitAPI.xcodeproj/project.pbxproj:
+        * WebKitTestRunner/Configurations/Base.xcconfig:
+        * WebKitTestRunner/Configurations/CompilerVersion.xcconfig: Removed.
+        * WebKitTestRunner/Configurations/DebugRelease.xcconfig:
+        * WebKitTestRunner/WebKitTestRunner.xcodeproj/project.pbxproj:
+
+2012-10-29  Dirk Pranke  <dpranke@chromium.org>
+
+        webkitpy: change non-verbose log format for webkit-patch
+        https://bugs.webkit.org/show_bug.cgi?id=100561
+
+        Reviewed by Ojan Vafai.
+
+        Logging the module name and the log level is annoying and nearly useless.
+        For starters, this change removes that unless you are doing verbose/
+        debug logging. In the future we should split out the concepts of
+        verbose and debug logging (like we did in test-webkitpy and
+        run-webkit-tests) so that you could get this in debug logging.
+
+        * Scripts/webkitpy/common/system/logutils.py:
+        (_default_handlers):
+        (configure_logging):
+        * Scripts/webkitpy/common/system/logutils_unittest.py:
+        (ConfigureLoggingTest.test_info_message):
+        (ConfigureLoggingTest):
+        (ConfigureLoggingTest.test_debug_message):
+        (ConfigureLoggingTest.test_two_messages):
+        (ConfigureLoggingVerboseTest):
+        (ConfigureLoggingVerboseTest._logging_level):
+        (ConfigureLoggingVerboseTest.test_info_message):
+        (ConfigureLoggingVerboseTest.test_debug_message):
+        (ConfigureLoggingCustomLevelTest.test_logged_message):
+
+2012-10-29  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [CMAKE] Add TestNetscapePlugIn/Tests/NPRuntimeCallsWithNullNPP.cpp to CMakeLists.txt
+        https://bugs.webkit.org/show_bug.cgi?id=100681
+
+        Reviewed by Anders Carlsson.
+
+        Add TestNetscapePlugIn/Tests/NPRuntimeCallsWithNullNPP.cpp to CMake since
+        it is needed by plugins/npruntime/npruntime-calls-with-null-npp.html
+        layout test.
+
+        * DumpRenderTree/TestNetscapePlugIn/CMakeLists.txt:
+
+2012-10-29  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Flaky security tests
+        https://bugs.webkit.org/show_bug.cgi?id=100388
+
+        Reviewed by Jocelyn Turcotte.
+
+        Disable text dumping and load a blank URL to ensure the documentLoader is cleared 
+        before we start dumping text for the new page. Otherwise messages from the old page
+        may end up in the text output of the new test.
+
+        This matches what WebKitTestRunner does, and reuses the Qt code for waiting for flag.
+
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::DumpRenderTree):
+        (WebCore::runUntil):
+        (WebCore::DumpRenderTree::resetToConsistentStateBeforeTesting):
+        (WebCore::DumpRenderTree::finishedResetting):
+        (WebCore::DumpRenderTree::dump):
+        * DumpRenderTree/qt/DumpRenderTreeQt.h:
+        (DumpRenderTree):
+        * DumpRenderTree/qt/TestRunnerQt.cpp:
+        (TestRunner::resetDumping):
+        (TestRunner::reset):
+        * DumpRenderTree/qt/TestRunnerQt.h:
+        (TestRunner):
+
+2012-10-29  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [WK2][WKTR] Enable Shadow DOM at runtime if compiled with SHADOW_DOM support
+        https://bugs.webkit.org/show_bug.cgi?id=100668
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Enable Shadow DOM functionality at run time in WebKitTestRunner
+        if compiled with SHADOW_DOM flag set. This is needed to run
+        the Shadow DOM layout tests.
+
+        * WebKitTestRunner/InjectedBundle/InjectedBundle.cpp:
+        (WTR::InjectedBundle::beginTesting):
+
+2012-10-29  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][AC] Fix bugs preventing us from running layout tests with AC turned on
+        https://bugs.webkit.org/show_bug.cgi?id=100598
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Make sure to use opengl_x11 engine when AC is turned on and X11 is in use.
+        We cannot create a gl context otherwise.
+
+        * MiniBrowser/efl/main.c:
+        (elm_main):
+        * WebKitTestRunner/efl/PlatformWebViewEfl.cpp:
+        (WTR::initEcoreEvas):
+        * DumpRenderTree/efl/DumpRenderTree.cpp:
+        (initEcoreEvas):
+        * EWebLauncher/efl/main.c:
+        (windowCreate):
+
+2012-10-29  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL][WK2] REGRESSION(r132342): fast/events/frame-tab-focus.html fails
+        https://bugs.webkit.org/show_bug.cgi?id=100646
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        * WebKitTestRunner/efl/PlatformWebViewEfl.cpp:
+        (WTR::PlatformWebView::focus): Improve the check we perform to
+        decide whether the focus should be taken out of the view before
+        focusing it again so that we do not unnecessarily unfocus it and
+        cause blur/focus events to be triggered. Instead of just verifying
+        if the Evas_Object representing the view has focus, use the WK C
+        API to check that the currently focused frame is not the main
+        frame.
+
+2012-10-29  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r132782.
+        http://trac.webkit.org/changeset/132782
+        https://bugs.webkit.org/show_bug.cgi?id=100653
+
+        It made 400+ tests fail and 180 tests flakey on Qt (Requested
+        by Ossy on #webkit).
+
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::resetToConsistentStateBeforeTesting):
+
+2012-10-29  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Flaky security tests
+        https://bugs.webkit.org/show_bug.cgi?id=100388
+
+        Reviewed by Jocelyn Turcotte.
+
+        Disable text output and load a blank URL to ensure the documentLoader is cleared
+        before we start dumping text for the new page. Otherwise messages from the old page
+        may end up in the text output of the new test.
+
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::resetToConsistentStateBeforeTesting):
+
+2012-10-29  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] remove remaining usages of webkit_support from the TestRunner library
+        https://bugs.webkit.org/show_bug.cgi?id=100344
+
+        Reviewed by Adam Barth.
+
+        The most important part is to not rely on calling out to gdk/X11 to
+        translate keycodes to hardware keycodes, as this is not possible inside
+        the sandbox.
+
+        * DumpRenderTree/DumpRenderTree.gypi:
+        * DumpRenderTree/chromium/DRTTestRunner.h:
+        (WebKit):
+        (webkit_support):
+        * DumpRenderTree/chromium/TestRunner/public/WebTestDelegate.h:
+        (WebTestDelegate):
+        * DumpRenderTree/chromium/TestRunner/src/CppVariant.h:
+        * DumpRenderTree/chromium/TestRunner/src/EventSender.cpp:
+        (WebTestRunner):
+        (WebTestRunner::EventSender::doDragDrop):
+        (WebTestRunner::EventSender::updateClickCountForButton):
+        (WebTestRunner::EventSender::mouseDown):
+        (WebTestRunner::EventSender::mouseUp):
+        (WebTestRunner::EventSender::mouseMoveTo):
+        (WebTestRunner::EventSender::keyDown):
+        (WebTestRunner::EventSender::replaySavedEvents):
+        (WebTestRunner::EventSender::contextClick):
+        (WebTestRunner::EventSender::beginDragWithFiles):
+        (WebTestRunner::EventSender::sendCurrentTouchEvent):
+        (WebTestRunner::EventSender::handleMouseWheel):
+        (WebTestRunner::EventSender::gestureEvent):
+        (WebTestRunner::EventSender::gestureFlingCancel):
+        (WebTestRunner::EventSender::gestureFlingStart):
+        * DumpRenderTree/chromium/TestRunner/src/KeyCodeMapping.cpp: Added.
+        (WebTestRunner):
+        (WebTestRunner::NativeKeyCodeForWindowsKeyCode):
+        * DumpRenderTree/chromium/TestRunner/src/KeyCodeMapping.h: Copied from Tools/DumpRenderTree/chromium/TestRunner/src/TestRunner.h.
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/TestDelegate.h:
+        (TestDelegate):
+        * DumpRenderTree/chromium/TestRunner/src/TestRunner.cpp:
+        * DumpRenderTree/chromium/TestRunner/src/TestRunner.h:
+        * DumpRenderTree/chromium/TestRunner/src/WebTestInterfaces.cpp:
+        (WebTestInterfaces::Internal):
+        (WebTestRunner::WebTestInterfaces::Internal::getCurrentTimeInMillisecond):
+        (WebTestRunner):
+        (WebTestRunner::WebTestInterfaces::Internal::getAbsoluteWebStringFromUTF8Path):
+        * DumpRenderTree/chromium/WebViewHost.cpp:
+        (WebViewHost::getCurrentTimeInMillisecond):
+        (WebViewHost::getAbsoluteWebStringFromUTF8Path):
+        * DumpRenderTree/chromium/WebViewHost.h:
+        (WebViewHost):
+
+2012-10-29  Jonathan Dong  <jonathan.dong@torchmobile.com.cn>
+
+        Unreviewed. Add jonathan.dong@torchmobile.com.cn as a committer.
+        https://bugs.webkit.org/show_bug.cgi?id=100629
+
+        * Scripts/webkitpy/common/config/committers.py:
+
 2012-10-27  Dan Bernstein  <mitz@apple.com>
 
         REAL_PLATFORM_NAME build setting is no longer needed

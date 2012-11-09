@@ -175,6 +175,19 @@ void LayerTreeCoordinatorProxy::renderNextFrame()
     m_drawingAreaProxy->page()->process()->send(Messages::LayerTreeCoordinator::RenderNextFrame(), m_drawingAreaProxy->page()->pageID());
 }
 
+#if ENABLE(REQUEST_ANIMATION_FRAME)
+void LayerTreeCoordinatorProxy::requestAnimationFrame()
+{
+    dispatchUpdate(bind(&LayerTreeRenderer::requestAnimationFrame, m_renderer.get()));
+    updateViewport();
+}
+
+void LayerTreeCoordinatorProxy::animationFrameReady()
+{
+    m_drawingAreaProxy->page()->process()->send(Messages::LayerTreeCoordinator::AnimationFrameReady(), m_drawingAreaProxy->page()->pageID());
+}
+#endif
+
 void LayerTreeCoordinatorProxy::didChangeScrollPosition(const IntPoint& position)
 {
     dispatchUpdate(bind(&LayerTreeRenderer::didChangeScrollPosition, m_renderer.get(), position));
@@ -190,6 +203,9 @@ void LayerTreeCoordinatorProxy::syncCanvas(uint32_t id, const IntSize& canvasSiz
 void LayerTreeCoordinatorProxy::purgeBackingStores()
 {
     m_drawingAreaProxy->page()->process()->send(Messages::LayerTreeCoordinator::PurgeBackingStores(), m_drawingAreaProxy->page()->pageID());
+#if USE(GRAPHICS_SURFACE)
+    m_surfaces.clear();
+#endif
 }
 
 }

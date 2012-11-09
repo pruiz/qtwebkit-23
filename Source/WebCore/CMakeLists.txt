@@ -1911,6 +1911,7 @@ SET(WebCore_SOURCES
     platform/graphics/filters/CustomFilterGlobalContext.cpp
     platform/graphics/filters/CustomFilterMesh.cpp
     platform/graphics/filters/CustomFilterOperation.cpp
+    platform/graphics/filters/CustomFilterParameterList.cpp
     platform/graphics/filters/CustomFilterProgram.cpp
     platform/graphics/filters/CustomFilterProgramInfo.cpp
     platform/graphics/filters/DistantLightSource.cpp
@@ -2020,7 +2021,7 @@ SET(WebCore_SOURCES
     platform/text/LineEnding.cpp
     platform/text/LocaleNone.cpp
     platform/text/LocaleToScriptMappingDefault.cpp
-    platform/text/Localizer.cpp
+    platform/text/PlatformLocale.cpp
     platform/text/QuotedPrintable.cpp
     platform/text/RegularExpression.cpp
     platform/text/SegmentedString.cpp

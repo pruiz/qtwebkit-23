@@ -943,7 +943,7 @@ SOURCES += \
     platform/text/Hyphenation.cpp \
     platform/text/LocaleNone.cpp \
     platform/text/LocaleToScriptMappingDefault.cpp \
-    platform/text/Localizer.cpp \
+    platform/text/PlatformLocale.cpp \
     platform/text/QuotedPrintable.cpp \
     platform/CalculationValue.cpp \
     platform/Clock.cpp \
@@ -2083,6 +2083,7 @@ HEADERS += \
     platform/graphics/filters/CustomFilterCompiledProgram.h \
     platform/graphics/filters/CustomFilterOperation.h \
     platform/graphics/filters/CustomFilterParameter.h \
+    platform/graphics/filters/CustomFilterParameterList.h \
     platform/graphics/filters/CustomFilterProgram.h \
     platform/graphics/filters/CustomFilterTransformParameter.h \
     platform/graphics/filters/CustomFilterValidatedProgram.h \
@@ -2875,8 +2876,9 @@ win32-*|wince* {
 
 mac {
     SOURCES += \
-        platform/text/cf/StringCF.cpp \
         platform/cf/SharedBufferCF.cpp \
+        platform/text/cf/AtomicStringCF.cpp \
+        platform/text/cf/StringCF.cpp \
         platform/text/cf/StringImplCF.cpp
 }
 
@@ -3505,6 +3507,7 @@ contains(DEFINES, ENABLE_FILTERS=1) {
     SOURCES += \
         platform/graphics/filters/CustomFilterGlobalContext.cpp \
         platform/graphics/filters/CustomFilterOperation.cpp \
+        platform/graphics/filters/CustomFilterParameterList.cpp \
         platform/graphics/filters/CustomFilterProgram.cpp \
         platform/graphics/filters/CustomFilterCompiledProgram.cpp \
         platform/graphics/filters/CustomFilterMesh.cpp \

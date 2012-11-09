@@ -78,7 +78,7 @@ protected:
     String formatTime(const String& localeString, int hour, int minute, int second, int millisecond, bool useShortFormat)
     {
         OwnPtr<LocaleMac> locale = LocaleMac::create(localeString);
-        return locale->formatDateTime(timeComponents(hour, minute, second, millisecond), (useShortFormat ? Localizer::FormatTypeShort : Localizer::FormatTypeMedium));
+        return locale->formatDateTime(timeComponents(hour, minute, second, millisecond), (useShortFormat ? Locale::FormatTypeShort : Locale::FormatTypeMedium));
     }
 
     double parseDate(const String& localeString, const String& dateString)
@@ -88,12 +88,6 @@ protected:
     }
 
 #if ENABLE(CALENDAR_PICKER)
-    String dateFormatText(const String& localeString)
-    {
-        OwnPtr<LocaleMac> locale = LocaleMac::create(localeString);
-        return locale->dateFormatText();
-    }
-
     unsigned firstDayOfWeek(const String& localeString)
     {
         OwnPtr<LocaleMac> locale = LocaleMac::create(localeString);
@@ -206,13 +200,6 @@ TEST_F(LocaleMacTest, parseDate)
 }
 
 #if ENABLE(CALENDAR_PICKER)
-TEST_F(LocaleMacTest, dateFormatText)
-{
-    EXPECT_STREQ("Month/Day/Year", dateFormatText("en_US").utf8().data());
-    EXPECT_STREQ("Day/Month/Year", dateFormatText("fr_FR").utf8().data());
-    EXPECT_STREQ("Year/Month/Day", dateFormatText("ja_JP").utf8().data());
-}
-
 TEST_F(LocaleMacTest, firstDayOfWeek)
 {
     EXPECT_EQ(Sunday, firstDayOfWeek("en_US"));
@@ -350,7 +337,7 @@ TEST_F(LocaleMacTest, invalidLocale)
 
 static void testNumberIsReversible(const AtomicString& localeString, const char* original, const char* shouldHave = 0)
 {
-    OwnPtr<Localizer> locale = Localizer::create(localeString);
+    OwnPtr<Locale> locale = Locale::create(localeString);
     String localized = locale->convertToLocalizedNumber(original);
     if (shouldHave)
         EXPECT_TRUE(localized.contains(shouldHave));

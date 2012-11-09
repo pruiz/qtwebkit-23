@@ -31,7 +31,7 @@
 #ifndef LocaleMac_h
 #define LocaleMac_h
 
-#include "Localizer.h"
+#include "PlatformLocale.h"
 #include <wtf/Forward.h>
 #include <wtf/RetainPtr.h>
 #include <wtf/Vector.h>
@@ -45,7 +45,7 @@ namespace WebCore {
 
 class DateComponents;
 
-class LocaleMac : public Localizer {
+class LocaleMac : public Locale {
 public:
     static PassOwnPtr<LocaleMac> create(const String&);
     static PassOwnPtr<LocaleMac> create(NSLocale*);
@@ -53,7 +53,6 @@ public:
     virtual double parseDateTime(const String&, DateComponents::Type) OVERRIDE;
 
 #if ENABLE(CALENDAR_PICKER)
-    virtual String dateFormatText() OVERRIDE;
     virtual const Vector<String>& weekDayShortLabels() OVERRIDE;
     virtual unsigned firstDayOfWeek() OVERRIDE;
     virtual bool isRTL() OVERRIDE;
@@ -76,12 +75,11 @@ public:
 private:
     explicit LocaleMac(NSLocale*);
     RetainPtr<NSDateFormatter> shortDateFormatter();
-    virtual void initializeLocalizerData() OVERRIDE;
+    virtual void initializeLocaleData() OVERRIDE;
 
     RetainPtr<NSLocale> m_locale;
     RetainPtr<NSCalendar> m_gregorianCalendar;
 #if ENABLE(CALENDAR_PICKER)
-    String m_localizedDateFormatText;
     Vector<String> m_weekDayShortLabels;
 #endif
 #if ENABLE(CALENDAR_PICKER) || ENABLE(INPUT_MULTIPLE_FIELDS_UI)

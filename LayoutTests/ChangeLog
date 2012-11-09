@@ -1,3 +1,538 @@
+2012-10-30  Kent Tamura  <tkent@chromium.org>
+
+        Fix crash by calendar picker or suggestion picker
+        https://bugs.webkit.org/show_bug.cgi?id=100728
+
+        Reviewed by Hajime Morita.
+
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-type-change-onchange-expected.txt: Added.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-type-change-onchange.html: Added.
+
+2012-10-30  Michelangelo De Simone  <michelangelo@webkit.org>
+
+        [CSS Shaders] Change the default compositing mode and the default CSS value for <fragmentShader>
+        https://bugs.webkit.org/show_bug.cgi?id=94020
+
+        Reviewed by Dean Jackson.
+
+        Existing tests have been modified to update them to the new default
+        compositing values (normal source-atop).
+
+        Also, the dummy empty shader has been removed: not needed.
+
+        * css3/filters/custom/custom-filter-property-computed-style-expected.txt:
+        * css3/filters/custom/custom-filter-shader-cache.html:
+        * css3/filters/custom/effect-custom-transform-parameters.html:
+        * css3/filters/custom/effect-custom.html:
+        * css3/filters/custom/filter-fallback-to-software.html:
+        * css3/filters/resources/empty-shader.fs: Removed.
+        * css3/filters/script-tests/custom-filter-property-computed-style.js:
+
+2012-10-30  Zoltan Nyul  <zoltan.nyul@intel.com>
+
+        3d rotation with [0, 0, 0] direction vector should not be applied
+        https://bugs.webkit.org/show_bug.cgi?id=100733
+
+        Reviewed by Levi Weintraub.
+
+        Add test for 3d rotation with [0, 0, 0] direction vector.
+
+        * transforms/3d/general/3dtransform-values-expected.txt:
+        * transforms/3d/general/3dtransform-values.html:
+
+2012-10-30  Kangil Han  <kangil.han@samsung.com>
+
+        [EFL][DRT] Bitmap should show whole view area.
+        https://bugs.webkit.org/show_bug.cgi?id=100642
+
+        Reviewed by Gyuyoung Kim.
+
+        Unskip css sticky position as well as scroll and fixed position related test cases.
+
+        * platform/efl-wk1/TestExpectations:
+
+2012-10-30  Byungwoo Lee  <bw80.lee@samsung.com>
+
+        [EFL][WK2] Unskip sputnik flaky tests.
+        https://bugs.webkit.org/show_bug.cgi?id=100732
+
+        Unreviewed, EFL gardening.
+
+        These tests are always passing now.
+
+        sputnik/Conformance/07_Lexical_Conventions/7.4_Comments/S7.4_A5.html
+        sputnik/Conformance/07_Lexical_Conventions/7.4_Comments/S7.4_A6.html
+        sputnik/Conformance/07_Lexical_Conventions/7.8_Literals/7.8.5_Regular_Expression_Literals/S7.8.5_A1.1_T2.html
+        sputnik/Conformance/07_Lexical_Conventions/7.8_Literals/7.8.5_Regular_Expression_Literals/S7.8.5_A1.4_T2.html
+        sputnik/Conformance/07_Lexical_Conventions/7.8_Literals/7.8.5_Regular_Expression_Literals/S7.8.5_A2.1_T2.html
+        sputnik/Conformance/07_Lexical_Conventions/7.8_Literals/7.8.5_Regular_Expression_Literals/S7.8.5_A2.4_T2.html
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-10-30  Nico Weber  <thakis@chromium.org>
+
+        Add a test for reading exif orientation off image documents
+        https://bugs.webkit.org/show_bug.cgi?id=100698
+
+        Reviewed by Eric Seidel.
+
+        fast/images/exif-orientation.html tests <img> elements, but image documents were untested previously.
+
+        * fast/images/exif-orientation-image-document.html: Added.
+        * platform/chromium/TestExpectations:
+        * platform/chromium/fast/images/exif-orientation-image-document-expected.txt: Added.
+
+2012-10-29  Csaba Osztrogonác  <ossy@webkit.org>
+
+        Unreviewed, rolling out r132819.
+        http://trac.webkit.org/changeset/132819
+        https://bugs.webkit.org/show_bug.cgi?id=100388
+
+        It made layout testing 40% slower and storage tests assert
+
+        * platform/qt/TestExpectations:
+
+2012-10-25  Stephen Chenney  <schenney@chromium.org>
+
+        feImage should not be allowed to self reference
+        https://bugs.webkit.org/show_bug.cgi?id=94652
+
+        Reviewed by Eric Seidel.
+
+        Additional test case for situations when the filter is applied to multiple objects that it also references.
+
+        * svg/filters/feImage-self-and-other-referencing-expected.html: Added.
+        * svg/filters/feImage-self-and-other-referencing.html: Added.
+
+2012-10-29  Michael Saboff  <msaboff@apple.com>
+
+        Non-special escape character sequences cause JSC::Lexer::parseString to create 16 bit strings
+        https://bugs.webkit.org/show_bug.cgi?id=100576
+
+        Reviewed by Darin Adler.
+
+        Added a new test to validated the behavior of the corresponding changes to string processing
+        in the Lexer.
+
+        * fast/js/normal-character-escapes-in-string-literals-expected.txt: Added.
+        * fast/js/normal-character-escapes-in-string-literals.html: Added.
+        * fast/js/script-tests/normal-character-escapes-in-string-literals.js: Added.
+
+2012-10-29  Roger Fong  <roger_fong@apple.com>
+
+        Unreviewed. Feature introduced in r132708 is chromium only. Skipping related tests.
+
+        * platform/win/TestExpectations:
+
+2012-10-29  Adam Barth  <abarth@webkit.org>
+
+        Block SVG external references pending a security review
+        https://bugs.webkit.org/show_bug.cgi?id=100635
+
+        Reviewed by Eric Seidel.
+
+        Skip tests that depend on external SVG references.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-29  Chris Rogers  <crogers@google.com>
+
+        Unreviewed rebaseline of webaudio/audiobuffersource-loop-points
+
+        * platform/chromium-win-xp/webaudio/audiobuffersource-loop-points-expected.wav: Added.
+        * platform/chromium-win/webaudio/audiobuffersource-loop-points-expected.wav: Added.
+
+2012-10-29  Alpha Lam  <hclam@chromium.org>
+
+        [skia] Handle mask box image.
+        https://bugs.webkit.org/show_bug.cgi?id=100570
+
+        Reviewed by James Robinson.
+
+        Added a test for -webkit-mask-box-image. Test should complete without crashes.
+        Output image should be blank.
+
+        * fast/images/mask-box-image-crash-expected.png: Added.
+        * fast/images/mask-box-image-crash-expected.txt: Added.
+        * fast/images/mask-box-image-crash.html: Added.
+
+2012-10-29  David Barton  <dbarton@mathscribe.com>
+
+        Unreviewed gardening. LayoutTests/mathml/msubsup-fuzz.html passes locally but not on
+        cr-linux-ews. I need to see a stack trace to debug it. See webkit.org/b/100463.
+
+        * mathml/msubsup-fuzz-expected.txt: Added.
+        * mathml/msubsup-fuzz.html: Added.
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+
+2012-10-29  Justin Novosad  <junov@google.com>
+
+        [Chromium] flickering observed when copying 2D canvas to webGL texture
+        https://bugs.webkit.org/show_bug.cgi?id=100691
+
+        Reviewed by Stephen White.
+
+        Modified test by adding a canvas draw imediately after webgl texture
+        upload in order to exercise graphics context synchronization between
+        the webGL and 2D canvas graphics contexts.
+
+        * fast/canvas/webgl/canvas-2d-webgl-texture.html:
+
+2012-10-29  Glenn Adams  <glenn@skynav.com>
+       
+        [CSSOM] Extraneous whitespace in CSSImportRule.cssText
+        https://bugs.webkit.org/show_bug.cgi?id=100657
+
+        Reviewed by Simon Fraser.
+
+        Test (from CSS WG) that checks serializion of CSSImportRule.cssText.
+
+        * http/tests/css/shared-stylesheet-mutation-expected.txt:
+        * http/tests/css/shared-stylesheet-mutation-preconstruct-expected.txt:
+        Fix expected output to match removal of extraneous space.
+
+        * cssom/cssimportrule-media-expected.txt: Added.
+        * cssom/cssimportrule-media.html: Added.
+        * cssom/resources/import.css: Added.
+
+2012-10-29  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Adding flaky crash expectations for tests that crash after r132699
+        if the accessibility object cache is populated.
+
+        * platform/gtk/TestExpectations:
+
+2012-10-29  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Skip fast/xmlhttprequest/xmlhttprequest-recursive-sync-event.html test case
+        https://bugs.webkit.org/show_bug.cgi?id=100687
+
+        Unreviewed EFL gardening.
+
+        Skip fast/xmlhttprequest/xmlhttprequest-recursive-sync-event.html test case
+        since it is intrinsically flaky and cannot be fixed.
+
+        * platform/efl/TestExpectations:
+
+2012-10-29  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Flaky security tests
+        https://bugs.webkit.org/show_bug.cgi?id=100388
+
+        Reviewed by Jocelyn Turcotte.
+
+        Unskip no longer flaky tests.
+
+        * platform/qt/TestExpectations:
+
+2012-10-29  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [WK2][WKTR] Enable Shadow DOM at runtime if compiled with SHADOW_DOM support
+        https://bugs.webkit.org/show_bug.cgi?id=100668
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Remove Shadow DOM layout tests from the global wk2 TestExpectations
+        and add it to the mac-wk2 one. EFL and GTK ports have Shadow DOM
+        enabled so they don't need to be skipped for those ports. The Qt port
+        is already skipping those tests in its global TestExpectations file.
+
+        * platform/efl-wk2/TestExpectations:
+        * platform/mac-wk2/TestExpectations:
+        * platform/wk2/TestExpectations:
+
+2012-10-29  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Text with zero font size renders as X px sometimes, causing fast/text/zero-font-size-2.html to fail
+        https://bugs.webkit.org/show_bug.cgi?id=100115
+
+        Reviewed by Noam Rosenthal.
+
+        * platform/qt/TestExpectations: Unskip fast/text/zero-font-size-2.html.
+
+2012-10-29  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL][WK2] REGRESSION(r132342): fast/events/frame-tab-focus.html fails
+        https://bugs.webkit.org/show_bug.cgi?id=100646
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        * platform/efl-wk2/TestExpectations: Unskip
+        fast/events/frame-tab-focus.html.
+
+2012-10-29  Michelangelo De Simone  <michelangelo@webkit.org>
+
+        [CSS Shaders] Implement CustomFilterArrayParameter::blend
+        https://bugs.webkit.org/show_bug.cgi?id=96437
+
+        Reviewed by Dean Jackson.
+
+        New tests to asses the correctness of CustomFilterArrayParameter::blend.
+        
+        * animations/resources/animation-test-helpers.js:
+        (customFilterParameterMatch): A check for functions' parameters length has been added.
+        * css3/filters/custom/custom-filter-array-blending-expected.txt: Added.
+        * css3/filters/custom/custom-filter-array-blending.html: Added.
+
+2012-10-29  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r132782.
+        http://trac.webkit.org/changeset/132782
+        https://bugs.webkit.org/show_bug.cgi?id=100653
+
+        It made 400+ tests fail and 180 tests flakey on Qt (Requested
+        by Ossy on #webkit).
+
+        * platform/qt/TestExpectations:
+
+2012-10-29  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Flaky security tests
+        https://bugs.webkit.org/show_bug.cgi?id=100388
+
+        Reviewed by Jocelyn Turcotte.
+
+        Unskip no longer flaky tests.
+
+        * platform/qt/TestExpectations:
+
+2012-10-29  Pavel Podivilov  <podivilov@google.com>
+
+        [Chromium] Test expectation update.
+
+        Unreviewed, mark recently added audiobuffersource-loop-points.html test as failing on windows.
+
+        * platform/chromium/TestExpectations:
+
+2012-10-29  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Test expectation update.
+        https://bugs.webkit.org/show_bug.cgi?id=99818
+
+        The failure of month-multiple-fields-keyboard-events.html on SnowLeopard
+        and XP is expected.
+
+        - OS X SnowLeopard
+          The month forma is "yyyy MMMM" on SnowLoepard though it's "MMMM yyyy"
+          on other platforms.
+
+        - Windows XP
+          It doesn't support the lang-attribute-aware-form-control-UI testing
+        feature.
+
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events-expected.txt: Copied from LayoutTests/platform/chromium-win-xp/fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events-expected.txt.
+        * platform/chromium-win-xp/fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events-expected.txt:
+        * platform/chromium/TestExpectations:
+
+2012-10-29  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Skip 2 tests failing due to missing drag'n drop support
+        https://bugs.webkit.org/show_bug.cgi?id=100638
+
+        Unreviewed EFL gardening.
+
+        Skip 2 test cases failing due to missing drag'n drop support
+        in EFL port.
+
+        * platform/efl/TestExpectations:
+
+2012-10-29  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Skip 2 jquery tests crashing after r132757
+        https://bugs.webkit.org/show_bug.cgi?id=100637
+
+        Unreviewed EFL gardening.
+
+        Skip 2 jquery test cases that started crashing after
+        r132757.
+
+        * platform/efl/TestExpectations:
+
+2012-10-29  Alexander Pavlov  <apavlov@chromium.org>
+
+        Web Inspector: [Styles] Handle non-parsedOk properties as inactive ones
+        https://bugs.webkit.org/show_bug.cgi?id=100119
+
+        Reviewed by Vsevolod Vlasov.
+
+        * http/tests/inspector/elements-test.js:
+        (initialize_ElementTest.InspectorTest.dumpStyleTreeItem):
+        * inspector/styles/inactive-properties-expected.txt: Added.
+        * inspector/styles/inactive-properties.html: Added.
+
+2012-10-29  Nandor Huszka  <hnandor@inf.u-szeged.hu>
+
+        [Qt] Unreviewed gardening.
+
+        Skip some tests because SHADOW_DOM is disabled on Qt.
+        Unskip another one that doesn't exist already.
+
+        * platform/qt/TestExpectations:
+
+2012-10-28  Shinya Kawanaka  <shinyak@chromium.org>
+
+        The shadow element is not reprojected to a nested ShadowRoot.
+        https://bugs.webkit.org/show_bug.cgi?id=99228
+
+        Reviewed by Dimitri Glazkov.
+
+        * fast/dom/shadow/composed-shadow-tree-walker-shadow-reprojection-expected.txt: Added.
+        * fast/dom/shadow/composed-shadow-tree-walker-shadow-reprojection.html: Added. A walker test case for elements distributed
+        to shadow element are reprojected.
+        * fast/dom/shadow/composed-shadow-tree-walker.html:
+        * fast/dom/shadow/content-reprojection-complex.html:
+        * fast/dom/shadow/content-reprojection-fallback-expected.html:
+        * fast/dom/shadow/content-reprojection-fallback-reprojection-expected.html:
+        * fast/dom/shadow/shadow-reprojection-click-expected.txt: Added.
+        * fast/dom/shadow/shadow-reprojection-click.html: Added. Does some interactive with a shadow-reprojected node.
+        * fast/dom/shadow/shadow-reprojection-dynamic-expected.html: Added.
+        * fast/dom/shadow/shadow-reprojection-dynamic.html: Added. Adds dynamically elements shadow-reprojected.
+        * fast/dom/shadow/shadow-reprojection-expected.html: Added.
+        * fast/dom/shadow/shadow-reprojection-fallback-expected.html: Added.
+        * fast/dom/shadow/shadow-reprojection-fallback.html: Added. A test case for fallback elements of a shadow element
+        are reprojected.
+        * fast/dom/shadow/shadow-reprojection-prohibited-expected.html: Removed.
+        * fast/dom/shadow/shadow-reprojection-prohibited.html: Removed.
+        * fast/dom/shadow/shadow-reprojection.html: Added. A basic test case.
+        * fast/dom/shadow/shadow-reprojection2-expected.html: Added.
+        * fast/dom/shadow/shadow-reprojection2.html: Added. Another basic test case.
+
+2012-10-28  Kunihiko Sakamoto  <ksakamoto@chromium.org>
+
+        Webkit adds a boundary to the Content-Type: text/plain POST header
+        https://bugs.webkit.org/show_bug.cgi?id=100445
+
+        Reviewed by Kent Tamura.
+
+        Fixed test failure and added a test case for Content-Type header.
+
+        * http/tests/misc/form-post-textplain-expected.txt:
+        * http/tests/misc/form-post-textplain.html:
+        * http/tests/misc/resources/form-post-textplain.php:
+        Added a test case for testing Content-Type POST header.
+        Also fixed existing test case that attempted to test newline in the input value.
+        LF in the input value is replaced with CRLF durling the construction of the form data set.
+
+2012-10-28  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Test expectation update
+
+        Rebaseline for http://trac.webkit.org/changeset/132753
+
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png:
+
+2012-10-28  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r132696.
+        http://trac.webkit.org/changeset/132696
+        https://bugs.webkit.org/show_bug.cgi?id=100609
+
+        Needs a bit more clean-up on Chrome Web UI side. (Requested by
+        dglazkov on #webkit).
+
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.html: Removed.
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.txt: Added.
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements.html:
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.html: Removed.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.txt: Added.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements.html:
+        * fast/forms/pseudo-elements-expected.html: Removed.
+        * fast/forms/pseudo-elements.html: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.html: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.txt: Added.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements.html:
+        * fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.html: Removed.
+        * fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.txt: Added.
+        * fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements.html:
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-mac-lion/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-lion/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-mac-lion/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png: Added.
+
+2012-10-28  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Test expectation update
+        https://bugs.webkit.org/show_bug.cgi?id=100128
+
+        Rebaseline for http://trac.webkit.org/changeset/132718 and crrev.com/164515.
+
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png:
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png:
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png:
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-10-28  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed weekend gardening, skip a failing test, update expected files.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt-5.0-wk2/compositing/tiling/crash-reparent-tiled-layer-expected.txt: Added.
+        * platform/qt-5.0-wk2/compositing/tiling/huge-layer-add-remove-child-expected.txt: Added.
+        * platform/qt-5.0-wk2/compositing/tiling/huge-layer-with-layer-children-expected.txt: Added.
+        * platform/qt-5.0-wk2/compositing/tiling/huge-layer-with-layer-children-resize-expected.txt: Added.
+        * platform/qt-5.0-wk2/http/tests/navigation/postredirect-basic-expected.txt: Added.
+        * platform/qt-5.0-wk2/http/tests/navigation/postredirect-goback1-expected.txt: Added.
+
+2012-10-27  Noam Rosenthal  <noam.rosenthal@nokia.com>
+
+        Coordinated Graphics: Animation jerkiness when rAF is enabled
+        https://bugs.webkit.org/show_bug.cgi?id=100536
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added a test to make sure we don't respond too eagerly to requestAnimationFrame.
+
+        * fast/animation/request-animation-frame-too-rapid-expected.txt: Added.
+        * fast/animation/request-animation-frame-too-rapid.html: Added.
+        * fast/animation/script-tests/request-animation-frame-too-rapid.js: Added.
+
+2012-10-27  David Barton  <dbarton@mathscribe.com>
+
+        [MathML] Improve some addChild methods
+        https://bugs.webkit.org/show_bug.cgi?id=98791
+
+        Reviewed by Eric Seidel.
+
+        * mathml/presentation/dynamic-expected.html: Added.
+        * mathml/presentation/dynamic.html: Added.
+
 2012-10-27  Balazs Kelemen  <kbalazs@webkit.org>
 
         Unreviewed gardening.

@@ -107,7 +107,6 @@
 #include "InspectorCounters.h"
 #include "InspectorInstrumentation.h"
 #include "Language.h"
-#include "Localizer.h"
 #include "Logging.h"
 #include "MediaCanStartListener.h"
 #include "MediaQueryList.h"
@@ -125,6 +124,7 @@
 #include "PageGroup.h"
 #include "PageTransitionEvent.h"
 #include "PlatformKeyboardEvent.h"
+#include "PlatformLocale.h"
 #include "PluginDocument.h"
 #include "PointerLockController.h"
 #include "PopStateEvent.h"
@@ -446,7 +446,7 @@ Document::Document(Frame* frame, const KURL& url, bool isXHTML, bool isHTML)
 #if ENABLE(MUTATION_OBSERVERS)
     , m_mutationObserverTypes(0)
 #endif
-    , m_styleSheetCollection(adoptPtr(new DocumentStyleSheetCollection(this)))
+    , m_styleSheetCollection(DocumentStyleSheetCollection::create(this))
     , m_readyState(Complete)
     , m_styleRecalcTimer(this, &Document::styleRecalcTimerFired)
     , m_pendingStyleRecalcShouldForce(false)
@@ -6035,14 +6035,14 @@ bool Document::haveStylesheetsLoaded() const
     return !m_styleSheetCollection->hasPendingSheets() || m_ignorePendingStylesheets;
 }
 
-Localizer& Document::getCachedLocalizer(const AtomicString& locale)
+Locale& Document::getCachedLocale(const AtomicString& locale)
 {
     AtomicString localeKey = locale;
     if (locale.isEmpty() || !RuntimeEnabledFeatures::langAttributeAwareFormControlUIEnabled())
         localeKey = defaultLanguage();
-    LocaleToLocalizerMap::AddResult result = m_localizerCache.add(localeKey, nullptr);
+    LocaleIdentifierToLocaleMap::AddResult result = m_localeCache.add(localeKey, nullptr);
     if (result.isNewEntry)
-        result.iterator->value = Localizer::create(localeKey);
+        result.iterator->value = Locale::create(localeKey);
     return *(result.iterator->value);
 }
 

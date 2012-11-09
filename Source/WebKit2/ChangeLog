@@ -1,3 +1,633 @@
+2012-10-30  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL][WK2] Simplify signal emitting API in EwkViewImpl
+        https://bugs.webkit.org/show_bug.cgi?id=100506
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Now signal emitting API in EwkViewImpl is simplified so that
+        there is one EwkViewImpl::smartCallback template method
+        returning EwkViewCallbacks::CallBack class instance
+        which encapsulates Ewk_view callback info and also provide
+        arguments type checking.
+
+        * UIProcess/API/efl/EwkViewCallbacks.h: Added.
+        (EwkViewCallbacks):
+        (CallBackInfo):
+        (EwkViewCallbacks::CallBackInfo::name):
+        (EwkViewCallbacks::CallBackInfo::hasArguments):
+        (CallBack):
+        (EwkViewCallbacks::CallBack::CallBack):
+        (EwkViewCallbacks::CallBack::call):
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (EwkViewImpl):
+        (EwkViewImpl::smartCallback):
+        * UIProcess/efl/DownloadManagerEfl.cpp:
+        (WebKit::DownloadManagerEfl::decideDestinationWithSuggestedFilename):
+        (WebKit::DownloadManagerEfl::didFail):
+        (WebKit::DownloadManagerEfl::didCancel):
+        (WebKit::DownloadManagerEfl::didFinish):
+        * UIProcess/efl/FindClientEfl.cpp:
+        (WebKit::FindClientEfl::didFindString):
+        (WebKit::FindClientEfl::didFailToFindString):
+        * UIProcess/efl/FormClientEfl.cpp:
+        (WebKit::FormClientEfl::willSubmitForm):
+        * UIProcess/efl/PageClientImpl.cpp:
+        (WebKit::PageClientImpl::processDidCrash):
+        (WebKit::PageClientImpl::toolTipChanged):
+        * UIProcess/efl/PageLoadClientEfl.cpp:
+        (WebKit::PageLoadClientEfl::didReceiveTitleForFrame):
+        (WebKit::PageLoadClientEfl::didReceiveIntentForFrame):
+        (WebKit::PageLoadClientEfl::registerIntentServiceForFrame):
+        (WebKit::PageLoadClientEfl::didChangeProgress):
+        (WebKit::PageLoadClientEfl::didFinishLoadForFrame):
+        (WebKit::PageLoadClientEfl::didFailLoadWithErrorForFrame):
+        (WebKit::PageLoadClientEfl::didStartProvisionalLoadForFrame):
+        (WebKit::PageLoadClientEfl::didReceiveServerRedirectForProvisionalLoadForFrame):
+        (WebKit::PageLoadClientEfl::didFailProvisionalLoadWithErrorForFrame):
+        (WebKit::PageLoadClientEfl::didCommitLoadForFrame):
+        (WebKit::PageLoadClientEfl::didChangeBackForwardList):
+        * UIProcess/efl/PagePolicyClientEfl.cpp:
+        (WebKit::PagePolicyClientEfl::decidePolicyForNavigationAction):
+        (WebKit::PagePolicyClientEfl::decidePolicyForNewWindowAction):
+        * UIProcess/efl/ResourceLoadClientEfl.cpp:
+        (WebKit::ResourceLoadClientEfl::didInitiateLoadForResource):
+        (WebKit::ResourceLoadClientEfl::didSendRequestForResource):
+        (WebKit::ResourceLoadClientEfl::didReceiveResponseForResource):
+        (WebKit::ResourceLoadClientEfl::didFinishLoadForResource):
+        (WebKit::ResourceLoadClientEfl::didFailLoadForResource):
+        (WebKit::ResourceLoadClientEfl::ResourceLoadClientEfl):
+        (WebKit::ResourceLoadClientEfl::~ResourceLoadClientEfl):
+
+2012-10-30  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        Coordinated Graphics: Unrelease adopted images
+        https://bugs.webkit.org/show_bug.cgi?id=100671
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Reloading could cause a crash since r132640 where the directly composited
+        image would be re-adopted with the same key before it was properly released
+        in the UI process.
+        Cancel the release when this happens rather than creating a new image.
+
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::adoptImageBackingStore):
+
+2012-10-30  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Let Ecore_Evas own the cursor object
+        https://bugs.webkit.org/show_bug.cgi?id=100731
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Ecore_Evas takes care of calling evas_object_del() on
+        the cursor object when it is no longer used (e.g. when
+        it is replaced by another cursor object). Therefore,
+        we don't need to keep a RefPtr to the cursor Evas
+        Object as a data member of EwkViewImpl. We pass
+        ownership of the cursor object to Ecore_Evas.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::setCursor):
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (EwkViewImpl):
+
+2012-10-30  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL][WK2] Simplify getting impl from ewk_view evas object instance
+        https://bugs.webkit.org/show_bug.cgi?id=100505
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Macros are removed from EwkViewImpl.h. New macro added to EwkViewImpl.cpp
+        so that it's possible to get impl directly from ewk view.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::displayTimerFired):
+        * UIProcess/API/efl/EwkViewImpl.h:
+        * UIProcess/API/efl/ewk_view.cpp:
+        (_ewk_view_smart_focus_in):
+        (_ewk_view_smart_focus_out):
+        (mapToWebContent):
+        (_ewk_view_smart_mouse_wheel):
+        (_ewk_view_smart_mouse_down):
+        (_ewk_view_smart_mouse_up):
+        (_ewk_view_smart_mouse_move):
+        (_ewk_view_smart_key_down):
+        (_ewk_view_smart_key_up):
+        (_ewk_view_on_show):
+        (_ewk_view_on_hide):
+        (_ewk_view_smart_calculate):
+        (_ewk_view_smart_color_set):
+        (ewk_view_context_get):
+        (ewk_view_url_set):
+        (ewk_view_url_get):
+        (ewk_view_icon_url_get):
+        (ewk_view_reload):
+        (ewk_view_reload_bypass_cache):
+        (ewk_view_stop):
+        (ewk_view_settings_get):
+        (ewk_view_title_get):
+        (ewk_view_load_progress_get):
+        (ewk_view_scale_set):
+        (ewk_view_scale_get):
+        (ewk_view_device_pixel_ratio_set):
+        (ewk_view_device_pixel_ratio_get):
+        (ewk_view_theme_set):
+        (ewk_view_theme_get):
+        (ewk_view_back):
+        (ewk_view_forward):
+        (ewk_view_intent_deliver):
+        (ewk_view_back_possible):
+        (ewk_view_forward_possible):
+        (ewk_view_back_forward_list_get):
+        (ewk_view_html_string_load):
+        (ewk_view_setting_encoding_custom_get):
+        (ewk_view_setting_encoding_custom_set):
+        (ewk_view_text_find):
+        (ewk_view_text_find_highlight_clear):
+        (ewk_view_text_matches_count):
+        (ewk_view_mouse_events_enabled_set):
+        (ewk_view_mouse_events_enabled_get):
+        (ewk_view_feed_touch_event):
+        (ewk_view_touch_events_enabled_set):
+        (ewk_view_touch_events_enabled_get):
+        (ewk_view_inspector_show):
+        (ewk_view_inspector_close):
+        (ewk_view_pagination_mode_set):
+        (ewk_view_pagination_mode_get):
+
+2012-10-30  Byungwoo Lee  <bw80.lee@samsung.com>
+
+        [WK2] Remove incorrect use of preprocessor macro in API headers.
+        https://bugs.webkit.org/show_bug.cgi?id=100722
+
+        Reviewed by Gyuyoung Kim.
+
+        Remove the preprocessor macro ENABLE(INSPECTOR) from the WKAPICast.h
+        and WKInspector.h.
+
+        * UIProcess/API/C/WKAPICast.h:
+        (WebKit):
+        * UIProcess/API/C/WKInspector.cpp:
+        (WKInspectorGetTypeID):
+        (WKInspectorGetPage):
+        (WKInspectorIsVisible):
+        (WKInspectorIsFront):
+        (WKInspectorShow):
+        (WKInspectorClose):
+        (WKInspectorShowConsole):
+        (WKInspectorShowResources):
+        (WKInspectorShowMainResourceForFrame):
+        (WKInspectorIsAttached):
+        (WKInspectorAttach):
+        (WKInspectorDetach):
+        (WKInspectorIsDebuggingJavaScript):
+        (WKInspectorToggleJavaScriptDebugging):
+        (WKInspectorIsProfilingJavaScript):
+        (WKInspectorToggleJavaScriptProfiling):
+        (WKInspectorIsProfilingPage):
+        (WKInspectorTogglePageProfiling):
+        * UIProcess/API/C/WKInspector.h:
+
+2012-10-29  Sergio Villar Senin  <svillar@igalia.com>
+
+        REGRESSION(r130755): All WebKit2 unit tests are failing in WebKit2 bot
+        https://bugs.webkit.org/show_bug.cgi?id=98864
+
+        Reviewed by Martin Robinson.
+
+        Use a dedicated directory to store WebKit2 generated resources.
+
+        * UIProcess/API/gtk/tests/GNUmakefile.am:
+        * UIProcess/API/gtk/tests/TestMain.cpp:
+        (registerGResource): load the resource from the new directory.
+
+2012-10-29  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Delete cached ShareableSurfaces when purging backingStores.
+        https://bugs.webkit.org/show_bug.cgi?id=100705
+
+        Reviewed by Noam Rosenthal.
+
+        LayerTreeCoordinatorProxy can be used after calling
+        LayerTreeCoordinatorProxy::purgeBackingStores(). So we should clear cached
+        ShareableSurfaces.
+
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.cpp:
+        (WebKit::LayerTreeCoordinatorProxy::purgeBackingStores):
+
+2012-10-28  Mark Rowe  <mrowe@apple.com>
+
+        Simplify Xcode configuration settings that used to vary between OS versions.
+
+        Reviewed by Dan Bernstein.
+
+        * Configurations/Base.xcconfig:
+        * Configurations/WebKit2.xcconfig:
+
+2012-10-28  Mark Rowe  <mrowe@apple.com>
+
+        Remove references to unsupported OS and Xcode versions.
+
+        Reviewed by Anders Carlsson.
+
+        * Configurations/Base.xcconfig:
+        * Configurations/CompilerVersion.xcconfig: Removed.
+        * Configurations/DebugRelease.xcconfig:
+        * Configurations/Version.xcconfig:
+        * DerivedSources.make:
+        * WebKit2.xcodeproj/project.pbxproj:
+
+2012-10-29  Alexey Proskuryakov  <ap@apple.com>
+
+        [WK2] Add a NetworkingContext for NetworkProcess
+        https://bugs.webkit.org/show_bug.cgi?id=100708
+
+        Reviewed by Anders Carlsson.
+
+        Each request will have a context, because these are so lightweight on Mac, and
+        other platforms will need ResourceHandle refactored anyway to use NetworkProcess.
+
+        * NetworkProcess/mac/RemoteNetworkingContext.h: Added.
+        * NetworkProcess/mac/RemoteNetworkingContext.mm: Added.
+        These go mac/ subdirectory, because NetworkingContext interface is different on
+        each platform, as ResourceHandle needs dictate.
+
+        * WebKit2.xcodeproj/project.pbxproj:
+
+2012-10-29  Michael Saboff  <msaboff@apple.com>
+
+        buildHTTPHeaders() should use a StringBuilder.appendLiteral() for separator
+        https://bugs.webkit.org/show_bug.cgi?id=100689
+
+        Reviewed by Darin Adler.
+
+        Changed from using a String temporary for the separator to using StringBuilder.appendLiteral(": ").
+
+        * WebProcess/Plugins/PluginView.cpp:
+        (WebKit::buildHTTPHeaders):
+
+2012-10-29  Michael Saboff  <msaboff@apple.com>
+
+        WKStringCopyCFString() should directly use 8 bit Strings data instead of up converting
+        https://bugs.webkit.org/show_bug.cgi?id=100579
+
+        Reviewed by Oliver Hunt.
+
+        Changed to use CFStringCreateWithBytes() for 8 bit strings using characters8() for an 8 bit argument string.
+        Changed the current call to characters16().
+
+        * Shared/API/c/cf/WKStringCF.cpp:
+        (WKStringCopyCFString):
+
+2012-10-29  Enrica Casucci  <enrica@apple.com>
+
+        Add ENABLE_USERSELECT_ALL feature flag.
+        https://bugs.webkit.org/show_bug.cgi?id=100559
+
+        Reviewed by Eric Seidel.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-10-29  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [WK2][WKTR] Enable Shadow DOM at runtime if compiled with SHADOW_DOM support
+        https://bugs.webkit.org/show_bug.cgi?id=100668
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Add Bundle API to enable Shadow DOM functionality. This is
+        now needed by WebKitTestRunner.
+
+        * WebProcess/InjectedBundle/API/c/WKBundle.cpp:
+        (WKBundleSetShadowDOMEnabled):
+        * WebProcess/InjectedBundle/API/c/WKBundlePrivate.h:
+        * WebProcess/InjectedBundle/InjectedBundle.cpp:
+        (WebKit::InjectedBundle::setShadowDOMEnabled):
+        (WebKit):
+        * WebProcess/InjectedBundle/InjectedBundle.h:
+        (InjectedBundle):
+
+2012-10-29  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Fix cursor change detection in EwkViewImpl::setCursor()
+        https://bugs.webkit.org/show_bug.cgi?id=100662
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Cursor change detection in EwkViewImpl::setCursor() relies on
+        addresses returned by Cursor::platformCursor(). However, the
+        value returned is currently assigned to a WKEinaSharedString
+        instead of a raw pointer. Therefore, the address is always
+        different and we keep recreating Evas Objects for the same
+        cursor.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::EwkViewImpl):
+        (EwkViewImpl::setCursor): Call smartData() after same cursor
+        detection since it is not needed if the cursor has not changed
+        and it may affect performance.
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (EwkViewImpl):
+
+2012-10-29  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        Coordinated Graphics: Make sure that we release images immediately when purging resources
+        https://bugs.webkit.org/show_bug.cgi?id=100661
+
+        Reviewed by Noam Rosenthal.
+
+        When we purge, we do both on the UI and web process at the same time,
+        both are expected to release references of the other process.
+        This creates problem when delaying the release of directly composited
+        images.
+
+        Release them immediately in that case.
+
+        Fixes the tst_QQuickWebView::removeFromCanvas API test.
+
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::flushPendingLayerChanges):
+        (WebKit::LayerTreeCoordinator::purgeReleasedImages):
+        (WebKit):
+        (WebKit::LayerTreeCoordinator::purgeBackingStores):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.h:
+        (LayerTreeCoordinator):
+
+2012-10-29  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Avoid useless assignment in EwkViewImpl::setCustomTextEncodingName()
+        https://bugs.webkit.org/show_bug.cgi?id=100667
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Remove useless m_customEncoding assignment in EwkViewImpl::setCustomTextEncodingName()
+        since the member is anyway assigned in EwkViewImpl::customTextEncodingName().
+
+        Have EwkViewImpl::setCustomTextEncodingName() take a String in argument instead
+        of a const char* to make the API more C++ and since we don't need a const char*
+        to assign to m_customEncoding anymore.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::setCustomTextEncodingName):
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (EwkViewImpl):
+        * UIProcess/API/efl/ewk_view.cpp:
+        (ewk_view_setting_encoding_custom_set):
+
+2012-10-29  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [WK2] Enable delegated scrolling as soon as the FrameView is created when using fixed layout
+        https://bugs.webkit.org/show_bug.cgi?id=100383
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Scroll requests and PageTransitionViewportReady messages depend on
+        delegated scrolling being set properly on the FrameView to behave
+        properly. Since we were waiting for the viewport information to be
+        ready before setting the flag this could cause those messages to be avoided.
+
+        This patch takes most of the flag set by setResizesToContentsUsingLayoutSize
+        and apply them as soon as possible in WebPage::setUseFixedLayout and
+        WebFrameLoaderClient::transitionToCommittedForNewPage.
+
+        The behavior should be the same except for the following settings which are
+        now set outside of USE(TILED_BACKING_STORE) if we're using fixed layout:
+        - setAcceleratedCompositingForFixedPositionEnabled
+        - setFixedElementsLayoutRelativeToFrame
+        - setFixedPositionCreatesStackingContext
+
+        This fixes the tst_QQuickWebView::scrollRequest auto test and improves the
+        reliability of the loadVisuallyCommitted signal with pages loaded from disk.
+
+        * WebProcess/WebCoreSupport/WebFrameLoaderClient.cpp:
+        (WebKit::WebFrameLoaderClient::transitionToCommittedForNewPage):
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::sendViewportAttributesChanged):
+        (WebKit::WebPage::setUseFixedLayout):
+        (WebKit::WebPage::setFixedLayoutSize):
+        * WebProcess/WebPage/WebPage.h:
+        (WebPage):
+
+2012-10-29  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        Unreviewed build fix after r132709.
+
+        * Shared/WebMemorySampler.cpp: Include unistd.h for getpid(3).
+
+2012-10-28  Byungwoo Lee  <bw80.lee@samsung.com>
+
+        [WK2] Fix the incorrect use of preprocessor statement in API header.
+        https://bugs.webkit.org/show_bug.cgi?id=100610
+
+        Reviewed by Timothy Hatcher.
+
+        Remove the preprocessor statement to check 'ENABLE_INSPECTOR' feature
+        from the WKPage.h.
+
+        * UIProcess/API/C/WKPage.cpp:
+        (WKPageGetInspector):
+        * UIProcess/API/C/WKPage.h:
+
+2012-10-28  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][WK2][AC] Viewport size does not change when the window size changes
+        https://bugs.webkit.org/show_bug.cgi?id=100573
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        The viewport size is set when we create the window the first time
+        and does not change automatically afterwards. When we change the window size,
+        we need to explicitly change the viewport size as well.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::createGLSurface):
+
+2012-10-27  Noam Rosenthal  <noam.rosenthal@nokia.com>
+
+        Unreviewed build fix for breakage to minimal bot caused by r132742.
+
+        * WebProcess/WebPage/LayerTreeHost.h:
+        (LayerTreeHost):
+            Added appropriate ENABLE(REQUEST_ANIMATION_FRAME) flag.
+
+2012-10-27  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r132740.
+        http://trac.webkit.org/changeset/132740
+        https://bugs.webkit.org/show_bug.cgi?id=100603
+
+        "Causing many crashes" (Requested by weinig on #webkit).
+
+        * UIProcess/Downloads/DownloadProxy.cpp:
+        (WebKit::DownloadProxy::DownloadProxy):
+        (WebKit::DownloadProxy::invalidate):
+        (WebKit):
+        * UIProcess/Downloads/DownloadProxy.h:
+        (DownloadProxy):
+        * UIProcess/WebContext.cpp:
+        (WebKit::WebContext::createDownloadProxy):
+        (WebKit::WebContext::downloadFinished):
+        (WebKit::WebContext::didReceiveMessage):
+        (WebKit::WebContext::didReceiveSyncMessage):
+        * UIProcess/WebContext.h:
+        (WebKit):
+        * UIProcess/WebPageProxy.cpp:
+        (WebKit::WebPageProxy::WebPageProxy):
+        (WebKit::WebPageProxy::~WebPageProxy):
+        (WebKit::WebPageProxy::didReceiveMessage):
+        (WebKit::WebPageProxy::didReceiveSyncMessage):
+        * UIProcess/WebPageProxy.h:
+        (CoreIPC):
+        (WebPageProxy):
+        * UIProcess/WebProcessProxy.cpp:
+        (WebKit::WebProcessProxy::didReceiveMessage):
+        (WebKit::WebProcessProxy::didReceiveSyncMessage):
+        * UIProcess/WebProcessProxy.h:
+        (WebProcessProxy):
+        * WebProcess/WebPage/WebPageGroupProxy.cpp:
+        (WebKit::WebPageGroupProxy::~WebPageGroupProxy):
+        (WebKit):
+        (WebKit::WebPageGroupProxy::didReceiveMessage):
+        (WebKit::WebPageGroupProxy::WebPageGroupProxy):
+        * WebProcess/WebPage/WebPageGroupProxy.h:
+        (CoreIPC):
+        (WebPageGroupProxy):
+        * WebProcess/WebProcess.cpp:
+        (WebKit::WebProcess::didReceiveSyncMessage):
+        (WebKit::WebProcess::didReceiveMessage):
+
+2012-10-27  Noam Rosenthal  <noam.rosenthal@nokia.com>
+
+        Coordinated Graphics: Animation jerkiness when rAF is enabled
+        https://bugs.webkit.org/show_bug.cgi?id=100536
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        The jerkiness comes from the fact that we schedule animations excessively; That's because
+        the previous patch broke requestAnimationFrame behavior during CSS animations, since the
+        frame returns right away instead of waiting till the previous frame is actually rendered.
+
+        This patch makes sure that when animations are scheduled, they're only serviced after the
+        UI process has actually painted the previous frame. We do so by sending a
+        RequestAnimationFrame message to the UI process, which responds with AnimationFrameReady
+        after the UI process paints.
+
+        New test: fast/animations/request-animation-frame-too-rapid.html
+        Tests that we don't receive an unreasonably high number of callbacks from
+        requestAnimationFrame (> 1000FPS).
+
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.cpp:
+        (WebKit):
+        (WebKit::LayerTreeCoordinatorProxy::requestAnimationFrame):
+        (WebKit::LayerTreeCoordinatorProxy::animationFrameReady):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.h:
+        (LayerTreeCoordinatorProxy):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.messages.in:
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::LayerTreeRenderer):
+        (WebKit::LayerTreeRenderer::paintToCurrentGLContext):
+        (WebKit):
+        (WebKit::LayerTreeRenderer::animationFrameReady):
+        (WebKit::LayerTreeRenderer::requestAnimationFrame):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+        (LayerTreeRenderer):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit):
+        (WebKit::LayerTreeCoordinator::scheduleAnimation):
+        (WebKit::LayerTreeCoordinator::animationFrameReady):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.h:
+        (LayerTreeCoordinator):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.messages.in:
+
+2012-10-27  Sam Weinig  <sam@webkit.org>
+
+        Yet more MessageReceivering
+        https://bugs.webkit.org/show_bug.cgi?id=100325
+
+        Reviewed by Anders Carlsson.
+
+        Make DownloadProxy, WebPageProxy, and WebPageGroupProxy MessageReceivers.
+
+        * UIProcess/Downloads/DownloadProxy.cpp:
+        (WebKit::DownloadProxy::DownloadProxy):
+        (WebKit::DownloadProxy::invalidate):
+        (WebKit::DownloadProxy::didReceiveMessage):
+        (WebKit::DownloadProxy::didReceiveSyncMessage):
+        * UIProcess/Downloads/DownloadProxy.h:
+        (DownloadProxy):
+        Make a MessageReceiver.
+
+        * UIProcess/WebContext.cpp:
+        (WebKit::WebContext::WebContext):
+        (WebKit::WebContext::addMessageReceiver):
+        (WebKit::WebContext::removeMessageReceiver):
+        (WebKit::WebContext::didReceiveMessage):
+        (WebKit::WebContext::didReceiveSyncMessage):
+        * UIProcess/WebContext.h:
+        Add additional MessageReceiverMap forwards, and stop dealing with DownloadProxy explicitly.
+        
+        * UIProcess/WebPageProxy.cpp:
+        (WebKit::WebPageProxy::WebPageProxy):
+        (WebKit::WebPageProxy::~WebPageProxy):
+        (WebKit::WebPageProxy::didReceiveMessage):
+        (WebKit::WebPageProxy::didReceiveSyncMessage):
+        * UIProcess/WebPageProxy.h:
+        Make a MessageReceiver, but keep sub objects using didReceiveMessage for now (like WebPage).
+        
+        * UIProcess/WebProcessProxy.cpp:
+        (WebKit::WebProcessProxy::addMessageReceiver):
+        (WebKit::WebProcessProxy::removeMessageReceiver):
+        (WebKit::WebProcessProxy::didReceiveMessage):
+        (WebKit::WebProcessProxy::didReceiveSyncMessage):
+        * UIProcess/WebProcessProxy.h:
+        Give WebProcessProxy a MessageReceiverMap and all the appropriate forwarding methods.
+        
+        * WebProcess/WebPage/WebPageGroupProxy.cpp:
+        (WebKit::WebPageGroupProxy::WebPageGroupProxy):
+        (WebKit::WebPageGroupProxy::~WebPageGroupProxy):
+        (WebKit::WebPageGroupProxy::didReceiveMessage):
+        * WebProcess/WebPage/WebPageGroupProxy.h:
+        (WebKit::WebPageGroupProxy::isVisibleToHistoryClient):
+        (WebPageGroupProxy):
+        Make a MessageReceiver and register/unregister with the WebProcess.
+
+        * WebProcess/WebProcess.cpp:
+        (WebKit::WebProcess::didReceiveSyncMessage):
+        Remove extraneous return statement.
+        (WebKit::WebProcess::didReceiveMessage):
+        Stop handling WebPageGroupProxy special.
+
+2012-10-27  Sam Weinig  <sam@webkit.org>
+
+        Completely roll out https://bugs.webkit.org/show_bug.cgi?id=99251 (r131686)
+
+        It has caused too many crashes.
+
+        * UIProcess/API/mac/PageClientImpl.mm:
+        * UIProcess/API/mac/WKView.mm:
+        * UIProcess/API/mac/WKViewInternal.h:
+        * UIProcess/API/mac/WKViewPrivate.h:
+        * UIProcess/mac/CorrectionPanel.mm:
+        * UIProcess/mac/WKFullScreenWindowController.mm:
+        * UIProcess/mac/WebFullScreenManagerProxyMac.mm:
+
+2012-10-27  Michael Saboff  <msaboff@apple.com>
+
+        buildHTTPHeaders() should use a StringBuilder instead of a Vector<UChar>
+        https://bugs.webkit.org/show_bug.cgi?id=100580
+
+        Reviewed by Oliver Hunt.
+
+        Replaced Vector<UChar> with StringBuilder in the HTTP header construction function buildHTTPHeaders.
+        This eliminates 8 -> 16 bit up conversion of the strings involved.
+
+        * WebProcess/Plugins/PluginView.cpp:
+        (WebKit::buildHTTPHeaders):
+
 2012-10-27  Dan Bernstein  <mitz@apple.com>
 
         REAL_PLATFORM_NAME build setting is no longer needed

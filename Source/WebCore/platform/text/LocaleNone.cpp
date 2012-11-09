@@ -24,21 +24,20 @@
  */
 
 #include "config.h"
-#include "Localizer.h"
+#include "PlatformLocale.h"
 #include <wtf/DateMath.h>
 #include <wtf/PassOwnPtr.h>
 
 namespace WebCore {
 
-class LocaleNone : public Localizer {
+class LocaleNone : public Locale {
 public:
     virtual ~LocaleNone();
 
 private:
-    virtual void initializeLocalizerData() OVERRIDE FINAL;
+    virtual void initializeLocaleData() OVERRIDE FINAL;
     virtual double parseDateTime(const String&, DateComponents::Type) OVERRIDE;
 #if ENABLE(CALENDAR_PICKER)
-    virtual String dateFormatText() OVERRIDE;
     virtual bool isRTL() OVERRIDE;
 #endif
 #if ENABLE(CALENDAR_PICKER) || ENABLE(INPUT_MULTIPLE_FIELDS_UI)
@@ -62,7 +61,7 @@ private:
 #endif
 };
 
-PassOwnPtr<Localizer> Localizer::create(const AtomicString&)
+PassOwnPtr<Locale> Locale::create(const AtomicString&)
 {
     return adoptPtr(new LocaleNone());
 }
@@ -71,7 +70,7 @@ LocaleNone::~LocaleNone()
 {
 }
 
-void LocaleNone::initializeLocalizerData()
+void LocaleNone::initializeLocaleData()
 {
 }
 
@@ -81,11 +80,6 @@ double LocaleNone::parseDateTime(const String&, DateComponents::Type)
 }
 
 #if ENABLE(CALENDAR_PICKER)
-String LocaleNone::dateFormatText()
-{
-    return ASCIILiteral("Year-Month-Day");
-}
-
 bool LocaleNone::isRTL()
 {
     return false;

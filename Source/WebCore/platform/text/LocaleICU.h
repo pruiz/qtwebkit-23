@@ -32,7 +32,7 @@
 #define LocaleICU_h
 
 #include "DateComponents.h"
-#include "Localizer.h"
+#include "PlatformLocale.h"
 #include <unicode/udat.h>
 #include <unicode/unum.h>
 #include <wtf/Forward.h>
@@ -44,7 +44,7 @@ namespace WebCore {
 
 // We should use this class only for LocalizedNumberICU.cpp, LocalizedDateICU.cpp,
 // and LocalizedNumberICUTest.cpp.
-class LocaleICU : public Localizer {
+class LocaleICU : public Locale {
 public:
     static PassOwnPtr<LocaleICU> create(const char* localeString);
     virtual ~LocaleICU();
@@ -52,8 +52,6 @@ public:
     // For LocalizedDate
     virtual double parseDateTime(const String&, DateComponents::Type) OVERRIDE;
 #if ENABLE(CALENDAR_PICKER)
-    virtual String dateFormatText() OVERRIDE;
-
     virtual const Vector<String>& weekDayShortLabels() OVERRIDE;
     virtual unsigned firstDayOfWeek() OVERRIDE;
     virtual bool isRTL() OVERRIDE;
@@ -76,7 +74,7 @@ private:
     explicit LocaleICU(const char*);
     String decimalSymbol(UNumberFormatSymbol);
     String decimalTextAttribute(UNumberFormatTextAttribute);
-    virtual void initializeLocalizerData() OVERRIDE;
+    virtual void initializeLocaleData() OVERRIDE;
 
     bool detectSignAndGetDigitRange(const String& input, bool& isNegative, unsigned& startIndex, unsigned& endIndex);
     unsigned matchedDecimalSymbolIndex(const String& input, unsigned& position);
@@ -85,7 +83,6 @@ private:
     UDateFormat* openDateFormat(UDateFormatStyle timeStyle, UDateFormatStyle dateStyle) const;
 
 #if ENABLE(CALENDAR_PICKER)
-    void initializeLocalizedDateFormatText();
     void initializeCalendar();
 #endif
 
@@ -104,7 +101,6 @@ private:
     bool m_didCreateShortDateFormat;
 
 #if ENABLE(CALENDAR_PICKER)
-    String m_localizedDateFormatText;
     OwnPtr<Vector<String> > m_weekDayShortLabels;
     unsigned m_firstDayOfWeek;
 #endif

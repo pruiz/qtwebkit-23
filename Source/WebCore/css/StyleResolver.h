@@ -61,6 +61,7 @@ class CSSValue;
 class ContainerNode;
 class CustomFilterOperation;
 class CustomFilterParameter;
+class CustomFilterParameterList;
 class Document;
 class Element;
 class Frame;
@@ -94,10 +95,6 @@ class StyledElement;
 class WebKitCSSFilterValue;
 class WebKitCSSShaderValue;
 class WebKitCSSSVGDocumentValue;
-
-#if ENABLE(CSS_SHADERS)
-typedef Vector<RefPtr<CustomFilterParameter> > CustomFilterParameterList;
-#endif
 
 class MediaQueryResult {
     WTF_MAKE_NONCOPYABLE(MediaQueryResult); WTF_MAKE_FAST_ALLOCATED;
@@ -357,7 +354,7 @@ private:
     void sortMatchedRules();
     void sortAndTransferMatchedRules(MatchResult&);
 
-    bool checkSelector(const RuleData&, const ContainerNode* scope = 0);
+    bool checkSelector(const RuleData&, const ContainerNode* scope);
     bool checkRegionSelector(CSSSelector* regionSelector, Element* regionElement);
     void applyMatchedProperties(const MatchResult&, const Element*);
     enum StyleApplicationPass {
@@ -423,7 +420,6 @@ public:
 private:
     static RenderStyle* s_styleNotYetAvailable;
 
-    void addStylesheetsFromSeamlessParents();
     void addAuthorRulesAndCollectUserRulesFromSheets(const Vector<RefPtr<CSSStyleSheet> >*, RuleSet& userStyle);
 
     void cacheBorderAndBackground();
@@ -492,7 +488,6 @@ private:
     bool m_matchAuthorAndUserStyles;
     bool m_sameOriginOnly;
     bool m_distributedToInsertionPoint;
-    bool m_hasUnknownPseudoElements;
 
     RefPtr<CSSFontSelector> m_fontSelector;
     Vector<OwnPtr<MediaQueryResult> > m_viewportDependentMediaQueryResults;

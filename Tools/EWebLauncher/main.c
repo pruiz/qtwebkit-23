@@ -426,8 +426,13 @@ static void
 on_tooltip_text_set(void* user_data, Evas_Object* webview, void* event_info)
 {
     const char *text = (const char *)event_info;
-    if (text && *text != '\0')
-        info("%s\n", text);
+    info("Tooltip is set: %s\n", text);
+}
+
+static void
+on_tooltip_text_unset(void* user_data, Evas_Object* webview, void* event_info)
+{
+    info("Tooltip is unset\n");
 }
 
 static void
@@ -747,6 +752,7 @@ browserCreate(const char *url, User_Arguments *userArgs)
     evas_object_smart_callback_add(appBrowser->browser, "toolbars,visible,get", on_toolbars_visible_get, appBrowser);
     evas_object_smart_callback_add(appBrowser->browser, "toolbars,visible,set", on_toolbars_visible_set, appBrowser);
     evas_object_smart_callback_add(appBrowser->browser, "tooltip,text,set", on_tooltip_text_set, appBrowser);
+    evas_object_smart_callback_add(appBrowser->browser, "tooltip,text,unset", on_tooltip_text_unset, appBrowser);
     evas_object_smart_callback_add(appBrowser->browser, "uri,changed", on_url_changed, appBrowser);
 
     evas_object_event_callback_add(appBrowser->browser, EVAS_CALLBACK_DEL, on_browser_del, appBrowser);
@@ -807,7 +813,16 @@ windowCreate(User_Arguments *userArgs)
         return NULL;
     }
 
-    app->ee = ecore_evas_new(userArgs->engine, 0, 0, userArgs->geometry.w, userArgs->geometry.h, NULL);
+#if defined(WTF_USE_ACCELERATED_COMPOSITING) && defined(HAVE_ECORE_X)
+    if (userArgs->engine)
+#endif
+        app->ee = ecore_evas_new(userArgs->engine, 0, 0, userArgs->geometry.w, userArgs->geometry.h, NULL);
+#if defined(WTF_USE_ACCELERATED_COMPOSITING) && defined(HAVE_ECORE_X)
+    else {
+        const char* engine = "opengl_x11";
+        app->ee = ecore_evas_new(engine, 0, 0, userArgs->geometry.w, userArgs->geometry.h, NULL);
+    }
+#endif
     if (!app->ee) {
         quit(EINA_FALSE, "ERROR: could not construct evas-ecore\n");
         return NULL;

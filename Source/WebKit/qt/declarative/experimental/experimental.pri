@@ -24,7 +24,8 @@ contains(QT_CONFIG, reduce_exports):CONFIG += hide_symbols
 
 wince*:LIBS += $$QMAKE_LIBS_GUI
 
-QT += widgets network quick quick-private webkit webkit-private
+haveQt(4): QT += widgets network quick quick-private webkit webkit-private
+haveQt(5): QT += network quick quick-private webkitwidgets webkitwidgets-private
 
 DESTDIR = $${ROOT_BUILD_DIR}/imports/$${TARGET.module_name}
 

@@ -48,7 +48,7 @@ namespace WebKit {
 struct WebProcessCreationParameters {
     WebProcessCreationParameters();
 
-    void encode(CoreIPC::ArgumentEncoder*) const;
+    void encode(CoreIPC::ArgumentEncoder&) const;
     static bool decode(CoreIPC::ArgumentDecoder*, WebProcessCreationParameters&);
 
     String injectedBundlePath;
@@ -126,6 +126,10 @@ struct WebProcessCreationParameters {
 
 #if ENABLE(NOTIFICATIONS) || ENABLE(LEGACY_NOTIFICATIONS)
     HashMap<String, bool> notificationPermissions;
+#endif
+
+#if ENABLE(NETWORK_PROCESS)
+    bool usesNetworkProcess;
 #endif
 };
 

@@ -64,6 +64,7 @@ EventSender::EventSender(QWebPage* parent)
     : QObject(parent)
 #ifndef QT_NO_GESTURES
     , m_tapGesture(parent)
+    , m_tapAndHoldGesture(parent)
 #endif
 {
     m_page = parent;
@@ -583,6 +584,21 @@ void EventSender::gestureTap(int x, int y)
     m_gestures.clear();
     m_gestures.append(&m_tapGesture);
     QGestureEvent event(m_gestures);
+#if !HAVE(QT5)
+    event.setWidget(m_page->view());
+#endif
+    sendEvent(m_page, &event);
+}
+
+void EventSender::gestureLongPress(int x, int y)
+{
+    m_tapAndHoldGesture.setPosition(QPointF(x, y));
+    m_gestures.clear();
+    m_gestures.append(&m_tapAndHoldGesture);
+    QGestureEvent event(m_gestures);
+#if !HAVE(QT5)
+    event.setWidget(m_page->view());
+#endif
     sendEvent(m_page, &event);
 }
 #endif

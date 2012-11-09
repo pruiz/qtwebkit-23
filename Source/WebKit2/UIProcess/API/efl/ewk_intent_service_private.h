@@ -34,33 +34,31 @@
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 
-typedef struct _Ewk_Intent_Service Ewk_Intent_Service;
-
 /**
- * \struct _Ewk_Intent_Service
+ * \struct Ewk_Intent_Service
  * @brief Contains the intent service data.
  */
-class _Ewk_Intent_Service : public RefCounted<_Ewk_Intent_Service> {
+class Ewk_Intent_Service : public RefCounted<Ewk_Intent_Service> {
 public:
-    WKEinaSharedString action;
-    WKEinaSharedString type;
-    WKEinaSharedString href;
-    WKEinaSharedString title;
-    WKEinaSharedString disposition;
-
-    static PassRefPtr<_Ewk_Intent_Service> create(WKIntentServiceInfoRef serviceRef)
+    static PassRefPtr<Ewk_Intent_Service> create(WKIntentServiceInfoRef serviceRef)
     {
-        return adoptRef(new _Ewk_Intent_Service(serviceRef));
+        return adoptRef(new Ewk_Intent_Service(serviceRef));
     }
 
+    const char* action() const;
+    const char* type() const;
+    const char* href() const;
+    const char* title() const;
+    const char* disposition() const;
+
 private:
-    explicit _Ewk_Intent_Service(WKIntentServiceInfoRef serviceRef)
-        : action(AdoptWK, WKIntentServiceInfoCopyAction(serviceRef))
-        , type(AdoptWK, WKIntentServiceInfoCopyType(serviceRef))
-        , href(AdoptWK, WKIntentServiceInfoCopyHref(serviceRef))
-        , title(AdoptWK, WKIntentServiceInfoCopyTitle(serviceRef))
-        , disposition(AdoptWK, WKIntentServiceInfoCopyDisposition(serviceRef))
-    { }
+    explicit Ewk_Intent_Service(WKIntentServiceInfoRef serviceRef);
+
+    WKEinaSharedString m_action;
+    WKEinaSharedString m_type;
+    WKEinaSharedString m_href;
+    WKEinaSharedString m_title;
+    WKEinaSharedString m_disposition;
 };
 
 #endif // ENABLE(WEB_INTENTS_TAG)

@@ -32,30 +32,42 @@
 #include <wtf/PassOwnPtr.h>
 
 /**
- * \struct  _Ewk_Popup_Menu_Item
+ * \struct  Ewk_Popup_Menu_Item
  * @brief   Contains the popup menu data.
  */
-class _Ewk_Popup_Menu_Item {
+class Ewk_Popup_Menu_Item {
 public:
-    Ewk_Popup_Menu_Item_Type type;
-    Ewk_Text_Direction textDirection;
-
-    bool hasTextDirectionOverride;
-    bool isEnabled;
-    bool isLabel;
-    bool isSelected;
-
-    WKEinaSharedString text;
-    WKEinaSharedString toolTip;
-    WKEinaSharedString accessibilityText;
-
-    static PassOwnPtr<_Ewk_Popup_Menu_Item> create(const WebKit::WebPopupItem& item)
+    static PassOwnPtr<Ewk_Popup_Menu_Item> create(const WebKit::WebPopupItem& item)
     {
-        return adoptPtr(new _Ewk_Popup_Menu_Item(item));
+        return adoptPtr(new Ewk_Popup_Menu_Item(item));
     }
 
+    Ewk_Popup_Menu_Item_Type type() const;
+    Ewk_Text_Direction textDirection() const;
+
+    bool hasTextDirectionOverride() const;
+    bool isEnabled() const;
+    bool isLabel() const;
+    bool isSelected() const;
+
+    const char* text() const;
+    const char* tooltipText() const;
+    const char* accessibilityText() const;
+
 private:
-    explicit _Ewk_Popup_Menu_Item(const WebKit::WebPopupItem& item);
+    explicit Ewk_Popup_Menu_Item(const WebKit::WebPopupItem& item);
+
+    Ewk_Popup_Menu_Item_Type m_type;
+    Ewk_Text_Direction m_textDirection;
+
+    bool m_hasTextDirectionOverride;
+    bool m_isEnabled;
+    bool m_isLabel;
+    bool m_isSelected;
+
+    WKEinaSharedString m_text;
+    WKEinaSharedString m_tooltipText;
+    WKEinaSharedString m_accessibilityText;
 };
 
 #endif // ewk_popup_menu_item_private_h

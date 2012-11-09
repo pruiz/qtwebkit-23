@@ -45,24 +45,22 @@ class ChromiumMacPort(chromium.ChromiumPort):
     FALLBACK_PATHS = {
         'snowleopard': [
             'chromium-mac-snowleopard',
+            'chromium-mac-lion',
             'chromium-mac',
             'chromium',
-            'mac',
         ],
         'lion': [
+            'chromium-mac-lion',
             'chromium-mac',
             'chromium',
-            'mac',
         ],
-        'mountainlion': [  # FIXME: we don't treat ML different from Lion yet.
+        'mountainlion': [
             'chromium-mac',
             'chromium',
-            'mac',
         ],
         'future': [
             'chromium-mac',
             'chromium',
-            'mac',
         ],
     }
 

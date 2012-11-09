@@ -328,6 +328,7 @@ SOURCES += \
     css/SelectorChecker.cpp \
     css/ShadowValue.cpp \
     css/StyleBuilder.cpp \
+    css/StyleInvalidationAnalysis.cpp \
     css/StyleMedia.cpp \
     css/StylePropertySet.cpp \
     css/StylePropertyShorthand.cpp \
@@ -826,6 +827,7 @@ SOURCES += \
     loader/CrossOriginAccessControl.cpp \
     loader/CrossOriginPreflightResultCache.cpp \
     loader/cache/CachedResourceLoader.cpp \
+    loader/cache/CachedResourceRequest.cpp \
     loader/DocumentLoadTiming.cpp \
     loader/DocumentLoader.cpp \
     loader/DocumentThreadableLoader.cpp \
@@ -842,7 +844,9 @@ SOURCES += \
     loader/icon/IconLoader.cpp \
     loader/ImageLoader.cpp \
     loader/LinkLoader.cpp \
+    loader/LoaderStrategy.cpp \
     loader/MainResourceLoader.cpp \
+    loader/MixedContentChecker.cpp \
     loader/NavigationAction.cpp \
     loader/NetscapePlugInStreamLoader.cpp \
     loader/PingLoader.cpp \
@@ -979,6 +983,7 @@ SOURCES += \
     platform/graphics/GraphicsContext.cpp \
     platform/graphics/GraphicsLayer.cpp \
     platform/graphics/GraphicsLayerAnimation.cpp \
+    platform/graphics/GraphicsLayerUpdater.cpp \
     platform/graphics/GraphicsLayerTransform.cpp \
     platform/graphics/GraphicsTypes.cpp \
     platform/graphics/Image.cpp \
@@ -1493,6 +1498,7 @@ HEADERS += \
     css/SiblingTraversalStrategies.h \
     css/StyleMedia.h \
     css/StyleBuilder.h \
+    css/StyleInvalidationAnalysis.h \
     css/StylePropertySet.h \
     css/StylePropertyShorthand.h \
     css/StyleResolver.h \
@@ -1962,7 +1968,9 @@ HEADERS += \
     loader/ImageLoader.h \
     loader/LinkLoader.h \
     loader/LinkLoaderClient.h \
+    loader/LoaderStrategy.h \
     loader/MainResourceLoader.h \
+    loader/MixedContentChecker.h \
     loader/NavigationAction.h \
     loader/NetscapePlugInStreamLoader.h \
     loader/PlaceholderDocument.h \
@@ -2214,6 +2222,7 @@ HEADERS += \
     platform/network/Credential.h \
     platform/network/CredentialStorage.h \
     platform/network/ContentTypeParser.h \
+    platform/network/DNSResolveQueue.h \
     platform/network/FormDataBuilder.h \
     platform/network/FormData.h \
     platform/network/HTTPHeaderMap.h \
@@ -2235,7 +2244,6 @@ HEADERS += \
     platform/network/ResourceLoadTiming.h \
     platform/network/ResourceRequestBase.h \
     platform/network/ResourceResponseBase.h \
-    platform/network/qt/DnsPrefetchHelper.h \
     platform/network/qt/NetworkStateNotifierPrivate.h \
     platform/PlatformExportMacros.h \
     platform/PlatformMemoryInstrumentation.h \
@@ -2790,11 +2798,12 @@ SOURCES += \
     platform/graphics/texmap/TextureMapperBackingStore.cpp \
     platform/graphics/texmap/TextureMapperImageBuffer.cpp \
     platform/graphics/texmap/TextureMapperLayer.cpp \
+    platform/network/DNSResolveQueue.cpp \
     platform/network/MIMESniffing.cpp \
     platform/network/qt/CredentialStorageQt.cpp \
     platform/network/qt/ResourceHandleQt.cpp \
     platform/network/qt/ResourceRequestQt.cpp \
-    platform/network/qt/DnsPrefetchHelper.cpp \
+    platform/network/qt/DNSQt.cpp \
     platform/network/qt/NetworkStateNotifierQt.cpp \
     platform/network/qt/ProxyServerQt.cpp \
     platform/network/qt/QtMIMETypeSniffer.cpp \
@@ -3925,6 +3934,7 @@ contains(DEFINES, ENABLE_WEBGL=1) {
         html/canvas/OESStandardDerivatives.h \
         html/canvas/OESTextureFloat.h \
         html/canvas/OESVertexArrayObject.h \
+        html/canvas/OESElementIndexUint.h \
         html/canvas/WebGLTexture.h \
         html/canvas/WebGLUniformLocation.h \
         html/canvas/WebGLVertexArrayObjectOES.h \
@@ -3958,6 +3968,7 @@ contains(DEFINES, ENABLE_WEBGL=1) {
         html/canvas/OESStandardDerivatives.cpp \
         html/canvas/OESTextureFloat.cpp \
         html/canvas/OESVertexArrayObject.cpp \
+        html/canvas/OESElementIndexUint.cpp \
         html/canvas/WebGLTexture.cpp \
         html/canvas/WebGLUniformLocation.cpp \
         html/canvas/WebGLVertexArrayObjectOES.cpp
@@ -4086,6 +4097,9 @@ contains(DEFINES, WTF_USE_GRAPHICS_SURFACE=1) {
     mac {
         SOURCES += platform/graphics/surfaces/mac/GraphicsSurfaceMac.cpp
         INCLUDEPATH += /System/Library/Frameworks/CoreFoundation.framework/Headers
+    }
+    win32 {
+        SOURCES += platform/graphics/surfaces/win/GraphicsSurfaceWin.cpp
     }
     contains(DEFINES, HAVE_XCOMPOSITE=1)  {
         SOURCES += platform/graphics/surfaces/qt/GraphicsSurfaceGLX.cpp

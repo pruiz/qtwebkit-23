@@ -32,27 +32,27 @@
 #include <wtf/RefCounted.h>
 
 /**
- * \struct  _Ewk_Back_Forward_List
+ * \struct  Ewk_Back_Forward_List
  * @brief   Contains the Back Forward List data.
  */
-class _Ewk_Back_Forward_List_Item : public RefCounted<_Ewk_Back_Forward_List_Item> {
+class Ewk_Back_Forward_List_Item : public RefCounted<Ewk_Back_Forward_List_Item> {
 public:
-    WKRetainPtr<WKBackForwardListItemRef> wkItem;
-    mutable WKEinaSharedString url;
-    mutable WKEinaSharedString title;
-    mutable WKEinaSharedString originalURL;
-
-    static PassRefPtr<_Ewk_Back_Forward_List_Item> create(WKBackForwardListItemRef itemRef)
+    static PassRefPtr<Ewk_Back_Forward_List_Item> create(WKBackForwardListItemRef itemRef)
     {
-        return adoptRef(new _Ewk_Back_Forward_List_Item(itemRef));
+        return adoptRef(new Ewk_Back_Forward_List_Item(itemRef));
     }
 
-private:
-    explicit _Ewk_Back_Forward_List_Item(WKBackForwardListItemRef itemRef)
-        : wkItem(itemRef)
-    { }
-};
+    const char* url() const;
+    const char* title() const;
+    const char* originalURL() const;
 
-typedef struct _Ewk_Back_Forward_List_Item Ewk_Back_Forward_List_Item;
+private:
+    explicit Ewk_Back_Forward_List_Item(WKBackForwardListItemRef itemRef);
+
+    WKRetainPtr<WKBackForwardListItemRef> m_wkItem;
+    mutable WKEinaSharedString m_url;
+    mutable WKEinaSharedString m_title;
+    mutable WKEinaSharedString m_originalURL;
+};
 
 #endif // ewk_back_forward_list_private_h

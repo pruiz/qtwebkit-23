@@ -1211,8 +1211,8 @@ static int findSignalIndex(const QMetaObject* meta, int initialIndex, QByteArray
 static JSClassRef prototypeForSignalsAndSlots()
 {
     static JSClassDefinition classDef = {
-        0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, QtRuntimeMethod::call, 0, 0, 0
+        0, kJSClassAttributeNoAutomaticPrototype, 0, 0, 0, 0,
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     };
     static JSClassRef cls = JSClassCreate(&classDef);
     return cls;
@@ -1321,7 +1321,12 @@ JSValueRef QtRuntimeMethod::connectOrDisconnect(JSContextRef context, JSObjectRe
 {
     QtRuntimeMethod* d = toRuntimeMethod(context, thisObject);
     if (!d)
-        d = static_cast<QtRuntimeMethod*>(JSObjectGetPrivate(function));
+        d = toRuntimeMethod(context, function);
+    if (!d) {
+        QString errorStr = QString::fromLatin1("QtMetaMethod.%1: Cannot connect to/from deleted QObject").arg(connect ?  QLatin1String("connect") : QLatin1String("disconnect"));
+        setException(context, exception, errorStr);
+        return JSValueMakeUndefined(context);
+    }
 
     QString functionName = connect ? QLatin1String("connect") : QLatin1String("disconnect");
 
@@ -1357,11 +1362,8 @@ JSValueRef QtRuntimeMethod::connectOrDisconnect(JSContextRef context, JSObjectRe
 
         // object.signal.connect(someFunction);
         if (JSObjectIsFunction(context, targetFunction)) {
-            if (JSValueIsObjectOfClass(context, targetFunction, prototypeForSignalsAndSlots())) {
-                // object.signal.connect(otherObject.slot);
-                if (QtRuntimeMethod* targetMethod = toRuntimeMethod(context, targetFunction))
-                    targetObject = toRef(QtInstance::getQtInstance(targetMethod->m_object.data(), d->m_instance->rootObject(), QtInstance::QtOwnership)->createRuntimeObject(toJS(context)));
-            }
+            if (QtRuntimeMethod* targetMethod = toRuntimeMethod(context, targetFunction))
+                targetObject = toRef(QtInstance::getQtInstance(targetMethod->m_object.data(), d->m_instance->rootObject(), QtInstance::QtOwnership)->createRuntimeObject(toJS(context)));
         } else
             targetFunction = 0;
     } else {

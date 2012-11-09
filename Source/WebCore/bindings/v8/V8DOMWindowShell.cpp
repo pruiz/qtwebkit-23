@@ -150,8 +150,8 @@ static void initializeV8IfNeeded()
 
     v8::V8::IgnoreOutOfMemoryException();
     v8::V8::SetFatalErrorHandler(reportFatalError);
-    v8::V8::SetGlobalGCPrologueCallback(&V8GCController::gcPrologue);
-    v8::V8::SetGlobalGCEpilogueCallback(&V8GCController::gcEpilogue);
+    v8::V8::AddGCPrologueCallback(&V8GCController::gcPrologue);
+    v8::V8::AddGCEpilogueCallback(&V8GCController::gcEpilogue);
     v8::V8::AddMessageListener(&reportUncaughtException);
     v8::V8::SetFailedAccessCheckCallbackFunction(reportUnsafeJavaScriptAccess);
 #if ENABLE(JAVASCRIPT_DEBUGGER)
@@ -381,6 +381,12 @@ bool V8DOMWindowShell::initializeIfNeeded()
         //        document domain
         //        changes.
         m_context->UseDefaultSecurityToken();
+
+        SecurityOrigin* origin = m_world->isolatedWorldSecurityOrigin();
+        if (origin && InspectorInstrumentation::hasFrontends()) {
+            ScriptState* scriptState = ScriptState::forContext(v8::Local<v8::Context>::New(m_context.get()));
+            InspectorInstrumentation::didCreateIsolatedContext(m_frame, scriptState, origin);
+        }
     }
     m_frame->loader()->client()->didCreateScriptContext(m_context.get(), m_world->extensionGroup(), m_world->worldId());
 
@@ -436,9 +442,8 @@ void V8DOMWindowShell::createContext()
 
 bool V8DOMWindowShell::installDOMWindow()
 {
-    Document* document = m_frame->document();
-    DOMWindow* window = document->domWindow();
-    v8::Local<v8::Object> windowWrapper = V8ObjectConstructor::newInstance(V8PerContextData::from(m_context.get())->constructorForType(&V8DOMWindow::info, document));
+    DOMWindow* window = m_frame->document()->domWindow();
+    v8::Local<v8::Object> windowWrapper = V8ObjectConstructor::newInstance(V8PerContextData::from(m_context.get())->constructorForType(&V8DOMWindow::info));
     if (windowWrapper.IsEmpty())
         return false;
 
@@ -609,18 +614,6 @@ void V8DOMWindowShell::updateSecurityOrigin()
         return;
     v8::HandleScope handleScope;
     setSecurityToken();
-}
-
-void V8DOMWindowShell::setIsolatedWorldSecurityOrigin(PassRefPtr<SecurityOrigin> securityOrigin)
-{
-    ASSERT(!m_world->isMainWorld());
-    // FIXME: Should this be here?
-    if (!m_isolatedWorldShellSecurityOrigin && !context().IsEmpty() && InspectorInstrumentation::runtimeAgentEnabled(m_frame)) {
-        v8::HandleScope handleScope;
-        ScriptState* scriptState = ScriptState::forContext(v8::Local<v8::Context>::New(context()));
-        InspectorInstrumentation::didCreateIsolatedContext(m_frame, scriptState, securityOrigin.get());
-    }
-    m_isolatedWorldShellSecurityOrigin = securityOrigin;
 }
 
 } // WebCore

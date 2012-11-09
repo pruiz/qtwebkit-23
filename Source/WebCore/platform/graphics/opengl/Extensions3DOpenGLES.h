@@ -29,7 +29,7 @@
 
 #include "Extensions3DOpenGLCommon.h"
 
-#if PLATFORM(QT)
+#if PLATFORM(QT) && HAVE(QT5)
 // Takes care of declaring the GLES extensions.
 #include <qopengl.h>
 #else
@@ -40,8 +40,12 @@
 #if OS(QNX) || PLATFORM(QT)
 // See https://bugs.webkit.org/show_bug.cgi?id=91030.
 // Newer Khorons headers do define these with a PROC suffix, but older headers don't.
+#ifdef PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEIMGPROC
 #define PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEIMG PFNGLFRAMEBUFFERTEXTURE2DMULTISAMPLEIMGPROC
+#endif
+#ifdef PFNGLRENDERBUFFERSTORAGEMULTISAMPLEIMGPROC
 #define PFNGLRENDERBUFFERSTORAGEMULTISAMPLEIMG PFNGLRENDERBUFFERSTORAGEMULTISAMPLEIMGPROC
+#endif
 #endif
 
 #ifndef GL_EXT_robustness

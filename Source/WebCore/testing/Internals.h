@@ -46,6 +46,7 @@ class Frame;
 class InspectorFrontendChannelDummy;
 class InternalSettings;
 class Node;
+class Page;
 class PagePopupController;
 class Range;
 class ScriptExecutionContext;
@@ -60,6 +61,8 @@ class Internals : public RefCounted<Internals>
 public:
     static PassRefPtr<Internals> create(Document*);
     virtual ~Internals();
+
+    static void resetToConsistentState(Page*);
 
     String elementRenderTreeAsText(Element*, ExceptionCode&);
 
@@ -90,7 +93,6 @@ public:
     bool isValidContentSelect(Element* insertionPoint, ExceptionCode&);
     Node* treeScopeRootNode(Node*, ExceptionCode&);
     Node* parentTreeScope(Node*, ExceptionCode&);
-    PassRefPtr<NodeList> distributedNodes(Element* insertionPoint, ExceptionCode&);
 
     bool attached(Node*, ExceptionCode&);
 
@@ -157,9 +159,6 @@ public:
     Vector<String> userPreferredLanguages() const;
     void setUserPreferredLanguages(const Vector<String>&);
 
-    void setShouldDisplayTrackKind(Document*, const String& kind, bool, ExceptionCode&);
-    bool shouldDisplayTrackKind(Document*, const String& kind, ExceptionCode&);
-
     unsigned wheelEventHandlerCount(Document*, ExceptionCode&);
     unsigned touchEventHandlerCount(Document*, ExceptionCode&);
 
@@ -189,7 +188,10 @@ public:
     void resumeAnimations(Document*, ExceptionCode&) const;
 
     enum {
-        LAYER_TREE_INCLUDES_VISIBLE_RECTS = 1 // Values need to kept in sync with Internals.idl.
+        // Values need to be kept in sync with Internals.idl.
+        LAYER_TREE_INCLUDES_VISIBLE_RECTS = 1,
+        LAYER_TREE_INCLUDES_TILE_CACHES = 2
+        
     };
     String layerTreeAsText(Document*, unsigned flags, ExceptionCode&) const;
     String layerTreeAsText(Document*, ExceptionCode&) const;
@@ -204,6 +206,8 @@ public:
     Vector<String> consoleMessageArgumentCounts(Document*) const;
     PassRefPtr<DOMWindow> openDummyInspectorFrontend(const String& url);
     void closeDummyInspectorFrontend();
+    void setInspectorResourcesDataSizeLimits(int maximumResourcesContentSize, int maximumSingleResourceContentSize, ExceptionCode&);
+    void setJavaScriptProfilingEnabled(bool enabled, ExceptionCode&);
 #endif
 
     String counterValue(Element*);

@@ -34,32 +34,38 @@
 #include <WebKit2/WKBase.h>
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
+#include <wtf/text/WTFString.h>
 
-typedef struct _Ewk_Intent Ewk_Intent;
+namespace WebKit {
+class WebIntentData;
+}
 
 /**
- * \struct  _Ewk_Intent
+ * \struct  Ewk_Intent
  * @brief   Contains the intent data.
  */
-class _Ewk_Intent : public RefCounted<_Ewk_Intent> {
+class Ewk_Intent : public RefCounted<Ewk_Intent> {
 public:
-    WKRetainPtr<WKIntentDataRef> wkIntent;
-    WKEinaSharedString action;
-    WKEinaSharedString type;
-    WKEinaSharedString service;
-
-    static PassRefPtr<_Ewk_Intent> create(WKIntentDataRef intentRef)
+    static PassRefPtr<Ewk_Intent> create(WKIntentDataRef intentRef)
     {
-        return adoptRef(new _Ewk_Intent(intentRef));
+        return adoptRef(new Ewk_Intent(intentRef));
     }
 
+    WebKit::WebIntentData* webIntentData() const;
+    const char* action() const;
+    const char* type() const;
+    const char* service() const;
+    WKRetainPtr<WKArrayRef> suggestions() const;
+    String extra(const char* key) const;
+    WKRetainPtr<WKArrayRef> extraKeys() const;
+
 private:
-    explicit _Ewk_Intent(WKIntentDataRef intentRef)
-        : wkIntent(intentRef)
-        , action(AdoptWK, WKIntentDataCopyAction(intentRef))
-        , type(AdoptWK, WKIntentDataCopyType(intentRef))
-        , service(AdoptWK, WKIntentDataCopyService(intentRef))
-    { }
+    explicit Ewk_Intent(WKIntentDataRef intentRef);
+
+    WKRetainPtr<WKIntentDataRef> m_wkIntent;
+    WKEinaSharedString m_action;
+    WKEinaSharedString m_type;
+    WKEinaSharedString m_service;
 };
 
 #endif // ENABLE(WEB_INTENTS)

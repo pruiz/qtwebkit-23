@@ -45,9 +45,11 @@
 #include "HTMLVideoElement.h"
 #include "LayoutRepainter.h"
 #include "LocalizedStrings.h"
+#include "MediaControlRootElement.h"
 #include "MediaControls.h"
 #include "MouseEvent.h"
 #include "Page.h"
+#include "PageGroup.h"
 #include "RenderDeprecatedFlexibleBox.h"
 #include "RenderInline.h"
 #include "RenderMedia.h"
@@ -156,7 +158,7 @@ void MediaControlPanelElement::startDrag(const LayoutPoint& eventLocation)
     if (!frame)
         return;
 
-    m_dragStartEventLocation = eventLocation;
+    m_lastDragEventLocation = eventLocation;
 
     frame->eventHandler()->setCapturingMouseEventsNode(this);
 
@@ -168,8 +170,10 @@ void MediaControlPanelElement::continueDrag(const LayoutPoint& eventLocation)
     if (!m_isBeingDragged)
         return;
 
-    LayoutSize distanceDragged = eventLocation - m_dragStartEventLocation;
-    setPosition(LayoutPoint(distanceDragged.width(), distanceDragged.height()));
+    LayoutSize distanceDragged = eventLocation - m_lastDragEventLocation;
+    m_cumulativeDragOffset.move(distanceDragged);
+    m_lastDragEventLocation = eventLocation;
+    setPosition(m_cumulativeDragOffset);
 }
 
 void MediaControlPanelElement::endDrag()
@@ -237,6 +241,9 @@ void MediaControlPanelElement::resetPosition()
 
     ExceptionCode ignored;
     classList()->remove("dragged", ignored);
+
+    m_cumulativeDragOffset.setX(0);
+    m_cumulativeDragOffset.setY(0);
 }
 
 void MediaControlPanelElement::makeOpaque()
@@ -1378,22 +1385,18 @@ void MediaControlTextTrackContainerElement::updateDisplay()
     hasChildNodes() ? show() : hide();
 }
 
-static const float mimimumFontSize = 16;
-static const float videoHeightFontSizePercentage = .05;
-static const float trackBottomMultiplier = .9;
-
 void MediaControlTextTrackContainerElement::updateSizes()
 {
     HTMLMediaElement* mediaElement = toParentMediaElement(this);
     if (!mediaElement || !mediaElement->renderer() || !mediaElement->renderer()->isVideo())
         return;
 
-    IntRect videoBox = toRenderVideo(mediaElement->renderer())->videoBox();
-    if (m_videoDisplaySize == videoBox)
+    if (!document()->page())
         return;
-    m_videoDisplaySize = videoBox;
 
-    float fontSize = m_videoDisplaySize.size().height() * videoHeightFontSizePercentage;
+    IntRect videoBox = toRenderVideo(mediaElement->renderer())->videoBox();
+
+    float fontSize = videoBox.size().height() * (document()->page()->group().captionFontSizeScale());
     if (fontSize != m_fontSize) {
         m_fontSize = fontSize;
         setInlineStyleProperty(CSSPropertyFontSize, String::number(fontSize) + "px");

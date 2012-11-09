@@ -37,8 +37,8 @@
 extern "C" {
 #endif
 
-/** Creates a type name for @a _Ewk_Favicon_Database. */
-typedef struct _Ewk_Favicon_Database Ewk_Favicon_Database;
+/** Creates a type name for @a Ewk_Favicon_Database. */
+typedef struct Ewk_Favicon_Database Ewk_Favicon_Database;
 
 /**
  * @typedef Ewk_Favicon_Database_Icon_Change_Cb Ewk_Favicon_Database_Icon_Change_Cb
@@ -63,11 +63,9 @@ typedef void (*Ewk_Favicon_Database_Async_Icon_Get_Cb)(const char *page_url, Eva
  * @param database database object to query
  * @param page_url URL of the page to get the favicon URL for
  *
- * @return the favicon URL pointer, that may be @c NULL. This pointer is
- *         guaranteed to be eina_stringshare, so whenever possible
- *         save yourself some cpu cycles and use
- *         eina_stringshare_ref() instead of eina_stringshare_add() or
- *         strdup()
+ * @return a newly allocated string guaranteed to be eina_stringshare
+ *         or @c NULL in case of error or if the key does not exist.
+ *         You need to call eina_stringshare_del() after use.
  */
 EAPI const char *ewk_favicon_database_icon_url_get(Ewk_Favicon_Database *database, const char *page_url);
 

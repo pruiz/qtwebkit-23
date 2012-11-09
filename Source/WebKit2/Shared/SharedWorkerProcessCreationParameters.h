@@ -26,6 +26,8 @@
 #ifndef SharedWorkerProcessCreationParameters_h
 #define SharedWorkerProcessCreationParameters_h
 
+#if ENABLE(SHARED_WORKER_PROCESS)
+
 #include <wtf/text/WTFString.h>
 
 #if PLATFORM(MAC)
@@ -42,7 +44,7 @@ namespace WebKit {
 struct SharedWorkerProcessCreationParameters {
     SharedWorkerProcessCreationParameters();
 
-    void encode(CoreIPC::ArgumentEncoder*) const;
+    void encode(CoreIPC::ArgumentEncoder&) const;
     static bool decode(CoreIPC::ArgumentDecoder*, SharedWorkerProcessCreationParameters&);
 
     double minimumLifetime;
@@ -54,5 +56,7 @@ struct SharedWorkerProcessCreationParameters {
 };
 
 } // namespace WebKit
+
+#endif // ENABLE(SHARED_WORKER_PROCESS)
 
 #endif // SharedWorkerProcessCreationParameters_h

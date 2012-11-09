@@ -33,7 +33,7 @@ SOURCES += \
 
 DESTDIR = $${ROOT_BUILD_DIR}/bin
 
-QT = core gui gui-private widgets network testlib quick quick-private webkit
+QT = core core-private gui gui-private widgets network testlib quick quick-private webkit
 
 WEBKIT += wtf javascriptcore webkit2
 

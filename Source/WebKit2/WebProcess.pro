@@ -14,11 +14,6 @@ SOURCES += qt/MainQt.cpp
 QT += network webkit widgets
 macx: QT += xml
 
-contains(QT_CONFIG, opengl) {
-    QT += opengl
-    DEFINES += QT_CONFIGURED_WITH_OPENGL
-}
-
 INSTALLS += target
 
 isEmpty(INSTALL_BINS) {

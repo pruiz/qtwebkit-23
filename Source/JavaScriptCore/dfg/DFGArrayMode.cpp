@@ -40,7 +40,7 @@ Array::Mode fromObserved(ArrayProfile* profile, Array::Action action, bool makeS
     case asArrayModes(NonArray):
         if (action == Array::Write && !profile->mayInterceptIndexedAccesses())
             return Array::ToContiguous; // FIXME: we don't know whether to go to contiguous or array storage. We're making a static guess here. In future we should use exit profiling for this.
-        return Array::Undecided;
+        return Array::SelectUsingPredictions;
     case asArrayModes(NonArrayWithContiguous):
         return makeSafe ? Array::ContiguousOutOfBounds : (profile->mayStoreToHole() ? Array::ContiguousToTail : Array::Contiguous);
     case asArrayModes(ArrayWithContiguous):
@@ -71,23 +71,23 @@ Array::Mode fromObserved(ArrayProfile* profile, Array::Action action, bool makeS
     case asArrayModes(NonArray) | asArrayModes(NonArrayWithContiguous):
         if (action == Array::Write && !profile->mayInterceptIndexedAccesses())
             return Array::ToContiguous;
-        return Array::Undecided;
+        return Array::SelectUsingPredictions;
     case asArrayModes(NonArray) | asArrayModes(NonArrayWithContiguous) | asArrayModes(NonArrayWithArrayStorage):
     case asArrayModes(NonArray) | asArrayModes(NonArrayWithArrayStorage):
         if (action == Array::Write && !profile->mayInterceptIndexedAccesses())
             return Array::ToArrayStorage;
-        return Array::Undecided;
+        return Array::SelectUsingPredictions;
     case asArrayModes(NonArray) | asArrayModes(NonArrayWithSlowPutArrayStorage):
     case asArrayModes(NonArray) | asArrayModes(NonArrayWithArrayStorage) | asArrayModes(NonArrayWithSlowPutArrayStorage):
         if (action == Array::Write && !profile->mayInterceptIndexedAccesses())
             return Array::ToSlowPutArrayStorage;
-        return Array::Undecided;
+        return Array::SelectUsingPredictions;
     default:
         // We know that this is possibly a kind of array for which, though there is no
         // useful data in the array profile, we may be able to extract useful data from
         // the value profiles of the inputs. Hence, we leave it as undecided, and let
         // the predictions propagator decide later.
-        return Array::Undecided;
+        return Array::SelectUsingPredictions;
     }
 }
 
@@ -110,7 +110,7 @@ Array::Mode refineArrayMode(Array::Mode arrayMode, SpeculatedType base, Speculat
         return Array::ForceExit;
     }
     
-    if (arrayMode != Array::Undecided)
+    if (arrayMode != Array::SelectUsingPredictions)
         return arrayMode;
     
     if (isStringSpeculation(base))
@@ -167,12 +167,17 @@ bool modeAlreadyChecked(AbstractValue& value, Array::Mode arrayMode)
     case Array::PossiblyArrayWithContiguous:
     case Array::PossiblyArrayWithContiguousToTail:
     case Array::PossiblyArrayWithContiguousOutOfBounds:
+    case Array::ToContiguous:
+        if (arrayModesAlreadyChecked(value.m_arrayModes, asArrayModes(NonArrayWithContiguous) | asArrayModes(ArrayWithContiguous)))
+            return true;
         return value.m_currentKnownStructure.hasSingleton()
             && hasContiguous(value.m_currentKnownStructure.singleton()->indexingType());
         
     case Array::ArrayWithContiguous:
     case Array::ArrayWithContiguousToTail:
     case Array::ArrayWithContiguousOutOfBounds:
+        if (arrayModesAlreadyChecked(value.m_arrayModes, asArrayModes(ArrayWithContiguous)))
+            return true;
         return value.m_currentKnownStructure.hasSingleton()
             && hasContiguous(value.m_currentKnownStructure.singleton()->indexingType())
             && (value.m_currentKnownStructure.singleton()->indexingType() & IsArray);
@@ -183,28 +188,37 @@ bool modeAlreadyChecked(AbstractValue& value, Array::Mode arrayMode)
     case Array::PossiblyArrayWithArrayStorage:
     case Array::PossiblyArrayWithArrayStorageToHole:
     case Array::PossiblyArrayWithArrayStorageOutOfBounds:
+    case Array::ToArrayStorage:
+    case Array::PossiblyArrayToArrayStorage:
+        if (arrayModesAlreadyChecked(value.m_arrayModes, asArrayModes(NonArrayWithArrayStorage) | asArrayModes(ArrayWithArrayStorage)))
+            return true;
         return value.m_currentKnownStructure.hasSingleton()
             && hasFastArrayStorage(value.m_currentKnownStructure.singleton()->indexingType());
         
     case Array::SlowPutArrayStorage:
     case Array::PossiblyArrayWithSlowPutArrayStorage:
+    case Array::ToSlowPutArrayStorage:
+        if (arrayModesAlreadyChecked(value.m_arrayModes, asArrayModes(NonArrayWithArrayStorage) | asArrayModes(ArrayWithArrayStorage) | asArrayModes(NonArrayWithSlowPutArrayStorage) | asArrayModes(ArrayWithSlowPutArrayStorage)))
+            return true;
         return value.m_currentKnownStructure.hasSingleton()
             && hasArrayStorage(value.m_currentKnownStructure.singleton()->indexingType());
         
     case Array::ArrayWithArrayStorage:
     case Array::ArrayWithArrayStorageToHole:
     case Array::ArrayWithArrayStorageOutOfBounds:
+    case Array::ArrayToArrayStorage:
+        if (arrayModesAlreadyChecked(value.m_arrayModes, asArrayModes(ArrayWithArrayStorage)))
+            return true;
         return value.m_currentKnownStructure.hasSingleton()
             && hasFastArrayStorage(value.m_currentKnownStructure.singleton()->indexingType())
             && (value.m_currentKnownStructure.singleton()->indexingType() & IsArray);
         
     case Array::ArrayWithSlowPutArrayStorage:
+        if (arrayModesAlreadyChecked(value.m_arrayModes, asArrayModes(ArrayWithArrayStorage) | asArrayModes(ArrayWithSlowPutArrayStorage)))
+            return true;
         return value.m_currentKnownStructure.hasSingleton()
             && hasArrayStorage(value.m_currentKnownStructure.singleton()->indexingType())
             && (value.m_currentKnownStructure.singleton()->indexingType() & IsArray);
-        
-    case ALL_EFFECTFUL_MODES:
-        return false;
         
     case Array::Arguments:
         return isArgumentsSpeculation(value.m_type);
@@ -236,7 +250,7 @@ bool modeAlreadyChecked(AbstractValue& value, Array::Mode arrayMode)
     case Array::Float64Array:
         return isFloat64ArraySpeculation(value.m_type);
         
-    case Array::Undecided:
+    case Array::SelectUsingPredictions:
     case Array::Unprofiled:
         break;
     }
@@ -248,8 +262,8 @@ bool modeAlreadyChecked(AbstractValue& value, Array::Mode arrayMode)
 const char* modeToString(Array::Mode mode)
 {
     switch (mode) {
-    case Array::Undecided:
-        return "Undecided";
+    case Array::SelectUsingPredictions:
+        return "SelectUsingPredictions";
     case Array::Unprofiled:
         return "Unprofiled";
     case Array::Generic:

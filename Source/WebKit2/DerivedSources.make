@@ -36,6 +36,7 @@ VPATH = \
     $(WebKit2)/WebProcess/IconDatabase \
     $(WebKit2)/WebProcess/KeyValueStorage \
     $(WebKit2)/WebProcess/MediaCache \
+    $(WebKit2)/WebProcess/Network \
     $(WebKit2)/WebProcess/Notifications \
     $(WebKit2)/WebProcess/Plugins \
     $(WebKit2)/WebProcess/ResourceCache \
@@ -44,6 +45,7 @@ VPATH = \
     $(WebKit2)/WebProcess \
     $(WebKit2)/UIProcess \
     $(WebKit2)/UIProcess/Downloads \
+    $(WebKit2)/UIProcess/Network \
     $(WebKit2)/UIProcess/Notifications \
     $(WebKit2)/UIProcess/Plugins \
     $(WebKit2)/UIProcess/SharedWorkers \
@@ -56,6 +58,8 @@ MESSAGE_RECEIVERS = \
     DownloadProxy \
     EventDispatcher \
     NetworkProcess \
+    NetworkProcessConnection \
+    NetworkProcessProxy \
     NPObjectMessageReceiver \
     PluginControllerProxy \
     PluginProcess \
@@ -69,6 +73,7 @@ MESSAGE_RECEIVERS = \
     WebCookieManager \
     WebCookieManagerProxy \
     WebConnection \
+    NetworkConnectionToWebProcess \
     WebContext \
     WebDatabaseManager \
     WebDatabaseManagerProxy \

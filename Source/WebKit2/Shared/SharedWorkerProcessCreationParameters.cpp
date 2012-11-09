@@ -26,6 +26,8 @@
 #include "config.h"
 #include "SharedWorkerProcessCreationParameters.h"
 
+#if ENABLE(SHARED_WORKER_PROCESS)
+
 #include "ArgumentCoders.h"
 
 namespace WebKit {
@@ -34,13 +36,13 @@ SharedWorkerProcessCreationParameters::SharedWorkerProcessCreationParameters()
 {
 }
 
-void SharedWorkerProcessCreationParameters::encode(CoreIPC::ArgumentEncoder* encoder) const
+void SharedWorkerProcessCreationParameters::encode(CoreIPC::ArgumentEncoder& encoder) const
 {
-    encoder->encode(minimumLifetime);
-    encoder->encode(terminationTimeout);
+    encoder.encode(minimumLifetime);
+    encoder.encode(terminationTimeout);
 
 #if PLATFORM(MAC)
-    encoder->encode(parentProcessName);
+    encoder.encode(parentProcessName);
 #endif
 }
 
@@ -60,3 +62,5 @@ bool SharedWorkerProcessCreationParameters::decode(CoreIPC::ArgumentDecoder* dec
 
 
 } // namespace WebKit
+
+#endif // ENABLE(SHARED_WORKER_PROCESS)

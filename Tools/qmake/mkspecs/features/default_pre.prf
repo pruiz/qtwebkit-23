@@ -25,7 +25,7 @@ ROOT_BUILD_DIR = $$toSystemPath($$replace(OUT_PWD, $${WEBKIT_SUBDIR}$,))
 MODULE_BASE_DIR = $$ROOT_WEBKIT_DIR
 MODULE_BASE_OUTDIR = $$ROOT_BUILD_DIR
 
-# The qmake files on the other hand live in a subdirectory.
+# The qmake generated module files belong into our Tools/qmake dir
 MODULE_QMAKE_OUTDIR = $$ROOT_BUILD_DIR/Tools/qmake
 
 # Now we're ready to load default_pre from Qt
@@ -77,6 +77,11 @@ win_cmd_shell {
 
 MAKEFILE_NOOP_COMMAND = @echo -n
 win32-msvc*: MAKEFILE_NOOP_COMMAND = @echo >NUL
+
+# Help keep the build tree clean
+MOC_DIR = moc
+RCC_DIR = rcc
+OBJECTS_DIR = obj/$$activeBuildConfig()
 
 # Set up a default python version
 scratchbox: PYTHON = python2.6
@@ -142,3 +147,6 @@ BASE_DEFINES = $$DEFINES
 # one that appears to provide binaries and is not cygwin is winflex.
 FLEX = flex
 win32: FLEX = win_flex
+
+BIN_EXTENSION =
+win32: BIN_EXTENSION = .exe

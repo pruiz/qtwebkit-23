@@ -61,11 +61,15 @@ LayoutUnit RenderRegion::pageLogicalWidth() const
 
 LayoutUnit RenderRegion::pageLogicalHeight() const
 {
+    if (hasOverrideHeight() && view()->normalLayoutPhase())
+        return overrideLogicalContentHeight() + borderAndPaddingLogicalHeight();
     return m_flowThread->isHorizontalWritingMode() ? contentHeight() : contentWidth();
 }
 
 LayoutUnit RenderRegion::logicalHeightOfAllFlowThreadContent() const
 {
+    if (hasOverrideHeight() && view()->normalLayoutPhase())
+        return overrideLogicalContentHeight() + borderAndPaddingLogicalHeight();
     return m_flowThread->isHorizontalWritingMode() ? contentHeight() : contentWidth();
 }
 
@@ -208,6 +212,7 @@ void RenderRegion::styleDidChange(StyleDifference diff, const RenderStyle* oldSt
 
 void RenderRegion::layout()
 {
+    StackStats::LayoutCheckPoint layoutCheckPoint;
     RenderReplaced::layout();
     if (m_flowThread && isValid()) {
         LayoutRect oldRegionRect(flowThreadPortionRect());

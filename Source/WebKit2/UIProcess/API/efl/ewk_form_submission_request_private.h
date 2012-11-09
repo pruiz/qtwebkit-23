@@ -31,33 +31,28 @@
 #include "WKRetainPtr.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
+#include <wtf/text/WTFString.h>
 
-typedef struct _Ewk_Form_Submission_Request Ewk_Form_Submission_Request;
-
-class _Ewk_Form_Submission_Request : public RefCounted<_Ewk_Form_Submission_Request> {
+class Ewk_Form_Submission_Request : public RefCounted<Ewk_Form_Submission_Request> {
 public:
-    WKRetainPtr<WKDictionaryRef> wkValues;
-    WKRetainPtr<WKFormSubmissionListenerRef> wkListener;
-    bool handledRequest;
+    ~Ewk_Form_Submission_Request();
 
-    ~_Ewk_Form_Submission_Request()
+    static PassRefPtr<Ewk_Form_Submission_Request> create(WKDictionaryRef values, WKFormSubmissionListenerRef listener)
     {
-        // Make sure the request is always handled before destroying.
-        if (!handledRequest)
-            WKFormSubmissionListenerContinue(wkListener.get());
+        return adoptRef(new Ewk_Form_Submission_Request(values, listener));
     }
 
-    static PassRefPtr<_Ewk_Form_Submission_Request> create(WKDictionaryRef values, WKFormSubmissionListenerRef listener)
-    {
-        return adoptRef(new _Ewk_Form_Submission_Request(values, listener));
-    }
+    WKRetainPtr<WKArrayRef> fieldNames() const;
+    String fieldValue(const String& fieldName) const;
+
+    void submit();
 
 private:
-    _Ewk_Form_Submission_Request(WKDictionaryRef values, WKFormSubmissionListenerRef listener)
-        : wkValues(values)
-        , wkListener(listener)
-        , handledRequest(false)
-    { }
+    Ewk_Form_Submission_Request(WKDictionaryRef values, WKFormSubmissionListenerRef listener);
+
+    WKRetainPtr<WKDictionaryRef> m_wkValues;
+    WKRetainPtr<WKFormSubmissionListenerRef> m_wkListener;
+    bool m_handledRequest;
 };
 
 #endif // ewk_form_submission_request_private_h

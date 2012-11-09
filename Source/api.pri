@@ -79,20 +79,27 @@ runSyncQt() # Generate forwarding headers for the QtWebKit API
 
 WEBKIT += wtf javascriptcore webcore
 
-!no_webkit2 {
-    WEBKIT += webkit2
-
-    # Ensure that changes to the WebKit1 and WebKit2 API will trigger a qmake of this
-    # file, which in turn runs syncqt to update the forwarding headers.
-    QMAKE_INTERNAL_INCLUDED_FILES *= WebKit2/Target.pri
-    QMAKE_INTERNAL_INCLUDED_FILES *= WebKit/WebKit1.pro
-}
-
-!no_webkit1: WEBKIT += webkit1
-
-# ------------- Install rules -------------
+# Ensure that changes to the WebKit1 and WebKit2 API will trigger a qmake of this
+# file, which in turn runs syncqt to update the forwarding headers.
+!no_webkit1: QMAKE_INTERNAL_INCLUDED_FILES *= WebKit/WebKit1.pro
+!no_webkit2: QMAKE_INTERNAL_INCLUDED_FILES *= WebKit2/Target.pri
 
 contains(DEFINES, WTF_USE_3D_GRAPHICS=1): WEBKIT += angle
+
+# This is the canonical list of dependencies for the public API of
+# the QtWebKit library, and will end up in the library's prl file.
+QT_API_DEPENDS = core gui network
+
+# We want the QtWebKit API forwarding includes to live in the root build dir.
+MODULE_BASE_DIR = $$_PRO_FILE_PWD_
+MODULE_BASE_OUTDIR = $$ROOT_BUILD_DIR
+
+QMAKE_DOCS = $$PWD/qtwebkit.qdocconf
+
+!no_webkit1: WEBKIT += webkit1
+!no_webkit2: WEBKIT += webkit2
+
+# ------------- Install rules -------------
 
 haveQt(5) {
     # Install rules handled by Qt's module system

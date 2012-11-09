@@ -64,7 +64,7 @@ bool RenderSlider::canBeReplacedWithInlineRunIn() const
     return false;
 }
 
-LayoutUnit RenderSlider::baselinePosition(FontBaseline, bool /*firstLine*/, LineDirectionMode, LinePositionMode) const
+int RenderSlider::baselinePosition(FontBaseline, bool /*firstLine*/, LineDirectionMode, LinePositionMode) const
 {
     // FIXME: Patch this function for writing-mode.
     return height() + marginTop();
@@ -102,6 +102,7 @@ void RenderSlider::computePreferredLogicalWidths()
 
 void RenderSlider::layout()
 {
+    StackStats::LayoutCheckPoint layoutCheckPoint;
     // FIXME: Find a way to cascade appearance.
     // http://webkit.org/b/62535
     RenderBox* thumbBox = sliderThumbElementOf(node())->renderBox();

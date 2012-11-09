@@ -26,6 +26,8 @@
 #import "config.h"
 #import "SharedWorkerProcessMain.h"
 
+#if ENABLE(SHARED_WORKER_PROCESS)
+
 #import "CommandLine.h"
 #import "EnvironmentUtilities.h"
 #import "SharedWorkerProcess.h"
@@ -94,6 +96,10 @@ int SharedWorkerProcessMain(const CommandLine& commandLine)
     WTF::initializeMainThread();
     RunLoop::initializeMainRunLoop();
 
+#if __MAC_OS_X_VERSION_MIN_REQUIRED >= 1090
+    [[NSProcessInfo processInfo] disableAutomaticTermination:@"Disable SharedWorkerProcess Auto Termination"];
+#endif
+
     // Initialize the shared worker process connection.
     SharedWorkerProcess::shared().initialize(CoreIPC::Connection::Identifier(serverPort), RunLoop::main());
 
@@ -105,3 +111,5 @@ int SharedWorkerProcessMain(const CommandLine& commandLine)
 }
 
 }
+
+#endif // ENABLE(SHARED_WORKER_PROCESS)

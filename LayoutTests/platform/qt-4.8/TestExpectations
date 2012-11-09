@@ -621,8 +621,8 @@ webkit.org/b/85262 fast/css/image-resolution [ Skip ]
 # CSS image-orientation is not yet enabled.
 webkit.org/b/89052 fast/css/image-orientation [ Skip ]
 
-# CSS3 Text Decoration support is not yet enabled (needs ENABLE_CSS3_TEXT_DECORATION).
-webkit.org/b/58491 fast/css3-text-decoration [ Skip ]
+# CSS3 Text support is not yet enabled (needs ENABLE_CSS3_TEXT).
+webkit.org/b/58491 fast/css3-text/css3-text-decoration
 
 # Needs rebaseline after bug 86441
 # failing new tests
@@ -665,6 +665,7 @@ http/tests/security/contentSecurityPolicy/object-src-url-allowed.html [ Failure 
 svg/custom/use-instanceRoot-event-listeners.xhtml [ Skip ]
 svg/dom/SVGScriptElement/script-change-externalResourcesRequired-while-loading.svg [ Skip ]
 fast/loader/javascript-url-in-embed.html [ Failure Pass ]
+editing/pasteboard/smart-paste-004.html [ Failure Pass ]
 
 webkit.org/b/93247 [ Debug ] fast/lists/list-marker-remove-crash.html [ Crash ]
 
@@ -704,6 +705,7 @@ touchadjustment/focusout-on-touch.html [ Failure ]
 xmlviewer/extensions-api.html [ Skip ]
 
 # Slow tests
+editing/selection/rtl-move-selection-right-left.html [ Slow ]
 fast/workers/storage/interrupt-database.html [ Slow ]
 fast/events/dispatch-message-string-data.html [ Slow ]
 editing/selection/hit-test-on-text-with-line-height.html [ Slow ]
@@ -724,6 +726,9 @@ svg/filters/feImage-filterUnits-objectBoundingBox-primitiveUnits-userSpaceOnUse.
 css2.1/t100801-c548-ln-ht-01-b-ag.html [ Missing ]
 css2.1/20110323/inline-non-replaced-height-003.htm [ Missing ]
 css2.1/20110323/inline-non-replaced-height-002.htm [ Missing ]
+fast/text/word-space.html [ Missing ]
+fast/events/touch/gesture/context-menu-on-long-press.html [ Missing ]
+fast/events/touch/gesture/right-click-gestures-set-cursor-at-correct-position.html [ Missing ]
 
 # [Qt4] editing/selection/5354455-1.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=99013
@@ -745,38 +750,6 @@ http/tests/security/cross-origin-local-storage-wk1.html
 
 # [Qt][WK1] ERROR:  TestRunner::overridePreference() does not support the 'WebKitPageCacheSupportsPluginsPreferenceKey' preference
 plugins/frameset-with-plugin-frame.html
-
-# [Qt4] Editing differences after r130411
-# https://bugs.webkit.org/show_bug.cgi?id=99841
-# Tests now different between QtWebKit trunk and QtWebKit2.3 after r130411
-webkit.org/b/99841 editing/execCommand/find-after-replace.html [ Failure ]
-webkit.org/b/99841 editing/execCommand/paste-1.html [ Failure ]
-webkit.org/b/99841 editing/execCommand/paste-2.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/5028447.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/5032095.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/5521237.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/insert-div-text-into-text.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/merge-after-delete.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/merge-end-5.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/paste-before-tab-span.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/paste-into-blockquote-with-document-font-color.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/paste-into-table-cell-2.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/paste-into-table-cell.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/paste-match-style-001.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/paste-text-001.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/paste-text-004.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/paste-text-005.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/paste-text-010.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/paste-text-at-tabspan-001.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/pasting-word-in-div-extra-line.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/smart-paste-001.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/smart-paste-003.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/smart-paste-004.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/smart-paste-005.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/smart-paste-006.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/smart-paste-007.html [ Failure ]
-webkit.org/b/99841 editing/pasteboard/smart-paste-008.html [ Failure ]
-webkit.org/b/99841 editing/selection/replace-selection-crash.html [ Failure ]
 
 // Test passing on text since merge of October 8th
 fast/text/font-kerning.html [ ImageOnlyFailure ]
@@ -868,3 +841,12 @@ fast/text/basic/013.html [ Failure ]
 editing/selection/caret-rtl-2.html [ Failure ]
 editing/selection/caret-rtl.html [ Failure ]
 editing/selection/extend-selection-bidi.html [ Failure ]
+
+# New tests failing after merge of October 19th-23rd
+editing/style/iframe-onload-crash-mac.html [ Failure ]
+media/video-playing-and-pause.html [ Slow Failure ]
+
+# [Qt][WK1] ERROR: TestRunner::overridePreference() does not support the 'WebKitSupportsMultipleWindows' preference
+fast/dom/HTMLAnchorElement/anchor-no-multiple-windows.html [ Failure ]
+fast/dom/Window/window-open-no-multiple-windows.html [ Failure ]
+fast/forms/post-popup-no-multiple-windows.html [ Failure ]

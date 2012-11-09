@@ -220,13 +220,15 @@ contains(DEFINES, ENABLE_WEB_AUDIO=1) {
 
 contains(DEFINES, WTF_USE_3D_GRAPHICS=1) {
     contains(QT_CONFIG, opengles2):!win32: LIBS += -lEGL
+    haveQt(4): QT *= opengl
+}
+
+contains(DEFINES, WTF_USE_GRAPHICS_SURFACE=1) {
     mac: LIBS += -framework IOSurface -framework CoreFoundation
     linux-*: {
-        contains(DEFINES, HAVE_XCOMPOSITE=1): LIBS += -lXcomposite
-        LIBS += -lXrender
+        LIBS += -lXcomposite -lXrender
         CONFIG *= x11
     }
-    haveQt(4): QT *= opengl
 }
 
 !system-sqlite:exists( $${SQLITE3SRCDIR}/sqlite3.c ) {

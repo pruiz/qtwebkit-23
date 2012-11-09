@@ -29,6 +29,7 @@
 #if ENABLE(NETWORK_PROCESS)
 
 #include "ChildProcess.h"
+#include "NetworkResourceLoadScheduler.h"
 #include <wtf/Forward.h>
 
 namespace WebCore {
@@ -36,7 +37,8 @@ namespace WebCore {
 }
 
 namespace WebKit {
-    
+
+class NetworkConnectionToWebProcess;
 struct NetworkProcessCreationParameters;
 
 class NetworkProcess : ChildProcess {
@@ -45,6 +47,10 @@ public:
     static NetworkProcess& shared();
 
     void initialize(CoreIPC::Connection::Identifier, WebCore::RunLoop*);
+
+    void removeNetworkConnectionToWebProcess(NetworkConnectionToWebProcess*);
+
+    NetworkResourceLoadScheduler& networkResourceLoadScheduler() { return m_networkResourceLoadScheduler; }
 
 private:
     NetworkProcess();
@@ -56,17 +62,23 @@ private:
     virtual bool shouldTerminate();
 
     // CoreIPC::Connection::Client
-    virtual void didReceiveMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::ArgumentDecoder*);
+    virtual void didReceiveMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&);
     virtual void didClose(CoreIPC::Connection*);
     virtual void didReceiveInvalidMessage(CoreIPC::Connection*, CoreIPC::MessageID);
     virtual void syncMessageSendTimedOut(CoreIPC::Connection*);
 
     // Message Handlers
-    void didReceiveNetworkProcessMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::ArgumentDecoder*);
+    void didReceiveNetworkProcessMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&);
     void initializeNetworkProcess(const NetworkProcessCreationParameters&);
+    void createNetworkConnectionToWebProcess();
 
     // The connection to the UI process.
     RefPtr<CoreIPC::Connection> m_uiConnection;
+
+    // Connections to WebProcesses.
+    Vector<RefPtr<NetworkConnectionToWebProcess> > m_webProcessConnections;
+
+    NetworkResourceLoadScheduler m_networkResourceLoadScheduler;
 };
 
 } // namespace WebKit

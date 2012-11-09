@@ -84,7 +84,7 @@ WebInspector.ScriptsNavigator.prototype = {
     {
         if (uiSourceCode.isContentScript)
             return this._contentScriptsView;
-        else if (uiSourceCode.isSnippet || uiSourceCode.isSnippetEvaluation)
+        else if (uiSourceCode.isSnippet)
             return this._snippetsView;
         else
             return this._scriptsView;
@@ -123,7 +123,7 @@ WebInspector.ScriptsNavigator.prototype = {
         this._snippetsNavigatorViewForUISourceCode(uiSourceCode).revealUISourceCode(uiSourceCode);
         if (uiSourceCode.isContentScript)
             this._tabbedPane.selectTab(WebInspector.ScriptsNavigator.ContentScriptsTab);
-        else if (uiSourceCode.isSnippet || uiSourceCode.isSnippetEvaluation)
+        else if (uiSourceCode.isSnippet)
             this._tabbedPane.selectTab(WebInspector.ScriptsNavigator.SnippetsTab);
         else
             this._tabbedPane.selectTab(WebInspector.ScriptsNavigator.ScriptsTab);
@@ -210,7 +210,7 @@ WebInspector.SnippetsNavigatorView.prototype = {
      */
     handleContextMenu: function(event, uiSourceCode)
     {
-        var contextMenu = new WebInspector.ContextMenu();
+        var contextMenu = new WebInspector.ContextMenu(event);
         if (uiSourceCode) {
             contextMenu.appendItem(WebInspector.UIString("Run"), this._handleEvaluateSnippet.bind(this, uiSourceCode));
             contextMenu.appendItem(WebInspector.UIString("Rename"), this._handleRenameSnippet.bind(this, uiSourceCode));
@@ -218,7 +218,7 @@ WebInspector.SnippetsNavigatorView.prototype = {
             contextMenu.appendSeparator();
         }
         contextMenu.appendItem(WebInspector.UIString("New"), this._handleCreateSnippet.bind(this));
-        contextMenu.show(event);
+        contextMenu.show();
     },
 
     /**

@@ -212,12 +212,14 @@ void V8${implClassName}::visitDOMWrapper(DOMDataStore* store, void* object, v8::
 {
     ${implClassName}* impl = static_cast<${implClassName}*>(object);
 END
-    if (GetGenerateIsReachable($dataNode) eq  "ImplElementRoot" ||
+    if (GetGenerateIsReachable($dataNode) eq  "ImplDocument" ||
+        GetGenerateIsReachable($dataNode) eq  "ImplElementRoot" ||
         GetGenerateIsReachable($dataNode) eq  "ImplOwnerRoot" ||
         GetGenerateIsReachable($dataNode) eq  "ImplOwnerNodeRoot" ||
         GetGenerateIsReachable($dataNode) eq  "ImplBaseRoot") {
 
         my $methodName;
+        $methodName = "document" if (GetGenerateIsReachable($dataNode) eq "ImplDocument");
         $methodName = "element" if (GetGenerateIsReachable($dataNode) eq "ImplElementRoot");
         $methodName = "owner" if (GetGenerateIsReachable($dataNode) eq "ImplOwnerRoot");
         $methodName = "ownerNode" if (GetGenerateIsReachable($dataNode) eq "ImplOwnerNodeRoot");
@@ -382,9 +384,13 @@ END
     }
     inline static v8::Handle<v8::Object> wrap(${nativeType}*, v8::Handle<v8::Object> creationContext = v8::Handle<v8::Object>(), v8::Isolate* = 0);
     static void derefObject(void*);
-    static void visitDOMWrapper(DOMDataStore*, void*, v8::Persistent<v8::Object>);
     static WrapperTypeInfo info;
 END
+
+    if (NeedsToVisitDOMWrapper($dataNode)) {
+        push(@headerContent, "    static void visitDOMWrapper(DOMDataStore*, void*, v8::Persistent<v8::Object>);\n");
+    }
+
     if ($dataNode->extendedAttributes->{"ActiveDOMObject"}) {
         push(@headerContent, "    static ActiveDOMObject* toActiveDOMObject(v8::Handle<v8::Object>);\n");
     }
@@ -477,11 +483,11 @@ END
 
     if (@enabledPerContextFunctions) {
         push(@headerContent, <<END);
-    static void installPerContextPrototypeProperties(v8::Handle<v8::Object>, ScriptExecutionContext*);
+    static void installPerContextPrototypeProperties(v8::Handle<v8::Object>);
 END
     } else {
         push(@headerContent, <<END);
-    static void installPerContextPrototypeProperties(v8::Handle<v8::Object>, ScriptExecutionContext*) { }
+    static void installPerContextPrototypeProperties(v8::Handle<v8::Object>) { }
 END
     }
 
@@ -550,8 +556,11 @@ inline v8::Handle<v8::Value> toV8Fast(Node* node, const v8::AccessorInfo& info, 
     // whether the holder's inline wrapper is the same wrapper we see in the
     // v8::AccessorInfo.
     v8::Handle<v8::Object> holderWrapper = info.Holder();
-    if (holder->wrapper() && *holder->wrapper() == holderWrapper && node->wrapper())
-        return *node->wrapper();
+    if (holder->wrapper() == holderWrapper) {
+        v8::Handle<v8::Object> wrapper = node->wrapper();
+        if (!wrapper.IsEmpty())
+            return wrapper;
+    }
     return toV8Slow(node, holderWrapper, info.GetIsolate());
 }
 END
@@ -749,6 +758,13 @@ sub IsConstructable
     return $dataNode->extendedAttributes->{"CustomConstructor"} || $dataNode->extendedAttributes->{"V8CustomConstructor"} || $dataNode->extendedAttributes->{"Constructor"} || $dataNode->extendedAttributes->{"ConstructorTemplate"};
 }
 
+sub IsReadonly
+{
+    my $attribute = shift;
+    my $attrExt = $attribute->signature->extendedAttributes;
+    return ($attribute->type =~ /readonly/ || $attrExt->{"V8ReadOnly"}) && !$attrExt->{"Replaceable"};
+}
+
 sub GenerateDomainSafeFunctionGetter
 {
     my $function = shift;
@@ -828,17 +844,7 @@ static v8::Handle<v8::Value> ${implClassName}ConstructorGetter(v8::Local<v8::Str
     V8PerContextData* perContextData = V8PerContextData::from(info.Holder()->CreationContext());
     if (!perContextData)
         return v8Undefined();
-END
-
-    if ($implClassName eq "DOMWindow") {
-        push(@implContentDecls, "    return perContextData->constructorForType(WrapperTypeInfo::unwrap(data), V8DOMWindow::toNative(info.Holder())->document());\n");
-END
-    } elsif ($implClassName eq "WorkerContext") {
-        push(@implContentDecls, "    return perContextData->constructorForType(WrapperTypeInfo::unwrap(data), V8WorkerContext::toNative(info.Holder()));\n")
-    } else {
-        push(@implContentDecls, "    return perContextData->constructorForType(WrapperTypeInfo::unwrap(data), 0);\n");
-    }
-    push(@implContentDecls, <<END);
+    return perContextData->constructorForType(WrapperTypeInfo::unwrap(data));
 }
 END
 }
@@ -1012,10 +1018,10 @@ END
     # Special case for readonly or Replaceable attributes (with a few exceptions). This attempts to ensure that JS wrappers don't get
     # garbage-collected prematurely when their lifetime is strongly tied to their owner. We accomplish this by inserting a reference to
     # the newly created wrapper into an internal field of the holder object.
-    if (!IsNodeSubType($dataNode) && $attrName ne "self" && (IsWrapperType($returnType) && ($attribute->type =~ /^readonly/ || $attribute->signature->extendedAttributes->{"Replaceable"} || $attrName eq "location")
+    if (!IsNodeSubType($dataNode) && $attrName ne "self" && IsWrapperType($returnType) && (IsReadonly($attribute) || $attribute->signature->extendedAttributes->{"Replaceable"} || $attrName eq "location")
         && $returnType ne "EventTarget" && $returnType ne "SerializedScriptValue" && $returnType ne "DOMWindow" 
         && $returnType ne "MessagePortArray"
-        && $returnType !~ /SVG/ && $returnType !~ /HTML/ && !IsDOMNodeType($returnType))) {
+        && $returnType !~ /SVG/ && $returnType !~ /HTML/ && !IsDOMNodeType($returnType)) {
 
         my $arrayType = $codeGenerator->GetArrayType($returnType);
         if ($arrayType) {
@@ -1709,13 +1715,13 @@ sub GenerateParametersCheck
 
     foreach my $parameter (@{$function->parameters}) {
         TranslateParameter($parameter);
-
-        my $parameterName = $parameter->name;
+        my $nativeType = GetNativeTypeFromSignature($parameter, $paramIndex);
 
         # Optional arguments with [Optional] should generate an early call with fewer arguments.
         # Optional arguments with [Optional=...] should not generate the early call.
+        # Optional Dictionary arguments always considered to have default of empty dictionary.
         my $optional = $parameter->extendedAttributes->{"Optional"};
-        if ($optional && $optional ne "DefaultIsUndefined" && $optional ne "DefaultIsNullString" && !$parameter->extendedAttributes->{"Callback"}) {
+        if ($optional && $optional ne "DefaultIsUndefined" && $optional ne "DefaultIsNullString" && $nativeType ne "Dictionary" && !$parameter->extendedAttributes->{"Callback"}) {
             $parameterCheckString .= "    if (args.Length() <= $paramIndex) {\n";
             my $functionCall = GenerateFunctionCallString($function, $paramIndex, "    " x 2, $implClassName, %replacements);
             $parameterCheckString .= $functionCall;
@@ -1727,6 +1733,7 @@ sub GenerateParametersCheck
             $parameterDefaultPolicy = "DefaultIsNullString";
         }
 
+        my $parameterName = $parameter->name;
         if (GetIndexOf($parameterName, @paramTransferListNames) != -1) {
             $replacements{$parameterName} = "messagePortArray" . ucfirst($parameterName);
             $paramIndex++;
@@ -1734,7 +1741,6 @@ sub GenerateParametersCheck
         }
 
         AddToImplIncludes("ExceptionCode.h");
-        my $nativeType = GetNativeTypeFromSignature($parameter, $paramIndex);
         if ($parameter->extendedAttributes->{"Callback"}) {
             my $className = GetCallbackClassName($parameter->type);
             AddToImplIncludes("$className.h");
@@ -2197,7 +2203,7 @@ sub GenerateSingleBatchedAttribute
         $accessControl = "v8::ALL_CAN_WRITE";
     } elsif ($attrExt->{"DoNotCheckSecurity"}) {
         $accessControl = "v8::ALL_CAN_READ";
-        if (!($attribute->type =~ /^readonly/) && !($attrExt->{"V8ReadOnly"})) {
+        if (!IsReadonly($attribute)) {
             $accessControl .= " | v8::ALL_CAN_WRITE";
         }
     }
@@ -2274,7 +2280,7 @@ sub GenerateSingleBatchedAttribute
     }
 
     # Read only attributes
-    if ($attribute->type =~ /^readonly/ || $attrExt->{"V8ReadOnly"}) {
+    if (IsReadonly($attribute)) {
         $setter = "0";
     }
 
@@ -2653,8 +2659,7 @@ sub GenerateImplementation
             $hasReplaceable = 1;
         } elsif (!$attribute->signature->extendedAttributes->{"CustomSetter"} &&
             !$attribute->signature->extendedAttributes->{"V8CustomSetter"} &&
-            $attribute->type !~ /^readonly/ &&
-            !$attribute->signature->extendedAttributes->{"V8ReadOnly"}) {
+            !IsReadonly($attribute)) {
             GenerateNormalAttrSetter($attribute, $dataNode, $implClassName, $interfaceName);
         }
     }
@@ -3086,15 +3091,16 @@ END
 
     if (@enabledPerContextFunctions) {
         push(@implContent, <<END);
-void ${className}::installPerContextPrototypeProperties(v8::Handle<v8::Object> proto, ScriptExecutionContext* context)
+void ${className}::installPerContextPrototypeProperties(v8::Handle<v8::Object> proto)
 {
     UNUSED_PARAM(proto);
-    UNUSED_PARAM(context);
 END
         # Setup the enable-by-settings functions if we have them
         push(@implContent,  <<END);
     v8::Local<v8::Signature> defaultSignature = v8::Signature::New(GetTemplate());
     UNUSED_PARAM(defaultSignature); // In some cases, it will not be used.
+
+    ScriptExecutionContext* context = toScriptExecutionContext(proto->CreationContext());
 END
 
         foreach my $runtimeFunc (@enabledPerContextFunctions) {
@@ -3427,13 +3433,14 @@ END
     }
 
     push(@implContent, <<END);
-    Document* document = 0;
-    UNUSED_PARAM(document);
+    // Please don't add any more uses of this variable.
+    Document* deprecatedDocument = 0;
+    UNUSED_PARAM(deprecatedDocument);
 END
 
-    if (IsNodeSubType($dataNode) || $interfaceName eq "NotificationCenter") {
+    if (IsNodeSubType($dataNode)) {
         push(@implContent, <<END);
-    document = impl->document(); 
+    deprecatedDocument = impl->document(); 
 END
     }
 
@@ -3448,7 +3455,7 @@ END
         context->Enter();
     }
 
-    wrapper = V8DOMWrapper::instantiateV8Object(document, &info, impl.get());
+    wrapper = V8DOMWrapper::instantiateV8Object(deprecatedDocument, &info, impl.get());
 
     if (!context.IsEmpty())
         context->Exit();
@@ -3457,19 +3464,9 @@ END
         return wrapper;
 
     installPerContextProperties(wrapper, impl.get());
-END
-
-    push(@implContent, <<END);
     v8::Persistent<v8::Object> wrapperHandle = V8DOMWrapper::setJSWrapperFor${domMapName}(impl, wrapper, isolate);
     if (!hasDependentLifetime)
         wrapperHandle.MarkIndependent();
-END
-    if (IsNodeSubType($dataNode)) {
-        push(@implContent, <<END);
-    wrapperHandle.SetWrapperClassId(v8DOMSubtreeClassId);
-END
-    }
-    push(@implContent, <<END);
     return wrapper;
 }
 END
@@ -3489,9 +3486,7 @@ sub GetDomMapName
     my $dataNode = shift;
     my $type = shift;
 
-    return "ActiveDOMNode" if (IsNodeSubType($dataNode) && $dataNode->extendedAttributes->{"ActiveDOMObject"});
     return "DOMNode" if IsNodeSubType($dataNode);
-    return "ActiveDOMObject" if $dataNode->extendedAttributes->{"ActiveDOMObject"};
     return "DOMObject";
 }
 

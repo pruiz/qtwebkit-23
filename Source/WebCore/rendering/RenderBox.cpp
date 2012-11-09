@@ -314,6 +314,7 @@ void RenderBox::updateFromStyle()
 
 void RenderBox::layout()
 {
+    StackStats::LayoutCheckPoint layoutCheckPoint;
     ASSERT(needsLayout());
 
     RenderObject* child = firstChild();
@@ -1785,7 +1786,7 @@ static bool isStretchingColumnFlexItem(const RenderObject* flexitem)
         return true;
 
     // We don't stretch multiline flexboxes because they need to apply line spacing (align-content) first.
-    if (parent->isFlexibleBox() && parent->style()->flexWrap() == FlexWrapNone && parent->style()->isColumnFlexDirection() && flexItemHasStretchAlignment(flexitem))
+    if (parent->isFlexibleBox() && parent->style()->flexWrap() == FlexNoWrap && parent->style()->isColumnFlexDirection() && flexItemHasStretchAlignment(flexitem))
         return true;
     return false;
 }
@@ -1819,7 +1820,7 @@ bool RenderBox::sizesLogicalWidthToFitContent(SizeType widthType) const
     // stretched size to avoid an extra layout when applying alignment.
     if (parent()->isFlexibleBox()) {
         // For multiline columns, we need to apply align-content first, so we can't stretch now.
-        if (!parent()->style()->isColumnFlexDirection() || parent()->style()->flexWrap() != FlexWrapNone)
+        if (!parent()->style()->isColumnFlexDirection() || parent()->style()->flexWrap() != FlexNoWrap)
             return true;
         if (!flexItemHasStretchAlignment(this))
             return true;
@@ -2212,10 +2213,9 @@ LayoutUnit RenderBox::computePercentageLogicalHeight(const Length& height) const
     } else if (cb->isRenderView() || isOutOfFlowPositionedWithSpecifiedHeight) {
         // Don't allow this to affect the block' height() member variable, since this
         // can get called while the block is still laying out its kids.
-        LayoutUnit oldHeight = cb->logicalHeight();
-        cb->updateLogicalHeight();
-        availableHeight = cb->contentLogicalHeight();
-        cb->setLogicalHeight(oldHeight);
+        LogicalExtentComputedValues computedValues;
+        cb->computeLogicalHeight(cb->logicalHeight(), 0, computedValues);
+        availableHeight = computedValues.m_extent - cb->borderAndPaddingLogicalHeight() - cb->scrollbarLogicalHeight();
     }
 
     if (availableHeight == -1)
@@ -2311,10 +2311,10 @@ LayoutUnit RenderBox::computeReplacedLogicalHeightUsing(SizeType sizeType, Lengt
             if (cb->isOutOfFlowPositioned() && cb->style()->height().isAuto() && !(cb->style()->top().isAuto() || cb->style()->bottom().isAuto())) {
                 ASSERT(cb->isRenderBlock());
                 RenderBlock* block = toRenderBlock(cb);
-                LayoutUnit oldHeight = block->height();
-                block->updateLogicalHeight();
-                LayoutUnit newHeight = block->adjustContentBoxLogicalHeightForBoxSizing(block->contentHeight());
-                block->setHeight(oldHeight);
+                LogicalExtentComputedValues computedValues;
+                block->computeLogicalHeight(block->logicalHeight(), 0, computedValues);
+                LayoutUnit newContentHeight = computedValues.m_extent - block->borderAndPaddingLogicalHeight() - block->scrollbarLogicalHeight();
+                LayoutUnit newHeight = block->adjustContentBoxLogicalHeightForBoxSizing(newContentHeight);
                 return adjustContentBoxLogicalHeightForBoxSizing(valueForLength(logicalHeight, newHeight));
             }
             
@@ -2386,11 +2386,10 @@ LayoutUnit RenderBox::availableLogicalHeightUsing(const Length& h) const
     // https://bugs.webkit.org/show_bug.cgi?id=46500
     if (isRenderBlock() && isOutOfFlowPositioned() && style()->height().isAuto() && !(style()->top().isAuto() || style()->bottom().isAuto())) {
         RenderBlock* block = const_cast<RenderBlock*>(toRenderBlock(this));
-        LayoutUnit oldHeight = block->logicalHeight();
-        block->updateLogicalHeight();
-        LayoutUnit newHeight = block->adjustContentBoxLogicalHeightForBoxSizing(block->contentLogicalHeight());
-        block->setLogicalHeight(oldHeight);
-        return adjustContentBoxLogicalHeightForBoxSizing(newHeight);
+        LogicalExtentComputedValues computedValues;
+        block->computeLogicalHeight(block->logicalHeight(), 0, computedValues);
+        LayoutUnit newContentHeight = computedValues.m_extent - block->borderAndPaddingLogicalHeight() - block->scrollbarLogicalHeight();
+        return adjustContentBoxLogicalHeightForBoxSizing(newContentHeight);
     }
 
     // FIXME: This is wrong if the containingBlock has a perpendicular writing mode.
@@ -3832,10 +3831,10 @@ LayoutUnit RenderBox::lineHeight(bool /*firstLine*/, LineDirectionMode direction
     return 0;
 }
 
-LayoutUnit RenderBox::baselinePosition(FontBaseline baselineType, bool /*firstLine*/, LineDirectionMode direction, LinePositionMode /*linePositionMode*/) const
+int RenderBox::baselinePosition(FontBaseline baselineType, bool /*firstLine*/, LineDirectionMode direction, LinePositionMode /*linePositionMode*/) const
 {
     if (isReplaced()) {
-        LayoutUnit result = direction == HorizontalLine ? m_marginBox.top() + height() + m_marginBox.bottom() : m_marginBox.right() + width() + m_marginBox.left();
+        int result = direction == HorizontalLine ? m_marginBox.top() + height() + m_marginBox.bottom() : m_marginBox.right() + width() + m_marginBox.left();
         if (baselineType == AlphabeticBaseline)
             return result;
         return result - result / 2;

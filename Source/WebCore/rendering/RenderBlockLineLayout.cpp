@@ -177,13 +177,15 @@ inline void LineWidth::shrinkAvailableWidthForNewFloatIfNeeded(RenderBlock::Floa
         return;
 
     if (newFloat->type() == RenderBlock::FloatingObject::FloatLeft) {
-        m_left = m_block->pixelSnappedLogicalRightForFloat(newFloat);
+        float newLeft = m_block->pixelSnappedLogicalRightForFloat(newFloat);
         if (m_isFirstLine && m_block->style()->isLeftToRightDirection())
-            m_left += floorToInt(m_block->textIndentOffset());
+            newLeft += floorToInt(m_block->textIndentOffset());
+        m_left = max<float>(m_left, newLeft);
     } else {
-        m_right = m_block->pixelSnappedLogicalLeftForFloat(newFloat);
+        float newRight = m_block->pixelSnappedLogicalLeftForFloat(newFloat);
         if (m_isFirstLine && !m_block->style()->isLeftToRightDirection())
-            m_right -= floorToInt(m_block->textIndentOffset());
+            newRight -= floorToInt(m_block->textIndentOffset());
+        m_right = min<float>(m_right, newRight);
     }
 
     computeAvailableWidthFromLeftAndRight();
@@ -1021,6 +1023,20 @@ static void setStaticPositions(RenderBlock* block, RenderBox* child)
     child->layer()->setStaticBlockPosition(blockHeight);
 }
 
+template <typename CharacterType>
+static inline int findFirstTrailingSpace(RenderText* lastText, const CharacterType* characters, int start, int stop)
+{
+    int firstSpace = stop;
+    while (firstSpace > start) {
+        UChar current = characters[firstSpace - 1];
+        if (!isCollapsibleSpace(current, lastText))
+            break;
+        firstSpace--;
+    }
+
+    return firstSpace;
+}
+
 inline BidiRun* RenderBlock::handleTrailingSpaces(BidiRunList<BidiRun>& bidiRuns, BidiContext* currentContext)
 {
     if (!bidiRuns.runCount()
@@ -1034,14 +1050,12 @@ inline BidiRun* RenderBlock::handleTrailingSpaces(BidiRunList<BidiRun>& bidiRuns
         return 0;
 
     RenderText* lastText = toRenderText(lastObject);
-    const UChar* characters = lastText->characters();
-    int firstSpace = trailingSpaceRun->stop();
-    while (firstSpace > trailingSpaceRun->start()) {
-        UChar current = characters[firstSpace - 1];
-        if (!isCollapsibleSpace(current, lastText))
-            break;
-        firstSpace--;
-    }
+    int firstSpace;
+    if (lastText->is8Bit())
+        firstSpace = findFirstTrailingSpace(lastText, lastText->characters8(), trailingSpaceRun->start(), trailingSpaceRun->stop());
+    else
+        firstSpace = findFirstTrailingSpace(lastText, lastText->characters16(), trailingSpaceRun->start(), trailingSpaceRun->stop());
+
     if (firstSpace == trailingSpaceRun->stop())
         return 0;
 
@@ -1389,9 +1403,9 @@ void RenderBlock::layoutRunsAndFloatsInRange(LineLayoutState& layoutState, Inlin
     ExclusionShapeInsideInfo* exclusionShapeInsideInfo = layoutExclusionShapeInsideInfo(this);
     if (exclusionShapeInsideInfo) {
         if (exclusionShapeInsideInfo != this->exclusionShapeInsideInfo()) {
-            // FIXME: If layout state is disabled, the offset will be incorrect.
-            LayoutSize layoutOffset = view()->layoutState()->layoutOffset();
-            absoluteLogicalTop = logicalTop() + (isHorizontalWritingMode() ? layoutOffset.height() : layoutOffset.width());
+            // FIXME Bug 100284: If subsequent LayoutStates are pushed, we will have to add
+            // their offsets from the original shape-inside container.
+            absoluteLogicalTop = logicalTop();
         }
         // Begin layout at the logical top of our shape inside.
         if (logicalHeight() + absoluteLogicalTop < exclusionShapeInsideInfo->shapeLogicalTop())
@@ -1422,8 +1436,7 @@ void RenderBlock::layoutRunsAndFloatsInRange(LineLayoutState& layoutState, Inlin
         // case these segments may be incorrect.
         if (exclusionShapeInsideInfo) {
             LayoutUnit lineTop = logicalHeight() + absoluteLogicalTop;
-            LayoutUnit lineBottom = lineTop + lineHeight(layoutState.lineInfo().isFirstLine(), isHorizontalWritingMode() ? HorizontalLine : VerticalLine, PositionOfInteriorLineBoxes);
-            exclusionShapeInsideInfo->computeSegmentsForLine(lineTop, lineBottom);
+            exclusionShapeInsideInfo->computeSegmentsForLine(lineTop, lineHeight(layoutState.lineInfo().isFirstLine(), isHorizontalWritingMode() ? HorizontalLine : VerticalLine, PositionOfInteriorLineBoxes));
         }
 #endif
         WordMeasurements wordMeasurements;
@@ -2389,6 +2402,14 @@ InlineIterator RenderBlock::LineBreaker::nextLineBreak(InlineBidiResolver& resol
                     lineInfo.setEmpty(false, m_block, &width);
                 trailingObjects.clear();
                 lineInfo.setPreviousLineBrokeCleanly(true);
+
+                // A <br> with clearance always needs a linebox in case the lines below it get dirtied later and 
+                // need to check for floats to clear - so if we're ignoring spaces, stop ignoring them and add a
+                // run for this object.
+                if (ignoringSpaces && currentStyle->clear() != CNONE) {
+                    addMidpoint(lineMidpointState, InlineIterator(0, current.m_obj, 0)); // Stop ignoring spaces.
+                    addMidpoint(lineMidpointState, InlineIterator(0, current.m_obj, 0)); // Start ignoring again.
+                }
 
                 if (!lineInfo.isEmpty())
                     m_clear = currentStyle->clear();

@@ -49,7 +49,13 @@ webkit.org/b/98747 plugins/document-open.html [ Crash ]
 Bug(EFL) fast/dom/HTMLAnchorElement/anchor-download.html [ Crash ]
 Bug(EFL) fast/dom/HTMLAnchorElement/anchor-nodownload-set.html [ Crash ]
 
-webkit.org/b/99571 http/tests/security/xss-DENIED-xsl-document-securityOrigin.xml [ Crash ]
+#Crash after r132386
+webkit.org/b/100342 fast/dom/nested-script-exceptions.html [ Crash ]
+webkit.org/b/100342 networkinformation/multiple-frames.html [ Crash ]
+webkit.org/b/100342 networkinformation/basic-all-types-of-events.html [ Crash ]
+webkit.org/b/100342 networkinformation/updates.html [ Crash ]
+webkit.org/b/100342 networkinformation/add-listener-from-callback.html [ Crash ]
+webkit.org/b/100342 networkinformation/basic-operation.html [ Crash ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # FLAKY TESTS
@@ -61,6 +67,7 @@ webkit.org/b/97560 inspector/extensions/extensions-audits-content-script.html [ 
 webkit.org/b/97560 inspector/extensions/extensions-audits.html [ Failure Pass ]
 webkit.org/b/97560 inspector/extensions/extensions-eval-content-script.html [ Failure Pass ]
 
+Bug(EFL) editing/selection/fake-doubleclick.html [ Failure Pass ]
 Bug(EFL) http/tests/security/contentSecurityPolicy/connect-src-websocket-blocked.html [ Crash Pass ]
 Bug(EFL) inspector/styles/styles-add-new-rule.html [ Failure Pass ]
 Bug(EFL) inspector/styles/metrics-box-sizing.html [ Failure Pass ]
@@ -254,6 +261,10 @@ webkit.org/b/98740 plugins/npruntime/delete-plugin-within-hasProperty-return-fal
 webkit.org/b/98740 plugins/npruntime/delete-plugin-within-hasProperty-return-true.html [ Failure ]
 webkit.org/b/98740 plugins/npruntime/delete-plugin-within-setProperty.html [ Failure ]
 
+# Http plugin test failures.
+webkit.org/b/99561 http/tests/plugins/plugin-document-has-focus.html [ Failure ]
+webkit.org/b/99562 http/tests/plugins/post-url-file.html [ Failure ]
+
 # Comparison of two javascript objects in C++ is failing.
 webkit.org/b/98739 plugins/npruntime/embed-property-equality.html [ Failure ]
 
@@ -262,3 +273,8 @@ webkit.org/b/96641 media/video-seek-past-end-playing.html [ Failure ]
 
 # EFL WK2 does not support the spellchecker feature
 webkit.org/b/91854 editing/spelling [ Skip ]
+
+webkit.org/b/100248 fast/forms/select-multiple-elements-with-mouse-drag.html [ Failure ]
+
+# Spurious output after fixing flakiness
+webkit.org/b/100010 fast/events/frame-tab-focus.html [ Failure ]

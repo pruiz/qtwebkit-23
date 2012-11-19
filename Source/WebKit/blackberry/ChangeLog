@@ -1,3 +1,114 @@
+2012-11-03  Alexey Proskuryakov  <ap@apple.com>
+
+        Get rid of USE(CFURLSTORAGESESSIONS)
+        https://bugs.webkit.org/show_bug.cgi?id=101131
+
+        Reviewed by Sam Weinig.
+
+        * WebCoreSupport/AboutDataUseFeatures.in: Not sure what this list is about, but
+        CFURLSTORAGESESSIONS probably doesn't need to stay here.
+
+2012-11-02  Nima Ghanavatian  <nghanavatian@rim.com>
+
+        [BlackBerry] Fix compile-time warning of a possible empty-body if statement
+        https://bugs.webkit.org/show_bug.cgi?id=101095
+
+        Reviewed by Yong Li.
+        Internally reviewed by Jeff Rogers.
+
+        BBLOG might be compiled out leaving an if statement with an empty
+        body. This is giving us a warning at the moment. Simply putting braces
+        around it will fail as well because then we'd have braces around a
+        single-line if. So, in following with the style observed in other parts
+        of BackingStore.cpp, break up the log message and add braces.
+
+        * Api/BackingStore.cpp:
+        (BlackBerry::WebKit::BackingStorePrivate::blitToWindow):
+        (BlackBerry::WebKit::BackingStorePrivate::fillWindow):
+        (BlackBerry::WebKit::BackingStorePrivate::clearWindow):
+
+2012-11-02  Nima Ghanavatian  <nghanavatian@rim.com>
+
+        [BlackBerry] Optimize backspace key handling
+        https://bugs.webkit.org/show_bug.cgi?id=101083
+
+        PR233591
+        Optimize backspace key handling. Some of these calls are not
+        required by IMF since the input_service already processes the backspace key
+        and updates the state before passing us the key.
+
+        Internally reviewed by Mike Fenton.
+
+        Reviewed by Yong Li.
+
+        Blocking calls with a flag that we clear immediately after
+        processing a backspace keydown.
+
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::nodeTextChanged):
+        (BlackBerry::WebKit::InputHandler::selectionChanged):
+        (BlackBerry::WebKit::InputHandler::handleKeyboardInput):
+        * WebKitSupport/InputHandler.h:
+        (InputHandler):
+
+2012-11-02  Otto Derek Cheung  <otcheung@rim.com>
+
+        [BlackBerry] Adding window.external to our port
+        https://bugs.webkit.org/show_bug.cgi?id=100868
+
+        Reviewed by Rob Buis.
+        PR 158809
+
+        Patch up an error where we were dereferencing a null pointer.
+
+        * WebCoreSupport/ExternalExtension.cpp:
+        (addSearchProviderMethod):
+        (IsSearchProviderInstalledMethod):
+
+2012-11-01  Peter Wang  <peter.wang@torchmobile.com.cn>
+
+        [BlackBerry] Simplify the code of returning JSValue in "BlackBerry::WebKit::WebPagePrivate::executeJavaScript"
+        https://bugs.webkit.org/show_bug.cgi?id=100941
+
+        Reviewed by Yong Li.
+
+        Remove the unnecessary steps, just directly deal with returned JSValue.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::executeJavaScript):
+        (BlackBerry::WebKit::WebPagePrivate::executeJavaScriptInIsolatedWorld):
+
+2012-11-01  Otto Derek Cheung  <otcheung@rim.com>
+
+        [BlackBerry] Add a prompt to enable global location services
+        https://bugs.webkit.org/show_bug.cgi?id=100992
+        
+        PR 227897
+
+        Reviewed by Rob Buis.
+
+        Adding a dialog to let the user know location services isn't enabled.
+        Currently, the browser app does not check whether the global setting for
+        location service is enabled. This patch adds a dialog to allow the user
+        to open the settings app and change that setting. This infobar will only
+        show once per session. If the user fails to turn on location services after
+        the first prompt, all geolocation requests will automatically fail.
+
+        Also, adapting GeolocationClientBlackBerry to the removal of GeoTracker.
+        The class now talks directly to the geo handler singleton.
+
+        * Api/WebPageClient.h:
+        * WebCoreSupport/GeolocationClientBlackBerry.cpp:
+        (GeolocationClientBlackBerry::GeolocationClientBlackBerry):
+        (GeolocationClientBlackBerry::geolocationDestroyed):
+        (GeolocationClientBlackBerry::startUpdating):
+        (GeolocationClientBlackBerry::stopUpdating):
+        (GeolocationClientBlackBerry::requestPermission):
+        (GeolocationClientBlackBerry::setEnableHighAccuracy):
+        * WebCoreSupport/GeolocationClientBlackBerry.h:
+        (WebCore::GeolocationClientBlackBerry::requiresHighAccuracy):
+        (GeolocationClientBlackBerry):
+
 2012-11-01  Michael Matovsky  <mmatovsky@rim.com>
 
         [BlackBerry] Web page view state should be preserved for pages loaded from page cache

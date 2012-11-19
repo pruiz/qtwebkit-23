@@ -1,3 +1,488 @@
+2012-11-03  Alexey Proskuryakov  <ap@apple.com>
+
+        Get rid of USE(CFURLSTORAGESESSIONS)
+        https://bugs.webkit.org/show_bug.cgi?id=101131
+
+        Reviewed by Sam Weinig.
+
+        * Shared/WebProcessCreationParameters.cpp:
+        (WebKit::WebProcessCreationParameters::encode):
+        (WebKit::WebProcessCreationParameters::decode):
+        * Shared/WebProcessCreationParameters.h:
+        (WebProcessCreationParameters):
+        * UIProcess/win/WebContextWin.cpp:
+        (WebKit::WebContext::platformInitializeWebProcess):
+        * WebProcess/Cookies/mac/WebCookieManagerMac.mm:
+        (WebKit::WebCookieManager::platformSetHTTPCookieAcceptPolicy):
+        * WebProcess/InjectedBundle/InjectedBundle.cpp:
+        (WebKit::InjectedBundle::switchNetworkLoaderToNewTestingSession):
+        * WebProcess/WebPage/mac/WebPageMac.mm:
+        (WebKit::WebPage::platformHasLocalDataForURL):
+        (WebKit::cachedResponseForURL):
+        * WebProcess/WebPage/win/WebPageWin.cpp:
+        (WebKit::cachedResponseForURL):
+        * WebProcess/WebProcess.cpp:
+        (WebKit::WebProcess::initializeWebProcess):
+        * WebProcess/win/WebProcessWin.cpp:
+        (WebKit::WebProcess::platformSetCacheModel):
+        (WebKit::WebProcess::platformClearResourceCaches):
+
+2012-11-03  Pavel Feldman  <pfeldman@chromium.org>
+
+        REGRESSION (r132014-r132047): Webkit Inspector Window docking broken
+        https://bugs.webkit.org/show_bug.cgi?id=101125
+
+        Reviewed by Vsevolod Vlasov.
+
+        Migrated from ?docked= to ?dockSide= format.
+
+        * UIProcess/WebInspectorProxy.cpp:
+        (WebKit::WebInspectorProxy::createInspectorPage):
+
+2012-10-25  Martin Robinson  <mrobinson@igalia.com>
+
+        [GTK] Move soup authentication from GtkAuthenticationDialog to WebCore
+        https://bugs.webkit.org/show_bug.cgi?id=99914
+
+        Reviewed by Carlos Garcia Campos.
+
+        Instead of passing the libsoup objects to the GtkAuthenticationDialog, pass the
+        AuthenticationChallenge itself.
+
+        * WebProcess/WebCoreSupport/gtk/WebFrameLoaderClientGtk.cpp:
+        (WebKit::WebFrameLoaderClient::dispatchDidReceiveAuthenticationChallenge):
+
+2012-11-02  Anders Carlsson  <andersca@apple.com>
+
+        Very speculative ArgumentDecoder crash fix
+        https://bugs.webkit.org/show_bug.cgi?id=101130
+        <rdar://problem/11917046>
+
+        Reviewed by Sam Weinig.
+
+        Switch from fastMalloc/fastFree to system malloc/free in the hopes that it'll give more information about
+        a crash inside TCMalloc when freeing the argument data. (It seems unlikely that this is a bug in TCMalloc, but
+        switching to the system malloc could potentially give better error reporting).
+
+        * Platform/CoreIPC/ArgumentDecoder.cpp:
+        (CoreIPC::ArgumentDecoder::~ArgumentDecoder):
+        (CoreIPC::ArgumentDecoder::initialize):
+
+2012-11-02  Anders Carlsson  <andersca@apple.com>
+
+        Don't instantiate the Java plug-in if it's inactive
+        https://bugs.webkit.org/show_bug.cgi?id=101102
+        <rdar://problem/12595679>
+
+        Reviewed by Andreas Kling.
+
+        * Shared/Plugins/PluginModuleInfo.h:
+        Add a PluginModuleLoadPolicy enum.
+
+        * UIProcess/Plugins/PluginInfoStore.cpp:
+        (WebKit::PluginInfoStore::policyForPlugin):
+        * UIProcess/Plugins/PluginInfoStore.h:
+        (PluginInfoStore):
+        Rename shouldBlockPlugin to policyForPlugin and make it return an enum so we can handle inactive plug-ins.
+        
+        * UIProcess/Plugins/mac/PluginInfoStoreMac.mm:
+        (WebKit::shouldBlockPlugin):
+        Add helper function.
+
+        (WebKit::PluginInfoStore::policyForPlugin):
+        If the Java plug-in is inactive, return PluginModuleInactive.
+
+        (WebKit::PluginInfoStore::reactivateInactivePlugin):
+        If the given plug-in is the Java plug-in, call WKJLReportWebComponentsUsed() to reactivate it.
+
+        * UIProcess/WebPageProxy.cpp:
+        (WebKit::WebPageProxy::unavailablePluginButtonClicked):
+        If the plug-in is inactive, try to reactivate it and reload the page if reactivation succeeded.
+
+        * UIProcess/WebProcessProxy.cpp:
+        (WebKit::WebProcessProxy::getPluginPath):
+        * UIProcess/WebProcessProxy.h:
+        This now returns a plug-in load policy.
+
+        * UIProcess/WebProcessProxy.messages.in:
+        GetPluginPack now returns a load policy enum.
+
+        * WebProcess/WebCoreSupport/WebChromeClient.cpp:
+        (WebKit::WebChromeClient::shouldUnavailablePluginMessageBeButton):
+        Change this to a switch statement and always return true for RenderEmbeddedObject::PluginInactive.
+
+        (WebKit::WebChromeClient::unavailablePluginButtonClicked):
+        Add RenderEmbeddedObject::PluginInactive to the assertion.
+
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::createPlugin):
+        Update now that GetPluginPath returns a pluginLoadPolicy enum.
+
+        (WebKit::canPluginHandleResponse):
+        Ditto.
+
+2012-11-02  Alexey Proskuryakov  <ap@apple.com>
+
+        [Mac] ResourceHandle changes for network process
+        https://bugs.webkit.org/show_bug.cgi?id=101111
+
+        Reviewed by Jessie Berlin.
+
+        * NetworkProcess/mac/NetworkProcessMainMac.mm: (WebKit::NetworkProcessMain):
+        We want to use WebKitSystemInterface in network process.
+        * NetworkProcess/mac/RemoteNetworkingContext.h:
+        (WebKit::RemoteNetworkingContext::create): Added a constructor and a create function.
+        Switched from scheduledRunLoopPairs() to the new scheduledOperationQueue().
+
+        * NetworkProcess/mac/RemoteNetworkingContext.mm:
+        (WebKit::RemoteNetworkingContext::RemoteNetworkingContext):
+        (WebKit::RemoteNetworkingContext::scheduledOperationQueue):
+        Ditto.
+
+2012-11-02  Simon Fraser  <simon.fraser@apple.com>
+
+        Enable SUBPIXEL_LAYOUT on Mac
+        https://bugs.webkit.org/show_bug.cgi?id=101076
+
+        Reviewed by Dave Hyatt.
+
+        Define ENABLE_SUBPIXEL_LAYOUT and include it in FEATURE_DEFINES.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-11-02  Anders Carlsson  <andersca@apple.com>
+
+        Add a PluginInactive plug-in unavailability reason
+        https://bugs.webkit.org/show_bug.cgi?id=101089
+
+        Reviewed by Sam Weinig.
+
+        * UIProcess/WebPageProxy.cpp:
+        (WebKit::WebPageProxy::unavailablePluginButtonClicked):
+
+2012-11-02  Adam Barth  <abarth@webkit.org>
+
+        ENABLE(UNDO_MANAGER) is disabled everywhere and is not under active development
+        https://bugs.webkit.org/show_bug.cgi?id=100711
+
+        Reviewed by Eric Seidel.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-11-02  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [WK2][EFL] Crash when calling WebOpenPanelResultListenerProxy::cancel() after PageClient is destroyed
+        https://bugs.webkit.org/show_bug.cgi?id=100977
+
+        Reviewed by Alexey Proskuryakov.
+
+        Call WebPageProxy::close() in EwkViewImpl's destructor to avoid crashes
+        if other objects keep a reference to the WebPageProxy and try to use
+        it after the view (and therefore the PageClient) is destroyed.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::~EwkViewImpl):
+
+2012-11-02  Martin Robinson  <mrobinson@igalia.com>
+
+        [GTK] Remove dependency on SoupPasswordManager
+        https://bugs.webkit.org/show_bug.cgi?id=100775
+
+        Reviewed by Carlos Garcia Campos.
+
+        Add a libsecret dependency to the build. This is necessary so that we can remove
+        a dependency on SoupPasswordManager.
+
+        * GNUmakefile.am: Add libsecret CFLAGS to the WebKit2 build.
+
+2012-11-02  Byungwoo Lee  <bw80.lee@samsung.com>
+
+        [EFL][WK2] Change the scope of locking in WorkQueueEfl.cpp.
+        https://bugs.webkit.org/show_bug.cgi?id=98978
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Release the m_workItemQueueLock and m_timerWorkItemsLock mutexes
+        immediately after the protected resource is no longer modified to
+        prevent a possible source of a deadlock.
+
+        And additional mutex locker for the m_writeToPipeDescriptor is added
+        to ensure thread-safety of the sendMessageToThread() function.
+
+        * Platform/WorkQueue.h:
+        (WorkQueue):
+        * Platform/efl/WorkQueueEfl.cpp:
+        (WorkQueue::insertTimerWorkItem):
+        (WorkQueue::performTimerWork):
+        (WorkQueue::sendMessageToThread):
+        (WorkQueue::dispatch):
+        (WorkQueue::dispatchAfterDelay):
+
+2012-11-02  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL][WK2] Add API unit tests for Ewk_Object
+        https://bugs.webkit.org/show_bug.cgi?id=101037
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added API unit tests for Ewk_Object.
+
+        * PlatformEfl.cmake:
+        * UIProcess/API/efl/tests/test_ewk2_object.cpp: Added.
+        (TestEwkObject1):
+        (TestEwkObject1::create):
+        (TestEwkObject1::~TestEwkObject1):
+        (TestEwkObject2):
+        (TestEwkObject2::create):
+        (TEST_F):
+
+2012-11-02  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        REGRESSION (r133075): plugins/plugin-javascript-access.html is failing
+        https://bugs.webkit.org/show_bug.cgi?id=101045
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Encode the plugin filename in ArgumentCoder<PluginInfo> so that
+        plugin.filename returns the filename instead of name of the plugin.
+
+        * Shared/WebCoreArgumentCoders.cpp:
+        (CoreIPC::::encode):
+
+2012-11-01  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][WK2][AC] Wrong translation of mouse events
+        https://bugs.webkit.org/show_bug.cgi?id=100983
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        The transform that we build for mouse events is scaled by the scale factor.
+        The url bar should not be scaled, so it should be scaled in the oposite
+        direction to compensate for that.
+
+        * UIProcess/API/efl/ewk_view.cpp:
+        (toWebContentTransform):
+
+2012-11-02  Andras Becsi  <andras.becsi@digia.com>
+
+        [Qt][WK2] Add missing variable initialization in PageViewportController
+
+        Reviewed by Jocelyn Turcotte.
+
+        Updating the viewport state depends on uninitialized booleans
+        which it should not.
+
+        * UIProcess/PageViewportController.cpp:
+        (WebKit::PageViewportController::PageViewportController):
+
+2012-11-02  Byungwoo Lee  <bw80.lee@samsung.com>
+
+        [EFL][WK2] Use MutexLocker instead of lock()/unlock().
+        https://bugs.webkit.org/show_bug.cgi?id=101015
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Instead of lock()/unlock(), use MutexLocker in WorkQueue::performWork()
+        and WorkQueue::performTimerWork().
+
+        The locking scope will be more clear and simple with using MutexLocker.
+
+        * Platform/efl/WorkQueueEfl.cpp:
+        (WorkQueue::performWork):
+        (WorkQueue::insertTimerWorkItem):
+        (WorkQueue::performTimerWork):
+        (WorkQueue::dispatchAfterDelay):
+
+2012-11-02  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL][WK2] Common ref and unref functions for EFL WK2 objects
+        https://bugs.webkit.org/show_bug.cgi?id=100751
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added common Ewk_Object class with ref/unref API also added several aux functions for safe
+        Ewk_Object conversion. Used new approach on ewk_back_forward_list_item as example.
+
+        * PlatformEfl.cmake:
+        * UIProcess/API/efl/EWebKit2.h:
+        * UIProcess/API/efl/ewk_back_forward_list.cpp:
+        (Ewk_Back_Forward_List::getFromCacheOrCreate):
+        (Ewk_Back_Forward_List::createEinaList):
+        * UIProcess/API/efl/ewk_back_forward_list_item.cpp:
+        (EwkBackForwardListItem::EwkBackForwardListItem):
+        (EwkBackForwardListItem::url):
+        (EwkBackForwardListItem::title):
+        (EwkBackForwardListItem::originalURL):
+        (ewk_back_forward_list_item_url_get):
+        (ewk_back_forward_list_item_title_get):
+        (ewk_back_forward_list_item_original_url_get):
+        * UIProcess/API/efl/ewk_back_forward_list_item.h:
+        * UIProcess/API/efl/ewk_back_forward_list_item_private.h:
+        (EwkBackForwardListItem):
+        (EwkBackForwardListItem::create):
+        * UIProcess/API/efl/ewk_back_forward_list_private.h:
+        * UIProcess/API/efl/ewk_object.cpp: Copied from Source/WebKit2/UIProcess/API/efl/ewk_back_forward_list_item_private.h.
+        (ewk_object_ref):
+        (ewk_object_unref):
+        * UIProcess/API/efl/ewk_object.h: Copied from Source/WebKit2/UIProcess/API/efl/ewk_back_forward_list_item_private.h.
+        * UIProcess/API/efl/ewk_object_private.h: Added.
+        (Ewk_Object):
+        (Ewk_Object::~Ewk_Object):
+        (ewk_object_is_of_type):
+        (ewk_object_cast_check):
+        (ewk_object_cast):
+        * UIProcess/API/efl/tests/test_ewk2_back_forward_list.cpp:
+        (freeEinaList):
+
+2012-11-02  Nandor Huszka  <hnandor@inf.u-szeged.hu>
+
+        [Qt][Mac][Win] Unreviewed build fix after r133182
+        https://bugs.webkit.org/show_bug.cgi?id=100995
+
+        Remove two methods' OVERRIDE and virtual modifiers, because they cannot be found in any base class.
+        Also relocate their prototypes, because they mix with the overridden ones.
+
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (CoordinatedGraphicsLayer):
+
+2012-11-02  Jihye Kang  <jye.kang@samsung.com>
+
+        [EFL][WK2] Add ewk_security_origin and ewk_storage_manager APIs
+        https://bugs.webkit.org/show_bug.cgi?id=92827
+
+        Reviewed by Gyuyoung Kim.
+
+        Add ewk_security_origin APIs to get security origin.
+        These APIs will be used to get host, protocol and port of security
+        origin.
+        Add ewk_storage_manager to manage web storage and
+        ewk_storage_manager_origins_get to get origins list of web storage.
+        Add Unit tests for ewk_storage_manager and ewk_security_origin APIs.
+
+        * PlatformEfl.cmake:
+        * UIProcess/API/efl/EWebKit2.h:
+        * UIProcess/API/efl/ewk_context.cpp:
+        (Ewk_Context::storageManager):
+        (ewk_context_storage_manager_get):
+        * UIProcess/API/efl/ewk_context.h:
+        * UIProcess/API/efl/ewk_context_private.h:
+        (Ewk_Context):
+        * UIProcess/API/efl/ewk_security_origin.cpp: Added.
+        (Ewk_Security_Origin::Ewk_Security_Origin):
+        (Ewk_Security_Origin::host):
+        (Ewk_Security_Origin::protocol):
+        (Ewk_Security_Origin::port):
+        (ewk_security_origin_ref):
+        (ewk_security_origin_unref):
+        (ewk_security_origin_host_get):
+        (ewk_security_origin_protocol_get):
+        (ewk_security_origin_port_get):
+        * UIProcess/API/efl/ewk_security_origin.h: Added.
+        * UIProcess/API/efl/ewk_security_origin_private.h: Added.
+        (Ewk_Security_Origin):
+        (Ewk_Security_Origin::create):
+        * UIProcess/API/efl/ewk_storage_manager.cpp: Added.
+        (Ewk_Storage_Manager::Ewk_Storage_Manager):
+        (Ewk_Storage_Manager::getStorageOrigins):
+        (Ewk_Storage_Manager::createOriginList):
+        (_Ewk_Storage_Origins_Async_Get_Context):
+        (_Ewk_Storage_Origins_Async_Get_Context::_Ewk_Storage_Origins_Async_Get_Context):
+        (getStorageOriginsCallback):
+        (ewk_storage_manager_origins_get):
+        * UIProcess/API/efl/ewk_storage_manager.h: Added.
+        * UIProcess/API/efl/ewk_storage_manager_private.h: Added.
+        (Ewk_Storage_Manager):
+        (Ewk_Storage_Manager::create):
+        * UIProcess/API/efl/tests/test_ewk2_context.cpp:
+        (TEST_F):
+        * UIProcess/API/efl/tests/test_ewk2_storage_manager.cpp: Added.
+        (getStorageOriginsCallback):
+        (TEST_F):
+
+2012-11-02  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Manage the lifecycle of shareable surfaces precisely.
+        https://bugs.webkit.org/show_bug.cgi?id=100797
+
+        Reviewed by Noam Rosenthal.
+
+        Internal Review by Gwang Yoon Hwang and Jae Hyun Park.
+
+        This patch makes UpdateAtlas manage the lifecycle of shareable surfaces
+        containing the updates in the way how CoordinatedTile manages the lifecycle of
+        tiles. Currently, UI Process creates the shareable surface when receiving an
+        UpdateTileForLayer message, but there is no exact point to remove the shareable
+        surface. Now, we introduce new two messages to handle the lifecycle:
+        CreateUpdateAtlas and RemoveUpdateAtlas.
+
+        This patch gives us two benefits.
+        1. Reduce file and mmap operations. Web Process does not need to duplicate a
+        file handle every tile update. UI Process does not need to create a
+        ShareableSurface every UpdateTileForLayer message.
+        2. Save memory. We can remove a ShareableSurface in UI Process when UpdateAtlas
+        in Web Process is removed.
+
+        * Shared/SurfaceUpdateInfo.cpp:
+        (WebKit::SurfaceUpdateInfo::encode):
+        (WebKit::SurfaceUpdateInfo::decode):
+        * Shared/SurfaceUpdateInfo.h:
+        (SurfaceUpdateInfo):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.cpp:
+        (WebKit::LayerTreeCoordinatorProxy::updateTileForLayer):
+        (WebKit::LayerTreeCoordinatorProxy::createUpdateAtlas):
+        (WebKit):
+        (WebKit::LayerTreeCoordinatorProxy::removeUpdateAtlas):
+        (WebKit::LayerTreeCoordinatorProxy::purgeBackingStores):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.h:
+        (LayerTreeCoordinatorProxy):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.messages.in:
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::beginContentUpdate):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (CoordinatedGraphicsLayerClient):
+        (CoordinatedGraphicsLayer):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedTile.cpp:
+        (WebKit::CoordinatedTile::updateBackBuffer):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedTile.h:
+        (CoordinatedTileClient):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::createUpdateAtlas):
+        (WebKit):
+        (WebKit::LayerTreeCoordinator::removeUpdateAtlas):
+        (WebKit::LayerTreeCoordinator::beginContentUpdate):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.h:
+        (LayerTreeCoordinator):
+        * WebProcess/WebPage/UpdateAtlas.cpp:
+        (WebKit::UpdateAtlas::UpdateAtlas):
+        (WebKit):
+        (WebKit::UpdateAtlas::~UpdateAtlas):
+        (WebKit::UpdateAtlas::beginPaintingOnAvailableBuffer):
+        * WebProcess/WebPage/UpdateAtlas.h:
+        (UpdateAtlasClient):
+        (WebKit):
+        (UpdateAtlas):
+
+2012-11-02  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL][WK2] Remove redundant internal function
+        https://bugs.webkit.org/show_bug.cgi?id=100969
+
+        Reviewed by Gyuyoung Kim.
+
+        Remove ewk_view_text_found() in ewk_view.cpp which is not used anymore.
+        Now, "text,found" signal is emitted by DECLARE_EWK_VIEW_CALLBACK(TextFound, "text,found", unsigned) 
+        in EwkViewCallback.h
+
+        * UIProcess/API/efl/ewk_view.cpp:
+
+2012-11-01  Anders Carlsson  <andersca@apple.com>
+
+        Reformat the annotationStyle initializer to appease update-webkit-localizable-strings.
+
+        Rubber-stamped by Dan Bernstein.
+
+        * WebProcess/Plugins/PDF/PDFPlugin.mm:
+
 2012-11-01  Alexandru Chiculita  <achicu@adobe.com>
 
         [CSS Shaders] Move MeshBoxType out of CustomFilterOperation

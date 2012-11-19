@@ -1,3 +1,54 @@
+2012-11-03  Alexey Proskuryakov  <ap@apple.com>
+
+        Get rid of USE(CFURLSTORAGESESSIONS)
+        https://bugs.webkit.org/show_bug.cgi?id=101131
+
+        Reviewed by Sam Weinig.
+
+        * wtf/Platform.h:
+
+2012-11-02  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Web Inspector: NMI instrument NodeRareData::Map. It uses ~250k on nytimes.com
+        https://bugs.webkit.org/show_bug.cgi?id=101052
+
+        Reviewed by Yury Semikhatsky.
+
+        I noticed that in many cases cache structures are plain static HashMap, HashSet etc.
+        MemoryAgent can visit it but instrumentation for these containers report no objectType.
+        It means that addRootObject method needs to accept objectType property as an argument.
+        Otherwise I would have had to create a proxy class with proper objectType.
+
+        * wtf/MemoryInstrumentation.h:
+        (WTF::MemoryInstrumentation::addRootObject):
+
+2012-11-01  Kent Tamura  <tkent@chromium.org>
+
+        Introduce ENABLE_DATE_AND_TIME_INPUT_TYPES, and clarify usage of other related flags
+        https://bugs.webkit.org/show_bug.cgi?id=101007
+
+        Reviewed by Kentaro Hara.
+
+        * wtf/Platform.h:
+        Add ENABLE_DATE_AND_TIME_INPUT_TYPES.  It's a union of
+        ENABLE_INPUT_TYPE_{DATE,DATETIME,DATETIMELOCAL,MONTH,TIME,WEEK}.
+
+2012-11-01  Yury Semikhatsky  <yurys@chromium.org>
+
+        Memory instrumentation: do not call checkCountedObject with wrong pointers
+        https://bugs.webkit.org/show_bug.cgi?id=100958
+
+        Reviewed by Alexander Pavlov.
+
+        Removed calls to checkCountedObject from places where the pointer may contain
+        an address of a base class which may differ from the actual object pointer. Instead
+        checkCountedObject is only called right after processing deferred pointer where
+        we know real address.
+
+        * wtf/MemoryInstrumentation.h:
+        (WTF::MemoryInstrumentation::addObjectImpl):
+        (WTF::::process):
+
 2012-11-01  Alexey Proskuryakov  <ap@apple.com>
 
         Rename HAVE(NETWORK_CFDATA_ARRAY_CALLBACK) to USE(NETWORK_CFDATA_ARRAY_CALLBACK)

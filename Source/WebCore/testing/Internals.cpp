@@ -315,6 +315,15 @@ bool Internals::hasShadowInsertionPoint(const Node* root, ExceptionCode& ec) con
     return 0;
 }
 
+bool Internals::hasContentElement(const Node* root, ExceptionCode& ec) const
+{
+    if (root && root->isShadowRoot())
+        return toShadowRoot(root)->hasContentElement();
+
+    ec = INVALID_ACCESS_ERR;
+    return 0;
+}
+
 bool Internals::attached(Node* node, ExceptionCode& ec)
 {
     if (!node) {
@@ -1259,6 +1268,8 @@ String Internals::layerTreeAsText(Document* document, unsigned flags, ExceptionC
         layerTreeFlags |= LayerTreeFlagsIncludeVisibleRects;
     if (flags & LAYER_TREE_INCLUDES_TILE_CACHES)
         layerTreeFlags |= LayerTreeFlagsIncludeTileCaches;
+    if (flags & LAYER_TREE_INCLUDES_REPAINT_RECTS)
+        layerTreeFlags |= LayerTreeFlagsIncludeRepaintRects;
 
     return document->frame()->layerTreeAsText(layerTreeFlags);
 }

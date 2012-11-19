@@ -1045,7 +1045,7 @@ webkit.org/b/75186 [ Linux ] http/tests/inspector-enabled/dedicated-workers-list
 webkit.org/b/75647 http/tests/inspector/network/download.html [ Pass Timeout ]
 
 webkit.org/b/78810 [ Linux Win Debug ] inspector/debugger/script-formatter-console.html [ Pass Slow ]
-webkit.org/b/99338 [ Linux Win ] inspector/debugger/dynamic-scripts.html [ Pass Text ]
+webkit.org/b/99338 [ Linux Win ] inspector/debugger/dynamic-scripts.html [ Pass Failure ]
 
 # -----------------------------------------------------------------
 # Editing tests
@@ -1424,9 +1424,6 @@ webkit.org/b/99665 accessibility/loading-iframe-sends-notification.html [ Skip ]
 
 webkit.org/b/73912 accessibility/aria-checkbox-sends-notification.html [ Failure Pass ]
 #webkit.org/b/98787 accessibility/aria-hidden-negates-no-visibility.html [ Skip ]
-webkit.org/b/100887 platform/chromium/accessibility/other-aria-attribute-change-sends-notification.html [ Failure Pass ]
-webkit.org/b/100887 platform/chromium/accessibility/is-ignored-change-sends-notification.html [ Failure Pass ]
-webkit.org/b/100887 platform/chromium/accessibility/text-change-notification.html [ Failure Pass ]
 
 # -----------------------------------------------------------------
 # Test failures with Skia GPU rendering of canvas 2D
@@ -1979,11 +1976,8 @@ crbug.com/20345 fast/js/getOwnPropertyDescriptor.html [ Failure ]
 crbug.com/22526 fast/js/Object-defineProperty.html [ Failure ]
 
 webkit.org/b/100463 mathml/msubsup-fuzz.html [ Crash Pass ]
-# WebKit merge 48500:48585, due to newly added support for MathML.
-# crbug.com/22554 mathml
 # The mathml pixel tests will be changing for a few days. They'll need rebaseline after that.
-webkit.org/b/96960 [ Android Linux Win ] mathml/xHeight.xhtml [ Pass Failure ImageOnlyFailure ]
-webkit.org/b/96960 [ Android Linux Win ] mathml/presentation [ Pass Failure ImageOnlyFailure ]
+webkit.org/b/96960 [ Linux Win ] mathml/presentation [ Pass Failure ImageOnlyFailure ]
 # Needs rebaseline after bug 97390
 webkit.org/b/97390 [ Mac ] mathml/presentation/mo-stretch.html [ Failure Pass ]
 webkit.org/b/97390 [ Mac ] mathml/presentation/row-alignment.xhtml [ Failure Pass ]
@@ -2962,7 +2956,7 @@ webkit.org/b/72039 [ Android Linux Release ] fast/forms/form-associated-element-
 webkit.org/b/72039 [ Android Linux Release ] fast/forms/form-attribute-elements-order.html [ Missing Pass ]
 webkit.org/b/72039 [ Android Linux Release ] fast/forms/form-attribute-elements-order2.html [ Missing Pass ]
 webkit.org/b/72039 [ Debug ] http/tests/multipart/policy-ignore-crash.php [ Missing Pass ]
-webkit.org/b/72039 [ Android Linux Release ] fast/forms/formaction-attribute.html [ Missing Pass ]
+webkit.org/b/72039 [ Release ] fast/forms/formaction-attribute.html [ Missing Pass ]
 webkit.org/b/78620 [ Android Linux Debug ] fast/forms/formaction-attribute.html [ Failure Pass Slow ]
 
 webkit.org/b/70988 [ Mac Win Debug ] fast/forms/submit-to-blank-multiple-times.html [ Failure Pass ]
@@ -3130,6 +3124,8 @@ webkit.org/b/81145 [ Lion ] fast/writing-mode/broken-ideographic-font.html [ Cra
 webkit.org/b/81145 [ Lion ] fast/writing-mode/japanese-rl-text-with-broken-font.html [ Crash ]
 
 webkit.org/b/81537 fast/events/touch/gesture/pad-gesture-fling.html [ Failure Pass ]
+# Skip test as its Android Specific and gestureLongPress does not select text in chromium port
+webkit.org/b/99698 fast/events/touch/gesture/disabled-input-text-selection.html [ Skip ]
 
 webkit.org/b/81638 [ Mac Debug ] editing/selection/iframe.html [ ImageOnlyFailure Pass ]
 
@@ -3285,9 +3281,6 @@ webkit.org/b/82297 [ Mac ] fast/events/scrollbar-double-click.html [ Failure Pas
 # this test appears to consistently fail during the main run but usually passes on a retry.
 webkit.org/b/82404 plugins/netscape-dom-access-and-reload.html [ Failure Pass ]
 
-webkit.org/b/82410 css2.1/20110323/abspos-containing-block-initial-004b.htm [ ImageOnlyFailure Pass ]
-webkit.org/b/82410 css2.1/20110323/abspos-containing-block-initial-004d.htm [ ImageOnlyFailure Pass ]
-
 webkit.org/b/82413 [ Android Linux ] fast/filesystem/workers/async-operations.html [ Pass Timeout ]
 webkit.org/b/82413 [ Mac Debug ] fast/filesystem/workers/async-operations.html [ Pass Timeout ]
 
@@ -3360,6 +3353,10 @@ webkit.org/b/84688 [ SnowLeopard ] platform/chromium/virtual/softwarecompositing
 webkit.org/b/84696 fast/workers/storage/interrupt-database.html [ Pass Slow ]
 
 webkit.org/b/84720 [ Debug ] fast/repaint/fixed-right-in-page-scale.html [ ImageOnlyFailure Pass ]
+webkit.org/b/84720 fast/repaint/fixed-scale.html [ ImageOnlyFailure Pass ]
+webkit.org/b/84720 fast/repaint/fixed-table-overflow-zindex.html [ ImageOnlyFailure Pass ]
+webkit.org/b/84720 fast/repaint/fixed-tranformed.html [ ImageOnlyFailure Pass ]
+webkit.org/b/84720 fast/repaint/scroll-fixed-reflected-layer.html [ ImageOnlyFailure Pass ]
 
 webkit.org/b/84724 [ SnowLeopard ] platform/chromium/media/video-frame-size-change.html [ ImageOnlyFailure Pass ]
 
@@ -3417,7 +3414,7 @@ webkit.org/b/86683 [ Linux Win Release ] inspector/profiler/heap-snapshot-summar
 
 webkit.org/b/86908 [ Win ] http/tests/security/cross-frame-access-put.html [ Failure Pass ]
 
-webkit.org/b/86909 [ Win ] compositing/geometry/object-clip-rects-assertion.html [ Pass Slow ]
+webkit.org/b/86909 [ Win ] compositing/geometry/object-clip-rects-assertion.html [ Pass Slow Crash ]
 webkit.org/b/86909 [ Win ] platform/chromium/virtual/softwarecompositing/geometry/object-clip-rects-assertion.html [ Pass Slow ]
 webkit.org/b/86909 [ Win ] http/tests/inspector/appcache/appcache-iframe-manifests.html [ Pass Timeout ]
 webkit.org/b/86909 [ Win ] http/tests/inspector/network/network-content-replacement-xhr.html [ Pass Timeout ]
@@ -3500,7 +3497,6 @@ webkit.org/b/89510 [ Win ] gamepad/gamepad-polling-access.html [ Pass Timeout ]
 
 webkit.org/b/96839 compositing/geometry/fixed-position-transform-composited-page-scale.html [ ImageOnlyFailure Pass ]
 webkit.org/b/96839 platform/chromium/virtual/softwarecompositing/geometry/fixed-position-transform-composited-page-scale.html [ ImageOnlyFailure Pass ]
-webkit.org/b/89702 platform/chromium/virtual/softwarecompositing/geometry/fixed-position-transform-composited-page-scale-down.html [ ImageOnlyFailure Pass ]
 webkit.org/b/89702 compositing/scaling/tiled-layer-recursion.html [ ImageOnlyFailure Pass ]
 webkit.org/b/89702 platform/chromium/virtual/softwarecompositing/scaling/tiled-layer-recursion.html [ ImageOnlyFailure Pass ]
 
@@ -3574,9 +3570,6 @@ webkit.org/b/93624 [ Win Release ] inspector/console/console-format-collections.
 
 # Started failing around r122770
 webkit.org/b/91445 [ Linux ] plugins/embed-attributes-style.html [ ImageOnlyFailure Pass ]
-
-# Fails since creation in r122130
-webkit.org/b/91620 css3/filters/blur-filter-page-scroll-self.html [ ImageOnlyFailure Pass Crash ]
 
 # Needs rebaseline after bug 97217 is fixed
 webkit.org/b/97325 css3/masking/clip-path-circle-relative-overflow.html [ ImageOnlyFailure Pass ]
@@ -3854,7 +3847,7 @@ webkit.org/b/96833 svg/carto.net/combobox.svg [ ImageOnlyFailure Pass ]
 webkit.org/b/96549 [ Android ] platform/chromium/virtual/gpu/fast/hidpi/focus-rings.html [ ImageOnlyFailure ]
 webkit.org/b/96628 [ Lion MountainLion ] fast/frames/calculate-order.html [ Failure Pass ]
 webkit.org/b/96550 http/tests/media/media-source/seek-to-end-after-duration-change.html [ Pass Timeout ]
-webkit.org/b/96725 [ Linux Mac Win ] http/tests/media/media-source/video-media-source-state-changes.html [ Failure Pass ]
+webkit.org/b/96725 [ Linux Mac Win ] http/tests/media/media-source/video-media-source-state-changes.html [ Pass Timeout ]
 crbug.com/63921 platform/chromium/virtual/gpu/fast/canvas/canvas-fillPath-shadow.html [ Failure ]
 webkit.org/b/77550 platform/chromium/virtual/gpu/canvas/philip/tests/2d.gradient.interpolate.colouralpha.html [ Failure ]
 
@@ -3900,7 +3893,6 @@ webkit.org/b/96961 platform/chromium/virtual/gpu/fast/canvas/webgl/oes-vertex-ar
 webkit.org/b/96951 platform/chromium-linux/compositing/gestures [ Skip ] 
 
 # Numerous failures in software compositing.
-crbug.com/152953 [ Mac ] platform/chromium/virtual/softwarecompositing/geometry/fixed-position-iframe-composited-page-scale-down.html [ ImageOnlyFailure ]
 crbug.com/152953 [ Mac ] platform/chromium/virtual/softwarecompositing/images/direct-image-background-color.html [ ImageOnlyFailure ]
 crbug.com/152953 [ Mac ] platform/chromium/virtual/softwarecompositing/overflow/clip-content-under-overflow-controls.html [ ImageOnlyFailure ]
 crbug.com/152953 [ Mac ] platform/chromium/virtual/softwarecompositing/overflow/overflow-positioning.html [ ImageOnlyFailure ]
@@ -4095,26 +4087,25 @@ webkit.org/b/94240 platform/chromium/virtual/deferred/fast/images/pixel-crack-im
 webkit.org/b/94240 platform/chromium/virtual/deferred/fast/images/repaint-subrect-grid.html [ Timeout ]
 webkit.org/b/94240 platform/chromium/virtual/deferred/fast/images/support-broken-image-delegate.html [ Failure ]
 
-# Just needs a rebaseline (but webkit-patch rebaseline doesn't seem to work)
-Bug(senorblanco) [ Mac ] fast/sub-pixel/float-wrap-zoom.html [ ImageOnlyFailure ]
+# This ref-test doesn't work on Chromium Mac ("Test" is offset).
+webkit.org/b/101093 [ Mac ] fast/sub-pixel/float-wrap-zoom.html [ ImageOnlyFailure ]
 
-# Failing since r133069 (maybe debug-only?  Update after more results are in)
-Bug(senorblanco) editing/pasteboard/file-drag-to-editable.html [ Failure Pass ]
-
-# Failing on Mac since Chromium r165269
-Bug(senorblanco) [ Mac ] compositing/geometry/fixed-position-iframe-composited-page-scale-down.html [ ImageOnlyFailure ]
-Bug(senorblanco) [ Mac ] compositing/geometry/fixed-position-transform-composited-page-scale-down.html [ ImageOnlyFailure ]
+# Flaky since r133069
+webkit.org/b/101092 [ Mac Win Debug ] editing/pasteboard/file-drag-to-editable.html [ Failure Pass ]
 
 # Crashy since at least r133035; gives a v8 error
-Bug(senorblanco) [ Linux Debug ] fast/files/workers/worker-apply-blob-url-to-xhr.html [ Crash Pass ]
+webkit.org/b/101099 [ Linux Debug ] fast/files/workers/worker-apply-blob-url-to-xhr.html [ Crash Pass ]
 
 # This reftest doesn't work on Mac 10.8 for some reason.
-Bug(senorblanco) [ MountainLion ] fast/regions/autoheight-definedheight-changenotdetected.html [ ImageOnlyFailure ]
+webkit.org/b/101101 [ MountainLion ] fast/regions/autoheight-definedheight-changenotdetected.html [ ImageOnlyFailure ]
 
 # Has been flaky in Debug since at least r133070, possibly earlier.
-Bug(senorblanco) [ Debug ] svg/as-image/same-image-two-instances.html [ ImageOnlyFailure Pass ]
-Bug(senorblanco) [ Debug ] svg/as-image/img-relative-height.html [ ImageOnlyFailure Pass ]
-Bug(senorblanco) [ Debug ] svg/as-image/img-relative-width.html [ ImageOnlyFailure Pass ]
+webkit.org/b/83471 [ Debug ] svg/as-image/same-image-two-instances.html [ ImageOnlyFailure Pass ]
+webkit.org/b/83471 [ Debug ] svg/as-image/img-relative-height.html [ ImageOnlyFailure Pass ]
+webkit.org/b/83471 [ Debug ] svg/as-image/img-relative-width.html [ ImageOnlyFailure Pass ]
+
+# Seems to have been flaky for quite a while.
+Bug(senorblanco) [ Lion Debug ] ietestcenter/css3/bordersbackgrounds/background-attachment-local-scrolling.htm [ Pass Failure ]
 
 # Have been flaky since at least r133043
 Bug(senorblanco) inspector-protocol/debugger-pause-dedicated-worker.html [ Failure Pass ]

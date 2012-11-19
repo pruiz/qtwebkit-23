@@ -116,7 +116,6 @@ class MouseEventWithHitTestResults;
 class NamedFlowCollection;
 class NodeFilter;
 class NodeIterator;
-class NodeRareData;
 class Page;
 class PlatformMouseEvent;
 class ProcessingInstruction;
@@ -140,7 +139,6 @@ class StyleSheetList;
 class Text;
 class TextResourceDecoder;
 class TreeWalker;
-class UndoManager;
 class WebKitNamedFlow;
 class XMLHttpRequest;
 class XPathEvaluator;
@@ -466,9 +464,6 @@ public:
     virtual bool isFrameSet() const { return false; }
 
     bool isSrcdocDocument() const { return m_isSrcdocDocument; }
-
-    NodeRareData* documentRareData() const { return m_documentRareData; };
-    void setDocumentRareData(NodeRareData*);
 
     StyleResolver* styleResolverIfExists() const { return m_styleResolver.get(); }
 
@@ -1119,11 +1114,7 @@ public:
 #if ENABLE(MICRODATA)
     PassRefPtr<NodeList> getItems(const String& typeNames);
 #endif
-    
-#if ENABLE(UNDO_MANAGER)
-    PassRefPtr<UndoManager> undoManager();
-#endif
-    
+
     bool isInDocumentWrite() { return m_writeRecursionDepth > 0; }
 
     void suspendScheduledTasks(ActiveDOMObject::ReasonForSuspension);
@@ -1434,8 +1425,6 @@ private:
     bool m_sawElementsInKnownNamespaces;
     bool m_isSrcdocDocument;
 
-    NodeRareData* m_documentRareData;
-
     RefPtr<DocumentEventQueue> m_eventQueue;
 
     RefPtr<DocumentWeakReference> m_weakReference;
@@ -1475,10 +1464,6 @@ private:
     unsigned m_wheelEventHandlerCount;
 #if ENABLE(TOUCH_EVENTS)
     unsigned m_touchEventHandlerCount;
-#endif
-    
-#if ENABLE(UNDO_MANAGER)
-    RefPtr<UndoManager> m_undoManager;
 #endif
 
 #if ENABLE(REQUEST_ANIMATION_FRAME)
@@ -1535,7 +1520,6 @@ inline Node::Node(Document* document, ConstructionType type)
     , m_document(document)
     , m_previous(0)
     , m_next(0)
-    , m_renderer(0)
 {
     if (document)
         document->guardRef();

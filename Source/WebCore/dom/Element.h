@@ -3,7 +3,7 @@
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2001 Peter Kelly (pmk@post.com)
  *           (C) 2001 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -312,6 +312,9 @@ public:
  
     virtual String title() const;
 
+    const AtomicString& pseudo() const;
+    void setPseudo(const AtomicString&);
+
     void updateId(const AtomicString& oldId, const AtomicString& newId);
     void updateId(TreeScope*, const AtomicString& oldId, const AtomicString& newId);
     void updateName(const AtomicString& oldName, const AtomicString& newName);
@@ -434,13 +437,7 @@ public:
     IntSize savedLayerScrollOffset() const;
     void setSavedLayerScrollOffset(const IntSize&);
 
-    virtual void reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
-    {
-        MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::DOM);
-        ContainerNode::reportMemoryUsage(memoryObjectInfo);
-        info.addMember(m_tagName);
-        info.addMember(m_attributeData);
-    }
+    virtual void reportMemoryUsage(MemoryObjectInfo*) const OVERRIDE;
 
 protected:
     Element(const QualifiedName& tagName, Document* document, ConstructionType type)
@@ -467,6 +464,8 @@ protected:
     // parseAttribute (called via setAttribute()) and
     // svgAttributeChanged (called when element.className.baseValue is set)
     void classAttributeChanged(const AtomicString& newClassString);
+
+    bool styleAttributeIsDirty() const;
 
 private:
     // FIXME: Remove the need for Attr to call willModifyAttribute/didModifyAttribute.
@@ -530,6 +529,9 @@ private:
 private:
     ElementRareData* elementRareData() const;
     ElementRareData* ensureElementRareData();
+
+    void detachAllAttrNodesFromElement();
+    void detachAttrNodeFromElementWithValue(Attr*, const AtomicString& value);
 
     RefPtr<ElementAttributeData> m_attributeData;
 };
@@ -731,9 +733,14 @@ inline Attribute* Element::getAttributeItem(const QualifiedName& name)
     return mutableAttributeData()->getAttributeItem(name);
 }
 
+inline bool Element::styleAttributeIsDirty() const
+{
+    return m_attributeData && m_attributeData->styleAttributeIsDirty();
+}
+
 inline void Element::updateInvalidAttributes() const
 {
-    if (!isStyleAttributeValid())
+    if (styleAttributeIsDirty())
         updateStyleAttribute();
 
 #if ENABLE(SVG)

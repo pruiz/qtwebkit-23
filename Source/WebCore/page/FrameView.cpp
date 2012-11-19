@@ -3183,10 +3183,6 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect)
         p->fillRect(rect, Color(0xFF, 0, 0), ColorSpaceDeviceRGB);
 #endif
 
-    bool isTopLevelPainter = !sCurrentPaintTimeStamp;
-    if (isTopLevelPainter)
-        sCurrentPaintTimeStamp = currentTime();
-    
     RenderView* root = rootRenderer(this);
     if (!root) {
         LOG_ERROR("called FrameView::paint with nil renderer");
@@ -3196,6 +3192,10 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect)
     ASSERT(!needsLayout());
     if (needsLayout())
         return;
+
+    bool isTopLevelPainter = !sCurrentPaintTimeStamp;
+    if (isTopLevelPainter)
+        sCurrentPaintTimeStamp = currentTime();
 
     FontCachePurgePreventer fontCachePurgePreventer;
 
@@ -3640,9 +3640,27 @@ void FrameView::setTracksRepaints(bool trackRepaints)
 {
     if (trackRepaints == m_isTrackingRepaints)
         return;
-    
+
+#if USE(ACCELERATED_COMPOSITING)
+    for (Frame* frame = m_frame->tree()->top(); frame; frame = frame->tree()->traverseNext()) {
+        if (RenderView* renderView = frame->contentRenderer())
+            renderView->compositor()->setTracksRepaints(trackRepaints);
+    }
+#endif
+
     resetTrackedRepaints();
     m_isTrackingRepaints = trackRepaints;
+}
+
+void FrameView::resetTrackedRepaints()
+{
+    m_trackedRepaintRects.clear();
+#if USE(ACCELERATED_COMPOSITING)
+    if (RenderView* root = rootRenderer(this)) {
+        RenderLayerCompositor* compositor = root->compositor();
+        compositor->resetTrackedRepaintRects();
+    }
+#endif
 }
 
 String FrameView::trackedRepaintRectsAsText() const

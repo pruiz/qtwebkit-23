@@ -201,13 +201,12 @@ static AffineTransform toWebContentTransform(Ewk_View_Smart_Data* smartData)
     AffineTransform transform;
     EWK_VIEW_IMPL_GET_BY_SD_OR_RETURN(smartData, impl, transform);
 
-    transform.translate(-smartData->view.x, -smartData->view.y);
-
 #if USE(TILED_BACKING_STORE)
     IntPoint scrollPos = impl->pageViewportControllerClient()->scrollPosition();
     transform.translate(scrollPos.x(), scrollPos.y());
     transform.scale(1 / impl->pageViewportControllerClient()->scaleFactor());
 #endif
+    transform.translate(-smartData->view.x, -smartData->view.y);
 
     return transform;
 }
@@ -657,17 +656,6 @@ const char* ewk_view_title_get(const Evas_Object* ewkView)
     EWK_VIEW_IMPL_GET_OR_RETURN(ewkView, impl, 0);
 
     return impl->title();
-}
-
-/**
- * @internal
- * Reports that the requested text was found.
- *
- * Emits signal: "text,found" with the number of matches.
- */
-void ewk_view_text_found(Evas_Object* ewkView, unsigned int matchCount)
-{
-    evas_object_smart_callback_call(ewkView, "text,found", &matchCount);
 }
 
 double ewk_view_load_progress_get(const Evas_Object* ewkView)

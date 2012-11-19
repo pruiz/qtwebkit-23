@@ -1,3 +1,559 @@
+2012-11-04  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r133381.
+        http://trac.webkit.org/changeset/133381
+        https://bugs.webkit.org/show_bug.cgi?id=101161
+
+        It made webkit-patch useless (Requested by Ossy_weekend on
+        #webkit).
+
+        * Scripts/webkitpy/common/system/autoinstall.py:
+        (AutoInstaller._create_scratch_directory):
+        (AutoInstaller._install):
+        (AutoInstaller.install):
+        * Scripts/webkitpy/thirdparty/__init__.py:
+        (AutoinstallImportHook.__init__):
+        (AutoinstallImportHook._install_pylint):
+        (AutoinstallImportHook._install_coverage):
+        (AutoinstallImportHook._install_eliza):
+        (AutoinstallImportHook._install):
+        * Scripts/webkitpy/thirdparty/__init___unittest.py:
+        (ThirdpartyTest.test_import_hook.MockImportHook.__init__):
+        (ThirdpartyTest.test_import_hook):
+
+2012-11-03  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r133403, r133404, and r133409.
+        http://trac.webkit.org/changeset/133403
+        http://trac.webkit.org/changeset/133404
+        http://trac.webkit.org/changeset/133409
+        https://bugs.webkit.org/show_bug.cgi?id=101158
+
+        "Broke tests" (Requested by kbalazs on #webkit).
+
+        * DumpRenderTree/qt/DumpRenderTree.pro:
+        * DumpRenderTree/qt/DumpRenderTreeMain.cpp:
+        (main):
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::open):
+        * DumpRenderTree/qt/QtInitializeTestFonts.cpp: Renamed from Source/WebCore/platform/qt/QtTestSupport.cpp.
+        (WebKit):
+        (WebKit::initializeTestFonts):
+        * DumpRenderTree/qt/QtInitializeTestFonts.h: Copied from Tools/WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp.
+        (WebKit):
+        * MiniBrowser/qt/MiniBrowser.pro:
+        * MiniBrowser/qt/MiniBrowserApplication.cpp:
+        (MiniBrowserApplication::handleUserOptions):
+        * QtTestBrowser/QtTestBrowser.pro:
+        * QtTestBrowser/qttestbrowser.cpp:
+        (LauncherApplication::handleUserOptions):
+        * WebKitTestRunner/InjectedBundle/Target.pri:
+        * WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp:
+        (WTR::activateFonts):
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.cpp: Copied from Tools/WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp.
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.h: Copied from Tools/WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp.
+        * WebKitTestRunner/InjectedBundle/qt/TestRunnerQt.cpp:
+        (WTR::TestRunner::platformInitialize):
+        * WebKitTestRunner/Target.pri:
+        * WebKitTestRunner/qt/main.cpp:
+        (main):
+
+2012-11-03  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WK2] setPlatformStrategies always asserts after r132744
+        https://bugs.webkit.org/show_bug.cgi?id=100838
+
+        2nd unreviewed buildfix.
+
+        * MiniBrowser/qt/MiniBrowserApplication.cpp:
+
+2012-11-03  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WK2] setPlatformStrategies always asserts after r132744
+        https://bugs.webkit.org/show_bug.cgi?id=100838
+
+        Unreviewed buildfix.
+
+        * WebKitTestRunner/Target.pri:
+
+2012-11-03  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WK2] setPlatformStrategies always asserts after r132744
+        https://bugs.webkit.org/show_bug.cgi?id=100838
+
+        Reviewed by Simon Hausmann.
+
+        Reland with build fix.
+
+        Turned test runners to use the new QtTestSupport.
+
+        * DumpRenderTree/qt/DumpRenderTree.pro:
+        * DumpRenderTree/qt/DumpRenderTreeMain.cpp:
+        (main):
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::open):
+        * DumpRenderTree/qt/QtInitializeTestFonts.h: Removed.
+        * MiniBrowser/qt/MiniBrowser.pro:
+        * QtTestBrowser/QtTestBrowser.pro:
+        * QtTestBrowser/qttestbrowser.cpp:
+        (LauncherApplication::handleUserOptions):
+        * WebKitTestRunner/InjectedBundle/Target.pri:
+        * WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp:
+        (WTR::activateFonts):
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.cpp: Removed.
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.h: Removed.
+        * WebKitTestRunner/InjectedBundle/qt/TestRunnerQt.cpp:
+        (WTR::TestRunner::platformInitialize):  Removed the comment from here
+        because it was just lying, apparently two times. First, it is not incorrect
+        to reinitialize our font set and clear font caches, it is what the tests
+        expect. Second, the use of QRawFont has nothing to do with the font cache.
+        * WebKitTestRunner/Target.pri:
+        * WebKitTestRunner/qt/main.cpp:
+        (main):
+
+2012-11-03  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r133397.
+        http://trac.webkit.org/changeset/133397
+        https://bugs.webkit.org/show_bug.cgi?id=101155
+
+        "Broke Qt. No way to force the damn bots to do a clean build.
+        I'm giving up." (Requested by kbalazs on #webkit).
+
+        * DumpRenderTree/qt/DumpRenderTree.pro:
+        * DumpRenderTree/qt/DumpRenderTreeMain.cpp:
+        (main):
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::open):
+        * DumpRenderTree/qt/QtInitializeTestFonts.cpp: Renamed from Source/WebCore/platform/qt/QtTestSupport.cpp.
+        (WebKit):
+        (WebKit::initializeTestFonts):
+        * DumpRenderTree/qt/QtInitializeTestFonts.h: Copied from Tools/WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp.
+        (WebKit):
+        * QtTestBrowser/QtTestBrowser.pro:
+        * QtTestBrowser/qttestbrowser.cpp:
+        (LauncherApplication::handleUserOptions):
+        * WebKitTestRunner/InjectedBundle/Target.pri:
+        * WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp:
+        (WTR::activateFonts):
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.cpp: Copied from Tools/WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp.
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.h: Copied from Tools/WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp.
+        * WebKitTestRunner/InjectedBundle/qt/TestRunnerQt.cpp:
+        (WTR::TestRunner::platformInitialize):
+        * WebKitTestRunner/Target.pri:
+        * WebKitTestRunner/qt/main.cpp:
+        (main):
+
+2012-11-03  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WK2] setPlatformStrategies always asserts after r132744
+        https://bugs.webkit.org/show_bug.cgi?id=100838
+
+        Reviewed by Simon Hausmann.
+
+        Turned test runners to use the new QtTestSupport.
+
+        * DumpRenderTree/qt/DumpRenderTree.pro:
+        * DumpRenderTree/qt/DumpRenderTreeMain.cpp:
+        (main):
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::open):
+        * QtTestBrowser/QtTestBrowser.pro:
+        * QtTestBrowser/qttestbrowser.cpp:
+        (LauncherApplication::handleUserOptions):
+        * WebKitTestRunner/InjectedBundle/Target.pri:
+        * WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp:
+        (WTR::activateFonts):
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.cpp: Removed.
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.h: Removed.
+        * WebKitTestRunner/InjectedBundle/qt/InjectedBundleQt.cpp:
+        * WebKitTestRunner/InjectedBundle/qt/TestRunnerQt.cpp:
+        (WTR::TestRunner::platformInitialize): Removed the comment from here
+        because it was just lying, apparently two times. First, it is not incorrect
+        to reinitialize our font set and clear font caches, it is what the tests
+        expect. Second, the use of QRawFont has nothing to do with the font cache.
+        * WebKitTestRunner/Target.pri:
+        * WebKitTestRunner/qt/main.cpp:
+        (main):
+
+2012-11-02  Dirk Pranke  <dpranke@chromium.org>
+
+        webkit-patch rebaseline is broken
+        https://bugs.webkit.org/show_bug.cgi?id=101081
+
+        Reviewed by Ojan Vafai.
+
+        I broke this in r133061 and the unit tests weren't covering this
+        code path. Fixed the issue and the tests. --results-directory
+        doesn't make sense for either 'webkit-patch rebaseline' or
+        'webkit-patch rebaseline-expectations', so we don't want to expose
+        that as a command line option, but they all call a common
+        _rebaseline() routine that references options.results_directory,
+        so we need to set a default value.
+
+        * Scripts/webkitpy/tool/commands/rebaseline.py:
+        (RebaselineExpectations.execute):
+        (Rebaseline.execute):
+        * Scripts/webkitpy/tool/commands/rebaseline_unittest.py:
+        (TestRebaseline):
+        (TestRebaseline.test_rebaseline):
+
+2012-11-02  Dirk Pranke  <dpranke@chromium.org>
+
+        lint-webkitpy doesn't autoinstall pylint properly
+        https://bugs.webkit.org/show_bug.cgi?id=101106
+
+        Reviewed by Ojan Vafai.
+
+        Turns out the autoinstalling code for pylint didn't install
+        pylint's dependencies, and the autoinstaller code didn't work
+        using nested directories (e.g., "logilab/astng"). Fix those issues,
+        clean up the autoinstaller code, and add tests to make sure everything
+        imports successfully.
+
+        * Scripts/webkitpy/common/system/autoinstall.py:
+        (AutoInstaller._create_scratch_directory):
+        (AutoInstaller._install):
+        (AutoInstaller.install):
+        * Scripts/webkitpy/thirdparty/__init__.py:
+        (AutoinstallImportHook._ensure_autoinstalled_dir_is_in_sys_path):
+        (AutoinstallImportHook._install_pylint):
+        (AutoinstallImportHook._install_coverage):
+        (AutoinstallImportHook._install_eliza):
+        (AutoinstallImportHook._install):
+        * Scripts/webkitpy/thirdparty/__init___unittest.py:
+        (ThirdpartyTest.test_import_hook.MockImportHook.__init__):
+        (ThirdpartyTest.test_import_hook):
+        (ThirdpartyTest.test_imports):
+
+2012-11-02  Dirk Pranke  <dpranke@chromium.org>
+
+        nrwt prints an awkward result message for missing results
+        https://bugs.webkit.org/show_bug.cgi?id=100915
+
+        Reviewed by Ojan Vafai.
+
+        Completely rework how we print out the description of
+        each tests's result - we now will print either "passed" or "failed",
+        followed by " unexpectedly" if we weren't expecting the result,
+        followed by a short description of each type of failure that happened
+        (in parentheses). Also reworked the description of each type of
+        failure slightly to be clearer.
+
+        Also rework the tests to make sure we have coverage of all of the
+        messages. Examples of the new output are posted as an attachment to
+        the bug.
+
+        * Scripts/webkitpy/layout_tests/models/test_expectations.py:
+        (TestExpectations):
+        * Scripts/webkitpy/layout_tests/models/test_failures.py:
+        (FailureTimeout.message):
+        (FailureMissingResult.message):
+        (FailureTextMismatch.message):
+        (FailureMissingImageHash.message):
+        (FailureMissingImage.message):
+        (FailureImageHashMismatch.message):
+        (FailureImageHashIncorrect.message):
+        (FailureReftestMismatch.message):
+        (FailureReftestMismatchDidNotOccur.message):
+        (FailureReftestNoImagesGenerated.message):
+        (FailureMissingAudio.message):
+        (FailureAudioMismatch.message):
+        (FailureEarlyExit.message):
+        * Scripts/webkitpy/layout_tests/port/test.py:
+        * Scripts/webkitpy/layout_tests/run_webkit_tests_integrationtest.py:
+        (MainTest.test_run_singly_actually_runs_tests):
+        (MainTest.test_missing_and_unexpected_results):
+        * Scripts/webkitpy/layout_tests/views/printing.py:
+        (Printer._print_result_summary_entry):
+        (Printer.print_finished_test):
+        (Printer._result_message):
+        (Printer._print_unexpected_results):
+        * Scripts/webkitpy/tool/bot/flakytestreporter_unittest.py:
+        * Scripts/webkitpy/tool/commands/queues_unittest.py:
+
+2012-11-02  Dirk Pranke  <dpranke@chromium.org>
+
+        webkitpy: clean up logging in common.system.autoinstall
+        https://bugs.webkit.org/show_bug.cgi?id=101090
+
+        Reviewed by Ojan Vafai.
+
+        This module logged way too much, much of which was logging that
+        was either really redundant or useful only during initial development.
+        This patch deletes a lot of code and tweaks the remaining log messages
+        to be more useful now.
+
+        Also, clean up a bunch of lint errors and warnings.
+
+        * Scripts/webkitpy/common/system/autoinstall.py:
+        (AutoInstaller.__init__):
+        (AutoInstaller._write_file):
+        (AutoInstaller._set_up_target_dir):
+        (AutoInstaller._create_scratch_directory):
+        (AutoInstaller._url_downloaded_path):
+        (AutoInstaller._is_downloaded):
+        (AutoInstaller._record_url_downloaded):
+        (AutoInstaller._extract_targz):
+        (AutoInstaller._extract_all):
+        (AutoInstaller._unzip):
+        (AutoInstaller._download_to_stream):
+        (AutoInstaller._download):
+        (AutoInstaller._install):
+        (AutoInstaller.install):
+
+2012-11-02  Dirk Pranke  <dpranke@chromium.org>
+
+        webkit-patch analyze-baselines output is weak
+        https://bugs.webkit.org/show_bug.cgi?id=100998
+
+        Reviewed by Ojan Vafai.
+
+        Currently analyze-baselines prints a list of baselines that have
+        the same checksum per line, but the format is hard to read;
+        this patch cleans up the output to print by directory instead
+        and use the same format I recently added for debugging optimize-baselines,
+        then refactors the code so that we share and adds tests for
+        analyze-baselines (which was untested).
+
+        Also, I got rid of a couple of unnecessarily-hardcoded port names,
+        and modified the baseline optimizer to log the current world when
+        optimize fails.
+
+        * Scripts/webkitpy/common/checkout/baselineoptimizer.py:
+        (BaselineOptimizer.read_results_by_directory):
+        (BaselineOptimizer.write_by_directory):
+        (BaselineOptimizer.optimize):
+        * Scripts/webkitpy/tool/commands/rebaseline.py:
+        (OptimizeBaselines.execute):
+        (AnalyzeBaselines.__init__):
+        (AnalyzeBaselines._write):
+        (AnalyzeBaselines._analyze_baseline):
+        (AnalyzeBaselines.execute):
+        * Scripts/webkitpy/tool/commands/rebaseline_unittest.py:
+        (_FakeOptimizer):
+        (_FakeOptimizer.read_results_by_directory):
+        (TestAnalyzeBaselines):
+        (TestAnalyzeBaselines.setUp):
+        (TestAnalyzeBaselines.test_default):
+        (TestAnalyzeBaselines.test_missing_baselines):
+
+2012-11-02  Adam Barth  <abarth@webkit.org>
+
+        ENABLE(UNDO_MANAGER) is disabled everywhere and is not under active development
+        https://bugs.webkit.org/show_bug.cgi?id=100711
+
+        Reviewed by Eric Seidel.
+
+        * Scripts/webkitperl/FeatureList.pm:
+        * qmake/mkspecs/features/features.pri:
+
+2012-11-02  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r133303.
+        http://trac.webkit.org/changeset/133303
+        https://bugs.webkit.org/show_bug.cgi?id=101068
+
+        "Broke qt wk2 build (seems like bots fails to rerun qmake if
+        needed)" (Requested by kbalazs on #webkit).
+
+        * DumpRenderTree/qt/DumpRenderTree.pro:
+        * DumpRenderTree/qt/DumpRenderTreeMain.cpp:
+        (main):
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::open):
+        * DumpRenderTree/qt/QtInitializeTestFonts.cpp: Renamed from Source/WebCore/platform/qt/QtTestSupport.cpp.
+        (WebKit):
+        (WebKit::initializeTestFonts):
+        * DumpRenderTree/qt/QtInitializeTestFonts.h: Copied from Tools/WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp.
+        (WebKit):
+        * QtTestBrowser/QtTestBrowser.pro:
+        * QtTestBrowser/qttestbrowser.cpp:
+        (LauncherApplication::handleUserOptions):
+        * WebKitTestRunner/InjectedBundle/Target.pri:
+        * WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp:
+        (WTR::activateFonts):
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.cpp: Copied from Tools/WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp.
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.h: Copied from Tools/WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp.
+        * WebKitTestRunner/InjectedBundle/qt/TestRunnerQt.cpp:
+        (WTR::TestRunner::platformInitialize):
+        * WebKitTestRunner/Target.pri:
+        * WebKitTestRunner/qt/main.cpp:
+        (main):
+
+2012-11-02  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WK2] setPlatformStrategies always asserts after r132744
+        https://bugs.webkit.org/show_bug.cgi?id=100838
+
+        Reviewed by Simon Hausmann.
+
+        Turned test runners to use the new QtTestSupport.
+
+        * DumpRenderTree/qt/DumpRenderTree.pro:
+        * DumpRenderTree/qt/DumpRenderTreeMain.cpp:
+        (main):
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::open):
+        * QtTestBrowser/QtTestBrowser.pro:
+        * QtTestBrowser/qttestbrowser.cpp:
+        (LauncherApplication::handleUserOptions):
+        * WebKitTestRunner/InjectedBundle/Target.pri:
+        * WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp:
+        (WTR::activateFonts):
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.cpp: Removed.
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.h: Removed.
+        * WebKitTestRunner/InjectedBundle/qt/InjectedBundleQt.cpp:
+        * WebKitTestRunner/InjectedBundle/qt/TestRunnerQt.cpp:
+        (WTR::TestRunner::platformInitialize): Removed the comment from here
+        because it was just lying, apparently two times. First, it is not incorrect
+        to reinitialize our font set and clear font caches, it is what the tests
+        expect. Second, the use of QRawFont has nothing to do with the font cache.
+        * WebKitTestRunner/Target.pri:
+        * WebKitTestRunner/qt/main.cpp:
+        (main):
+
+2012-11-02  Peter Beverloo  <peter@chromium.org>
+
+        Output Android's device status before running tests on the bots
+        https://bugs.webkit.org/show_bug.cgi?id=100944
+
+        Reviewed by Dirk Pranke.
+
+        This adds a new step to the build master which will be run prior to the
+        actual tests-suites on the Chromium Android tester, and soon the Chromium
+        Android Perf bot. For each attached device, it outputs the build
+        information, battery level, battery temperature and username.
+
+        The Android tester currently is very flaky, and this will help tremendously
+        in being able to figure out what's wrong with the bot.
+
+        * BuildSlaveSupport/build.webkit.org-config/master.cfg:
+        (OutputAndroidDeviceStatus):
+        (TestFactory.__init__):
+        * BuildSlaveSupport/chromium/output-android-device-status: Added.
+        (GetAttachedDevices):
+        (AndroidDeviceStatus):
+        (AndroidDeviceStatus.__init__):
+        (AndroidDeviceStatus._run_adb_command):
+        (AndroidDeviceStatus.device_type):
+        (AndroidDeviceStatus.device_build):
+        (AndroidDeviceStatus.device_fingerprint):
+        (AndroidDeviceStatus.battery_level):
+        (AndroidDeviceStatus.battery_temperature):
+        (AndroidDeviceStatus.username):
+        (main):
+
+2012-11-02  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [Qt] WTR: Make sure that eventSender.mouseDown sends a press event for the second press
+        https://bugs.webkit.org/show_bug.cgi?id=101033
+
+        Reviewed by Simon Hausmann.
+
+        eventSender.mouseDown doesn't work properly since r133153 where
+        MouseButtonDblClick events aren't interpreted as Press events anymore.
+        The problem is that mouseDown sends a DblClick event instead of a Press,
+        while the correct way is to send both events.
+
+        Since QQuickWebView isn't doing anything with DblClick events anymore,
+        simply send Press events all the time and let WebCore figure out
+        where the double clicks are.
+
+        * WebKitTestRunner/qt/EventSenderProxyQt.cpp:
+        (WTR::EventSenderProxy::updateClickCountForButton):
+        (WTR::EventSenderProxy::mouseDown):
+
+2012-11-02  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Add HTTP authentication support to MiniBrowser
+        https://bugs.webkit.org/show_bug.cgi?id=100953
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Add HTTP authentication support to MiniBrowser. An authentication
+        dialog now pops up to ask the user for credentials whenever
+        a Web site requires authentication.
+
+        * MiniBrowser/efl/main.c:
+        (auth_popup_close):
+        (on_auth_cancel):
+        (on_auth_ok):
+        (on_authentication_request):
+        (window_create):
+
+2012-11-01  Yury Semikhatsky  <yurys@chromium.org>
+
+        Memory instrumentation: do not call checkCountedObject with wrong pointers
+        https://bugs.webkit.org/show_bug.cgi?id=100958
+
+        Reviewed by Alexander Pavlov.
+
+        * TestWebKitAPI/Tests/WTF/MemoryInstrumentationTest.cpp: test that if there
+        if there is class A derived from classes B and C and we have pointer B* to an
+        object of class A then MemoryInstrumentationClient::checkoutCountedObject won't
+        be called for B* but only for A*
+
+        Also MemoryInstrumentation implementation used in the test was refactored to
+        allow passing client as a parameter. The client implementation was extracted into
+        a top-level class MemoryInstrumentationTestClient.
+
+2012-11-01  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Make File Chooser dialog modal in MiniBrowser
+        https://bugs.webkit.org/show_bug.cgi?id=100962
+
+        Reviewed by Gyuyoung Kim.
+
+        Make File Chooser dialog modal in MiniBrowser and make
+        sure it is closed and freed when its parent window is
+        closed.
+
+        * MiniBrowser/efl/main.c:
+        (close_file_picker):
+        (on_filepicker_parent_deletion):
+        (on_file_chooser_request):
+
+2012-11-01  Seonae Kim  <sunaeluv.kim@samsung.com>
+
+        [EFL][DRT] Support Geolocation
+        https://bugs.webkit.org/show_bug.cgi?id=97427
+
+        Reviewed by Gyuyoung Kim. 
+
+        Implement methods to use GeolocationClientMock in DumpRenderTree.
+        This client attaches to the page whenever a view is created.
+
+        * DumpRenderTree/efl/DumpRenderTreeChrome.cpp:
+        (DumpRenderTreeChrome::createView):
+        (DumpRenderTreeChrome::resetDefaultsToConsistentValues):
+        * DumpRenderTree/efl/TestRunnerEfl.cpp:
+        (TestRunner::setMockGeolocationPosition):
+        (TestRunner::setMockGeolocationPositionUnavailableError):
+        (TestRunner::setGeolocationPermission):
+        (TestRunner::numberOfPendingGeolocationPermissionRequests):
+
+2012-11-01  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Remove tests no longer needed after r133229.
+
+        * Scripts/webkitpy/performance_tests/perftest_unittest.py:
+        (TestPerfTestFactory.test_inspector_test):
+        * Scripts/webkitpy/performance_tests/perftestsrunner_unittest.py:
+        (test_collect_tests_with_skipped_list):
+
+2012-11-01  Nico Weber  <thakis@chromium.org>
+
+        [chromium] Try to find ninja if it's not in the path already
+        https://bugs.webkit.org/show_bug.cgi?id=100988
+
+        Reviewed by Ryosuke Niwa.
+
+        Similar to the gclient detection logic in update-webkit-chromium
+
+        * Scripts/webkitdirs.pm:
+        (buildChromiumNinja):
+
 2012-11-01  Eric Seidel  <eric@webkit.org>
 
         Add Glenn Adams to the Contributor list

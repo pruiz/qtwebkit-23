@@ -29,11 +29,12 @@
 import unittest
 
 from webkitpy.common.system.outputcapture import OutputCapture
+from webkitpy.common.checkout.baselineoptimizer import BaselineOptimizer
+from webkitpy.common.net.buildbot.buildbot_mock import MockBuilder
+from webkitpy.common.system.executive_mock import MockExecutive2
 from webkitpy.thirdparty.mock import Mock
 from webkitpy.tool.commands.rebaseline import *
 from webkitpy.tool.mocktool import MockTool, MockOptions
-from webkitpy.common.net.buildbot.buildbot_mock import MockBuilder
-from webkitpy.common.system.executive_mock import MockExecutive2
 
 
 class _BaseTestCase(unittest.TestCase):
@@ -277,23 +278,15 @@ class TestRebaselineJson(_BaseTestCase):
 class TestRebaseline(_BaseTestCase):
     # This command shares most of its logic with RebaselineJson, so these tests just test what is different.
 
-    command_constructor = Rebaseline  # AKA webkit-patch rebaseline-test
+    command_constructor = Rebaseline  # AKA webkit-patch rebaseline
 
     def test_tests_to_update(self):
         build = Mock()
         OutputCapture().assert_outputs(self, self.command._tests_to_update, [build])
 
     def test_rebaseline(self):
-        # This test basically tests the path from command.execute() to command._rebaseline();
-        # it doesn't test that _rebaseline() actually does anything (that is tested in TestRebaselineJson.
-        self.test_list = {}
-
-        def rebaseline_stub(options, test_list):
-            self.test_list = test_list
-
         self.command._builders_to_pull_from = lambda: [MockBuilder('MOCK builder')]
         self.command._tests_to_update = lambda builder: ['mock/path/to/test.html']
-        self.command._rebaseline = rebaseline_stub
 
         self._zero_out_test_expectations()
 
@@ -304,12 +297,14 @@ class TestRebaseline(_BaseTestCase):
                 "MOCK builder": {"port_name": "test-mac-leopard", "specifiers": set(["mock-specifier"])},
             }
             oc.capture_output()
-            self.command.execute(MockOptions(optimize=True, builders=None, suffixes=["txt"], verbose=True), [], self.tool)
+            self.command.execute(MockOptions(optimize=False, builders=None, suffixes=["txt"], verbose=True, move_overwritten_baselines=False), [], self.tool)
         finally:
             oc.restore_output()
             builders._exact_matches = old_exact_matches
 
-        self.assertEquals(self.test_list, {'mock/path/to/test.html': {'MOCK builder': ['txt']}})
+        calls = filter(lambda x: x != ['qmake', '-v'] and x[0] != 'perl', self.tool.executive.calls)
+        self.assertEquals(calls,
+            [[['echo', 'rebaseline-test-internal', '--suffixes', 'txt', '--builder', 'MOCK builder', '--test', 'mock/path/to/test.html', '--verbose']]])
 
 
 class TestRebaselineExpectations(_BaseTestCase):
@@ -360,3 +355,36 @@ class TestRebaselineExpectations(_BaseTestCase):
         self.assertEquals(self._read(self.lion_expectations_path), '')
 
 
+class _FakeOptimizer(BaselineOptimizer):
+    def read_results_by_directory(self, baseline_name):
+        if baseline_name.endswith('txt'):
+            return {'LayoutTests/passes/text.html': '123456',
+                    'LayoutTests/platform/test-mac-leopard/passes/text.html': 'abcdef'}
+        return {}
+
+
+class TestAnalyzeBaselines(_BaseTestCase):
+    command_constructor = AnalyzeBaselines
+
+    def setUp(self):
+        super(TestAnalyzeBaselines, self).setUp()
+        self.port = self.tool.port_factory.get('test')
+        self.tool.port_factory.get = lambda port_name=None, options=None: self.port
+        self.lines = []
+        self.command._optimizer_class = _FakeOptimizer
+        self.command._write = lambda msg: self.lines.append(msg)
+
+    def test_default(self):
+        self.command.execute(MockOptions(suffixes='txt', missing=False), ['passes/text.html'], self.tool)
+        self.assertEquals(self.lines,
+            ['passes/text-expected.txt:',
+             '  (generic): 123456',
+             '  test-mac-leopard: abcdef'])
+
+    def test_missing_baselines(self):
+        self.command.execute(MockOptions(suffixes='png,txt', missing=True), ['passes/text.html'], self.tool)
+        self.assertEquals(self.lines,
+            ['passes/text-expected.png: (no baselines found)',
+             'passes/text-expected.txt:',
+             '  (generic): 123456',
+             '  test-mac-leopard: abcdef'])

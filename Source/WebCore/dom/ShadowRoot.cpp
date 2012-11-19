@@ -57,6 +57,7 @@ ShadowRoot::ShadowRoot(Document* document)
     , m_resetStyleInheritance(false)
     , m_insertionPointAssignedTo(0)
     , m_numberOfShadowElementChildren(0)
+    , m_numberOfContentElementChildren(0)
     , m_numberOfStyles(0)
 {
     ASSERT(document);
@@ -198,12 +199,7 @@ ElementShadow* ShadowRoot::owner() const
 
 bool ShadowRoot::hasInsertionPoint() const
 {
-    for (Node* n = firstChild(); n; n = n->traverseNextNode(this)) {
-        if (isInsertionPoint(n))
-            return true;
-    }
-
-    return false;
+    return hasShadowInsertionPoint() || hasContentElement();
 }
 
 bool ShadowRoot::applyAuthorStyles() const
@@ -258,6 +254,17 @@ void ShadowRoot::unregisterScopedHTMLStyleChild()
     ASSERT(hasScopedHTMLStyleChild() && m_numberOfStyles > 0);
     --m_numberOfStyles;
     setHasScopedHTMLStyleChild(m_numberOfStyles > 0);
+}
+
+
+void ShadowRoot::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
+{
+    MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::DOM);
+    DocumentFragment::reportMemoryUsage(memoryObjectInfo);
+    TreeScope::reportMemoryUsage(memoryObjectInfo);
+    info.addMember(m_prev);
+    info.addMember(m_next);
+    info.addMember(m_insertionPointAssignedTo);
 }
 
 }

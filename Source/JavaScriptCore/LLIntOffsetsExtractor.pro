@@ -13,12 +13,16 @@ debug_and_release {
     CONFIG += build_all
 }
 
-# Don't try to link against any Qt libraries, but at least
-# pull in include paths as we include qglobal.h.
-INCLUDEPATH += $$QT.core.includes
-CONFIG += console
-CONFIG -= qt
-LIBS =
+haveQt(5) {
+    # Don't try to link against any Qt libraries, but at least
+    # pull in include paths as we include qglobal.h.
+    INCLUDEPATH += $$QT.core.includes
+    CONFIG += console
+    CONFIG -= qt
+    LIBS =
+} else {
+    QT = core # Needed for global.h
+}
 
 defineTest(addIncludePaths) {
     # Just needed for include paths

@@ -349,6 +349,7 @@ SOURCES += \
     css/WebKitCSSSVGDocumentValue.cpp \
     css/WebKitCSSShaderValue.cpp \
     css/WebKitCSSTransformValue.cpp \
+    css/WebKitCSSViewportRule.cpp \
     dom/ActiveDOMObject.cpp \
     dom/Attr.cpp \
     dom/BeforeTextInsertedEvent.cpp \
@@ -1517,6 +1518,7 @@ HEADERS += \
     css/WebKitCSSSVGDocumentValue.h \
     css/WebKitCSSShaderValue.h \
     css/WebKitCSSTransformValue.h \
+    css/WebKitCSSViewportRule.h \
     dom/ActiveDOMObject.h \
     dom/Attr.h \
     dom/Attribute.h \
@@ -2082,9 +2084,12 @@ HEADERS += \
     platform/graphics/filters/CustomFilterNumberParameter.h \
     platform/graphics/filters/CustomFilterCompiledProgram.h \
     platform/graphics/filters/CustomFilterOperation.h \
+    platform/graphics/filters/ValidatedCustomFilterOperation.h \
     platform/graphics/filters/CustomFilterParameter.h \
     platform/graphics/filters/CustomFilterParameterList.h \
     platform/graphics/filters/CustomFilterProgram.h \
+    platform/graphics/filters/CustomFilterProgramInfo.h \
+    platform/graphics/filters/CustomFilterRenderer.h \
     platform/graphics/filters/CustomFilterTransformParameter.h \
     platform/graphics/filters/CustomFilterValidatedProgram.h \
     platform/graphics/filters/FEBlend.h \
@@ -3508,10 +3513,12 @@ contains(DEFINES, ENABLE_FILTERS=1) {
         platform/graphics/filters/CustomFilterGlobalContext.cpp \
         platform/graphics/filters/CustomFilterOperation.cpp \
         platform/graphics/filters/CustomFilterParameterList.cpp \
+        platform/graphics/filters/ValidatedCustomFilterOperation.cpp \
         platform/graphics/filters/CustomFilterProgram.cpp \
         platform/graphics/filters/CustomFilterCompiledProgram.cpp \
         platform/graphics/filters/CustomFilterMesh.cpp \
         platform/graphics/filters/CustomFilterMeshGenerator.cpp \
+        platform/graphics/filters/CustomFilterRenderer.cpp \
         platform/graphics/filters/CustomFilterValidatedProgram.cpp \
         platform/graphics/filters/DistantLightSource.cpp \
         platform/graphics/filters/FEBlend.cpp \

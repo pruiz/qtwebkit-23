@@ -81,7 +81,6 @@
 #include "InspectorController.h"
 #include "InspectorInstrumentation.h"
 #include "InspectorOverlay.h"
-#include "JavaScriptDebuggerBlackBerry.h"
 #include "JavaScriptVariant_p.h"
 #include "LayerWebKitThread.h"
 #if ENABLE(NETWORK_INFO)
@@ -2362,12 +2361,6 @@ Platform::WebContext WebPagePrivate::webContext(TargetDetectionStrategy strategy
     if (node->isElementNode()) {
         Element* element = static_cast<Element*>(node->shadowAncestorNode());
 
-        String webWorksContext(DOMSupport::webWorksContext(element));
-        if (!webWorksContext.stripWhiteSpace().isEmpty()) {
-            context.setFlag(Platform::WebContext::IsWebWorksContext);
-            context.setWebWorksContext(webWorksContext);
-        }
-
         if (DOMSupport::isTextBasedContentEditableElement(element)) {
             if (!canStartSelection) {
                 // Input fields host node is by spec non-editable unless the field itself has content editable enabled.
@@ -2393,6 +2386,20 @@ Platform::WebContext WebPagePrivate::webContext(TargetDetectionStrategy strategy
 
     if (node->isFocusable())
         context.setFlag(Platform::WebContext::IsFocusable);
+
+    // Walk up the node tree looking for our custom webworks context attribute.
+    while (node) {
+        if (node->isElementNode()) {
+            Element* element = static_cast<Element*>(node->shadowAncestorNode());
+            String webWorksContext(DOMSupport::webWorksContext(element));
+            if (!webWorksContext.stripWhiteSpace().isEmpty()) {
+                context.setFlag(Platform::WebContext::IsWebWorksContext);
+                context.setWebWorksContext(webWorksContext);
+                break;
+            }
+        }
+        node = node->parentNode();
+    }
 
     return context;
 }
@@ -4885,108 +4892,6 @@ void WebPage::runLayoutTests()
     if (!d->m_dumpRenderTree)
         d->m_dumpRenderTree = new DumpRenderTree(this);
     d->m_dumpRenderTree->runTests();
-#endif
-}
-
-bool WebPage::enableScriptDebugger()
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    if (d->m_scriptDebugger)
-        return true;
-
-    d->m_scriptDebugger = adoptPtr(new JavaScriptDebuggerBlackBerry(this->d));
-
-    return !!d->m_scriptDebugger;
-#endif
-}
-
-bool WebPage::disableScriptDebugger()
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    if (!d->m_scriptDebugger)
-        return true;
-
-    d->m_scriptDebugger.clear();
-    return true;
-#endif
-}
-
-void WebPage::addBreakpoint(const unsigned short* url, unsigned urlLength, int lineNumber, const unsigned short* condition, unsigned conditionLength)
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    if (d->m_scriptDebugger)
-        d->m_scriptDebugger->addBreakpoint(url, urlLength, lineNumber, condition, conditionLength);
-#endif
-}
-
-void WebPage::updateBreakpoint(const unsigned short* url, unsigned urlLength, int lineNumber, const unsigned short* condition, unsigned conditionLength)
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    if (d->m_scriptDebugger)
-        d->m_scriptDebugger->updateBreakpoint(url, urlLength, lineNumber, condition, conditionLength);
-#endif
-}
-
-void WebPage::removeBreakpoint(const unsigned short* url, unsigned urlLength, int lineNumber)
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    if (d->m_scriptDebugger)
-        d->m_scriptDebugger->removeBreakpoint(url, urlLength, lineNumber);
-#endif
-}
-
-bool WebPage::pauseOnExceptions()
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    return d->m_scriptDebugger ? d->m_scriptDebugger->pauseOnExceptions() : false;
-#endif
-}
-
-void WebPage::setPauseOnExceptions(bool pause)
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    if (d->m_scriptDebugger)
-        d->m_scriptDebugger->setPauseOnExceptions(pause);
-#endif
-}
-
-void WebPage::pauseInDebugger()
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    if (d->m_scriptDebugger)
-        d->m_scriptDebugger->pauseInDebugger();
-#endif
-}
-
-void WebPage::resumeDebugger()
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    if (d->m_scriptDebugger)
-        d->m_scriptDebugger->resumeDebugger();
-#endif
-}
-
-void WebPage::stepOverStatementInDebugger()
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    if (d->m_scriptDebugger)
-        d->m_scriptDebugger->stepOverStatementInDebugger();
-#endif
-}
-
-void WebPage::stepIntoStatementInDebugger()
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    if (d->m_scriptDebugger)
-        d->m_scriptDebugger->stepIntoStatementInDebugger();
-#endif
-}
-
-void WebPage::stepOutOfFunctionInDebugger()
-{
-#if ENABLE(JAVASCRIPT_DEBUGGER)
-    if (d->m_scriptDebugger)
-        d->m_scriptDebugger->stepOutOfFunctionInDebugger();
 #endif
 }
 

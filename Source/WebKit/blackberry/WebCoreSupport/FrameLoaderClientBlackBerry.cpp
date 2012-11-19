@@ -33,6 +33,7 @@
 #include "CredentialManager.h"
 #include "CredentialTransformData.h"
 #include "DumpRenderTreeClient.h"
+#include "ExternalExtension.h"
 #include "FrameNetworkingContextBlackBerry.h"
 #include "FrameView.h"
 #include "HTMLFormElement.h"
@@ -906,6 +907,8 @@ void FrameLoaderClientBlackBerry::dispatchDidClearWindowObjectInWorld(DOMWrapper
     if (m_webPagePrivate->m_enableQnxJavaScriptObject)
         attachExtensionObjectToFrame(m_frame, m_webPagePrivate->m_client);
 
+    attachExternalExtensionObjectToFrame(m_frame);
+
     m_webPagePrivate->m_client->notifyWindowObjectCleared();
 
     if (m_webPagePrivate->m_dumpRenderTree) {
@@ -1040,6 +1043,7 @@ void FrameLoaderClientBlackBerry::saveViewStateToItem(HistoryItem* item)
         viewState.minimumScale = m_webPagePrivate->m_minimumScale;
         viewState.maximumScale = m_webPagePrivate->m_maximumScale;
         viewState.isUserScalable = m_webPagePrivate->m_userScalable;
+        viewState.webPageClientState = m_webPagePrivate->m_client->serializePageCacheState();
     }
 }
 
@@ -1057,6 +1061,9 @@ void FrameLoaderClientBlackBerry::restoreViewState()
     HistoryItemViewState& viewState = currentItem->viewState();
     if (!viewState.shouldSaveViewState)
         return;
+
+    m_webPagePrivate->m_client->deserializePageCacheState(viewState.webPageClientState);
+
     // WebPagePrivate is messing up FrameView::wasScrolledByUser() by sending
     // scroll events that look like they were user generated all the time.
     //

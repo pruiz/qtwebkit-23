@@ -666,6 +666,20 @@ PassRefPtr<ImmutableArray> WebPage::trackedRepaintRects()
     return ImmutableArray::adopt(vector);
 }
 
+static PluginView* focusedPluginViewForFrame(Frame* frame)
+{
+    if (!frame->document()->isPluginDocument())
+        return 0;
+
+    PluginDocument* pluginDocument = static_cast<PluginDocument*>(frame->document());
+
+    if (pluginDocument->focusedNode() != pluginDocument->pluginNode())
+        return 0;
+
+    PluginView* pluginView = static_cast<PluginView*>(pluginDocument->pluginWidget());
+    return pluginView;
+}
+
 static PluginView* pluginViewForFrame(Frame* frame)
 {
     if (!frame->document()->isPluginDocument())
@@ -682,7 +696,7 @@ void WebPage::executeEditingCommand(const String& commandName, const String& arg
     if (!frame)
         return;
 
-    if (PluginView* pluginView = pluginViewForFrame(frame)) {
+    if (PluginView* pluginView = focusedPluginViewForFrame(frame)) {
         pluginView->handleEditingCommand(commandName, argument);
         return;
     }
@@ -696,7 +710,7 @@ bool WebPage::isEditingCommandEnabled(const String& commandName)
     if (!frame)
         return false;
 
-    if (PluginView* pluginView = pluginViewForFrame(frame))
+    if (PluginView* pluginView = focusedPluginViewForFrame(frame))
         return pluginView->isEditingCommandEnabled(commandName);
     
     Editor::Command command = frame->editor()->command(commandName);
@@ -1163,11 +1177,16 @@ float WebPage::deviceScaleFactor() const
 
 void WebPage::setUseFixedLayout(bool fixed)
 {
+    // Do not overwrite current settings if initially setting it to false.
+    if (m_useFixedLayout == fixed)
+        return;
     m_useFixedLayout = fixed;
 
-    m_page->settings()->setAcceleratedCompositingForFixedPositionEnabled(fixed);
     m_page->settings()->setFixedElementsLayoutRelativeToFrame(fixed);
+#if USE(COORDINATED_GRAPHICS)
+    m_page->settings()->setAcceleratedCompositingForFixedPositionEnabled(fixed);
     m_page->settings()->setFixedPositionCreatesStackingContext(fixed);
+#endif
 
 #if USE(TILED_BACKING_STORE) && ENABLE(SMOOTH_SCROLLING)
     // Delegated scrolling will be enabled when the FrameView is created if fixed layout is enabled.
@@ -1598,7 +1617,7 @@ void WebPage::validateCommand(const String& commandName, uint64_t callbackID)
     int32_t state = 0;
     Frame* frame = m_page->focusController()->focusedOrMainFrame();
     if (frame) {
-        if (PluginView* pluginView = pluginViewForFrame(frame))
+        if (PluginView* pluginView = focusedPluginViewForFrame(frame))
             isEnabled = pluginView->isEditingCommandEnabled(commandName);
         else {
             Editor::Command command = frame->editor()->command(commandName);

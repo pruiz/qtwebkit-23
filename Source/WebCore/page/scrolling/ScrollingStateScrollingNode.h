@@ -40,6 +40,8 @@ namespace WebCore {
 class ScrollingStateScrollingNode : public ScrollingStateNode {
 public:
     static PassOwnPtr<ScrollingStateScrollingNode> create(ScrollingStateTree*, ScrollingNodeID);
+
+    ScrollingStateScrollingNode(const ScrollingStateScrollingNode&);
     virtual ~ScrollingStateScrollingNode();
 
     enum ChangedProperty {
@@ -59,8 +61,6 @@ public:
     };
 
     virtual bool isScrollingStateScrollingNode() OVERRIDE { return true; }
-
-    virtual PassOwnPtr<ScrollingStateNode> cloneAndResetNode() OVERRIDE;
 
     virtual bool hasChangedProperties() const OVERRIDE { return m_changedProperties; }
     virtual unsigned changedProperties() const OVERRIDE { return m_changedProperties; }
@@ -107,9 +107,10 @@ public:
 
     bool requestedScrollPositionRepresentsProgrammaticScroll() const { return m_requestedScrollPositionRepresentsProgrammaticScroll; }
 
+    virtual void dumpProperties(TextStream&, int indent) const OVERRIDE;
+
 private:
     ScrollingStateScrollingNode(ScrollingStateTree*, ScrollingNodeID);
-    ScrollingStateScrollingNode(ScrollingStateScrollingNode*);
 
     unsigned m_changedProperties;
 

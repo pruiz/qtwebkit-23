@@ -262,6 +262,7 @@ COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleUserInterfaceTooltip, UserInter
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleToggleButton, ToggleButtonRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleCanvas, CanvasRole);
 COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleLegend, LegendRole);
+COMPILE_ASSERT_MATCHING_ENUM(WebAccessibilityRoleSVGRoot, SVGRootRole);
 
 COMPILE_ASSERT_MATCHING_ENUM(WebApplicationCacheHost::Uncached, ApplicationCacheHost::UNCACHED);
 COMPILE_ASSERT_MATCHING_ENUM(WebApplicationCacheHost::Idle, ApplicationCacheHost::IDLE);
@@ -619,8 +620,10 @@ COMPILE_ASSERT_MATCHING_ENUM(WebReferrerPolicyDefault, ReferrerPolicyDefault);
 COMPILE_ASSERT_MATCHING_ENUM(WebReferrerPolicyNever, ReferrerPolicyNever);
 COMPILE_ASSERT_MATCHING_ENUM(WebReferrerPolicyOrigin, ReferrerPolicyOrigin);
 
-COMPILE_ASSERT_MATCHING_ENUM(WebContentSecurityPolicyTypeReportOnly, ContentSecurityPolicy::ReportOnly);
-COMPILE_ASSERT_MATCHING_ENUM(WebContentSecurityPolicyTypeEnforcePolicy, ContentSecurityPolicy::EnforcePolicy);
+COMPILE_ASSERT_MATCHING_ENUM(WebContentSecurityPolicyTypeReportStableDirectives, ContentSecurityPolicy::ReportStableDirectives);
+COMPILE_ASSERT_MATCHING_ENUM(WebContentSecurityPolicyTypeEnforceStableDirectives, ContentSecurityPolicy::EnforceStableDirectives);
+COMPILE_ASSERT_MATCHING_ENUM(WebContentSecurityPolicyTypeReportAllDirectives, ContentSecurityPolicy::ReportAllDirectives);
+COMPILE_ASSERT_MATCHING_ENUM(WebContentSecurityPolicyTypeEnforceAllDirectives, ContentSecurityPolicy::EnforceAllDirectives);
 
 COMPILE_ASSERT_MATCHING_ENUM(WebURLResponse::Unknown, ResourceResponse::Unknown);
 COMPILE_ASSERT_MATCHING_ENUM(WebURLResponse::HTTP_0_9, ResourceResponse::HTTP_0_9);

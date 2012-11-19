@@ -904,6 +904,10 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::valueForFilter(const RenderObj
             break;
         }
 #if ENABLE(CSS_SHADERS)
+        case FilterOperation::VALIDATED_CUSTOM:
+            // ValidatedCustomFilterOperation is not supposed to end up in the RenderStyle.
+            ASSERT_NOT_REACHED();
+            break;
         case FilterOperation::CUSTOM: {
             CustomFilterOperation* customOperation = static_cast<CustomFilterOperation*>(filterOperation);
             filterValue = WebKitCSSFilterValue::create(WebKitCSSFilterValue::CustomFilterOperation);
@@ -942,7 +946,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::valueForFilter(const RenderObj
             
             // FIXME: The specification doesn't have any "attached" identifier. Should we add one?
             // https://bugs.webkit.org/show_bug.cgi?id=72700
-            if (customOperation->meshType() == CustomFilterOperation::DETACHED)
+            if (customOperation->meshType() == MeshTypeDetached)
                 meshParameters->append(cssValuePool().createIdentifierValue(CSSValueDetached));
             
             filterValue->append(meshParameters.release());
@@ -2134,7 +2138,7 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(CSSPropert
         case CSSPropertyWordWrap:
             return cssValuePool().createValue(style->overflowWrap());
         case CSSPropertyWebkitLineBreak:
-            return cssValuePool().createValue(style->khtmlLineBreak());
+            return cssValuePool().createValue(style->lineBreak());
         case CSSPropertyWebkitNbspMode:
             return cssValuePool().createValue(style->nbspMode());
         case CSSPropertyResize:
@@ -2725,20 +2729,20 @@ String CSSComputedStyleDeclaration::item(unsigned i) const
     return getPropertyNameString(computedProperties[i]);
 }
 
-bool CSSComputedStyleDeclaration::cssPropertyMatches(const CSSProperty* property) const
+bool CSSComputedStyleDeclaration::cssPropertyMatches(const StylePropertySet::PropertyReference& property) const
 {
-    if (property->id() == CSSPropertyFontSize && property->value()->isPrimitiveValue() && m_node) {
+    if (property.id() == CSSPropertyFontSize && property.value()->isPrimitiveValue() && m_node) {
         m_node->document()->updateLayoutIgnorePendingStylesheets();
         RenderStyle* style = m_node->computedStyle(m_pseudoElementSpecifier);
         if (style && style->fontDescription().keywordSize()) {
             int sizeValue = cssIdentifierForFontSizeKeyword(style->fontDescription().keywordSize());
-            CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(property->value());
+            const CSSPrimitiveValue* primitiveValue = static_cast<const CSSPrimitiveValue*>(property.value());
             if (primitiveValue->isIdent() && primitiveValue->getIdent() == sizeValue)
                 return true;
         }
     }
-    RefPtr<CSSValue> value = getPropertyCSSValue(property->id());
-    return value && value->cssText() == property->value()->cssText();
+    RefPtr<CSSValue> value = getPropertyCSSValue(property.id());
+    return value && value->cssText() == property.value()->cssText();
 }
 
 PassRefPtr<StylePropertySet> CSSComputedStyleDeclaration::copy() const

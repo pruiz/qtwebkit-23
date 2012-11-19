@@ -25,6 +25,8 @@
 #include "FindClientEfl.h"
 #include "FormClientEfl.h"
 #include "InputMethodContextEfl.h"
+#include "LayerTreeCoordinatorProxy.h"
+#include "LayerTreeRenderer.h"
 #include "PageClientImpl.h"
 #include "PageLoadClientEfl.h"
 #include "PagePolicyClientEfl.h"
@@ -55,6 +57,10 @@
 
 #if ENABLE(FULLSCREEN_API)
 #include "WebFullScreenManagerProxy.h"
+#endif
+
+#if USE(ACCELERATED_COMPOSITING)
+#include <Evas_GL.h>
 #endif
 
 using namespace WebCore;
@@ -105,11 +111,6 @@ EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<Ewk_Context> context, Pas
     , m_pageViewportControllerClient(PageViewportControllerClientEfl::create(this))
     , m_pageViewportController(adoptPtr(new PageViewportController(m_pageProxy.get(), m_pageViewportControllerClient.get())))
 #endif
-#if USE(ACCELERATED_COMPOSITING)
-    , m_evasGl(0)
-    , m_evasGlContext(0)
-    , m_evasGlSurface(0)
-#endif
     , m_settings(Ewk_Settings::create(this))
     , m_cursorGroup(0)
     , m_mouseEventsEnabled(false)
@@ -126,6 +127,9 @@ EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<Ewk_Context> context, Pas
 #if USE(COORDINATED_GRAPHICS)
     m_pageProxy->pageGroup()->preferences()->setAcceleratedCompositingEnabled(true);
     m_pageProxy->pageGroup()->preferences()->setForceCompositingMode(true);
+#if ENABLE(WEBGL)
+    m_pageProxy->pageGroup()->preferences()->setWebGLEnabled(true);
+#endif
     m_pageProxy->setUseFixedLayout(true);
 #endif
 
@@ -233,38 +237,49 @@ void EwkViewImpl::setCursor(const Cursor& cursor)
     ecore_evas_object_cursor_set(ecoreEvas, cursorObject.release().leakRef(), EVAS_LAYER_MAX, hotspotX, hotspotY);
 }
 
-void EwkViewImpl::displayTimerFired(WebCore::Timer<EwkViewImpl>*)
+void EwkViewImpl::displayTimerFired(Timer<EwkViewImpl>*)
 {
+#if USE(COORDINATED_GRAPHICS)
     Ewk_View_Smart_Data* sd = smartData();
 
+    evas_gl_make_current(evasGL(), evasGLSurface(), evasGLContext());
+
+    // We are supposed to clip to the actual viewport, nothing less.
+    IntRect viewport(sd->view.x, sd->view.y, sd->view.w, sd->view.h);
+
+    IntPoint scrollPosition = m_pageViewportControllerClient->scrollPosition();
+    float scaleFactor = m_pageViewportControllerClient->scaleFactor();
+
+    WebCore::TransformationMatrix matrix;
+    matrix.translate(viewport.x(), viewport.y());
+    matrix.scale(scaleFactor);
+    matrix.translate(-scrollPosition.x(), -scrollPosition.y());
+
+    LayerTreeRenderer* renderer = page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer();
+    renderer->setActive(true);
+    renderer->syncRemoteContent();
+
+    renderer->paintToCurrentGLContext(matrix, /* opacity */ 1, viewport);
+
+    evas_object_image_data_update_add(sd->image, viewport.x(), viewport.y(), viewport.width(), viewport.height());
+#endif
+}
+
+void EwkViewImpl::update(const IntRect& rect)
+{
+#if USE(COORDINATED_GRAPHICS)
+    // Coordinated graphices needs to schedule an full update, not
+    // repainting of a region. Update in the event loop.
+    UNUSED_PARAM(rect);
+    if (!m_displayTimer.isActive())
+        m_displayTimer.startOneShot(0);
+#else
+    Ewk_View_Smart_Data* sd = smartData();
     if (!sd->image)
         return;
 
-    Region dirtyRegion;
-    for (Vector<IntRect>::iterator it = m_dirtyRects.begin(); it != m_dirtyRects.end(); ++it)
-        dirtyRegion.unite(*it);
-
-    m_dirtyRects.clear();
-
-    Vector<IntRect> rects = dirtyRegion.rects();
-    Vector<IntRect>::iterator end = rects.end();
-
-    for (Vector<IntRect>::iterator it = rects.begin(); it != end; ++it) {
-        IntRect rect = *it;
-#if USE(COORDINATED_GRAPHICS)
-        evas_gl_make_current(m_evasGl, m_evasGlSurface, m_evasGlContext);
-        m_pageViewportControllerClient->display(rect, IntPoint(sd->view.x, sd->view.y));
+    evas_object_image_data_update_add(sd->image, rect.x(), rect.y(), rect.width(), rect.height());
 #endif
-
-        evas_object_image_data_update_add(sd->image, rect.x(), rect.y(), rect.width(), rect.height());
-    }
-}
-
-void EwkViewImpl::redrawRegion(const IntRect& rect)
-{
-    if (!m_displayTimer.isActive())
-        m_displayTimer.startOneShot(0);
-    m_dirtyRects.append(rect);
 }
 
 #if ENABLE(FULLSCREEN_API)
@@ -449,7 +464,7 @@ bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
 {
     Ewk_View_Smart_Data* sd = smartData();
 
-    Evas_GL_Config evasGlConfig = {
+    Evas_GL_Config evasGLConfig = {
         EVAS_GL_RGBA_8888,
         EVAS_GL_DEPTH_BIT_8,
         EVAS_GL_STENCIL_NONE,
@@ -457,18 +472,18 @@ bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
         EVAS_GL_MULTISAMPLE_NONE
     };
 
-    ASSERT(!m_evasGlSurface);
-    m_evasGlSurface = evas_gl_surface_create(m_evasGl, &evasGlConfig, viewSize.width(), viewSize.height());
-    if (!m_evasGlSurface)
+    ASSERT(!m_evasGLSurface);
+    m_evasGLSurface = EvasGLSurface::create(evasGL(), &evasGLConfig, viewSize);
+    if (!m_evasGLSurface)
         return false;
 
     Evas_Native_Surface nativeSurface;
-    evas_gl_native_surface_get(m_evasGl, m_evasGlSurface, &nativeSurface);
+    evas_gl_native_surface_get(evasGL(), evasGLSurface(), &nativeSurface);
     evas_object_image_native_surface_set(sd->image, &nativeSurface);
 
-    evas_gl_make_current(m_evasGl, m_evasGlSurface, m_evasGlContext);
+    evas_gl_make_current(evasGL(), evasGLSurface(), evasGLContext());
 
-    Evas_GL_API* gl = evas_gl_api_get(evasGl());
+    Evas_GL_API* gl = evas_gl_api_get(evasGL());
     gl->glViewport(0, 0, viewSize.width() + sd->view.x, viewSize.height() + sd->view.y);
 
     return true;
@@ -476,29 +491,27 @@ bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
 
 bool EwkViewImpl::enterAcceleratedCompositingMode()
 {
-    if (m_evasGl) {
+    if (m_evasGL) {
         EINA_LOG_DOM_WARN(_ewk_log_dom, "Accelerated compositing mode already entered.");
         return false;
     }
 
     Evas* evas = evas_object_evas_get(m_view);
-    m_evasGl = evas_gl_new(evas);
-    if (!m_evasGl)
+    m_evasGL = adoptPtr(evas_gl_new(evas));
+    if (!m_evasGL)
         return false;
 
-    m_evasGlContext = evas_gl_context_create(m_evasGl, 0);
-    if (!m_evasGlContext) {
-        evas_gl_free(m_evasGl);
-        m_evasGl = 0;
+    m_evasGLContext = EvasGLContext::create(evasGL());
+    if (!m_evasGLContext) {
+        EINA_LOG_DOM_WARN(_ewk_log_dom, "Failed to create GLContext.");
+        m_evasGL.clear();
         return false;
     }
 
     if (!createGLSurface(size())) {
-        evas_gl_context_destroy(m_evasGl, m_evasGlContext);
-        m_evasGlContext = 0;
-
-        evas_gl_free(m_evasGl);
-        m_evasGl = 0;
+        EINA_LOG_DOM_WARN(_ewk_log_dom, "Failed to create GLSurface.");
+        m_evasGLContext.clear();
+        m_evasGL.clear();
         return false;
     }
 
@@ -508,20 +521,11 @@ bool EwkViewImpl::enterAcceleratedCompositingMode()
 
 bool EwkViewImpl::exitAcceleratedCompositingMode()
 {
-    EINA_SAFETY_ON_NULL_RETURN_VAL(m_evasGl, false);
+    EINA_SAFETY_ON_NULL_RETURN_VAL(m_evasGL, false);
 
-    if (m_evasGlSurface) {
-        evas_gl_surface_destroy(m_evasGl, m_evasGlSurface);
-        m_evasGlSurface = 0;
-    }
-
-    if (m_evasGlContext) {
-        evas_gl_context_destroy(m_evasGl, m_evasGlContext);
-        m_evasGlContext = 0;
-    }
-
-    evas_gl_free(m_evasGl);
-    m_evasGl = 0;
+    m_evasGLSurface.clear();
+    m_evasGLContext.clear();
+    m_evasGL.clear();
 
     return true;
 }

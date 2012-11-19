@@ -30,6 +30,7 @@
 #include "WKAPICast.h"
 #include "WKFrame.h"
 #include "WKPage.h"
+#include "ewk_auth_request_private.h"
 #include "ewk_back_forward_list_private.h"
 #include "ewk_error_private.h"
 #include "ewk_intent_private.h"
@@ -136,7 +137,7 @@ void PageLoadClientEfl::didCommitLoadForFrame(WKPageRef, WKFrameRef frame, WKTyp
         return;
 
     EwkViewImpl* viewImpl = toPageLoadClientEfl(clientInfo)->viewImpl();
-    viewImpl->smartCallback<LoadCommitted>().call();
+    viewImpl->informLoadCommitted();
 }
 #endif
 
@@ -159,6 +160,14 @@ void PageLoadClientEfl::didSameDocumentNavigationForFrame(WKPageRef, WKFrameRef 
 
     EwkViewImpl* viewImpl = toPageLoadClientEfl(clientInfo)->viewImpl();
     viewImpl->informURLChange();
+}
+
+void PageLoadClientEfl::didReceiveAuthenticationChallengeInFrame(WKPageRef, WKFrameRef, WKAuthenticationChallengeRef authenticationChallenge, const void* clientInfo)
+{
+    EwkViewImpl* viewImpl = toPageLoadClientEfl(clientInfo)->viewImpl();
+
+    RefPtr<Ewk_Auth_Request> authenticationRequest = Ewk_Auth_Request::create(toImpl(authenticationChallenge));
+    viewImpl->smartCallback<AuthenticationRequest>().call(authenticationRequest.get());
 }
 
 PageLoadClientEfl::PageLoadClientEfl(EwkViewImpl* viewImpl)
@@ -191,6 +200,7 @@ PageLoadClientEfl::PageLoadClientEfl(EwkViewImpl* viewImpl)
 #endif
     loadClient.didChangeBackForwardList = didChangeBackForwardList;
     loadClient.didSameDocumentNavigationForFrame = didSameDocumentNavigationForFrame;
+    loadClient.didReceiveAuthenticationChallengeInFrame = didReceiveAuthenticationChallengeInFrame;
     WKPageSetPageLoaderClient(pageRef, &loadClient);
 }
 

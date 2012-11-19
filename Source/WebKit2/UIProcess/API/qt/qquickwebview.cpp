@@ -323,6 +323,9 @@ void QQuickWebViewPrivate::initialize(WKContextRef contextRef, WKPageGroupRef pa
 
     pageClient.initialize(q_ptr, pageViewPrivate->eventHandler.data(), &undoController);
     webPageProxy->initializeWebPage();
+
+    q_ptr->setAcceptedMouseButtons(Qt::MouseButtonMask);
+    q_ptr->setAcceptHoverEvents(true);
 }
 
 void QQuickWebViewPrivate::loadDidStop()
@@ -421,9 +424,6 @@ void QQuickWebViewPrivate::handleMouseEvent(QMouseEvent* event)
 {
     switch (event->type()) {
     case QEvent::MouseButtonPress:
-    case QEvent::MouseButtonDblClick:
-        // If a MouseButtonDblClick was received then we got a MouseButtonPress before
-        // handleMousePressEvent will take care of double clicks.
         pageView->eventHandler()->handleMousePressEvent(event);
         break;
     case QEvent::MouseMove:
@@ -431,6 +431,11 @@ void QQuickWebViewPrivate::handleMouseEvent(QMouseEvent* event)
         break;
     case QEvent::MouseButtonRelease:
         pageView->eventHandler()->handleMouseReleaseEvent(event);
+        break;
+    case QEvent::MouseButtonDblClick:
+        // If a MouseButtonDblClick was received then we got a MouseButtonPress before.
+        // WebCore will build double-clicks out of press events.
+        event->accept();
         break;
     default:
         ASSERT_NOT_REACHED();
@@ -807,11 +812,7 @@ QQuickWebViewLegacyPrivate::QQuickWebViewLegacyPrivate(QQuickWebView* viewport)
 
 void QQuickWebViewLegacyPrivate::initialize(WKContextRef contextRef, WKPageGroupRef pageGroupRef)
 {
-    Q_Q(QQuickWebView);
     QQuickWebViewPrivate::initialize(contextRef, pageGroupRef);
-
-    q->setAcceptedMouseButtons(Qt::MouseButtonMask);
-    q->setAcceptHoverEvents(true);
 
     // Trigger setting of correct visibility flags after everything was allocated and initialized.
     _q_onVisibleChanged();
@@ -849,7 +850,6 @@ void QQuickWebViewLegacyPrivate::setZoomFactor(qreal factor)
 QQuickWebViewFlickablePrivate::QQuickWebViewFlickablePrivate(QQuickWebView* viewport)
     : QQuickWebViewPrivate(viewport)
 {
-    viewport->setAcceptHoverEvents(false);
 }
 
 void QQuickWebViewFlickablePrivate::initialize(WKContextRef contextRef, WKPageGroupRef pageGroupRef)

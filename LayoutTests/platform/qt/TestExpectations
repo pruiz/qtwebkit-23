@@ -340,6 +340,9 @@ fast/js/i18n-bindings-locale.html
 # JSC does not support setIsolatedWorldSecurityOrigin, (http://webkit.org/b/61540)
 http/tests/security/isolatedWorld/cross-origin-xhr.html
 
+# JSC also doesn't support setIsolatedWorldContentSecurityPolicy (webkit.org/b/100815)
+http/tests/security/isolatedWorld/bypass-main-world-csp.html
+
 # This test is for clients that choose to make the missing plugin indicator a button
 plugins/clicking-missing-plugin-fires-delegate.html
 
@@ -447,6 +450,9 @@ fast/js/names.html
 
 # Don't have GestureTapCancel event type
 touchadjustment/touch-links-active.html
+
+# Don't have width/height on GestureLongPress necessary to enable adjustment
+touchadjustment/touch-links-longpress.html
 
 # ENABLE(HIDDEN_PAGE_DOM_TIMER_THROTTLING) is disabled
 fast/dom/timer-throttling-hidden-page.html
@@ -2469,6 +2475,9 @@ webkit.org/b/23166 ietestcenter/css3/bordersbackgrounds/border-radius-clip-002.h
 # css3-conditionals support is not yet enabled.
 webkit.org/b/86146 css3/supports.html
 
+# CSS Device Adaptation is not enabled.
+webkit.org/b/95969 css3/device-adapt [ Skip ]
+
 # Added by bug 89826
 webkit.org/b/94005 css2.1/20110323/word-spacing-remove-space-003.htm [ ImageOnlyFailure ]
 webkit.org/b/94005 css2.1/20110323/word-spacing-remove-space-006.htm [ ImageOnlyFailure ]
@@ -2479,6 +2488,8 @@ webkit.org/b/98525 plugins/mouse-click-plugin-clears-selection.html
 webkit.org/b/98525 plugins/netscape-dom-access.html
 webkit.org/b/98525 plugins/resize-from-plugin.html
 webkit.org/b/98640 plugins/refcount-leaks.html
+
+webkit.org/b/99893 svg/animations/mozilla/animateMotion-mpath-targetChange-1.svg [ ImageOnlyFailure ]
 
 # New inspector/profiler/memory-instrumentation-canvas.html fails on JSC platforms
 webkit.org/b/99001 inspector/profiler/memory-instrumentation-canvas.html
@@ -2496,3 +2507,11 @@ webkit.org/b/100117 fast/xmlhttprequest/xmlhttprequest-recursive-sync-event.html
 
 # [Qt] New http/tests/inspector/network/image-as-text-loading-data-url.html fails
 webkit.org/b/100196 http/tests/inspector/network/image-as-text-loading-data-url.html
+
+webkit.org/b/100424 editing/selection/user-select-all-selection.html [ Failure ]
+
+# REGRESSION(r132757): It made 2 jquery tests assert
+webkit.org/b/100636 jquery/manipulation.html
+webkit.org/b/100636 jquery/traversing.html
+
+webkit.org/b/100846 inspector-protocol/debugger-pause-dedicated-worker.html [ Skip ]

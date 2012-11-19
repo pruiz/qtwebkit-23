@@ -157,6 +157,7 @@
 
 #if ENABLE(CSS_SHADERS)
 #include "CustomFilterArrayParameter.h"
+#include "CustomFilterConstants.h"
 #include "CustomFilterNumberParameter.h"
 #include "CustomFilterOperation.h"
 #include "CustomFilterParameter.h"
@@ -4248,18 +4249,6 @@ Color StyleResolver::colorFromPrimitiveValue(CSSPrimitiveValue* value, bool forV
     }
 }
 
-bool StyleResolver::hasSelectorForAttribute(const AtomicString &attrname) const
-{
-    return m_features.attrsInRules.contains(attrname.impl());
-}
-
-bool StyleResolver::hasSelectorForId(const AtomicString& idValue) const
-{
-    if (idValue.isEmpty())
-        return false;
-    return m_features.idsInRules.contains(idValue.impl());
-}
-
 void StyleResolver::addViewportDependentMediaQueryResult(const MediaQueryExp* expr, bool result)
 {
     m_viewportDependentMediaQueryResults.append(adoptPtr(new MediaQueryResult(*expr, result)));
@@ -4823,8 +4812,8 @@ PassRefPtr<CustomFilterOperation> StyleResolver::createCustomFilterOperation(Web
     
     unsigned meshRows = 1;
     unsigned meshColumns = 1;
-    CustomFilterOperation::MeshBoxType meshBoxType = CustomFilterOperation::FILTER_BOX;
-    CustomFilterOperation::MeshType meshType = CustomFilterOperation::ATTACHED;
+    CustomFilterMeshBoxType meshBoxType = MeshBoxTypeFilter;
+    CustomFilterMeshType meshType = MeshTypeAttached;
     
     CSSValue* parametersValue = 0;
     
@@ -4868,7 +4857,7 @@ PassRefPtr<CustomFilterOperation> StyleResolver::createCustomFilterOperation(Web
         if (iterator.hasMore() && iterator.isPrimitiveValue()) {
             CSSPrimitiveValue* primitiveValue = static_cast<CSSPrimitiveValue*>(iterator.value());
             if (primitiveValue->getIdent() == CSSValueDetached) {
-                meshType = CustomFilterOperation::DETACHED;
+                meshType = MeshTypeDetached;
                 iterator.advance();
             }
         }
@@ -4888,7 +4877,7 @@ PassRefPtr<CustomFilterOperation> StyleResolver::createCustomFilterOperation(Web
     if (parametersValue && !parseCustomFilterParameterList(parametersValue, parameterList))
         return 0;
     
-    RefPtr<StyleCustomFilterProgram> program = StyleCustomFilterProgram::create(vertexShader.release(), fragmentShader.release(), programType, mixSettings);
+    RefPtr<StyleCustomFilterProgram> program = StyleCustomFilterProgram::create(vertexShader.release(), fragmentShader.release(), programType, mixSettings, meshType);
     return CustomFilterOperation::create(program.release(), parameterList, meshRows, meshColumns, meshBoxType, meshType);
 }
 #endif
@@ -4920,6 +4909,11 @@ bool StyleResolver::createFilterOperations(CSSValue* inValue, RenderStyle* style
         FilterOperation::OperationType operationType = filterOperationForType(filterValue->operationType());
 
 #if ENABLE(CSS_SHADERS)
+        if (operationType == FilterOperation::VALIDATED_CUSTOM) {
+            // ValidatedCustomFilterOperation is not supposed to end up in the RenderStyle.
+            ASSERT_NOT_REACHED();
+            continue;
+        }
         if (operationType == FilterOperation::CUSTOM) {
             RefPtr<CustomFilterOperation> operation = createCustomFilterOperation(filterValue);
             if (!operation)

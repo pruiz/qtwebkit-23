@@ -269,6 +269,9 @@ CSSParser::CSSParser(const CSSParserContext& context)
     , m_lastSelectorLineNumber(0)
     , m_allowImportRules(true)
     , m_allowNamespaceDeclarations(true)
+#if ENABLE(CSS_DEVICE_ADAPTATION)
+    , m_inViewport(false)
+#endif
     , m_selectorVector(adoptPtr(new CSSSelectorVector))
 {
 #if YYDEBUG > 0
@@ -827,8 +830,8 @@ static inline bool isValidKeywordPropertyAndValue(CSSPropertyID propertyId, int 
         if (valueID == CSSValueNone || valueID == CSSValueEdges)
             return true;
         break;
-    case CSSPropertyWebkitLineBreak: // normal | after-white-space
-        if (valueID == CSSValueNormal || valueID == CSSValueAfterWhiteSpace)
+    case CSSPropertyWebkitLineBreak: // auto | loose | normal | strict | after-white-space
+        if (valueID == CSSValueAuto || valueID == CSSValueLoose || valueID == CSSValueNormal || valueID == CSSValueStrict || valueID == CSSValueAfterWhiteSpace)
             return true;
         break;
     case CSSPropertyWebkitLineSnap:
@@ -1874,15 +1877,18 @@ bool CSSParser::parseValue(CSSPropertyID propId, bool important)
                 coords.append(int(value->fValue));
                 value = m_valueList->next();
             }
+            bool hasHotSpot = false;
             IntPoint hotSpot(-1, -1);
             int nrcoords = coords.size();
             if (nrcoords > 0 && nrcoords != 2)
                 return false;
-            if (nrcoords == 2)
+            if (nrcoords == 2) {
+                hasHotSpot = true;
                 hotSpot = IntPoint(coords[0], coords[1]);
+            }
 
             if (!uri.isNull())
-                list->append(CSSCursorImageValue::create(completeURL(uri), hotSpot));
+                list->append(CSSCursorImageValue::create(completeURL(uri), hasHotSpot, hotSpot));
 
             if ((inStrictMode() && !value) || (value && !(value->unit == CSSParserValue::Operator && value->iValue == ',')))
                 return false;
@@ -8007,6 +8013,8 @@ bool CSSParser::parsePerspectiveOrigin(CSSPropertyID propId, CSSPropertyID& prop
 
     switch (propId) {
         case CSSPropertyWebkitPerspectiveOrigin:
+            if (m_valueList->size() > 2)
+                return false;
             parseFillPosition(m_valueList.get(), value, value2);
             break;
         case CSSPropertyWebkitPerspectiveOriginX: {
@@ -9313,8 +9321,15 @@ inline void CSSParser::detectAtToken(int length, bool hasEscape)
             return;
 
         case 17:
-            if (!hasEscape && isEqualToCSSIdentifier(name + 2, "webkit-selector"))
+            if (hasEscape)
+                return;
+
+            if (isASCIIAlphaCaselessEqual(name[16], 'r') && isEqualToCSSIdentifier(name + 2, "webkit-selecto"))
                 m_token = WEBKIT_SELECTOR_SYM;
+#if ENABLE(CSS_DEVICE_ADAPTATION)
+            else if (isASCIIAlphaCaselessEqual(name[16], 't') && isEqualToCSSIdentifier(name + 2, "webkit-viewpor"))
+                m_token = WEBKIT_VIEWPORT_RULE_SYM;
+#endif
             return;
 
         case 18:
@@ -10386,6 +10401,24 @@ void CSSParser::markPropertyEnd(bool isImportantFound, bool isPropertyParsed)
     }
     resetPropertyRange();
 }
+
+#if ENABLE(CSS_DEVICE_ADAPTATION)
+StyleRuleBase* CSSParser::createViewportRule()
+{
+    m_allowImportRules = m_allowNamespaceDeclarations = false;
+
+    RefPtr<StyleRuleViewport> rule = StyleRuleViewport::create();
+
+    rule->setProperties(createStylePropertySet());
+    clearProperties();
+
+    StyleRuleViewport* result = rule.get();
+    m_parsedRules.append(rule.release());
+    processAndAddNewRuleToSourceTreeIfNeeded();
+
+    return result;
+}
+#endif
 
 template <typename CharacterType>
 static CSSPropertyID cssPropertyID(const CharacterType* propertyName, unsigned length)

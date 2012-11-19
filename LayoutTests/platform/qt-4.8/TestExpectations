@@ -55,6 +55,52 @@ editing/selection/click-left-of-rtl-wrapping-text.html
 #################################################
 
 #################################################
+# Fails with Qt xmlpatterns, but pass with libxml2:
+
+# [Qt4] Five http/tests/xmlviewer/dumpAsText tests fails
+# https://bugs.webkit.org/show_bug.cgi?id=99014
+#webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/svg.xml [ Failure ]
+#webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer-charset-cp1251.xml [ Failure ]
+#webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer-charset-utf8.xml [ Failure ]
+#webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer.xml [ Failure ]
+#webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xsl-stylesheet.xml [ Failure ]
+
+# [Qt] REGRESSION(r114059): It made these tests fail
+#webkit.org/b/83432 fast/dom/dom-parse-serialize-display.html [ Failure ]
+#webkit.org/b/83432 fast/dom/dom-parse-serialize-xmldecl.html [ Failure ]
+#webkit.org/b/83432 fast/dom/dom-parse-serialize.html [ Failure ]
+#webkit.org/b/83432 fast/xmlhttprequest/xmlhttprequest-get.xhtml [ Failure ]
+
+#svg/custom/junk-data.svg [ Failure ]
+#svg/custom/missing-xlink.svg [ Failure ]
+#svg/custom/path-bad-data.svg [ Failure ]
+#svg/custom/use-invalid-pattern.svg [ Failure ]
+#svg/hixie/error/012.xml [ Failure ]
+#webkit.org/b/46093 svg/custom/use-font-face-crash.svg [ Failure ]
+#webkit.org/b/46093 svg/zoom/text/zoom-coords-viewattr-01-b.svg [ Failure ]
+#svg/W3C-SVG-1.1/coords-viewattr-01-b.svg [ Failure ]
+#svg/W3C-SVG-1.1/coords-viewattr-02-b.svg [ Failure ]
+
+#fast/parser/external-entities-in-xslt.xml [ Failure ]
+#fast/parser/innerhtml-with-prefixed-elements.xhtml [ Failure ]
+#fast/parser/xhtml-innerhtml-null-byte.xhtml [ Failure ]
+#fast/xsl/default-html.html [ Failure ]
+#fast/xsl/document-function.xml [ Failure ]
+#fast/xsl/dtd-in-source-document.xml [ Failure ]
+#fast/xsl/exslt-node-set.xml [ Failure ]
+#fast/xsl/import-after-comment.xml [ Failure ]
+#fast/xsl/import-non-document-node.xhtml [ Failure ]
+#fast/xsl/mozilla-tests.xml [ Failure ]
+#fast/xsl/sort-unicode.xml [ Failure ]
+#fast/xsl/xslt-doc-enc.xml [ Failure ]
+#fast/xsl/xslt-nested-stylesheets.xml [ Failure ]
+#fast/xsl/xslt-processor.html [ Failure ]
+#fast/xsl/xslt-second-level-import.xml [ Failure ]
+#fast/xsl/xslt-url.xml [ Failure ]
+#fast/xsl/xslt-entity.xml [ Failure ]
+#################################################
+
+#################################################
 # Moved from qt/Skipped:
 # Failing since isWordTextBreak is not implemented. https://bugs.webkit.org/show_bug.cgi?id=81136
 editing/selection/move-by-word-visually-crash-test-1.html
@@ -388,8 +434,6 @@ fast/text/textIteratorNilRenderer.html [ Failure ]
 fast/text/whitespace/028.html [ Failure ]
 fast/transforms/transformed-focused-text-input.html [ Failure ]
 fast/writing-mode/fallback-orientation.html [ Failure ]
-fast/xsl/document-function.xml [ Failure ]
-fast/xsl/xslt-entity.xml [ Failure ]
 http/tests/misc/location-replace-crossdomain.html [ Failure ]
 http/tests/navigation/javascriptlink-frames.html [ Failure ]
 http/tests/navigation/postredirect-basic.html [ Failure ]
@@ -706,14 +750,6 @@ fast/events/touch/gesture/right-click-gestures-set-cursor-at-correct-position.ht
 # https://bugs.webkit.org/show_bug.cgi?id=99013
 webkit.org/b/99013 editing/selection/5354455-1.html [ Failure ]
 
-# [Qt4] Five http/tests/xmlviewer/dumpAsText tests fails
-# https://bugs.webkit.org/show_bug.cgi?id=99014
-webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/svg.xml [ Failure ]
-webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer-charset-cp1251.xml [ Failure ]
-webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer-charset-utf8.xml [ Failure ]
-webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer.xml [ Failure ]
-webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xsl-stylesheet.xml [ Failure ]
-
 # New test failing added by https://bugs.webkit.org/show_bug.cgi?id=97639
 fast/js/string-localeCompare.html [ Failure ]
 
@@ -752,8 +788,6 @@ fast/inline/inline-box-background-repeat-x.html [ Failure ]
 fast/inline/inline-box-background-repeat-y.html [ Failure ]
 fast/inline/inline-box-background.html [ Failure ]
 webkit.org/b/65266 svg/W3C-SVG-1.1-SE/styling-pres-02-f.svg [ Failure ]
-svg/W3C-SVG-1.1/coords-viewattr-01-b.svg [ Failure ]
-svg/W3C-SVG-1.1/coords-viewattr-02-b.svg [ Failure ]
 svg/W3C-SVG-1.1/fonts-desc-02-t.svg [ Failure ]
 svg/W3C-SVG-1.1/fonts-glyph-04-t.svg [ Failure ]
 svg/batik/text/textLayout.svg [ Failure ]
@@ -764,13 +798,6 @@ svg/custom/feComponentTransfer-Discrete.svg [ Failure ]
 svg/custom/feComponentTransfer-Gamma.svg [ Failure ]
 svg/custom/feComponentTransfer-Linear.svg [ Failure ]
 svg/custom/feComponentTransfer-Table.svg [ Failure ]
-svg/custom/junk-data.svg [ Failure ]
-svg/custom/missing-xlink.svg [ Failure ]
-svg/custom/path-bad-data.svg [ Failure ]
-webkit.org/b/46093 svg/custom/use-font-face-crash.svg [ Failure ]
-webkit.org/b/46093 svg/zoom/text/zoom-coords-viewattr-01-b.svg [ Failure ]
-svg/custom/use-invalid-pattern.svg [ Failure ]
-svg/hixie/error/012.xml [ Failure ]
 svg/text/select-textLength-spacingAndGlyphs-squeeze-1.svg [ Failure ]
 svg/text/select-textLength-spacingAndGlyphs-squeeze-2.svg [ Failure ]
 svg/text/select-textLength-spacingAndGlyphs-squeeze-3.svg [ Failure ]
@@ -788,11 +815,6 @@ fast/css/case-transform.html [ Failure ]
 # New fast/dom/Window/mozilla-focus-blur.html introduced in r118916 fails
 webkit.org/b/87956 fast/dom/Window/mozilla-focus-blur.html [ Failure ]
 
-# [Qt] REGRESSION(r114059): It made these tests fail
-webkit.org/b/83432 fast/dom/dom-parse-serialize-display.html [ Failure ]
-webkit.org/b/83432 fast/dom/dom-parse-serialize-xmldecl.html [ Failure ]
-webkit.org/b/83432 fast/dom/dom-parse-serialize.html [ Failure ]
-webkit.org/b/83432 fast/xmlhttprequest/xmlhttprequest-get.xhtml [ Failure ]
 
 webkit.org/b/35973 fast/multicol/hit-test-above-or-below.html [ Failure ]
 css2.1/t051201-c23-first-line-00-b.html [ Failure ]

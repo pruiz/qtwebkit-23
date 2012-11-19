@@ -74,19 +74,14 @@ haveQt(5) {
     }
 }
 
-# We need libxml2 config test to determine to use libxml2 or not
-!contains(DEFINES, WTF_USE_LIBXML2=.) {
-    config_libxml2: DEFINES += WTF_USE_LIBXML2=1
-}
-
-# We need libxslt config test to determine to use libxslt or not
+# We need libxml2 and libxslt to be able to replace Qt xmlpatterns.
 !contains(DEFINES, ENABLE_XSLT=.) {
-    config_libxslt: DEFINES += ENABLE_XSLT=1
+    packagesExist(libxml-2.0,libxslt): DEFINES +=  WTF_USE_LIBXML2=1
 }
 
-# We need libzlib config test to determine to use enable websocket extension or not
+# We need zlib to use enable websocket extension.
 !contains(DEFINES, WTF_USE_ZLIB=.) {
-    config_libzlib: DEFINES += WTF_USE_ZLIB=1
+    packagesExist(zlib): DEFINES += WTF_USE_ZLIB=1
 }
 
 # Tiled Backing Store support
@@ -152,11 +147,8 @@ haveQt(4):contains(DEFINES, ENABLE_WEBGL=1):contains(DEFINES, WTF_USE_3D_GRAPHIC
 }
 
 !contains(DEFINES, ENABLE_XSLT=.) {
-    # Using QtXmlPatterns
-    contains(QT_CONFIG, xmlpatterns): DEFINES += ENABLE_XSLT=1
-
-    # Or libxml2 -- experimental and only works on Linux so far
-    contains(DEFINES, WTF_USE_LIBXML2=1): DEFINES += ENABLE_XSLT=1
+    # Using QtXmlPatterns or libxml2
+    contains(QT_CONFIG, xmlpatterns)|contains(DEFINES, WTF_USE_LIBXML2=1): DEFINES += ENABLE_XSLT=1
 }
 
 # Geolocation support if QtMobility exists

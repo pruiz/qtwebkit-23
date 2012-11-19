@@ -231,7 +231,8 @@ haveQt(5):linux-*:config_glx:!contains(QT_CONFIG, opengles2): DEFINES += HAVE_GL
 
 # Support for Graphics Surface
 # GraphicsSurface requires GraphicsContext3D and hence use_3d_graphics
-contains(DEFINES, WTF_USE_3D_GRAPHICS=1) {
+# GraphicsSurface has not been ported to Qt4 yet.
+haveQt(5):contains(DEFINES, WTF_USE_3D_GRAPHICS=1) {
     mac: DEFINES += WTF_USE_GRAPHICS_SURFACE=1
     win32:contains(QT_CONFIG, opengles2): DEFINES += WTF_USE_GRAPHICS_SURFACE=1
     # On linux we require GLX, libXcomposite and libXrender to enable graphics surface.

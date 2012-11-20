@@ -44,9 +44,6 @@ void SimpleFontData::determinePitch()
 
 #if HAVE(QRAWFONT)
 
-static const float smallCapsFraction = 0.7;
-static const float emphasisMarkFraction = 0.5;
-
 bool SimpleFontData::containsCharacters(const UChar* characters, int length) const
 {
     QRawFont rawFont(m_platformData.rawFont());
@@ -71,12 +68,6 @@ float SimpleFontData::platformWidthForGlyph(Glyph glyph) const
     return advances.at(0).x();
 }
 
-PassRefPtr<SimpleFontData> SimpleFontData::createScaledFontData(const FontDescription& fontDescription, float scaleFactor) const
-{
-    const float scaledSize = lroundf(fontDescription.computedSize() * scaleFactor);
-    return SimpleFontData::create(FontPlatformData(m_platformData, scaledSize), isCustomFont(), false);
-}
-
 FloatRect SimpleFontData::platformBoundsForGlyph(Glyph) const
 {
     notImplemented();
@@ -99,6 +90,12 @@ void SimpleFontData::platformGlyphInit()
     m_missingGlyphData.glyph = 0;
 }
 #endif
+
+PassRefPtr<SimpleFontData> SimpleFontData::createScaledFontData(const FontDescription& fontDescription, float scaleFactor) const
+{
+    const float scaledSize = lroundf(fontDescription.computedSize() * scaleFactor);
+    return SimpleFontData::create(FontPlatformData(m_platformData, scaledSize), isCustomFont(), false);
+}
 
 void SimpleFontData::platformInit()
 {

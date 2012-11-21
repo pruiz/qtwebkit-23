@@ -26,8 +26,6 @@ haveQt(5) {
 }
 macx: QT += xml
 
-contains(DEFINES, HAVE_FONTCONFIG=1): PKGCONFIG += fontconfig
-
 HEADERS += \
     $$PWD/../WorkQueue.h \
     $$PWD/../DumpRenderTree.h \

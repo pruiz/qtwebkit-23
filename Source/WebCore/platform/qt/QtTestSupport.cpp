@@ -62,6 +62,7 @@ void QtTestSupport::clearMemoryCaches()
 
 void QtTestSupport::initializeTestFonts()
 {
+    QFontDatabase::removeAllApplicationFonts();
 #if HAVE(FONTCONFIG)
     static int numFonts = -1;
 
@@ -96,7 +97,6 @@ void QtTestSupport::initializeTestFonts()
     numFonts = appFontSet->nfont;
 
     WebCore::fontCache()->invalidate();
-    QFontDatabase::removeAllApplicationFonts();
 #endif
 }
 

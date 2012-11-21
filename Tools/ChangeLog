@@ -1,3 +1,389 @@
+2012-11-06  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        [EFL][WK2] Minibrowser forgets http variables when url includes ampersand
+        https://bugs.webkit.org/show_bug.cgi?id=101061
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Elementary entry only returns 'markup' text, meaning ampersands
+        in a url will become "&amp;". Use elm_entry_markup_to_utf8() and
+        elm_entry_utf8_to_markup() when interacting with the entry.
+
+        * MiniBrowser/efl/main.c:
+        (on_url_changed):
+        (on_url_bar_activated):
+
+2012-11-06  Balazs Kelemen  <kbalazs@webkit.org>
+
+        DumpRenderTree should have --pixel-tests option again
+        https://bugs.webkit.org/show_bug.cgi?id=98648
+
+        Reviewed by Dirk Pranke.
+
+        Add back the --pixel-tests command line option to DumpRenderTree.
+        It was removed r124581 because tools don't use it after that patch.
+        However, it turned out that it is useful for debugging and working
+        with pixel tests.
+
+        * DumpRenderTree/efl/DumpRenderTree.cpp:
+        (parseCommandLineOptions):
+        (runTest):
+        * DumpRenderTree/gtk/DumpRenderTree.cpp:
+        (initializeGlobalsFromCommandLineOptions):
+        (runTest):
+        * DumpRenderTree/mac/DumpRenderTree.mm:
+        (initializeGlobalsFromCommandLineOptions):
+        (runTest):
+        * DumpRenderTree/qt/DumpRenderTreeMain.cpp:
+        (isOption):
+        (printUsage):
+        (main):
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::processLine):
+        * DumpRenderTree/qt/DumpRenderTreeQt.h:
+        (WebCore::DumpRenderTree::setShouldDumpPixelsForAllTests):
+        (DumpRenderTree):
+        * DumpRenderTree/win/DumpRenderTree.cpp:
+        (runTest):
+        (dllLauncherEntryPoint):
+        * DumpRenderTree/wx/DumpRenderTreeWx.cpp:
+        (runTest):
+        (MyApp::OnInit):
+        * WebKitTestRunner/TestController.cpp:
+        (WTR::TestController::TestController):
+        (WTR::TestController::initialize):
+        (WTR::TestController::runTest):
+        * WebKitTestRunner/TestController.h:
+        (TestController):
+
+2012-11-05  Dirk Pranke  <dpranke@chromium.org>
+
+        webkit-patch rebaseline*: fix typo for --results-directory
+        https://bugs.webkit.org/show_bug.cgi?id=101295
+
+        Reviewed by Ojan Vafai.
+
+        Had --results_directory instead of --results-directory in both the
+        code and the unit test.
+
+        * Scripts/webkitpy/tool/commands/rebaseline.py:
+        (AbstractParallelRebaselineCommand._rebaseline_commands):
+        * Scripts/webkitpy/tool/commands/rebaseline_unittest.py:
+        (TestRebaselineJson.test_results_directory):
+
+2012-11-05  Dirk Pranke  <dpranke@chromium.org>
+
+        webkit-patch rebaseline*: fix handling of local file urls
+        https://bugs.webkit.org/show_bug.cgi?id=101296
+
+        Reviewed by Ojan Vafai.
+
+        When using --results-directory, we need to make sure we're converting
+        paths to file:/// urls for urllib to work correctly. Also, this
+        patch reworks the unit tests to get better coverage (of the execute()
+        command) and reduce copy/pasting of mock options.
+
+        * Scripts/webkitpy/tool/commands/rebaseline.py:
+        (RebaselineTest._rebaseline_test_and_update_expectations):
+        (RebaselineTest.execute):
+        * Scripts/webkitpy/tool/commands/rebaseline_unittest.py:
+        (TestRebaselineTest.setUp):
+        (test_rebaseline_updates_expectations_file):
+        (test_rebaseline_does_not_include_overrides):
+        (test_rebaseline_test_with_results_directory):
+        (test_rebaseline_test_internal_with_move_overwritten_baselines_to):
+
+2012-11-05  Kenneth Russell  <kbr@google.com>
+
+        Added secondary email address and IRC nick.
+        https://bugs.webkit.org/show_bug.cgi?id=101290
+
+        Unreviewed change to committers.py.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-05  Glenn Adams  <glenn@skynav.com>
+
+        Add IRC alias for Glenn Adams
+        https://bugs.webkit.org/show_bug.cgi?id=101262
+
+        Reviewed by Eric Seidel.
+
+        Add IRC alias for Glenn Adams.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-05  Dima Gorbik  <dgorbik@apple.com>
+
+        Back out controversial changes from Bug 98665.
+        https://bugs.webkit.org/show_bug.cgi?id=101244
+
+        Reviewed by David Kilzer.
+
+        Backing out changes from Bug 98665 until further discussions take place on rules for including Platform.h in Assertions.h.
+
+        * DumpRenderTree/mac/MockGeolocationProvider.mm:
+
+2012-11-05  Dirk Pranke  <dpranke@chromium.org>
+
+        webkitpy: lint, clean up rebaseline.py
+        https://bugs.webkit.org/show_bug.cgi?id=101240
+
+        Reviewed by Ojan Vafai.
+
+        Miscellaneous cleanup of lint errors and warnings.
+
+        * Scripts/webkitpy/tool/commands/rebaseline.py:
+        (AbstractRebaseliningCommand):
+        (RebaselineTest._test_root):
+        (OptimizeBaselines._optimize_baseline):
+        (OptimizeBaselines.execute):
+        (AnalyzeBaselines.__init__):
+        (AbstractParallelRebaselineCommand):
+        (AbstractParallelRebaselineCommand._builders_to_fetch_from):
+        (AbstractParallelRebaselineCommand._files_to_add):
+        (AbstractParallelRebaselineCommand._rebaseline):
+        (RebaselineExpectations.__init__):
+        (Rebaseline.execute):
+        * Scripts/webkitpy/tool/commands/rebaseline_unittest.py:
+        (_BaseTestCase.setUp):
+        (TestAnalyzeBaselines.setUp):
+
+2012-11-05  Dirk Pranke  <dpranke@chromium.org>
+
+        webkit-patch optimize-baselines should take a --platform arg
+        https://bugs.webkit.org/show_bug.cgi?id=97623
+
+        Reviewed by Ojan Vafai.
+
+        So that we can optionally limit/control which platforms' results
+        are affected.
+
+        This patch adds --platform to analyze-baselines as well.
+
+        * Scripts/webkitpy/common/checkout/baselineoptimizer.py:
+        (_baseline_search_hypergraph):
+        (BaselineOptimizer.__init__):
+        * Scripts/webkitpy/common/checkout/baselineoptimizer_unittest.py:
+        (TestBaselineOptimizer.__init__):
+        (BaselineOptimizerTest.test_move_baselines):
+        * Scripts/webkitpy/tool/commands/rebaseline.py:
+        (OptimizeBaselines.__init__):
+        (OptimizeBaselines.execute):
+        (AnalyzeBaselines.__init__):
+        (AnalyzeBaselines.execute):
+        * Scripts/webkitpy/tool/commands/rebaseline_unittest.py:
+        (TestAnalyzeBaselines.test_default):
+        (TestAnalyzeBaselines.test_missing_baselines):
+
+2012-11-05  Dirk Pranke  <dpranke@chromium.org>
+
+        webkit-patch rebaseline-expectations should take a --platform arg
+        https://bugs.webkit.org/show_bug.cgi?id=97621
+
+        Reviewed by Ojan Vafai.
+
+        So that we can limit which platforms we attempt to rebaseline;
+        this can reduce the noise the command produces if some ports
+        have errors or warnings in their TestExpectations files and/or
+        help produce more predictable results.
+
+        In testing this patch, I realized that the rebaseline-in-parallel
+        commands (rebaseline-json, rebaseline-expectations, etc.) can
+        cause multiple rebaseline-test-internal commands to attempt to
+        modify the TestExpectations files concurrently, and that we needed
+        to lock the files to prevent corruption; it would be nice if
+        we can split the updating-the-expectations-files out separately
+        from updating the filesystem (much like we do with the scm updates)
+        to avoid this concurrency.
+
+        * Scripts/webkitpy/common/system/file_lock_mock.py: Added.
+        (MockFileLock):
+        (MockFileLock.__init__):
+        (MockFileLock.acquire_lock):
+        (MockFileLock.release_lock):
+        * Scripts/webkitpy/common/system/systemhost.py:
+        (SystemHost.copy_current_environment):
+        (SystemHost):
+        (SystemHost.make_file_lock):
+        * Scripts/webkitpy/common/system/systemhost_mock.py:
+        (MockSystemHost.copy_current_environment):
+        (MockSystemHost):
+        (MockSystemHost.make_file_lock):
+        * Scripts/webkitpy/tool/commands/rebaseline.py:
+        (RebaselineTest._update_expectations_file):
+        (RebaselineExpectations.__init__):
+        (RebaselineExpectations._add_tests_to_rebaseline_for_port):
+        (RebaselineExpectations.execute):
+
+2012-11-05  Dirk Pranke  <dpranke@chromium.org>
+
+        webkitpy: clean up options for specifying multiple platforms at once
+        https://bugs.webkit.org/show_bug.cgi?id=101140
+
+        Reviewed by Ojan Vafai.
+
+        This patch reworks how we display the help strings for --platform
+        options and how we filter out platforms matching a glob. This will
+        be useful as I add patches to ensure that all the webkit-patch
+        commands are using --platform consistently to filter ports.
+
+        There should be no functional changes resulting from this patch.
+
+        * Scripts/webkitpy/layout_tests/port/factory.py:
+        (platform_options):
+        (PortFactory.all_port_names):
+        (PortFactory.get_from_builder_name):
+        * Scripts/webkitpy/tool/commands/queries.py:
+        (PrintExpectations.__init__):
+        (PrintBaselines.__init__):
+        * Scripts/webkitpy/tool/commands/rebaseline.py:
+        (AbstractRebaseliningCommand):
+        (RebaselineJson.__init__):
+        * Scripts/webkitpy/tool/commands/rebaseline_unittest.py:
+        (TestRebaselineExpectations.setUp):
+        (TestRebaselineExpectations.test_rebaseline_expectations):
+
+2012-11-05  Peter Beverloo  <peter@chromium.org>
+
+        The layout test runner shouldn't wait for data if stdout/stderr have been closed
+        https://bugs.webkit.org/show_bug.cgi?id=101233
+
+        Reviewed by Dirk Pranke.
+
+        Trying to read the file descriptor for the stdout or stderr pipes when DumpRenderTree
+        has crashed during a Chromium Android layout test-run, which uses FIFOs for
+        communication, causes the File.fileno() method to raise a ValueError. Return early
+        if either of the pipes has already been closed.
+
+        * Scripts/webkitpy/layout_tests/port/server_process.py:
+        (ServerProcess._wait_for_data_and_update_buffers_using_select):
+
+2012-11-05  Dirk Pranke  <dpranke@chromium.org>
+
+        webkit-patch rebaseline is broken
+        https://bugs.webkit.org/show_bug.cgi?id=101235
+
+        Reviewed by Ojan Vafai.
+
+        It didn't get updated to handle the change in parsing --suffixes
+        properly, and the unit test didn't get updated either, masking the
+        problem.
+
+        * Scripts/webkitpy/tool/commands/rebaseline.py:
+        (Rebaseline._tests_to_update):
+        (Rebaseline.execute):
+        * Scripts/webkitpy/tool/commands/rebaseline_unittest.py:
+        (TestRebaseline.test_rebaseline):
+
+2012-11-05  Dirk Pranke  <dpranke@chromium.org>
+
+        lint-webkitpy doesn't autoinstall pylint properly.
+        https://bugs.webkit.org/show_bug.cgi?id=101106
+
+        Reviewed by Ojan Vafai.
+
+        Re-land r133381 with fix; ironically, lint-webkitpy would've
+        complained about the problem. Also modify pylintrc and clean up
+        any other lint errors in the modified files.
+
+        * Scripts/webkitpy/common/system/autoinstall.py:
+        (AutoInstaller._set_up_target_dir):
+        (AutoInstaller):
+        (AutoInstaller._make_package):
+        (AutoInstaller._create_scratch_directory):
+        (AutoInstaller._install):
+        (AutoInstaller.install):
+        * Scripts/webkitpy/pylintrc:
+        * Scripts/webkitpy/thirdparty/__init__.py:
+        (AutoinstallImportHook._ensure_autoinstalled_dir_is_in_sys_path):
+        (AutoinstallImportHook):
+        (AutoinstallImportHook.find_module):
+        (AutoinstallImportHook._install_pylint):
+        (AutoinstallImportHook._install_coverage):
+        (AutoinstallImportHook._install_eliza):
+        (AutoinstallImportHook._install_webpagereplay):
+        (AutoinstallImportHook._install):
+        * Scripts/webkitpy/thirdparty/__init___unittest.py:
+        (ThirdpartyTest.test_import_hook.MockImportHook.__init__):
+        (ThirdpartyTest.test_import_hook):
+        (ThirdpartyTest.test_imports):
+
+2012-11-05  KyungTae Kim  <ktf.kim@samsung.com>
+
+        [EFL] Fix build warning in EWebLauncher/main.c
+        https://bugs.webkit.org/show_bug.cgi?id=101197
+
+        Reviewed by Kentaro Hara.
+
+        Because the strp of _Ecore_Getopt_Value is char** (Ecore_Getopt.h),
+        The parameter of ECORE_GETOPT_VALUE_STR should be char*
+
+        * EWebLauncher/main.c:
+        (_User_Arguments):
+
+2012-11-05  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL][WK2] Add --window-size command line option to EFL MiniBrowser
+        https://bugs.webkit.org/show_bug.cgi?id=100942
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Added window-size (-s) command line option to EFL MiniBrowser.
+
+        * MiniBrowser/efl/main.c:
+        (window_create):
+        (parse_window_size):
+        (elm_main):
+
+2012-11-05  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] The icon database path should be set by the client
+        https://bugs.webkit.org/show_bug.cgi?id=101182
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Enable favicon database functionality in MiniBrowser since
+        it is used and it is no longer enabled by default.
+
+        * MiniBrowser/efl/main.c:
+        (elm_main):
+
+2012-11-03  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WK2] setPlatformStrategies always asserts after r132744
+        https://bugs.webkit.org/show_bug.cgi?id=100838
+
+        Reviewed by Simon Hausmann.
+
+        Reland with build fixes.
+
+        Turned test runners to use the new QtTestSupport.
+
+        * DumpRenderTree/qt/DumpRenderTree.pro:
+        * DumpRenderTree/qt/DumpRenderTreeMain.cpp:
+        (main):
+        * DumpRenderTree/qt/DumpRenderTreeQt.cpp:
+        (WebCore::DumpRenderTree::open):
+        * DumpRenderTree/qt/QtInitializeTestFonts.h: Removed.
+        * MiniBrowser/qt/MiniBrowser.pro:
+        * QtTestBrowser/QtTestBrowser.pro:
+        * QtTestBrowser/qttestbrowser.cpp:
+        (LauncherApplication::handleUserOptions):
+        * WebKitTestRunner/InjectedBundle/Target.pri:
+        * WebKitTestRunner/InjectedBundle/qt/ActivateFontsQt.cpp:
+        (WTR::activateFonts):
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.cpp: Removed.
+        * WebKitTestRunner/InjectedBundle/qt/QtInitializeTestFonts.h: Removed.
+        * WebKitTestRunner/InjectedBundle/qt/TestRunnerQt.cpp:
+        (WTR::TestRunner::platformInitialize):  Removed the comment from here
+        because it was just lying, apparently two times. First, it is not incorrect
+        to reinitialize our font set and clear font caches, it is what the tests
+        expect. Second, the use of QRawFont has nothing to do with the font cache.
+        * WebKitTestRunner/Target.pri:
+        * WebKitTestRunner/qt/main.cpp:
+        (main):
+
 2012-11-04  Sheriff Bot  <webkit.review.bot@gmail.com>
 
         Unreviewed, rolling out r133381.

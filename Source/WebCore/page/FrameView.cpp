@@ -267,6 +267,7 @@ void FrameView::reset()
     m_doFullRepaint = true;
     m_layoutSchedulingEnabled = true;
     m_inLayout = false;
+    m_doingPreLayoutStyleUpdate = false;
     m_inSynchronousPostLayout = false;
     m_layoutCount = 0;
     m_nestedLayoutCount = 0;
@@ -707,6 +708,10 @@ void FrameView::updateCompositingLayersAfterStyleChange()
     if (!root)
         return;
 
+    // If we expect to update compositing after an incipient layout, don't do so here.
+    if (m_doingPreLayoutStyleUpdate || layoutPending() || root->needsLayout())
+        return;
+
     // This call will make sure the cached hasAcceleratedCompositing is updated from the pref
     root->compositor()->cacheAcceleratedCompositingFlags();
     root->compositor()->updateCompositingLayers(CompositingUpdateAfterStyleChange);
@@ -1065,6 +1070,7 @@ void FrameView::layout(bool allowSubtree)
 
         // Always ensure our style info is up-to-date. This can happen in situations where
         // the layout beats any sort of style recalc update that needs to occur.
+        TemporaryChange<bool> changeDoingPreLayoutStyleUpdate(m_doingPreLayoutStyleUpdate, true);
         document->updateStyleIfNeeded();
 
         subtree = m_layoutRoot;
@@ -1845,13 +1851,44 @@ void FrameView::repaintFixedElementsAfterScrolling()
     }
 }
 
+bool FrameView::shouldUpdateFixedElementsAfterScrolling()
+{
+#if ENABLE(THREADED_SCROLLING)
+    Page* page = m_frame->page();
+    if (!page)
+        return true;
+
+    // If the scrolling thread is updating the fixed elements, then the FrameView should not update them as well.
+    if (page->mainFrame() != m_frame)
+        return true;
+
+    ScrollingCoordinator* scrollingCoordinator = page->scrollingCoordinator();
+    if (!scrollingCoordinator)
+        return true;
+
+    if (!scrollingCoordinator->supportsFixedPositionLayers())
+        return true;
+
+    if (scrollingCoordinator->shouldUpdateScrollLayerPositionOnMainThread())
+        return true;
+
+    if (inProgrammaticScroll())
+        return true;
+
+    return false;
+#endif
+    return true;
+}
+
 void FrameView::updateFixedElementsAfterScrolling()
 {
 #if USE(ACCELERATED_COMPOSITING)
+    if (!shouldUpdateFixedElementsAfterScrolling())
+        return;
+
     if (m_nestedLayoutCount <= 1 && hasViewportConstrainedObjects()) {
-        if (RenderView* root = rootRenderer(this)) {
+        if (RenderView* root = rootRenderer(this))
             root->compositor()->updateCompositingLayers(CompositingUpdateOnScroll);
-        }
     }
 #endif
 }

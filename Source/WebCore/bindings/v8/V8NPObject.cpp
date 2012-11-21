@@ -35,7 +35,6 @@
 #include "HTMLPlugInElement.h"
 #include "NPV8Object.h"
 #include "V8Binding.h"
-#include "V8DOMMap.h"
 #include "V8HTMLAppletElement.h"
 #include "V8HTMLEmbedElement.h"
 #include "V8HTMLObjectElement.h"
@@ -196,6 +195,7 @@ private:
         MapType::iterator it = m_map.find(key);
         ASSERT(it != m_map.end());
         it->value.Dispose();
+        it->value.Clear();
         m_map.remove(it);
     }
 
@@ -397,6 +397,7 @@ static void weakNPObjectCallback(v8::Persistent<v8::Value> value, void*)
     // call forgetV8ObjectForNPObject, which uses the table as well.
     staticNPObjectMap().remove(npObject, wrapper);
     wrapper.Dispose();
+    wrapper.Clear();
 
     if (_NPN_IsAlive(npObject))
         _NPN_ReleaseObject(npObject);
@@ -459,6 +460,7 @@ void forgetV8ObjectForNPObject(NPObject* object)
         V8DOMWrapper::setDOMWrapper(wrapper, npObjectTypeInfo(), 0);
         staticNPObjectMap().remove(object, wrapper);
         wrapper.Dispose();
+        wrapper.Clear();
         _NPN_ReleaseObject(object);
     }
 }

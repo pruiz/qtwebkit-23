@@ -48,10 +48,11 @@ public:
     bool setInlineStyleProperty(CSSPropertyID, double value, CSSPrimitiveValue::UnitTypes, bool important = false);
     bool setInlineStyleProperty(CSSPropertyID, const String& value, bool important = false);
     bool removeInlineStyleProperty(CSSPropertyID);
+    void removeAllInlineStyleProperties();
     
     virtual CSSStyleDeclaration* style() OVERRIDE;
 
-    const StylePropertySet* presentationAttributeStyle();
+    const StylePropertySet* attributeStyle();
 
     virtual void collectStyleForAttribute(const Attribute&, StylePropertySet*) { }
 
@@ -78,22 +79,19 @@ private:
     void inlineStyleChanged();
 
     void makePresentationAttributeCacheKey(PresentationAttributeCacheKey&) const;
-    void rebuildPresentationAttributeStyle();
+    void updateAttributeStyle();
 };
 
 inline void StyledElement::invalidateStyleAttribute()
 {
-    ASSERT(attributeData());
-    attributeData()->setStyleAttributeIsDirty(true);
+    clearIsStyleAttributeValid();
 }
 
-inline const StylePropertySet* StyledElement::presentationAttributeStyle()
+inline const StylePropertySet* StyledElement::attributeStyle()
 {
-    if (!attributeData())
-        return 0;
-    if (attributeData()->presentationAttributeStyleIsDirty())
-        rebuildPresentationAttributeStyle();
-    return attributeData()->presentationAttributeStyle();
+    if (attributeStyleDirty())
+        updateAttributeStyle();
+    return attributeData() ? attributeData()->attributeStyle() : 0;
 }
 
 } //namespace

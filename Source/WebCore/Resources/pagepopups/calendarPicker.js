@@ -139,13 +139,13 @@ function formatJapaneseImperialEra(year, month) {
 }
 
 /**
- * @param {!number} year
- * @param {!number} month
  * @return {!string}
  */
-function formatYearMonth(year, month) {
-    var yearString = localizeNumber(year);
-    var monthString = global.params.monthLabels[month];
+Month.prototype.toLocaleString = function() {
+    if (isNaN(this.year) || isNaN(this.year))
+        return "Invalid Month";
+    var yearString = localizeNumber(this.year);
+    var monthString = global.params.monthLabels[this.month];
     switch (getLanguage()) {
     case "eu":
     case "fil":
@@ -158,7 +158,7 @@ function formatYearMonth(year, month) {
     case "hu":
         return yearString + ". " + monthString;
     case "ja":
-        return yearString + "年" + formatJapaneseImperialEra(year, month) + " " + monthString;
+        return yearString + "年" + formatJapaneseImperialEra(this.year, this.month) + " " + monthString;
     case "zh":
         return yearString + "年" + monthString;
     case "ko":
@@ -172,42 +172,233 @@ function formatYearMonth(year, month) {
     default:
         return monthString + " " + yearString;
     }
-}
+};
 
 function createUTCDate(year, month, date) {
-    var newDate = new Date(Date.UTC(year, month, date));
-    if (year < 100)
-        newDate.setUTCFullYear(year);
+    var newDate = new Date(0);
+    newDate.setUTCFullYear(year);
+    newDate.setUTCMonth(month);
+    newDate.setUTCDate(date);
     return newDate;
 };
 
 /**
- * @param {string=} opt_current
- * @return {!Date}
+ * @param {string} dateString
+ * @return {?Day|Month}
  */
-function parseDateString(opt_current) {
-    if (opt_current) {
-        var result = opt_current.match(/(\d+)-(\d+)-(\d+)/);
-        if (result)
-            return createUTCDate(Number(result[1]), Number(result[2]) - 1, Number(result[3]));
-    }
-    var now = new Date();
-    // Create UTC date with same numbers as local date.
-    return createUTCDate(now.getFullYear(), now.getMonth(), now.getDate());
+function parseDateString(dateString) {
+    var month = Month.parse(dateString);
+    if (month)
+        return month;
+    return Day.parse(dateString);
 }
 
 /**
- * @param {!number} year
- * @param {!number} month
- * @param {!number} day
+ * @param {!number|Day} valueOrDayOrYear
+ * @param {!number=} month
+ * @param {!number=} date
+ */
+function Day(valueOrDayOrYear, month, date) {
+    var dateObject;
+    if (arguments.length == 3)
+        dateObject = createUTCDate(valueOrDayOrYear, month, date);
+    else if (valueOrDayOrYear instanceof Day)
+        dateObject = createUTCDate(valueOrDayOrYear.year, valueOrDayOrYear.month, valueOrDayOrYear.date);
+    else
+        dateObject = new Date(valueOrDayOrYear);
+    this.year = dateObject.getUTCFullYear();    
+    this.month = dateObject.getUTCMonth();
+    this.date = dateObject.getUTCDate();
+};
+
+Day.ISOStringRegExp = /^(\d+)-(\d+)-(\d+)$/;
+
+// See WebCore/platform/DateComponents.h.
+Day.Minimum = new Date(-62135596800000.0);
+Day.Maximum = new Date(8640000000000000.0);
+
+/**
+ * @param {!string} str
+ * @return {?Month}
+ */
+Day.parse = function(str) {
+    var match = Day.ISOStringRegExp.exec(str);
+    if (!match)
+        return null;
+    var year = parseInt(match[1], 10);
+    var month = parseInt(match[2], 10) - 1;
+    var date = parseInt(match[3], 10);
+    return new Day(year, month, date);
+};
+/**
+ * @param {!Date} date
+ * @return {!Month}
+ */
+Day.createFromDate = function(date) {
+    return new Day(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+};
+
+Day.createFromToday = function() {
+    var now = new Date();
+    return new Day(now.getFullYear(), now.getMonth(), now.getDate());
+}
+
+/**
+ * @param {!Day} other
+ * @return {!bool}
+ */
+Day.prototype.equals = function(other) {
+    return this.year === other.year && this.month === other.month && this.date === other.date;
+};
+
+/**
+ * @return {!Day}
+ */
+Day.prototype.previous = function() {
+    return new Day(this.year, this.month, this.date - 1);
+};
+
+/**
+ * @return {!Day}
+ */
+Day.prototype.next = function() {
+    return new Day(this.year, this.month, this.date + 1);
+};
+
+/**
+ * @return {!Date}
+ */
+Day.prototype.startDate = function() {
+    return createUTCDate(this.year, this.month, this.date);
+};
+
+/**
+ * @return {!Date}
+ */
+Day.prototype.endDate = function() {
+    return createUTCDate(this.year, this.month, this.date + 1);
+};
+
+/**
+ * @return {!number}
+ */
+Day.prototype.valueOf = function() {
+    return this.startDate().getTime();
+};
+
+/**
  * @return {!string}
  */
-function serializeDate(year, month, day) {
-    var yearString = String(year);
+Day.prototype.toString = function() {
+    var yearString = String(this.year);
     if (yearString.length < 4)
         yearString = ("000" + yearString).substr(-4, 4);
-    return yearString + "-" + ("0" + (month + 1)).substr(-2, 2) + "-" + ("0" + day).substr(-2, 2);
-}
+    return yearString + "-" + ("0" + (this.month + 1)).substr(-2, 2) + "-" + ("0" + this.date).substr(-2, 2);
+};
+
+/**
+ * @param {!number|Month} valueOrMonthOrYear
+ * @param {!number=} month
+ */
+function Month(valueOrMonthOrYear, month) {
+    if (arguments.length == 2) {
+        this.year = valueOrMonthOrYear;
+        this.month = month;
+    } else if (valueOrMonthOrYear instanceof Month) {
+        this.year = valueOrMonthOrYear.year;
+        this.month = valueOrMonthOrYear.month;
+    } else {
+        this.year = 1970;
+        this.month = valueOrMonthOrYear;
+    }
+    this.year = this.year + Math.floor(this.month / 12);
+    this.month = this.month < 0 ? this.month % 12 + 12 : this.month % 12;
+    if (this.year <= 0 || Month.Maximum < this) {
+        this.year = NaN;
+        this.month = NaN;
+    }
+};
+
+Month.ISOStringRegExp = /^(\d+)-(\d+)$/;
+
+// See WebCore/platform/DateComponents.h.
+Month.Maximum = new Month(275760, 8);
+
+/**
+ * @param {!string} str
+ * @return {?Month}
+ */
+Month.parse = function(str) {
+    var match = Month.ISOStringRegExp.exec(str);
+    if (!match)
+        return null;
+    var year = parseInt(match[1], 10);
+    var month = parseInt(match[2], 10) - 1;
+    return new Month(year, month);
+};
+
+/**
+ * @param {!Date} date
+ * @return {!Month}
+ */
+Month.createFromDate = function(date) {
+    return new Month(date.getUTCFullYear(), date.getUTCMonth());
+};
+
+/**
+ * @param {!Month} other
+ * @return {!bool}
+ */
+Month.prototype.equals = function(other) {
+    return this.year === other.year && this.month === other.month;
+};
+
+/**
+ * @return {!Month}
+ */
+Month.prototype.previous = function() {
+    return new Month(this.year, this.month - 1);
+};
+
+/**
+ * @return {!Month}
+ */
+Month.prototype.next = function() {
+    return new Month(this.year, this.month + 1);
+};
+
+/**
+ * @return {!Date}
+ */
+Month.prototype.startDate = function() {
+    return createUTCDate(this.year, this.month, 1);
+};
+
+/**
+ * @return {!Date}
+ */
+Month.prototype.endDate = function() {
+    if (this.equals(Month.Maximum))
+        return Day.Maximum.startDate();
+    return this.next().startDate();
+};
+
+/**
+ * @return {!number}
+ */
+Month.prototype.valueOf = function() {
+    return (this.year - 1970) * 12 + this.month;
+};
+
+/**
+ * @return {!string}
+ */
+Month.prototype.toString = function() {
+    var yearString = String(this.year);
+    if (yearString.length < 4)
+        yearString = ("000" + yearString).substr(-4, 4);
+    return yearString + "-" + ("0" + (this.month + 1)).substr(-2, 2);
+};
 
 // ----------------------------------------------------------------
 // Initialization
@@ -314,30 +505,33 @@ function CalendarPicker(element, config) {
     this._handleWindowResizeBound = this._handleWindowResize.bind(this);
     window.addEventListener("resize", this._handleWindowResizeBound, false);
     // We assume this._config.min is a valid date.
-    this.minimumDate = (typeof this._config.min !== "undefined") ? parseDateString(this._config.min) : CalendarPicker.MinimumPossibleDate;
+    this._minimumValue = (typeof this._config.min !== "undefined") ? parseDateString(this._config.min).valueOf() : Day.Minimum.valueOf();
     // We assume this._config.max is a valid date.
-    this.maximumDate = (typeof this._config.max !== "undefined") ? parseDateString(this._config.max) : CalendarPicker.MaximumPossibleDate;
+    this._maximumValue = (typeof this._config.max !== "undefined") ? parseDateString(this._config.max).valueOf() : Day.Maximum.valueOf();
     this.step = (typeof this._config.step !== undefined) ? Number(this._config.step) : CalendarPicker.DefaultStepScaleFactor;
     this.stepBase = (typeof this._config.stepBase !== "undefined") ? Number(this._config.stepBase) : CalendarPicker.DefaultStepBase;
-    this.yearMonthController = new YearMonthController(this);
-    this.daysTable = new DaysTable(this);
+    this._minimumMonth = Month.createFromDate(new Date(this._minimumValue));
+    this.maximumMonth = Month.createFromDate(new Date(this._maximumValue));
+    this._currentMonth = new Month(NaN, NaN);
+    this._yearMonthController = new YearMonthController(this);
+    this._daysTable = new DaysTable(this);
     this._hadKeyEvent = false;
     this._layout();
-    var initialDate = parseDateString(this._config.currentValue);
-    if (initialDate < this.minimumDate)
-        initialDate = this.minimumDate;
-    else if (initialDate > this.maximumDate)
-        initialDate = this.maximumDate;
-    this.daysTable.selectDate(initialDate);
+    var initialSelection = parseDateString(this._config.currentValue);
+    if (!initialSelection)
+        initialSelection = Day.createFromToday();
+    if (initialSelection.valueOf() < this._minimumValue)
+        initialSelection = new Day(this._minimumValue);
+    else if (initialSelection.valueOf() > this._maximumValue)
+        initialSelection = new Day(this._maximumValue);
+    this.showMonth(Month.createFromDate(initialSelection.startDate()), false);
+    this._daysTable.selectRange(initialSelection);
     this.fixWindowSize();
     this._handleBodyKeyDownBound = this._handleBodyKeyDown.bind(this);
     document.body.addEventListener("keydown", this._handleBodyKeyDownBound, false);
 }
 CalendarPicker.prototype = Object.create(Picker.prototype);
 
-// Hard limits of type=date. See WebCore/platform/DateComponents.h.
-CalendarPicker.MinimumPossibleDate = new Date(-62135596800000.0);
-CalendarPicker.MaximumPossibleDate = new Date(8640000000000000.0);
 // See WebCore/html/DateInputType.cpp.
 CalendarPicker.DefaultStepScaleFactor = 86400000;
 CalendarPicker.DefaultStepBase = 0.0;
@@ -353,17 +547,17 @@ CalendarPicker.prototype.cleanup = function() {
 CalendarPicker.prototype._layout = function() {
     if (this._config.isCalendarRTL)
         this._element.classList.add("rtl");
-    this.yearMonthController.attachTo(this._element);
-    this.daysTable.attachTo(this._element);
+    this._yearMonthController.attachTo(this._element);
+    this._daysTable.attachTo(this._element);
     this._layoutButtons();
     // DaysTable will have focus but we don't want to show its focus ring until the first key event.
     this._element.classList.add(ClassNames.NoFocusRing);
 };
 
 CalendarPicker.prototype.handleToday = function() {
-    var date = new Date();
-    this.daysTable.selectDate(date);
-    this.submitValue(serializeDate(date.getFullYear(), date.getMonth(), date.getDate()));
+    var today = Day.createFromToday();
+    this._daysTable.selectRange(today);
+    this.submitValue(today.toString());
 };
 
 CalendarPicker.prototype.handleClear = function() {
@@ -424,6 +618,38 @@ CalendarPicker.prototype._layoutButtons = function() {
     this.lastFocusableControl = this.clear || this.today;
 };
 
+/**
+ * @param {!Month} month
+ * @return {!bool}
+ */
+CalendarPicker.prototype.shouldShowMonth = function(month) {
+    return this._minimumMonth.valueOf() <= month.valueOf() && this.maximumMonth.valueOf() >= month.valueOf();
+};
+
+/**
+ * @param {!Month} month
+ * @param {!bool=} animate
+ * @param {!bool=} keepSelectionPosition
+ */
+CalendarPicker.prototype.showMonth = function(month, animate, keepSelectionPosition) {
+    if (this._currentMonth.equals(month))
+        return;
+    else if (month.valueOf() < this._minimumMonth.valueOf())
+        month = this._minimumMonth;
+    else if (month.valueOf() > this.maximumMonth.valueOf())
+        month = this.maximumMonth;
+    this._yearMonthController.setMonth(month);
+    this._daysTable.navigateToMonth(month, animate, keepSelectionPosition);
+    this._currentMonth = month;
+};
+
+/**
+ * @return {!Month}
+ */
+CalendarPicker.prototype.currentMonth = function() {
+    return this._currentMonth;
+};
+
 // ----------------------------------------------------------------
 
 /**
@@ -432,14 +658,6 @@ CalendarPicker.prototype._layoutButtons = function() {
  */
 function YearMonthController(picker) {
     this.picker = picker;
-    /**
-     * @type {!number}
-     */
-    this._currentYear = -1;
-    /**
-     * @type {!number}
-     */
-    this._currentMonth = -1;
 }
 
 /**
@@ -476,15 +694,16 @@ YearMonthController.prototype.attachTo = function(element) {
     this._wall.addEventListener("click", this._closePopup.bind(this), false);
     element.appendChild(this._wall);
 
-    var maximumYear = this.picker.maximumDate.getUTCFullYear();
+    var month = this.picker.maximumMonth;
     var maxWidth = 0;
     for (var m = 0; m < 12; ++m) {
-        this._month.textContent = formatYearMonth(maximumYear, m);
+        this._month.textContent = month.toLocaleString();
         maxWidth = Math.max(maxWidth, this._month.offsetWidth);
+        month = month.previous();
     }
     if (getLanguage() == "ja" && ImperialEraLimit < maximumYear) {
         for (var m = 0; m < 12; ++m) {
-            this._month.textContent = formatYearMonth(ImperialEraLimit, m);
+            this._month.textContent = new Month(ImperialEraLimit, m).toLocaleString();
             maxWidth = Math.max(maxWidth, this._month.offsetWidth);
         }
     }
@@ -551,52 +770,30 @@ YearMonthController.prototype._attachRightButtonsTo = function(parent) {
 };
 
 /**
- * @return {!number}
+ * @param {!Month} month
  */
-YearMonthController.prototype.year = function() {
-    return this._currentYear;
-};
-
-/**
- * @return {!number}
- */
-YearMonthController.prototype.month = function() {
-    return this._currentMonth;
-};
-
-/**
- * @param {!number} year
- * @param {!number} month
- */
-YearMonthController.prototype.setYearMonth = function(year, month) {
-    this._currentYear = year;
-    this._currentMonth = month;
-    this._redraw();
-};
-
-YearMonthController.prototype._redraw = function() {
-    var min = this.picker.minimumDate.getUTCFullYear() * 12 + this.picker.minimumDate.getUTCMonth();
-    var max = this.picker.maximumDate.getUTCFullYear() * 12 + this.picker.maximumDate.getUTCMonth();
-    var current = this._currentYear * 12 + this._currentMonth;
+YearMonthController.prototype.setMonth = function(month) {
+    var monthValue = month.valueOf();
     if (this._left3)
-        this._left3.disabled = current - 13 < min;
-    this._left2.disabled = current - 2 < min;
-    this._left1.disabled = current - 1 < min;
-    this._right1.disabled = current + 1 > max;
-    this._right2.disabled = current + 2 > max;
+        this._left3.disabled = !this.picker.shouldShowMonth(new Month(monthValue - 13));
+    this._left2.disabled = !this.picker.shouldShowMonth(new Month(monthValue - 2));
+    this._left1.disabled = !this.picker.shouldShowMonth(new Month(monthValue - 1));
+    this._right1.disabled = !this.picker.shouldShowMonth(new Month(monthValue + 1));
+    this._right2.disabled = !this.picker.shouldShowMonth(new Month(monthValue + 2));
     if (this._right3)
-        this._right3.disabled = current + 13 > max;
-    this._month.innerText = formatYearMonth(this._currentYear, this._currentMonth);
+        this._left3.disabled = !this.picker.shouldShowMonth(new Month(monthValue + 13));
+    this._month.innerText = month.toLocaleString();
     while (this._monthPopupContents.hasChildNodes())
         this._monthPopupContents.removeChild(this._monthPopupContents.firstChild);
 
-    for (var m = current - 6; m <= current + 6; m++) {
-        if (m < min || m > max)
+    for (var m = monthValue - 6; m <= monthValue + 6; m++) {
+        var month = new Month(m);
+        if (!this.picker.shouldShowMonth(month))
             continue;
-        var option = createElement("div", ClassNames.MonthSelectorPopupEntry, formatYearMonth(Math.floor(m / 12), m % 12));
-        option.dataset.value = String(Math.floor(m / 12)) + "-" + String(m % 12);
+        var option = createElement("div", ClassNames.MonthSelectorPopupEntry, month.toLocaleString());
+        option.dataset.value = month.toString();
         this._monthPopupContents.appendChild(option);
-        if (m == current)
+        if (m == monthValue)
             option.classList.add(ClassNames.SelectedMonthYear);
     }
 };
@@ -715,13 +912,7 @@ YearMonthController.prototype._handleYearMonthChange = function() {
     var selection = this._getSelection();
     if (!selection)
         return;
-    var value = selection.dataset.value;
-    var result  = value.match(/(\d+)-(\d+)/);
-    if (!result)
-        return;
-    var newYear = Number(result[1]);
-    var newMonth = Number(result[2]);
-    this.picker.daysTable.navigateToMonthAndKeepSelectionPosition(newYear, newMonth);
+    this.picker.showMonth(Month.parse(selection.dataset.value));
 };
 
 /*
@@ -779,17 +970,9 @@ YearMonthController.prototype._handleButtonClick = function(event) {
  * @param {!number} amount
  */
 YearMonthController.prototype.moveRelatively = function(amount) {
-    var min = this.picker.minimumDate.getUTCFullYear() * 12 + this.picker.minimumDate.getUTCMonth();
-    var max = this.picker.maximumDate.getUTCFullYear() * 12 + this.picker.maximumDate.getUTCMonth();
-    var current = this._currentYear * 12 + this._currentMonth;
-    var updated = current;
-    if (amount < 0)
-        updated = current + amount >= min ? current + amount : min;
-    else
-        updated = current + amount <= max ? current + amount : max;
-    if (updated == current)
-        return;
-    this.picker.daysTable.navigateToMonthAndKeepSelectionPosition(Math.floor(updated / 12), updated % 12);
+    var current = this.picker.currentMonth().valueOf();
+    var updated = new Month(current + amount);
+    this.picker.showMonth(updated, true, true);
 };
 
 // ----------------------------------------------------------------
@@ -800,14 +983,6 @@ YearMonthController.prototype.moveRelatively = function(amount) {
  */
 function DaysTable(picker) {
     this.picker = picker;
-    /**
-     * @type {!number}
-     */
-    this._currentYear = -1;
-    /**
-     * @type {!number}
-     */
-    this._currentMonth = -1;
 }
 
 /**
@@ -862,37 +1037,35 @@ DaysTable.prototype.attachTo = function(element) {
 };
 
 /**
- * @param {!number} time date in millisecond.
+ * @param {!number} value
  * @return {!boolean}
  */
-CalendarPicker.prototype.stepMismatch = function(time) {
-    return (time - this.stepBase) % this.step != 0;
+CalendarPicker.prototype._stepMismatch = function(value) {
+    return (value - this.stepBase) % this.step != 0;
 }
 
 /**
- * @param {!number} time date in millisecond.
+ * @param {!number} value
  * @return {!boolean}
  */
-CalendarPicker.prototype.outOfRange = function(time) {
-    return time < this.minimumDate.getTime() || time > this.maximumDate.getTime();
+CalendarPicker.prototype._outOfRange = function(value) {
+    return value < this._minimumValue || value > this._maximumValue;
 }
 
 /**
- * @param {!number} time date in millisecond.
+ * @param {!Month|Day} range
  * @return {!boolean}
  */
-CalendarPicker.prototype.isValidDate = function(time) {
-    return !this.outOfRange(time) && !this.stepMismatch(time);
+CalendarPicker.prototype.isValidDate = function(range) {
+    var value = range.valueOf();
+    return !this._outOfRange(value) && !this._stepMismatch(value);
 }
 
 /**
- * @param {!number} year
- * @param {!number} month
+ * @param {!Month} month
  */
-DaysTable.prototype._renderMonth = function(year, month) {
-    this._currentYear = year;
-    this._currentMonth = month;
-    var dayIterator = createUTCDate(year, month, 1);
+DaysTable.prototype._renderMonth = function(month) {
+    var dayIterator = month.startDate();
     var monthStartDay = dayIterator.getUTCDay();
     var weekStartDay = global.params.weekStartDay || 0;
     var startOffset = weekStartDay - monthStartDay;
@@ -901,65 +1074,48 @@ DaysTable.prototype._renderMonth = function(year, month) {
     dayIterator.setUTCDate(startOffset + 1);
     for (var w = 0; w < DaysTable._Weeks; w++) {
         for (var d = 0; d < 7; d++) {
-            var iterYear = dayIterator.getUTCFullYear();
-            var iterMonth = dayIterator.getUTCMonth();
+            var iterMonth = Month.createFromDate(dayIterator);
             var time = dayIterator.getTime();
             var element = this._days[w][d];
             element.innerText = localizeNumber(dayIterator.getUTCDate());
             element.className = ClassNames.Day;
-            element.dataset.submitValue = serializeDate(iterYear, iterMonth, dayIterator.getUTCDate());
-            if (this.picker.outOfRange(time))
-                element.classList.add(ClassNames.Unavailable);
-            else if (this.picker.stepMismatch(time))
-                element.classList.add(ClassNames.Unavailable);
-            else if ((iterYear == year && dayIterator.getUTCMonth() < month) || (month == 0 && iterMonth == 11)) {
-                element.classList.add(ClassNames.Available);
-                element.classList.add(ClassNames.NotThisMonth);
-            } else if ((iterYear == year && dayIterator.getUTCMonth() > month) || (month == 11 && iterMonth == 0)) {
-                element.classList.add(ClassNames.Available);
-                element.classList.add(ClassNames.NotThisMonth);
-            } else if (isNaN(time)) {
+            element.dataset.submitValue = Day.createFromDate(dayIterator).toString();
+            if (isNaN(time)) {
                 element.innerText = "-";
                 element.classList.add(ClassNames.Unavailable);
+            } else if (!this.picker.isValidDate(Day.createFromDate(dayIterator)))
+                element.classList.add(ClassNames.Unavailable);
+            else if (!iterMonth.equals(month)) {
+                element.classList.add(ClassNames.Available);
+                element.classList.add(ClassNames.NotThisMonth);
             } else
                 element.classList.add(ClassNames.Available);
             dayIterator.setUTCDate(dayIterator.getUTCDate() + 1);
         }
     }
 
-    this.picker.today.disabled = !this.picker.isValidDate(parseDateString().getTime());
+    this.picker.today.disabled = !this.picker.isValidDate(Day.createFromToday().valueOf());
 };
 
 /**
- * @param {!number} year
- * @param {!number} month
+ * @param {!Month} month
+ * @param {!bool} animate
+ * @param {!bool} keepSelectionPosition
  */
-DaysTable.prototype._navigateToMonth = function(year, month) {
-    this.picker.yearMonthController.setYearMonth(year, month);
-    this._renderMonth(year, month);
-};
-
-/**
- * @param {!number} year
- * @param {!number} month
- */
-DaysTable.prototype._navigateToMonthWithAnimation = function(year, month) {
-    if (this._currentYear >= 0 && this._currentMonth >= 0) {
-        if (year == this._currentYear && month == this._currentMonth)
-            return;
-        var decreasing = false;
-        if (year < this._currentYear)
-            decreasing = true;
-        else if (year > this._currentYear)
-            decreasing = false;
-        else
-            decreasing = month < this._currentMonth;
+DaysTable.prototype.navigateToMonth = function(month, animate, keepSelectionPosition) {
+    var firstNodeInSelectedRange = this._firstNodeInSelectedRange();
+    if (animate) {
         var daysStyle = this._daysContainer.style;
         daysStyle.position = "relative";
         daysStyle.webkitTransition = "left 0.1s ease";
-        daysStyle.left = (decreasing ? "" : "-") + this._daysContainer.offsetWidth + "px";
+        daysStyle.left = (this.picker.currentMonth().valueOf() > month.valueOf() ? "" : "-") + this._daysContainer.offsetWidth + "px";
     }
-    this._navigateToMonth(year, month);
+    this._renderMonth(month);
+    if (keepSelectionPosition && firstNodeInSelectedRange) {
+        var x = parseInt(firstNodeInSelectedRange.dataset.positionX, 10);
+        var y = parseInt(firstNodeInSelectedRange.dataset.positionY, 10);
+        this._selectRangeAtPosition(x, y);
+    }
 };
 
 DaysTable.prototype._moveInDays = function() {
@@ -974,28 +1130,12 @@ DaysTable.prototype._moveInDays = function() {
 };
 
 /**
- * @param {!number} year
- * @param {!number} month
- */
-DaysTable.prototype.navigateToMonthAndKeepSelectionPosition = function(year, month) {
-    if (year == this._currentYear && month == this._currentMonth)
-        return;
-    var firstNodeInSelectedRange = this._firstNodeInSelectedRange();
-    this._navigateToMonthWithAnimation(year, month);
-    if (firstNodeInSelectedRange) {
-        var x = parseInt(firstNodeInSelectedRange.dataset.positionX, 10);
-        var y = parseInt(firstNodeInSelectedRange.dataset.positionY, 10);
-        this._selectRangeAtPosition(x, y);
-    }
-};
-
-/**
  * @param {!Date} date
  */
-DaysTable.prototype.selectDate = function(date) {
+DaysTable.prototype.selectRange = function(day) {
     this._deselect();
-    this._navigateToMonthWithAnimation(date.getUTCFullYear(), date.getUTCMonth());
-    var dateString = serializeDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
+    this.picker.showMonth(Month.createFromDate(day.startDate()), true);
+    var dateString = day.toString();
     for (var w = 0; w < DaysTable._Weeks; w++) {
         for (var d = 0; d < 7; d++) {
             if (this._days[w][d].dataset.submitValue == dateString) {
@@ -1042,17 +1182,10 @@ DaysTable.prototype._deselect = function() {
  * @return {!boolean}
  */
 DaysTable.prototype._maybeSetPreviousMonth = function() {
-    var year = this.picker.yearMonthController.year();
-    var month = this.picker.yearMonthController.month();
-    var thisMonthStartTime = createUTCDate(year, month, 1).getTime();
-    if (this.picker.minimumDate.getTime() >= thisMonthStartTime)
+    var previousMonth = this.picker.currentMonth().previous();
+    if (!this.picker.shouldShowMonth(previousMonth))
         return false;
-    if (month == 0) {
-        year--;
-        month = 11;
-    } else
-        month--;
-    this._navigateToMonthWithAnimation(year, month);
+    this.picker.showMonth(previousMonth, true);
     return true;
 };
 
@@ -1060,17 +1193,10 @@ DaysTable.prototype._maybeSetPreviousMonth = function() {
  * @return {!boolean}
  */
 DaysTable.prototype._maybeSetNextMonth = function() {
-    var year = this.picker.yearMonthController.year();
-    var month = this.picker.yearMonthController.month();
-    if (month == 11) {
-        year++;
-        month = 0;
-    } else
-        month++;
-    var nextMonthStartTime = createUTCDate(year, month, 1).getTime();
-    if (this.picker.maximumDate.getTime() < nextMonthStartTime)
+    var nextMonth = this.picker.currentMonth().next();
+    if (!this.picker.shouldShowMonth(nextMonth))
         return false;
-    this._navigateToMonthWithAnimation(year, month);
+    this.picker.showMonth(nextMonth, true);
     return true;
 };
 
@@ -1180,7 +1306,7 @@ DaysTable.prototype._handleKey = function(event) {
         }
 
     } else if (key == "U+0054") { // 't'
-        this.selectDate(new Date());
+        this.selectRange(Day.createFromToday());
         event.stopPropagation();
         event.preventDefault();
     }
@@ -1214,11 +1340,11 @@ CalendarPicker.prototype._handleBodyKeyDown = function(event) {
             this.lastFocusableControl.focus();
         }
     } else if (key == "U+004D") { // 'm'
-        this.yearMonthController.moveRelatively(event.shiftKey ? YearMonthController.PreviousMonth : YearMonthController.NextMonth);
+        this._yearMonthController.moveRelatively(event.shiftKey ? YearMonthController.PreviousMonth : YearMonthController.NextMonth);
     } else if (key == "U+0059") { // 'y'
-        this.yearMonthController.moveRelatively(event.shiftKey ? YearMonthController.PreviousYear : YearMonthController.NextYear);
+        this._yearMonthController.moveRelatively(event.shiftKey ? YearMonthController.PreviousYear : YearMonthController.NextYear);
     } else if (key == "U+0044") { // 'd'
-        this.yearMonthController.moveRelatively(event.shiftKey ? YearMonthController.PreviousTenYears : YearMonthController.NextTenYears);
+        this._yearMonthController.moveRelatively(event.shiftKey ? YearMonthController.PreviousTenYears : YearMonthController.NextTenYears);
     } else if (key == "U+001B") // ESC
         this.handleCancel();
 }

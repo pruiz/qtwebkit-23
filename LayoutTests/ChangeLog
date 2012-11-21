@@ -1,3 +1,1434 @@
+2012-11-06  Kangil Han  <kangil.han@samsung.com>
+
+        [EFL] Exclude fast/css/style-scoped cases from layout test running
+        https://bugs.webkit.org/show_bug.cgi?id=101326
+
+        Unreviewed, EFL gardening.
+
+        According to BUG 49142, html5 style scoped attribute implementation is on progress.
+        Therefore, we can skip its test cases from regular layout test running.
+
+        * platform/efl/TestExpectations:
+
+2012-11-06  Peter Beverloo  <peter@chromium.org>
+
+        [Chromium] There shouldn't be linting errors about our TestExpectation files
+
+        Unreviewed test expectation update.
+
+        A number of linting errors were being displayed, partially because of my
+        recent additions. Fix them.
+
+        * platform/chromium-android/TestExpectations:
+        * platform/chromium/TestExpectations:
+
+2012-11-06  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Qt] Disable all tests fast/dom/shadow
+        https://bugs.webkit.org/show_bug.cgi?id=101324
+
+        Reviewed by Csaba Osztrogonác.
+
+        Since Qt does not have SHADOW_DOM flag enabled, a lot of tests are failing.
+        Let's skip all tests.
+
+        * platform/qt/TestExpectations:
+
+2012-11-06  Vsevolod Vlasov  <vsevik@chromium.org>
+
+        Web Inspector: Displayed name/path of urls in network tab of dev tools is inconsistent
+        https://bugs.webkit.org/show_bug.cgi?id=101064
+
+        Reviewed by Yury Semikhatsky.
+
+        * http/tests/inspector/network/request-name-path-expected.txt: Added.
+        * http/tests/inspector/network/request-name-path.html: Added.
+
+2012-11-06  Takashi Sakamoto  <tasak@google.com>
+
+        removeAttribute('style') not working in certain circumstances
+        https://bugs.webkit.org/show_bug.cgi?id=99295
+
+        Reviewed by Ryosuke Niwa.
+
+        * fast/css/remove-attribute-style-expected.txt: Added.
+        * fast/css/remove-attribute-style.html: Added.
+
+2012-11-06  Peter Beverloo  <peter@chromium.org>
+
+        [Chromium-Android] Skip a number of crashing tests.
+
+        Unreviewed rebaselining.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-06  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Shadow] Using isUnknownPseudoElement() for shadow pseudo id seems confusing
+        https://bugs.webkit.org/show_bug.cgi?id=100826
+
+        Reviewed by Hajime Morita.
+
+        * fast/dom/shadow/shadow-nested-pseudo-id.html: Fixed a testcase so that shadowPseudoId starts with 'x-'.
+        * fast/dom/shadow/shadow-pseudo-id-expected.html: Added.
+        * fast/dom/shadow/shadow-pseudo-id.html: Added.
+
+2012-11-06  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Shadow] ShadowRoot should know the existence of elements having ElementShadow.
+        https://bugs.webkit.org/show_bug.cgi?id=100922
+
+        Reviewed by Hajime Morita.
+
+        * fast/dom/shadow/has-elementshadow-expected.txt: Added.
+        * fast/dom/shadow/has-elementshadow.html: Added.
+
+2012-11-06  Dongwoo Joshua Im  <dw.im@samsung.com>
+
+        [QT] [GTK] Remove fast/forms/week-multiple-fields from TestExpectations of gtk and qt.
+        https://bugs.webkit.org/show_bug.cgi?id=101317
+
+        Unreviewed gardening.
+
+        fast/forms/week-multiple-fields is removed by http://trac.webkit.org/changeset/133440.
+
+        * platform/gtk/TestExpectations:
+        * platform/qt/TestExpectations:
+
+2012-11-05  Yury Semikhatsky  <yurys@chromium.org>
+
+        Web Inspector: JavaScript web workers debugging crashes
+        https://bugs.webkit.org/show_bug.cgi?id=101065
+
+        Reviewed by Alexander Pavlov.
+
+        Test that inspected page won't crash if inspected worker is terminated when it is paused
+        on a breakpoint.
+
+        * inspector-protocol/debugger-terminate-dedicated-worker-while-paused-expected.txt: Added.
+        * inspector-protocol/debugger-terminate-dedicated-worker-while-paused.html: Added.
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+
+2012-11-05  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed morning gardening, skip new failing tests.
+
+        * platform/qt/TestExpectations:
+
+2012-11-05  David Barton  <dbarton@mathscribe.com>
+
+        Unreviewed gardening. Updating MathML chromium baselines.
+
+        * platform/chromium-linux-x86/mathml/presentation: Added.
+        * platform/chromium-linux-x86/mathml/presentation/attributes-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/attributes-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/fenced-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/fenced-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/fenced-mi-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/fenced-mi-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/fractions-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/fractions-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/fractions-vertical-alignment-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/fractions-vertical-alignment-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/mo-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/mo-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/mo-stretch-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/mo-stretch-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/mroot-pref-width-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/mroot-pref-width-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/over-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/over-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/roots-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/roots-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/row-alignment-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/row-alignment-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/row-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/row-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/style-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/style-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/sub-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/sub-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/subsup-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/subsup-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/sup-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/sup-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/tables-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/tables-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/tokenElements-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/tokenElements-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/under-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/under-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/presentation/underover-expected.png: Added.
+        * platform/chromium-linux-x86/mathml/presentation/underover-expected.txt: Added.
+        * platform/chromium-linux-x86/mathml/xHeight-expected.txt:
+        * platform/chromium-linux/mathml/presentation: Added.
+        * platform/chromium-linux/mathml/presentation/attributes-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/attributes-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/fenced-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/fenced-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/fenced-mi-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/fenced-mi-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/fractions-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/fractions-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/fractions-vertical-alignment-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/fractions-vertical-alignment-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/mo-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/mo-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/mo-stretch-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/mo-stretch-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/mroot-pref-width-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/mroot-pref-width-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/over-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/over-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/roots-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/roots-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/row-alignment-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/row-alignment-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/row-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/row-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/style-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/style-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/sub-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/sub-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/subsup-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/subsup-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/sup-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/sup-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/tables-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/tables-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/tokenElements-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/tokenElements-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/under-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/under-expected.txt: Added.
+        * platform/chromium-linux/mathml/presentation/underover-expected.png: Added.
+        * platform/chromium-linux/mathml/presentation/underover-expected.txt: Added.
+        * platform/chromium-linux/mathml/xHeight-expected.txt:
+        * platform/chromium-mac-lion/mathml/presentation/mo-stretch-expected.txt: Added.
+        * platform/chromium-mac-lion/mathml/presentation/row-alignment-expected.png:
+        * platform/chromium-mac-lion/mathml/presentation/row-alignment-expected.txt: Added.
+        * platform/chromium-mac-lion/mathml/presentation/subsup-expected.png:
+        * platform/chromium-mac-lion/mathml/presentation/subsup-expected.txt:
+        * platform/chromium-mac-lion/mathml/presentation/tables-expected.png:
+        * platform/chromium-mac-lion/mathml/presentation/tables-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/mathml/presentation/mo-stretch-expected.txt:
+        * platform/chromium-mac-snowleopard/mathml/presentation/row-alignment-expected.png:
+        * platform/chromium-mac-snowleopard/mathml/presentation/row-alignment-expected.txt:
+        * platform/chromium-mac-snowleopard/mathml/presentation/subsup-expected.png:
+        * platform/chromium-mac-snowleopard/mathml/presentation/subsup-expected.txt:
+        * platform/chromium-mac-snowleopard/mathml/presentation/tables-expected.png:
+        * platform/chromium-mac-snowleopard/mathml/presentation/tables-expected.txt:
+        * platform/chromium-mac/mathml/presentation/mo-stretch-expected.txt: Added.
+        * platform/chromium-mac/mathml/presentation/row-alignment-expected.png:
+        * platform/chromium-mac/mathml/presentation/row-alignment-expected.txt: Added.
+        * platform/chromium-mac/mathml/presentation/subsup-expected.png:
+        * platform/chromium-mac/mathml/presentation/subsup-expected.txt:
+        * platform/chromium-mac/mathml/presentation/tables-expected.png:
+        * platform/chromium-mac/mathml/presentation/tables-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation: Added.
+        * platform/chromium-win-xp/mathml/presentation/attributes-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/attributes-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/fenced-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/fenced-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/fenced-mi-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/fenced-mi-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/fractions-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/fractions-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/fractions-vertical-alignment-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/fractions-vertical-alignment-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/mo-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/mo-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/mo-stretch-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/mo-stretch-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/mroot-pref-width-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/mroot-pref-width-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/over-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/over-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/roots-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/roots-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/row-alignment-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/row-alignment-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/row-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/row-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/style-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/style-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/sub-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/sub-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/subsup-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/subsup-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/sup-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/sup-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/tables-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/tables-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/tokenElements-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/tokenElements-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/under-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/under-expected.txt: Added.
+        * platform/chromium-win-xp/mathml/presentation/underover-expected.png: Added.
+        * platform/chromium-win-xp/mathml/presentation/underover-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation: Added.
+        * platform/chromium-win/mathml/presentation/attributes-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/attributes-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/fenced-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/fenced-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/fenced-mi-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/fenced-mi-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/fractions-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/fractions-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/fractions-vertical-alignment-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/fractions-vertical-alignment-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/mo-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/mo-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/mo-stretch-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/mo-stretch-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/mroot-pref-width-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/mroot-pref-width-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/over-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/over-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/roots-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/roots-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/row-alignment-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/row-alignment-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/row-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/row-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/style-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/style-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/sub-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/sub-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/subsup-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/subsup-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/sup-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/sup-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/tables-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/tables-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/tokenElements-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/tokenElements-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/under-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/under-expected.txt: Added.
+        * platform/chromium-win/mathml/presentation/underover-expected.png: Added.
+        * platform/chromium-win/mathml/presentation/underover-expected.txt: Added.
+        * platform/chromium/TestExpectations:
+        * platform/chromium/mathml/presentation/attributes-expected.png: Removed.
+        * platform/chromium/mathml/presentation/fractions-expected.png: Removed.
+        * platform/chromium/mathml/presentation/fractions-vertical-alignment-expected.png: Removed.
+        * platform/chromium/mathml/presentation/mo-expected.png: Removed.
+        * platform/chromium/mathml/presentation/mo-stretch-expected.png: Removed.
+        * platform/chromium/mathml/presentation/mroot-pref-width-expected.png: Removed.
+        * platform/chromium/mathml/presentation/over-expected.png: Removed.
+        * platform/chromium/mathml/presentation/roots-expected.png: Removed.
+        * platform/chromium/mathml/presentation/row-alignment-expected.png: Removed.
+        * platform/chromium/mathml/presentation/row-expected.png: Removed.
+        * platform/chromium/mathml/presentation/style-expected.png: Removed.
+        * platform/chromium/mathml/presentation/subsup-expected.png: Removed.
+
+2012-11-05  Kangil Han  <kangil.han@samsung.com>
+
+        [EFL][WK2][PixelTests] Add missing expectations
+        https://bugs.webkit.org/show_bug.cgi?id=101289
+
+        Unreviewed, EFL gardening.
+
+        Add 16 missing pixel test expectations.
+
+        * platform/efl/compositing/geometry/fixed-position-iframe-composited-page-scale-down-expected.png: Added.
+        * platform/efl/compositing/geometry/fixed-position-transform-composited-page-scale-down-expected.png: Added.
+        * platform/efl/compositing/geometry/fixed-position-transform-composited-page-scale-expected.png: Added.
+        * platform/efl/compositing/overflow/overflow-compositing-descendant-expected.png: Added.
+        * platform/efl/compositing/overflow/scroll-ancestor-update-expected.png: Added.
+        * platform/efl/compositing/reflections/nested-reflection-anchor-point-expected.png: Added.
+        * platform/efl/fast/forms/basic-inputs-expected.png: Added.
+        * platform/efl/fast/media/view-mode-media-feature-expected.png: Added.
+        * platform/efl/media/video-aspect-ratio-expected.png: Added.
+        * platform/efl/media/video-layer-crash-expected.png: Added.
+        * platform/efl/media/video-transformed-expected.png: Added.
+        * platform/efl/media/video-zoom-controls-expected.png: Added.
+        * platform/efl/media/video-zoom-expected.png: Added.
+        * platform/efl/svg/dynamic-updates/SVGUseElement-dom-requiredFeatures-expected.png: Added.
+        * platform/efl/svg/zoom/page/zoom-svg-through-object-with-absolute-size-2-expected.png: Added.
+        * platform/efl/svg/zoom/page/zoom-svg-through-object-with-percentage-size-expected.png: Added.
+
+2012-11-05  Dirk Pranke  <dpranke@chromium.org>
+
+        Unreviewed, update chromium-mac-mountainlion baselines for svg failures after r133538
+
+        * platform/chromium-mac-lion/svg/W3C-SVG-1.2-Tiny/struct-use-recursion-02-t-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/W3C-SVG-1.2-Tiny/struct-use-recursion-02-t-expected.png.
+        * platform/chromium-mac-lion/svg/W3C-SVG-1.2-Tiny/struct-use-recursion-03-t-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/W3C-SVG-1.2-Tiny/struct-use-recursion-03-t-expected.png.
+        * platform/chromium-mac-lion/svg/batik/filters/filterRegions-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/filters/filterRegions-expected.png.
+        * platform/chromium-mac-lion/svg/batik/masking/maskRegions-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/masking/maskRegions-expected.png.
+        * platform/chromium-mac-lion/svg/batik/paints/gradientLimit-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/paints/gradientLimit-expected.png.
+        * platform/chromium-mac-lion/svg/batik/paints/patternPreserveAspectRatioA-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/paints/patternPreserveAspectRatioA-expected.png.
+        * platform/chromium-mac-lion/svg/batik/paints/patternRegionA-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/paints/patternRegionA-expected.png.
+        * platform/chromium-mac-lion/svg/batik/paints/patternRegions-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/paints/patternRegions-expected.png.
+        * platform/chromium-mac-lion/svg/batik/paints/patternRegions-positioned-objects-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/paints/patternRegions-positioned-objects-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/longTextOnPath-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/longTextOnPath-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/smallFonts-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/smallFonts-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textAnchor-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textAnchor-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textDecoration-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textDecoration-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textEffect-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textEffect-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textEffect2-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textEffect2-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textEffect3-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textEffect3-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textFeatures-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textFeatures-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textLayout-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textLayout-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textLayout2-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textLayout2-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textLength-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textLength-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textOnPath-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textOnPath-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textOnPathSpaces-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textOnPathSpaces-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textPosition-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textPosition-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textPosition2-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textPosition2-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textProperties-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textProperties-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textProperties2-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textProperties2-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/textStyles-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/textStyles-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/verticalText-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/verticalText-expected.png.
+        * platform/chromium-mac-lion/svg/batik/text/verticalTextOnPath-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/batik/text/verticalTextOnPath-expected.png.
+        * platform/chromium-mac-lion/svg/dynamic-updates/SVGUseElement-dom-href2-attr-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/dynamic-updates/SVGUseElement-dom-href2-attr-expected.png.
+        * platform/chromium-mac-lion/svg/dynamic-updates/SVGUseElement-svgdom-href2-prop-expected.png: Copied from LayoutTests/platform/chromium-mac/svg/dynamic-updates/SVGUseElement-svgdom-href2-prop-expected.png.
+        * platform/chromium-mac/svg/W3C-SVG-1.2-Tiny/struct-use-recursion-02-t-expected.png:
+        * platform/chromium-mac/svg/W3C-SVG-1.2-Tiny/struct-use-recursion-03-t-expected.png:
+        * platform/chromium-mac/svg/batik/filters/filterRegions-expected.png:
+        * platform/chromium-mac/svg/batik/masking/maskRegions-expected.png:
+        * platform/chromium-mac/svg/batik/paints/gradientLimit-expected.png:
+        * platform/chromium-mac/svg/batik/paints/patternPreserveAspectRatioA-expected.png:
+        * platform/chromium-mac/svg/batik/paints/patternRegionA-expected.png:
+        * platform/chromium-mac/svg/batik/paints/patternRegions-expected.png:
+        * platform/chromium-mac/svg/batik/paints/patternRegions-positioned-objects-expected.png:
+        * platform/chromium-mac/svg/batik/text/longTextOnPath-expected.png:
+        * platform/chromium-mac/svg/batik/text/smallFonts-expected.png:
+        * platform/chromium-mac/svg/batik/text/textAnchor-expected.png:
+        * platform/chromium-mac/svg/batik/text/textDecoration-expected.png:
+        * platform/chromium-mac/svg/batik/text/textEffect-expected.png:
+        * platform/chromium-mac/svg/batik/text/textEffect2-expected.png:
+        * platform/chromium-mac/svg/batik/text/textEffect3-expected.png:
+        * platform/chromium-mac/svg/batik/text/textFeatures-expected.png:
+        * platform/chromium-mac/svg/batik/text/textLayout-expected.png:
+        * platform/chromium-mac/svg/batik/text/textLayout2-expected.png:
+        * platform/chromium-mac/svg/batik/text/textLength-expected.png:
+        * platform/chromium-mac/svg/batik/text/textOnPath-expected.png:
+        * platform/chromium-mac/svg/batik/text/textOnPathSpaces-expected.png:
+        * platform/chromium-mac/svg/batik/text/textPosition-expected.png:
+        * platform/chromium-mac/svg/batik/text/textPosition2-expected.png:
+        * platform/chromium-mac/svg/batik/text/textProperties-expected.png:
+        * platform/chromium-mac/svg/batik/text/textProperties2-expected.png:
+        * platform/chromium-mac/svg/batik/text/textStyles-expected.png:
+        * platform/chromium-mac/svg/batik/text/verticalText-expected.png:
+        * platform/chromium-mac/svg/batik/text/verticalTextOnPath-expected.png:
+        * platform/chromium-mac/svg/dynamic-updates/SVGUseElement-dom-href2-attr-expected.png:
+        * platform/chromium-mac/svg/dynamic-updates/SVGUseElement-svgdom-href2-prop-expected.png:
+
+2012-11-05  Kenichi Ishibashi  <bashi@chromium.org>
+
+        [Chromium] Unicode combining diacritical aren't always combined on Linux
+        https://bugs.webkit.org/show_bug.cgi?id=101009
+
+        Reviewed by Kent Tamura.
+
+        Add a test that checks whether combining marks are combined with base characters.
+
+        * fast/text/international/combining-marks-position-expected.txt: Added.
+        * fast/text/international/combining-marks-position.html: Added.
+
+2012-11-05  Filip Pizlo  <fpizlo@apple.com>
+
+        Prototype chain caching should check that the path from the base object to the slot base involves prototype hops only
+        https://bugs.webkit.org/show_bug.cgi?id=101276
+
+        Reviewed by Gavin Barraclough.
+
+        This test already covered this case, but only for method_check. Modified it to
+        also cover the get_by_id case.
+
+        * fast/js/toString-and-valueOf-override-expected.txt:
+        * fast/js/toString-and-valueOf-override.html:
+
+2012-11-05  Mark Lam  <mark.lam@apple.com>
+
+        Fixed flaky fast/xmlhttprequest/xmlhttprequest-recursive-sync-event.html.
+        https://bugs.webkit.org/show_bug.cgi?id=101268.
+
+        Reviewed by Geoffrey Garen.
+
+        * fast/xmlhttprequest/xmlhttprequest-recursive-sync-event-expected.txt:
+        * fast/xmlhttprequest/xmlhttprequest-recursive-sync-event.html:
+
+2012-11-05  Philip Rogers  <pdr@google.com>
+
+        Unblock SVG external references
+        https://bugs.webkit.org/show_bug.cgi?id=100635
+
+        Reviewed by Adam Barth.
+
+        This patch reverts r132849 and r132869 because the potential XSS issue
+        turned out to not be an issue after all.
+
+        Covered by existing tests, many of which are re-whitelisted with this patch.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-05  Beth Dakin  <bdakin@apple.com>
+
+        https://bugs.webkit.org/show_bug.cgi?id=101001
+        Pages with position:fixed elements should still be able to scroll on 
+        the scrolling thread
+        -and corresponding-
+        <rdar://problem/10857315>
+
+        Reviewed by Simon Fraser.
+
+        New tests.
+        * platform/mac/tiled-drawing/fixed: Added.
+        * platform/mac/tiled-drawing/fixed/absolute-inside-fixed-expected.txt: Added.
+        * platform/mac/tiled-drawing/fixed/absolute-inside-fixed.html: Added.
+        * platform/mac/tiled-drawing/fixed/fixed-position-out-of-view-expected.txt: Added.
+        * platform/mac/tiled-drawing/fixed/fixed-position-out-of-view-negative-zindex-expected.txt: Added.
+        * platform/mac/tiled-drawing/fixed/fixed-position-out-of-view-negative-zindex.html: Added.
+        * platform/mac/tiled-drawing/fixed/fixed-position-out-of-view.html: Added.
+        * platform/mac/tiled-drawing/fixed/four-bars-expected.txt: Added.
+        * platform/mac/tiled-drawing/fixed/four-bars.html: Added.
+        * platform/mac/tiled-drawing/fixed/nested-fixed-expected.txt: Added.
+        * platform/mac/tiled-drawing/fixed/nested-fixed.html: Added.
+        * platform/mac/tiled-drawing/fixed/percentage-inside-fixed-expected.txt: Added.
+        * platform/mac/tiled-drawing/fixed/percentage-inside-fixed.html: Added.
+
+        These two tests are supposed to be in "slow scrolling" mode. Now that 
+        fixed elements can scroll "fast," we need something else to force 
+        slow scrolling. We should probably just add something to 
+        window.internals to do that, but in the meantime, 
+        background-attachment:fixed will work.
+        * platform/mac/tiled-drawing/scrolling-tree-slow-scrolling-expected.txt:
+        * platform/mac/tiled-drawing/scrolling-tree-slow-scrolling.html:
+        * platform/mac/tiled-drawing/tile-coverage-slow-scrolling-expected.txt:
+        * platform/mac/tiled-drawing/tile-coverage-slow-scrolling.html:
+
+2012-11-05  Alice Boxhall  <aboxhall@chromium.org>
+
+        Unreviewed gardening. Mark fonts/cursive.html as flaky on MountainLion as well as Lion.
+        https://bugs.webkit.org/show_bug.cgi?id=83219
+
+        * platform/chromium/TestExpectations:
+
+2012-11-05  Stephen White  <senorblanco@chromium.org>
+
+        [chromium] Unreviewed gardening.
+
+        * platform/chromium-mac-mountainlion/TestExpectations:
+
+2012-11-05  Glenn Adams  <glenn@skynav.com>
+
+        Add support to -webkit-line-break property for CSS3 Text line-break property values and semantics.
+        https://bugs.webkit.org/show_bug.cgi?id=89235
+
+        Reviewed by Eric Seidel.
+
+        See also wiki documentation at:
+        [1] http://trac.webkit.org/wiki/LineBreaking
+        [2] http://trac.webkit.org/wiki/LineBreakingCSS3Mapping
+
+        * css3/line-break/line-break-auto-centered-expected.html: Added.
+        * css3/line-break/line-break-auto-centered.html: Added.
+        * css3/line-break/line-break-auto-half-kana-expected.html: Added.
+        * css3/line-break/line-break-auto-half-kana.html: Added.
+        * css3/line-break/line-break-auto-hyphens-expected.html: Added.
+        * css3/line-break/line-break-auto-hyphens.html: Added.
+        * css3/line-break/line-break-auto-inseparables-expected.html: Added.
+        * css3/line-break/line-break-auto-inseparables.html: Added.
+        * css3/line-break/line-break-auto-iteration-marks-expected.html: Added.
+        * css3/line-break/line-break-auto-iteration-marks.html: Added.
+        * css3/line-break/line-break-auto-postfixes-expected.html: Added.
+        * css3/line-break/line-break-auto-postfixes.html: Added.
+        * css3/line-break/line-break-auto-prefixes-expected.html: Added.
+        * css3/line-break/line-break-auto-prefixes.html: Added.
+        * css3/line-break/line-break-auto-sound-marks-expected.html: Added.
+        * css3/line-break/line-break-auto-sound-marks.html: Added.
+        * css3/line-break/line-break-loose-centered-expected.html: Added.
+        * css3/line-break/line-break-loose-centered.html: Added.
+        * css3/line-break/line-break-loose-half-kana-expected.html: Added.
+        * css3/line-break/line-break-loose-half-kana.html: Added.
+        * css3/line-break/line-break-loose-hyphens-expected.html: Added.
+        * css3/line-break/line-break-loose-hyphens.html: Added.
+        * css3/line-break/line-break-loose-inseparables-expected.html: Added.
+        * css3/line-break/line-break-loose-inseparables.html: Added.
+        * css3/line-break/line-break-loose-iteration-marks-expected.html: Added.
+        * css3/line-break/line-break-loose-iteration-marks.html: Added.
+        * css3/line-break/line-break-loose-postfixes-expected.html: Added.
+        * css3/line-break/line-break-loose-postfixes.html: Added.
+        * css3/line-break/line-break-loose-prefixes-expected.html: Added.
+        * css3/line-break/line-break-loose-prefixes.html: Added.
+        * css3/line-break/line-break-loose-sound-marks-expected.html: Added.
+        * css3/line-break/line-break-loose-sound-marks.html: Added.
+        * css3/line-break/line-break-normal-centered-expected.html: Added.
+        * css3/line-break/line-break-normal-centered.html: Added.
+        * css3/line-break/line-break-normal-half-kana-expected.html: Added.
+        * css3/line-break/line-break-normal-half-kana.html: Added.
+        * css3/line-break/line-break-normal-hyphens-expected.html: Added.
+        * css3/line-break/line-break-normal-hyphens.html: Added.
+        * css3/line-break/line-break-normal-inseparables-expected.html: Added.
+        * css3/line-break/line-break-normal-inseparables.html: Added.
+        * css3/line-break/line-break-normal-iteration-marks-expected.html: Added.
+        * css3/line-break/line-break-normal-iteration-marks.html: Added.
+        * css3/line-break/line-break-normal-postfixes-expected.html: Added.
+        * css3/line-break/line-break-normal-postfixes.html: Added.
+        * css3/line-break/line-break-normal-prefixes-expected.html: Added.
+        * css3/line-break/line-break-normal-prefixes.html: Added.
+        * css3/line-break/line-break-normal-sound-marks-expected.html: Added.
+        * css3/line-break/line-break-normal-sound-marks.html: Added.
+        * css3/line-break/line-break-strict-centered-expected.html: Added.
+        * css3/line-break/line-break-strict-centered.html: Added.
+        * css3/line-break/line-break-strict-half-kana-expected.html: Added.
+        * css3/line-break/line-break-strict-half-kana.html: Added.
+        * css3/line-break/line-break-strict-hyphens-expected.html: Added.
+        * css3/line-break/line-break-strict-hyphens.html: Added.
+        * css3/line-break/line-break-strict-inseparables-expected.html: Added.
+        * css3/line-break/line-break-strict-inseparables.html: Added.
+        * css3/line-break/line-break-strict-iteration-marks-expected.html: Added.
+        * css3/line-break/line-break-strict-iteration-marks.html: Added.
+        * css3/line-break/line-break-strict-postfixes-expected.html: Added.
+        * css3/line-break/line-break-strict-postfixes.html: Added.
+        * css3/line-break/line-break-strict-prefixes-expected.html: Added.
+        * css3/line-break/line-break-strict-prefixes.html: Added.
+        * css3/line-break/line-break-strict-sound-marks-expected.html: Added.
+        * css3/line-break/line-break-strict-sound-marks.html: Added.
+
+        * platform/chromium/css3/line-break/line-break-auto-half-kana-expected.html: Added.
+        * platform/chromium/css3/line-break/line-break-auto-sound-marks-expected.html: Added.
+        Override reftest expectations on chromium due to different ICU auto behavior.
+
+        * platform/chromium-android/css3/line-break/line-break-auto-half-kana-expected.html: Added.
+        * platform/chromium-android/css3/line-break/line-break-auto-sound-marks-expected.html: Added.
+        Override override of reftest expectations on chromium due to different ICU auto behavior;
+        that is, chromium-android seems to follow the generic expectations.
+
+2012-11-05  Adam Barth  <abarth@webkit.org>
+
+        webkitRegionLayoutUpdate is incorrectly named
+        https://bugs.webkit.org/show_bug.cgi?id=100335
+
+        Reviewed by Ojan Vafai.
+
+        Update tests to use the proper name.
+
+        * fast/regions/webkit-named-flow-event-add-to-flow.html:
+        * fast/regions/webkit-named-flow-event-no-regions.html:
+        * fast/regions/webkit-named-flow-event-remove-from-dom.html:
+        * fast/regions/webkit-named-flow-event-remove-from-flow.html:
+        * fast/regions/webkit-named-flow-event-target.html:
+        * fast/regions/webkit-named-flow-event-to-null.html:
+        * fast/regions/webkit-named-flow-event.html:
+
+2012-11-05  Stephen White  <senorblanco@chromium.org>
+
+        Remove fast/forms/week-multiple-fields from
+        platform/mac/TestExpectations, since it no longer exists and makes the
+        style script complain.  Unreviewed.
+
+        * platform/mac/TestExpectations:
+
+2012-11-05  Stephen White  <senorblanco@chromium.org>
+
+        [chromium] Give actual bug IDs to some past gardening.  Unreviewed.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-05  Florin Malita  <fmalita@chromium.org>
+
+        Crash when mixing layers, foreignObjects and SVG hidden containers
+        https://bugs.webkit.org/show_bug.cgi?id=87297
+
+        Reviewed by Dirk Schulze.
+
+        * platform/chromium-mac-snowleopard/svg/custom/use-on-disallowed-foreign-object-6-expected.txt:
+        * platform/chromium-win/svg/custom/use-on-disallowed-foreign-object-5-expected.txt:
+        * platform/chromium-win/svg/custom/use-on-disallowed-foreign-object-6-expected.txt:
+        * platform/chromium-win/svg/foreignObject/fO-parent-display-none-expected.txt:
+        * platform/chromium-win/svg/foreignObject/fO-parent-display-none-with-relative-pos-content-expected.txt:
+        * platform/chromium-win/svg/foreignObject/fO-parent-of-parent-display-none-expected.txt:
+        * platform/chromium-win/svg/foreignObject/fO-parent-of-parent-display-none-with-relative-pos-content-expected.txt:
+        * platform/chromium/svg/custom/use-on-disallowed-foreign-object-5-expected.txt:
+        * platform/chromium/svg/custom/use-on-disallowed-foreign-object-6-expected.txt:
+        * platform/chromium/svg/foreignObject/fO-parent-display-none-expected.txt:
+        * platform/chromium/svg/foreignObject/fO-parent-display-none-with-relative-pos-content-expected.txt:
+        * platform/chromium/svg/foreignObject/fO-parent-of-parent-display-none-expected.txt:
+        * platform/chromium/svg/foreignObject/fO-parent-of-parent-display-none-with-relative-pos-content-expected.txt:
+        * platform/efl/svg/foreignObject/fO-parent-display-none-expected.txt:
+        * platform/efl/svg/foreignObject/fO-parent-display-none-with-relative-pos-content-expected.txt:
+        * platform/efl/svg/foreignObject/fO-parent-of-parent-display-none-expected.txt:
+        * platform/efl/svg/foreignObject/fO-parent-of-parent-display-none-with-relative-pos-content-expected.txt:
+        * platform/gtk/svg/custom/use-on-disallowed-foreign-object-5-expected.txt:
+        * platform/gtk/svg/custom/use-on-disallowed-foreign-object-6-expected.txt:
+        * platform/gtk/svg/foreignObject/fO-parent-display-none-expected.txt:
+        * platform/gtk/svg/foreignObject/fO-parent-display-none-with-relative-pos-content-expected.txt:
+        * platform/gtk/svg/foreignObject/fO-parent-of-parent-display-none-expected.txt:
+        * platform/gtk/svg/foreignObject/fO-parent-of-parent-display-none-with-relative-pos-content-expected.txt:
+        * platform/mac/svg/custom/use-on-disallowed-foreign-object-5-expected.txt:
+        * platform/mac/svg/custom/use-on-disallowed-foreign-object-6-expected.txt:
+        * platform/mac/svg/foreignObject/fO-parent-display-none-expected.txt:
+        * platform/mac/svg/foreignObject/fO-parent-display-none-with-relative-pos-content-expected.txt:
+        * platform/mac/svg/foreignObject/fO-parent-of-parent-display-none-expected.txt:
+        * platform/mac/svg/foreignObject/fO-parent-of-parent-display-none-with-relative-pos-content-expected.txt:
+        * platform/qt/svg/custom/use-on-disallowed-foreign-object-5-expected.txt:
+        * platform/qt/svg/custom/use-on-disallowed-foreign-object-6-expected.txt:
+        * platform/qt/svg/foreignObject/fO-parent-display-none-expected.txt:
+        * platform/qt/svg/foreignObject/fO-parent-display-none-with-relative-pos-content-expected.txt:
+        * platform/qt/svg/foreignObject/fO-parent-of-parent-display-none-expected.txt:
+        * platform/qt/svg/foreignObject/fO-parent-of-parent-display-none-with-relative-pos-content-expected.txt:
+        * svg/custom/use-on-g-containing-foreignObject-and-image-expected.txt:
+        * svg/foreignObject/foreign-object-defs-crash-expected.txt: Added.
+        * svg/foreignObject/foreign-object-defs-crash.svg: Added.
+        * svg/foreignObject/text-tref-02-b-expected.txt:
+
+2012-11-05  Stephen White  <senorblanco@chromium.org>
+
+        [chromium] Mark several compositing tests as only failing Image
+        and not Text, after r133513.  Unreviewed.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-05  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt][WK2] New compositing/tiling tests fail
+        https://bugs.webkit.org/show_bug.cgi?id=101166
+
+        Unskip now passing tests after r133513.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+
+2012-11-05  Simon Fraser  <simon.fraser@apple.com>
+
+        [Qt][WK2] New compositing/tiling tests fail
+        https://bugs.webkit.org/show_bug.cgi?id=101166
+
+        The platform-independent results should not contain visibleRect, since this is
+        only dumped on Mac.
+
+        * compositing/tiling/rotated-tiled-clamped-expected.txt:
+        * compositing/tiling/rotated-tiled-preserve3d-clamped-expected.txt:
+
+2012-11-05  Simon Fraser  <simon.fraser@apple.com>
+
+        Rebaseline some Lion results that were affected by enabling subpixel layout.
+
+        * platform/mac-lion/editing/selection/vertical-lr-ltr-extend-line-backward-br-expected.txt:
+        * platform/mac-lion/editing/selection/vertical-lr-ltr-extend-line-forward-br-expected.txt:
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-backward-br-expected.txt:
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-backward-p-expected.txt:
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-forward-br-expected.txt:
+        * platform/mac-lion/editing/selection/vertical-rl-ltr-extend-line-forward-p-expected.txt:
+        * platform/mac-lion/fast/text/international/hindi-spacing-expected.txt:
+        * platform/mac-lion/fast/text/international/vertical-text-glyph-test-expected.txt:
+        * platform/mac-lion/fast/writing-mode/Kusa-Makura-background-canvas-expected.txt:
+        * platform/mac-lion/fast/writing-mode/japanese-ruby-vertical-lr-expected.txt:
+        * platform/mac-lion/fast/writing-mode/japanese-ruby-vertical-rl-expected.txt:
+        * platform/mac-lion/fast/writing-mode/vertical-font-fallback-expected.txt:
+
+2012-11-05  Stephen White  <senorblanco@chromium.org>
+
+        [chromium] Mark css3/filters/custom/custom-filter-animation.html
+        as timing out intermittently.  Unreviewed.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-05  David Barton  <dbarton@mathscribe.com>
+
+        Implement SimpleFontData::platformBoundsForGlyph on skia
+        https://bugs.webkit.org/show_bug.cgi?id=101115
+
+        Reviewed by Eric Seidel.
+
+        Some lineboxcontain/etc. tests will need rebaselining.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-05  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, unskip a now passing test.
+
+        * platform/qt-5.0-wk1/TestExpectations:
+
+2012-11-05  Hans Muller  <hmuller@adobe.com>
+
+        [CSS Exclusions] Polygon edges should span colinear vertices
+        https://bugs.webkit.org/show_bug.cgi?id=99343
+
+        Reviewed by Dirk Schulze.
+
+        Verify that exclusion polygonal shape-inside layout is unaffected by coincident
+        or collinear vertices.
+
+        * fast/exclusions/shape-inside/shape-inside-coincident-vertices-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-coincident-vertices.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-collinear-vertices-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-collinear-vertices.html: Added.
+
+2012-11-05  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, unskip now passing tests.
+
+        * platform/qt/TestExpectations:
+
+2012-11-05  Stephen White  <senorblanco@chromium.org>
+
+        [chromium] Mark inspector-protocol/debugger-pause-dedicated-worker.html
+        as also crashy, and give it a bug ID.  Unreviewed.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-05  Dominik Röttsches  <dominik.rottsches@intel.com>
+
+        [Cairo] Make Cairo honor image orientation
+        https://bugs.webkit.org/show_bug.cgi?id=101207
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Unskip and rebaseline exif orientation tests for EFL.
+
+        * platform/efl-wk1/TestExpectations: Tests not passing here yet, since DRT needs a setShouldRespectImageOrientation setting.
+        * platform/efl/TestExpectations: Unskipping three exif orientation tests.
+        * platform/efl/fast/images/exif-orientation-css-expected.png: Added.
+        * platform/efl/fast/images/exif-orientation-css-expected.txt: Added.
+        * platform/efl/fast/images/exif-orientation-expected.png: Added.
+        * platform/efl/fast/images/exif-orientation-expected.txt: Added.
+        * platform/efl/fast/images/exif-orientation-image-document-expected.png: Added.
+        * platform/efl/fast/images/exif-orientation-image-document-expected.txt: Added.
+
+2012-11-05  Hans Muller  <hmuller@adobe.com>
+
+        [CSS Exclusions] Layout of the first shape-inside line can be incorrect
+        https://bugs.webkit.org/show_bug.cgi?id=100996
+
+        Reviewed by Dirk Schulze.
+
+        Verify that the first line of shape-inside content is laid out correctly
+        when the top of the shape's bounds has a non-integral value.
+
+        * fast/exclusions/shape-inside/shape-inside-shape-logical-top-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-shape-logical-top.html: Added.
+
+2012-11-05  Stephen White  <senorblanco@chromium.org>
+
+        [chromium] Mark a flaky test.  Unreviewed.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-05  Stephen White  <senorblanco@chromium.org>
+
+        [chromium] Add a now-failing test, remove a now-passing test.  Unreviewed.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-05  Pierre Rossi  <pierre.rossi@gmail.com>
+
+        [Qt] Fix broken comment in WK2 TestExpectations
+
+        Unreviewed fix, just an obviously missing '#' character.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+
+2012-11-05  Christophe Dumez  <christophe.dumez@intel.com>
+
+        fast/events/popup-allowed-from-gesture-initiated-event.html is flaky
+        https://bugs.webkit.org/show_bug.cgi?id=101208
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Close the new popup between each test to make sure the new window
+        does not mask the buttons and therefore prevent them from being
+        clicked. This addresses flakiness for this test.
+
+        * fast/events/popup-allowed-from-gesture-initiated-event.html:
+
+2012-11-05  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        A followup to r133453, adding a baseline for http/tests/inspector/console-websocket-error.html.
+
+        * platform/gtk/http/tests/inspector: Added.
+        * platform/gtk/http/tests/inspector/console-websocket-error-expected.txt: Added.
+
+2012-11-05  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        Validate CSS Device Adaptation properties and resolve shorthands
+        https://bugs.webkit.org/show_bug.cgi?id=95962
+
+        Reviewed by Alexis Menard.
+
+        Added a test for CSS Device Adaptation property parsing validation.
+
+        * css3/device-adapt/viewport-properties-validation-expected.txt: Added.
+        * css3/device-adapt/viewport-properties-validation.html: Added.
+
+2012-11-05  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Unreviewed gardening.
+
+        Remove a few tests which depend on setIsolatedWorldSecurityOrigin
+        since they are already skipped in efl/TestExpectations.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-11-05  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] fast/forms/week-multiple-fields does not exist and should be removed from TestExpectations
+        https://bugs.webkit.org/show_bug.cgi?id=101202
+
+        Unreviewed EFL gardening.
+
+        Remove fast/forms/week-multiple-fields from TestExpections since it does
+        not exist and makes the style script complain.
+
+        * platform/efl/TestExpectations:
+
+2012-11-05  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Clean up the inspector-related test expectations. Instead of marking
+        many tests as skipped, proper failure expectations are put in place.
+        The tests are still being skipped as their current behavior on the
+        buildbots is unknown.
+
+        * platform/gtk/TestExpectations:
+
+2012-11-05  Kristóf Kosztyó  <kkristof@inf.u-szeged.hu>
+
+        [Qt] Unreviewed gardening.
+
+        Skip fast/dom/shadow/shadowroot-type.html because SHADOW_DOM is disabled.
+
+        * platform/qt/TestExpectations:
+
+2012-11-05  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Rebaselining MathML tests after r132264 and r133221 and updating
+        pixel baselines with outdated hash.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/mathml/presentation/attributes-expected.png:
+        * platform/gtk/mathml/presentation/fenced-expected.png:
+        * platform/gtk/mathml/presentation/fenced-expected.txt:
+        * platform/gtk/mathml/presentation/mo-expected.png:
+        * platform/gtk/mathml/presentation/mo-expected.txt:
+        * platform/gtk/mathml/presentation/mo-stretch-expected.png:
+        * platform/gtk/mathml/presentation/mo-stretch-expected.txt:
+        * platform/gtk/mathml/presentation/mroot-pref-width-expected.png:
+        * platform/gtk/mathml/presentation/over-expected.png:
+        * platform/gtk/mathml/presentation/over-expected.txt:
+        * platform/gtk/mathml/presentation/roots-expected.png:
+        * platform/gtk/mathml/presentation/row-alignment-expected.png:
+        * platform/gtk/mathml/presentation/row-alignment-expected.txt:
+        * platform/gtk/mathml/presentation/row-expected.png:
+        * platform/gtk/mathml/presentation/row-expected.txt:
+        * platform/gtk/mathml/presentation/style-expected.png:
+        * platform/gtk/mathml/presentation/subsup-expected.png:
+        * platform/gtk/mathml/presentation/subsup-expected.txt:
+        * platform/gtk/mathml/presentation/tables-expected.png:
+        * platform/gtk/mathml/presentation/tables-expected.txt:
+
+2012-11-05  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Skip compositing/repaint/invalidations-on-composited-layers.html
+        https://bugs.webkit.org/show_bug.cgi?id=101181
+
+        Unreviewed EFL gardening.
+
+        Mark compositing/repaint/invalidations-on-composited-layers.html as
+        expected to fail since accelerated compositing is disabled by default
+        on EFL port.
+
+        * platform/efl/TestExpectations:
+
+2012-11-05  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Skipping ENABLE_SUBPIXEL- and ENABLE_INPUT_TYPE_*-related testing
+        directories. These features are not enabled yet and most of the
+        tests fail.
+
+        Removing failure expectation for fast/files/workers/worker-apply-blob-url-to-xhr.html,
+        the issue was fixed in r132973.
+
+        Moving the skip entry for css3/device-adapt to the proper section.
+
+        * platform/gtk/TestExpectations:
+
+2012-11-05  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Shadow] ShadowRoot type is not set correctly.
+        https://bugs.webkit.org/show_bug.cgi?id=101188
+
+        Reviewed by Hajime Morita.
+
+        * fast/dom/shadow/shadowroot-type-expected.txt: Added.
+        * fast/dom/shadow/shadowroot-type.html: Added.
+
+2012-11-04  Kent Tamura  <tkent@chromium.org>
+
+        Move *-multiple-fields-appearance-*.html from fast/forms/*-multiple-fields/ to fast/forms/*/
+        https://bugs.webkit.org/show_bug.cgi?id=101186
+
+        Rubber-stamped by Kentaro Hara.
+
+        The fast/forms/{date,month,time,week}-multiple-fields/
+        {date,month,time,week}-multiple-fields-appearance-*.html tests don't
+        depend on the multiple-fields UI, and should work for non
+        multiple-fields configuration too. They should be moved to
+        fast/forms/{date,month,time,week}/.
+
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.txt: Removed.
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic.html: Removed.
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.txt: Removed.
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n.html: Removed.
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.txt: Removed.
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes.html: Removed.
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.txt: Removed.
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements.html: Removed.
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.txt: Removed.
+        * fast/forms/date-multiple-fields/date-multiple-fields-appearance-style.html: Removed.
+        * fast/forms/date/date-appearance-basic-expected.txt: Copied from LayoutTests/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.txt.
+        * fast/forms/date/date-appearance-basic.html: Copied from LayoutTests/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic.html.
+        * fast/forms/date/date-appearance-l10n-expected.txt: Copied from LayoutTests/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.txt.
+        * fast/forms/date/date-appearance-l10n.html: Copied from LayoutTests/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n.html.
+        * fast/forms/date/date-appearance-pseudo-classes-expected.txt: Copied from LayoutTests/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.txt.
+        * fast/forms/date/date-appearance-pseudo-classes.html: Copied from LayoutTests/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes.html.
+        * fast/forms/date/date-appearance-pseudo-elements-expected.txt: Copied from LayoutTests/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.txt.
+        * fast/forms/date/date-appearance-pseudo-elements.html: Copied from LayoutTests/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements.html.
+        * fast/forms/date/date-appearance-style-expected.txt: Copied from LayoutTests/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.txt.
+        * fast/forms/date/date-appearance-style.html: Copied from LayoutTests/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style.html.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.txt: Removed.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic.html: Removed.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.txt: Removed.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n.html: Removed.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.txt: Removed.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes.html: Removed.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.txt: Removed.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements.html: Removed.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.txt: Removed.
+        * fast/forms/month-multiple-fields/month-multiple-fields-appearance-style.html: Removed.
+        * fast/forms/month/month-appearance-basic-expected.txt: Copied from LayoutTests/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.txt.
+        * fast/forms/month/month-appearance-basic.html: Copied from LayoutTests/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic.html.
+        * fast/forms/month/month-appearance-l10n-expected.txt: Copied from LayoutTests/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.txt.
+        * fast/forms/month/month-appearance-l10n.html: Copied from LayoutTests/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n.html.
+        * fast/forms/month/month-appearance-pseudo-classes-expected.txt: Copied from LayoutTests/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.txt.
+        * fast/forms/month/month-appearance-pseudo-classes.html: Copied from LayoutTests/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes.html.
+        * fast/forms/month/month-appearance-pseudo-elements-expected.txt: Copied from LayoutTests/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.txt.
+        * fast/forms/month/month-appearance-pseudo-elements.html: Copied from LayoutTests/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements.html.
+        * fast/forms/month/month-appearance-style-expected.txt: Copied from LayoutTests/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.txt.
+        * fast/forms/month/month-appearance-style.html: Copied from LayoutTests/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style.html.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.txt: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic.html: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.txt: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly.html: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.txt: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes.html: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.txt: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements.html: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.txt: Removed.
+        * fast/forms/time-multiple-fields/time-multiple-fields-appearance-style.html: Removed.
+        * fast/forms/time/time-appearance-basic-expected.txt: Copied from LayoutTests/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.txt.
+        * fast/forms/time/time-appearance-basic.html: Copied from LayoutTests/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic.html.
+        * fast/forms/time/time-appearance-disabled-readonly-expected.txt: Copied from LayoutTests/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.txt.
+        * fast/forms/time/time-appearance-disabled-readonly.html: Copied from LayoutTests/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly.html.
+        * fast/forms/time/time-appearance-pseudo-classes-expected.txt: Copied from LayoutTests/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.txt.
+        * fast/forms/time/time-appearance-pseudo-classes.html: Copied from LayoutTests/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes.html.
+        * fast/forms/time/time-appearance-pseudo-elements-expected.txt: Copied from LayoutTests/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.txt.
+        * fast/forms/time/time-appearance-pseudo-elements.html: Copied from LayoutTests/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements.html.
+        * fast/forms/time/time-appearance-style-expected.txt: Copied from LayoutTests/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.txt.
+        * fast/forms/time/time-appearance-style.html: Copied from LayoutTests/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style.html.
+        * fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.txt: Removed.
+        * fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic.html: Removed.
+        * fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.txt: Removed.
+        * fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes.html: Removed.
+        * fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.txt: Removed.
+        * fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements.html: Removed.
+        * fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.txt: Removed.
+        * fast/forms/week-multiple-fields/week-multiple-fields-appearance-style.html: Removed.
+        * fast/forms/week/week-appearance-basic-expected.txt: Copied from LayoutTests/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.txt.
+        * fast/forms/week/week-appearance-basic.html: Copied from LayoutTests/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic.html.
+        * fast/forms/week/week-appearance-pseudo-classes-expected.txt: Copied from LayoutTests/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.txt.
+        * fast/forms/week/week-appearance-pseudo-classes.html: Copied from LayoutTests/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes.html.
+        * fast/forms/week/week-appearance-pseudo-elements-expected.txt: Copied from LayoutTests/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.txt.
+        * fast/forms/week/week-appearance-pseudo-elements.html: Copied from LayoutTests/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements.html.
+        * fast/forms/week/week-appearance-style-expected.txt: Copied from LayoutTests/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.txt.
+        * fast/forms/week/week-appearance-style.html: Copied from LayoutTests/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style.html.
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/date/date-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-linux/fast/forms/date/date-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-linux/fast/forms/date/date-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-linux/fast/forms/date/date-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-linux/fast/forms/date/date-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-linux/fast/forms/month: Added.
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/month/month-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-linux/fast/forms/month/month-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-linux/fast/forms/month/month-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-linux/fast/forms/month/month-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-linux/fast/forms/month/month-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-linux/fast/forms/time: Added.
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/time/time-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-linux/fast/forms/time/time-appearance-disabled-readonly-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png.
+        * platform/chromium-linux/fast/forms/time/time-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-linux/fast/forms/time/time-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-linux/fast/forms/time/time-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-linux/fast/forms/week: Added.
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/week/week-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-linux/fast/forms/week/week-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-linux/fast/forms/week/week-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-linux/fast/forms/week/week-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-linux/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac-lion/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/date/date-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac-lion/fast/forms/date/date-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-mac-lion/fast/forms/date/date-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac-lion/fast/forms/date/date-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac-lion/fast/forms/date/date-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac-lion/fast/forms/month: Added.
+        * platform/chromium-mac-lion/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/month/month-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac-lion/fast/forms/month/month-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-mac-lion/fast/forms/month/month-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac-lion/fast/forms/month/month-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac-lion/fast/forms/month/month-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac-lion/fast/forms/time: Added.
+        * platform/chromium-mac-lion/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/time/time-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac-lion/fast/forms/time/time-appearance-disabled-readonly-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png.
+        * platform/chromium-mac-lion/fast/forms/time/time-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac-lion/fast/forms/time/time-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac-lion/fast/forms/time/time-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac-lion/fast/forms/week: Added.
+        * platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/week/week-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac-lion/fast/forms/week/week-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac-lion/fast/forms/week/week-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac-lion/fast/forms/week/week-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac-lion/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/date/date-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/date/date-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/date/date-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/date/date-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/date/date-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/month: Added.
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/month/month-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/month/month-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/month/month-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/month/month-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/month/month-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/time: Added.
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/time/time-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/time/time-appearance-disabled-readonly-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/time/time-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/time/time-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/time/time-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/week: Added.
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/week/week-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/week/week-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/week/week-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac-snowleopard/fast/forms/week/week-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac-snowleopard/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/date/date-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac/fast/forms/date/date-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-mac/fast/forms/date/date-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac/fast/forms/date/date-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac/fast/forms/date/date-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac/fast/forms/month: Added.
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/month/month-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac/fast/forms/month/month-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-mac/fast/forms/month/month-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac/fast/forms/month/month-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac/fast/forms/month/month-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac/fast/forms/time: Added.
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/time/time-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac/fast/forms/time/time-appearance-disabled-readonly-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png.
+        * platform/chromium-mac/fast/forms/time/time-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac/fast/forms/time/time-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac/fast/forms/time/time-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-mac/fast/forms/week: Added.
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/week/week-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-mac/fast/forms/week/week-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-mac/fast/forms/week/week-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-mac/fast/forms/week/week-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-mac/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-win-xp/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-win-xp/fast/forms/date/date-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-win-xp/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-win-xp/fast/forms/month: Added.
+        * platform/chromium-win-xp/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-win-xp/fast/forms/month/month-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-win-xp/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-win/fast/forms/date/date-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-win/fast/forms/date/date-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-win/fast/forms/date/date-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-win/fast/forms/date/date-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-win/fast/forms/date/date-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/date-multiple-fields/date-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-win/fast/forms/month: Added.
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png: Removed.
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-win/fast/forms/month/month-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-win/fast/forms/month/month-appearance-l10n-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-l10n-expected.png.
+        * platform/chromium-win/fast/forms/month/month-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-win/fast/forms/month/month-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-win/fast/forms/month/month-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-win/fast/forms/time: Added.
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png: Removed.
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-win/fast/forms/time/time-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-win/fast/forms/time/time-appearance-disabled-readonly-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-disabled-readonly-expected.png.
+        * platform/chromium-win/fast/forms/time/time-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-win/fast/forms/time/time-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-win/fast/forms/time/time-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/time-multiple-fields/time-multiple-fields-appearance-style-expected.png.
+        * platform/chromium-win/fast/forms/week: Added.
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png: Removed.
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png: Removed.
+        * platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png: Removed.
+        * platform/chromium-win/fast/forms/week/week-appearance-basic-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-basic-expected.png.
+        * platform/chromium-win/fast/forms/week/week-appearance-pseudo-classes-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-classes-expected.png.
+        * platform/chromium-win/fast/forms/week/week-appearance-pseudo-elements-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-pseudo-elements-expected.png.
+        * platform/chromium-win/fast/forms/week/week-appearance-style-expected.png: Copied from LayoutTests/platform/chromium-win/fast/forms/week-multiple-fields/week-multiple-fields-appearance-style-expected.png.
+        * platform/chromium/TestExpectations:
+
+2012-11-04  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Fix the collapsing border code to handle mixed directionality at the row level
+        https://bugs.webkit.org/show_bug.cgi?id=101060
+
+        Reviewed by Ojan Vafai.
+
+        * fast/table/border-collapsing/table-ltr-rows-mixed-direction-expected.html: Added.
+        * fast/table/border-collapsing/table-ltr-rows-mixed-direction.html: Added.
+        * fast/table/border-collapsing/table-rtl-row-mixed-direction-expected.html: Added.
+        * fast/table/border-collapsing/table-rtl-row-mixed-direction.html: Added.
+
+2012-11-04  Andrey Adaikin  <aandrey@chromium.org>
+
+        Web Inspector: [Canvas] do not blow up the capturing log
+        https://bugs.webkit.org/show_bug.cgi?id=100752
+
+        Reviewed by Pavel Feldman.
+
+        Added test for track Canvas 2D API changes, as well as basics for the capturing.
+
+        * inspector/profiler/canvas-profiler-test.js: Renamed from LayoutTests/inspector/profiler/webgl/webgl-profiler-test.js.
+        (initialize_CanvasWebGLProfilerTest.InspectorTest.enableCanvasAgent):
+        (initialize_CanvasWebGLProfilerTest):
+        (createWebGLContext):
+        (createCanvas2DContext):
+        * inspector/profiler/canvas2d/canvas2d-api-changes-expected.txt: Added.
+        * inspector/profiler/canvas2d/canvas2d-api-changes.html: Added.
+        * inspector/profiler/canvas2d/canvas2d-profiler-capturing-basics-expected.txt: Added.
+        * inspector/profiler/canvas2d/canvas2d-profiler-capturing-basics.html: Added.
+        * inspector/profiler/webgl/webgl-profiler-get-error.html:
+
+2012-11-04  Nandor Huszka  <hnandor@inf.u-szeged.hu>
+
+        [Qt] Unreviewed gardening.
+
+        Skip a new failing test introduced in r133428, because SHADOW_DOM is disabled.
+        Unskip a test that does not exist already.
+
+        * platform/qt/TestExpectations:
+
+2012-11-04  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Adding failure expectations for accessibility/svg-remote-element,
+        fast/images/exif-orientation-image-document.html and
+        svg/animations/mozilla/animateMotion-mpath-targetChange-1.svg.
+        Rebaselining fast/images/repaint-subrect-grid.html, the new baseline
+        matches the one Mac port uses.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/fast/images/repaint-subrect-grid-expected.txt: Added.
+
+2012-11-04  Keishi Hattori  <keishi@webkit.org>
+
+        Introduce Month class to calendar picker
+        https://bugs.webkit.org/show_bug.cgi?id=101024
+
+        Reviewed by Kent Tamura.
+
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/calendar-picker-key-operations-expected.txt:
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-key-operations-expected.txt:
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-key-operations.html: Adjust the expectation because we changed the month string format.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-mouse-operations-expected.txt:
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-mouse-operations.html: Ditto.
+
+2012-11-04  Kent Tamura  <tkent@chromium.org>
+
+        Remove obsolete tests for date/time input types
+        https://bugs.webkit.org/show_bug.cgi?id=98783
+
+        Reviewed by Kentaro Hara.
+
+        *-input-visible-string.html and *-stepup-stepdown-from-renderer.html are
+        unnecessary and should be removed because they depend on textfield
+        behavior, and the date/time input types no longer have textfield
+        behavior on any platforms.
+
+        * fast/forms/datetime/datetime-input-visible-string-expected.txt: Removed.
+        * fast/forms/datetime/datetime-input-visible-string.html: Removed.
+        * fast/forms/datetime/datetime-stepup-stepdown-from-renderer-expected.txt: Removed.
+        * fast/forms/datetime/datetime-stepup-stepdown-from-renderer.html: Removed.
+        * fast/forms/datetimelocal/datetimelocal-input-visible-string-expected.txt: Removed.
+        * fast/forms/datetimelocal/datetimelocal-input-visible-string.html: Removed.
+        * fast/forms/datetimelocal/datetimelocal-stepup-stepdown-from-renderer-expected.txt: Removed.
+        * fast/forms/datetimelocal/datetimelocal-stepup-stepdown-from-renderer.html: Removed.
+        * fast/forms/month/month-input-visible-string-expected.txt: Removed.
+        * fast/forms/month/month-input-visible-string.html: Removed.
+        * fast/forms/month/month-stepup-stepdown-from-renderer-expected.txt: Removed.
+        * fast/forms/month/month-stepup-stepdown-from-renderer.html: Removed.
+        * fast/forms/time/time-input-visible-string-expected.txt: Removed.
+        * fast/forms/time/time-input-visible-string.html: Removed.
+        * fast/forms/time/time-stepup-stepdown-from-renderer-expected.txt: Removed.
+        * fast/forms/time/time-stepup-stepdown-from-renderer.html: Removed.
+        * fast/forms/week/week-input-visible-string-expected.txt: Removed.
+        * fast/forms/week/week-input-visible-string.html: Removed.
+        * fast/forms/week/week-stepup-stepdown-from-renderer-expected.txt: Removed.
+        * fast/forms/week/week-stepup-stepdown-from-renderer.html: Removed.
+        * platform/chromium-android/fast/forms/time/time-stepup-stepdown-from-renderer-expected.txt: Removed.
+        * platform/chromium/TestExpectations:
+        * platform/chromium/fast/forms/datetime/datetime-input-visible-string-expected.txt: Removed.
+        * platform/chromium/fast/forms/datetime/datetime-stepup-stepdown-from-renderer-expected.txt: Removed.
+        * platform/chromium/fast/forms/datetimelocal/datetimelocal-input-visible-string-expected.txt: Removed.
+        * platform/chromium/fast/forms/datetimelocal/datetimelocal-stepup-stepdown-from-renderer-expected.txt: Removed.
+        * platform/chromium/fast/forms/month/month-input-visible-string-expected.txt: Removed.
+        * platform/chromium/fast/forms/month/month-stepup-stepdown-from-renderer-expected.txt: Removed.
+        * platform/chromium/fast/forms/time/time-input-visible-string-expected.txt: Removed.
+        * platform/chromium/fast/forms/time/time-stepup-stepdown-from-renderer-expected.txt: Removed.
+        * platform/chromium/fast/forms/week/week-input-visible-string-expected.txt: Removed.
+        * platform/chromium/fast/forms/week/week-stepup-stepdown-from-renderer-expected.txt: Removed.
+
+2012-11-04  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL][DRT] Skip a fast/images/repaint-subrect-grid.html test case after r133322
+        https://bugs.webkit.org/show_bug.cgi?id=101175
+
+        Unreviewed gardening.
+
+        fast/images/repaint-subrect-grid.html is failing on WK1 debug bot.
+
+        * platform/efl-wk1/TestExpectations:
+
+2012-11-04  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Shadow] Implement custom pseudo-elements styling
+        https://bugs.webkit.org/show_bug.cgi?id=100812
+
+        Reviewed by Hajime Morita.
+
+        * fast/dom/shadow/styling-pseudo-attribute-expected.html: Added.
+        * fast/dom/shadow/styling-pseudo-attribute.html: Added.
+
+2012-11-04  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r133416.
+        http://trac.webkit.org/changeset/133416
+        https://bugs.webkit.org/show_bug.cgi?id=101169
+
+        Broke world selection by right click (Requested by rniwa on
+        #webkit).
+
+        * fast/events/touch/gesture/disabled-input-text-selection-expected.txt: Removed.
+        * fast/events/touch/gesture/disabled-input-text-selection.html: Removed.
+        * platform/chromium/TestExpectations:
+
+2012-11-04  Stephen White  <senorblanco@chromium.org>
+
+        [chromium] Add a now-failing test.  Unreviewed.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-04  Florin Malita  <fmalita@chromium.org>
+
+        Color-profile property triggers assert
+        https://bugs.webkit.org/show_bug.cgi?id=101080
+
+        Reviewed by Dirk Schulze.
+
+        * svg/css/color-profile-crash-expected.txt: Added.
+        * svg/css/color-profile-crash.html: Added.
+
 2012-11-04  Csaba Osztrogonác  <ossy@webkit.org>
 
         [Qt][WK2] Unreviewed weekend gardening, skip failing tests, update expected files.

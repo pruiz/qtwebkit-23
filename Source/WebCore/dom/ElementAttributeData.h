@@ -62,8 +62,8 @@ public:
     void destroyInlineStyle(StyledElement*);
     void detachCSSOMWrapperIfNeeded(StyledElement*);
 
-    const StylePropertySet* presentationAttributeStyle() const { return m_presentationAttributeStyle.get(); }
-    void setPresentationAttributeStyle(PassRefPtr<StylePropertySet> style) const { m_presentationAttributeStyle= style; }
+    const StylePropertySet* attributeStyle() const { return m_attributeStyle.get(); }
+    void setAttributeStyle(PassRefPtr<StylePropertySet> style) const { m_attributeStyle = style; }
 
     size_t length() const;
     bool isEmpty() const { return !length(); }
@@ -85,11 +85,6 @@ public:
 
     bool isEquivalent(const ElementAttributeData* other) const;
 
-    bool styleAttributeIsDirty() const { return m_styleAttributeIsDirty; }
-    void setStyleAttributeIsDirty(bool f) const { m_styleAttributeIsDirty = f; }
-    bool presentationAttributeStyleIsDirty() const { return m_presentationAttributeStyleIsDirty; }
-    void setPresentationAttributeStyleIsDirty(bool f) const { m_presentationAttributeStyleIsDirty = f; }
-
     void reportMemoryUsage(MemoryObjectInfo*) const;
 
     bool isMutable() const { return m_isMutable; }
@@ -98,25 +93,19 @@ public:
 protected:
     ElementAttributeData()
         : m_isMutable(true)
-        , m_styleAttributeIsDirty(false)
-        , m_presentationAttributeStyleIsDirty(false)
         , m_arraySize(0)
     { }
 
     ElementAttributeData(unsigned arraySize)
         : m_isMutable(false)
-        , m_styleAttributeIsDirty(false)
-        , m_presentationAttributeStyleIsDirty(false)
         , m_arraySize(arraySize)
     { }
 
     unsigned m_isMutable : 1;
-    mutable unsigned m_styleAttributeIsDirty : 1;
-    mutable unsigned m_presentationAttributeStyleIsDirty : 1;
-    unsigned m_arraySize : 29;
+    unsigned m_arraySize : 31;
 
     mutable RefPtr<StylePropertySet> m_inlineStyleDecl;
-    mutable RefPtr<StylePropertySet> m_presentationAttributeStyle;
+    mutable RefPtr<StylePropertySet> m_attributeStyle;
     mutable SpaceSplitString m_classNames;
     mutable AtomicString m_idForStyleResolution;
 

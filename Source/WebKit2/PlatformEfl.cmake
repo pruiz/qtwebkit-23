@@ -82,7 +82,9 @@ LIST(APPEND WebKit2_SOURCES
     UIProcess/efl/FormClientEfl.cpp
     UIProcess/efl/InputMethodContextEfl.cpp
     UIProcess/efl/NetworkInfoProvider.cpp
-    UIProcess/efl/PageClientImpl.cpp
+    UIProcess/efl/PageClientBase.cpp
+    UIProcess/efl/PageClientLegacyImpl.cpp
+    UIProcess/efl/PageClientDefaultImpl.cpp
     UIProcess/efl/PageLoadClientEfl.cpp
     UIProcess/efl/PagePolicyClientEfl.cpp
     UIProcess/efl/PageUIClientEfl.cpp
@@ -202,8 +204,8 @@ LIST(APPEND WebKit2_LIBRARIES
     ${OPENGL_LIBRARIES}
     ${SQLITE_LIBRARIES}
     ${FONTCONFIG_LIBRARIES}
-    ${PNG_LIBRARY}
-    ${JPEG_LIBRARY}
+    ${PNG_LIBRARIES}
+    ${JPEG_LIBRARIES}
     ${CMAKE_DL_LIBS}
     ${GLIB_LIBRARIES}
     ${GLIB_GIO_LIBRARIES}

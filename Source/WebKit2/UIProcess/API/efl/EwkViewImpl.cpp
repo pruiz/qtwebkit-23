@@ -27,12 +27,12 @@
 #include "InputMethodContextEfl.h"
 #include "LayerTreeCoordinatorProxy.h"
 #include "LayerTreeRenderer.h"
-#include "PageClientImpl.h"
+#include "PageClientBase.h"
+#include "PageClientDefaultImpl.h"
+#include "PageClientLegacyImpl.h"
 #include "PageLoadClientEfl.h"
 #include "PagePolicyClientEfl.h"
 #include "PageUIClientEfl.h"
-#include "PageViewportController.h"
-#include "PageViewportControllerClientEfl.h"
 #include "ResourceLoadClientEfl.h"
 #include "WKString.h"
 #include "WebContext.h"
@@ -51,6 +51,7 @@
 #include "ewk_view.h"
 #include "ewk_view_private.h"
 #include <Ecore_Evas.h>
+#include <Ecore_X.h>
 #include <Edje.h>
 #include <WebCore/Cursor.h>
 
@@ -95,10 +96,10 @@ const Evas_Object* EwkViewImpl::viewFromPageViewMap(const WKPageRef page)
     return pageViewMap().get(page);
 }
 
-EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<Ewk_Context> context, PassRefPtr<WebPageGroup> pageGroup)
+EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<EwkContext> context, PassRefPtr<WebPageGroup> pageGroup, ViewBehavior behavior)
     : m_view(view)
     , m_context(context)
-    , m_pageClient(PageClientImpl::create(this))
+    , m_pageClient(behavior == DefaultBehavior ? PageClientDefaultImpl::create(this) : PageClientLegacyImpl::create(this))
     , m_pageProxy(toImpl(m_context->wkContext())->createWebPage(m_pageClient.get(), pageGroup.get()))
     , m_pageLoadClient(PageLoadClientEfl::create(this))
     , m_pagePolicyClient(PagePolicyClientEfl::create(this))
@@ -108,8 +109,7 @@ EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<Ewk_Context> context, Pas
     , m_formClient(FormClientEfl::create(this))
     , m_backForwardList(Ewk_Back_Forward_List::create(toAPI(m_pageProxy->backForwardList())))
 #if USE(TILED_BACKING_STORE)
-    , m_pageViewportControllerClient(PageViewportControllerClientEfl::create(this))
-    , m_pageViewportController(adoptPtr(new PageViewportController(m_pageProxy.get(), m_pageViewportControllerClient.get())))
+    , m_scaleFactor(1)
 #endif
     , m_settings(Ewk_Settings::create(this))
     , m_cursorGroup(0)
@@ -130,14 +130,11 @@ EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<Ewk_Context> context, Pas
 #if ENABLE(WEBGL)
     m_pageProxy->pageGroup()->preferences()->setWebGLEnabled(true);
 #endif
-    m_pageProxy->setUseFixedLayout(true);
+    if (behavior == DefaultBehavior)
+        m_pageProxy->setUseFixedLayout(true);
 #endif
 
     m_pageProxy->initializeWebPage();
-
-#if USE(TILED_BACKING_STORE)
-    m_pageClient->setPageViewportController(m_pageViewportController.get());
-#endif
 
 #if ENABLE(FULLSCREEN_API)
     m_pageProxy->fullScreenManager()->setWebView(m_view);
@@ -169,7 +166,7 @@ EwkViewImpl::~EwkViewImpl()
     EwkViewImpl::removeFromPageViewMap(this);
 }
 
-Ewk_View_Smart_Data* EwkViewImpl::smartData()
+Ewk_View_Smart_Data* EwkViewImpl::smartData() const
 {
     return static_cast<Ewk_View_Smart_Data*>(evas_object_smart_data_get(m_view));
 }
@@ -239,6 +236,54 @@ void EwkViewImpl::setCursor(const Cursor& cursor)
     ecore_evas_object_cursor_set(ecoreEvas, cursorObject.release().leakRef(), EVAS_LAYER_MAX, hotspotX, hotspotY);
 }
 
+AffineTransform EwkViewImpl::transformFromScene() const
+{
+    AffineTransform transform;
+
+#if USE(TILED_BACKING_STORE)
+    transform.translate(m_scrollPosition.x(), m_scrollPosition.y());
+    transform.scale(1 / m_scaleFactor);
+#endif
+
+    Ewk_View_Smart_Data* sd = smartData();
+    transform.translate(-sd->view.x, -sd->view.y);
+
+    return transform;
+}
+
+AffineTransform EwkViewImpl::transformToScene() const
+{
+    return transformFromScene().inverse();
+}
+
+AffineTransform EwkViewImpl::transformToScreen() const
+{
+    AffineTransform transform;
+
+    int windowGlobalX = 0;
+    int windowGlobalY = 0;
+
+    Ewk_View_Smart_Data* sd = smartData();
+
+#ifdef HAVE_ECORE_X
+    Ecore_Evas* ecoreEvas = ecore_evas_ecore_evas_get(sd->base.evas);
+    Ecore_X_Window window = ecore_evas_software_x11_window_get(ecoreEvas); // Returns 0 if none.
+
+    int x, y; // x, y are relative to parent (in a reparenting window manager).
+    while (window) {
+        ecore_x_window_geometry_get(window, &x, &y, 0, 0);
+        windowGlobalX += x;
+        windowGlobalY += y;
+        window = ecore_x_window_parent_get(window);
+    }
+#endif
+
+    transform.translate(-sd->view.x, -sd->view.y);
+    transform.translate(windowGlobalX, windowGlobalY);
+
+    return transform;
+}
+
 void EwkViewImpl::displayTimerFired(Timer<EwkViewImpl>*)
 {
 #if USE(COORDINATED_GRAPHICS)
@@ -249,19 +294,11 @@ void EwkViewImpl::displayTimerFired(Timer<EwkViewImpl>*)
     // We are supposed to clip to the actual viewport, nothing less.
     IntRect viewport(sd->view.x, sd->view.y, sd->view.w, sd->view.h);
 
-    IntPoint scrollPosition = m_pageViewportControllerClient->scrollPosition();
-    float scaleFactor = m_pageViewportControllerClient->scaleFactor();
-
-    WebCore::TransformationMatrix matrix;
-    matrix.translate(viewport.x(), viewport.y());
-    matrix.scale(scaleFactor);
-    matrix.translate(-scrollPosition.x(), -scrollPosition.y());
-
     LayerTreeRenderer* renderer = page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer();
     renderer->setActive(true);
     renderer->syncRemoteContent();
 
-    renderer->paintToCurrentGLContext(matrix, /* opacity */ 1, viewport);
+    renderer->paintToCurrentGLContext(transformToScene().toTransformationMatrix(), /* opacity */ 1, viewport);
 
     evas_object_image_data_update_add(sd->image, viewport.x(), viewport.y(), viewport.width(), viewport.height());
 #endif
@@ -328,7 +365,7 @@ void EwkViewImpl::setImageData(void* imageData, const IntSize& size)
 #if USE(TILED_BACKING_STORE)
 void EwkViewImpl::informLoadCommitted()
 {
-    m_pageViewportController->didCommitLoad();
+    m_pageClient->didCommitLoad();
 }
 #endif
 
@@ -464,6 +501,21 @@ void EwkViewImpl::informIconChange()
 #if USE(ACCELERATED_COMPOSITING)
 bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
 {
+    if (!m_evasGL) {
+        Evas* evas = evas_object_evas_get(m_view);
+        m_evasGL = adoptPtr(evas_gl_new(evas));
+        if (!m_evasGL)
+            return false;
+    }
+
+    if (!m_evasGLContext) {
+        m_evasGLContext = EvasGLContext::create(evasGL());
+        if (!m_evasGLContext) {
+            WARN("Failed to create GLContext.");
+            return false;
+        }
+    }
+
     Ewk_View_Smart_Data* sd = smartData();
 
     Evas_GL_Config evasGLConfig = {
@@ -493,42 +545,19 @@ bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
 
 bool EwkViewImpl::enterAcceleratedCompositingMode()
 {
-    if (m_evasGL) {
-        EINA_LOG_DOM_WARN(_ewk_log_dom, "Accelerated compositing mode already entered.");
-        return false;
+    if (!m_evasGLSurface) {
+        if (!createGLSurface(size())) {
+            WARN("Failed to create GLSurface.");
+            return false;
+        }
     }
 
-    Evas* evas = evas_object_evas_get(m_view);
-    m_evasGL = adoptPtr(evas_gl_new(evas));
-    if (!m_evasGL)
-        return false;
-
-    m_evasGLContext = EvasGLContext::create(evasGL());
-    if (!m_evasGLContext) {
-        EINA_LOG_DOM_WARN(_ewk_log_dom, "Failed to create GLContext.");
-        m_evasGL.clear();
-        return false;
-    }
-
-    if (!createGLSurface(size())) {
-        EINA_LOG_DOM_WARN(_ewk_log_dom, "Failed to create GLSurface.");
-        m_evasGLContext.clear();
-        m_evasGL.clear();
-        return false;
-    }
-
-    m_pageViewportControllerClient->setRendererActive(true);
+    page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer()->setActive(true);
     return true;
 }
 
 bool EwkViewImpl::exitAcceleratedCompositingMode()
 {
-    EINA_SAFETY_ON_NULL_RETURN_VAL(m_evasGL, false);
-
-    m_evasGLSurface.clear();
-    m_evasGLContext.clear();
-    m_evasGL.clear();
-
     return true;
 }
 #endif
@@ -576,7 +605,7 @@ void EwkViewImpl::dismissColorPicker()
 void EwkViewImpl::informContentsSizeChange(const IntSize& size)
 {
 #if USE(COORDINATED_GRAPHICS)
-    m_pageViewportControllerClient->didChangeContentsSize(size);
+    m_pageClient->didChangeContentsSize(size);
 #else
     UNUSED_PARAM(size);
 #endif

@@ -304,7 +304,7 @@ bool Element::hasAttribute(const QualifiedName& name) const
 
 const AtomicString& Element::getAttribute(const QualifiedName& name) const
 {
-    if (UNLIKELY(name == styleAttr) && styleAttributeIsDirty())
+    if (UNLIKELY(name == styleAttr) && !isStyleAttributeValid())
         updateStyleAttribute();
 
 #if ENABLE(SVG)
@@ -662,7 +662,7 @@ const AtomicString& Element::getAttribute(const AtomicString& name) const
     bool ignoreCase = shouldIgnoreAttributeCase(this);
 
     // Update the 'style' attribute if it's invalid and being requested:
-    if (styleAttributeIsDirty() && equalPossiblyIgnoringCase(name, styleAttr.localName(), ignoreCase))
+    if (!isStyleAttributeValid() && equalPossiblyIgnoringCase(name, styleAttr.localName(), ignoreCase))
         updateStyleAttribute();
 
 #if ENABLE(SVG)
@@ -1354,20 +1354,17 @@ ShadowRoot* Element::userAgentShadowRoot() const
 
 const AtomicString& Element::shadowPseudoId() const
 {
-    return hasRareData() ? elementRareData()->m_shadowPseudoId : nullAtom;
+    return pseudo();
 }
 
 void Element::setShadowPseudoId(const AtomicString& id, ExceptionCode& ec)
 {
-    if (!hasRareData() && id == nullAtom)
-        return;
-
-    if (!CSSSelector::isUnknownPseudoType(id)) {
+    if (!CSSSelector::isCustomPseudoType(id)) {
         ec = SYNTAX_ERR;
         return;
     }
 
-    ensureElementRareData()->m_shadowPseudoId = id;
+    setPseudo(id);
 }
 
 bool Element::childTypeAllowed(NodeType type) const
@@ -1665,8 +1662,11 @@ void Element::removeAttribute(const AtomicString& name)
 
     AtomicString localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
     size_t index = attributeData()->getAttributeItemIndex(localName, false);
-    if (index == notFound)
+    if (index == notFound) {
+        if (UNLIKELY(localName == styleAttr) && !isStyleAttributeValid() && isStyledElement())
+            static_cast<StyledElement*>(this)->removeAllInlineStyleProperties();
         return;
+    }
 
     removeAttributeInternal(index, NotInSynchronizationOfLazyAttribute);
 }
@@ -1931,6 +1931,7 @@ void Element::cancelFocusAppearanceUpdate()
 
 void Element::normalizeAttributes()
 {
+    updateInvalidAttributes();
     if (AttrNodeList* attrNodeList = attrNodeListForElement(this)) {
         for (unsigned i = 0; i < attrNodeList->size(); ++i)
             attrNodeList->at(i)->normalize();

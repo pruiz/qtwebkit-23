@@ -1,3 +1,235 @@
+2012-11-05  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG should not fall down to patchable GetById just because a prototype had things added to it
+        https://bugs.webkit.org/show_bug.cgi?id=101299
+
+        Reviewed by Geoffrey Garen.
+
+        This looks like a slight win on V8v7 and SunSpider.
+
+        * bytecode/DFGExitProfile.h:
+        (JSC::DFG::exitKindToString):
+        * dfg/DFGSpeculativeJIT64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+
+2012-11-05  Filip Pizlo  <fpizlo@apple.com>
+
+        Get rid of method_check
+        https://bugs.webkit.org/show_bug.cgi?id=101147
+
+        Reviewed by Geoffrey Garen.
+
+        op_method_check no longer buys us anything, since get_by_id proto caching
+        gives just as much profiling information and the DFG inlines monomorphic
+        proto accesses anyway.
+        
+        This also has the potential for a speed-up since it makes parsing of
+        profiling data easier. No longer do we have to deal with the confusion of
+        the get_by_id portion of a method_check appearing monomorphic even though
+        we're really dealing with a bimorphic access (method_check specializes for
+        one case and get_by_id for another).
+
+        This looks like a 1% speed-up on both SunSpider and V8v7.
+
+        * CMakeLists.txt:
+        * GNUmakefile.list.am:
+        * JavaScriptCore.vcproj/JavaScriptCore/JavaScriptCore.vcproj:
+        * JavaScriptCore.xcodeproj/project.pbxproj:
+        * Target.pri:
+        * bytecode/CodeBlock.cpp:
+        (JSC::CodeBlock::printGetByIdCacheStatus):
+        (JSC::CodeBlock::dump):
+        (JSC::CodeBlock::finalizeUnconditionally):
+        (JSC::CodeBlock::shrinkToFit):
+        (JSC::CodeBlock::unlinkCalls):
+        * bytecode/CodeBlock.h:
+        (JSC::CodeBlock::getCallLinkInfo):
+        (JSC::CodeBlock::callLinkInfo):
+        (CodeBlock):
+        * bytecode/GetByIdStatus.cpp:
+        (JSC::GetByIdStatus::computeFromLLInt):
+        * bytecode/MethodCallLinkInfo.cpp: Removed.
+        * bytecode/MethodCallLinkInfo.h: Removed.
+        * bytecode/MethodCallLinkStatus.cpp: Removed.
+        * bytecode/MethodCallLinkStatus.h: Removed.
+        * bytecode/Opcode.h:
+        (JSC):
+        (JSC::padOpcodeName):
+        * bytecompiler/BytecodeGenerator.cpp:
+        (JSC):
+        * bytecompiler/BytecodeGenerator.h:
+        (BytecodeGenerator):
+        * bytecompiler/NodesCodegen.cpp:
+        (JSC::FunctionCallDotNode::emitBytecode):
+        * dfg/DFGByteCodeParser.cpp:
+        (JSC::DFG::ByteCodeParser::parseBlock):
+        * dfg/DFGCapabilities.h:
+        (JSC::DFG::canCompileOpcode):
+        * jit/JIT.cpp:
+        (JSC::JIT::privateCompileMainPass):
+        (JSC::JIT::privateCompileSlowCases):
+        (JSC::PropertyStubCompilationInfo::copyToStubInfo):
+        (JSC::JIT::privateCompile):
+        * jit/JIT.h:
+        (JSC::PropertyStubCompilationInfo::slowCaseInfo):
+        (PropertyStubCompilationInfo):
+        (JSC):
+        (JIT):
+        * jit/JITPropertyAccess.cpp:
+        (JSC):
+        (JSC::JIT::emitSlow_op_get_by_id):
+        (JSC::JIT::compileGetByIdSlowCase):
+        * jit/JITPropertyAccess32_64.cpp:
+        (JSC):
+        (JSC::JIT::compileGetByIdSlowCase):
+        * jit/JITStubs.cpp:
+        (JSC):
+        * jit/JITStubs.h:
+        * llint/LowLevelInterpreter.asm:
+
+2012-11-05  Yuqiang Xian  <yuqiang.xian@intel.com>
+
+        Refactor LLInt64 to distinguish the pointer operations from the 64-bit integer operations
+        https://bugs.webkit.org/show_bug.cgi?id=100321
+
+        Reviewed by Filip Pizlo.
+
+        We have refactored the MacroAssembler and JIT compilers to distinguish
+        the pointer operations from the 64-bit integer operations (see bug #99154).
+        Now we want to do the similar work for LLInt, and the goal is same as
+        the one mentioned in 99154.
+
+        This is the second part of the modification: in the low level interpreter,
+        changing the operations on 64-bit integers to use the "<foo>q" instructions.
+        This also removes some unused/meaningless "<foo>p" instructions.
+
+        * llint/LowLevelInterpreter.asm:
+        * llint/LowLevelInterpreter.cpp:
+        (JSC::CLoop::execute):
+        * llint/LowLevelInterpreter64.asm:
+        * offlineasm/armv7.rb:
+        * offlineasm/cloop.rb:
+        * offlineasm/instructions.rb:
+        * offlineasm/x86.rb:
+
+2012-11-05  Filip Pizlo  <fpizlo@apple.com>
+
+        Prototype chain caching should check that the path from the base object to the slot base involves prototype hops only
+        https://bugs.webkit.org/show_bug.cgi?id=101276
+
+        Reviewed by Gavin Barraclough.
+
+        Changed normalizePrototypeChain() to report an invalid prototype chain if any object is a proxy.
+        This catches cases where our prototype chain checks would have been insufficient to guard against
+        newly introduced properties, despecialized properties, or deleted properties in the chain of
+        objects involved in the access.
+
+        * dfg/DFGRepatch.cpp:
+        (JSC::DFG::tryCacheGetByID):
+        (JSC::DFG::tryBuildGetByIDProtoList):
+        (JSC::DFG::tryCachePutByID):
+        (JSC::DFG::tryBuildPutByIdList):
+        * jit/JITStubs.cpp:
+        (JSC::JITThunks::tryCachePutByID):
+        (JSC::JITThunks::tryCacheGetByID):
+        (JSC::DEFINE_STUB_FUNCTION):
+        * llint/LLIntSlowPaths.cpp:
+        (JSC::LLInt::LLINT_SLOW_PATH_DECL):
+        * runtime/Operations.h:
+        (JSC):
+        (JSC::normalizePrototypeChain):
+
+2012-11-05  Dima Gorbik  <dgorbik@apple.com>
+
+        Back out controversial changes from Bug 98665.
+        https://bugs.webkit.org/show_bug.cgi?id=101244
+
+        Reviewed by David Kilzer.
+
+        Backing out changes from Bug 98665 until further discussions take place on rules for including Platform.h in Assertions.h.
+
+        * API/tests/minidom.c:
+        * API/tests/testapi.c:
+
+2012-11-04  Filip Pizlo  <fpizlo@apple.com>
+
+        Reduce the verbosity of referring to QNaN in JavaScriptCore
+        https://bugs.webkit.org/show_bug.cgi?id=101174
+
+        Reviewed by Geoffrey Garen.
+
+        Introduces a #define QNaN in JSValue.h, and replaces all previous uses of
+        std::numeric_limits<double>::quiet_NaN() with QNaN.
+
+        * API/JSValueRef.cpp:
+        (JSValueMakeNumber):
+        (JSValueToNumber):
+        * dfg/DFGSpeculativeJIT.cpp:
+        (JSC::DFG::SpeculativeJIT::compileGetByValOnFloatTypedArray):
+        * jit/JITPropertyAccess.cpp:
+        (JSC::JIT::emitFloatTypedArrayGetByVal):
+        * runtime/CachedTranscendentalFunction.h:
+        (JSC::CachedTranscendentalFunction::initialize):
+        * runtime/DateConstructor.cpp:
+        (JSC::constructDate):
+        * runtime/DateInstanceCache.h:
+        (JSC::DateInstanceData::DateInstanceData):
+        (JSC::DateInstanceCache::reset):
+        * runtime/ExceptionHelpers.cpp:
+        (JSC::InterruptedExecutionError::defaultValue):
+        (JSC::TerminatedExecutionError::defaultValue):
+        * runtime/JSCell.h:
+        (JSC::JSValue::getPrimitiveNumber):
+        * runtime/JSDateMath.cpp:
+        (JSC::parseDateFromNullTerminatedCharacters):
+        * runtime/JSGlobalData.cpp:
+        (JSC::JSGlobalData::JSGlobalData):
+        (JSC::JSGlobalData::resetDateCache):
+        * runtime/JSGlobalObjectFunctions.cpp:
+        (JSC::parseInt):
+        (JSC::jsStrDecimalLiteral):
+        (JSC::toDouble):
+        (JSC::jsToNumber):
+        (JSC::parseFloat):
+        * runtime/JSValue.cpp:
+        (JSC::JSValue::toNumberSlowCase):
+        * runtime/JSValue.h:
+        (JSC):
+        * runtime/JSValueInlineMethods.h:
+        (JSC::jsNaN):
+        * runtime/MathObject.cpp:
+        (JSC::mathProtoFuncMax):
+        (JSC::mathProtoFuncMin):
+
+2012-11-03  Filip Pizlo  <fpizlo@apple.com>
+
+        Baseline JIT should use structure watchpoints whenever possible
+        https://bugs.webkit.org/show_bug.cgi?id=101146
+
+        Reviewed by Sam Weinig.
+
+        No speed-up yet except on toy programs. I think that it will start to show
+        speed-ups with https://bugs.webkit.org/show_bug.cgi?id=101147, which this is
+        a step towards.
+
+        * jit/JIT.h:
+        (JIT):
+        * jit/JITPropertyAccess.cpp:
+        (JSC::JIT::privateCompilePutByIdTransition):
+        (JSC::JIT::privateCompileGetByIdProto):
+        (JSC::JIT::privateCompileGetByIdProtoList):
+        (JSC::JIT::privateCompileGetByIdChainList):
+        (JSC::JIT::privateCompileGetByIdChain):
+        (JSC::JIT::addStructureTransitionCheck):
+        (JSC):
+        (JSC::JIT::testPrototype):
+        * jit/JITPropertyAccess32_64.cpp:
+        (JSC::JIT::privateCompilePutByIdTransition):
+        (JSC::JIT::privateCompileGetByIdProto):
+        (JSC::JIT::privateCompileGetByIdProtoList):
+        (JSC::JIT::privateCompileGetByIdChainList):
+        (JSC::JIT::privateCompileGetByIdChain):
+
 2012-11-04  Csaba Osztrogonác  <ossy@webkit.org>
 
         [Qt] udis86_itab.c is always regenerated

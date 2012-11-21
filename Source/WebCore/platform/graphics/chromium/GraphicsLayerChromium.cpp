@@ -300,6 +300,7 @@ void GraphicsLayerChromium::setContentsOpaque(bool opaque)
 {
     GraphicsLayer::setContentsOpaque(opaque);
     m_layer->layer()->setOpaque(m_contentsOpaque);
+    m_opaqueRectTrackingContentLayerDelegate->setOpaque(m_contentsOpaque);
 }
 
 static bool copyWebCoreFilterOperationsToWebFilterOperations(const FilterOperations& filters, WebFilterOperations& webFilters)
@@ -847,7 +848,7 @@ void GraphicsLayerChromium::setupContentsLayer(WebLayer* contentsLayer)
         // shadow content that must display in front of the video.
         m_layer->layer()->insertChild(m_contentsLayer, 0);
 
-        if (showDebugBorders()) {
+        if (isShowingDebugBorder()) {
             m_contentsLayer->setDebugBorderColor(Color(0, 0, 128, 180).rgb());
             m_contentsLayer->setDebugBorderWidth(1);
         }
@@ -868,7 +869,6 @@ bool GraphicsLayerChromium::appliesPageScale() const
 
 void GraphicsLayerChromium::paint(GraphicsContext& context, const IntRect& clip)
 {
-    context.platformContext()->setDrawingToImageBuffer(true);
     paintGraphicsLayerContents(context, clip);
 }
 

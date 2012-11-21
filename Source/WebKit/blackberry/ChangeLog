@@ -1,3 +1,127 @@
+2012-11-05  Lianghui Chen  <liachen@rim.com>
+
+        [BlackBerry] Do not show error page for main loads denied by client application
+        https://bugs.webkit.org/show_bug.cgi?id=101287
+
+        Internal PR: 237574.
+        Internally reviewed by Arvid Nilsson, Joe Mason.
+        Reviewed by George Staikos.
+
+        * WebCoreSupport/FrameLoaderClientBlackBerry.cpp:
+        (WebCore::FrameLoaderClientBlackBerry::dispatchDidFailProvisionalLoad):
+
+2012-11-05  Lianghui Chen  <liachen@rim.com>
+
+        [BlackBerry] Do not display error page for failed downloads
+        https://bugs.webkit.org/show_bug.cgi?id=101246
+
+        Internal PR: 236318
+        Internal reviewed by Joe Mason, Leo Yang.
+        Reviewed by Rob Buis.
+
+        Right now when a main load, including all downloads, failed, it will
+        display an error page. This is not very user friendly, especially for
+        WebWorks application, which want to use its own user interface to info
+        user about the failure.
+        So we just stop displaying error page for downloads.
+
+        * WebCoreSupport/FrameLoaderClientBlackBerry.cpp:
+        (WebCore::FrameLoaderClientBlackBerry::dispatchDidFailProvisionalLoad):
+
+2012-11-05  Simon Fraser  <simon.fraser@apple.com>
+
+        Fix layer borders to cleaning appear and disappear on switching
+        https://bugs.webkit.org/show_bug.cgi?id=101136
+
+        Reviewed by Sam Weinig.
+
+        Remove the GraphicsLayerClient methods showDebugBorders() and
+        showRepaintCounter().
+
+        * Api/WebOverlay_p.h:
+        (WebOverlayPrivateWebKitThread):
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::notifyFlushRequired):
+        * Api/WebPage_p.h:
+        * WebKitSupport/DefaultTapHighlight.cpp:
+        * WebKitSupport/DefaultTapHighlight.h:
+        (DefaultTapHighlight):
+        * WebKitSupport/InspectorOverlayBlackBerry.cpp:
+        * WebKitSupport/InspectorOverlayBlackBerry.h:
+        (InspectorOverlay):
+        * WebKitSupport/SelectionOverlay.cpp:
+        * WebKitSupport/SelectionOverlay.h:
+        (SelectionOverlay):
+
+2012-11-05  Rob Buis  <rbuis@rim.com>
+
+        [BlackBerry] screenX/Y gives wrong values
+        https://bugs.webkit.org/show_bug.cgi?id=101259
+
+        Reviewed by Yong Li.
+
+        PR 237071
+
+        Reviewed internally by Gen Mak.
+
+        Do not transform screenPos coordinates.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPage::mouseEvent):
+        (BlackBerry::WebKit::WebPage::touchEvent):
+        (BlackBerry::WebKit::WebPage::touchPointAsMouseEvent):
+
+2012-11-05  Rob Buis  <rbuis@rim.com>
+
+        [BlackBerry] Input date should not popup dialog when readonly is set
+        https://bugs.webkit.org/show_bug.cgi?id=101234
+
+        Reviewed by Yong Li.
+
+        PR 236114
+
+        Reviewed internally by Mike Fenton.
+
+        Suppress popup dialog if the input element has readonly attribute set.
+
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::openDatePopup):
+        (BlackBerry::WebKit::InputHandler::openColorPopup):
+
+2012-11-05  Genevieve Mak  <gmak@rim.com>
+
+        [BLACKBERRY] Update touch code to reflect touch refactor
+        https://bugs.webkit.org/show_bug.cgi?id=101227
+
+        Reviewed by Rob Buis.
+
+        PR #2706785
+        Reviewed Internally by: Mike Lattanzio
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPage::touchEvent):
+        (BlackBerry::WebKit::WebPagePrivate::dispatchTouchEventToFullScreenPlugin):
+
+2012-11-05  Konrad Piascik  <kpiascik@rim.com>
+
+        [BlackBerry] Web Inspector: Add InspectorInstrumentaiton calls for timeline compositing.
+        https://bugs.webkit.org/show_bug.cgi?id=101213
+        RIM PR 178131
+
+        Reviewed by Rob Buis.
+
+        Internally Reviewed by Arvid Nilsson.
+
+        Added compositing events to the timeline for BlackBerry.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::commitRootLayerIfNeeded):
+        (BlackBerry::WebKit::WebPagePrivate::willComposite):
+        (WebKit):
+        (BlackBerry::WebKit::WebPagePrivate::didComposite):
+        * Api/WebPage_p.h:
+        (WebPagePrivate):
+
 2012-11-03  Alexey Proskuryakov  <ap@apple.com>
 
         Get rid of USE(CFURLSTORAGESESSIONS)

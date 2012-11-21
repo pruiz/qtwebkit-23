@@ -48,12 +48,10 @@ namespace WebKit {
 class FindClientEfl;
 class FormClientEfl;
 class InputMethodContextEfl;
-class PageClientImpl;
+class PageClientBase;
 class PageLoadClientEfl;
 class PagePolicyClientEfl;
 class PageUIClientEfl;
-class PageViewportControllerClientEfl;
-class PageViewportController;
 class ResourceLoadClientEfl;
 class WebPageGroup;
 class WebPageProxy;
@@ -62,14 +60,16 @@ class WebPopupMenuProxyEfl;
 }
 
 namespace WebCore {
+class AffineTransform;
 class Color;
 class Cursor;
 class IntSize;
 }
 
+class EwkContext;
+
 class Ewk_Back_Forward_List;
 class Ewk_Color_Picker;
-class Ewk_Context;
 class Ewk_Download_Job;
 class Ewk_Error;
 class Ewk_Form_Submission_Request;
@@ -79,8 +79,6 @@ class Ewk_Navigation_Policy_Decision;
 class Ewk_Resource;
 class Ewk_Popup_Menu;
 class Ewk_Settings;
-class Ewk_Url_Request;
-class Ewk_Url_Response;
 
 #if USE(ACCELERATED_COMPOSITING)
 typedef struct _Evas_GL_Context Evas_GL_Context;
@@ -91,7 +89,12 @@ typedef struct Ewk_View_Smart_Data Ewk_View_Smart_Data;
 
 class EwkViewImpl {
 public:
-    EwkViewImpl(Evas_Object* view, PassRefPtr<Ewk_Context> context, PassRefPtr<WebKit::WebPageGroup> pageGroup);
+
+    enum ViewBehavior {
+        LegacyBehavior,
+        DefaultBehavior
+    };
+    EwkViewImpl(Evas_Object* view, PassRefPtr<EwkContext> context, PassRefPtr<WebKit::WebPageGroup> pageGroup, ViewBehavior);
     ~EwkViewImpl();
 
     static EwkViewImpl* fromEvasObject(const Evas_Object* view);
@@ -99,13 +102,17 @@ public:
     Evas_Object* view() { return m_view; }
     WKPageRef wkPage();
     WebKit::WebPageProxy* page() { return m_pageProxy.get(); }
-    Ewk_Context* ewkContext() { return m_context.get(); }
+    EwkContext* ewkContext() { return m_context.get(); }
     Ewk_Settings* settings() { return m_settings.get(); }
     Ewk_Back_Forward_List* backForwardList() { return m_backForwardList.get(); }
 
     WebCore::IntSize size() const;
     bool isFocused() const;
     bool isVisible() const;
+
+    WebCore::AffineTransform transformToScene() const;
+    WebCore::AffineTransform transformFromScene() const;
+    WebCore::AffineTransform transformToScreen() const;
 
     const char* url() const { return m_url; }
     const char* faviconURL() const { return m_faviconURL; }
@@ -174,8 +181,13 @@ public:
     unsigned long long informDatabaseQuotaReached(const String& databaseName, const String& displayName, unsigned long long currentQuota, unsigned long long currentOriginUsage, unsigned long long currentDatabaseUsage, unsigned long long expectedUsage);
 
 #if USE(TILED_BACKING_STORE)
-    WebKit::PageViewportControllerClientEfl* pageViewportControllerClient() { return m_pageViewportControllerClient.get(); }
-    WebKit::PageViewportController* pageViewportController() { return m_pageViewportController.get(); }
+    WebKit::PageClientBase* pageClient() { return m_pageClient.get(); }
+
+    void setScaleFactor(float scaleFactor) { m_scaleFactor = scaleFactor; }
+    float scaleFactor() const { return m_scaleFactor; }
+
+    void setScrollPosition(WebCore::IntPoint position) { m_scrollPosition = position; }
+    const WebCore::IntPoint scrollPosition() const { return m_scrollPosition; }
 #endif
 #if USE(ACCELERATED_COMPOSITING)
     Evas_GL* evasGL() { return m_evasGL.get(); }
@@ -188,7 +200,7 @@ public:
     void informURLChange();
 
 private:
-    inline Ewk_View_Smart_Data* smartData();
+    inline Ewk_View_Smart_Data* smartData() const;
     void displayTimerFired(WebCore::Timer<EwkViewImpl>*);
 
     void informIconChange();
@@ -206,13 +218,13 @@ private:
 
     // Note, initialization matters.
     Evas_Object* m_view;
-    RefPtr<Ewk_Context> m_context;
+    RefPtr<EwkContext> m_context;
 #if USE(ACCELERATED_COMPOSITING)
     OwnPtr<Evas_GL> m_evasGL;
     OwnPtr<WebKit::EvasGLContext> m_evasGLContext;
     OwnPtr<WebKit::EvasGLSurface> m_evasGLSurface;
 #endif
-    OwnPtr<WebKit::PageClientImpl> m_pageClient;
+    OwnPtr<WebKit::PageClientBase> m_pageClient;
     RefPtr<WebKit::WebPageProxy> m_pageProxy;
     OwnPtr<WebKit::PageLoadClientEfl> m_pageLoadClient;
     OwnPtr<WebKit::PagePolicyClientEfl> m_pagePolicyClient;
@@ -222,8 +234,8 @@ private:
     OwnPtr<WebKit::FormClientEfl> m_formClient;
     OwnPtr<Ewk_Back_Forward_List> m_backForwardList;
 #if USE(TILED_BACKING_STORE)
-    OwnPtr<WebKit::PageViewportControllerClientEfl> m_pageViewportControllerClient;
-    OwnPtr<WebKit::PageViewportController> m_pageViewportController;
+    float m_scaleFactor;
+    WebCore::IntPoint m_scrollPosition;
 #endif
     OwnPtr<Ewk_Settings> m_settings;
     const char* m_cursorGroup; // This is an address, do not free it or use WKEinaSharedString.

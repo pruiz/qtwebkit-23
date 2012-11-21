@@ -27,10 +27,77 @@
 #if ENABLE(DATE_AND_TIME_INPUT_TYPES) && !ENABLE(INPUT_MULTIPLE_FIELDS_UI)
 #include "BaseChooserOnlyDateAndTimeInputType.h"
 
+#include "Chrome.h"
+#include "ChromeClient.h"
+#include "HTMLInputElement.h"
+#include "Page.h"
+#include "ScriptController.h"
+
 namespace WebCore {
 
 BaseChooserOnlyDateAndTimeInputType::~BaseChooserOnlyDateAndTimeInputType()
 {
+    closeDateTimeChooser();
+}
+
+void BaseChooserOnlyDateAndTimeInputType::handleDOMActivateEvent(Event*)
+{
+    if (element()->disabled() || element()->readOnly() || !element()->renderer() || !ScriptController::processingUserGesture())
+        return;
+
+    if (m_dateTimeChooser)
+        return;
+    if (!element()->document()->page())
+        return;
+    Chrome* chrome = element()->document()->page()->chrome();
+    if (!chrome)
+        return;
+    DateTimeChooserParameters parameters;
+    if (!element()->setupDateTimeChooserParameters(parameters))
+        return;
+    m_dateTimeChooser = chrome->client()->openDateTimeChooser(this, parameters);
+}
+
+void BaseChooserOnlyDateAndTimeInputType::detach()
+{
+    closeDateTimeChooser();
+}
+
+void BaseChooserOnlyDateAndTimeInputType::didChooseValue(const String& value)
+{
+    element()->setValue(value, DispatchChangeEvent);
+}
+
+void BaseChooserOnlyDateAndTimeInputType::didEndChooser()
+{
+    m_dateTimeChooser.clear();
+}
+
+void BaseChooserOnlyDateAndTimeInputType::closeDateTimeChooser()
+{
+    if (m_dateTimeChooser)
+        m_dateTimeChooser->endChooser();
+}
+
+void BaseChooserOnlyDateAndTimeInputType::handleKeydownEvent(KeyboardEvent* event)
+{
+    BaseClickableWithKeyInputType::handleKeydownEvent(element(), event);
+}
+
+void BaseChooserOnlyDateAndTimeInputType::handleKeypressEvent(KeyboardEvent* event)
+{
+    BaseClickableWithKeyInputType::handleKeypressEvent(element(), event);
+}
+
+void BaseChooserOnlyDateAndTimeInputType::handleKeyupEvent(KeyboardEvent* event)
+{
+    BaseClickableWithKeyInputType::handleKeyupEvent(*this, event);
+}
+
+void BaseChooserOnlyDateAndTimeInputType::accessKeyAction(bool sendMouseEvents)
+{
+    BaseDateAndTimeInputType::accessKeyAction(sendMouseEvents);
+    BaseClickableWithKeyInputType::accessKeyAction(element(), sendMouseEvents);
 }
 
 }

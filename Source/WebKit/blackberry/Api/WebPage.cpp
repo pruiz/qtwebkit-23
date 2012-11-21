@@ -3895,15 +3895,13 @@ bool WebPage::mouseEvent(const Platform::MouseEvent& mouseEvent, bool* wheelDelt
         buttonType = MiddleButton;
 
     // Create our event.
-    PlatformMouseEvent platformMouseEvent(d->mapFromTransformed(mouseEvent.position()),
-                                          d->mapFromTransformed(mouseEvent.screenPosition()),
+    PlatformMouseEvent platformMouseEvent(d->mapFromTransformed(mouseEvent.position()), mouseEvent.screenPosition(),
                                           toWebCoreMouseEventType(mouseEvent.type()), clickCount, buttonType, PointingDevice);
     d->m_lastMouseEvent = platformMouseEvent;
     bool success = d->handleMouseEvent(platformMouseEvent);
 
     if (mouseEvent.wheelTicks()) {
-        PlatformWheelEvent wheelEvent(d->mapFromTransformed(mouseEvent.position()),
-                                      d->mapFromTransformed(mouseEvent.screenPosition()),
+        PlatformWheelEvent wheelEvent(d->mapFromTransformed(mouseEvent.position()), mouseEvent.screenPosition(),
                                       0, -mouseEvent.wheelDelta(),
                                       0, -mouseEvent.wheelTicks(),
                                       ScrollByPixelWheelEvent,
@@ -4030,10 +4028,10 @@ bool WebPage::touchEvent(const Platform::TouchEvent& event)
     Platform::TouchEvent tEvent = event;
     for (unsigned i = 0; i < event.m_points.size(); i++) {
         tEvent.m_points[i].m_pos = d->mapFromTransformed(tEvent.m_points[i].m_pos);
-        tEvent.m_points[i].m_screenPos = d->mapFromTransformed(tEvent.m_points[i].m_screenPos);
+        tEvent.m_points[i].m_screenPos = tEvent.m_points[i].m_screenPos;
     }
 
-    if (event.hasGesture(Platform::Gesture::SingleTap))
+    if (event.isSingleTap())
         d->m_pluginMayOpenNewTab = true;
     else if (tEvent.m_type == Platform::TouchEvent::TouchStart || tEvent.m_type == Platform::TouchEvent::TouchCancel)
         d->m_pluginMayOpenNewTab = false;
@@ -4043,7 +4041,7 @@ bool WebPage::touchEvent(const Platform::TouchEvent& event)
 
     bool handled = false;
 
-    if (d->m_needTouchEvents && !event.hasGesture(Platform::Gesture::Injected))
+    if (d->m_needTouchEvents && !event.m_type != Platform::TouchEvent::TouchInjected)
         handled = d->m_mainFrame->eventHandler()->handleTouchEvent(PlatformTouchEvent(&tEvent));
 
     // Unpress mouse if touch end is consumed by a JavaScript touch handler, otherwise the mouse state will remain pressed
@@ -4063,7 +4061,7 @@ bool WebPage::touchEvent(const Platform::TouchEvent& event)
         return true;
     }
 
-    if (event.hasGesture(Platform::Gesture::TouchHold))
+    if (event.isTouchHold())
         d->m_touchEventHandler->touchHoldEvent();
 #endif
 
@@ -4094,9 +4092,9 @@ bool WebPagePrivate::dispatchTouchEventToFullScreenPlugin(PluginView* plugin, co
 {
     NPTouchEvent npTouchEvent;
 
-    if (event.hasGesture(Platform::Gesture::DoubleTap))
+    if (event.isDoubleTap())
         npTouchEvent.type = TOUCH_EVENT_DOUBLETAP;
-    else if (event.hasGesture(Platform::Gesture::TouchHold))
+    else if (event.isTouchHold())
         npTouchEvent.type = TOUCH_EVENT_TOUCHHOLD;
     else {
         switch (event.m_type) {
@@ -4161,7 +4159,7 @@ bool WebPage::touchPointAsMouseEvent(const Platform::TouchPoint& point, bool use
 
     Platform::TouchPoint tPoint = point;
     tPoint.m_pos = d->mapFromTransformed(tPoint.m_pos);
-    tPoint.m_screenPos = d->mapFromTransformed(tPoint.m_screenPos);
+    tPoint.m_screenPos = tPoint.m_screenPos;
 
     return d->m_touchEventHandler->handleTouchPoint(tPoint, useFatFingers);
 }
@@ -5507,6 +5505,7 @@ bool WebPagePrivate::commitRootLayerIfNeeded()
         return false;
     }
 
+    willComposite();
     m_needsCommit = false;
     // We get here either due to the commit timer, which would have called
     // render if a one shot sync was needed. Or we get called from render
@@ -5539,6 +5538,7 @@ bool WebPagePrivate::commitRootLayerIfNeeded()
             contentsSizeForCompositing,
             drawsRootLayer));
 
+    didComposite();
     return true;
 }
 
@@ -5730,16 +5730,6 @@ void WebPagePrivate::setNeedsOneShotDrawingSynchronization()
 void WebPagePrivate::notifyFlushRequired(const GraphicsLayer*)
 {
     scheduleRootLayerCommit();
-}
-
-bool WebPagePrivate::showDebugBorders(const GraphicsLayer*) const
-{
-    return m_page->settings()->showDebugBorders();
-}
-
-bool WebPagePrivate::showRepaintCounter(const GraphicsLayer*) const
-{
-    return m_page->settings()->showRepaintCounter();
 }
 #endif // USE(ACCELERATED_COMPOSITING)
 
@@ -6256,6 +6246,20 @@ const HitTestResult& WebPagePrivate::hitTestResult(const IntPoint& contentPos)
 void WebPagePrivate::clearCachedHitTestResult()
 {
     m_cachedHitTestContentPos = WebCore::IntPoint(-1, -1);
+}
+
+void WebPagePrivate::willComposite()
+{
+    if (!m_page->settings()->developerExtrasEnabled())
+        return;
+    InspectorInstrumentation::willComposite(m_page);
+}
+
+void WebPagePrivate::didComposite()
+{
+    if (!m_page->settings()->developerExtrasEnabled())
+        return;
+    InspectorInstrumentation::didComposite(m_page);
 }
 
 }

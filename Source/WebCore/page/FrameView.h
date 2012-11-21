@@ -390,6 +390,8 @@ private:
     void updateCanBlitOnScrollRecursively();
     bool contentsInCompositedLayer() const;
 
+    bool shouldUpdateFixedElementsAfterScrolling();
+
     void applyOverflowToViewport(RenderObject*, ScrollbarMode& hMode, ScrollbarMode& vMode);
     void applyPaginationToViewport();
 
@@ -485,6 +487,7 @@ private:
     
     bool m_layoutSchedulingEnabled;
     bool m_inLayout;
+    bool m_doingPreLayoutStyleUpdate;
     bool m_inSynchronousPostLayout;
     int m_layoutCount;
     unsigned m_nestedLayoutCount;

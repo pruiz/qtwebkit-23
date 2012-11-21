@@ -75,6 +75,7 @@ namespace JSC {
         bool isString() const;
         bool isObject() const;
         bool isGetterSetter() const;
+        bool isProxy() const;
         bool inherits(const ClassInfo*) const;
         bool isAPIValueWrapper() const;
 
@@ -279,7 +280,7 @@ namespace JSC {
             return true;
         }
         ASSERT(isUndefined());
-        number = std::numeric_limits<double>::quiet_NaN();
+        number = QNaN;
         value = *this;
         return true;
     }

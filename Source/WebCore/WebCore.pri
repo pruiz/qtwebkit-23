@@ -321,5 +321,4 @@ unix|win32-g++* {
 
 enable_fast_mobile_scrolling: DEFINES += ENABLE_FAST_MOBILE_SCROLLING=1
 
-!production_build:have?(FONTCONFIG): PKGCONFIG += fontconfig
-
+!production_build:contains(DEFINES, HAVE_FONTCONFIG=1): PKGCONFIG += fontconfig

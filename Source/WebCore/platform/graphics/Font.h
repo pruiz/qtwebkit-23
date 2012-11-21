@@ -297,7 +297,7 @@ private:
         return features;
     }
 
-#if PLATFORM(QT)
+#if PLATFORM(QT) && HAVE(QT5)
     void initFormatForTextLayout(QTextLayout*) const;
 #endif
 

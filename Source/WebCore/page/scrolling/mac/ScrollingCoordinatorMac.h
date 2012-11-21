@@ -66,18 +66,20 @@ public:
 
     // These functions are used to indicate that a layer should be (or should not longer be) represented by a node
     // in the scrolling tree.
-    virtual ScrollingNodeID attachToStateTree(ScrollingNodeID newNodeID, ScrollingNodeID parentID);
+    virtual ScrollingNodeID attachToStateTree(ScrollingNodeType, ScrollingNodeID newNodeID, ScrollingNodeID parentID);
     virtual void detachFromStateTree(ScrollingNodeID);
 
     // This function wipes out the current tree.
     virtual void clearStateTree();
+
+    virtual String scrollingStateTreeAsText() const OVERRIDE;
 
 private:
     virtual void recomputeWheelEventHandlerCountForFrameView(FrameView*);
     virtual void setShouldUpdateScrollLayerPositionOnMainThread(MainThreadScrollingReasons);
 
     void ensureRootStateNodeForFrameView(FrameView*);
-    ScrollingStateScrollingNode* stateNodeForID(ScrollingNodeID);
+    ScrollingStateNode* stateNodeForID(ScrollingNodeID);
 
     struct ScrollParameters {
         ScrollElasticity horizontalScrollElasticity;

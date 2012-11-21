@@ -422,13 +422,17 @@ webkit.org/b/99059 fast/dom/timer-throttling-hidden-page.html [ Skip ]
 # css3-conditionals support is not yet enabled.
 webkit.org/b/86146 css3/supports.html
 
-# MathML layout is being tuned/reworked.
+webkit.org/b/100463 mathml/msubsup-fuzz.html [ Crash Pass ]
+# Needs rebaseline
 webkit.org/b/99921 mathml/presentation/fenced.xhtml [ Failure ]
 webkit.org/b/99921 mathml/presentation/mo.xhtml [ Failure ]
-webkit.org/b/99921 mathml/presentation/mo-stretch.html [ Failure ]
 webkit.org/b/99921 mathml/presentation/over.xhtml [ Failure ]
 webkit.org/b/99921 mathml/presentation/row.xhtml [ Failure ]
-webkit.org/b/99921 mathml/presentation/row-alignment.xhtml [ Failure ]
+# Needs rebaseline after bug 97390
+webkit.org/b/97390 mathml/presentation/mo-stretch.html [ Failure Pass ]
+webkit.org/b/97390 mathml/presentation/row-alignment.xhtml [ Failure Pass ]
+webkit.org/b/97390 mathml/presentation/tables.xhtml [ Failure Pass ]
+webkit.org/b/97390 mathml/presentation/subsup.xhtml [ Failure Pass ]
 
 # Requires Resolution Media Query support
 webkit.org/b/100137 fast/media/mq-resolution.html [ Failure ]
@@ -484,6 +488,13 @@ webkit.org/b/100236 [ Debug ] http/tests/misc/401-alternative-content.php [ Cras
 webkit.org/b/100236 [ Debug ] http/tests/misc/authentication-redirect-1/authentication-sent-to-redirect-cross-origin.html [ Crash ]
 webkit.org/b/100236 [ Debug ] http/tests/misc/authentication-redirect-2/authentication-sent-to-redirect-same-origin.html [ Crash ]
 webkit.org/b/100236 [ Debug ] http/tests/misc/authentication-redirect-3/authentication-sent-to-redirect-same-origin-with-location-credentials.html [ Crash ]
+
+webkit.org/b/100688 fast/css-generated-content/first-letter-table-cell-format-block-crash.html [ Crash Pass ]
+webkit.org/b/100688 fast/text/text-fragment-first-letter-update-crash.html [ Crash Pass ]
+webkit.org/b/100688 fast/text/custom-font-data-crash2.html [ Crash Pass ]
+webkit.org/b/100688 fast/css/first-letter-text-fragment-crash.html [ Crash Pass ]
+webkit.org/b/100688 editing/selection/first-letter-selection-crash.html [ Crash Pass ]
+webkit.org/b/100688 editing/text-iterator/backward-textiterator-first-letter-crash.html [ Crash Pass ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Crashing tests
@@ -572,9 +583,6 @@ webkit.org/b/94119 storage/websql/database-lock-after-reload.html [ Failure Pass
 webkit.org/b/93812 [ Release ] svg/custom/use-instanceRoot-as-event-target.xhtml [ Pass Timeout ]
 
 webkit.org/b/95430 fast/layers/scroll-no-visible-content-but-visible-descendant.html [ ImageOnlyFailure Pass ]
-
-webkit.org/b/97390 mathml/presentation/subsup.xhtml [ Failure Pass ]
-webkit.org/b/97390 mathml/presentation/msubsup-base-changed.xhtml [ ImageOnlyFailure Pass ]
 
 webkit.org/b/73409 fast/forms/textarea-placeholder-set-attribute.html [ ImageOnlyFailure Pass ]
 
@@ -1401,6 +1409,9 @@ webkit.org/b/98612 [ Release ] fast/dom/gc-dom-tree-lifetime.html [ Failure ]
 webkit.org/b/98613 css3/masking/clip-path-reference-userSpaceOnUse.html [ ImageOnlyFailure ]
 webkit.org/b/98613 css3/masking/clip-path-reference.html [ ImageOnlyFailure ]
 
+# Requires rebaselining after https://bugs.webkit.org/show_bug.cgi?id=11645
+webkit.org/b/11645 fast/table/025.html [ Failure ]
+
 # New inspector/profiler/memory-instrumentation-canvas.html fails on JSC platforms
 webkit.org/b/99001 inspector/profiler/memory-instrumentation-canvas.html
 
@@ -1418,6 +1429,15 @@ webkit.org/b/99825 accessibility/title-ui-element-correctness.html [ Failure ]
 
 webkit.org/b/98718 svg/animations/animate-css-xml-attributeType.html [ Failure ]
 
+webkit.org/b/100424 editing/selection/user-select-all-selection.html [ Failure ]
+
+webkit.org/b/100846 inspector-protocol/debugger-pause-dedicated-worker.html [ Skip ]
+
+webkit.org/b/95299 fast/images/exif-orientation.html [ Failure ]
+
 #////////////////////////////////////////////////////////////////////////////////////////
 # End of Tests failing
 #////////////////////////////////////////////////////////////////////////////////////////
+
+# CSS Device Adaptation is not enabled.
+webkit.org/b/95959 css3/device-adapt [ Skip ]

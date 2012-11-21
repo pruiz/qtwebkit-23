@@ -54,6 +54,7 @@
 #include "NumberInputType.h"
 #include "RenderTextControlSingleLine.h"
 #include "RenderTheme.h"
+#include "ScopedEventQueue.h"
 #include "SearchInputType.h"
 #include "ShadowRoot.h"
 #include "ScriptEventListener.h"
@@ -1021,6 +1022,7 @@ void HTMLInputElement::setValue(const String& value, TextFieldEventBehavior even
         return;
 
     RefPtr<HTMLInputElement> protector(this);
+    EventQueueScope scope;
     String sanitizedValue = sanitizeValue(value);
     bool valueChanged = sanitizedValue != this->value();
 
@@ -1740,13 +1742,6 @@ bool HTMLInputElement::shouldAppearChecked() const
 bool HTMLInputElement::supportsPlaceholder() const
 {
     return m_inputType->supportsPlaceholder();
-}
-
-bool HTMLInputElement::isPlaceholderEmpty() const
-{
-    if (m_inputType->usesFixedPlaceholder())
-        return m_inputType->fixedPlaceholder().isEmpty();
-    return HTMLTextFormControlElement::isPlaceholderEmpty();
 }
 
 void HTMLInputElement::updatePlaceholderText()

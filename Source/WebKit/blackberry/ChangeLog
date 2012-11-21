@@ -1,3 +1,154 @@
+2012-11-01  Michael Matovsky  <mmatovsky@rim.com>
+
+        [BlackBerry] Web page view state should be preserved for pages loaded from page cache
+        https://bugs.webkit.org/show_bug.cgi?id=100694
+        Internal PR: 220488
+
+        Internally reviewed by Lianghui Chen, Joe Mason
+        Reviewed by Rob Buis.
+
+        The web page view specific metadata should be preserved for web pages loaded from page cache (by using back/forward).
+        This requires web page view state to be saved in and restored from the corresponding page cache history item.
+
+        * Api/WebPageClient.h:
+        * WebCoreSupport/FrameLoaderClientBlackBerry.cpp:
+        (WebCore::FrameLoaderClientBlackBerry::saveViewStateToItem):
+        (WebCore::FrameLoaderClientBlackBerry::restoreViewState):
+
+2012-11-01  Leo Yang  <leoyang@rim.com>
+
+        [BlackBerry] Use clipped background rect in backing store
+        https://bugs.webkit.org/show_bug.cgi?id=100960
+
+        Reviewed by Yong Li.
+        Reviewed internally by Arvid Nilsson.
+
+        We calculated clipped background rect but didn't really use it when painting
+        the background. Use the correct rect to avoid ASSERT failure in platform code.
+
+        * Api/BackingStore.cpp:
+        (BlackBerry::WebKit::BackingStorePrivate::paintDefaultBackground):
+
+2012-10-31  George Staikos  <staikos@webkit.org>
+
+        [BlackBerry] Crash on html popup form control when element is deleted
+        https://bugs.webkit.org/show_bug.cgi?id=100869
+
+        Reviewed by Yong Li.
+
+        Make the element pointers RefPtr so they don't go away before the popup
+        is closed.
+
+        * WebCoreSupport/ColorPickerClient.h:
+        (ColorPickerClient):
+        * WebCoreSupport/DatePickerClient.h:
+        (DatePickerClient):
+        * WebCoreSupport/SelectPopupClient.h:
+        (SelectPopupClient):
+
+2012-10-31  Genevieve Mak  <gmak@rim.com>
+
+        [BLACKBERRY] Custom WebWorks context menus don't always work.
+        https://bugs.webkit.org/show_bug.cgi?id=100891
+
+        Reviewed by Rob Buis.
+
+        Walk up the dom tree until we find the webworks attribute or run out
+        of parent nodes.
+        PR# 227732
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::webContext):
+
+2012-10-31  Otto Derek Cheung  <otcheung@rim.com>
+
+        [BlackBerry] Adding window.external to our port
+        https://bugs.webkit.org/show_bug.cgi?id=100868
+
+        Reviewed by Rob Buis.
+
+        Attaching the window.external interface to the frame when
+        it loads up.
+
+        When called, the external interface methods call stubs declared
+        in ChromeClientBlackBerry. The method passes in the url of the search
+        provider and the url of the frame. Cross-site check has to be done in the
+        implementation PR.
+
+        * WebCoreSupport/ChromeClientBlackBerry.cpp:
+        (WebCore::ChromeClientBlackBerry::addSearchProvider):
+        (WebCore):
+        (WebCore::ChromeClientBlackBerry::isSearchProviderInstalled):
+        * WebCoreSupport/ChromeClientBlackBerry.h:
+        (ChromeClientBlackBerry):
+        * WebCoreSupport/ExternalExtension.cpp: Added.
+        (addSearchProviderMethod):
+        (IsSearchProviderInstalledMethod):
+        (externalExtensionInitialize):
+        (externalExtensionFinalize):
+        * WebCoreSupport/ExternalExtension.h: Added.
+        (WebCore):
+        * WebCoreSupport/FrameLoaderClientBlackBerry.cpp:
+        (WebCore::FrameLoaderClientBlackBerry::dispatchDidClearWindowObjectInWorld):
+
+2012-10-30  Peter Wang  <peter.wang@torchmobile.com.cn>
+
+        [BlackBerry] Clean the code of "JavaScriptDebuggerBlackBerry"
+        https://bugs.webkit.org/show_bug.cgi?id=100724
+
+        Reviewed by Rob Buis.
+
+        Remove the code of JavaScriptDebuggerBlackBerry.
+
+        * Api/WebPage.cpp:
+        * Api/WebPage.h:
+        * Api/WebPage_p.h:
+        (WebCore):
+        (WebPagePrivate):
+        * WebCoreSupport/JavaScriptDebuggerBlackBerry.cpp: Removed.
+        * WebCoreSupport/JavaScriptDebuggerBlackBerry.h: Removed.
+
+2012-10-29  Rob Buis  <rbuis@rim.com>
+
+        [BlackBerry] Simplify AuthenticationChallengeManager::instance
+        https://bugs.webkit.org/show_bug.cgi?id=100614
+
+        Reviewed by Yong Li.
+        Internally reviewed by Lyon Chen.
+
+        No need to call AuthenticationChallengeManager::init anymore.
+
+        * Api/BlackBerryGlobal.cpp:
+        (BlackBerry::WebKit::globalInitialize):
+
+2012-10-29  Mike Lattanzio  <mlattanzio@rim.com>
+
+        [BlackBerry] Typo in WebPagePrivate::postponeDocumentRecalcStyle()
+        https://bugs.webkit.org/show_bug.cgi?id=100377
+
+        Reviewed by Adam Treat.
+
+        Should be void, not bool.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::postponeDocumentStyleRecalc):
+        * Api/WebPage_p.h:
+        (WebPagePrivate):
+
+2012-10-29  Robin Cao  <robin.cao@torchmobile.com.cn>
+
+        [BlackBerry] Fix a build error
+        https://bugs.webkit.org/show_bug.cgi?id=100649
+
+        Reviewed by Kentaro Hara.
+
+        r127876 changed the signature of WebCore::EventHandler::hitTestResultAtPoint()
+        and this commit was later reverted. We need to update a call site in the
+        BlackBerry port to make it build.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::hitTestResult):
+
 2012-10-26  Jacky Jiang  <zhajiang@rim.com>
 
         [BlackBerry][FullScreen] entering/leaving fullscreen results in temporary glitches on the screen

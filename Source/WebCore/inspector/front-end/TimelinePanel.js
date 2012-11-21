@@ -133,7 +133,7 @@ WebInspector.TimelinePanel = function()
 
     this._mainThreadTasks = [];
     this._mainThreadMonitoringEnabled = false;
-    if (WebInspector.experimentsSettings.mainThreadMonitoring.isEnabled())
+    if (WebInspector.settings.showCpuOnTimelineRuler.get() && Capabilities.timelineCanMonitorMainThread)
         this._enableMainThreadMonitoring();
 
     this._createFileSelector();
@@ -553,17 +553,17 @@ WebInspector.TimelinePanel.prototype = {
         this._automaticallySizeWindow = false;
         var records = this._model.records;
         for (var i = 0; i < records.length; ++i)
-            this._innerAddRecordToTimeline(records[i], this._rootRecord());
+            this._innerAddRecordToTimeline(records[i]);
         this._invalidateAndScheduleRefresh(false);
     },
 
     _onTimelineEventRecorded: function(event)
     {
-        if (this._innerAddRecordToTimeline(event.data, this._rootRecord()))
+        if (this._innerAddRecordToTimeline(event.data))
             this._invalidateAndScheduleRefresh(false);
     },
 
-    _innerAddRecordToTimeline: function(record, parentRecord)
+    _innerAddRecordToTimeline: function(record)
     {
         if (record.type === WebInspector.TimelineModel.RecordType.Program) {
             this._mainThreadTasks.push({
@@ -572,7 +572,7 @@ WebInspector.TimelinePanel.prototype = {
             });
         }
 
-        var records = this._presentationModel.addRecord(record, parentRecord);
+        var records = this._presentationModel.addRecord(record);
         this._allRecordsCount += records.length;
         var timeStampRecords = this._timeStampRecords;
         var hasVisibleRecords = false;
@@ -875,7 +875,7 @@ WebInspector.TimelinePanel.prototype = {
         var taskIndex = insertionIndexForObjectInListSortedByFunction(startTime, tasks, compareEndTime);
 
         var container = this._cpuBarsElement;
-        var element = container.firstChild.nextSibling;
+        var element = container.firstChild;
         var lastElement;
         var lastLeft;
         var lastRight;
@@ -921,12 +921,8 @@ WebInspector.TimelinePanel.prototype = {
 
     _enableMainThreadMonitoring: function()
     {
-        ++this._headerLineCount;
-
         var container = this._timelineGrid.gridHeaderElement;
-        this._cpuBarsElement = container.createChild("div", "timeline-cpu-bars timeline-category-program");
-        var cpuBarsLabel = this._cpuBarsElement.createChild("span", "timeline-cpu-bars-label");
-        cpuBarsLabel.textContent = WebInspector.UIString("CPU");
+        this._cpuBarsElement = container.createChild("div", "timeline-cpu-bars");
 
         const headerBorderWidth = 1;
         const headerMargin = 2;

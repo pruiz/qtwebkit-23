@@ -82,13 +82,17 @@ public:
 
     ~OffScreenRootWindow()
     {
-        if (!--m_refCount) {
+        if (--m_refCount || !m_display)
+            return;
+
+        if (m_window) {
             XUnmapWindow(m_display, m_window);
             XDestroyWindow(m_display, m_window);
-            if (m_display)
-                XCloseDisplay(m_display);
-            m_display = 0;
+            m_window = 0;
         }
+
+        XCloseDisplay(m_display);
+        m_display = 0;
     }
 
 private:
@@ -130,7 +134,7 @@ struct GraphicsSurfacePrivate {
         , m_hasAlpha(false)
     {
         GLXContext shareContextObject = 0;
-        m_display = XOpenDisplay(0);
+        m_display = m_offScreenWindow.display();
 
 #if PLATFORM(QT)
         if (shareContext) {
@@ -152,9 +156,10 @@ struct GraphicsSurfacePrivate {
             previousContext->makeCurrent(previousSurface);
 #endif
         }
+#else
+        UNUSED_PARAM(shareContext);
 #endif
 
-        m_display = m_offScreenWindow.display();
         int attributes[] = {
             GLX_LEVEL, 0,
             GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
@@ -319,7 +324,7 @@ private:
     bool m_hasAlpha;
 };
 
-static bool resolveGLMethods(GraphicsSurfacePrivate* p)
+static bool resolveGLMethods(GraphicsSurfacePrivate*)
 {
     static bool resolved = false;
     if (resolved)
@@ -357,7 +362,7 @@ uint32_t GraphicsSurface::platformGetTextureID()
     return m_texture;
 }
 
-void GraphicsSurface::platformCopyToGLTexture(uint32_t target, uint32_t id, const IntRect& targetRect, const IntPoint& offset)
+void GraphicsSurface::platformCopyToGLTexture(uint32_t /*target*/, uint32_t /*id*/, const IntRect& /*targetRect*/, const IntPoint& /*offset*/)
 {
     // This is not supported by GLX/Xcomposite.
 }
@@ -370,9 +375,10 @@ void GraphicsSurface::platformCopyFromTexture(uint32_t texture, const IntRect& s
 
 void GraphicsSurface::platformPaintToTextureMapper(TextureMapper* textureMapper, const FloatRect& targetRect, const TransformationMatrix& transform, float opacity, BitmapTexture* mask)
 {
+    TextureMapperGL* texMapGL = static_cast<TextureMapperGL*>(textureMapper);
     TransformationMatrix adjustedTransform = transform;
     adjustedTransform.multiply(TransformationMatrix::rectToRect(FloatRect(FloatPoint::zero(), m_size), targetRect));
-    static_cast<TextureMapperGL*>(textureMapper)->drawTexture(platformGetTextureID(), 0, m_size, targetRect, adjustedTransform, opacity, mask);
+    texMapGL->drawTexture(platformGetTextureID(), TextureMapperGL::ShouldFlipTexture, m_size, targetRect, adjustedTransform, opacity, mask);
 }
 
 uint32_t GraphicsSurface::platformFrontBuffer() const
@@ -427,7 +433,7 @@ PassRefPtr<GraphicsSurface> GraphicsSurface::platformImport(const IntSize& size,
     return surface;
 }
 
-char* GraphicsSurface::platformLock(const IntRect& rect, int* outputStride, LockOptions lockOptions)
+char* GraphicsSurface::platformLock(const IntRect&, int* /*outputStride*/, LockOptions)
 {
     // GraphicsSurface is currently only being used for WebGL, which does not require this locking mechanism.
     return 0;

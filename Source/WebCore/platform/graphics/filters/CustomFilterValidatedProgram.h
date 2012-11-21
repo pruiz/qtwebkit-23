@@ -49,7 +49,7 @@ typedef WebCore::LayerCompiledProgram PlatformCompiledProgram;
 
 namespace WebCore {
 
-class ANGLEWebKitBridge;
+struct ANGLEShaderSymbol;
 class CustomFilterCompiledProgram;
 class CustomFilterGlobalContext;
 
@@ -100,7 +100,7 @@ private:
     static String blendFunctionString(BlendMode);
     static String compositeFunctionString(CompositeOperator);
 
-    void rewriteMixVertexShader();
+    void rewriteMixVertexShader(const Vector<ANGLEShaderSymbol>& symbols);
     void rewriteMixFragmentShader();
 
     bool needsInputTexture() const;

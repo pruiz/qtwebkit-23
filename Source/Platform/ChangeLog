@@ -1,3 +1,122 @@
+2012-11-01  Robert Kroeger  <rjkroege@chromium.org>
+
+        [chromium] Provide WebKit API interface for platform gesture curves
+        https://bugs.webkit.org/show_bug.cgi?id=100675
+
+        Reviewed by James Robinson.
+
+        Define interfaces to permit the Chromium embedder to provide its own
+        implementation of a gesture animation curve and add an entry point
+        to Platform.h that permits WebKit to obtain an instance of an embedder-
+        provided gesture curve.
+
+        No tests needed in this CL: only interfaces are being added.
+
+        * Platform.gypi:
+        * chromium/public/Platform.h:
+        (WebKit):
+        (Platform):
+        (WebKit::Platform::createFlingAnimationCurve):
+        * chromium/public/WebGestureCurve.h: Added.
+        (WebKit):
+        (WebGestureCurve):
+        (WebKit::WebGestureCurve::~WebGestureCurve):
+        * chromium/public/WebGestureCurveTarget.h: Added.
+        (WebKit):
+        (WebGestureCurveTarget):
+        (WebKit::WebGestureCurveTarget::~WebGestureCurveTarget):
+        * chromium/src/WebActiveGestureAnimation.cpp: Added.
+        (WebKit):
+        (WebKit::WebActiveGestureAnimation::createAtAnimationStart):
+        (WebKit::WebActiveGestureAnimation::createWithTimeOffset):
+        (WebKit::WebActiveGestureAnimation::~WebActiveGestureAnimation):
+        (WebKit::WebActiveGestureAnimation::WebActiveGestureAnimation):
+        (WebKit::WebActiveGestureAnimation::animate):
+        * chromium/src/WebActiveGestureAnimation.h: Added.
+        (WebKit):
+        (WebActiveGestureAnimation):
+
+2012-11-01  Dana Jansens  <danakj@chromium.org>
+
+        [chromium] Allow implicit conversion between gfx::Vector2d and WebSize
+        https://bugs.webkit.org/show_bug.cgi?id=100553
+
+        Reviewed by James Robinson.
+
+        The gfx::Vector2d class is used in chromium for defining distances. The
+        IntSize class is used equivalently inside WebCore. This lets us convert
+        between vectors and sizes along the API boundary.
+
+        * chromium/public/WebSize.h:
+        (WebKit::WebSize::WebSize):
+        (WebSize):
+        (WebKit::WebSize::operator=):
+        (WebKit::WebSize::operator gfx::Vector2d):
+
+2012-11-01  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] Make WebLayerTreeView::adjustEventPointForPinchZoom pure virtual.
+        https://bugs.webkit.org/show_bug.cgi?id=100875
+
+        Reviewed by James Robinson.
+
+        This CL removes the default implementation for adjustEventPointForPinchZoom(), which
+        was necessary for landing the original patch in https://bugs.webkit.org/show_bug.cgi?id=100542.
+
+        * chromium/public/WebLayerTreeView.h:
+        (WebLayerTreeView):
+
+2012-10-31  Stephen White  <senorblanco@chromium.org>
+
+        Unreviewed, rolling out r133122.
+        http://trac.webkit.org/changeset/133122
+        https://bugs.webkit.org/show_bug.cgi?id=99083
+
+        Broke Chromium Win, Android, ChromeOS builds
+
+        * chromium/public/WebContentLayerClient.h:
+        (WebContentLayerClient):
+
+2012-10-31  Alok Priyadarshi  <alokp@chromium.org>
+
+        [chromium] Pass canPaintLCDText to WebContentLayerClient::paintContents
+        https://bugs.webkit.org/show_bug.cgi?id=99083
+
+        Reviewed by James Robinson.
+
+        Use LCD text setting passed to WebContentLayerClient::paintContents instead of turning it off for all composited layers.
+
+        * chromium/public/WebContentLayerClient.h:
+        (WebContentLayerClient):
+        (WebKit::WebContentLayerClient::paintContents):
+
+2012-10-30  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] Transform mouse/gesture event coordinates to account for pinch-zoom in compositor.
+        https://bugs.webkit.org/show_bug.cgi?id=100542
+
+        Reviewed by James Robinson.
+
+        Pinch-zoom in the compositor applies a transformation that WebCore does not know about.
+        We need to adjust mouse and gesture event coordinates to account for this in order that
+        hit testing work properly for these types while zoomed.
+
+        * chromium/public/WebLayerTreeView.h:
+        (WebLayerTreeView):
+        (WebKit::WebLayerTreeView::adjustPointForZoom): Adjusts point coordinated to account for zoom in compositor.
+
+2012-10-30  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Forward declare WebGraphicsContext3D in WebLayerTreeViewClient.h
+        https://bugs.webkit.org/show_bug.cgi?id=100717
+
+        Reviewed by Adrienne Walker.
+
+        Currently it isn't possible to include WebLayerTreeViewClient by itself.
+
+        * chromium/public/WebLayerTreeViewClient.h:
+        (WebKit):
+
 2012-10-26  Christopher Cameron  <ccameron@chromium.org>
 
         [chromium] Add additional memory management fields to WebGraphicsContext3D

@@ -39,12 +39,6 @@
 #include <wtf/Functional.h>
 #include <wtf/HashSet.h>
 
-#if PLATFORM(QT)
-QT_BEGIN_NAMESPACE
-class QSGNode;
-QT_END_NAMESPACE
-#endif
-
 namespace WebKit {
 
 class WebLayerInfo;
@@ -52,9 +46,11 @@ class LayerTreeRenderer;
 class WebLayerUpdateInfo;
 
 class LayerTreeCoordinatorProxy {
+    WTF_MAKE_NONCOPYABLE(LayerTreeCoordinatorProxy);
+    WTF_MAKE_FAST_ALLOCATED;
 public:
-    LayerTreeCoordinatorProxy(DrawingAreaProxy*);
-    virtual ~LayerTreeCoordinatorProxy();
+    explicit LayerTreeCoordinatorProxy(DrawingAreaProxy*);
+    ~LayerTreeCoordinatorProxy();
     void setCompositingLayerState(WebLayerID, const WebLayerInfo&);
     void setCompositingLayerChildren(WebLayerID, const Vector<WebLayerID>&);
 #if ENABLE(CSS_FILTERS)
@@ -62,8 +58,6 @@ public:
 #endif
     void deleteCompositingLayer(WebLayerID);
     void setRootCompositingLayer(WebLayerID);
-    void didReceiveMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&);
-    void purgeGLResources();
     void setContentsSize(const WebCore::FloatSize&);
     void setVisibleContentsRect(const WebCore::FloatRect&, float scale, const WebCore::FloatPoint& trajectoryVector);
     void didRenderFrame(const WebCore::IntSize& contentsSize, const WebCore::IntRect& coveredRect);
@@ -83,6 +77,10 @@ public:
     LayerTreeRenderer* layerTreeRenderer() const { return m_renderer.get(); }
     void setLayerAnimations(WebLayerID, const WebCore::GraphicsLayerAnimations&);
     void setAnimationsLocked(bool);
+#if ENABLE(REQUEST_ANIMATION_FRAME)
+    void requestAnimationFrame();
+    void animationFrameReady();
+#endif
 
 protected:
     void dispatchUpdate(const Function<void()>&);

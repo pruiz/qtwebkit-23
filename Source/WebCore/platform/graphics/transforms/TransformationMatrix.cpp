@@ -589,7 +589,7 @@ FloatPoint TransformationMatrix::projectPoint(const FloatPoint& p, bool* clamped
     return FloatPoint(static_cast<float>(outX), static_cast<float>(outY));
 }
 
-FloatQuad TransformationMatrix::projectQuad(const FloatQuad& q) const
+FloatQuad TransformationMatrix::projectQuad(const FloatQuad& q, bool* clamped) const
 {
     FloatQuad projectedQuad;
 
@@ -603,6 +603,9 @@ FloatQuad TransformationMatrix::projectQuad(const FloatQuad& q) const
     projectedQuad.setP3(projectPoint(q.p3(), &clamped3));
     projectedQuad.setP4(projectPoint(q.p4(), &clamped4));
 
+    if (clamped)
+        *clamped = clamped1 || clamped2 || clamped3 || clamped4;
+        
     // If all points on the quad had w < 0, then the entire quad would not be visible to the projected surface.
     bool everythingWasClipped = clamped1 && clamped2 && clamped3 && clamped4;
     if (everythingWasClipped)
@@ -727,24 +730,22 @@ TransformationMatrix& TransformationMatrix::scale3d(double sx, double sy, double
 
 TransformationMatrix& TransformationMatrix::rotate3d(double x, double y, double z, double angle)
 {
-    // Angles are in degrees. Switch to radians.
-    angle = deg2rad(angle);
-
-    double sinTheta = sin(angle);
-    double cosTheta = cos(angle);
-    
     // Normalize the axis of rotation
     double length = sqrt(x * x + y * y + z * z);
     if (length == 0) {
-        // bad vector, just use something reasonable
-        x = 0;
-        y = 0;
-        z = 1;
+        // A direction vector that cannot be normalized, such as [0, 0, 0], will cause the rotation to not be applied. 
+        return *this;
     } else if (length != 1) {
         x /= length;
         y /= length;
         z /= length;
     }
+
+    // Angles are in degrees. Switch to radians.
+    angle = deg2rad(angle);
+
+    double sinTheta = sin(angle);
+    double cosTheta = cos(angle);
     
     TransformationMatrix mat;
 

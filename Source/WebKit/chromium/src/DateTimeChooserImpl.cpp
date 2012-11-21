@@ -40,9 +40,9 @@
 #include "FrameView.h"
 #include "InputTypeNames.h"
 #include "Language.h"
-#include "Localizer.h"
 #include "NotImplemented.h"
 #include "PickerCommon.h"
+#include "PlatformLocale.h"
 #include "RenderTheme.h"
 #include "WebViewImpl.h"
 #include <public/Platform.h>
@@ -57,11 +57,16 @@ DateTimeChooserImpl::DateTimeChooserImpl(ChromeClientImpl* chromeClient, WebCore
     , m_client(client)
     , m_popup(0)
     , m_parameters(parameters)
-    , m_localizer(WebCore::Localizer::createDefault())
+    , m_locale(WebCore::Locale::createDefault())
 {
     ASSERT(m_chromeClient);
     ASSERT(m_client);
     m_popup = m_chromeClient->openPagePopup(this, m_parameters.anchorRectInRootView);
+}
+
+PassRefPtr<DateTimeChooserImpl> DateTimeChooserImpl::create(ChromeClientImpl* chromeClient, WebCore::DateTimeChooserClient* client, const WebCore::DateTimeChooserParameters& parameters)
+{
+    return adoptRef(new DateTimeChooserImpl(chromeClient, client, parameters));
 }
 
 DateTimeChooserImpl::~DateTimeChooserImpl()
@@ -93,6 +98,7 @@ void DateTimeChooserImpl::writeDocument(WebCore::DocumentWriter& writer)
     FrameView* view = static_cast<WebViewImpl*>(m_chromeClient->webView())->page()->mainFrame()->view();
     IntRect rootViewVisibleContentRect = view->visibleContentRect(true /* include scrollbars */);
     IntRect rootViewRectInScreen = m_chromeClient->rootViewToScreen(rootViewVisibleContentRect);
+    rootViewRectInScreen.move(-view->scrollX(), -view->scrollY());
 
     addString("<!DOCTYPE html><head><meta charset='UTF-8'><style>\n", writer);
     writer.addData(WebCore::pickerCommonCss, sizeof(WebCore::pickerCommonCss));
@@ -119,10 +125,10 @@ void DateTimeChooserImpl::writeDocument(WebCore::DocumentWriter& writer)
     addProperty("locale", WebCore::defaultLanguage(), writer);
     addProperty("todayLabel", Platform::current()->queryLocalizedString(WebLocalizedString::CalendarToday), writer);
     addProperty("clearLabel", Platform::current()->queryLocalizedString(WebLocalizedString::CalendarClear), writer);
-    addProperty("weekStartDay", m_localizer->firstDayOfWeek(), writer);
-    addProperty("monthLabels", m_localizer->monthLabels(), writer);
-    addProperty("dayLabels", m_localizer->weekDayShortLabels(), writer);
-    addProperty("isCalendarRTL", m_localizer->isRTL(), writer);
+    addProperty("weekStartDay", m_locale->firstDayOfWeek(), writer);
+    addProperty("monthLabels", m_locale->monthLabels(), writer);
+    addProperty("dayLabels", m_locale->weekDayShortLabels(), writer);
+    addProperty("isCalendarRTL", m_locale->isRTL(), writer);
     addProperty("isRTL", m_parameters.isAnchorElementRTL, writer);
     if (m_parameters.suggestionValues.size()) {
         addProperty("inputWidth", static_cast<unsigned>(m_parameters.anchorRectInRootView.width()), writer);
@@ -142,13 +148,14 @@ void DateTimeChooserImpl::writeDocument(WebCore::DocumentWriter& writer)
     addString("</script></body>\n", writer);
 }
 
-WebCore::Localizer& DateTimeChooserImpl::localizer()
+WebCore::Locale& DateTimeChooserImpl::locale()
 {
-    return *m_localizer;
+    return *m_locale;
 }
 
 void DateTimeChooserImpl::setValueAndClosePopup(int numValue, const String& stringValue)
 {
+    RefPtr<DateTimeChooserImpl> protector(this);
     if (numValue >= 0)
         m_client->didChooseValue(stringValue);
     endChooser();

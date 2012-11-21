@@ -45,14 +45,9 @@ public:
     virtual void set(Node* node, v8::Persistent<v8::Object> wrapper) OVERRIDE
     {
         ASSERT(node && node->wrapper().IsEmpty());
-        ASSERT(wrapper.WrapperClassId() == v8DOMSubtreeClassId);
+        ASSERT(wrapper.WrapperClassId() == v8DOMNodeClassId);
         node->setWrapper(wrapper);
         wrapper.MakeWeak(node, weakCallback);
-    }
-
-    virtual void visit(DOMDataStore* store, DOMWrapperVisitor<Node>* visitor) OVERRIDE
-    {
-        ASSERT_NOT_REACHED();
     }
 
     virtual void clear() OVERRIDE

@@ -121,7 +121,7 @@ void V8PerIsolateData::visitExternalStrings(ExternalStringVisitor* visitor)
         virtual ~VisitorImpl() { }
         virtual void VisitExternalString(v8::Handle<v8::String> string)
         {
-            WebCoreStringResource* resource = static_cast<WebCoreStringResource*>(string->GetExternalStringResource());
+            WebCoreStringResourceBase* resource = WebCoreStringResourceBase::toWebCoreStringResourceBase(string);
             if (resource)
                 resource->visitStrings(m_visitor);
         }
@@ -131,13 +131,6 @@ void V8PerIsolateData::visitExternalStrings(ExternalStringVisitor* visitor)
     v8::V8::VisitExternalResources(&v8Visitor);
 }
 #endif
-
-v8::Handle<v8::Context> V8PerIsolateData::ensureAuxiliaryContext()
-{
-    if (m_auxiliaryContext.isEmpty())
-        m_auxiliaryContext.adopt(v8::Context::New());
-    return m_auxiliaryContext.get();
-}
 
 v8::Handle<v8::Value> V8PerIsolateData::constructorOfToString(const v8::Arguments& args)
 {

@@ -108,7 +108,7 @@ class HitTestResult;
 class IntPoint;
 class DOMWrapperWorld;
 class JSNode;
-class Localizer;
+class Locale;
 class MediaCanStartListener;
 class MediaQueryList;
 class MediaQueryMatcher;
@@ -1156,8 +1156,8 @@ public:
 
     bool inStyleRecalc() { return m_inStyleRecalc; }
 
-    // Return a Localizer for the default locale if the argument is null or empty.
-    Localizer& getCachedLocalizer(const AtomicString& locale = nullAtom);
+    // Return a Locale for the default locale if the argument is null or empty.
+    Locale& getCachedLocale(const AtomicString& locale = nullAtom);
 
 protected:
     Document(Frame*, const KURL&, bool isXHTML, bool isHTML);
@@ -1193,7 +1193,7 @@ private:
     virtual const KURL& virtualURL() const; // Same as url(), but needed for ScriptExecutionContext to implement it without a performance loss for direct calls.
     virtual KURL virtualCompleteURL(const String&) const; // Same as completeURL() for the same reason as above.
 
-    virtual void addMessage(MessageSource, MessageType, MessageLevel, const String& message, const String& sourceURL, unsigned lineNumber, PassRefPtr<ScriptCallStack>);
+    virtual void addMessage(MessageSource, MessageType, MessageLevel, const String& message, const String& sourceURL, unsigned lineNumber, PassRefPtr<ScriptCallStack>, unsigned long requestIdentifier = 0);
 
     virtual double minimumTimerInterval() const;
 
@@ -1513,8 +1513,8 @@ private:
     bool m_didDispatchViewportPropertiesChanged;
 #endif
 
-    typedef HashMap<AtomicString, OwnPtr<Localizer> > LocaleToLocalizerMap;
-    LocaleToLocalizerMap m_localizerCache;
+    typedef HashMap<AtomicString, OwnPtr<Locale> > LocaleIdentifierToLocaleMap;
+    LocaleIdentifierToLocaleMap m_localeCache;
 };
 
 inline void Document::notifyRemovePendingSheetIfNeeded()

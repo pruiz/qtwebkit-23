@@ -1,3 +1,656 @@
+2012-11-01  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: add methods to support id-based backend APIs
+        https://bugs.webkit.org/show_bug.cgi?id=100425
+
+        Reviewed by Tony Chang.
+
+        Chromium Proxy and WebIDB* support for new int64_t-based methods.
+
+        * public/WebIDBDatabase.h:
+        (WebKit::WebIDBDatabase::deleteObjectStore):
+        (WebKit::WebIDBDatabase::transaction):
+        * public/WebIDBObjectStore.h:
+        (WebKit::WebIDBObjectStore::put):
+        (WebKit::WebIDBObjectStore::setIndexKeys):
+        (WebKit::WebIDBObjectStore::setIndexesReady):
+        (WebKit::WebIDBObjectStore::index):
+        (WebKit::WebIDBObjectStore::deleteIndex):
+        * public/WebIDBTransaction.h:
+        (WebKit::WebIDBTransaction::objectStore):
+        * src/IDBDatabaseBackendProxy.cpp:
+        (WebKit::IDBDatabaseBackendProxy::deleteObjectStore):
+        (WebKit):
+        (WebKit::IDBDatabaseBackendProxy::transaction):
+        * src/IDBDatabaseBackendProxy.h:
+        (IDBDatabaseBackendProxy):
+        * src/IDBObjectStoreBackendProxy.cpp:
+        (WebKit::IDBObjectStoreBackendProxy::put):
+        (WebKit):
+        (WebKit::IDBObjectStoreBackendProxy::setIndexKeys):
+        (WebKit::IDBObjectStoreBackendProxy::setIndexesReady):
+        (WebKit::IDBObjectStoreBackendProxy::index):
+        (WebKit::IDBObjectStoreBackendProxy::deleteIndex):
+        * src/IDBObjectStoreBackendProxy.h:
+        (IDBObjectStoreBackendProxy):
+        * src/IDBTransactionBackendProxy.cpp:
+        (WebKit::IDBTransactionBackendProxy::objectStore):
+        * src/IDBTransactionBackendProxy.h:
+        (IDBTransactionBackendProxy):
+        * src/WebIDBMetadata.cpp:
+        (WebKit::WebIDBMetadata::WebIDBMetadata):
+        (WebKit::WebIDBMetadata::operator IDBDatabaseMetadata):
+        * src/WebIDBTransactionImpl.cpp:
+        (WebKit::WebIDBTransactionImpl::objectStore):
+        (WebKit):
+        * src/WebIDBTransactionImpl.h:
+        * tests/IDBDatabaseBackendTest.cpp:
+
+2012-11-01  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-11-01  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: expose Inspector.detached event factory to the embedder.
+        https://bugs.webkit.org/show_bug.cgi?id=100967
+
+        Reviewed by Vsevolod Vlasov.
+
+        That way embedder will be able to send messages on behalf of the backend being destructed.
+
+        * public/WebDevToolsAgent.h:
+        (WebDevToolsAgent):
+        * src/WebDevToolsAgentImpl.cpp:
+        (SerializingFrontendChannel):
+        (WebKit::SerializingFrontendChannel::sendMessageToFrontend):
+        (WebKit::WebDevToolsAgent::inspectorDetachedEvent):
+        (WebKit):
+        (WebKit::WebDevToolsAgent::workerDisconnectedFromWorkerEvent):
+        (WebKit::WebDevToolsAgent::disconnectEventAsText):
+
+2012-11-01  Vsevolod Vlasov  <vsevik@chromium.org>
+
+        [Chromium] debug builds: Use after free under ~PageOverlay()
+        https://bugs.webkit.org/show_bug.cgi?id=100930
+
+        Reviewed by Pavel Feldman.
+
+        Changed members order in PageOverlay so that GraphicsLayer is destroyed before GraphicsLayerClient.
+
+        * src/PageOverlay.h:
+        (PageOverlay):
+
+2012-11-01  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Avoid attempting to defer commits when they are already deferred
+        https://bugs.webkit.org/show_bug.cgi?id=100913
+
+        Reviewed by Adrienne Walker.
+
+        In threaded compositing mode, it's possible to load and unload FrameViews without any
+        intervening invalidations. In this case, we enter setIsAcceleratedCompositingActive
+        with commits already deferred.  There's no need to defer again and doing so trips
+        an assertion in the implementation.
+
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::setIsAcceleratedCompositingActive):
+        (WebKit):
+
+2012-11-01  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-11-01  Yury Semikhatsky  <yurys@chromium.org>
+
+        Memory instrumentation: report memory occupied by ResourceRequest instead of its base ResourceRequestBase
+        https://bugs.webkit.org/show_bug.cgi?id=100497
+
+        Reviewed by Alexander Pavlov.
+
+        Updated MemoryInstrumentationTest.ImageObserver so that it doesn't fail
+        when instrumentation of objects referenced by CachedImage changes.
+
+        * tests/MemoryInstrumentationTest.cpp:
+
+2012-11-01  Kent Tamura  <tkent@chromium.org>
+
+        Remove unused Locale::parseDateTime
+        https://bugs.webkit.org/show_bug.cgi?id=100910
+
+        Reviewed by Kentaro Hara.
+
+        * tests/LocaleMacTest.cpp: Remove tests for parseDateTime.
+        * tests/LocaleWinTest.cpp: Ditto.
+
+2012-10-31  Keishi Hattori  <keishi@webkit.org>
+
+        [Chromium] Page popup shows up at wrong locations when root view is scrolled
+        https://bugs.webkit.org/show_bug.cgi?id=100830
+
+        Reviewed by Kent Tamura.
+
+        We need to account for the scroll position when calculating the root view rectangle in the screen.
+
+        * src/DateTimeChooserImpl.cpp:
+        (WebKit::DateTimeChooserImpl::writeDocument):
+
+2012-10-31  Stephen White  <senorblanco@chromium.org>
+
+        Unreviewed, rolling out r133122.
+        http://trac.webkit.org/changeset/133122
+        https://bugs.webkit.org/show_bug.cgi?id=99083
+
+        Broke Chromium Win, Android, ChromeOS builds
+
+        * src/LinkHighlight.cpp:
+        (WebKit::LinkHighlight::paintContents):
+        * src/LinkHighlight.h:
+        (LinkHighlight):
+        * src/NonCompositedContentHost.cpp:
+        (WebKit::NonCompositedContentHost::NonCompositedContentHost):
+        (WebKit::NonCompositedContentHost::setOpaque):
+        (WebKit::NonCompositedContentHost::paintContents):
+        * src/NonCompositedContentHost.h:
+        (NonCompositedContentHost):
+        * tests/OpaqueRectTrackingContentLayerDelegateTest.cpp:
+        (WebCore::TEST_F):
+
+2012-10-31  Alok Priyadarshi  <alokp@chromium.org>
+
+        [chromium] Pass canPaintLCDText to WebContentLayerClient::paintContents
+        https://bugs.webkit.org/show_bug.cgi?id=99083
+
+        Reviewed by James Robinson.
+
+        Use LCD text setting passed to WebContentLayerClient::paintContents instead of turning it off for all composited layers.
+
+        * src/LinkHighlight.cpp:
+        (WebKit::LinkHighlight::paintContents):
+        * src/LinkHighlight.h:
+        (LinkHighlight):
+        * src/NonCompositedContentHost.cpp:
+        (WebKit::NonCompositedContentHost::NonCompositedContentHost):
+        (WebKit::NonCompositedContentHost::setOpaque):
+        (WebKit::NonCompositedContentHost::paintContents):
+        * src/NonCompositedContentHost.h:
+        (NonCompositedContentHost):
+        * tests/OpaqueRectTrackingContentLayerDelegateTest.cpp:
+        (WebCore::TEST_F):
+
+2012-10-31  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-10-31  Stephen White  <senorblanco@chromium.org>
+
+        Unreviewed, rolling out r133107.
+        http://trac.webkit.org/changeset/133107
+        https://bugs.webkit.org/show_bug.cgi?id=100425
+
+        Broke compile on Chromium Win
+
+        * public/WebIDBDatabase.h:
+        (WebKit::WebIDBDatabase::transaction):
+        * public/WebIDBObjectStore.h:
+        (WebKit::WebIDBObjectStore::index):
+        * public/WebIDBTransaction.h:
+        (WebKit::WebIDBTransaction::objectStore):
+        * src/IDBDatabaseBackendProxy.cpp:
+        * src/IDBDatabaseBackendProxy.h:
+        (IDBDatabaseBackendProxy):
+        * src/IDBObjectStoreBackendProxy.cpp:
+        (WebKit::IDBObjectStoreBackendProxy::setIndexesReady):
+        * src/IDBObjectStoreBackendProxy.h:
+        (IDBObjectStoreBackendProxy):
+        * src/IDBTransactionBackendProxy.cpp:
+        * src/IDBTransactionBackendProxy.h:
+        (IDBTransactionBackendProxy):
+        * src/WebIDBCallbacksImpl.cpp:
+        * src/WebIDBDatabaseImpl.cpp:
+        * src/WebIDBDatabaseImpl.h:
+        (WebIDBDatabaseImpl):
+        * src/WebIDBMetadata.cpp:
+        (WebKit::WebIDBMetadata::WebIDBMetadata):
+        (WebKit::WebIDBMetadata::operator IDBDatabaseMetadata):
+        * src/WebIDBObjectStoreImpl.cpp:
+        * src/WebIDBObjectStoreImpl.h:
+        (WebIDBObjectStoreImpl):
+        * src/WebIDBTransactionImpl.cpp:
+        * src/WebIDBTransactionImpl.h:
+        * tests/IDBDatabaseBackendTest.cpp:
+
+2012-10-31  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: add methods to support id-based backend APIs
+        https://bugs.webkit.org/show_bug.cgi?id=100425
+
+        Reviewed by Tony Chang.
+
+        Chromium Proxy and WebIDB* support for new int64_t-based methods.
+
+        * public/WebIDBDatabase.h:
+        (WebKit::WebIDBDatabase::deleteObjectStore):
+        (WebKit::WebIDBDatabase::transaction):
+        * public/WebIDBObjectStore.h:
+        (WebKit::WebIDBObjectStore::put):
+        (WebKit::WebIDBObjectStore::setIndexKeys):
+        (WebKit::WebIDBObjectStore::setIndexesReady):
+        (WebKit::WebIDBObjectStore::index):
+        (WebKit::WebIDBObjectStore::deleteIndex):
+        * public/WebIDBTransaction.h:
+        (WebKit::WebIDBTransaction::objectStore):
+        * src/IDBDatabaseBackendProxy.cpp:
+        (WebKit::IDBDatabaseBackendProxy::deleteObjectStore):
+        (WebKit):
+        (WebKit::IDBDatabaseBackendProxy::transaction):
+        * src/IDBDatabaseBackendProxy.h:
+        (IDBDatabaseBackendProxy):
+        * src/IDBObjectStoreBackendProxy.cpp:
+        (WebKit::IDBObjectStoreBackendProxy::put):
+        (WebKit):
+        (WebKit::IDBObjectStoreBackendProxy::setIndexKeys):
+        (WebKit::IDBObjectStoreBackendProxy::setIndexesReady):
+        (WebKit::IDBObjectStoreBackendProxy::index):
+        (WebKit::IDBObjectStoreBackendProxy::deleteIndex):
+        * src/IDBObjectStoreBackendProxy.h:
+        (IDBObjectStoreBackendProxy):
+        * src/IDBTransactionBackendProxy.cpp:
+        (WebKit::IDBTransactionBackendProxy::objectStore):
+        * src/IDBTransactionBackendProxy.h:
+        (IDBTransactionBackendProxy):
+        * src/WebIDBMetadata.cpp:
+        (WebKit::WebIDBMetadata::WebIDBMetadata):
+        (WebKit::WebIDBMetadata::operator IDBDatabaseMetadata):
+        * src/WebIDBTransactionImpl.cpp:
+        (WebKit::WebIDBTransactionImpl::objectStore):
+        (WebKit):
+        * src/WebIDBTransactionImpl.h:
+        * tests/IDBDatabaseBackendTest.cpp:
+
+2012-10-31  Tien-Ren Chen  <trchen@chromium.org>
+
+        Apply transformation for highlights on non-composited contents
+        https://bugs.webkit.org/show_bug.cgi?id=100438
+
+        Reviewed by Adam Barth.
+
+        Non-composited content host layer "steals" the contents on the
+        RenderView layer, including the highlight layer.
+        The transformation for regular contents are applied by the paint
+        function of the non-composited content host however the highlight
+        uses its own WebLayer. Need to apply the same transformation to
+        the highlight layer as well.
+
+        * src/LinkHighlight.cpp:
+        (WebKit::LinkHighlight::computeEnclosingCompositingLayer):
+        * src/LinkHighlight.h:
+        (LinkHighlight):
+
+2012-10-31  Mike West  <mkwst@chromium.org>
+
+        Prefer document->addConsoleMessage to document->domWindow->console->addMessage.
+        https://bugs.webkit.org/show_bug.cgi?id=100850
+
+        Reviewed by Adam Barth.
+
+        For historical reasons, a few places in WebCore talk to Console directly
+        via 'document()->domWindow()->console()->addMessage(...)'. This is more
+        safely wrapped by calling 'addConsoleMessage' on the Document itself.
+
+        No visible functionality should change; we'll simply avoid potential
+        null dereferences in the future.
+
+        * src/WebFrameImpl.cpp:
+        (WebKit::WebFrameImpl::addMessageToConsole):
+
+2012-10-31  Kent Tamura  <tkent@chromium.org>
+
+        Remove code to hide/reshow text caret for PagePopups
+        https://bugs.webkit.org/show_bug.cgi?id=100834
+
+        Reviewed by Hajime Morita.
+
+        All of form controls supporting PagePopups don't have a text
+        caret. We don't need to hide a text caret on opening a PagePopup,
+        and don't need to reshow it on closing the PagePopup.
+
+        We had this code because an old UI of input[type=date] had a text
+        caret.
+
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::openPagePopup):
+        (WebKit::WebViewImpl::closePagePopup):
+
+2012-10-31  Mike West  <mkwst@chromium.org>
+
+        Script run from an isolated world should bypass a page's CSP.
+        https://bugs.webkit.org/show_bug.cgi?id=97398
+
+        Reviewed by Adam Barth.
+
+        * public/WebFrame.h:
+        (WebFrame):
+        * src/WebFrameImpl.cpp:
+        (WebKit::WebFrameImpl::setIsolatedWorldSecurityOrigin):
+        (WebKit):
+        (WebKit::WebFrameImpl::setIsolatedWorldContentSecurityPolicy):
+        * src/WebFrameImpl.h:
+        (WebFrameImpl):
+            Piping a Content Security Policy through WebFrame, in the same way
+            we're currently doing for SecurityOrigin. As a drive-by, this also
+            uses the static method on DOMWrapperWindow to set the security
+            origin, rather than routing through the frame's ScriptController.
+
+2012-10-30  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] Transform mouse/gesture event coordinates to account for pinch-zoom in compositor.
+        https://bugs.webkit.org/show_bug.cgi?id=100542
+
+        Reviewed by James Robinson.
+
+        Pinch-zoom in the compositor applies a transformation that WebCore does not know about.
+        We need to adjust mouse and gesture event coordinates to account for this in order that
+        hit testing work properly for these types while zoomed.
+
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::handleInputEvent): Modified to adjoint event coordinates to account for zoom.
+
+2012-10-30  W. James MacLean  <wjmaclean@chromium.org>
+
+        [chromium] Restrict link highlights to targets that display a hand-cursor
+        https://bugs.webkit.org/show_bug.cgi?id=99862
+
+        Reviewed by James Robinson.
+
+        To avoid applying highlights to inappropriate targets, such as large divs with
+        click handlers installed, test candidate targets and only highlight them if they
+        would normally display a hand cursor on mouse over. This is a heuristic, but has
+        been tested and found effective in practice.
+
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::handleGestureEvent):
+        (WebKit::invokesHandCursor):
+        (WebKit::WebViewImpl::bestTouchLinkNode):
+        (WebKit::WebViewImpl::enableTouchHighlight):
+        * src/WebViewImpl.h:
+        (WebViewImpl):
+        * tests/LinkHighlightTest.cpp:
+        (WebCore::TEST):
+        * tests/data/test_touch_link_highlight.html:
+
+2012-10-30  Alok Priyadarshi  <alokp@chromium.org>
+
+        Unreviewed. Rolled DEPS.
+
+        * DEPS:
+
+2012-10-30  Dan Carney  <dcarney@google.com>
+
+        Remove ensureAuxiliaryContext
+        https://bugs.webkit.org/show_bug.cgi?id=99975
+
+        Reviewed by Adam Barth.
+
+        Updated tests to use correct v8 context.
+
+        * tests/IDBBindingUtilitiesTest.cpp:
+        (WebKit::checkKeyFromValueAndKeyPathInternal):
+        (WebKit::checkKeyPathNullValue):
+        (WebKit::injectKey):
+        (WebKit::checkInjection):
+        (WebKit::checkInjectionFails):
+        (WebKit::checkKeyPathStringValue):
+        (WebKit::checkKeyPathNumberValue):
+        (WebKit::scriptExecutionContext):
+        (WebKit):
+        (WebKit::TEST):
+
+2012-10-30  Kent Tamura  <tkent@chromium.org>
+
+        Remove unused code for old input[type=date] UI
+        https://bugs.webkit.org/show_bug.cgi?id=100734
+
+        Reviewed by Hajime Morita.
+
+        * src/LocalizedStrings.cpp:
+        Follow the LocalizedStrings.h change.
+        * tests/LocaleMacTest.cpp:
+        (LocaleMacTest): Remove tests for Locale::dateFormatText.
+        * tests/LocaleWinTest.cpp:
+        (LocaleWinTest): Ditto.
+
+2012-10-30  Kent Tamura  <tkent@chromium.org>
+
+        Fix crash by calendar picker or suggestion picker
+        https://bugs.webkit.org/show_bug.cgi?id=100728
+
+        Reviewed by Hajime Morita.
+
+        * src/DateTimeChooserImpl.h:
+        (DateTimeChooserImpl): Add a factory function, and made the constructor private.
+        * src/DateTimeChooserImpl.cpp:
+        (WebKit::DateTimeChooserImpl::create): Added.
+        (WebKit::DateTimeChooserImpl::setValueAndClosePopup):
+        Protect this because JavaScript code might run during didChooseValue.
+
+        * src/ChromeClientImpl.h:
+        (ChromeClientImpl): Follow the ChromeClient change.
+        * src/ChromeClientImpl.cpp:
+        (WebKit::ChromeClientImpl::openDateTimeChooser):
+        Use DateTimeChooserImpl::create.
+
+
+2012-10-29  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Null-check WebViewImpl::m_client before calling invalidateRect() on it
+        https://bugs.webkit.org/show_bug.cgi?id=100716
+
+        Reviewed by Dirk Pranke.
+
+        This check was accidentally removed in r132862 and the value is null in at least some unit tests.
+
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::invalidateRect):
+
+2012-10-29  Vincent Scheib  <scheib@chromium.org>
+
+        Unreviewed, rolling out r132845.
+        http://trac.webkit.org/changeset/132845
+        https://bugs.webkit.org/show_bug.cgi?id=99975
+
+        Broke chromium builds, linker errors from
+        IDBBindingUtilitiesTest
+
+        * tests/IDBBindingUtilitiesTest.cpp:
+        (WebCore::TEST):
+
+2012-10-29  James Robinson  <jamesr@chromium.org>
+
+        [chromium] Defer commits between page unload and first invalidation in threaded compositing mode
+        https://bugs.webkit.org/show_bug.cgi?id=100702
+
+        Reviewed by Adrienne Walker.
+
+        In threaded compositing mode, it's not terribly useful to commit after unloading a page and before receiving
+        the first invalidation for the new page since the document is likely not loaded enough to paint usefully.
+        This defers commits from the time compositing is deactivated (which in force compositing mode only happens
+        at FrameView destruction) until we get the first invalidation from WebCore.
+
+        * src/ChromeClientImpl.cpp:
+        (WebKit::ChromeClientImpl::invalidateContentsAndRootView):
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::invalidateRect):
+        (WebKit::WebViewImpl::setIsAcceleratedCompositingActive):
+        (WebKit):
+        * src/WebViewImpl.h:
+        (WebViewImpl):
+
+2012-10-29  Stephen White  <senorblanco@chromium.org>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-10-29  Dan Carney  <dcarney@google.com>
+
+        Remove ensureAuxiliaryContext
+        https://bugs.webkit.org/show_bug.cgi?id=99975
+
+        Reviewed by Adam Barth.
+
+        Updated tests to use correct v8 context.
+
+        * tests/IDBBindingUtilitiesTest.cpp:
+        (WebKit::checkKeyFromValueAndKeyPathInternal):
+        (WebKit::checkKeyPathNullValue):
+        (WebKit::injectKey):
+        (WebKit::checkInjection):
+        (WebKit::checkInjectionFails):
+        (WebKit::checkKeyPathStringValue):
+        (WebKit::checkKeyPathNumberValue):
+        (WebKit::scriptExecutionContext):
+        (WebKit):
+        (WebKit::TEST):
+
+2012-10-29  Patrick Dubroy  <dubroy@chromium.org>
+
+        Web Inspector: Style toolbar to match Chromium toolbar on Chromium/Mac.
+        https://bugs.webkit.org/show_bug.cgi?id=100683
+
+        Reviewed by Pavel Feldman.
+
+        When in compact mode, style the Web Inspector toolbar using the same colors & gradients
+        as the Chromium toolbar (Chromium port only).
+
+        * src/js/devTools.css:
+        (body.compact.platform-mac #toolbar):
+        (body.compact.platform-mac.inactive #toolbar):
+        (body.platform-mac.inactive #toolbar .toolbar-label):
+
+2012-10-29  Eugene Klyuchnikov  <eustas.bug@gmail.com>
+
+        Web Inspector: Timeline: make cpu-monitoring feature available only on capable browsers
+        https://bugs.webkit.org/show_bug.cgi?id=100530
+
+        Reviewed by Yury Semikhatsky.
+
+        Motivation: cpu-monitoring feature looks like a glitch,
+        when it is not supported by browser.
+
+        * src/InspectorClientImpl.cpp: Implemented capability getter.
+        * src/InspectorClientImpl.h:
+
+2012-10-29  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Merge LocalizedNumberICUTest into LocaleICUTest
+        https://bugs.webkit.org/show_bug.cgi?id=100648
+
+        Reviewed by Kentaro Hara.
+
+        LocalizedNumberICU was removed some months ago, and its features were
+        merged to LocaleICU. We merge the test too.
+
+        * WebKit.gypi: Remove LocalizedNumberICUTest.cpp
+        * tests/LocaleICUTest.cpp:
+        Move a #if because some headers are used unconditionally.
+        (testDecimalSeparator): Moved from LocalizedNumberICUTest.cpp.
+        (TEST_F): Ditto.
+        (testNumberIsReversible): Ditto.
+        (testNumbers): Ditto.
+        * tests/LocalizedNumberICUTest.cpp: Removed.
+
+2012-10-29  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Rename LocalizedDateICUTest.cpp to LocaleICUTest.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=100643
+
+        Reviewed by Kentaro Hara.
+
+        LocalizedDateICU was removed some months ago, and LocalizedDateICUTest
+        actually had tests for LocaleICU.
+
+        * WebKit.gypi:
+        * tests/LocaleICUTest.cpp:
+        - Renamed from Source/WebKit/chromium/tests/LocalizedDateICUTest.cpp.
+        - Rename LocalizedDateICUTest class to LocaleICUTest.
+
+2012-10-29  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium-linux] Fix build.
+
+        * tests/LocalizedNumberICUTest.cpp:
+        (testNumberIsReversible): Rename an argument.
+        (testDecimalSeparator): Ditto.
+
+2012-10-28  Kent Tamura  <tkent@chromium.org>
+
+        Rename Localizer to Locale
+        https://bugs.webkit.org/show_bug.cgi?id=100634
+
+        Reviewed by Kentaro Hara.
+
+        * src/ColorChooserUIController.h:
+        (ColorChooserUIController):
+        Rename m_localizer to m_locale, and follow other renamings.
+        * src/ColorChooserUIController.cpp:
+        (WebKit::ColorChooserUIController::ColorChooserUIController): Follow renamings.
+        (WebKit::ColorChooserUIController::locale): Ditto.
+        * src/DateTimeChooserImpl.h:
+        (DateTimeChooserImpl):
+        Rename m_localizer to m_locale, and follow other renamings.
+        * src/DateTimeChooserImpl.cpp:
+        (WebKit::DateTimeChooserImpl::DateTimeChooserImpl): Follow renamings.
+        (WebKit::DateTimeChooserImpl::writeDocument): Ditto.
+        (WebKit::DateTimeChooserImpl::locale): Ditto.
+        * tests/LocaleMacTest.cpp:
+        (LocaleMacTest::formatTime): Ditto.
+        (testNumberIsReversible): Ditto.
+        * tests/LocalizedNumberICUTest.cpp:
+        (testNumberIsReversible): Ditto.
+        (testDecimalSeparator): Ditto.
+
+2012-10-29  Kent Tamura  <tkent@chromium.org>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-10-28  Kent Tamura  <tkent@chromium.org>
+
+        Rename Localizer.{cpp,h} to PlatformLocale.{cpp,h}
+        https://bugs.webkit.org/show_bug.cgi?id=100627
+
+        Reviewed by Yuta Kitamura.
+
+        * src/ColorChooserUIController.h: Follow the file name renaming.
+        * src/DateTimeChooserImpl.cpp: Ditto.
+
+2012-10-27  Adam Barth  <abarth@webkit.org>
+
+        [Chromium] Find-in-page reports matches in hidden iframes
+        https://bugs.webkit.org/show_bug.cgi?id=100604
+
+        Reviewed by Eric Seidel.
+
+        This is actually a regression caused by
+        http://trac.webkit.org/changeset/128784. This patch adds back some code
+        removed in WebFrameImpl::shouldScopeMatches in r128784.
+
+        This patch also introduces a test so that we don't make this mistake
+        again.
+
+        * src/WebFrameImpl.cpp:
+        (WebKit::WebFrameImpl::shouldScopeMatches):
+        * tests/WebFrameTest.cpp:
+        * tests/data/find_in_hidden_frame.html: Added.
+
 2012-10-26  Kent Tamura  <tkent@chromium.org>
 
         [Chromium] Convert Chromium template string to an LDML date format

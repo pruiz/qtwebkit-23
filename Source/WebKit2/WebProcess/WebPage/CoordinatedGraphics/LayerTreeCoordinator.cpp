@@ -267,9 +267,7 @@ bool LayerTreeCoordinator::flushPendingLayerChanges()
 
     m_rootLayer->flushCompositingStateForThisLayerOnly();
 
-    for (size_t i = 0; i < m_releasedDirectlyCompositedImages.size(); ++i)
-        m_webPage->send(Messages::LayerTreeCoordinatorProxy::DestroyDirectlyCompositedImage(m_releasedDirectlyCompositedImages[i]));
-    m_releasedDirectlyCompositedImages.clear();
+    purgeReleasedImages();
 
     if (m_shouldSyncRootLayer) {
         m_webPage->send(Messages::LayerTreeCoordinatorProxy::SetRootCompositingLayer(toCoordinatedGraphicsLayer(m_rootLayer.get())->id()));
@@ -449,6 +447,13 @@ void LayerTreeCoordinator::didPerformScheduledLayerFlush()
     }
 }
 
+void LayerTreeCoordinator::purgeReleasedImages()
+{
+    for (size_t i = 0; i < m_releasedDirectlyCompositedImages.size(); ++i)
+        m_webPage->send(Messages::LayerTreeCoordinatorProxy::DestroyDirectlyCompositedImage(m_releasedDirectlyCompositedImages[i]));
+    m_releasedDirectlyCompositedImages.clear();
+}
+
 void LayerTreeCoordinator::layerFlushTimerFired(Timer<LayerTreeCoordinator>*)
 {
     performScheduledLayerFlush();
@@ -507,15 +512,20 @@ int64_t LayerTreeCoordinator::adoptImageBackingStore(Image* image)
         return key;
     }
 
-    RefPtr<ShareableBitmap> bitmap = ShareableBitmap::createShareable(image->size(), (image->currentFrameHasAlpha() ? ShareableBitmap::SupportsAlpha : 0));
-    {
-        OwnPtr<WebCore::GraphicsContext> graphicsContext = bitmap->createGraphicsContext();
-        graphicsContext->drawImage(image, ColorSpaceDeviceRGB, IntPoint::zero());
-    }
+    // Check if we were going to release this image during the next flush.
+    size_t releasedIndex = m_releasedDirectlyCompositedImages.find(key);
+    if (releasedIndex == notFound) {
+        RefPtr<ShareableBitmap> bitmap = ShareableBitmap::createShareable(image->size(), (image->currentFrameHasAlpha() ? ShareableBitmap::SupportsAlpha : 0));
+        {
+            OwnPtr<WebCore::GraphicsContext> graphicsContext = bitmap->createGraphicsContext();
+            graphicsContext->drawImage(image, ColorSpaceDeviceRGB, IntPoint::zero());
+        }
+        ShareableBitmap::Handle handle;
+        bitmap->createHandle(handle);
+        m_webPage->send(Messages::LayerTreeCoordinatorProxy::CreateDirectlyCompositedImage(key, handle));
+    } else
+        m_releasedDirectlyCompositedImages.remove(releasedIndex);
 
-    ShareableBitmap::Handle handle;
-    bitmap->createHandle(handle);
-    m_webPage->send(Messages::LayerTreeCoordinatorProxy::CreateDirectlyCompositedImage(key, handle));
     m_directlyCompositedImageRefCounts.add(key, 1);
     return key;
 }
@@ -651,10 +661,17 @@ GraphicsLayerFactory* LayerTreeCoordinator::graphicsLayerFactory()
     return this;
 }
 
+#if ENABLE(REQUEST_ANIMATION_FRAME)
 void LayerTreeCoordinator::scheduleAnimation()
+{
+    m_webPage->send(Messages::LayerTreeCoordinatorProxy::RequestAnimationFrame());
+}
+
+void LayerTreeCoordinator::animationFrameReady()
 {
     scheduleLayerFlush();
 }
+#endif
 
 void LayerTreeCoordinator::renderNextFrame()
 {
@@ -675,7 +692,10 @@ void LayerTreeCoordinator::purgeBackingStores()
     for (HashSet<WebCore::CoordinatedGraphicsLayer*>::iterator it = m_registeredLayers.begin(); it != end; ++it)
         (*it)->purgeBackingStores();
 
+    purgeReleasedImages();
+
     ASSERT(!m_directlyCompositedImageRefCounts.size());
+    ASSERT(!m_releasedDirectlyCompositedImages.size());
     m_updateAtlases.clear();
 }
 

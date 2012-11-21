@@ -335,9 +335,6 @@ WebInspector.loaded = function()
             InspectorFrontendHost.sendMessageToBackend = WebInspector.socket.send.bind(WebInspector.socket);
             WebInspector.doLoadedDone();
         }
-        WebInspector.socket.onclose = function() {
-            (new WebInspector.RemoteDebuggingTerminatedScreen()).showModal();
-        }
         return;
     }
 
@@ -369,6 +366,7 @@ WebInspector.doLoadedDone = function()
     ProfilerAgent.isSampling(WebInspector._initializeCapability.bind(WebInspector, "samplingCPUProfiler", null));
     ProfilerAgent.hasHeapProfiler(WebInspector._initializeCapability.bind(WebInspector, "heapProfilerPresent", null));
     TimelineAgent.supportsFrameInstrumentation(WebInspector._initializeCapability.bind(WebInspector, "timelineSupportsFrameInstrumentation", null));
+    TimelineAgent.canMonitorMainThread(WebInspector._initializeCapability.bind(WebInspector, "timelineCanMonitorMainThread", null));
     PageAgent.canOverrideDeviceMetrics(WebInspector._initializeCapability.bind(WebInspector, "canOverrideDeviceMetrics", null));
     PageAgent.canOverrideGeolocation(WebInspector._initializeCapability.bind(WebInspector, "canOverrideGeolocation", null));
     PageAgent.canOverrideDeviceOrientation(WebInspector._initializeCapability.bind(WebInspector, "canOverrideDeviceOrientation", WebInspector._doLoadedDoneWithCapabilities.bind(WebInspector)));
@@ -887,6 +885,7 @@ WebInspector.showErrorMessage = function(error)
     WebInspector.log(error, WebInspector.ConsoleMessage.MessageLevel.Error, true);
 }
 
+// Inspector.inspect protocol event
 WebInspector.inspect = function(payload, hints)
 {
     var object = WebInspector.RemoteObject.fromPayload(payload);
@@ -906,6 +905,12 @@ WebInspector.inspect = function(payload, hints)
         WebInspector.showPanel("resources").selectDOMStorage(WebInspector.domStorageModel.storageForId(hints.domStorageId));
 
     object.release();
+}
+
+// Inspector.detached protocol event
+WebInspector.detached = function(reason)
+{
+    (new WebInspector.RemoteDebuggingTerminatedScreen(reason)).showModal();
 }
 
 WebInspector._updateFocusedNode = function(nodeId)

@@ -44,8 +44,6 @@ public:
     static PassRefPtr<LayerTreeCoordinator> create(WebPage*);
     virtual ~LayerTreeCoordinator();
 
-    static bool supportsAcceleratedCompositing();
-
     virtual const LayerTreeContext& layerTreeContext() { return m_layerTreeContext; }
     virtual void setLayerFlushSchedulingEnabled(bool);
     virtual void scheduleLayerFlush();
@@ -96,7 +94,10 @@ public:
     virtual void syncFixedLayers();
 
     virtual PassOwnPtr<WebCore::GraphicsContext> beginContentUpdate(const WebCore::IntSize&, ShareableBitmap::Flags, ShareableSurface::Handle&, WebCore::IntPoint&);
+
+#if ENABLE(REQUEST_ANIMATION_FRAME)
     virtual void scheduleAnimation() OVERRIDE;
+#endif
 
 protected:
     explicit LayerTreeCoordinator(WebPage*);
@@ -122,10 +123,15 @@ private:
     void syncDisplayState();
     void lockAnimations();
     void unlockAnimations();
+    void purgeReleasedImages();
 
     void layerFlushTimerFired(WebCore::Timer<LayerTreeCoordinator>*);
 
     void scheduleReleaseInactiveAtlases();
+#if ENABLE(REQUEST_ANIMATION_FRAME)
+    void animationFrameReady();
+#endif
+
     void releaseInactiveAtlasesTimerFired(WebCore::Timer<LayerTreeCoordinator>*);
 
     OwnPtr<WebCore::GraphicsLayer> m_rootLayer;

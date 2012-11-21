@@ -70,6 +70,10 @@
 #include <wtf/OwnArrayPtr.h>
 #include <wtf/PassOwnArrayPtr.h>
 
+#if ENABLE(SHADOW_DOM)
+#include <WebCore/RuntimeEnabledFeatures.h>
+#endif
+
 using namespace WebCore;
 using namespace JSC;
 
@@ -93,7 +97,7 @@ void InjectedBundle::initializeClient(WKBundleClient* client)
 
 void InjectedBundle::postMessage(const String& messageName, APIObject* messageBody)
 {
-    OwnPtr<CoreIPC::MessageEncoder> encoder = CoreIPC::MessageEncoder::create(CoreIPC::MessageKindTraits<WebContextLegacyMessage::Kind>::messageReceiverName(), "", 0);
+    OwnPtr<CoreIPC::MessageEncoder> encoder = CoreIPC::MessageEncoder::create(CoreIPC::MessageKindTraits<WebContextLegacyMessage::Kind>::messageReceiverName(), CoreIPC::StringReference("PostMessage"), 0);
     encoder->encode(messageName);
     encoder->encode(InjectedBundleUserMessageEncoder(messageBody));
 
@@ -105,7 +109,7 @@ void InjectedBundle::postSynchronousMessage(const String& messageName, APIObject
     InjectedBundleUserMessageDecoder messageDecoder(returnData);
 
     uint64_t syncRequestID;
-    OwnPtr<CoreIPC::MessageEncoder> encoder = WebProcess::shared().connection()->createSyncMessageEncoder(CoreIPC::MessageKindTraits<WebContextLegacyMessage::Kind>::messageReceiverName(), "", 0, syncRequestID);
+    OwnPtr<CoreIPC::MessageEncoder> encoder = WebProcess::shared().connection()->createSyncMessageEncoder(CoreIPC::MessageKindTraits<WebContextLegacyMessage::Kind>::messageReceiverName(), CoreIPC::StringReference("PostSynchronousMessage"), 0, syncRequestID);
     encoder->encode(messageName);
     encoder->encode(InjectedBundleUserMessageEncoder(messageBody));
 
@@ -620,6 +624,15 @@ void InjectedBundle::setTabKeyCyclesThroughElements(WebPage* page, bool enabled)
 void InjectedBundle::setSerialLoadingEnabled(bool enabled)
 {
     resourceLoadScheduler()->setSerialLoadingEnabled(enabled);
+}
+
+void InjectedBundle::setShadowDOMEnabled(bool enabled)
+{
+#if ENABLE(SHADOW_DOM)
+    RuntimeEnabledFeatures::setShadowDOMEnabled(enabled);
+#else
+    UNUSED_PARAM(enabled);
+#endif
 }
 
 void InjectedBundle::dispatchPendingLoadRequests()

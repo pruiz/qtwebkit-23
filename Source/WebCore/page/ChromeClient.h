@@ -227,7 +227,7 @@ namespace WebCore {
 #endif
 
 #if ENABLE(CALENDAR_PICKER)
-        virtual PassOwnPtr<DateTimeChooser> openDateTimeChooser(DateTimeChooserClient*, const DateTimeChooserParameters&) = 0;
+        virtual PassRefPtr<DateTimeChooser> openDateTimeChooser(DateTimeChooserClient*, const DateTimeChooserParameters&) = 0;
 #endif
 
         virtual void runOpenPanel(Frame*, PassRefPtr<FileChooser>) = 0;
@@ -363,6 +363,8 @@ namespace WebCore {
         virtual void logDiagnosticMessage(const String& message, const String& description, const String& status) { UNUSED_PARAM(message); UNUSED_PARAM(description); UNUSED_PARAM(status); }
 
         virtual FloatSize minimumWindowSize() const { return FloatSize(100, 100); };
+
+        virtual bool isEmptyChromeClient() const { return false; }
 
     protected:
         virtual ~ChromeClient() { }

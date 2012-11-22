@@ -356,7 +356,6 @@ fast/forms/fieldset-align.html [ Failure ]
 fast/forms/focus-selection-textarea.html [ Failure ]
 fast/forms/form-element-geometry.html [ Failure ]
 fast/forms/input-align.html [ Failure ]
-fast/forms/input-appearance-bkcolor.htm [ Failure ]
 fast/forms/input-appearance-default-bkcolor.html [ Failure ]
 fast/forms/input-appearance-disabled.html [ Failure ]
 fast/forms/input-appearance-focus.html [ Failure ]
@@ -610,10 +609,6 @@ webkit.org/b/85310 ietestcenter/css3/valuesandunits/units-010.htm [ ImageOnlyFai
 # IETC namespace failures
 webkit.org/b/86142 ietestcenter/css3/namespaces/syntax-021.xml [ ImageOnlyFailure ]
 
-# CSS Variables are not yet enabled.
-webkit.org/b/85580 fast/css/variables [ Skip ]
-webkit.org/b/85580 inspector/styles/variables [ Skip ]
-
 # Need rebaseline after https://bugs.webkit.org/show_bug.cgi?id=6033
 webkit.org/b/6033 css3/filters/add-filter-rendering.html [ ImageOnlyFailure ]
 webkit.org/b/6033 css3/filters/crash-filter-change.html [ ImageOnlyFailure ]
@@ -733,7 +728,6 @@ fast/workers/storage/interrupt-database.html [ Slow ]
 fast/events/dispatch-message-string-data.html [ Slow ]
 editing/selection/hit-test-on-text-with-line-height.html [ Slow ]
 fast/forms/search-disabled-readonly.html [ Slow Pass ]
-fast/events/popup-blocking-timers.html [ Slow Pass ]
 editing/selection/select-line-break-with-opposite-directionality.html [ Slow Pass ]
 http/tests/navigation/slowtimerredirect-basic.html [ Slow Pass ]
 http/tests/navigation/slowmetaredirect-basic.html  [ Slow Pass ]
@@ -752,6 +746,7 @@ css2.1/20110323/inline-non-replaced-height-002.htm [ Missing ]
 fast/text/word-space.html [ Missing ]
 fast/events/touch/gesture/context-menu-on-long-press.html [ Missing ]
 fast/events/touch/gesture/right-click-gestures-set-cursor-at-correct-position.html [ Missing ]
+css3/filters/effect-reference-ordering-hw.html [ Missing ]
 
 # [Qt4] editing/selection/5354455-1.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=99013
@@ -849,7 +844,9 @@ fast/dom/HTMLAnchorElement/anchor-no-multiple-windows.html [ Failure ]
 fast/dom/Window/window-open-no-multiple-windows.html [ Failure ]
 fast/forms/post-popup-no-multiple-windows.html [ Failure ]
 
-# New test failing after merge of November 2nd-4th
-fast/dom/shadow/pseudo-attribute.html [ Failure ]
-# New test crashing after merge of November 2nd-4th
-http/tests/security/video-poster-cross-origin-crash.html
+# Test has error output, so skip it.
+media/video-playing-and-pause.html
+
+# New test failing after merge of November 4th-6th
+fast/js/string-capitalization.html [ Failure ]
+fast/text/international/combining-marks-position.html [ Failure ]

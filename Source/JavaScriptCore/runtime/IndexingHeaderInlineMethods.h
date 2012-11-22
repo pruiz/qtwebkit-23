@@ -43,6 +43,9 @@ inline size_t IndexingHeader::preCapacity(Structure* structure)
 inline size_t IndexingHeader::indexingPayloadSizeInBytes(Structure* structure)
 {
     switch (structure->indexingType()) {
+    case ALL_UNDECIDED_INDEXING_TYPES:
+    case ALL_INT32_INDEXING_TYPES:
+    case ALL_DOUBLE_INDEXING_TYPES:
     case ALL_CONTIGUOUS_INDEXING_TYPES:
         return vectorLength() * sizeof(EncodedJSValue);
         

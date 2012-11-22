@@ -28,6 +28,13 @@
 #////////////////////////////////////////////////////////////////////////////////////////
 # PASSING TESTS
 #////////////////////////////////////////////////////////////////////////////////////////
+editing/spelling/design-mode-spellcheck-off.html [ Pass ]
+editing/spelling/spellcheck-api-crash.html [ Pass ]
+editing/spelling/spellcheck-attribute.html [ Pass ]
+editing/spelling/spelling-attribute-at-child.html [ Pass ]
+editing/spelling/spelling-attribute-change.html [ Pass ]
+editing/spelling/spelling-hasspellingmarker.html [ Pass ]
+editing/spelling/spelling-linebreak.html [ Pass ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # TESTS EXPECTED TO FAIL
@@ -56,6 +63,8 @@ webkit.org/b/100342 networkinformation/basic-all-types-of-events.html [ Crash ]
 webkit.org/b/100342 networkinformation/updates.html [ Crash ]
 webkit.org/b/100342 networkinformation/add-listener-from-callback.html [ Crash ]
 webkit.org/b/100342 networkinformation/basic-operation.html [ Crash ]
+
+webkit.org/b/101428 media/media-continues-playing-after-replace-source.html [ Crash ]
 
 webkit.org/b/100334 fast/dom/navigator-vibration.html [ Crash ]
 
@@ -168,6 +177,8 @@ webkit.org/b/90980 fast/forms/textarea/textarea-state-restore.html [ Failure Pas
 # Flaky, probably because the result is sometimes taken before data about visited link have passed through IPC.
 webkit.org/b/81797 fast/history/visited-link-background-color.html [ Failure  Pass ]
 
+webkit.org/b/101417 fast/dom/shadow/shadowdom-for-object-only-shadow.html [ ImageOnlyFailure Pass ]
+
 # Also flaky at least on GTK+
 webkit.org/b/72698 media/audio-garbage-collect.html
 
@@ -190,6 +201,13 @@ Bug(EFL) fast/media/media-query-list-05.html [ Failure ]
 Bug(EFL) fast/media/media-query-list-06.html [ Failure ]
 Bug(EFL) fast/media/media-query-list-07.html [ Failure ]
 Bug(EFL) fast/media/view-mode-media-feature.html [ Failure ]
+
+# Needs grammar checking
+Bug(EFL) editing/spelling/grammar-edit-word.html [ Failure ]
+Bug(EFL) editing/spelling/markers.html [ Failure ]
+
+# Unified text checking is failing
+Bug(EFL) editing/spelling/spelling-unified-emulation.html [ Failure ]
 
 # WebKitTestRunner needs an implementation for eventSender.scheduleAsynchronousKeyDown
 webkit.org/b/93979 fast/mutation/end-of-task-delivery.html [ Failure ]
@@ -227,10 +245,6 @@ webkit.org/b/99436 editing/selection/doubleclick-whitespace.html [ Failure ]
 # Text input controller needs selectedRange implementation
 webkit.org/b/99438 editing/selection/mixed-editability-10.html [ Failure ]
 
-# BUG: wrong test results that need investigation
-editing/selection/anchor-focus3.html [ Failure ]
-editing/selection/click-in-margins-inside-editable-div.html [ Failure ]
-
 # NPN_ReloadPlugins is not implemented.
 webkit.org/b/98744 plugins/reloadplugins-and-pages.html [ Failure ]
 
@@ -265,9 +279,6 @@ webkit.org/b/99562 http/tests/plugins/post-url-file.html [ Failure ]
 # Comparison of two javascript objects in C++ is failing.
 webkit.org/b/98739 plugins/npruntime/embed-property-equality.html [ Failure ]
 
-# EFL WK2 does not support the spellchecker feature
-webkit.org/b/91854 editing/spelling [ Skip ]
-
 # WebKitTestRunner needs an implementation for eventSender.contextClick
 webkit.org/b/86881 editing/pasteboard/copy-standalone-image-crash.html [ Failure ]
 webkit.org/b/86881 editing/selection/5354455-1.html [ Failure ]
@@ -277,6 +288,7 @@ webkit.org/b/86881 editing/selection/context-menu-on-text.html [ Failure ]
 webkit.org/b/86881 editing/selection/context-menu-text-selection.html [ Failure ]
 webkit.org/b/86881 editing/selection/empty-cell-right-click.html [ Failure ]
 webkit.org/b/86881 editing/shadow/rightclick-on-meter-in-shadow-crash.html [ Failure ]
+webkit.org/b/86881 editing/spelling/context-menu-suggestions.html [ Failure ]
 webkit.org/b/86881 fast/events/context-no-deselect.html [ Failure ]
 webkit.org/b/86881 fast/events/context-onmousedown-event.html [ Failure ]
 webkit.org/b/86881 fast/events/contextmenu-scrolled-page-with-frame.html [ Failure ]

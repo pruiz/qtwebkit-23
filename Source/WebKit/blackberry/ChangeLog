@@ -1,3 +1,287 @@
+2012-11-08  Tiancheng Jiang  <tijiang@rim.com>
+
+        [BlackBerry] Update BB10 date input form.
+        https://bugs.webkit.org/show_bug.cgi?id=101075
+
+        Reviewed by Rob Buis.
+
+        RIM PR 234531
+        Internally Reviewed by Mike Fenton.
+        Change date input appearance to button and hide caret when click on them.
+
+        * WebCoreSupport/DatePickerClient.cpp:
+        (WebCore::DatePickerClient::setValueAndClosePopup):
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::openDatePopup):
+
+2012-11-08  Nima Ghanavatian  <nghanavatian@rim.com>
+
+        [BlackBerry] Provide pixel coordinates to IMF relative to the screen
+        https://bugs.webkit.org/show_bug.cgi?id=101628
+
+        Reviewed by Rob Buis.
+
+        Reviewed internally by Mike Fenton and Jakob Petsovits.
+
+        We need to provide the correct pixel coordinates to IMF,
+        accounting for webkit based fields in UIB as well as browser.
+        Getting an offset value from the screen point to the document
+        content point allows us to adjust for when the document,
+        such as in UIB, does not start at 0,0.
+
+        * Api/WebPageClient.h:
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::requestSpellingCheckingOptions):
+        * WebKitSupport/InputHandler.h:
+        (InputHandler):
+        * WebKitSupport/TouchEventHandler.cpp:
+        (BlackBerry::WebKit::TouchEventHandler::handleTouchPoint):
+
+2012-11-08  Jakob Petsovits  <jpetsovits@rim.com>
+
+        [BlackBerry] Janitor: Remove unused m_isValid bool
+        https://bugs.webkit.org/show_bug.cgi?id=101610
+
+        Reviewed by Rob Buis.
+
+        It's not used anywhere, but as we have a constructor
+        that creates an invalid TileIndex, let's add another
+        method to check validity - now a correct check.
+
+        On top of that, make the stylebot happy by reducing
+        "unsigned int" to just "unsigned".
+
+        * WebKitSupport/TileIndex.h:
+        (BlackBerry::WebKit::TileIndex::TileIndex):
+        (BlackBerry::WebKit::TileIndex::i):
+        (BlackBerry::WebKit::TileIndex::j):
+        (BlackBerry::WebKit::TileIndex::setIndex):
+        (BlackBerry::WebKit::TileIndex::isValid):
+        (TileIndex):
+
+2012-11-08  Eli Fidler  <efidler@rim.com>
+
+        [BlackBerry] Increase memory cache size
+        https://bugs.webkit.org/show_bug.cgi?id=101622
+
+        Reviewed by Yong Li.
+
+        * WebCoreSupport/CacheClientBlackBerry.cpp:
+        (WebCore::CacheClientBlackBerry::updateCacheCapacity):
+        * WebCoreSupport/CacheClientBlackBerry.h:
+        (CacheClientBlackBerry):
+
+2012-11-08  Jakob Petsovits  <jpetsovits@rim.com>
+
+        [BlackBerry] Rework the API to use document coordinates
+        https://bugs.webkit.org/show_bug.cgi?id=101608
+        RIM PR 173292
+
+        Reviewed by Adam Treat.
+
+        Scrolling and zooming APIs used to operate on
+        transformed coordinates, which is a bad idea:
+        The UI thread might long have moved on to a
+        different scale and scroll position so outdated
+        pixel coordinates are of limited value.
+
+        Moreover, more transformation calculations are
+        needed than if we operate purely on document
+        coordinates.
+
+        With webkitThreadViewportAccessor() exposed,
+        the caller has a choice between how to handle
+        coordinates and the means to perform conversions
+        with little effort and overhead if needed.
+        Therefore, we should remove pixel coordinates
+        from the public API. This commit makes this change.
+
+        * Api/BackingStore.cpp:
+        (BlackBerry::WebKit::BackingStorePrivate::repaint):
+        (BlackBerry::WebKit::BackingStorePrivate::didRenderContent):
+        * Api/InRegionScroller.cpp:
+        (BlackBerry::WebKit::InRegionScroller::setDocumentScrollPositionCompositingThread):
+        (BlackBerry::WebKit::InRegionScroller::setDocumentScrollPositionWebKitThread):
+        (BlackBerry::WebKit::InRegionScrollerPrivate::calculateInRegionScrollableAreasForPoint):
+        * Api/InRegionScroller.h:
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::WebPagePrivate):
+        (BlackBerry::WebKit::WebPagePrivate::setLoadState):
+        (BlackBerry::WebKit::WebPagePrivate::shouldZoomAboutPoint):
+        (BlackBerry::WebKit::WebPagePrivate::zoomAboutPoint):
+        (BlackBerry::WebKit::WebPage::setDocumentScrollPosition):
+        (BlackBerry::WebKit::WebPagePrivate::hasVirtualViewport):
+        (BlackBerry::WebKit::WebPagePrivate::notifyTransformedContentsSizeChanged):
+        (BlackBerry::WebKit::WebPagePrivate::notifyTransformedScrollChanged):
+        (BlackBerry::WebKit::WebPagePrivate::setCursor):
+        (BlackBerry::WebKit::WebPagePrivate::notifyPopupAutofillDialog):
+        (BlackBerry::WebKit::WebPagePrivate::fixedLayoutSize):
+        (BlackBerry::WebKit::WebPagePrivate::bestNodeForZoomUnderPoint):
+        (BlackBerry::WebKit::WebPagePrivate::blockZoomRectForNode):
+        (BlackBerry::WebKit::WebPagePrivate::zoomBlock):
+        (BlackBerry::WebKit::WebPage::setVirtualViewportSize):
+        (BlackBerry::WebKit::WebPagePrivate::recomputeVirtualViewportFromViewportArguments):
+        (BlackBerry::WebKit::WebPagePrivate::dispatchViewportPropertiesDidChange):
+        (BlackBerry::WebKit::WebPagePrivate::resumeBackingStore):
+        (BlackBerry::WebKit::WebPagePrivate::setViewportSize):
+        (BlackBerry::WebKit::WebPage::setDefaultLayoutSize):
+        (BlackBerry::WebKit::WebPagePrivate::setScrollOriginPoint):
+        (BlackBerry::WebKit::WebPage::setDocumentScrollOriginPoint):
+        (BlackBerry::WebKit::handleScrolling):
+        (BlackBerry::WebKit::WebPage::selectionContainsDocumentPoint):
+        (BlackBerry::WebKit::WebPage::setDocumentSelection):
+        (BlackBerry::WebKit::WebPage::setDocumentCaretPosition):
+        (BlackBerry::WebKit::WebPage::selectAtDocumentPoint):
+        (BlackBerry::WebKit::WebPagePrivate::setTextReflowAnchorPoint):
+        (BlackBerry::WebKit::WebPage::pinchZoomAboutPoint):
+        (BlackBerry::WebKit::WebPage::blockZoom):
+        (BlackBerry::WebKit::WebPage::nodeAtDocumentPoint):
+        (BlackBerry::WebKit::WebPagePrivate::enterFullscreenForNode):
+        * Api/WebPage.h:
+        (Platform):
+        * Api/WebPageClient.h:
+        * Api/WebPage_p.h:
+        (WebPagePrivate):
+        * WebCoreSupport/AutofillManager.cpp:
+        (WebCore::AutofillManager::didChangeInTextField):
+        * WebCoreSupport/FrameLoaderClientBlackBerry.cpp:
+        (WebCore::FrameLoaderClientBlackBerry::dispatchDidLayout):
+        * WebKitSupport/SelectionHandler.cpp:
+        (BlackBerry::WebKit::SelectionHandler::selectionPositionChanged):
+        (BlackBerry::WebKit::SelectionHandler::caretPositionChanged):
+
+2012-11-08  Nima Ghanavatian  <nghanavatian@rim.com>
+
+        [BlackBerry] Verify touched element using the rootEditableElement
+        https://bugs.webkit.org/show_bug.cgi?id=101510
+
+        Reviewed by Rob Buis.
+
+        Reviewed internally by Mike Fenton.
+
+        Move up the tree until we find the rootEditableElement and use
+        that to compare with the touched element.
+
+        * WebKitSupport/FatFingers.h:
+        (BlackBerry::WebKit::FatFingersResult::node):
+        (BlackBerry::WebKit::FatFingersResult::nodeAsElementIfApplicable):
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::shouldRequestSpellCheckingOptionsForPoint):
+        * WebKitSupport/TouchEventHandler.cpp:
+        (BlackBerry::WebKit::TouchEventHandler::handleTouchPoint):
+
+2012-11-07  Rob Buis  <rbuis@rim.com>
+
+        [BlackBerry] Remove setUserStyleSheetString/userStyleSheetString
+        https://bugs.webkit.org/show_bug.cgi?id=101490
+
+        Reviewed by Yong Li.
+
+        We no longer need this API.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::didChangeSettings):
+        * Api/WebSettings.cpp:
+        (WebKit):
+        * Api/WebSettings.h:
+
+2012-11-07  Christophe Dumez  <christophe.dumez@intel.com>
+
+        Add replaceWithLiteral() method to WTF::String
+        https://bugs.webkit.org/show_bug.cgi?id=101257
+
+        Reviewed by Benjamin Poulain.
+
+        Substitute String::replace() calls by String::replaceWithLiteral() where
+        adequate, for efficiency.
+
+        * WebCoreSupport/SelectPopupClient.cpp:
+        (WebCore::SelectPopupClient::generateHTML):
+
+2012-11-07  Kenneth Rohde Christiansen  <kenneth@webkit.org>
+
+        Remove support for "desktop-width" in the viewport meta tag
+        https://bugs.webkit.org/show_bug.cgi?id=101217
+
+        Reviewed by Gyuyoung Kim.
+
+        Sync WebViewportArguments enum with the one in
+        WebCore::ViewportArguments
+
+        * Api/WebViewportArguments.h:
+
+2012-11-06  Genevieve Mak  <gmak@rim.com>
+
+        [BlackBerry] Crash in InRegionScrollerPrivate.
+        https://bugs.webkit.org/show_bug.cgi?id=101399
+
+        Reviewed by Rob Buis.
+
+        Add a pointer to the enclosing document as the pointer to layer
+        or node along the way may become invalid.
+        Use document pointer in clearDocumentData.
+        PR #238469
+
+        * Api/InRegionScroller.cpp:
+        (BlackBerry::WebKit::InRegionScrollerPrivate::clearDocumentData):
+        * WebKitSupport/InRegionScrollableArea.cpp:
+        (BlackBerry::WebKit::InRegionScrollableArea::InRegionScrollableArea):
+        (BlackBerry::WebKit::InRegionScrollableArea::document):
+        (WebKit):
+        * WebKitSupport/InRegionScrollableArea.h:
+        (WebCore):
+        (InRegionScrollableArea):
+
+2012-11-06  Otto Derek Cheung  <otcheung@rim.com>
+
+        [BlackBerry] Pushing window.external.* events to webplatform
+        https://bugs.webkit.org/show_bug.cgi?id=101386
+
+        Reviewed by Rob Buis.
+
+        Adding calls to trigger window.external events so we can handle them on the
+        browser side.
+
+        PR 170059
+
+        * Api/WebPageClient.h:
+        * WebCoreSupport/ChromeClientBlackBerry.cpp:
+        (WebCore::ChromeClientBlackBerry::addSearchProvider):
+        (WebCore::ChromeClientBlackBerry::isSearchProviderInstalled):
+
+2012-11-06  Otto Derek Cheung  <otcheung@rim.com>
+
+        [BlackBerry] Adding window.external to our port
+        https://bugs.webkit.org/show_bug.cgi?id=100868
+
+        Reviewed by Rob Buis.
+
+        Patching the method names to match the ones in the spec.
+
+        * WebCoreSupport/ExternalExtension.cpp:
+
+2012-11-06  Jacky Jiang  <zhajiang@rim.com>
+
+        [BlackBerry] Page can't back to whole screen after zoom out and orientation change
+        https://bugs.webkit.org/show_bug.cgi?id=101350
+
+        Reviewed by Rob Buis.
+        Internally reviewed by Arvid Nilsson.
+
+        PR: 229321
+        When rotating device during touch interaction, bitmap zooming was
+        unexpected ended by resetBitmapZoomScale() so that it couldn't bounce
+        back. The call resetBitmapZoomScale() is ancient, which just resets the
+        scale of the bitmap before. Right now it only ends the bitmap zooming
+        which caused the issue. As UI viewport will be updated by zoomChanged()
+        right after that, we can remove this trouble maker.
+        Update the interaction views if the rotation is being changed so that
+        ZoomHandler can get the updated views.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::zoomAboutPoint):
+        * Api/WebPageClient.h:
+
 2012-11-05  Lianghui Chen  <liachen@rim.com>
 
         [BlackBerry] Do not show error page for main loads denied by client application

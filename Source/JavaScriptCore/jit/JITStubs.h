@@ -45,6 +45,7 @@ namespace JSC {
 
     struct StructureStubInfo;
 
+    class ArrayAllocationProfile;
     class CodeBlock;
     class ExecutablePool;
     class FunctionExecutable;
@@ -85,6 +86,7 @@ namespace JSC {
         ReturnAddressPtr returnAddress() { return ReturnAddressPtr(asPointer); }
         ResolveOperations* resolveOperations() { return static_cast<ResolveOperations*>(asPointer); }
         PutToBaseOperation* putToBaseOperation() { return static_cast<PutToBaseOperation*>(asPointer); }
+        ArrayAllocationProfile* arrayAllocationProfile() { return static_cast<ArrayAllocationProfile*>(asPointer); }
     };
     
     struct TrampolineStructure {
@@ -452,7 +454,7 @@ extern "C" {
     void JIT_STUB cti_op_init_global_const_check(STUB_ARGS_DECLARATION) WTF_INTERNAL;
     void JIT_STUB cti_op_tear_off_activation(STUB_ARGS_DECLARATION) WTF_INTERNAL;
     void JIT_STUB cti_op_tear_off_arguments(STUB_ARGS_DECLARATION) WTF_INTERNAL;
-    void JIT_STUB cti_op_throw_reference_error(STUB_ARGS_DECLARATION) WTF_INTERNAL;
+    void JIT_STUB cti_op_throw_static_error(STUB_ARGS_DECLARATION) WTF_INTERNAL;
 #if ENABLE(DFG_JIT)
     void JIT_STUB cti_optimize(STUB_ARGS_DECLARATION) WTF_INTERNAL;
 #endif

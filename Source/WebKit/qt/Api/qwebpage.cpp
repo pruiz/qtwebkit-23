@@ -254,6 +254,8 @@ static const char* editorCommandWebActions[] =
 
     0, // CopyImageUrlToClipboard,
 
+    0, // OpenLinkInThisWindow,
+
     0 // WebActionCount
 };
 
@@ -377,11 +379,6 @@ QWebPagePrivate::QWebPagePrivate(QWebPage *qq)
 
 QWebPagePrivate::~QWebPagePrivate()
 {
-    if (inspector && inspectorIsInternalOnly) {
-        // Since we have to delete an internal inspector,
-        // call setInspector(0) directly to prevent potential crashes
-        setInspector(0);
-    }
 #ifndef QT_NO_CONTEXTMENU
     delete currentContextMenu.data();
 #endif
@@ -391,8 +388,13 @@ QWebPagePrivate::~QWebPagePrivate()
     delete settings;
     delete page;
     
-    if (inspector)
-        inspector->setPage(0);
+    if (inspector) {
+        // If the inspector is ours, delete it, otherwise just detach from it.
+        if (inspectorIsInternalOnly)
+            delete inspector;
+        else
+            inspector->setPage(0);
+    }
 
 #if ENABLE(NOTIFICATIONS) || ENABLE(LEGACY_NOTIFICATIONS)
     NotificationPresenterClientQt::notificationPresenter()->removeClient();
@@ -437,6 +439,7 @@ static QWebPage::WebAction webActionForContextMenuAction(WebCore::ContextMenuAct
     switch (action) {
         case WebCore::ContextMenuItemTagOpenLink: return QWebPage::OpenLink;
         case WebCore::ContextMenuItemTagOpenLinkInNewWindow: return QWebPage::OpenLinkInNewWindow;
+        case WebCore::ContextMenuItemTagOpenLinkInThisWindow: return QWebPage::OpenLinkInThisWindow;
         case WebCore::ContextMenuItemTagDownloadLinkToDisk: return QWebPage::DownloadLinkToDisk;
         case WebCore::ContextMenuItemTagCopyLinkToClipboard: return QWebPage::CopyLinkToClipboard;
         case WebCore::ContextMenuItemTagOpenImageInNewWindow: return QWebPage::OpenImageInNewWindow;
@@ -1464,13 +1467,6 @@ void QWebPagePrivate::setInspector(QWebInspector* insp)
     if (inspector)
         inspector->d->setFrontend(0);
 
-    if (inspectorIsInternalOnly) {
-        QWebInspector* inspToDelete = inspector;
-        inspector = 0;
-        inspectorIsInternalOnly = false;
-        delete inspToDelete;    // Delete after to prevent infinite recursion
-    }
-
     inspector = insp;
 
     // Give inspector frontend web view if previously created
@@ -1694,6 +1690,7 @@ IntPoint QWebPagePrivate::TouchAdjuster::findCandidatePointForTouch(const IntPoi
     \value NoWebAction No action is triggered.
     \value OpenLink Open the current link.
     \value OpenLinkInNewWindow Open the current link in a new window.
+    \value OpenLinkInThisWindow Open the current link without opening a new window. Used on links that would default to opening in another frame or a new window. (Added in Qt 5.0)
     \value OpenFrameInNewWindow Replicate the current frame in a new window.
     \value DownloadLinkToDisk Download the current link to the disk.
     \value CopyLinkToClipboard Copy the current link to the clipboard.
@@ -2368,6 +2365,10 @@ void QWebPage::triggerAction(WebAction action, bool)
         case OpenLinkInNewWindow:
             openNewWindow(d->hitTestResult.linkUrl(), frame);
             break;
+        case OpenLinkInThisWindow:
+            frame->loader()->loadFrameRequest(frameLoadRequest(d->hitTestResult.linkUrl(), frame),
+                /*lockHistory*/ false, /*lockBackForwardList*/ false, /*event*/ 0, /*FormState*/ 0, MaybeSendReferrer);
+            break;
         case OpenFrameInNewWindow: {
             KURL url = frame->loader()->documentLoader()->unreachableURL();
             if (url.isEmpty())
@@ -2788,6 +2789,9 @@ QAction *QWebPage::action(WebAction action) const
             break;
         case OpenFrameInNewWindow:
             text = contextMenuItemTagOpenFrameInNewWindow();
+            break;
+        case OpenLinkInThisWindow:
+            text = contextMenuItemTagOpenLinkInThisWindow();
             break;
 
         case DownloadLinkToDisk:

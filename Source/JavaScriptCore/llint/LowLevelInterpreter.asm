@@ -88,15 +88,18 @@ else
 end
 
 # Constant for reasoning about butterflies.
-const IsArray = 1
-const IndexingShapeMask = 30
-const ContiguousShape = 26
-const ArrayStorageShape = 28
+const IsArray                  = 1
+const IndexingShapeMask        = 30
+const NoIndexingShape          = 0
+const Int32Shape               = 20
+const DoubleShape              = 22
+const ContiguousShape          = 26
+const ArrayStorageShape        = 28
 const SlowPutArrayStorageShape = 30
 
 # Type constants.
 const StringType = 5
-const ObjectType = 13
+const ObjectType = 17
 
 # Type flags constants.
 const MasqueradesAsUndefined = 1
@@ -462,19 +465,19 @@ end
 _llint_op_new_array:
     traceExecution()
     callSlowPath(_llint_slow_path_new_array)
-    dispatch(4)
+    dispatch(5)
 
 
 _llint_op_new_array_with_size:
     traceExecution()
     callSlowPath(_llint_slow_path_new_array_with_size)
-    dispatch(3)
+    dispatch(4)
 
 
 _llint_op_new_array_buffer:
     traceExecution()
     callSlowPath(_llint_slow_path_new_array_buffer)
-    dispatch(4)
+    dispatch(5)
 
 
 _llint_op_new_regexp:
@@ -1234,10 +1237,10 @@ _llint_op_throw:
     dispatch(2)
 
 
-_llint_op_throw_reference_error:
+_llint_op_throw_static_error:
     traceExecution()
-    callSlowPath(_llint_slow_path_throw_reference_error)
-    dispatch(2)
+    callSlowPath(_llint_slow_path_throw_static_error)
+    dispatch(3)
 
 
 _llint_op_profile_will_call:
@@ -1326,6 +1329,8 @@ _llint_op_put_by_id_replace:
 _llint_op_put_by_id_transition:
     notSupported()
 
+_llint_op_init_global_const_nop:
+    dispatch(5)
 
 # Indicate the end of LLInt.
 _llint_end:

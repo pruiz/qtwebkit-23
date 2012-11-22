@@ -58,7 +58,7 @@ void RequestManagerClientEfl::didReceiveURIRequest(WKSoupRequestManagerRef soupR
 {
     RequestManagerClientEfl* requestManager = toRequestManagerClientEfl(clientInfo);
 
-    RefPtr<Ewk_Url_Scheme_Request> schemeRequest = Ewk_Url_Scheme_Request::create(soupRequestManagerRef, urlRef, requestID);
+    RefPtr<EwkUrlSchemeRequest> schemeRequest = EwkUrlSchemeRequest::create(soupRequestManagerRef, urlRef, requestID);
     Ewk_Url_Scheme_Handler handler = requestManager->m_urlSchemeHandlers.get(schemeRequest->scheme());
     if (!handler.callback)
         return;
@@ -67,7 +67,7 @@ void RequestManagerClientEfl::didReceiveURIRequest(WKSoupRequestManagerRef soupR
 }
 
 RequestManagerClientEfl::RequestManagerClientEfl(EwkContext* context)
-    : m_soupRequestManager(WKContextGetSoupRequestManager(context->wkContext()))
+    : m_soupRequestManager(WKContextGetSoupRequestManager(toAPI(context->webContext().get())))
 {
     ASSERT(context);
 

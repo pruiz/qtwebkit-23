@@ -1,3 +1,245 @@
+2012-11-08  Adam Barth  <abarth@webkit.org>
+
+        Unreviewed.
+
+        Roll Chromium DEPS: 166678 => 166755
+
+        * DEPS:
+
+2012-11-08  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-11-08  Sami Kyostila  <skyostil@chromium.org>
+
+        Introduce WebScreenInfo.deviceScaleFactor
+        https://bugs.webkit.org/show_bug.cgi?id=101613
+
+        Reviewed by Adam Barth.
+
+        Introduce the WebScreenInfo.deviceScaleFactor property, which specifies the
+        ratio between physical and logical pixels. This is the first step in replacing
+        horizontalDPI/verticalDPI in favor of the deviceScaleFactor.
+
+        For now, this value is only initialized on Mac, because the other ports that
+        use it initialize the value in Chromium, whereas Windows and X11 default to a
+        factor of 1. The value on Mac is truncated to an integer to match the
+        expectation in Chromium's RenderWidget.
+
+        * src/mac/WebScreenInfoFactory.mm:
+        (WebKit::WebScreenInfoFactory::screenInfo):
+
+2012-11-08  Dan Carney  <dcarney@google.com>
+
+        Cleanup IDBBindingUtilitiesTest
+        https://bugs.webkit.org/show_bug.cgi?id=100860
+
+        Reviewed by Adam Barth.
+
+        Small cleanup of IDBBindingUtilitiesTest as per
+        https://bugs.webkit.org/show_bug.cgi?id=99975#c38
+
+        * tests/IDBBindingUtilitiesTest.cpp:
+        (IDBKeyFromValueAndKeyPathTest):
+        (WebKit::IDBKeyFromValueAndKeyPathTest::IDBKeyFromValueAndKeyPathTest):
+        (WebKit::IDBKeyFromValueAndKeyPathTest::context):
+        (WebKit):
+        (WebKit::TEST_F):
+
+2012-11-08  Keishi Hattori  <keishi@webkit.org>
+
+        Add properties for week/month picker in DateTimeChooserImpl::writeDocument
+        https://bugs.webkit.org/show_bug.cgi?id=101552
+
+        Reviewed by Kent Tamura.
+
+        Changing the arguments for calendar picker to support week/month picker.
+
+        * src/DateTimeChooserImpl.cpp:
+        (WebKit::DateTimeChooserImpl::writeDocument):
+
+2012-11-08  Dimitri Glazkov  <dglazkov@chromium.org>
+
+        Unreviewed, rolling out r133429.
+        http://trac.webkit.org/changeset/133429
+        https://bugs.webkit.org/show_bug.cgi?id=101173
+
+        Speculative roll out, investigating perf regression.
+
+        * src/ContextFeaturesClientImpl.cpp:
+        (WebKit::ContextFeaturesClientImpl::askIfIsEnabled):
+
+2012-11-08  Yury Semikhatsky  <yurys@chromium.org>
+
+        Web Inspector: move front-end methods called from native part to InspectorFrontendAPI
+        https://bugs.webkit.org/show_bug.cgi?id=101463
+
+        Reviewed by Vsevolod Vlasov.
+
+        Moved Web Inspector methods called from native code to InspectorFrontendAPI. Updated
+        WebDevToolsFrontendImpl appropriately.
+
+        * src/WebDevToolsFrontendImpl.cpp:
+        (WebKit::WebDevToolsFrontendImpl::dispatchOnInspectorFrontend):
+
+2012-11-08  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: Rename methods and remove dead code from IDBBackingStore
+        https://bugs.webkit.org/show_bug.cgi?id=101488
+
+        Reviewed by Ojan Vafai.
+
+        Update IDBFakeBackingStore to reflect method changes in IDBBackingStore.
+
+        * tests/IDBFakeBackingStore.h:
+
+2012-08-20  Taiju Tsuiki  <tzik@chromium.org>
+
+        Web Inspector: Drop dimmed crumb handling
+        https://bugs.webkit.org/show_bug.cgi?id=94457
+
+        Reviewed by Vsevolod Vlasov.
+
+        * src/js/devTools.css:
+
+2012-11-07  Adam Barth  <abarth@webkit.org>
+
+        [V8] We should hide the DOMWrapperMaps inside DOMDataStore
+        https://bugs.webkit.org/show_bug.cgi?id=101430
+
+        Reviewed by Kentaro Hara.
+
+        Remove unneeded header includes.
+
+        * src/WebScriptController.cpp:
+
+2012-11-07  Varun Jain  <varunjain@chromium.org>
+
+        Add new gesture type, LongTap, which is basically the completion of a GestureLongPress
+        https://bugs.webkit.org/show_bug.cgi?id=101385
+
+        Reviewed by Adam Barth.
+
+        Test: Only creating the new enum. No functionality change, hence no tests required.
+
+        * public/WebInputEvent.h:
+        (WebKit::WebInputEvent::isGestureEventType):
+        * src/PageWidgetDelegate.cpp:
+        (WebKit::PageWidgetDelegate::handleInputEvent):
+        * src/WebInputEventConversion.cpp:
+        (WebKit::PlatformGestureEventBuilder::PlatformGestureEventBuilder):
+        * src/WebPopupMenuImpl.cpp:
+        (WebKit::WebPopupMenuImpl::handleInputEvent):
+        * src/WebViewImpl.cpp:
+        (WebKit::WebViewImpl::handleGestureEvent):
+
+2012-11-05  Emil A Eklund  <eae@chromium.org>
+
+        Remove LayoutTypes abstraction
+        https://bugs.webkit.org/show_bug.cgi?id=93050
+
+        Reviewed by Levi Weintraub.
+
+        Remove LayoutTypes abstraction and rename FractionalLayout* to
+        Layout* now that all platforms use the FractionalLayout version
+        (albeit with different fractions).
+
+        No new tests, no change in functionality.
+
+        * src/LinkHighlight.cpp:
+
+2012-11-07  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-11-07  Kenneth Rohde Christiansen  <kenneth@webkit.org>
+
+        Remove support for "desktop-width" in the viewport meta tag
+        https://bugs.webkit.org/show_bug.cgi?id=101217
+
+        Reviewed by Gyuyoung Kim.
+
+        Remove some code trying to use the set desktop width (say 980) for
+        sites not using a viewport meta element.
+
+        Removing this code should have no effect as it ends up being set
+        to desktop width in that case anyway, by the ViewportArguments
+        algorithm.
+
+        * src/ChromeClientImpl.cpp:
+        (WebKit::ChromeClientImpl::dispatchViewportPropertiesDidChange):
+
+2012-11-06  Dan Beam  <dbeam@chromium.org>
+
+        Enable REQUEST_AUTOCOMPLETE for chromium port
+        https://bugs.webkit.org/show_bug.cgi?id=101376
+
+        Reviewed by Adam Barth.
+
+        This patch enables the feature flag REQUEST_AUTOCOMPLETE in WebKit/chromium only to allow web authors to start to use
+        HTMLFormElement#requestAutocomplete as the chrome-side work progresses further.
+
+        * features.gypi:
+
+        Turned on the *compile* time flag for REQUEST_AUTOCOMPLETE in chromium's webkit port but also added a *run* time flag
+        that functionally enables the behavior.  This means the chromium port will compile in support but will require a run
+        time flag to enable.
+
+        * public/WebRuntimeFeatures.h:
+        (WebRuntimeFeatures):
+
+        Added a method to the public chromium run time features interface to allow chrome to enable/disable this feature.
+
+        * src/WebRuntimeFeatures.cpp:
+        (WebKit::WebRuntimeFeatures::enableRequestAutocomplete):
+        (WebKit):
+
+        A setter than can be called from chrome code to change the enable/disable requestAutocomplete and associated events at
+        runtime.
+
+        (WebKit::WebRuntimeFeatures::isRequestAutocompleteEnabled):
+
+        A getter that returns whether the requestAutocomplete run time feature is enabled.
+
+2012-11-06  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r133526.
+        http://trac.webkit.org/changeset/133526
+        https://bugs.webkit.org/show_bug.cgi?id=101388
+
+        May have caused 15% memory regression in Chromium (Requested
+        by jsbell|gardener on #webkit).
+
+        * src/WebScriptController.cpp:
+
+2012-11-06  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-11-06  Peter Beverloo  <peter@chromium.org>
+
+        [Chromium] Enable the JavaScript i18n API for Android
+        https://bugs.webkit.org/show_bug.cgi?id=101357
+
+        Reviewed by Adam Barth.
+
+        Enable the JavaScript i18n API for Chromium on Android. This adds a
+        grand total of 18.7 KiB of data to the content shell apk.
+
+        * features.gypi:
+
+2012-11-06  Stephen White  <senorblanco@chromium.org>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
 2012-11-05  Adam Barth  <abarth@webkit.org>
 
         [V8] IntrusiveDOMWrapperMap should be usable for more than just Nodes

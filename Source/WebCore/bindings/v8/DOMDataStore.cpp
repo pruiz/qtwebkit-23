@@ -31,6 +31,7 @@
 #include "config.h"
 #include "DOMDataStore.h"
 
+#include "DOMWrapperMap.h"
 #include "V8Binding.h"
 #include "WebCoreMemoryInstrumentation.h"
 #include <wtf/MainThread.h>
@@ -40,15 +41,15 @@ namespace WebCore {
 DOMDataStore::DOMDataStore(Type type)
     : m_type(type)
 {
+    m_domObjectMap = adoptPtr(new DOMWrapperMap<void>);
     V8PerIsolateData::current()->registerDOMDataStore(this);
 }
 
 DOMDataStore::~DOMDataStore()
 {
     ASSERT(m_type != MainWorld); // We never actually destruct the main world's DOMDataStore.
-
     V8PerIsolateData::current()->unregisterDOMDataStore(this);
-    m_wrapperMap.clear();
+    m_domObjectMap->clear();
 }
 
 DOMDataStore* DOMDataStore::current(v8::Isolate* isolate)
@@ -66,7 +67,7 @@ DOMDataStore* DOMDataStore::current(v8::Isolate* isolate)
 void DOMDataStore::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::Binding);
-    info.addMember(m_wrapperMap);
+    info.addMember(m_domObjectMap);
 }
 
 void DOMDataStore::weakCallback(v8::Persistent<v8::Value> value, void* context)
@@ -77,12 +78,13 @@ void DOMDataStore::weakCallback(v8::Persistent<v8::Value> value, void* context)
     ASSERT(key->wrapper() == wrapper);
     // Note: |object| might not be equal to |key|, e.g., if ScriptWrappable isn't a left-most base class.
     void* object = toNative(wrapper);
-    WrapperTypeInfo* type = toWrapperTypeInfo(wrapper);
+    WrapperTypeInfo* info = toWrapperTypeInfo(wrapper);
+    ASSERT(info->derefObjectFunction);
 
     key->clearWrapper();
     value.Dispose();
     value.Clear();
-    type->derefObject(object);
+    info->derefObject(object);
 }
 
 } // namespace WebCore

@@ -378,9 +378,9 @@ v8::Handle<v8::Array> npObjectIndexedPropertyEnumerator(const v8::AccessorInfo& 
 
 static void weakNPObjectCallback(v8::Persistent<v8::Value>, void*);
 
-static DOMWrapperHashMap<NPObject>& staticNPObjectMap()
+static DOMWrapperMap<NPObject>& staticNPObjectMap()
 {
-    DEFINE_STATIC_LOCAL(DOMWrapperHashMap<NPObject>, npObjectMap, (&weakNPObjectCallback));
+    DEFINE_STATIC_LOCAL(DOMWrapperMap<NPObject>, npObjectMap, (&weakNPObjectCallback));
     return npObjectMap;
 }
 
@@ -457,7 +457,7 @@ void forgetV8ObjectForNPObject(NPObject* object)
     v8::Persistent<v8::Object> wrapper = staticNPObjectMap().get(object);
     if (!wrapper.IsEmpty()) {
         v8::HandleScope scope;
-        V8DOMWrapper::setDOMWrapper(wrapper, npObjectTypeInfo(), 0);
+        V8DOMWrapper::clearDOMWrapper(wrapper, npObjectTypeInfo());
         staticNPObjectMap().remove(object, wrapper);
         wrapper.Dispose();
         wrapper.Clear();

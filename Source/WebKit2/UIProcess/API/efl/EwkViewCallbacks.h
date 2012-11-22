@@ -26,40 +26,46 @@
 #ifndef EwkViewCallbacks_h
 #define EwkViewCallbacks_h
 
+#include "WKEinaSharedString.h"
 #include "ewk_private.h"
 #include <Evas.h>
 #include <wtf/text/CString.h>
 #include <wtf/text/WTFString.h>
 
-struct Ewk_Auth_Request;
-struct Ewk_Download_Job;
+typedef struct Ewk_Object Ewk_Auth_Request;
+typedef struct Ewk_Object Ewk_Download_Job;
+typedef struct Ewk_Object Ewk_File_Chooser_Request;
+typedef struct Ewk_Object Ewk_Form_Submission_Request;
+typedef struct Ewk_Object Ewk_Navigation_Policy_Decision;
+typedef struct Ewk_Object Ewk_Resource;
+#if ENABLE(WEB_INTENTS)
+typedef struct Ewk_Object Ewk_Intent;
+#endif
+#if ENABLE(WEB_INTENTS_TAG)
+typedef struct Ewk_Object Ewk_Intent_Service;
+#endif
+
 struct Ewk_Download_Job_Error;
-struct Ewk_File_Chooser_Request;
-struct Ewk_Form_Submission_Request;
 struct Ewk_Error;
 struct Ewk_Resource_Request;
 struct Ewk_Resource_Load_Response;
 struct Ewk_Resource_Load_Error;
-struct Ewk_Resource;
-struct Ewk_Navigation_Policy_Decision;
-#if ENABLE(WEB_INTENTS)
-struct Ewk_Intent;
-#endif
-#if ENABLE(WEB_INTENTS_TAG)
-struct Ewk_Intent_Service;
-#endif
 
 namespace EwkViewCallbacks {
 
 enum CallbackType {
     AuthenticationRequest,
     BackForwardListChange,
+    CancelVibration,
+    CloseWindow,
+    CreateWindow,
     DownloadJobCancelled,
     DownloadJobFailed,
     DownloadJobFinished,
     DownloadJobRequested,
     FileChooserRequest,
     NewFormSubmissionRequest,
+    IconChanged,
     LoadError,
     LoadFinished,
     LoadProgress,
@@ -77,6 +83,8 @@ enum CallbackType {
     TitleChange,
     TooltipTextUnset,
     TooltipTextSet,
+    URLChanged,
+    Vibrate,
     WebProcessCrashed,
 #if ENABLE(WEB_INTENTS)
     IntentRequest,
@@ -136,6 +144,11 @@ public:
         call(const_cast<char*>(arg.utf8().data()));
     }
 
+    void call(const WKEinaSharedString& arg)
+    {
+        call(const_cast<char*>(static_cast<const char*>(arg)));
+    }
+
 private:
     Evas_Object* m_view;
 };
@@ -150,12 +163,16 @@ struct CallBackInfo<callbackType> {                           \
 // Note: type 'void' means that no arguments are expected.
 DECLARE_EWK_VIEW_CALLBACK(AuthenticationRequest, "authentication,request", Ewk_Auth_Request);
 DECLARE_EWK_VIEW_CALLBACK(BackForwardListChange, "back,forward,list,changed", void);
+DECLARE_EWK_VIEW_CALLBACK(CancelVibration, "cancel,vibration", void);
+DECLARE_EWK_VIEW_CALLBACK(CloseWindow, "close,window", void);
+DECLARE_EWK_VIEW_CALLBACK(CreateWindow, "create,window", Evas_Object*);
 DECLARE_EWK_VIEW_CALLBACK(DownloadJobCancelled, "download,cancelled", Ewk_Download_Job);
 DECLARE_EWK_VIEW_CALLBACK(DownloadJobFailed, "download,failed", Ewk_Download_Job_Error);
 DECLARE_EWK_VIEW_CALLBACK(DownloadJobFinished, "download,finished", Ewk_Download_Job);
 DECLARE_EWK_VIEW_CALLBACK(DownloadJobRequested, "download,request", Ewk_Download_Job);
 DECLARE_EWK_VIEW_CALLBACK(FileChooserRequest, "file,chooser,request", Ewk_File_Chooser_Request);
 DECLARE_EWK_VIEW_CALLBACK(NewFormSubmissionRequest, "form,submission,request", Ewk_Form_Submission_Request);
+DECLARE_EWK_VIEW_CALLBACK(IconChanged, "icon,changed", void);
 DECLARE_EWK_VIEW_CALLBACK(LoadError, "load,error", Ewk_Error);
 DECLARE_EWK_VIEW_CALLBACK(LoadFinished, "load,finished", void);
 DECLARE_EWK_VIEW_CALLBACK(LoadProgress, "load,progress", double);
@@ -173,6 +190,8 @@ DECLARE_EWK_VIEW_CALLBACK(TextFound, "text,found", unsigned);
 DECLARE_EWK_VIEW_CALLBACK(TitleChange, "title,changed", char);
 DECLARE_EWK_VIEW_CALLBACK(TooltipTextUnset, "tooltip,text,unset", void);
 DECLARE_EWK_VIEW_CALLBACK(TooltipTextSet, "tooltip,text,set", char);
+DECLARE_EWK_VIEW_CALLBACK(URLChanged, "url,changed", char);
+DECLARE_EWK_VIEW_CALLBACK(Vibrate, "vibrate", uint64_t);
 DECLARE_EWK_VIEW_CALLBACK(WebProcessCrashed, "webprocess,crashed", bool);
 #if ENABLE(WEB_INTENTS)
 DECLARE_EWK_VIEW_CALLBACK(IntentRequest, "intent,request,new", Ewk_Intent);

@@ -40,16 +40,16 @@
 namespace WebCore {
 
 template<class KeyType>
-class DOMWrapperHashMap {
+class DOMWrapperMap {
 public:
     typedef HashMap<KeyType*, v8::Persistent<v8::Object> > MapType;
 
-    explicit DOMWrapperHashMap(v8::WeakReferenceCallback callback = &defaultWeakCallback)
+    explicit DOMWrapperMap(v8::WeakReferenceCallback callback = &defaultWeakCallback)
         : m_callback(callback)
     {
     }
 
-    v8::Persistent<v8::Object> get(KeyType* key) const
+    v8::Persistent<v8::Object> get(KeyType* key)
     {
         return m_map.get(key);
     }
@@ -90,10 +90,11 @@ public:
 private:
     static void defaultWeakCallback(v8::Persistent<v8::Value> value, void* context)
     {
-        DOMWrapperHashMap<KeyType>* map = static_cast<DOMWrapperHashMap<KeyType>*>(context);
+        DOMWrapperMap<KeyType>* map = static_cast<DOMWrapperMap<KeyType>*>(context);
         ASSERT(value->IsObject());
         v8::Persistent<v8::Object> wrapper = v8::Persistent<v8::Object>::Cast(value);
         WrapperTypeInfo* type = toWrapperTypeInfo(wrapper);
+        ASSERT(type->derefObjectFunction);
         KeyType* key = static_cast<KeyType*>(toNative(wrapper));
 
         map->remove(key, wrapper);

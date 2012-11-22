@@ -66,12 +66,19 @@ namespace WebCore {
         static bool maybeDOMWrapper(v8::Handle<v8::Value>);
 #endif
 
-        // Sets contents of a DOM wrapper.
         static void setDOMWrapper(v8::Handle<v8::Object> object, WrapperTypeInfo* type, void* cptr)
         {
             ASSERT(object->InternalFieldCount() >= 2);
             object->SetPointerInInternalField(v8DOMWrapperObjectIndex, cptr);
             object->SetPointerInInternalField(v8DOMWrapperTypeIndex, type);
+        }
+
+        static void clearDOMWrapper(v8::Handle<v8::Object> object, WrapperTypeInfo* type)
+        {
+            ASSERT(object->InternalFieldCount() >= 2);
+            ASSERT(type);
+            object->SetPointerInInternalField(v8DOMWrapperTypeIndex, type);
+            object->SetPointerInInternalField(v8DOMWrapperObjectIndex, 0);
         }
 
         static v8::Handle<v8::Object> lookupDOMWrapper(v8::Handle<v8::FunctionTemplate> functionTemplate, v8::Handle<v8::Object> object)
@@ -108,19 +115,16 @@ namespace WebCore {
         static v8::Handle<v8::Object> getCachedWrapper(Node* node)
         {
             ASSERT(isMainThread());
-            if (LIKELY(!DOMWrapperWorld::isolatedWorldsExist())) {
-                v8::Persistent<v8::Object> wrapper = node->wrapper();
-                if (LIKELY(!wrapper.IsEmpty()))
-                    return wrapper;
-            }
+            if (LIKELY(!DOMWrapperWorld::isolatedWorldsExist()))
+                return node->wrapper();
 
             V8DOMWindowShell* context = V8DOMWindowShell::getEntered();
             if (LIKELY(!context))
                 return node->wrapper();
 
-            DOMDataStore* store = context->world()->domDataStore();
-            return store->get(node);
+            return context->world()->domDataStore()->get(node);
         }
+
     private:
         static void setWrapperClass(void*, v8::Persistent<v8::Object> wrapper)
         {

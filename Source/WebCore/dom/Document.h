@@ -37,7 +37,6 @@
 #include "IconURL.h"
 #include "InspectorCounters.h"
 #include "IntRect.h"
-#include "LayoutTypes.h"
 #include "MutationObserver.h"
 #include "PageVisibilityState.h"
 #include "PlatformScreen.h"
@@ -106,6 +105,8 @@ class HTMLNameCollection;
 class HitTestRequest;
 class HitTestResult;
 class IntPoint;
+class LayoutPoint;
+class LayoutRect;
 class DOMWrapperWorld;
 class JSNode;
 class Locale;
@@ -556,7 +557,17 @@ public:
 
     RenderArena* renderArena() { return m_renderArena.get(); }
 
+    // Implemented in RenderView.h to avoid a cyclic header dependency this just
+    // returns renderer so callers can avoid verbose casts.
     RenderView* renderView() const;
+
+    // Shadow the implementations on Node to provide faster access for documents.
+    RenderObject* renderer() const { return m_renderer; }
+    void setRenderer(RenderObject* renderer)
+    {
+        m_renderer = renderer;
+        Node::setRenderer(renderer);
+    }
 
     void clearAXObjectCache();
     AXObjectCache* axObjectCache() const;
@@ -981,7 +992,14 @@ public:
 
     String displayStringModifiedByEncoding(const String&) const;
     PassRefPtr<StringImpl> displayStringModifiedByEncoding(PassRefPtr<StringImpl>) const;
-    void displayBufferModifiedByEncoding(UChar* buffer, unsigned len) const;
+    void displayBufferModifiedByEncoding(LChar* buffer, unsigned len) const
+    {
+        displayBufferModifiedByEncodingInternal(buffer, len);
+    }
+    void displayBufferModifiedByEncoding(UChar* buffer, unsigned len) const
+    {
+        displayBufferModifiedByEncodingInternal(buffer, len);
+    }
 
     // Quirk for the benefit of Apple's Dictionary application.
     void setFrameElementsShouldIgnoreScrolling(bool ignore) { m_frameElementsShouldIgnoreScrolling = ignore; }
@@ -1207,6 +1225,9 @@ private:
     void pendingTasksTimerFired(Timer<Document>*);
 
     static void didReceiveTask(void*);
+    
+    template <typename CharacterType>
+    void displayBufferModifiedByEncodingInternal(CharacterType*, unsigned) const;
 
 #if ENABLE(PAGE_VISIBILITY_API)
     PageVisibilityState visibilityState() const;
@@ -1425,6 +1446,7 @@ private:
     bool m_sawElementsInKnownNamespaces;
     bool m_isSrcdocDocument;
 
+    RenderObject* m_renderer;
     RefPtr<DocumentEventQueue> m_eventQueue;
 
     RefPtr<DocumentWeakReference> m_weakReference;

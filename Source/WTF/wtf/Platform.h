@@ -302,6 +302,14 @@
 #define HAVE_ARM_NEON_INTRINSICS 1
 #endif
 
+#if (defined(__VFP_FP__) && !defined(__SOFTFP__))
+#define WTF_CPU_ARM_VFP 1
+#endif
+
+#if defined(__ARM_ARCH_7S__)
+#define WTF_CPU_APPLE_ARMV7S 1
+#endif
+
 #endif /* ARM */
 
 #if CPU(ARM) || CPU(MIPS) || CPU(SH4) || CPU(SPARC)
@@ -1056,17 +1064,17 @@
 #define ENABLE_CSS_IMAGE_SET 1
 #endif
 
+#if ENABLE(WEBGL) && !defined(WTF_USE_3D_GRAPHICS)
+#define WTF_USE_3D_GRAPHICS 1
+#endif
 
 /* Qt always uses Texture Mapper */
 #if PLATFORM(QT)
 #define WTF_USE_TEXTURE_MAPPER 1
-#if USE(3D_GRAPHICS)
-#define WTF_USE_TEXTURE_MAPPER_GL 1
-#endif
 #endif
 
-#if ENABLE(WEBGL) && !defined(WTF_USE_3D_GRAPHICS)
-#define WTF_USE_3D_GRAPHICS 1
+#if USE(TEXTURE_MAPPER) && USE(3D_GRAPHICS) && !defined(WTF_USE_TEXTURE_MAPPER_GL)
+#define WTF_USE_TEXTURE_MAPPER_GL 1
 #endif
 
 /* Compositing on the UI-process in WebKit2 */

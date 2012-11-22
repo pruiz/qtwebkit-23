@@ -27,7 +27,7 @@
 #define ScrollingCoordinator_h
 
 #include "IntRect.h"
-#include "LayoutTypes.h"
+#include "LayoutRect.h"
 #include "PlatformWheelEvent.h"
 #include "ScrollTypes.h"
 #include "Timer.h"
@@ -155,7 +155,7 @@ private:
     virtual void recomputeWheelEventHandlerCountForFrameView(FrameView*) { }
     virtual void setShouldUpdateScrollLayerPositionOnMainThread(MainThreadScrollingReasons) { }
 
-    bool hasNonLayerFixedObjects(FrameView*) const;
+    virtual bool hasVisibleSlowRepaintFixedObjects(FrameView*) const;
     void updateShouldUpdateScrollLayerPositionOnMainThread();
 
     bool m_forceMainThreadScrollLayerPositionUpdates;

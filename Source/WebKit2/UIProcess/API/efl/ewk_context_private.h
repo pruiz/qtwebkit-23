@@ -23,10 +23,12 @@
 #include "DownloadManagerEfl.h"
 #include "WKAPICast.h"
 #include "WKRetainPtr.h"
+#include "WebContext.h"
 #include "ewk_context.h"
 #include "ewk_object_private.h"
 
-class Ewk_Url_Scheme_Request;
+using namespace WebKit;
+
 class Ewk_Cookie_Manager;
 class Ewk_Favicon_Database;
 
@@ -39,16 +41,13 @@ class BatteryProvider;
 #if ENABLE(NETWORK_INFO)
 class NetworkInfoProvider;
 #endif
-#if ENABLE(VIBRATION)
-class VibrationProvider;
-#endif
 }
 
 class EwkContext : public Ewk_Object {
 public:
     EWK_OBJECT_DECLARE(EwkContext)
 
-    static PassRefPtr<EwkContext> create(WKContextRef context);
+    static PassRefPtr<EwkContext> create(PassRefPtr<WebContext> context);
     static PassRefPtr<EwkContext> create();
     static PassRefPtr<EwkContext> create(const String& injectedBundlePath);
 
@@ -58,6 +57,8 @@ public:
 
     Ewk_Cookie_Manager* cookieManager();
 
+    Ewk_Database_Manager* databaseManager();
+
     bool setFaviconDatabaseDirectoryPath(const String& databaseDirectory);
     Ewk_Favicon_Database* faviconDatabase();
 
@@ -65,32 +66,31 @@ public:
 
     WebKit::RequestManagerClientEfl* requestManager();
 
-#if ENABLE(VIBRATION)
-    PassRefPtr<WebKit::VibrationProvider> vibrationProvider();
-#endif
-
     void addVisitedLink(const String& visitedURL);
 
     void setCacheModel(Ewk_Cache_Model);
 
     Ewk_Cache_Model cacheModel() const;
 
-    WKContextRef wkContext();
-
-    void urlSchemeRequestReceived(Ewk_Url_Scheme_Request*);
+    PassRefPtr<WebContext> webContext() { return m_context; }
 
     WebKit::DownloadManagerEfl* downloadManager() const;
 
     WebKit::ContextHistoryClientEfl* historyClient();
 
+#if ENABLE(NETSCAPE_PLUGIN_API)
+    void setAdditionalPluginPath(const String&);
+#endif
+
 private:
-    explicit EwkContext(WKContextRef);
+    explicit EwkContext(PassRefPtr<WebContext>);
 
     void ensureFaviconDatabase();
 
-    WKRetainPtr<WKContextRef> m_context;
+    RefPtr<WebContext> m_context;
 
     OwnPtr<Ewk_Cookie_Manager> m_cookieManager;
+    OwnPtr<Ewk_Database_Manager> m_databaseManager;
     OwnPtr<Ewk_Favicon_Database> m_faviconDatabase;
     OwnPtr<Ewk_Storage_Manager> m_storageManager;
 #if ENABLE(BATTERY_STATUS)
@@ -98,9 +98,6 @@ private:
 #endif
 #if ENABLE(NETWORK_INFO)
     RefPtr<WebKit::NetworkInfoProvider> m_networkInfoProvider;
-#endif
-#if ENABLE(VIBRATION)
-    RefPtr<WebKit::VibrationProvider> m_vibrationProvider;
 #endif
     OwnPtr<WebKit::DownloadManagerEfl> m_downloadManager;
     OwnPtr<WebKit::RequestManagerClientEfl> m_requestManagerClient;

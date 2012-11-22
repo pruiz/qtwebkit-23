@@ -39,6 +39,8 @@
 #include "TimeRanges.h"
 #include "WebPageClient.h"
 
+#include <BlackBerryPlatformDeviceInfo.h>
+#include <BlackBerryPlatformPrimitives.h>
 #include <BlackBerryPlatformSettings.h>
 #include <FrameLoaderClientBlackBerry.h>
 #include <set>
@@ -113,6 +115,7 @@ MediaPlayerPrivate::MediaPlayerPrivate(MediaPlayer* player)
 #endif
     , m_userDrivenSeekTimer(this, &MediaPlayerPrivate::userDrivenSeekTimerFired)
     , m_lastSeekTime(0)
+    , m_lastLoadingTime(0)
     , m_lastSeekTimePending(false)
     , m_isAuthenticationChallenging(false)
     , m_waitMetadataTimer(this, &MediaPlayerPrivate::waitMetadataTimerFired)
@@ -187,8 +190,11 @@ void MediaPlayerPrivate::prepareToPlay()
 
 void MediaPlayerPrivate::play()
 {
-    if (m_platformPlayer)
+    if (m_platformPlayer) {
         m_platformPlayer->play();
+        if (m_platformPlayer->isMetadataReady())
+            conditionallyGoFullscreenAfterPlay();
+    }
 }
 
 void MediaPlayerPrivate::pause()
@@ -336,8 +342,15 @@ PassRefPtr<TimeRanges> MediaPlayerPrivate::buffered() const
 
 bool MediaPlayerPrivate::didLoadingProgress() const
 {
-    notImplemented();
-    return false;
+    if (!m_platformPlayer)
+        return false;
+
+    float bufferLoaded = m_platformPlayer->bufferLoaded();
+    if (bufferLoaded == m_lastLoadingTime)
+        return false;
+
+    m_lastLoadingTime = bufferLoaded;
+    return true;
 }
 
 void MediaPlayerPrivate::setSize(const IntSize&)
@@ -453,9 +466,11 @@ BlackBerry::Platform::Graphics::Window* MediaPlayerPrivate::getPeerWindow(const 
     return m_platformPlayer->getPeerWindow(uniqueID);
 }
 
-int MediaPlayerPrivate::getWindowPosition(unsigned& x, unsigned& y, unsigned& width, unsigned& height) const
+BlackBerry::Platform::IntRect MediaPlayerPrivate::getWindowScreenRect() const
 {
-    return m_platformPlayer->getWindowPosition(x, y, width, height);
+    unsigned x, y, width, height;
+    m_platformPlayer->getWindowPosition(x, y, width, height);
+    return BlackBerry::Platform::IntRect(x, y, width, height);
 }
 
 const char* MediaPlayerPrivate::mmrContextName()
@@ -663,6 +678,7 @@ void MediaPlayerPrivate::waitMetadataTimerFired(Timer<MediaPlayerPrivate>*)
 {
     if (m_platformPlayer->isMetadataReady()) {
         m_platformPlayer->playWithMetadataReady();
+        conditionallyGoFullscreenAfterPlay();
         m_waitMetadataPopDialogCounter = 0;
         return;
     }
@@ -679,9 +695,10 @@ void MediaPlayerPrivate::waitMetadataTimerFired(Timer<MediaPlayerPrivate>*)
     if (!wait)
         onPauseNotified();
     else {
-        if (m_platformPlayer->isMetadataReady())
+        if (m_platformPlayer->isMetadataReady()) {
             m_platformPlayer->playWithMetadataReady();
-        else
+            conditionallyGoFullscreenAfterPlay();
+        } else
             m_waitMetadataTimer.startOneShot(checkMetadataReadyInterval);
     }
 }
@@ -962,6 +979,29 @@ void MediaPlayerPrivate::drawBufferingAnimation(const TransformationMatrix& matr
     }
 }
 #endif
+
+void MediaPlayerPrivate::conditionallyGoFullscreenAfterPlay()
+{
+    BlackBerry::Platform::DeviceInfo* info = BlackBerry::Platform::DeviceInfo::instance();
+    if (hasVideo() && m_webCorePlayer->mediaPlayerClient()->mediaPlayerIsFullscreenPermitted() && info->isMobile()) {
+        // This is a mobile device (small screen), not a tablet, so we
+        // enter fullscreen video on user-initiated plays.
+        bool nothingIsFullscreen = !m_webCorePlayer->mediaPlayerClient()->mediaPlayerIsFullscreen();
+#if ENABLE(FULLSCREEN_API)
+        if (m_webCorePlayer->mediaPlayerClient()->mediaPlayerOwningDocument()->webkitIsFullScreen())
+            nothingIsFullscreen = false;
+#endif
+        if (nothingIsFullscreen && currentTime() == 0.0f) {
+            // Only enter fullscreen when playing from the beginning. Doing
+            // so on every play is sure to annoy the user who does not want
+            // to watch the video fullscreen. Note that the following call
+            // will fail if we are not here due to a user gesture, as per the
+            // check in Document::requestFullScreenForElement() to prevent
+            // popups.
+            m_webCorePlayer->mediaPlayerClient()->mediaPlayerEnterFullscreen();
+        }
+    }
+}
 
 } // namespace WebCore
 

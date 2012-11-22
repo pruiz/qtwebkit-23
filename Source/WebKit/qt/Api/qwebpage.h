@@ -184,6 +184,8 @@ public:
 
         CopyImageUrlToClipboard,
 
+        OpenLinkInThisWindow,
+
         WebActionCount
     };
 

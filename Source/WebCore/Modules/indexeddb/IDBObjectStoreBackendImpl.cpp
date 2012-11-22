@@ -107,7 +107,7 @@ void IDBObjectStoreBackendImpl::getInternal(ScriptExecutionContext*, PassRefPtr<
 
 void IDBObjectStoreBackendImpl::put(PassRefPtr<SerializedScriptValue> prpValue, PassRefPtr<IDBKey> prpKey, PutMode putMode, PassRefPtr<IDBCallbacks> prpCallbacks, IDBTransactionBackendInterface* transactionPtr, const Vector<int64_t>& indexIds, const Vector<IndexKeys>& indexKeys)
 {
-    IDB_TRACE("IDBObjectStoreBackendImpl::putWithIndexKeys");
+    IDB_TRACE("IDBObjectStoreBackendImpl::put");
 
     RefPtr<IDBObjectStoreBackendImpl> objectStore = this;
     RefPtr<SerializedScriptValue> value = prpValue;
@@ -126,10 +126,6 @@ void IDBObjectStoreBackendImpl::put(PassRefPtr<SerializedScriptValue> prpValue, 
         callbacks->onError(IDBDatabaseError::create(IDBDatabaseException::IDB_ABORT_ERR));
 }
 
-void IDBObjectStoreBackendImpl::putWithIndexKeys(PassRefPtr<SerializedScriptValue> prpValue, PassRefPtr<IDBKey> prpKey, PutMode putMode, PassRefPtr<IDBCallbacks> prpCallbacks, IDBTransactionBackendInterface* transactionPtr, const Vector<String>& indexNames, const Vector<IndexKeys>& indexKeys, ExceptionCode&)
-{
-    return put(prpValue, prpKey, putMode, prpCallbacks, transactionPtr, getIndexIds(indexNames), indexKeys);
-}
 namespace {
 class IndexWriter {
 public:
@@ -236,7 +232,7 @@ void IDBObjectStoreBackendImpl::setIndexKeys(PassRefPtr<IDBKey> prpPrimaryKey, c
     RefPtr<IDBTransactionBackendImpl> transaction = IDBTransactionBackendImpl::from(transactionPtr);
 
     // FIXME: This method could be asynchronous, but we need to evaluate if it's worth the extra complexity.
-    RefPtr<IDBBackingStore::RecordIdentifier> recordIdentifier = backingStore()->createInvalidRecordIdentifier();
+    RefPtr<IDBBackingStore::RecordIdentifier> recordIdentifier = IDBBackingStore::RecordIdentifier::create();
     if (!backingStore()->keyExistsInObjectStore(transaction->backingStoreTransaction(), databaseId(), id(), *primaryKey, recordIdentifier.get())) {
         transaction->abort();
         return;
@@ -259,12 +255,6 @@ void IDBObjectStoreBackendImpl::setIndexKeys(PassRefPtr<IDBKey> prpPrimaryKey, c
     }
 }
 
-void IDBObjectStoreBackendImpl::setIndexKeys(PassRefPtr<IDBKey> prpPrimaryKey, const Vector<String>& indexNames, const Vector<IndexKeys>& indexKeys, IDBTransactionBackendInterface* transactionPtr)
-{
-    Vector<int64_t> indexIds = getIndexIds(indexNames);
-    return setIndexKeys(prpPrimaryKey, indexIds, indexKeys, transactionPtr);
-}
-
 void IDBObjectStoreBackendImpl::setIndexesReady(const Vector<int64_t>& indexIds, IDBTransactionBackendInterface* transactionInterface)
 {
     IDB_TRACE("IDBObjectStoreBackendImpl::setIndexesReady");
@@ -277,22 +267,6 @@ void IDBObjectStoreBackendImpl::setIndexesReady(const Vector<int64_t>& indexIds,
             IDBTransactionBackendInterface::PreemptiveTask,
             createCallbackTask(&IDBObjectStoreBackendImpl::setIndexesReadyInternal, objectStore, newIndexIds.release(), transaction)))
         ASSERT_NOT_REACHED();
-}
-
-void IDBObjectStoreBackendImpl::setIndexesReady(const Vector<String>& indexNames, IDBTransactionBackendInterface* transactionInterface)
-{
-    Vector<int64_t> indexIds(indexNames.size());
-    // FIXME: We manually convert each name to an indexId, even if the name has already been deleted, because we have to remove exactly that many preemptive events, but this will go away when https://bugs.webkit.org/show_bug.cgi?id=100426 lands.
-    for (size_t i = 0; i < indexNames.size(); ++i) {
-        indexIds[i] = InvalidId;
-        for (IndexMap::const_iterator it = m_indexes.begin(); it != m_indexes.end(); ++it) {
-            if (it->value->name() == indexNames[i]) {
-                indexIds[i] = it->key;
-                break;
-            }
-        }
-    }
-    return setIndexesReady(indexIds, transactionInterface);
 }
 
 void IDBObjectStoreBackendImpl::setIndexesReadyInternal(ScriptExecutionContext*, PassRefPtr<IDBObjectStoreBackendImpl> objectStore, PassOwnPtr<Vector<int64_t> > popIndexIds, PassRefPtr<IDBTransactionBackendImpl> transaction)
@@ -329,7 +303,7 @@ void IDBObjectStoreBackendImpl::putInternal(ScriptExecutionContext*, PassRefPtr<
 
     ASSERT(key && key->isValid());
 
-    RefPtr<IDBBackingStore::RecordIdentifier> recordIdentifier = objectStore->backingStore()->createInvalidRecordIdentifier();
+    RefPtr<IDBBackingStore::RecordIdentifier> recordIdentifier = IDBBackingStore::RecordIdentifier::create();
     if (putMode == AddOnly && objectStore->backingStore()->keyExistsInObjectStore(transaction->backingStoreTransaction(), objectStore->databaseId(), objectStore->id(), *key, recordIdentifier.get())) {
         callbacks->onError(IDBDatabaseError::create(IDBDatabaseException::CONSTRAINT_ERR, "Key already exists in the object store."));
         return;
@@ -393,7 +367,7 @@ void IDBObjectStoreBackendImpl::deleteInternal(ScriptExecutionContext*, PassRefP
     if (backingStoreCursor) {
 
         do {
-            recordIdentifier = backingStoreCursor->objectStoreRecordIdentifier();
+            recordIdentifier = backingStoreCursor->recordIdentifier();
 
             for (IDBObjectStoreBackendImpl::IndexMap::iterator it = objectStore->m_indexes.begin(); it != objectStore->m_indexes.end(); ++it) {
                 bool success = objectStore->backingStore()->deleteIndexDataForRecord(transaction->backingStoreTransaction(), objectStore->databaseId(), objectStore->id(), it->key, recordIdentifier.get());
@@ -470,29 +444,6 @@ PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreBackendImpl::index(int64_t in
     return index.release();
 }
 
-PassRefPtr<IDBIndexBackendInterface> IDBObjectStoreBackendImpl::index(const String& name, ExceptionCode&)
-{
-    return index(getIndexId(name));
-}
-
-int64_t IDBObjectStoreBackendImpl::getIndexId(const String& name)
-{
-    for (IndexMap::const_iterator it = m_indexes.begin(); it != m_indexes.end(); ++it) {
-        if (it->value->name() == name)
-            return it->key;
-    }
-    ASSERT_NOT_REACHED();
-    return 0;
-}
-
-Vector<int64_t> IDBObjectStoreBackendImpl::getIndexIds(const Vector<String>& names)
-{
-    Vector<int64_t> result;
-    for (size_t i = 0; i < names.size(); ++i)
-        result.append(getIndexId(names[i]));
-    return result;
-}
-
 void IDBObjectStoreBackendImpl::deleteIndex(int64_t indexId, IDBTransactionBackendInterface* transactionPtr, ExceptionCode& ec)
 {
     ASSERT(m_indexes.contains(indexId));
@@ -509,11 +460,6 @@ void IDBObjectStoreBackendImpl::deleteIndex(int64_t indexId, IDBTransactionBacke
         return;
     }
     m_indexes.remove(indexId);
-}
-
-void IDBObjectStoreBackendImpl::deleteIndex(const String& name, IDBTransactionBackendInterface* transactionPtr, ExceptionCode& ec)
-{
-    return deleteIndex(getIndexId(name), transactionPtr, ec);
 }
 
 void IDBObjectStoreBackendImpl::deleteIndexInternal(ScriptExecutionContext*, PassRefPtr<IDBObjectStoreBackendImpl> objectStore, PassRefPtr<IDBIndexBackendImpl> index, PassRefPtr<IDBTransactionBackendImpl> transaction)

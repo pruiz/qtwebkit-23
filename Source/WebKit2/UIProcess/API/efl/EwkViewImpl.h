@@ -199,6 +199,8 @@ public:
     // FIXME: needs refactoring (split callback invoke)
     void informURLChange();
 
+    bool isHardwareAccelerated() const { return m_isHardwareAccelerated; }
+
 private:
     inline Ewk_View_Smart_Data* smartData() const;
     void displayTimerFired(WebCore::Timer<EwkViewImpl>*);
@@ -241,7 +243,7 @@ private:
     WebCore::IntPoint m_scrollPosition;
 #endif
     OwnPtr<Ewk_Settings> m_settings;
-    const char* m_cursorGroup; // This is an address, do not free it or use WKEinaSharedString.
+    const void* m_cursorIdentifier; // This is an address, do not free it.
     WKEinaSharedString m_faviconURL;
     WKEinaSharedString m_url;
     mutable WKEinaSharedString m_title;
@@ -255,6 +257,7 @@ private:
     OwnPtr<Ewk_Popup_Menu> m_popupMenu;
     OwnPtr<WebKit::InputMethodContextEfl> m_inputMethodContext;
     OwnPtr<Ewk_Color_Picker> m_colorPicker;
+    bool m_isHardwareAccelerated;
 };
 
 #endif // EwkViewImpl_h

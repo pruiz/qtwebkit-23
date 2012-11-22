@@ -1,3 +1,1404 @@
+2012-11-12  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: convert tests from setVersion to upgradeneeded
+        https://bugs.webkit.org/show_bug.cgi?id=101676
+
+        Reviewed by Tony Chang.
+
+        A la bug 92037, add a function to shared.js that sets up the database
+        for tests where opening and versioning isn't the focus.
+
+        * storage/indexeddb/create-object-store-options-expected.txt:
+        * storage/indexeddb/createObjectStore-name-argument-required-expected.txt:
+        * storage/indexeddb/createObjectStore-null-name-expected.txt:
+          ...many tests and expected files...
+
+        * storage/indexeddb/resources/shared.js:
+          The new utility function indexedDBTest lives here.
+
+        * storage/indexeddb/values-odd-types-expected.txt:
+
+2012-11-12  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Make sure that MediaConstraints only has optional and mandatory at the top level
+        https://bugs.webkit.org/show_bug.cgi?id=101733
+
+        Reviewed by Jochen Eisinger.
+
+        This patch adds more tests for MediaConstraints.
+
+        * fast/mediastream/RTCPeerConnection-expected.txt:
+        * fast/mediastream/RTCPeerConnection.html:
+
+2012-11-12  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Support ResourceRequest's setTimeoutInterval
+        https://bugs.webkit.org/show_bug.cgi?id=101731
+
+        Reviewed by Simon Hausmann.
+
+        Unskip now passing XHR timeout tests.
+
+        * platform/qt/TestExpectations:
+
+2012-11-12  Vsevolod Vlasov  <vsevik@chromium.org>
+
+        Layout Test inspector/debugger/dynamic-scripts.html is flaky
+        https://bugs.webkit.org/show_bug.cgi?id=99338
+
+        Unreviewed inspector tests flakiness fix.
+
+        * http/tests/inspector-enabled/dynamic-scripts.html:
+        * inspector/debugger/dynamic-scripts.html:
+        * platform/chromium/TestExpectations:
+
+2012-11-12  János Badics  <jbadics@inf.u-szeged.hu>
+
+        [Qt] REGRESSION(r134205): gardening. Skipped 2 failing reftests.
+        https://bugs.webkit.org/show_bug.cgi?id=101933
+
+        Reviewed by Csaba Osztrogonác.
+
+        * platform/qt/TestExpectations:
+
+2012-11-12  Tommy Widenflycht  <tommyw@google.com>
+
+        Remove the V8 custom code for WebSockets constructor
+        https://bugs.webkit.org/show_bug.cgi?id=100801
+
+        Reviewed by Kentaro Hara.
+
+        Added test for null argument to WebSocket(url).
+
+        * http/tests/websocket/tests/hybi/url-parsing-expected.txt:
+        * http/tests/websocket/tests/hybi/url-parsing.html:
+        * platform/chromium-win/websocket/tests/url-parsing-expected.txt:
+        * platform/chromium/http/tests/websocket/tests/hixie76/url-parsing-expected.txt:
+        * platform/chromium/http/tests/websocket/tests/hybi/url-parsing-expected.txt:
+
+2012-11-12  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] Pixel tests need rebaseline
+        https://bugs.webkit.org/show_bug.cgi?id=99323
+
+        Unreviewed gardening.
+
+        Fix my previous gardening commit: s/-actual.png/-expected.png
+
+        * platform/qt/css3/filters/effect-reference-ordering-hw-expected.png: Renamed from LayoutTests/platform/qt/css3/filters/effect-reference-ordering-hw-actual.png.
+        * platform/qt/fast/images/png-suite/test-expected.png: Renamed from LayoutTests/platform/qt/fast/images/png-suite/test-actual.png.
+        * platform/qt/svg/as-image/image-respects-pageScaleFactor-change-expected.png: Renamed from LayoutTests/platform/qt/svg/as-image/image-respects-pageScaleFactor-change-actual.png.
+        * platform/qt/svg/as-object/embedded-svg-size-changes-expected.png: Renamed from LayoutTests/platform/qt/svg/as-object/embedded-svg-size-changes-actual.png.
+        * platform/qt/svg/as-object/nested-embedded-svg-size-changes-expected.png: Renamed from LayoutTests/platform/qt/svg/as-object/nested-embedded-svg-size-changes-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-refX-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-refX-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-refY-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-refY-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-setOrientToAngle-call-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-setOrientToAngle-call-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-setOrientToAuto-call-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-setOrientToAuto-call-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-height-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-dom-height-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-maskContentUnits-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-dom-maskContentUnits-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-maskUnits-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-dom-maskUnits-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-width-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-dom-width-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-x-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-dom-x-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-y-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-dom-y-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-height-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-height-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-maskContentUnits-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-maskContentUnits-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-maskUnits-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-maskUnits-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-width-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-width-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-x-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-x-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-y-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-y-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPathElement-dom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPathElement-dom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPathElement-svgdom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPathElement-svgdom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-height-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-dom-height-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-patternContentUnits-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-dom-patternContentUnits-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-patternTransform-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-dom-patternTransform-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-patternUnits-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-dom-patternUnits-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-width-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-dom-width-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-x-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-dom-x-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-y-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-dom-y-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-height-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-height-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-patternContentUnits-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-patternContentUnits-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-patternTransform-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-patternTransform-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-patternUnits-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-patternUnits-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-width-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-width-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-x-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-x-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-y-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-y-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPolygonElement-dom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPolygonElement-dom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPolygonElement-svgdom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPolygonElement-svgdom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPolylineElement-dom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPolylineElement-dom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGPolylineElement-svgdom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGPolylineElement-svgdom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-cx-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-cx-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-cy-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-cy-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-fx-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-fx-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-fy-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-fy-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-gradientTransform-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-gradientTransform-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-gradientUnits-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-gradientUnits-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-r-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-r-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-cx-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-cx-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-cy-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-cy-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-fx-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-fx-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-fy-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-fy-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-gradientTransform-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-gradientTransform-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-gradientUnits-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-gradientUnits-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-r-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-r-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-dom-height-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRectElement-dom-height-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-dom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRectElement-dom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-dom-width-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRectElement-dom-width-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-dom-x-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRectElement-dom-x-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-dom-y-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRectElement-dom-y-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-height-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-height-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-width-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-width-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-x-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-x-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-y-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-y-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGSVGElement-dom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGSVGElement-dom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGSVGElement-svgdom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGSVGElement-svgdom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTRefElement-dom-href-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTRefElement-dom-href-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-dx-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-dom-dx-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-dy-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-dom-dy-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-lengthAdjust-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-dom-lengthAdjust-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-dom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-rotate-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-dom-rotate-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-textLength-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-dom-textLength-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-transform-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-dom-transform-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-x-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-dom-x-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-y-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-dom-y-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-dx-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-dx-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-dy-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-dy-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-lengthAdjust-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-lengthAdjust-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-rotate-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-rotate-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-textLength-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-textLength-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-transform-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-transform-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-x-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-x-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-y-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-y-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-dom-href1-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGUseElement-dom-href1-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-dom-href2-attr-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGUseElement-dom-href2-attr-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-dom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGUseElement-dom-requiredFeatures-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-svgdom-href1-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGUseElement-svgdom-href1-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-svgdom-href2-prop-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGUseElement-svgdom-href2-prop-actual.png.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-svgdom-requiredFeatures-expected.png: Renamed from LayoutTests/platform/qt/svg/dynamic-updates/SVGUseElement-svgdom-requiredFeatures-actual.png.
+        * platform/qt/svg/filters/subRegion-one-effect-expected.png: Renamed from LayoutTests/platform/qt/svg/filters/subRegion-one-effect-actual.png.
+        * platform/qt/svg/filters/subRegion-two-effects-expected.png: Renamed from LayoutTests/platform/qt/svg/filters/subRegion-two-effects-actual.png.
+
+2012-11-12  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, skip a new crashing test.
+
+        * platform/qt/TestExpectations:
+
+2012-11-12  Eugene Klyuchnikov  <eustas.bug@gmail.com>
+
+        Web Inspector: Timeline: fix test expectations
+        https://bugs.webkit.org/show_bug.cgi?id=101737
+
+        Reviewed by Yury Semikhatsky.
+
+        The expected order of timeline records of specific types
+        have been changed: https://bugs.webkit.org/show_bug.cgi?id=101544
+
+        This change fixes test expectations.
+        Also removed expectation that test can fail.
+
+        * inspector/timeline/timeline-receive-response-event-expected.txt:
+        * platform/chromium/TestExpectations: Removed "fail" expectation.
+
+2012-11-12  János Badics  <jbadics@inf.u-szeged.hu>
+
+        [Qt] Gardening after 134099 and 134100. Skipped two tests because layoutTestController
+        needs implementation of setBackingScaleFactor().
+
+        Reviewed by Csaba Osztrogonác.
+
+        * platform/qt/TestExpectations:
+
+2012-11-12  Keishi Hattori  <keishi@webkit.org>
+
+        Add tests for month picker
+        https://bugs.webkit.org/show_bug.cgi?id=101556
+
+        Reviewed by Kent Tamura.
+
+        Adding tests for month picker.
+
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step-expected.png: Added.
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/month-picker-key-operations-expected.txt: Added.
+        * platform/chromium/TestExpectations: Marking appearance tests as needs rebaseline.
+        * platform/chromium/fast/forms/calendar-picker/month-picker-appearance-expected.txt: Added.
+        * platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step-expected.txt: Added.
+        * platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step.html: Added.
+        * platform/chromium/fast/forms/calendar-picker/month-picker-appearance.html: Added.
+        * platform/chromium/fast/forms/calendar-picker/month-picker-key-operations-expected.txt: Added.
+        * platform/chromium/fast/forms/calendar-picker/month-picker-key-operations.html: Added.
+        * platform/chromium/fast/forms/calendar-picker/month-picker-mouse-operations-expected.txt: Added.
+        * platform/chromium/fast/forms/calendar-picker/month-picker-mouse-operations.html: Added.
+        * platform/chromium/fast/forms/calendar-picker/month-picker-with-step-expected.txt: Added.
+        * platform/chromium/fast/forms/calendar-picker/month-picker-with-step.html: Added.
+        * platform/chromium/fast/forms/calendar-picker/resources/calendar-picker-common.js:
+        (selectedMonth): Returns ISO string for selected month.
+
+2012-11-12  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Schedule the RTCDataChannel events to be triggered at idle state
+        https://bugs.webkit.org/show_bug.cgi?id=101751
+
+        Reviewed by Adam Barth.
+
+        Adding shouldNotTrow to the send() calls.
+
+        * fast/mediastream/RTCPeerConnection-datachannel-expected.txt:
+        * fast/mediastream/RTCPeerConnection-datachannel.html:
+
+2012-11-12  Mihnea Ovidenie  <mihnea@adobe.com>
+
+        [CSSRegions]Add support for text-shadow in region styling
+        https://bugs.webkit.org/show_bug.cgi?id=94472
+
+        Reviewed by David Hyatt.
+
+        Original patch by Andrei Onea.
+        Added tests for region styling using the text-shadow property.
+
+        * fast/regions/region-style-text-shadow-expected.html: Added.
+        * fast/regions/region-style-text-shadow.html: Added.
+
+2012-11-12  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: wasShown is called twice when show() is called from within wasShown
+        https://bugs.webkit.org/show_bug.cgi?id=101858
+
+        Reviewed by Vsevolod Vlasov.
+
+        * inspector/view-events-expected.txt:
+        * inspector/view-events.html:
+
+2012-11-12  Mihnea Ovidenie  <mihnea@adobe.com>
+
+        [CSSRegions] region-style-inline-background-color.html failing on MountainLion/Chromium
+        https://bugs.webkit.org/show_bug.cgi?id=101897
+
+        Unreviewed, disable the test on Mac/Chromium until we figure out the cause of failure.
+
+        * platform/chromium/TestExpectations:
+        * platform/mac/TestExpectations:
+
+2012-11-12  Shinya Kawanaka  <shinyak@chromium.org>
+
+        Don't update style when attaching in HTMLMeterElement
+        https://bugs.webkit.org/show_bug.cgi?id=101714
+
+        Reviewed by Hajime Morita.
+
+        * fast/dom/HTMLMeterElement/meter-bar-set-value-expected.html: Added.
+        * fast/dom/HTMLMeterElement/meter-bar-set-value.html: Added.
+
+2012-11-11  Michael Pruett  <michael@68k.org>
+
+        Fix assertion failure in JSObject::tryGetIndexQuickly()
+        https://bugs.webkit.org/show_bug.cgi?id=101869
+
+        Reviewed by Filip Pizlo.
+
+        Add test case for an assertion failure triggered when constructing
+        a Blob with a sparse array.
+
+        * fast/constructors/blob-sparse-array-assertion-failure.html: Added.
+
+2012-11-09  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Multiple Layout Tests (e.g. fast/repaint/japanese-rl-selection-clear.html) is failing after r133840.
+        https://bugs.webkit.org/show_bug.cgi?id=101547
+
+        Reviewed by Simon Fraser.
+
+        Remove Chromium test expectations as these tests now pass.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-11  Dongwoo Joshua Im  <dw.im@samsung.com>
+
+        [CSS3] Parsing the property, text-align-last.
+        https://bugs.webkit.org/show_bug.cgi?id=99439
+
+        Reviewed by Julien Chaffraix.
+
+        This patch implements the parsing side of the "text-align-last" property specified
+        in CSS3 working draft, with "-webkit-" prefix, under ENABLE_CSS3_TEXT flag.
+        Specification link : http://www.w3.org/TR/css3-text/#text-align-last
+
+        * fast/css3-text/css3-text-align-last/getComputedStyle/getComputedStyle-text-align-last-inherited.html: Added.
+        * fast/css3-text/css3-text-align-last/getComputedStyle/getComputedStyle-text-align-last.html: Added.
+        * fast/css3-text/css3-text-align-last/getComputedStyle/script-tests/getComputedStyle-text-align-last-inherited.js: Added.
+        (testComputedStyle):
+        * fast/css3-text/css3-text-align-last/getComputedStyle/script-tests/getComputedStyle-text-align-last.js: Added.
+        (testElementStyle):
+        (testComputedStyle):
+        * platform/chromium/TestExpectations:
+        * fast/css3-text/css3-text-align-last/getComputedStyle/getComputedStyle-text-align-last-expected.txt: Added.
+        * fast/css3-text/css3-text-align-last/getComputedStyle/getComputedStyle-text-align-last-inherited-expected.txt: Added.
+        * platform/mac/TestExpectations:
+        * platform/qt-4.8/TestExpectations:
+        * platform/qt-mac/TestExpectations:
+        * platform/qt/TestExpectations:
+
+2012-11-11  Keishi Hattori  <keishi@webkit.org>
+
+        Rebaseline month/week appearance tests
+        https://bugs.webkit.org/show_bug.cgi?id=101561
+
+        Unreviewed.
+
+        Rebaselining month/week appearance tests.
+
+        * platform/chromium-linux/fast/forms/month/month-appearance-basic-expected.png:
+        * platform/chromium-linux/fast/forms/month/month-appearance-l10n-expected.png:
+        * platform/chromium-linux/fast/forms/month/month-appearance-pseudo-classes-expected.png:
+        * platform/chromium-linux/fast/forms/month/month-appearance-pseudo-elements-expected.png:
+        * platform/chromium-linux/fast/forms/month/month-appearance-style-expected.png:
+        * platform/chromium-linux/fast/forms/week/week-appearance-basic-expected.png:
+        * platform/chromium-linux/fast/forms/week/week-appearance-pseudo-classes-expected.png:
+        * platform/chromium-linux/fast/forms/week/week-appearance-pseudo-elements-expected.png:
+        * platform/chromium-linux/fast/forms/week/week-appearance-style-expected.png:
+        * platform/chromium-mac-lion/fast/forms/month/month-appearance-basic-expected.png:
+        * platform/chromium-mac-lion/fast/forms/month/month-appearance-l10n-expected.png:
+        * platform/chromium-mac-lion/fast/forms/month/month-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac-lion/fast/forms/month/month-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-lion/fast/forms/month/month-appearance-style-expected.png:
+        * platform/chromium-mac-lion/fast/forms/week/week-appearance-basic-expected.png:
+        * platform/chromium-mac-lion/fast/forms/week/week-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac-lion/fast/forms/week/week-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-lion/fast/forms/week/week-appearance-style-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/month/month-appearance-basic-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/month/month-appearance-l10n-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/month/month-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/month/month-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/month/month-appearance-style-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week/week-appearance-basic-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week/week-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week/week-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/week/week-appearance-style-expected.png:
+        * platform/chromium-mac/fast/forms/month/month-appearance-basic-expected.png:
+        * platform/chromium-mac/fast/forms/month/month-appearance-l10n-expected.png:
+        * platform/chromium-mac/fast/forms/month/month-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac/fast/forms/month/month-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/month/month-appearance-style-expected.png:
+        * platform/chromium-mac/fast/forms/week/week-appearance-basic-expected.png:
+        * platform/chromium-mac/fast/forms/week/week-appearance-pseudo-classes-expected.png:
+        * platform/chromium-mac/fast/forms/week/week-appearance-pseudo-elements-expected.png:
+        * platform/chromium-mac/fast/forms/week/week-appearance-style-expected.png:
+        * platform/chromium-win-xp/fast/forms/month/month-appearance-l10n-expected.png:
+        * platform/chromium-win/fast/forms/month/month-appearance-basic-expected.png:
+        * platform/chromium-win/fast/forms/month/month-appearance-l10n-expected.png:
+        * platform/chromium-win/fast/forms/month/month-appearance-pseudo-classes-expected.png:
+        * platform/chromium-win/fast/forms/month/month-appearance-pseudo-elements-expected.png:
+        * platform/chromium-win/fast/forms/month/month-appearance-style-expected.png:
+        * platform/chromium-win/fast/forms/week/week-appearance-basic-expected.png:
+        * platform/chromium-win/fast/forms/week/week-appearance-pseudo-classes-expected.png:
+        * platform/chromium-win/fast/forms/week/week-appearance-pseudo-elements-expected.png:
+        * platform/chromium-win/fast/forms/week/week-appearance-style-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-11-11  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Shadow] ElementShadow should have RuleFeatureSet for select attribute selectors.
+        https://bugs.webkit.org/show_bug.cgi?id=101180
+
+        Reviewed by Dimitri Glazkov.
+
+        * fast/dom/shadow/shadow-select-attribute-featureset-expected.txt: Added.
+        * fast/dom/shadow/shadow-select-attribute-featureset.html: Added.
+
+2012-11-11  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134144.
+        http://trac.webkit.org/changeset/134144
+        https://bugs.webkit.org/show_bug.cgi?id=101876
+
+        seems to break win 7 chromium browser test (Requested by
+        hayato on #webkit).
+
+        * fast/events/mouse-cursor-expected.txt: Removed.
+        * fast/events/mouse-cursor.html: Removed.
+
+2012-11-11  Kent Tamura  <tkent@chromium.org>
+
+        Internals: MockPagePopup should not update DOM structure during detach()
+        https://bugs.webkit.org/show_bug.cgi?id=101710
+
+        Reviewed by Hajime Morita.
+
+        Update tests because page popup closing becomes asynchronous.
+
+        * fast/forms/resources/picker-common.js:
+        (waitUntilClosing): Added. Helper to wait until a page popup closing.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-key-operations.html:
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-mouse-operations.html:
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-pre-100-year.html:
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-type-change-onchange.html:
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-with-step.html:
+        * platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-key-operations.html:
+        * platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-mouse-operations.html:
+        * platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-reset-value-after-reload.html:
+        * platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-step-attribute.html:
+        * platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-key-operations.html:
+        * platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-mouse-operations.html:
+        * platform/chromium/fast/forms/suggestion-picker/time-suggestion-picker-step-attribute.html:
+
+2012-11-11  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [WK2] Mark fast/repaint/body-background-image.html as flaky.
+
+        * platform/wk2/TestExpectations:
+
+2012-11-11  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Unreviewed gardening.
+
+        Replace the pixel expectation for
+        fast/repaint/body-background-image.html with the one generated by the
+        WK1 port, since WK2 fails to render it properly at times (see bug
+        101773).
+
+        * platform/efl/fast/repaint/body-background-image-expected.png:
+
+2012-11-10  Mike West  <mkwst@chromium.org>
+
+        Web Inspector: Multiple '%c' formatting options should all have effect.
+        https://bugs.webkit.org/show_bug.cgi?id=101495
+
+        Reviewed by Pavel Feldman.
+
+        * http/tests/inspector/console-test.js:
+        (initialize_ConsoleTest.InspectorTest.dumpConsoleMessagesWithStyles):
+            We're no longer putting the style directly on the message's
+            parent, but instead on each section of the message in order to
+            support multiple styles.
+        * inspector/console/console-format-style-expected.txt:
+        * inspector/console/console-format-style-whitelist-expected.txt:
+        * inspector/console/console-format-style.html:
+
+2012-11-10  Bruno de Oliveira Abinader  <bruno.abinader@basyskom.com>
+
+        [css] text-decoration:none no longer valid
+        https://bugs.webkit.org/show_bug.cgi?id=101529
+
+        Reviewed by Ojan Vafai.
+
+        The getComputedStyle layout tests for 'text-decoration' and
+        '-webkit-text-decoration-line' CSS properties are updated with the correct
+        results for the 'none' value.
+
+        * fast/css/getComputedStyle/getComputedStyle-text-decoration-expected.txt:
+        * fast/css/getComputedStyle/script-tests/getComputedStyle-text-decoration.js:
+        * fast/css3-text/css3-text-decoration/getComputedStyle/getComputedStyle-text-decoration-line-expected.txt:
+        * fast/css3-text/css3-text-decoration/getComputedStyle/script-tests/getComputedStyle-text-decoration-line.js:
+        * inspector/console/console-format-style-whitelist-expected.txt:
+
+2012-11-10  Noel Gordon  <noel.gordon@gmail.com>
+
+        [chromium] Unreviewed. Rebaseline fast/images/color-jpeg-with-color-profile.html on Win.
+
+        * platform/chromium-win/fast/images/color-jpeg-with-color-profile-expected.png: Rebaseline.
+        * platform/chromium/TestExpectations:
+
+2012-11-09  Ojan Vafai  <ojan@chromium.org>
+
+        Should only fire a single set of mouse events and update hover state once when scrolling is done
+        https://bugs.webkit.org/show_bug.cgi?id=99940
+
+        Reviewed by Levi Weintraub.
+
+        Tests basic throttling. I couldn't think of a good way to test changing
+        the delay that wouldn't make for a test that takes minutes to run.
+
+        * fast/scrolling/fake-mouse-event-throttling-expected.txt: Added.
+        * fast/scrolling/fake-mouse-event-throttling.html: Added.
+
+2012-11-09  Rick Byers  <rbyers@chromium.org>
+
+        [chromium] Move to USE(LAZY_NATIVE_CURSOR)
+        https://bugs.webkit.org/show_bug.cgi?id=101501
+
+        Reviewed by Adam Barth.
+
+        Remove failure expectation for fast/events/mouse-cursor.html now that
+        chromium uses the same cursor architecture as other ports.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-09  Rick Byers  <rbyers@chromium.org>
+
+        No tests for changing mouse cursors
+        https://bugs.webkit.org/show_bug.cgi?id=100550
+
+        Reviewed by Adam Barth.
+
+        Add a simple test covering the basic scenarios of changing a mouse
+        cursor with CSS.  This includes most of the cases currently covered
+        by ManualTests/*cursor*.
+
+        * fast/events/mouse-cursor-expected.txt: Added.
+        * fast/events/mouse-cursor.html: Added.
+        * platform/chromium/TestExpectations: Add failure expectation.
+
+2012-11-09  Noel Gordon  <noel.gordon@gmail.com>
+
+        [chromium] Should pass fast/images/paletted-png-with-color-profile.html
+        https://bugs.webkit.org/show_bug.cgi?id=101551
+
+        Reviewed by Adam Barth.
+
+        Update fast/images/paletted-png-with-color-profile.html image results for
+        Mac and Win (Chromium Android and Linux don't support color profiles).
+
+        * platform/chromium-mac/fast/images/paletted-png-with-color-profile-expected.png: Added.
+        * platform/chromium-win/fast/images/paletted-png-with-color-profile-expected.png: Added.
+        * platform/chromium/TestExpectations:
+
+2012-11-09  Joshua Bell  <jsbell@chromium.org>
+
+        [Chromium] Unreviewed gardening. One more baseline following 134112.
+
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/iframes/composited-iframe-alignment-expected.png: Added.
+
+2012-11-09  Tien-Ren Chen  <trchen@chromium.org>
+
+        Correct hit-test point scaling for document.elementFromPoint
+        https://bugs.webkit.org/show_bug.cgi?id=101798
+
+        Reviewed by Adam Barth.
+
+        The hit-test point come from user JavaScript is in the document coordinate.
+        Convert to the frame coordinate with correct scale factor for hit test.
+
+        * fast/dom/elementFromPoint-scaled-scrolled-expected.txt: Added.
+        * fast/dom/elementFromPoint-scaled-scrolled.html: Added.
+
+2012-11-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] More gardening.
+
+        media/video-seek-past-end-playing.html is still flaky on WK2, skip
+        it on both WK1 and WK2.
+
+        * platform/efl-wk1/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-11-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Unreviewed gardening.
+
+        Skip fast/canvas/canvas-resize-reset-pixelRatio.html since
+        HIGH_DPI_CANVAS is disabled by default.
+
+        * platform/efl/TestExpectations:
+
+2012-11-09  Tien-Ren Chen  <trchen@chromium.org>
+
+        Correct scroll adjustment for touchEvent.clientX/clientY
+        https://bugs.webkit.org/show_bug.cgi?id=101800
+
+        Reviewed by Adam Barth.
+
+        FrameView::scrollX/scrollY returns scroll offset in (scaled) frame coordinate.
+        Convert to document coordinate before passing to JavaScript.
+
+        * fast/events/touch/touch-scaled-scrolled-expected.txt: Added.
+        * fast/events/touch/touch-scaled-scrolled.html: Added.
+
+2012-11-09  Alexandru Chiculita  <achicu@adobe.com>
+
+        [Texmap][CSS Shaders] Enable CSS Shaders in TextureMapperGL
+        https://bugs.webkit.org/show_bug.cgi?id=98990
+
+        Reviewed by Noam Rosenthal.
+
+        Copied the custom-filter-blend-modes.html test file and forced the filtered elements to have 
+        composited layers using 3d transforms.
+
+        * css3/filters/custom/composited/custom-filter-blend-modes-expected.html: Added.
+        * css3/filters/custom/composited/custom-filter-blend-modes.html: Added.
+        * platform/qt-4.8/TestExpectations: Only Qt-Wk2 can currently run the shaders.
+        * platform/qt-5.0-wk1/TestExpectations:
+        * platform/qt/TestExpectations: Added a couple of tests that are not passing currently. 
+        I've added 101531 to track those.
+
+2012-11-09  Joshua Bell  <jsbell@chromium.org>
+
+        [Chromium] Unreviewed gardening. A few more baselines following 134112.
+
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/overflow/overflow-positioning-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/overflow/overflow-positioning-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/reflections/reflection-opacity-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/overflow/clip-content-under-overflow-controls-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/overflow/overflow-positioning-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/reflections/reflection-opacity-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/repaint/newly-composited-on-scroll-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/absolute-position-changed-with-composited-parent-layer-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/iframes/composited-iframe-alignment-expected.png: Added.
+
+2012-11-09  Joshua Bell  <jsbell@chromium.org>
+
+        [Chromium] Unreviewed gardening. Widen cross-fade-invalidation expectation to include all platforms.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Unreviewed gardening.
+
+        Unskip fast/dom/navigator-vibration.html after r133828.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-11-09  Joshua Bell  <jsbell@chromium.org>
+
+        [Chromium] Unreviewed gardening. Updated expectations following 134112.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-09  Slavomir Kaslev  <skaslev@google.com>
+
+        [chromium] Rebaselining software compositor tests.
+
+        Patch by Slavomir Kaslev <skaslev@google.com> on 2012-11-09
+        Reviewed by Adrienne Walker.
+
+        * platform/chromium-linux-x86/platform/chromium/virtual/softwarecompositing/masks/masked-ancestor-expected.png: Added.
+        * platform/chromium-linux-x86/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-animated-expected.png: Added.
+        * platform/chromium-linux-x86/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-opacity-expected.png: Added.
+        * platform/chromium-linux-x86/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute2-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/color-matching/image-color-matching-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/direct-image-compositing-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/flat-with-transformed-child-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/geometry/clipping-foreground-expected.png: Renamed from LayoutTests/platform/chromium-android/platform/chromium/virtual/softwarecompositing/geometry/clipping-foreground-expected.png.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/geometry/layer-due-to-layer-children-deep-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/geometry/layer-due-to-layer-children-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/geometry/vertical-scroll-composited-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/masks/direct-image-mask-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/masks/masked-ancestor-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/masks/multiple-masks-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/masks/simple-composited-mask-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/reflections/animation-inside-reflection-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-anchor-point-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-animated-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-mask-change-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-opacity-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-transition-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/reflections/reflection-in-composited-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/reflections/transform-inside-reflection-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute2-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/virtual/softwarecompositing/transitions/scale-transition-no-start-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/color-matching/image-color-matching-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/direct-image-compositing-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/geometry/clipping-foreground-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/geometry/layer-due-to-layer-children-deep-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/geometry/layer-due-to-layer-children-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/images/direct-image-background-color-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/masks/direct-image-mask-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/masks/masked-ancestor-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/masks/multiple-masks-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/masks/simple-composited-mask-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/reflections/animation-inside-reflection-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-anchor-point-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-animated-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-mask-change-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-opacity-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-transition-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/reflections/reflection-in-composited-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/reflections/transform-inside-reflection-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute2-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/virtual/softwarecompositing/transitions/scale-transition-no-start-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/color-matching/image-color-matching-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/direct-image-compositing-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/geometry/clipping-foreground-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/geometry/layer-due-to-layer-children-deep-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/geometry/layer-due-to-layer-children-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/images/direct-image-background-color-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/masks/direct-image-mask-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/masks/masked-ancestor-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/masks/multiple-masks-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/masks/simple-composited-mask-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/reflections/animation-inside-reflection-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-anchor-point-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-animated-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-mask-change-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-opacity-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-transition-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/reflections/reflection-in-composited-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/reflections/transform-inside-reflection-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute2-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/softwarecompositing/transitions/scale-transition-no-start-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/color-matching/image-color-matching-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/direct-image-compositing-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/flat-with-transformed-child-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/geometry/bounds-ignores-hidden-dynamic-negzindex-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/geometry/clipping-foreground-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/geometry/layer-due-to-layer-children-deep-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/geometry/layer-due-to-layer-children-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/geometry/vertical-scroll-composited-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/images/direct-image-background-color-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/masks/direct-image-mask-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/masks/masked-ancestor-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/masks/multiple-masks-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/masks/simple-composited-mask-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/reflections/animation-inside-reflection-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-anchor-point-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-animated-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-mask-change-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-opacity-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-transition-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/reflections/reflection-in-composited-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/reflections/transform-inside-reflection-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute2-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/scaling/tiled-layer-recursion-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/scrollbar-painting-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/transitions/scale-transition-no-start-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/visibility/visibility-image-layers-expected.png: Added.
+        * platform/chromium-win-xp/platform/chromium/virtual/softwarecompositing/masks/masked-ancestor-expected.png: Added.
+        * platform/chromium-win-xp/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-animated-expected.png: Added.
+        * platform/chromium-win-xp/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-opacity-expected.png: Added.
+        * platform/chromium-win-xp/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute2-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/color-matching/image-color-matching-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/direct-image-compositing-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/flat-with-transformed-child-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/geometry/bounds-ignores-hidden-dynamic-negzindex-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/geometry/layer-due-to-layer-children-deep-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/geometry/layer-due-to-layer-children-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/geometry/vertical-scroll-composited-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/masks/direct-image-mask-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/masks/masked-ancestor-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/masks/multiple-masks-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/masks/simple-composited-mask-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/reflections/animation-inside-reflection-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-anchor-point-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-animated-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-opacity-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/reflections/nested-reflection-transition-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/reflections/reflection-in-composited-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/reflections/transform-inside-reflection-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/repaint/opacity-between-absolute2-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/scaling/tiled-layer-recursion-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/transitions/scale-transition-no-start-expected.png: Added.
+        * platform/chromium-win/platform/chromium/virtual/softwarecompositing/visibility/visibility-image-layers-expected.png: Added.
+        * platform/chromium/TestExpectations:
+
+2012-11-09  Joshua Bell  <jsbell@chromium.org>
+
+        [Chromium] Unreviewed gardening, failing new hidpi tests in r134099/r134100
+
+        * platform/chromium/TestExpectations:
+
+2012-11-09  Dirk Pranke  <dpranke@chromium.org>
+
+        Unreviewed, last few chromium-mac-mountainlion expectations cleaned up.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-09  Dirk Pranke  <dpranke@chromium.org>
+
+        Unreviewed, baselines change - remove stray baselines for reftests.
+
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/text-on-scaled-layer-expected.png: Removed.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/text-on-scaled-surface-expected.png: Removed.
+
+2012-11-09  Erik Arvidsson  <arv@chromium.org>
+
+        REGRESSION (r125239): classList contains() doesn't work after element was moved from strict mode document to quirks mode document
+        https://bugs.webkit.org/show_bug.cgi?id=101627
+
+        Reviewed by Alexey Proskuryakov.
+
+        We used to only create m_classNamesForQuirksMode in the constructor or when the class attribute
+        was changed. If an element is moved from a standards document to a quirks mode document the
+        m_classNamesForQuirksMode would not be up to date which lead to wrong results.
+
+        Now we alway check if m_classNamesForQuirksMode is up to date (in quirks mode only).
+
+        * fast/dom/Element/class-list-move-between-document-with-different-quirks-mode-expected.txt: Added.
+        * fast/dom/Element/class-list-move-between-document-with-different-quirks-mode.html: Added.
+
+2012-10-28  Timothy Hatcher  <timothy@apple.com>
+
+        Test if -webkit-canvas in CSS uses the full backing store instead
+        of always 1x when rendering.
+
+        https://bugs.webkit.org/show_bug.cgi?id=100611
+
+        Reviewed by Dean Jackson.
+
+        * fast/canvas/canvas-as-image-hidpi-expected.png: Added.
+        * fast/canvas/canvas-as-image-hidpi-expected.txt: Added.
+        * fast/canvas/canvas-as-image-hidpi.html: Added.
+
+2012-10-28  Timothy Hatcher  <timothy@apple.com>
+
+        Test the canvas backing store pixel ratio when the buffer resizes.
+
+        https://bugs.webkit.org/show_bug.cgi?id=100608
+
+        Reviewed by Darin Adler.
+
+        * fast/canvas/canvas-resize-reset-pixelRatio-expected.txt: Added.
+        * fast/canvas/canvas-resize-reset-pixelRatio.html: Added.
+
+2012-11-08  Ryosuke Niwa  <rniwa@webkit.org>
+
+        RemoveFormat command doesn't remove background color
+        https://bugs.webkit.org/show_bug.cgi?id=101682
+
+        Reviewed by Tony Chang.
+
+        Added a regression test.
+
+        * editing/execCommand/remove-format-background-color-expected.txt: Added.
+        * editing/execCommand/remove-format-background-color.html: Added.
+
+2012-11-09  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        Rebaselining and removing stale expectations after the Cairo
+        version used in Jhbuild modules was bumped to 1.12.8 in r134073.
+
+        * platform/gtk/TestExpectations:
+        * platform/gtk/svg/W3C-SVG-1.1/animate-elem-08-t-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/animate-elem-08-t-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/animate-elem-83-t-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/animate-elem-83-t-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/paths-data-01-t-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/paths-data-01-t-expected.txt:
+        * platform/gtk/svg/W3C-SVG-1.1/paths-data-02-t-expected.png:
+        * platform/gtk/svg/W3C-SVG-1.1/paths-data-02-t-expected.txt:
+        * platform/gtk/svg/batik/text/smallFonts-expected.png:
+        * platform/gtk/svg/batik/text/smallFonts-expected.txt:
+        * platform/gtk/svg/batik/text/textGlyphOrientationHorizontal-expected.png:
+        * platform/gtk/svg/batik/text/textGlyphOrientationHorizontal-expected.txt:
+        * platform/gtk/svg/batik/text/textOnPath-expected.png:
+        * platform/gtk/svg/batik/text/textOnPath-expected.txt:
+        * platform/gtk/svg/batik/text/textOnPath2-expected.png:
+        * platform/gtk/svg/batik/text/textOnPath2-expected.txt:
+        * platform/gtk/svg/batik/text/textOnPath3-expected.png:
+        * platform/gtk/svg/batik/text/textOnPath3-expected.txt:
+        * platform/gtk/svg/batik/text/textOnPathSpaces-expected.png:
+        * platform/gtk/svg/batik/text/textOnPathSpaces-expected.txt:
+        * platform/gtk/svg/batik/text/verticalTextOnPath-expected.png:
+        * platform/gtk/svg/batik/text/verticalTextOnPath-expected.txt:
+        * platform/gtk/svg/custom/js-update-path-changes-expected.png:
+        * platform/gtk/svg/custom/js-update-path-changes-expected.txt:
+        * platform/gtk/svg/custom/js-update-path-removal-expected.png:
+        * platform/gtk/svg/custom/js-update-path-removal-expected.txt:
+        * platform/gtk/svg/custom/path-textPath-simulation-expected.png:
+        * platform/gtk/svg/custom/path-textPath-simulation-expected.txt:
+
+2012-11-09  Mihnea Ovidenie  <mihnea@adobe.com>
+
+        [CSSRegions] Region styling properties are not filtered correctly
+        https://bugs.webkit.org/show_bug.cgi?id=101768
+
+        Reviewed by Andreas Kling.
+
+        Visibility is not a supported region style property, therefore using it inside @-webkit-region
+        should not be possible.
+
+        * fast/regions/region-style-not-supported-properties-expected.html: Added.
+        * fast/regions/region-style-not-supported-properties.html: Added.
+
+2012-11-09  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Deleting all files relating to the deprecated PeerConnection00
+        https://bugs.webkit.org/show_bug.cgi?id=101730
+
+        Reviewed by Adam Barth.
+
+        Since RTCPeerConenction has superseeded PeerConnection00 this patch removes all
+        files relating to the old API.
+
+        * fast/mediastream/SessionDescription-expected.txt: Removed.
+        * fast/mediastream/SessionDescription.html: Removed.
+        * fast/mediastream/constructors-expected.txt:
+        * fast/mediastream/constructors.html:
+        * fast/mediastream/peerconnection-Attributes-expected.txt: Removed.
+        * fast/mediastream/peerconnection-Attributes.html: Removed.
+        * fast/mediastream/peerconnection-addstream-expected.txt: Removed.
+        * fast/mediastream/peerconnection-addstream.html: Removed.
+        * fast/mediastream/peerconnection-argument-types-expected.txt: Removed.
+        * fast/mediastream/peerconnection-argument-types.html: Removed.
+        * fast/mediastream/peerconnection-eventlistener-optional-argument-expected.txt: Removed.
+        * fast/mediastream/peerconnection-eventlistener-optional-argument.html: Removed.
+        * fast/mediastream/peerconnection-iceoptions-expected.txt: Removed.
+        * fast/mediastream/peerconnection-iceoptions.html: Removed.
+        * fast/mediastream/peerconnection-mediastreamlist-expected.txt: Removed.
+        * fast/mediastream/peerconnection-mediastreamlist.html: Removed.
+        * fast/mediastream/peerconnection-removestream-expected.txt: Removed.
+        * fast/mediastream/peerconnection-removestream.html: Removed.
+        * fast/mediastream/script-tests/peerconnection-Attributes.js: Removed.
+        * fast/mediastream/script-tests/peerconnection-addstream.js: Removed.
+        * fast/mediastream/script-tests/peerconnection-argument-types.js: Removed.
+        * fast/mediastream/script-tests/peerconnection-removestream.js: Removed.
+
+2012-11-09  Bruno de Oliveira Abinader  <bruno.abinader@basyskom.com>
+
+        [css] Text decoration's "blink" not valid when CSS3_TEXT is enabled
+        https://bugs.webkit.org/show_bug.cgi?id=101750
+
+        Reviewed by Ojan Vafai.
+
+        This patch updates the "text-decoration" computed style layout tests to
+        handle a larger variety of value combinations.
+
+        * fast/css/getComputedStyle/getComputedStyle-text-decoration-expected.txt:
+        * fast/css/getComputedStyle/script-tests/getComputedStyle-text-decoration.js:
+
+2012-11-09  Joshua Bell  <jsbell@chromium.org>
+
+        [Chromium] Unreviewed gardening - rebaseline a handful of image tests for chromium-mac-lion.
+
+        * platform/chromium-mac-lion/platform/chromium/compositing/layout-width-change-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/compositing/video-frame-size-change-expected.png: Added.
+        * platform/chromium-mac-lion/tables/mozilla_expected_failures/core/backgrounds-expected.png: Added.
+        * platform/chromium-mac-lion/tables/mozilla_expected_failures/core/captions1-expected.png: Added.
+        * platform/chromium-mac-lion/tables/mozilla_expected_failures/core/captions2-expected.png: Added.
+        * platform/chromium-mac-lion/tables/mozilla_expected_failures/core/captions3-expected.png: Added.
+        * platform/chromium-mac-lion/tables/mozilla_expected_failures/marvin/backgr_border-table-cell-expected.png: Added.
+        * platform/chromium-mac-lion/tables/mozilla_expected_failures/marvin/backgr_border-table-column-group-expected.png: Added.
+
+2012-11-09  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        [EFL] Rebaseline svg tests after 99870
+        https://bugs.webkit.org/show_bug.cgi?id=101756
+
+        Unreviewed svg baseline after https://bugs.webkit.org/show_bug.cgi?id=99870.
+
+        * platform/efl/TestExpectations:
+        * platform/efl/svg/custom/pattern-scaling-expected.png: Added.
+        * platform/efl/svg/custom/pattern-scaling-expected.txt: Added.
+        * platform/efl/svg/transforms/text-with-pattern-inside-transformed-html-expected.png:
+
+2012-11-09  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        [EFL] Rebaseline fast/table/025-expected
+        https://bugs.webkit.org/show_bug.cgi?id=101752
+
+        Unreviewed rebaseline after https://bugs.webkit.org/show_bug.cgi?id=11645.
+
+        * platform/efl/TestExpectations:
+        * platform/efl/fast/table/025-expected.png:
+        * platform/efl/fast/table/025-expected.txt:
+
+2012-11-09  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt] Pixel tests need rebaseline
+        https://bugs.webkit.org/show_bug.cgi?id=99323
+
+        Unreviewed pixel rebaseline.
+
+        Rebaseline some tests, add missing expectations.
+
+        * platform/qt-5.0-wk2/css3/filters/composited-reflected-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/backgrounds/transformed-body-background-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/backgrounds/transformed-body-html-background-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/backgrounds/transformed-html-body-background-expected.png: Added.
+        * platform/qt-5.0-wk2/fast/css-generated-content/before-with-first-letter-expected.png: Added.
+        * platform/qt-5.0-wk2/svg/animations/animateMotion-additive-2c-expected.png: Added.
+        * platform/qt-5.0-wk2/svg/text/text-rescale-expected.png: Added.
+        * platform/qt/css3/filters/effect-reference-ordering-hw-actual.png: Added.
+        * platform/qt/fast/images/png-suite/test-actual.png: Added.
+        * platform/qt/svg/as-image/image-respects-pageScaleFactor-change-actual.png: Added.
+        * platform/qt/svg/as-object/embedded-svg-size-changes-actual.png: Added.
+        * platform/qt/svg/as-object/nested-embedded-svg-size-changes-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-refX-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-refY-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-setOrientToAngle-call-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMarkerElement-svgdom-setOrientToAuto-call-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-height-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-maskContentUnits-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-maskUnits-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-width-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-x-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-dom-y-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-height-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-maskContentUnits-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-maskUnits-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-width-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-x-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGMaskElement-svgdom-y-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPathElement-dom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPathElement-svgdom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-height-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-patternContentUnits-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-patternTransform-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-patternUnits-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-width-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-x-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-dom-y-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-height-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-patternContentUnits-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-patternTransform-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-patternUnits-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-width-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-x-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPatternElement-svgdom-y-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPolygonElement-dom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPolygonElement-svgdom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPolylineElement-dom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGPolylineElement-svgdom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-cx-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-cy-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-fx-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-fy-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-gradientTransform-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-gradientUnits-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-dom-r-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-cx-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-cy-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-fx-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-fy-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-gradientTransform-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-gradientUnits-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRadialGradientElement-svgdom-r-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-dom-height-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-dom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-dom-width-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-dom-x-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-dom-y-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-height-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-width-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-x-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGRectElement-svgdom-y-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGSVGElement-dom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGSVGElement-svgdom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTRefElement-dom-href-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-dx-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-dy-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-lengthAdjust-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-rotate-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-textLength-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-transform-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-x-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-dom-y-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-dx-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-dy-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-lengthAdjust-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-rotate-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-textLength-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-transform-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-x-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGTextElement-svgdom-y-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-dom-href1-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-dom-href2-attr-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-dom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-svgdom-href1-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-svgdom-href2-prop-actual.png: Added.
+        * platform/qt/svg/dynamic-updates/SVGUseElement-svgdom-requiredFeatures-actual.png: Added.
+        * platform/qt/svg/filters/subRegion-one-effect-actual.png: Added.
+        * platform/qt/svg/filters/subRegion-two-effects-actual.png: Added.
+
+2012-11-07  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: wrong output for empty object {}
+        https://bugs.webkit.org/show_bug.cgi?id=101356
+
+        Reviewed by Vsevolod Vlasov.
+
+        Changed preview formatting to iterate over enumerable properties only + visit the prototypes.
+
+        * inspector/console/command-line-api-expected.txt:
+        * inspector/console/command-line-api-inspect-expected.txt:
+        * inspector/console/console-format-collections-expected.txt:
+        * inspector/console/console-format-expected.txt:
+        * platform/chromium/inspector/console/console-format-collections-expected.txt:
+
+2012-11-09  Kangil Han  <kangil.han@samsung.com>
+
+        [EFL] Refactor TestExpectations file
+        https://bugs.webkit.org/show_bug.cgi?id=101738
+
+        Unreviewed, EFL gardening. 
+
+        Remove duplicated definitions.
+
+        * platform/efl/TestExpectations:
+
+2012-11-09  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [EFL] Skip failing test perf/accessibility-title-ui-element.html
+        https://bugs.webkit.org/show_bug.cgi?id=101728
+
+        Unreviewed EFL gardening.
+
+        * platform/efl/TestExpectations:
+
+2012-11-09  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [EFL] Update baselines for failing svg tests
+        https://bugs.webkit.org/show_bug.cgi?id=101726
+
+        Unreviewed EFL gardening.
+
+        * platform/efl/svg/W3C-I18N/g-dirRTL-ubNone-expected.png:
+        * platform/efl/svg/W3C-I18N/g-dirRTL-ubNone-expected.txt:
+        * platform/efl/svg/W3C-I18N/g-dirRTL-ubOverride-expected.png:
+        * platform/efl/svg/W3C-I18N/g-dirRTL-ubOverride-expected.txt:
+        * platform/efl/svg/W3C-I18N/text-dirRTL-ubNone-expected.png:
+        * platform/efl/svg/W3C-I18N/text-dirRTL-ubNone-expected.txt:
+        * platform/efl/svg/W3C-I18N/tspan-direction-rtl-expected.png:
+        * platform/efl/svg/W3C-I18N/tspan-direction-rtl-expected.txt:
+        * platform/efl/svg/text/bidi-tspans-expected.png:
+        * platform/efl/svg/text/bidi-tspans-expected.txt:
+
+2012-11-09  Jaehun Lim  <ljaehun.lim@samsung.com>
+
+        [EFL] css3/flexbox/multiline-justify-content.html doesn't crash
+        https://bugs.webkit.org/show_bug.cgi?id=101717
+
+        Unreviewed, EFL gardening. 
+
+        css3/flexbox/multiline-justify-content.html doesn't crash and can be passed.
+
+        * platform/efl/TestExpectations:
+
+2012-11-08  Hayato Ito  <hayato@chromium.org>
+
+        Unreviewed, update chromium-mac baselines.
+
+        * platform/chromium-mac/platform/chromium/compositing/layout-width-change-expected.png:
+        * platform/chromium-mac/platform/chromium/compositing/video-frame-size-change-expected.png:
+        * platform/chromium-mac/platform/chromium/media/video-frame-size-change-expected.png:
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/text-on-scaled-layer-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/virtual/softwarecompositing/text-on-scaled-surface-expected.png: Added.
+
+2012-11-08  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Remove Chromium test expectations after r133939.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-08  Arpita Bahuguna  <arpitabahuguna@gmail.com>
+
+        table not aligned in center column and seems shrunk because of float:right (table-layout: fixed and width: 100%)
+        https://bugs.webkit.org/show_bug.cgi?id=18153
+
+        Reviewed by Beth Dakin.
+
+        * fast/table/fixed-table-layout/table-with-percent-width-expected.txt: Added.
+        * fast/table/fixed-table-layout/table-with-percent-width.html: Added.
+        Test added to verify the width of the fixed layout tables with 100%
+        width, in standards mode.
+
+2012-11-08  Noel Gordon  <noel.gordon@gmail.com>
+
+        [chromium] Unreviewed test expectations update.
+
+        Unskip and start generating results for fast/images/color-jpeg-with-color-profile.html
+        on Win to prepare for an upcoming rebaseline.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-08  Hayato Ito  <hayato@chromium.org>
+
+        Unreviewed, Unreviewed gardening following r133972.
+
+        * platform/chromium-linux/platform/chromium/virtual/deferred/fast/images/exif-orientation-expected.png: Added.
+
+2012-11-08  Hayato Ito  <hayato@chromium.org>
+
+        Unreviewed, update chromium expectations for svg/repaint/image-with-clip-path.svg.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-08  Kangil Han  <kangil.han@samsung.com>
+
+        [EFL][WK2] Make jquery/manipulation.html into one in TestExpectations
+        https://bugs.webkit.org/show_bug.cgi?id=101686
+
+        Unreviewed, EFL gardening.
+
+        Currently there are three definitions on jquery/manipulation.html case.
+        As BUG 100636 fixed, we don't need Crash definition anymore.
+        Therefore, this patch makes this case into one definition without Crash in TestExpectations.
+
+        * platform/efl/TestExpectations:
+
+2012-11-08  Hayato Ito  <hayato@chromium.org>
+
+        Unreviewed, update chromium expectations for tables/.
+
+        * platform/chromium-mac/tables/mozilla_expected_failures/core/backgrounds-expected.png:
+        * platform/chromium-mac/tables/mozilla_expected_failures/core/captions1-expected.png:
+        * platform/chromium-mac/tables/mozilla_expected_failures/core/captions2-expected.png:
+        * platform/chromium-mac/tables/mozilla_expected_failures/core/captions3-expected.png:
+        * platform/chromium-mac/tables/mozilla_expected_failures/marvin/backgr_border-table-cell-expected.png:
+        * platform/chromium-mac/tables/mozilla_expected_failures/marvin/backgr_border-table-column-group-expected.png:
+
+2012-11-08  Dirk Pranke  <dpranke@chromium.org>
+
+        Unreviewed, update chromium-mac-mountainlion baselines for fast/
+
+        Also roll remaining mountainlion-specific failures into the main
+        TestExpectations file.
+
+        * platform/chromium/TestExpectations:
+        * platform/chromium-mac-mountainlion/TestExpectations:
+
+2012-11-08  Keishi Hattori  <keishi@webkit.org>
+
+        Enable calendar picker for input types week/month
+        https://bugs.webkit.org/show_bug.cgi?id=101553
+
+        Reviewed by Kent Tamura.
+
+        * platform/chromium/TestExpectations: Mark week/month appearance tests as needs rebaseline.
+
+2012-11-08  Hayato Ito  <hayato@chromium.org>
+
+        Unreviewed, update chromium expectations to remove a duplication.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-08  Dongwoo Joshua Im  <dw.im@samsung.com>
+
+        [QT] css3/line-break should be removed from TestExpectations.
+        https://bugs.webkit.org/show_bug.cgi?id=101562
+
+        Unreviewed gardening.
+
+        css3/line-break is removed by http://trac.webkit.org/changeset/133644.
+
+        * platform/qt/TestExpectations:
+
+2012-11-08  Dirk Pranke  <dpranke@chromium.org>
+
+        Unreviewed, update chromium expectations for chromium-mac-mountainlion svg failure.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-08  Dirk Pranke  <dpranke@chromium.org>
+
+        Unreviewed, chromium-mac-mountainlion baselines for tables/.
+
+        * platform/chromium/TestExpectations:
+        * platform/chromium-mac-mountainlion/TestExpectations:
+
+2012-11-08  Joshua Bell  <jsbell@chromium.org>
+
+        [Chromium] Unreviewed gardening following r133972.
+
+        * platform/chromium-win/platform/chromium/virtual/deferred/fast/images/exif-orientation-expected.png: Added.
+
+2012-11-08  Kenichi Ishibashi  <bashi@chromium.org>
+
+        [Chromium] Arabic digits should appear left-to-right
+        https://bugs.webkit.org/show_bug.cgi?id=101440
+
+        Reviewed by Tony Chang.
+
+        Add a test that checks Arabic digits appear in increasing order from left to right.
+
+        * fast/text/international/arabic-digits-expected.html: Added.
+        * fast/text/international/arabic-digits.html: Added.
+
+2012-11-08  Yael Aharon  <yael.aharon@intel.com>
+
+        Unreviewed. Some more gardening after r133898.
+
+        * platform/efl/TestExpectations:
+
+2012-11-08  Beth Dakin  <bdakin@apple.com>
+
+        https://bugs.webkit.org/show_bug.cgi?id=101644
+        Fixed header on Facebook news feed becomes detached from top of 
+        viewport after rubber band scrolling
+        -and corresponding-
+        <rdar://problem/12651944>
+
+        Reviewed by Simon Fraser.
+
+        New test ensures that negative offsets will not make their way into 
+        the FixedPositionViewportConstraints.
+        * platform/mac/tiled-drawing/fixed/negative-scroll-offset-expected.txt: Added.
+        * platform/mac/tiled-drawing/fixed/negative-scroll-offset.html: Added.
+
+2012-11-08  Alpha Lam  <hclam@chromium.org>
+
+        [chromium] Deferred image decoding fails with image orientation
+        https://bugs.webkit.org/show_bug.cgi?id=101648
+
+        Reviewed by Stephen White.
+
+        Update test expectations and baselines accordingly since these two
+        tests are now passing with deferred image decoding.
+
+        fast/images/exif-orientation-image-document.html
+        fast/images/exif-orientation.html
+
+        * platform/chromium-linux/platform/chromium/virtual/deferred/fast/images/exif-orientation-image-document-expected.png: Removed.
+        * platform/chromium-mac-lion/platform/chromium/virtual/deferred/fast/images/exif-orientation-image-document-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/platform/chromium/virtual/deferred/fast/images/exif-orientation-image-document-expected.png: Removed.
+        * platform/chromium-mac/platform/chromium/virtual/deferred/fast/images/exif-orientation-image-document-expected.png: Removed.
+        * platform/chromium-win/platform/chromium/virtual/deferred/fast/images/exif-orientation-image-document-expected.png: Removed.
+        * platform/chromium/TestExpectations:
+
+2012-11-08  Hans Muller  <hmuller@adobe.com>
+
+        [CSS Exclusions] Polygon with horizontal bottom edges returns incorrect segments
+        https://bugs.webkit.org/show_bug.cgi?id=100874
+
+        Reviewed by Dirk Schulze.
+
+        Added two additional tests for rectilinear polygons, where the tops and bottoms
+        of lines intersect the polygons' horizontal edges. More tests of this kind will
+        be needed when exclusion layout supports polygons that break horizontal lines up
+        into more than one segment.
+
+        * fast/exclusions/shape-inside/shape-inside-rectilinear-polygon-003-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-rectilinear-polygon-003.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-rectilinear-polygon-004-expected.html: Added.
+        * fast/exclusions/shape-inside/shape-inside-rectilinear-polygon-004.html: Added.
+
+2012-11-08  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [JSC] HTML extensions to String.prototype should escape " as &quot; in argument values
+        https://bugs.webkit.org/show_bug.cgi?id=90667
+
+        Reviewed by Benjamin Poulain.
+
+        Add layout test coverage for the following String.prototype methods:
+        - String.prototype.anchor(name)
+        - String.prototype.fontcolor(color)
+        - String.prototype.fontsize(size)
+        - String.prototype.link(href)
+
+        Those tests also check that the quotation mark is correctly escaped
+        in argument values to prevent potential exploits.
+
+        * fast/js/string-anchor-expected.txt: Added.
+        * fast/js/string-anchor.html: Added.
+        * fast/js/string-fontcolor-expected.txt: Added.
+        * fast/js/string-fontcolor.html: Added.
+        * fast/js/string-fontsize-expected.txt: Added.
+        * fast/js/string-fontsize.html: Added.
+        * fast/js/string-link-expected.txt: Added.
+        * fast/js/string-link.html: Added.
+        * platform/chromium/TestExpectations: Skip new tests for chromium port due
+        to http://code.google.com/p/v8/issues/detail?id=2218
+
+2012-11-08  Joshua Bell  <jsbell@chromium.org>
+
+       [Chromium] Unreviewed gardening. Added missing *-expected.txt following rebaselines.
+
+        * platform/chromium-mac/fast/css/text-overflow-input-expected.txt: Added.
+        * platform/chromium-mac/fast/forms/input-readonly-dimmed-expected.txt: Added.
+        * platform/chromium-mac/fast/forms/input-text-scroll-left-on-blur-expected.txt: Added.
+
 2012-11-08  Yael Aharon  <yael.aharon@intel.com>
 
         Unreviewed. Some more gardening after r133898.

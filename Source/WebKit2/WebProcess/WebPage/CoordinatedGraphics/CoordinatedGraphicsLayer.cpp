@@ -387,6 +387,20 @@ void CoordinatedGraphicsLayer::setMaskLayer(GraphicsLayer* layer)
 
 }
 
+bool CoordinatedGraphicsLayer::shouldDirectlyCompositeImage(Image* image) const
+{
+    if (!image || !image->isBitmapImage())
+        return false;
+
+    enum { kMaxDimenstionForDirectCompositing = 2000 };
+    if (image->width() > kMaxDimenstionForDirectCompositing || image->height() > kMaxDimenstionForDirectCompositing)
+        return false;
+
+    return true;
+
+    // TODO: don't directly composite images with more than one frame.
+}
+
 void CoordinatedGraphicsLayer::setReplicatedByLayer(GraphicsLayer* layer)
 {
     if (layer == replicaLayer())
@@ -641,14 +655,14 @@ PassOwnPtr<WebCore::GraphicsContext> CoordinatedGraphicsLayer::beginContentUpdat
     return m_CoordinatedGraphicsLayerClient->beginContentUpdate(size, contentsOpaque() ? 0 : ShareableBitmap::SupportsAlpha, atlas, offset);
 }
 
-void CoordinatedGraphicsLayer::createTile(int tileID, const SurfaceUpdateInfo& updateInfo, const IntRect& targetRect)
+void CoordinatedGraphicsLayer::createTile(int tileID, const SurfaceUpdateInfo& updateInfo, const WebCore::IntRect& tileRect, const WebCore::IntSize& backingSize)
 {
-    m_CoordinatedGraphicsLayerClient->createTile(id(), tileID, updateInfo, targetRect);
+    m_CoordinatedGraphicsLayerClient->createTile(id(), tileID, updateInfo, tileRect, backingSize);
 }
 
-void CoordinatedGraphicsLayer::updateTile(int tileID, const SurfaceUpdateInfo& updateInfo, const IntRect& targetRect)
+void CoordinatedGraphicsLayer::updateTile(int tileID, const SurfaceUpdateInfo& updateInfo, const IntRect& tileRect)
 {
-    m_CoordinatedGraphicsLayerClient->updateTile(id(), tileID, updateInfo, targetRect);
+    m_CoordinatedGraphicsLayerClient->updateTile(id(), tileID, updateInfo, tileRect);
 }
 
 void CoordinatedGraphicsLayer::removeTile(int tileID)

@@ -1,3 +1,345 @@
+2012-11-12  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Support ResourceRequest's setTimeoutInterval
+        https://bugs.webkit.org/show_bug.cgi?id=101731
+
+        Reviewed by Simon Hausmann.
+
+        Enable XHR_TIMEOUT now that we support the necessary feature.
+
+        * qmake/mkspecs/features/features.pri:
+
+2012-11-12  Gustavo Noronha Silva  <gns@gnome.org>
+
+        Unreviewed. Removing myself from the list of address to CC on EWS
+        build failure; the CC turned out to just be too noisy so I'm
+        tracking those in a different way.
+
+        * Scripts/webkitpy/tool/commands/earlywarningsystem.py:
+        (GtkEWS):
+
+2012-11-12  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Can not load MHTML documents
+        https://bugs.webkit.org/show_bug.cgi?id=101765
+
+        Reviewed by Simon Hausmann.
+
+        Enable MHTML feature.
+
+        * qmake/mkspecs/features/features.pri:
+
+2012-11-12  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Schedule the RTCDataChannel events to be triggered at idle state
+        https://bugs.webkit.org/show_bug.cgi?id=101751
+
+        Reviewed by Adam Barth.
+
+        Makes the data channel mocks to be synchronous instead of asynchronous to be able to
+        properly test RTCDataChannel event handling.
+
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.cpp:
+        (MockWebRTCPeerConnectionHandler::sendStringData):
+        (MockWebRTCPeerConnectionHandler::sendRawData):
+
+2012-11-12  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] move TestRunner implementation into WebTestRunner namespace
+        https://bugs.webkit.org/show_bug.cgi?id=101837
+
+        Reviewed by Adam Barth.
+
+        That way, we don't get collisions when linking e.g. against chromium's
+        net test support library.
+
+        * DumpRenderTree/chromium/DRTTestRunner.h:
+        (DRTTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/AccessibilityControllerChromium.h:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/AccessibilityUIElementChromium.cpp:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/AccessibilityUIElementChromium.h:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/CppBoundClass.cpp:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/CppBoundClass.h:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/CppVariant.cpp:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/CppVariant.h:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/EventSender.h:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/GamepadController.cpp:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/GamepadController.h:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/TestDelegate.h:
+        (WebTestRunner):
+        (TestDelegate):
+        * DumpRenderTree/chromium/TestRunner/src/TestInterfaces.cpp:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/TestInterfaces.h:
+        (WebTestRunner):
+        (TestInterfaces):
+        * DumpRenderTree/chromium/TestRunner/src/TestRunner.cpp:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/TestRunner.h:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/TextInputController.cpp:
+        (WebTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/TextInputController.h:
+        (WebTestRunner):
+
+2012-11-12  Zeno Albisser  <zeno@webkit.org>
+
+        [Qt] MiniBrowser should not strongly depend on QtTestSupport.
+        https://bugs.webkit.org/show_bug.cgi?id=101775
+
+        Introducing HAVE(QTTESTSUPPORT) to allow building
+        MiniBrowser without QtTestSupport.
+        This is necessary when using a production build.
+
+        Reviewed by Tor Arne Vestbø.
+
+        * MiniBrowser/qt/MiniBrowserApplication.cpp:
+        (MiniBrowserApplication::handleUserOptions):
+        * qmake/mkspecs/features/configure.prf:
+        * qmake/mkspecs/features/features.prf:
+
+2012-11-11  Kangil Han  <kangil.han@samsung.com>
+
+        Change build congratulation message in EFL
+        https://bugs.webkit.org/show_bug.cgi?id=101833
+
+        Reviewed by Gyuyoung Kim.
+
+        EFL port is currently supporting both WK1 and WK2.
+        But, build congratulation message still shows WK1(EWebLauncher) only.
+        Therefore, this patch adopts WK2 reference execution(MiniBrowser) in its message.
+
+        From 'To run EWebLauncher with this newly-built code, use the'
+        to 'To run EWebLauncher/MiniBrowser with this newly-built code, use the'.
+
+        * Scripts/build-webkit:
+        (writeCongrats):
+        * Scripts/webkitdirs.pm:
+        (launcherName):
+
+2012-11-09  Ryosuke Niwa  <rniwa@webkit.org>
+
+        People with dichromacy can't tell crashes and passes on flakiness dashboard
+        https://bugs.webkit.org/show_bug.cgi?id=101711
+
+        Reviewed by Ojan Vafai.
+
+        Lower the brightness of orange, and raise the brightness of green so that
+        people with color blindnes can still distinguish passes and crashes easily.
+
+        * TestResultServer/static-dashboards/flakiness_dashboard_tests.css:
+        (.P):
+        (.C):
+
+2012-11-09  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Deleting all files relating to the deprecated PeerConnection00
+        https://bugs.webkit.org/show_bug.cgi?id=101730
+
+        Reviewed by Adam Barth.
+
+        Since RTCPeerConenction has superseeded PeerConnection00 this patch removes all
+        files relating to the old API.
+
+        * DumpRenderTree/chromium/MockWebMediaStreamCenter.cpp:
+        * DumpRenderTree/chromium/MockWebMediaStreamCenter.h:
+        (MockWebMediaStreamCenter):
+        * DumpRenderTree/chromium/TestShell.cpp:
+        (TestShell::TestShell):
+
+2012-11-09  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL] Give the view a size in TestWebKitAPI
+        https://bugs.webkit.org/show_bug.cgi?id=101770
+
+        Reviewed by Laszlo Gombos.
+
+        2 tests are currently failing, because they expect us to paint, but we don't paint if the view size is empty.
+
+        * TestWebKitAPI/efl/PlatformWebView.cpp:
+        (TestWebKitAPI::PlatformWebView::PlatformWebView):
+        (TestWebKitAPI::PlatformWebView::~PlatformWebView):
+        (TestWebKitAPI):
+        (TestWebKitAPI::PlatformWebView::resizeTo):
+
+2012-11-09  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134068.
+        http://trac.webkit.org/changeset/134068
+        https://bugs.webkit.org/show_bug.cgi?id=101766
+
+        Caused crashes on the bots. (Requested by rakuco on #webkit).
+
+        * WebKitTestRunner/cairo/TestInvocationCairo.cpp:
+        (WTR::TestInvocation::dumpPixelsAndCompareWithExpected):
+
+2012-11-09  Zan Dobersek  <zandobersek@gmail.com>
+
+        [GTK] Bump the jhbuild Cairo version to 1.12.8
+        https://bugs.webkit.org/show_bug.cgi?id=101721
+
+        Bump the Cairo version in Jhbuild moduleset to 1.12.8. This version
+        should fix multiple failures in canvas tests and also contains
+        fixes for X-related crashes that occurred from the 1.12.4 version onwards.
+
+        * gtk/jhbuild.modules:
+
+2012-11-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [WTR][Cairo] Do not call paintRepaintRectOverlay() when there is no repaint rect.
+        https://bugs.webkit.org/show_bug.cgi?id=101759
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        * WebKitTestRunner/cairo/TestInvocationCairo.cpp:
+        (WTR::TestInvocation::dumpPixelsAndCompareWithExpected): Improve
+        the check for an empty repaintRect -- we need to check if the
+        WKArrayRef has any items. `if (repaintRect)' will return true
+        regardless of whether the array is empty or not.
+
+
+2012-11-09  Tor Arne Vestbø  <tor.arne.vestbo@digia.com>
+
+        [Qt] Stop watchlist from triggering QtBuildSystem rule on DerivedSources
+
+        Having DerivedSources.pri in the watchlist regexp was creating too much
+        noise.
+
+        Reviewed by Ossy.
+
+        * Scripts/webkitpy/common/config/watchlist:
+
+2012-11-09  Dominik Röttsches  <dominik.rottsches@intel.com>
+
+        webkitpy/layouttests integration test fails if high shards/processes environment variables are used
+        https://bugs.webkit.org/show_bug.cgi?id=101455
+
+        Reviewed by Dirk Pranke.
+
+        Updating test to disregard WEBKIT_TEST_MAX_LOCKED_SHARDS environment variable.
+
+        * Scripts/webkitpy/layout_tests/run_webkit_tests_integrationtest.py:
+        (MainTest.test_max_locked_shards):
+
+2012-11-09  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL][DRT] Force a repaint before tracking repaint rects.
+        https://bugs.webkit.org/show_bug.cgi?id=101743
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Do like other ports and force a repaint before we start tracking
+        repaints so that the pixel results generated look more in line
+        with what's expected.
+
+        * DumpRenderTree/efl/DumpRenderTree.cpp:
+        (displayWebView): Call DRTSupport::forceLayout() before start
+        tracking repaints.
+
+2012-11-09  Xiaobo Wang  <xbwang@torchmobile.com.cn>
+
+        [BlackBerry] DRT - eventSender.keyDown() needs to support pageUp, pageDown, home, end key
+        https://bugs.webkit.org/show_bug.cgi?id=100937
+
+        Reviewed by Rob Buis.
+
+        1. Translate these keys to their corresponding BlackBerry key code.
+        2. Break down a KeyChar event to a KeyDown/KeyUp pair. This is required
+        because we only handle scrolling on a KeyDown event in WebPage::keyEvent()
+        , and internally a KeyChar event is interpreted as a KeyDown event + a
+        KeyUp event in InputHandler::handleKeyboardInput().
+
+        Tests fixed:
+        1. editing/input/scroll-viewport-page-up-down.html
+        2. editing/selection/move-begin-end.html
+        3. fast/forms/select-popup-pagekeys.html
+
+        * DumpRenderTree/blackberry/EventSender.cpp:
+        (keyDownCallback):
+
+2012-11-09  Simon Hausmann  <simon.hausmann@digia.com>
+
+        Unreviewed prospective Qt/Windows build bot fix:
+
+        Make determination of qmake mkspec work with older versions of Qt that
+        still create a "mkspecs/default" directory.
+
+        * Scripts/webkitdirs.pm:
+        (qtMakeCommand):
+
+2012-11-09  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] Introduce a WebTestProxy to override methods in WebViewClient for layout tests
+        https://bugs.webkit.org/show_bug.cgi?id=101452
+
+        Reviewed by Adam Barth.
+
+        The WebTestProxy is template, so it can derive from an implementation
+        of the WebViewClient interface. That way, WebTestProxy can hook into
+        individual methods of the WebViewClient and forward all the rest to the
+        actual implementation.
+
+        To demonstrate how I want to use this, I moved the
+        postAccessibilityNotification method from WebViewHost to WebTestProxy.
+
+        * DumpRenderTree/DumpRenderTree.gypi:
+        * DumpRenderTree/chromium/TestRunner/public/WebTestProxy.h: Added.
+        (WebKit):
+        (WebTestRunner):
+        (WebTestProxyBase):
+        (WebTestProxy):
+        (WebTestRunner::WebTestProxy::WebTestProxy):
+        (WebTestRunner::WebTestProxy::~WebTestProxy):
+        (WebTestRunner::WebTestProxy::postAccessibilityNotification):
+        * DumpRenderTree/chromium/TestRunner/src/WebTestProxy.cpp: Added.
+        (WebTestRunner):
+        (WebTestRunner::WebTestProxyBase::WebTestProxyBase):
+        (WebTestRunner::WebTestProxyBase::~WebTestProxyBase):
+        (WebTestRunner::WebTestProxyBase::setInterfaces):
+        (WebTestRunner::WebTestProxyBase::setDelegate):
+        (WebTestRunner::WebTestProxyBase::doPostAccessibilityNotification):
+        * DumpRenderTree/chromium/TestShell.cpp:
+        (TestShell::createNewWindow):
+        * DumpRenderTree/chromium/WebViewHost.cpp:
+        * DumpRenderTree/chromium/WebViewHost.h:
+        (WebViewHost):
+
+2012-11-09  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Build with MSVC fails to use nmake instead of make
+        https://bugs.webkit.org/show_bug.cgi?id=98645
+
+        Reviewed by Tor Arne Vestbø.
+
+        Don't rely on the "default" mkspec but instead query the target
+        mkspec variable from qmake to find the right qmake.conf.
+
+        * Scripts/webkitdirs.pm:
+        (qtMakeCommand):
+
+2012-11-08  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [EFL] about:blank should display the blank page
+        https://bugs.webkit.org/show_bug.cgi?id=101566
+
+        Reviewed by Laszlo Gombos.
+
+        Add a check to return early without prepending http:// scheme, if the
+        URL is 'about:blank'.
+
+        * EWebLauncher/url_utils.c:
+        (url_from_user_input):
+
 2012-11-08  Christophe Dumez  <christophe.dumez@intel.com>
 
         [EFL][WK2] Add proper support for fullscreen API to MiniBrowser

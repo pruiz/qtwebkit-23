@@ -985,6 +985,7 @@ webkit.org/b/89052 fast/css/image-orientation
 
 # CSS3 Text support is not yet enabled (needs ENABLE_CSS3_TEXT).
 webkit.org/b/58491 fast/css3-text/css3-text-decoration
+webkit.org/b/76173 fast/css3-text/css3-text-align-last
 
 # Our slow tests, in alphabetical order.
 webkit.org/b/57672 http/tests/local/fileapi/send-sliced-dragged-file.html [ Failure Pass ]
@@ -1083,6 +1084,8 @@ webkit.org/b/85918 compositing/backface-visibility/backface-visibility-non3d.htm
 # Accelerated compositing is disabled for elements in a RenderFlowThread
 webkit.org/b/84900 compositing/regions/webkit-flow-renderer-layer-compositing.html [ ImageOnlyFailure ]
 
+webkit.org/b/101897 fast/regions/region-style-inline-background-color.html [ ImageOnlyFailure ]
+
 # Disable webaudio codec tests, including proprietary codecs.
 webkit.org/b/88794 webaudio/codec-tests
 
@@ -1164,6 +1167,9 @@ webkit.org/b/61138 http/tests/w3c/webperf/submission/Intel/resource-timing [ Ski
 
 # TileCache tests that don't apply to WK1 (they are re-enabled via the WK2 TestExpectations file)
 platform/mac/tiled-drawing/ [ Skip ]
+
+# DRT is not firing fake mouse events. Safari fires them fine. Looks like a bug with Apple's Mac DRT.
+webkit.org/b/101808 fast/scrolling/fake-mouse-event-throttling.html [ Skip ]
 
 webkit.org/b/100846 inspector-protocol/debugger-pause-dedicated-worker.html [ Skip ]
 webkit.org/b/100846 inspector-protocol/debugger-terminate-dedicated-worker-while-paused.html [ Skip ]

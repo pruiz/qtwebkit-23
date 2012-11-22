@@ -441,10 +441,6 @@ webcore_built_sources += \
 	DerivedSources/WebCore/JSHTMLUListElement.h \
 	DerivedSources/WebCore/JSHTMLVideoElement.cpp \
 	DerivedSources/WebCore/JSHTMLVideoElement.h \
-	DerivedSources/WebCore/JSIceCallback.cpp \
-	DerivedSources/WebCore/JSIceCallback.h \
-	DerivedSources/WebCore/JSIceCandidate.cpp \
-	DerivedSources/WebCore/JSIceCandidate.h \
 	DerivedSources/WebCore/JSIDBAny.cpp \
 	DerivedSources/WebCore/JSIDBAny.h \
 	DerivedSources/WebCore/JSIDBCursor.cpp \
@@ -587,8 +583,6 @@ webcore_built_sources += \
 	DerivedSources/WebCore/JSOverflowEvent.h \
 	DerivedSources/WebCore/JSPageTransitionEvent.cpp \
 	DerivedSources/WebCore/JSPageTransitionEvent.h \
-	DerivedSources/WebCore/JSPeerConnection00.cpp \
-	DerivedSources/WebCore/JSPeerConnection00.h \
 	DerivedSources/WebCore/JSPerformance.cpp \
 	DerivedSources/WebCore/JSPerformance.h \
 	DerivedSources/WebCore/JSPerformanceEntry.cpp \
@@ -661,8 +655,6 @@ webcore_built_sources += \
 	DerivedSources/WebCore/JSScriptProfile.h \
 	DerivedSources/WebCore/JSScriptProfileNode.cpp \
 	DerivedSources/WebCore/JSScriptProfileNode.h \
-	DerivedSources/WebCore/JSSessionDescription.cpp \
-	DerivedSources/WebCore/JSSessionDescription.h \
 	DerivedSources/WebCore/JSShadowRoot.cpp \
 	DerivedSources/WebCore/JSShadowRoot.h \
 	DerivedSources/WebCore/JSSharedWorkerContext.cpp \
@@ -1228,8 +1220,6 @@ dom_binding_idls += \
 	$(WebCore)/Modules/mediasource/SourceBuffer.idl \
 	$(WebCore)/Modules/mediasource/SourceBufferList.idl \
 	$(WebCore)/Modules/mediastream/DOMWindowMediaStream.idl \
-	$(WebCore)/Modules/mediastream/IceCallback.idl \
-	$(WebCore)/Modules/mediastream/IceCandidate.idl \
 	$(WebCore)/Modules/mediastream/LocalMediaStream.idl \
 	$(WebCore)/Modules/mediastream/MediaStream.idl \
 	$(WebCore)/Modules/mediastream/MediaStreamEvent.idl \
@@ -1241,7 +1231,6 @@ dom_binding_idls += \
 	$(WebCore)/Modules/mediastream/NavigatorUserMediaError.idl \
 	$(WebCore)/Modules/mediastream/NavigatorUserMediaErrorCallback.idl \
 	$(WebCore)/Modules/mediastream/NavigatorUserMediaSuccessCallback.idl \
-	$(WebCore)/Modules/mediastream/PeerConnection00.idl \
 	$(WebCore)/Modules/mediastream/RTCDataChannel.idl \
 	$(WebCore)/Modules/mediastream/RTCDataChannelEvent.idl \
 	$(WebCore)/Modules/mediastream/RTCErrorCallback.idl \
@@ -1254,7 +1243,6 @@ dom_binding_idls += \
 	$(WebCore)/Modules/mediastream/RTCStatsElement.idl \
 	$(WebCore)/Modules/mediastream/RTCStatsReport.idl \
 	$(WebCore)/Modules/mediastream/RTCStatsResponse.idl \
-	$(WebCore)/Modules/mediastream/SessionDescription.idl \
 	$(WebCore)/Modules/navigatorcontentutils/NavigatorContentUtils.idl \
 	$(WebCore)/Modules/notifications/Notification.idl \
 	$(WebCore)/Modules/notifications/NotificationCenter.idl \
@@ -1833,6 +1821,7 @@ webcore_modules_sources += \
 	Source/WebCore/Modules/indexeddb/DOMWindowIndexedDatabase.h \
 	Source/WebCore/Modules/indexeddb/IDBAny.cpp \
 	Source/WebCore/Modules/indexeddb/IDBAny.h \
+	Source/WebCore/Modules/indexeddb/IDBBackingStore.cpp \
 	Source/WebCore/Modules/indexeddb/IDBBackingStore.h \
 	Source/WebCore/Modules/indexeddb/IDBCallbacks.h \
 	Source/WebCore/Modules/indexeddb/IDBCursorBackendImpl.cpp \
@@ -1872,8 +1861,6 @@ webcore_modules_sources += \
 	Source/WebCore/Modules/indexeddb/IDBKeyPath.h \
 	Source/WebCore/Modules/indexeddb/IDBKeyRange.cpp \
 	Source/WebCore/Modules/indexeddb/IDBKeyRange.h \
-	Source/WebCore/Modules/indexeddb/IDBBackingStore.cpp \
-	Source/WebCore/Modules/indexeddb/IDBLevelDBBackingStore.h \
 	Source/WebCore/Modules/indexeddb/IDBLevelDBCoding.cpp \
 	Source/WebCore/Modules/indexeddb/IDBLevelDBCoding.h \
 	Source/WebCore/Modules/indexeddb/IDBMetadata.h \
@@ -1915,9 +1902,6 @@ webcore_modules_sources += \
 	Source/WebCore/Modules/mediasource/SourceBuffer.h \
 	Source/WebCore/Modules/mediasource/SourceBufferList.cpp \
 	Source/WebCore/Modules/mediasource/SourceBufferList.h \
-	Source/WebCore/Modules/mediastream/IceCallback.h \
-	Source/WebCore/Modules/mediastream/IceCandidate.cpp \
-	Source/WebCore/Modules/mediastream/IceCandidate.h \
 	Source/WebCore/Modules/mediastream/LocalMediaStream.cpp \
 	Source/WebCore/Modules/mediastream/LocalMediaStream.h \
 	Source/WebCore/Modules/mediastream/MediaConstraintsImpl.cpp \
@@ -1941,8 +1925,6 @@ webcore_modules_sources += \
 	Source/WebCore/Modules/mediastream/NavigatorUserMediaError.h \
 	Source/WebCore/Modules/mediastream/NavigatorUserMediaErrorCallback.h \
 	Source/WebCore/Modules/mediastream/NavigatorUserMediaSuccessCallback.h \
-	Source/WebCore/Modules/mediastream/PeerConnection00.cpp \
-	Source/WebCore/Modules/mediastream/PeerConnection00.h \
 	Source/WebCore/Modules/mediastream/RTCDataChannel.cpp \
 	Source/WebCore/Modules/mediastream/RTCDataChannel.h \
 	Source/WebCore/Modules/mediastream/RTCDataChannelEvent.cpp \
@@ -1970,8 +1952,6 @@ webcore_modules_sources += \
 	Source/WebCore/Modules/mediastream/RTCStatsResponse.h \
 	Source/WebCore/Modules/mediastream/RTCVoidRequestImpl.cpp \
 	Source/WebCore/Modules/mediastream/RTCVoidRequestImpl.h \
-	Source/WebCore/Modules/mediastream/SessionDescription.cpp \
-	Source/WebCore/Modules/mediastream/SessionDescription.h \
 	Source/WebCore/Modules/mediastream/UserMediaClient.h \
 	Source/WebCore/Modules/mediastream/UserMediaController.h \
 	Source/WebCore/Modules/mediastream/UserMediaController.cpp \
@@ -2385,7 +2365,6 @@ webcore_sources += \
 	Source/WebCore/bindings/js/JSSVGElementInstanceCustom.cpp \
 	Source/WebCore/bindings/js/JSSVGLengthCustom.cpp \
 	Source/WebCore/bindings/js/JSSVGPathSegCustom.cpp \
-	Source/WebCore/bindings/js/JSScriptProfileNodeCustom.cpp \
 	Source/WebCore/bindings/js/JSSharedWorkerCustom.cpp \
 	Source/WebCore/bindings/js/JSStorageCustom.cpp \
 	Source/WebCore/bindings/js/JSStorageCustom.h \
@@ -2495,6 +2474,7 @@ webcore_sources += \
 	Source/WebCore/config.h \
 	Source/WebCore/css/BasicShapeFunctions.cpp \
 	Source/WebCore/css/BasicShapeFunctions.h \
+	Source/WebCore/css/CachedSVGDocumentReference.h \
 	Source/WebCore/css/Counter.h \
 	Source/WebCore/css/CSSAspectRatioValue.cpp \
 	Source/WebCore/css/CSSAspectRatioValue.h \
@@ -3574,6 +3554,8 @@ webcore_sources += \
 	Source/WebCore/html/shadow/MeterShadowElement.h \
 	Source/WebCore/html/shadow/ProgressShadowElement.cpp \
 	Source/WebCore/html/shadow/ProgressShadowElement.h \
+	Source/WebCore/html/shadow/SelectRuleFeatureSet.cpp \
+	Source/WebCore/html/shadow/SelectRuleFeatureSet.h \
 	Source/WebCore/html/shadow/SliderThumbElement.cpp \
 	Source/WebCore/html/shadow/SliderThumbElement.h \
 	Source/WebCore/html/shadow/SpinButtonElement.cpp \
@@ -3857,6 +3839,8 @@ webcore_sources += \
 	Source/WebCore/loader/cache/CachePolicy.h \
 	Source/WebCore/loader/CachedMetadata.cpp \
 	Source/WebCore/loader/CachedMetadata.h \
+	Source/WebCore/loader/CookieJar.cpp \
+	Source/WebCore/loader/CookieJar.h \
 	Source/WebCore/loader/CrossOriginAccessControl.cpp \
 	Source/WebCore/loader/CrossOriginAccessControl.h \
 	Source/WebCore/loader/CrossOriginPreflightResultCache.cpp \
@@ -4103,6 +4087,8 @@ webcore_sources += \
 	Source/WebCore/page/scrolling/ScrollingCoordinator.h \
 	Source/WebCore/page/scrolling/ScrollingStateNode.cpp \
 	Source/WebCore/page/scrolling/ScrollingStateNode.h \
+	Source/WebCore/page/scrolling/ScrollingStateFixedNode.cpp \
+	Source/WebCore/page/scrolling/ScrollingStateFixedNode.h \
 	Source/WebCore/page/scrolling/ScrollingStateScrollingNode.cpp \
 	Source/WebCore/page/scrolling/ScrollingStateScrollingNode.h \
 	Source/WebCore/page/scrolling/ScrollingStateTree.cpp \
@@ -4247,7 +4233,6 @@ webcore_sources += \
 	Source/WebCore/platform/ContextMenuItem.h \
 	Source/WebCore/platform/Cookie.h \
 	Source/WebCore/platform/CookiesStrategy.h \
-	Source/WebCore/platform/CookieJar.h \
 	Source/WebCore/platform/CrossThreadCopier.cpp \
 	Source/WebCore/platform/CrossThreadCopier.h \
 	Source/WebCore/platform/Cursor.cpp \
@@ -4633,13 +4618,7 @@ webcore_sources += \
 	Source/WebCore/platform/LayoutTestSupport.h \
 	Source/WebCore/platform/linux/GamepadDeviceLinux.cpp \
 	Source/WebCore/platform/linux/GamepadDeviceLinux.h \
-	Source/WebCore/platform/mediastream/IceCandidateDescriptor.cpp \
-	Source/WebCore/platform/mediastream/IceCandidateDescriptor.h \
-	Source/WebCore/platform/mediastream/IceOptions.cpp \
-	Source/WebCore/platform/mediastream/IceOptions.h \
 	Source/WebCore/platform/mediastream/MediaConstraints.h \
-	Source/WebCore/platform/mediastream/MediaHints.cpp \
-	Source/WebCore/platform/mediastream/MediaHints.h \
 	Source/WebCore/platform/mediastream/MediaStreamCenter.cpp \
 	Source/WebCore/platform/mediastream/MediaStreamCenter.h \
 	Source/WebCore/platform/mediastream/MediaStreamComponent.h \
@@ -4647,9 +4626,6 @@ webcore_sources += \
 	Source/WebCore/platform/mediastream/MediaStreamSource.cpp \
 	Source/WebCore/platform/mediastream/MediaStreamSource.h \
 	Source/WebCore/platform/mediastream/MediaStreamSourcesQueryClient.h \
-	Source/WebCore/platform/mediastream/PeerConnection00Handler.cpp \
-	Source/WebCore/platform/mediastream/PeerConnection00Handler.h \
-	Source/WebCore/platform/mediastream/PeerConnection00HandlerClient.h \
 	Source/WebCore/platform/mediastream/RTCConfiguration.h \
 	Source/WebCore/platform/mediastream/RTCDataChannelDescriptor.cpp \
 	Source/WebCore/platform/mediastream/RTCDataChannelDescriptor.h \
@@ -4663,8 +4639,6 @@ webcore_sources += \
 	Source/WebCore/platform/mediastream/RTCSessionDescriptionDescriptor.h \
 	Source/WebCore/platform/mediastream/RTCStatsRequest.h \
 	Source/WebCore/platform/mediastream/RTCVoidRequest.h \
-	Source/WebCore/platform/mediastream/SessionDescriptionDescriptor.cpp \
-	Source/WebCore/platform/mediastream/SessionDescriptionDescriptor.h \
 	Source/WebCore/platform/mediastream/gstreamer/MediaStreamCenterGStreamer.cpp \
 	Source/WebCore/platform/mediastream/gstreamer/MediaStreamCenterGStreamer.h \
 	Source/WebCore/platform/mock/DeviceMotionClientMock.cpp \
@@ -4715,6 +4689,7 @@ webcore_sources += \
 	Source/WebCore/platform/network/ProxyServer.h \
 	Source/WebCore/platform/network/NetworkStateNotifier.cpp \
 	Source/WebCore/platform/network/NetworkStateNotifier.h \
+	Source/WebCore/platform/network/PlatformCookieJar.h \
 	Source/WebCore/platform/network/ProtectionSpaceHash.h \
 	Source/WebCore/platform/network/ProtectionSpace.cpp \
 	Source/WebCore/platform/network/ProtectionSpace.h \
@@ -5801,6 +5776,7 @@ webcore_sources += \
 	Source/WebCore/workers/SharedWorker.cpp \
 	Source/WebCore/workers/SharedWorker.h \
 	Source/WebCore/workers/SharedWorkerRepository.h \
+	Source/WebCore/workers/SharedWorkerStrategy.h \
 	Source/WebCore/workers/SharedWorkerThread.cpp \
 	Source/WebCore/workers/SharedWorkerThread.h \
 	Source/WebCore/workers/WorkerContext.cpp \
@@ -5824,10 +5800,10 @@ webcore_sources += \
 	Source/WebCore/workers/WorkerScriptLoader.h \
 	Source/WebCore/workers/WorkerThread.cpp \
 	Source/WebCore/workers/WorkerThread.h \
-	Source/WebCore/xml/parser/CharacterReferenceParserInlineMethods.h \
+	Source/WebCore/xml/parser/CharacterReferenceParserInlines.h \
 	Source/WebCore/xml/parser/MarkupTokenBase.h \
 	Source/WebCore/xml/parser/MarkupTokenizerBase.h \
-	Source/WebCore/xml/parser/MarkupTokenizerInlineMethods.h \
+	Source/WebCore/xml/parser/MarkupTokenizerInlines.h \
 	Source/WebCore/xml/parser/NewXMLDocumentParser.cpp \
 	Source/WebCore/xml/parser/NewXMLDocumentParser.h \
 	Source/WebCore/xml/parser/XMLCharacterReferenceParser.cpp \

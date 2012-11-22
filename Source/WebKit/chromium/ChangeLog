@@ -1,3 +1,290 @@
+2012-11-12  Keishi Hattori  <keishi@webkit.org>
+
+        Add support for week/month to Locale::formatDateTime()
+        https://bugs.webkit.org/show_bug.cgi?id=101878
+
+        Reviewed by Kent Tamura.
+
+        * tests/LocaleMacTest.cpp:
+        (LocaleMacTest::formatWeek): Takes ISO string and returns localized string.
+        (LocaleMacTest):
+        (LocaleMacTest::formatMonth): Ditto.
+        (TEST_F):
+
+2012-11-11  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        [chromium] Expose CustomEvent through WebDOMCustomEvent.
+        https://bugs.webkit.org/show_bug.cgi?id=101293
+
+        Reviewed by Adam Barth.
+
+        * WebKit.gyp:
+        * public/WebDOMCustomEvent.h: Added.
+        (WebKit):
+        (WebDOMCustomEvent):
+        (WebKit::WebDOMCustomEvent::WebDOMCustomEvent):
+        * src/WebDOMCustomEvent.cpp: Added.
+        (WebKit):
+        (WebKit::WebDOMCustomEvent::initCustomEvent):
+
+2012-11-09  Rick Byers  <rbyers@chromium.org>
+
+        Move chromium to USE(LAZY_NATIVE_CURSOR)
+        https://bugs.webkit.org/show_bug.cgi?id=101501
+
+        Reviewed by Adam Barth.
+
+        Update conversion from Cursor to WebCursorInfo to remove the
+        intermediate (and useless) step of PlatformCursor.
+
+        * src/AssertMatchingEnums.cpp:
+        * src/WebCursorInfo.cpp:
+        (WebKit::WebCursorInfo::WebCursorInfo):
+
+2012-11-09  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: Combine IDBBackingStore and IDBLevelDBBackingStore
+        https://bugs.webkit.org/show_bug.cgi?id=101415
+
+        Reviewed by Tony Chang.
+
+        Remove method that is no longer in the base class.
+
+        * tests/IDBFakeBackingStore.h:
+
+2012-11-09  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134101.
+        http://trac.webkit.org/changeset/134101
+        https://bugs.webkit.org/show_bug.cgi?id=101790
+
+        IDBDatabaseBackendTest.BackingStoreRetention failing
+        (Requested by jsbell|gardener on #webkit).
+
+        * tests/IDBFakeBackingStore.h:
+
+2012-11-09  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: Combine IDBBackingStore and IDBLevelDBBackingStore
+        https://bugs.webkit.org/show_bug.cgi?id=101415
+
+        Reviewed by Tony Chang.
+
+        Remove method that is no longer in the base class.
+
+        * tests/IDBFakeBackingStore.h:
+
+2012-11-09  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: switch frontend to use int64_t-based references
+        https://bugs.webkit.org/show_bug.cgi?id=100426
+
+        Reviewed by Tony Chang.
+
+        Remove implementation stubs from chromium API for
+        methods obsoleted by https://bugs.webkit.org/show_bug.cgi?id=100425
+
+        * src/IDBObjectStoreBackendProxy.cpp:
+        * src/IDBObjectStoreBackendProxy.h:
+        (IDBObjectStoreBackendProxy):
+        * src/WebIDBDatabaseImpl.cpp:
+        * src/WebIDBDatabaseImpl.h:
+        (WebIDBDatabaseImpl):
+        * src/WebIDBObjectStoreImpl.cpp:
+        * src/WebIDBObjectStoreImpl.h:
+        (WebIDBObjectStoreImpl):
+
+2012-11-09  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Deleting all files relating to the deprecated PeerConnection00
+        https://bugs.webkit.org/show_bug.cgi?id=101730
+
+        Reviewed by Adam Barth.
+
+        Since RTCPeerConenction has superseeded PeerConnection00 this patch removes all
+        files relating to the old API.
+
+        * WebKit.gyp:
+        * public/WebRuntimeFeatures.h:
+        (WebRuntimeFeatures):
+        * public/platform/WebICECandidateDescriptor.h: Removed.
+        * public/platform/WebICEOptions.h: Removed.
+        * public/platform/WebMediaHints.h: Removed.
+        * public/platform/WebPeerConnection00Handler.h: Removed.
+        * public/platform/WebPeerConnection00HandlerClient.h: Removed.
+        * public/platform/WebPeerConnectionHandler.h: Removed.
+        * public/platform/WebPeerConnectionHandlerClient.h: Removed.
+        * public/platform/WebSessionDescriptionDescriptor.h: Removed.
+        * src/AssertMatchingEnums.cpp:
+        * src/WebRuntimeFeatures.cpp:
+        (WebKit::WebRuntimeFeatures::isPeerConnectionEnabled):
+        * src/WebSessionDescriptionDescriptor.cpp: Removed.
+
+2012-11-08  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134010.
+        http://trac.webkit.org/changeset/134010
+        https://bugs.webkit.org/show_bug.cgi?id=101716
+
+        Broke the chromium windows build. (Requested by noel_ on
+        #webkit).
+
+        * src/IDBCallbacksProxy.cpp:
+        * src/IDBDatabaseBackendProxy.cpp:
+        (WebKit::IDBDatabaseBackendProxy::transaction):
+        (WebKit):
+        * src/IDBDatabaseBackendProxy.h:
+        (IDBDatabaseBackendProxy):
+        * src/IDBObjectStoreBackendProxy.cpp:
+        (WebKit::IDBObjectStoreBackendProxy::putWithIndexKeys):
+        (WebKit):
+        (WebKit::IDBObjectStoreBackendProxy::setIndexKeys):
+        (WebKit::IDBObjectStoreBackendProxy::createIndex):
+        (WebKit::IDBObjectStoreBackendProxy::setIndexesReady):
+        (WebKit::IDBObjectStoreBackendProxy::index):
+        (WebKit::IDBObjectStoreBackendProxy::deleteIndex):
+        * src/IDBObjectStoreBackendProxy.h:
+        (IDBObjectStoreBackendProxy):
+        * src/WebIDBDatabaseImpl.cpp:
+        (WebKit::WebIDBDatabaseImpl::deleteObjectStore):
+        (WebKit):
+        (WebKit::WebIDBDatabaseImpl::transaction):
+        * src/WebIDBDatabaseImpl.h:
+        (WebIDBDatabaseImpl):
+        * src/WebIDBObjectStoreImpl.cpp:
+        (WebKit::WebIDBObjectStoreImpl::putWithIndexKeys):
+        (WebKit):
+        (WebKit::WebIDBObjectStoreImpl::setIndexKeys):
+        (WebKit::WebIDBObjectStoreImpl::setIndexesReady):
+        (WebKit::WebIDBObjectStoreImpl::index):
+        (WebKit::WebIDBObjectStoreImpl::deleteIndex):
+        * src/WebIDBObjectStoreImpl.h:
+        (WebIDBObjectStoreImpl):
+        * src/WebIDBTransactionImpl.cpp:
+        (WebKit::WebIDBTransactionImpl::objectStore):
+        (WebKit):
+        * src/WebIDBTransactionImpl.h:
+        * tests/IDBRequestTest.cpp:
+
+2012-11-08  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: switch frontend to use int64_t-based references
+        https://bugs.webkit.org/show_bug.cgi?id=100426
+
+        Reviewed by Tony Chang.
+
+        Remove implementation stubs from chromium API for
+        methods obsoleted by https://bugs.webkit.org/show_bug.cgi?id=100425
+
+        * src/IDBObjectStoreBackendProxy.cpp:
+        * src/IDBObjectStoreBackendProxy.h:
+        (IDBObjectStoreBackendProxy):
+        * src/WebIDBDatabaseImpl.cpp:
+        * src/WebIDBDatabaseImpl.h:
+        (WebIDBDatabaseImpl):
+        * src/WebIDBObjectStoreImpl.cpp:
+        * src/WebIDBObjectStoreImpl.h:
+        (WebIDBObjectStoreImpl):
+
+2012-11-08  Keishi Hattori  <keishi@webkit.org>
+
+        WebPagePopupImpl::handleKeyEvent is called after WebPagePopupImpl::close
+        https://bugs.webkit.org/show_bug.cgi?id=93800
+
+        Reviewed by Kent Tamura.
+
+        We need to set m_closing to true in WebPagePopupImpl::close so we won't access m_page in WebPagePopupImpl::handleKeyEvent.
+
+        * src/WebPagePopupImpl.cpp:
+        (WebKit::WebPagePopupImpl::close): Set m_closing to true.
+
+2012-11-08  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r133984.
+        http://trac.webkit.org/changeset/133984
+        https://bugs.webkit.org/show_bug.cgi?id=101684
+
+        windows build error. (Requested by hayato on #webkit).
+
+        * src/IDBObjectStoreBackendProxy.cpp:
+        (WebKit::IDBObjectStoreBackendProxy::putWithIndexKeys):
+        (WebKit):
+        (WebKit::IDBObjectStoreBackendProxy::setIndexKeys):
+        (WebKit::IDBObjectStoreBackendProxy::createIndex):
+        (WebKit::IDBObjectStoreBackendProxy::setIndexesReady):
+        (WebKit::IDBObjectStoreBackendProxy::index):
+        (WebKit::IDBObjectStoreBackendProxy::deleteIndex):
+        * src/IDBObjectStoreBackendProxy.h:
+        (IDBObjectStoreBackendProxy):
+        * src/WebIDBDatabaseImpl.cpp:
+        (WebKit::WebIDBDatabaseImpl::deleteObjectStore):
+        (WebKit):
+        (WebKit::WebIDBDatabaseImpl::transaction):
+        * src/WebIDBDatabaseImpl.h:
+        (WebIDBDatabaseImpl):
+        * src/WebIDBObjectStoreImpl.cpp:
+        (WebKit::WebIDBObjectStoreImpl::putWithIndexKeys):
+        (WebKit):
+        (WebKit::WebIDBObjectStoreImpl::setIndexKeys):
+        (WebKit::WebIDBObjectStoreImpl::setIndexesReady):
+        (WebKit::WebIDBObjectStoreImpl::index):
+        (WebKit::WebIDBObjectStoreImpl::deleteIndex):
+        * src/WebIDBObjectStoreImpl.h:
+        (WebIDBObjectStoreImpl):
+        * src/WebIDBTransactionImpl.cpp:
+        (WebKit::WebIDBTransactionImpl::objectStore):
+        (WebKit):
+        * src/WebIDBTransactionImpl.h:
+
+2012-11-08  Alec Flett  <alecflett@chromium.org>
+
+        IndexedDB: switch frontend to use int64_t-based references
+        https://bugs.webkit.org/show_bug.cgi?id=100426
+
+        Reviewed by Tony Chang.
+
+        Remove implementation stubs from chromium API for
+        methods obsoleted by https://bugs.webkit.org/show_bug.cgi?id=100425
+
+        * src/IDBObjectStoreBackendProxy.cpp:
+        * src/IDBObjectStoreBackendProxy.h:
+        (IDBObjectStoreBackendProxy):
+        * src/WebIDBDatabaseImpl.cpp:
+        * src/WebIDBDatabaseImpl.h:
+        (WebIDBDatabaseImpl):
+        * src/WebIDBObjectStoreImpl.cpp:
+        * src/WebIDBObjectStoreImpl.h:
+        (WebIDBObjectStoreImpl):
+
+2012-11-07  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] WebElement::hasHTMLTagName returns true for non-HTML elements
+        https://bugs.webkit.org/show_bug.cgi?id=101537
+
+        Reviewed by Abhishek Arya.
+
+        We should not do ignore-case comparison for tagName, which is always
+        upper-case and createElementNS(xhtmlNS, "INPUT") doesn't create an
+        HTMLInputElement object. We need to check if localName is equal to
+        "input" in this case.
+
+        * src/WebElement.cpp:
+        (WebKit::WebElement::hasHTMLTagName):
+
+2012-11-08  Joshua Bell  <jsbell@chromium.org>
+
+        Expose snapshots in platform/leveldb wrapper API
+        https://bugs.webkit.org/show_bug.cgi?id=100786
+
+        Reviewed by Tony Chang.
+
+        Add unit tests for transactions/snapshots.
+
+        * tests/LevelDBTest.cpp:
+        (WebCore::encodeString): Don't append to pre-sized vector.
+        (WebCore::TEST):
+        (WebCore):
+
 2012-11-08  Adam Barth  <abarth@webkit.org>
 
         Unreviewed.

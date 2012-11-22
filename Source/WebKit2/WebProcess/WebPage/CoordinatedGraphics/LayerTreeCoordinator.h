@@ -70,7 +70,7 @@ public:
     virtual int64_t adoptImageBackingStore(WebCore::Image*);
     virtual void releaseImageBackingStore(int64_t);
 
-    virtual void createTile(WebLayerID, int tileID, const SurfaceUpdateInfo&, const WebCore::IntRect&);
+    virtual void createTile(WebLayerID, int tileID, const SurfaceUpdateInfo&, const WebCore::IntRect& tileRect, const WebCore::IntSize& backingSize);
     virtual void updateTile(WebLayerID, int tileID, const SurfaceUpdateInfo&, const WebCore::IntRect&);
     virtual void removeTile(WebLayerID, int tileID);
     virtual WebCore::IntRect visibleContentsRect() const;
@@ -153,6 +153,8 @@ private:
 
     bool m_notifyAfterScheduledLayerFlush;
     bool m_isValid;
+    // We don't send the messages related to releasing resources to UI Process during purging, because UI Process already had removed all resources.
+    bool m_isPurging;
 
     bool m_waitingForUIProcess;
     bool m_isSuspended;

@@ -49,12 +49,12 @@ class LayerTreeRenderer : public ThreadSafeRefCounted<LayerTreeRenderer>, public
 public:
     struct TileUpdate {
         WebCore::IntRect sourceRect;
-        WebCore::IntRect targetRect;
+        WebCore::IntRect tileRect;
         RefPtr<ShareableSurface> surface;
         WebCore::IntPoint offset;
-        TileUpdate(const WebCore::IntRect& source, const WebCore::IntRect& target, PassRefPtr<ShareableSurface> newSurface, const WebCore::IntPoint& newOffset)
+        TileUpdate(const WebCore::IntRect& source, const WebCore::IntRect& tile, PassRefPtr<ShareableSurface> newSurface, const WebCore::IntPoint& newOffset)
             : sourceRect(source)
-            , targetRect(target)
+            , tileRect(tile)
             , surface(newSurface)
             , offset(newOffset)
         {
@@ -85,7 +85,7 @@ public:
     void setLayerFilters(WebLayerID, const WebCore::FilterOperations&);
 #endif
 
-    void createTile(WebLayerID, int, float scale);
+    void createTile(WebLayerID, int, float scale, const WebCore::IntSize&);
     void removeTile(WebLayerID, int);
     void updateTile(WebLayerID, int, const TileUpdate&);
     void flushLayerChanges();
@@ -99,6 +99,12 @@ public:
     void animationFrameReady();
 #endif
 
+    void setAccelerationMode(WebCore::TextureMapper::AccelerationMode mode)
+    {
+        // The acceleration mode is set only before TextureMapper was created.
+        ASSERT(!m_textureMapper);
+        m_accelerationMode = mode;
+    }
 private:
     PassOwnPtr<WebCore::GraphicsLayer> createLayer(WebLayerID);
 
@@ -153,6 +159,7 @@ private:
 #if ENABLE(REQUEST_ANIMATION_FRAME)
     bool m_animationFrameRequested;
 #endif
+    WebCore::TextureMapper::AccelerationMode m_accelerationMode;
 };
 
 };

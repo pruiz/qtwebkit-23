@@ -422,7 +422,7 @@ WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const In
     , m_fullscreenVideoNode(0)
     , m_hasInRegionScrollableAreas(false)
     , m_updateDelegatedOverlaysDispatched(false)
-    , m_enableQnxJavaScriptObject(true)
+    , m_enableQnxJavaScriptObject(false)
     , m_deferredTasksTimer(this, &WebPagePrivate::deferredTasksTimerFired)
     , m_selectPopup(0)
     , m_autofillManager(AutofillManager::create(this))
@@ -570,9 +570,6 @@ void WebPagePrivate::init(const BlackBerry::Platform::String& pageGroupName)
 #if ENABLE(NETWORK_INFO)
     WebCore::provideNetworkInfoTo(m_page, new WebCore::NetworkInfoClientBlackBerry(this));
 #endif
-
-    m_page->setCustomHTMLTokenizerChunkSize(256);
-    m_page->setCustomHTMLTokenizerTimeDelay(0.3);
 
     m_webSettings = WebSettings::createFromStandardSettings();
     m_webSettings->setUserAgentString(defaultUserAgent());
@@ -1032,6 +1029,11 @@ void WebPagePrivate::setLoadState(LoadState state)
     // See RIM Bug #1068.
     if (state == Finished && m_mainFrame && m_mainFrame->document())
         m_mainFrame->document()->updateStyleIfNeeded();
+
+    // Dispatch the backingstore background color at important state changes.
+    m_backingStore->d->setWebPageBackgroundColor(m_mainFrame && m_mainFrame->view()
+        ? m_mainFrame->view()->documentBackgroundColor()
+        : m_webSettings->backgroundColor());
 
     m_loadState = state;
 
@@ -4112,6 +4114,11 @@ bool WebPage::touchPointAsMouseEvent(const Platform::TouchPoint& point, bool use
     return d->m_touchEventHandler->handleTouchPoint(tPoint, useFatFingers);
 }
 
+void WebPage::playSoundIfAnchorIsTarget() const
+{
+    d->m_touchEventHandler->playSoundIfAnchorIsTarget();
+}
+
 bool WebPagePrivate::dispatchTouchPointAsMouseEventToFullScreenPlugin(PluginView* pluginView, const Platform::TouchPoint& point)
 {
     NPEvent npEvent;
@@ -5848,6 +5855,11 @@ void WebPagePrivate::didChangeSettings(WebSettings* webSettings)
 
         Platform::userInterfaceThreadMessageClient()->dispatchMessage(
             createMethodCallMessage(&WebPagePrivate::setCompositorBackgroundColor, this, backgroundColor));
+    }
+    if (m_backingStore) {
+        m_backingStore->d->setWebPageBackgroundColor(m_mainFrame && m_mainFrame->view()
+            ? m_mainFrame->view()->documentBackgroundColor()
+            : webSettings->backgroundColor());
     }
 
     m_page->setDeviceScaleFactor(webSettings->devicePixelRatio());

@@ -54,6 +54,7 @@
 #include <Ecore_Evas.h>
 #include <Ecore_X.h>
 #include <Edje.h>
+#include <WebCore/CairoUtilitiesEfl.h>
 #include <WebCore/Cursor.h>
 
 #if ENABLE(VIBRATION)
@@ -120,13 +121,14 @@ EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<EwkContext> context, Pass
     , m_scaleFactor(1)
 #endif
     , m_settings(Ewk_Settings::create(this))
-    , m_cursorGroup(0)
+    , m_cursorIdentifier(0)
     , m_mouseEventsEnabled(false)
 #if ENABLE(TOUCH_EVENTS)
     , m_touchEventsEnabled(false)
 #endif
     , m_displayTimer(this, &EwkViewImpl::displayTimerFired)
     , m_inputMethodContext(InputMethodContextEfl::create(this, smartData()->base.evas))
+    , m_isHardwareAccelerated(true)
 {
     ASSERT(m_view);
     ASSERT(m_context);
@@ -148,6 +150,8 @@ EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<EwkContext> context, Pass
     m_pageProxy->fullScreenManager()->setWebView(m_view);
     m_pageProxy->pageGroup()->preferences()->setFullScreenEnabled(true);
 #endif
+
+    m_pageProxy->pageGroup()->preferences()->setOfflineWebApplicationCacheEnabled(true);
 
     // Enable mouse events by default
     setMouseEventsEnabled(true);
@@ -199,11 +203,38 @@ WKPageRef EwkViewImpl::wkPage()
 
 void EwkViewImpl::setCursor(const Cursor& cursor)
 {
+    if (cursor.image()) {
+        // Custom cursor.
+        if (cursor.image() == m_cursorIdentifier)
+            return;
+
+        m_cursorIdentifier = cursor.image();
+
+        Ewk_View_Smart_Data* sd = smartData();
+        RefPtr<Evas_Object> cursorObject = adoptRef(cursor.image()->getEvasObject(sd->base.evas));
+        if (!cursorObject)
+            return;
+
+        // Resize cursor.
+        evas_object_resize(cursorObject.get(), cursor.image()->size().width(), cursor.image()->size().height());
+
+        // Get cursor hot spot.
+        IntPoint hotSpot;
+        cursor.image()->getHotSpot(hotSpot);
+
+        Ecore_Evas* ecoreEvas = ecore_evas_ecore_evas_get(sd->base.evas);
+        // ecore_evas takes care of freeing the cursor object.
+        ecore_evas_object_cursor_set(ecoreEvas, cursorObject.release().leakRef(), EVAS_LAYER_MAX, hotSpot.x(), hotSpot.y());
+
+        return;
+    }
+
+    // Standard cursor.
     const char* group = cursor.platformCursor();
-    if (!group || group == m_cursorGroup)
+    if (!group || group == m_cursorIdentifier)
         return;
 
-    m_cursorGroup = group;
+    m_cursorIdentifier = group;
     Ewk_View_Smart_Data* sd = smartData();
     RefPtr<Evas_Object> cursorObject = adoptRef(edje_object_add(sd->base.evas));
 
@@ -305,23 +336,40 @@ void EwkViewImpl::displayTimerFired(Timer<EwkViewImpl>*)
     LayerTreeRenderer* renderer = page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer();
     renderer->setActive(true);
     renderer->syncRemoteContent();
+    if (m_isHardwareAccelerated) {
+        renderer->paintToCurrentGLContext(transformToScene().toTransformationMatrix(), /* opacity */ 1, viewport);
+        // sd->image is tied to a native surface. The native surface is in the parent's coordinates,
+        // so we need to account for the viewport position when calling evas_object_image_data_update_add.
+        evas_object_image_data_update_add(sd->image, viewport.x(), viewport.y(), viewport.width(), viewport.height());
+    } else {
+        RefPtr<cairo_surface_t> surface = createSurfaceForImage(sd->image);
+        if (!surface)
+            return;
 
-    renderer->paintToCurrentGLContext(transformToScene().toTransformationMatrix(), /* opacity */ 1, viewport);
-
-    evas_object_image_data_update_add(sd->image, viewport.x(), viewport.y(), viewport.width(), viewport.height());
+        RefPtr<cairo_t> graphicsContext = adoptRef(cairo_create(surface.get()));
+        cairo_translate(graphicsContext.get(), -m_scrollPosition.x(), -m_scrollPosition.y());
+        cairo_scale(graphicsContext.get(), m_scaleFactor, m_scaleFactor);
+        renderer->paintToGraphicsContext(graphicsContext.get());
+        evas_object_image_data_update_add(sd->image, 0, 0, viewport.width(), viewport.height());
+    }
 #endif
 }
 
 void EwkViewImpl::update(const IntRect& rect)
 {
+    Ewk_View_Smart_Data* sd = smartData();
 #if USE(COORDINATED_GRAPHICS)
     // Coordinated graphices needs to schedule an full update, not
     // repainting of a region. Update in the event loop.
     UNUSED_PARAM(rect);
+
+    // Guard for zero sized viewport.
+    if (!(sd->view.w && sd->view.h))
+        return;
+
     if (!m_displayTimer.isActive())
         m_displayTimer.startOneShot(0);
 #else
-    Ewk_View_Smart_Data* sd = smartData();
     if (!sd->image)
         return;
 
@@ -534,11 +582,20 @@ void EwkViewImpl::informIconChange()
 #if USE(ACCELERATED_COMPOSITING)
 bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
 {
+    if (!m_isHardwareAccelerated)
+        return true;
+
     if (!m_evasGL) {
         Evas* evas = evas_object_evas_get(m_view);
         m_evasGL = adoptPtr(evas_gl_new(evas));
-        if (!m_evasGL)
+        if (!m_evasGL) {
+            m_isHardwareAccelerated = false;
+            page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer()->setAccelerationMode(TextureMapper::SoftwareMode);
+#if ENABLE(WEBGL)
+            m_pageProxy->pageGroup()->preferences()->setWebGLEnabled(false);
+#endif
             return false;
+        }
     }
 
     if (!m_evasGLContext) {
@@ -578,6 +635,11 @@ bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
 
 bool EwkViewImpl::enterAcceleratedCompositingMode()
 {
+    page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer()->setActive(true);
+
+    if (!m_isHardwareAccelerated)
+        return true;
+
     if (!m_evasGLSurface) {
         if (!createGLSurface(size())) {
             WARN("Failed to create GLSurface.");
@@ -585,7 +647,6 @@ bool EwkViewImpl::enterAcceleratedCompositingMode()
         }
     }
 
-    page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer()->setActive(true);
     return true;
 }
 

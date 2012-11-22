@@ -162,14 +162,6 @@ v8::Handle<v8::Value> V8HTMLDocument::openCallback(const v8::Arguments& args)
     return args.Holder();
 }
 
-v8::Handle<v8::Value> V8HTMLDocument::allAccessorGetter(v8::Local<v8::String> name, const v8::AccessorInfo& info)
-{
-    INC_STATS("DOM.HTMLDocument.all._get");
-    v8::Handle<v8::Object> holder = info.Holder();
-    HTMLDocument* htmlDocument = V8HTMLDocument::toNative(holder);
-    return toV8(htmlDocument->all(), info.Holder(), info.GetIsolate());
-}
-
 void V8HTMLDocument::allAccessorSetter(v8::Local<v8::String> name, v8::Local<v8::Value> value, const v8::AccessorInfo& info)
 {
     // Just emulate a normal JS behaviour---install a property on this.
@@ -185,7 +177,7 @@ v8::Handle<v8::Value> toV8(HTMLDocument* impl, v8::Handle<v8::Object> creationCo
         return wrapper;
     if (!V8DOMWindowShell::getEntered()) {
         if (Frame* frame = impl->frame())
-            frame->script()->windowShell()->updateDocumentWrapper(wrapper);
+            frame->script()->windowShell(mainThreadNormalWorld())->updateDocumentWrapper(wrapper);
     }
     return wrapper;
 }

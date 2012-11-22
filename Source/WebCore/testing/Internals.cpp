@@ -68,6 +68,7 @@
 #include "RenderTreeAsText.h"
 #include "RuntimeEnabledFeatures.h"
 #include "SchemeRegistry.h"
+#include "SelectRuleFeatureSet.h"
 #include "Settings.h"
 #include "ShadowRoot.h"
 #include "SpellChecker.h"
@@ -304,6 +305,39 @@ Node* Internals::parentTreeScope(Node* node, ExceptionCode& ec)
     }
     const TreeScope* parentTreeScope = node->treeScope()->parentTreeScope();
     return parentTreeScope ? parentTreeScope->rootNode() : 0;
+}
+
+bool Internals::hasSelectorForIdInShadow(Element* host, const String& idValue, ExceptionCode& ec)
+{
+    if (!host || !host->shadow()) {
+        ec = INVALID_ACCESS_ERR;
+        return 0;
+    }
+
+    host->shadow()->ensureSelectFeatureSetCollected();
+    return host->shadow()->selectRuleFeatureSet().hasSelectorForId(idValue);
+}
+
+bool Internals::hasSelectorForClassInShadow(Element* host, const String& className, ExceptionCode& ec)
+{
+    if (!host || !host->shadow()) {
+        ec = INVALID_ACCESS_ERR;
+        return 0;
+    }
+
+    host->shadow()->ensureSelectFeatureSetCollected();
+    return host->shadow()->selectRuleFeatureSet().hasSelectorForClass(className);
+}
+
+bool Internals::hasSelectorForAttributeInShadow(Element* host, const String& attributeName, ExceptionCode& ec)
+{
+    if (!host || !host->shadow()) {
+        ec = INVALID_ACCESS_ERR;
+        return 0;
+    }
+
+    host->shadow()->ensureSelectFeatureSetCollected();
+    return host->shadow()->selectRuleFeatureSet().hasSelectorForAttribute(attributeName);
 }
 
 bool Internals::hasShadowInsertionPoint(const Node* root, ExceptionCode& ec) const

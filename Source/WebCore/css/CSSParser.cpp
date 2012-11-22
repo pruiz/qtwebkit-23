@@ -1865,6 +1865,14 @@ bool CSSParser::parseValue(CSSPropertyID propId, bool important)
         }
         break;
 
+#if ENABLE(CSS3_TEXT)
+    case CSSPropertyWebkitTextAlignLast:
+        // auto | start | end | left | right | center | justify
+        if ((id >= CSSValueLeft && id <= CSSValueJustify) || id == CSSValueStart || id == CSSValueEnd || id == CSSValueAuto)
+            validPrimitive = true;
+        break;
+#endif // CSS3_TEXT
+
     case CSSPropertyCursor: {
         // [<uri>,]*  [ auto | crosshair | default | pointer | progress | move | e-resize | ne-resize |
         // nw-resize | n-resize | se-resize | sw-resize | s-resize | w-resize | ew-resize |
@@ -8236,7 +8244,7 @@ bool CSSParser::parseTextDecoration(CSSPropertyID propId, bool important)
 {
     CSSParserValue* value = m_valueList->current();
     if (value->id == CSSValueNone) {
-        addTextDecorationProperty(propId, cssValuePool().createExplicitInitialValue(), important);
+        addTextDecorationProperty(propId, cssValuePool().createIdentifierValue(CSSValueNone), important);
         m_valueList->next();
         return true;
     }
@@ -8249,6 +8257,8 @@ bool CSSParser::parseTextDecoration(CSSPropertyID propId, bool important)
 #if ENABLE(CSS3_TEXT)
             // Blink value is not accepted by -webkit-text-decoration-line.
             isValid = propId != CSSPropertyWebkitTextDecorationLine;
+            if (isValid)
+                list->append(cssValuePool().createIdentifierValue(value->id));
             break;
 #endif // CSS3_TEXT
         case CSSValueUnderline:

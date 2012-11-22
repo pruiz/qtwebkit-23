@@ -92,6 +92,7 @@ LayerTreeRenderer::LayerTreeRenderer(LayerTreeCoordinatorProxy* layerTreeCoordin
 #if ENABLE(REQUEST_ANIMATION_FRAME)
     , m_animationFrameRequested(false)
 #endif
+    , m_accelerationMode(TextureMapper::OpenGLMode)
 {
 }
 
@@ -367,7 +368,7 @@ PassRefPtr<CoordinatedBackingStore> LayerTreeRenderer::getBackingStore(WebLayerI
     return backingStore;
 }
 
-void LayerTreeRenderer::removeBackingStoreIfNeeded(WebLayerID layerID, int tileID)
+void LayerTreeRenderer::removeBackingStoreIfNeeded(WebLayerID layerID, int /*tileID*/)
 {
     TextureMapperLayer* layer = toTextureMapperLayer(layerByID(layerID));
     ASSERT(layer);
@@ -377,9 +378,11 @@ void LayerTreeRenderer::removeBackingStoreIfNeeded(WebLayerID layerID, int tileI
         layer->setBackingStore(0);
 }
 
-void LayerTreeRenderer::createTile(WebLayerID layerID, int tileID, float scale)
+void LayerTreeRenderer::createTile(WebLayerID layerID, int tileID, float scale, const WebCore::IntSize& backingSize)
 {
-    getBackingStore(layerID)->createTile(tileID, scale);
+    RefPtr<CoordinatedBackingStore> backingStore = getBackingStore(layerID);
+    backingStore->createTile(tileID, scale);
+    backingStore->setSize(backingSize);
 }
 
 void LayerTreeRenderer::removeTile(WebLayerID layerID, int tileID)
@@ -391,7 +394,7 @@ void LayerTreeRenderer::removeTile(WebLayerID layerID, int tileID)
 void LayerTreeRenderer::updateTile(WebLayerID layerID, int tileID, const TileUpdate& update)
 {
     RefPtr<CoordinatedBackingStore> backingStore = getBackingStore(layerID);
-    backingStore->updateTile(tileID, update.sourceRect, update.targetRect, update.surface, update.offset);
+    backingStore->updateTile(tileID, update.sourceRect, update.tileRect, update.surface, update.offset);
     m_backingStoresWithPendingBuffers.add(backingStore);
 }
 
@@ -454,7 +457,7 @@ void LayerTreeRenderer::ensureRootLayer()
     if (m_rootLayer)
         return;
     if (!m_textureMapper) {
-        m_textureMapper = TextureMapper::create(TextureMapper::OpenGLMode);
+        m_textureMapper = TextureMapper::create(m_accelerationMode);
         static_cast<TextureMapperGL*>(m_textureMapper.get())->setEnableEdgeDistanceAntialiasing(true);
     }
 

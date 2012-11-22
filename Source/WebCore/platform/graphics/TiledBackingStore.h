@@ -72,6 +72,7 @@ public:
     Tile::Coordinate tileCoordinateForPoint(const IntPoint&) const;
     double tileDistance(const IntRect& viewport, const Tile::Coordinate&) const;
 
+    IntRect rect() const { return m_rect; }
     IntRect coverRect() const { return m_coverRect; }
     bool visibleAreaIsCovered() const;
     void removeAllNonVisibleTiles();
@@ -102,7 +103,6 @@ private:
     void setTile(const Tile::Coordinate& coordinate, PassRefPtr<Tile> tile);
     void removeTile(const Tile::Coordinate& coordinate);
 
-    IntRect visibleContentsRect() const;
     IntRect visibleRect() const;
 
     float coverageRatio(const IntRect&) const;

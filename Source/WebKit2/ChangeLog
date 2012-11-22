@@ -1,3 +1,584 @@
+2012-11-12  Kenneth Rohde Christiansen  <kenneth@webkit.org>
+
+        [EFL] Add implementations of device - user conversion methods
+        https://bugs.webkit.org/show_bug.cgi?id=101938
+
+        Reviewed by Laszlo Gombos.
+
+        Consider the deviceScaleFactor when convertion to/from user
+        and device units.
+
+        This affects DOM API's such as window.moveTo, resizeTo etc.
+
+        * UIProcess/efl/PageClientBase.cpp:
+        * UIProcess/efl/PageClientBase.h:
+        (PageClientBase):
+        * UIProcess/efl/PageClientDefaultImpl.cpp:
+        (WebKit::PageClientDefaultImpl::convertToDeviceSpace):
+        (WebKit):
+        (WebKit::PageClientDefaultImpl::convertToUserSpace):
+        * UIProcess/efl/PageClientDefaultImpl.h:
+        (PageClientDefaultImpl):
+        * UIProcess/efl/PageClientLegacyImpl.cpp:
+        (WebKit::PageClientLegacyImpl::convertToDeviceSpace):
+        (WebKit):
+        (WebKit::PageClientLegacyImpl::convertToUserSpace):
+        * UIProcess/efl/PageClientLegacyImpl.h:
+        (PageClientLegacyImpl):
+
+2012-11-12  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][WK2][AC] Black screen when applications use software backend.
+        https://bugs.webkit.org/show_bug.cgi?id=101659
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        If creating openGL context fails, automatically fallback to software rendering.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::EwkViewImpl):
+        (EwkViewImpl::displayTimerFired):
+        (EwkViewImpl::createGLSurface):
+        (EwkViewImpl::enterAcceleratedCompositingMode):
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (EwkViewImpl::hardwareAccelerationEnabled):
+        (EwkViewImpl):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::LayerTreeRenderer):
+        (WebKit::LayerTreeRenderer::ensureRootLayer):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+        (WebKit::LayerTreeRenderer::setAccelerationMode):
+        (LayerTreeRenderer):
+        * UIProcess/efl/PageClientBase.cpp:
+        (WebKit::PageClientBase::createDrawingAreaProxy):
+
+2012-11-12  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [WK2] Indentation nit on WebPage
+        https://bugs.webkit.org/show_bug.cgi?id=101928
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::setViewportSize):
+
+2012-11-12  Jiyeon Kim  <jiyeon0402.kim@samsung.com>
+
+        [EFL][WK2] Add ewk_settings_offline_web_application_cache_enabled set/get APIs
+        https://bugs.webkit.org/show_bug.cgi?id=101688
+
+        Reviewed by Gyuyoung Kim.
+
+        Add ewk_settings_offline_web_application_cache_get API to be used for enabling disabling the web application cache.
+        Add ewk_settings_offline_web_application_cache_set API to be used for getting the web application cache status.
+        In addition, offline web application cache is enabled by default.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::EwkViewImpl):
+        * UIProcess/API/efl/ewk_settings.cpp:
+        (ewk_settings_offline_web_application_cache_enabled_set):
+        (ewk_settings_offline_web_application_cache_enabled_get):
+        * UIProcess/API/efl/ewk_settings.h:
+        * UIProcess/API/efl/tests/test_ewk2_settings.cpp:
+        (TEST_F):
+
+2012-11-11  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Shadow] ElementShadow should have RuleFeatureSet for select attribute selectors.
+        https://bugs.webkit.org/show_bug.cgi?id=101180
+
+        Reviewed by Dimitri Glazkov.
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-11  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134144.
+        http://trac.webkit.org/changeset/134144
+        https://bugs.webkit.org/show_bug.cgi?id=101876
+
+        seems to break win 7 chromium browser test (Requested by
+        hayato on #webkit).
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-11  Kenichi Ishibashi  <bashi@chromium.org>
+
+        WTFString::utf8() should have a mode of conversion to use replacement character
+        https://bugs.webkit.org/show_bug.cgi?id=101678
+
+        Reviewed by Alexey Proskuryakov.
+
+        Update the symbol for String::utf8().
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-10  Zeno Albisser  <zeno@webkit.org>
+
+        [Qt][WK2] Use QLibraryInfo to search for executables.
+        https://bugs.webkit.org/show_bug.cgi?id=101774
+
+        Reviewed by Simon Hausmann.
+
+        This allows finding the WebProcess or the PluginProcess
+        in it's installed location. This is necessary when
+        deploying QtWebKit with an installer.
+
+        * Shared/qt/ProcessExecutablePathQt.cpp:
+        (WebKit::executablePath):
+
+2012-11-09  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Rename tileRect from targetRect.
+        https://bugs.webkit.org/show_bug.cgi?id=101705
+
+        Reviewed by Noam Rosenthal.
+
+        Messages::LayerTreeCoordinatorProxy::CreateTileForLayer contains the targetRect
+        variable. The targetRect stands for the rect of the tile created. This patch
+        renames tileRect to enhance the clearity.
+
+        * UIProcess/CoordinatedGraphics/CoordinatedBackingStore.cpp:
+        (WebKit::CoordinatedBackingStoreTile::swapBuffers):
+        (WebKit::CoordinatedBackingStoreTile::setBackBuffer):
+        (WebKit::CoordinatedBackingStore::updateTile):
+        * UIProcess/CoordinatedGraphics/CoordinatedBackingStore.h:
+        (CoordinatedBackingStoreTile):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.cpp:
+        (WebKit::LayerTreeCoordinatorProxy::createTileForLayer):
+        (WebKit::LayerTreeCoordinatorProxy::updateTileForLayer):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.h:
+        (LayerTreeCoordinatorProxy):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.messages.in:
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::updateTile):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+        (TileUpdate):
+        (WebKit::LayerTreeRenderer::TileUpdate::TileUpdate):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::createTile):
+        (WebCore::CoordinatedGraphicsLayer::updateTile):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (CoordinatedGraphicsLayerClient):
+        (CoordinatedGraphicsLayer):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedTile.h:
+        (CoordinatedTileClient):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::createTile):
+        (WebKit::LayerTreeCoordinator::updateTile):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.h:
+        (LayerTreeCoordinator):
+
+2012-11-09  Noam Rosenthal  <noam.rosenthal@nokia.com>
+
+        Allow ports to decide whether an image should be directly composited
+        https://bugs.webkit.org/show_bug.cgi?id=101827
+
+        Reviewed by Simon Fraser.
+
+        Implement shouldDirectlyCompositeImage for coordinated graphics, effectively disabling direct
+        compositing of images with width or height larger than 2000 pixels.
+
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::shouldDirectlyCompositeImage):
+        (WebCore):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (CoordinatedGraphicsLayer):
+
+2012-11-09  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Antialias the edge-tiles of CoordinatedBackingStore.
+        https://bugs.webkit.org/show_bug.cgi?id=101818
+
+        Reviewed by Noam Rosenthal.
+
+        Since we now have the entire surfaceRect, we can antialias the edge-tiles.
+
+        * UIProcess/CoordinatedGraphics/CoordinatedBackingStore.cpp:
+        (WebKit::CoordinatedBackingStore::paintTilesToTextureMapper):
+        (WebKit::CoordinatedBackingStore::paintToTextureMapper):
+        * UIProcess/CoordinatedGraphics/CoordinatedBackingStore.h:
+        (CoordinatedBackingStore):
+
+2012-11-09  Rick Byers  <rbyers@chromium.org>
+
+        No tests for changing mouse cursors
+        https://bugs.webkit.org/show_bug.cgi?id=100550
+
+        Reviewed by Adam Barth.
+
+        Add necessary exports for Internals::getCurrentCursorInfo
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-09  Vivek Galatage  <vivekgalatage@gmail.com>
+
+        Add missing exports setMediaTypeOverride, setResolutionOverride and layerTreeAsText to WebKit2CFLite.def
+        https://bugs.webkit.org/show_bug.cgi?id=101816
+
+        Reviewed by Anders Carlsson.
+
+        Add missing exports setMediaTypeOverride, setResolutionOverride and layerTreeAsText to WebKit2CFLite.def to fix win-cairo build.
+
+        * win/WebKit2CFLite.def:
+
+2012-11-09  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Amend CoordinatedBackingStore::paintToTextureMapper to fit its own semantic.
+        https://bugs.webkit.org/show_bug.cgi?id=101701
+
+        Reviewed by Noam Rosenthal.
+
+        Currently, all subclasses of TextureMapperPlatformLayer implement
+        paintToTextureMapper to draw its own texture on the given targetRect. Subclasses
+        can scale the texture to fit the size of the targetRect. However, only
+        CoordinatedBackingStore::paintToTextureMapper draws its texture using its own
+        texture size. There is no bug yet, because TextureMapperLayer uses
+        CoordinatedBackingStore only as a backing store, not a content layer. So,
+        TextureMapperLayer always request CoordinatedBackingStore to draw using its own
+        texture size. However, we can use CoordinatedBackingStore as a content layer in
+        the future. So this patch fixes this potential bug.
+
+        * UIProcess/CoordinatedGraphics/CoordinatedBackingStore.cpp:
+        (WebKit::CoordinatedBackingStore::setSize):
+        (WebKit):
+        (WebKit::mapToContents):
+        (WebKit::paintTilesToTextureMapper):
+        (WebKit::CoordinatedBackingStore::paintToTextureMapper):
+        * UIProcess/CoordinatedGraphics/CoordinatedBackingStore.h:
+        (CoordinatedBackingStore):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.cpp:
+        (WebKit::LayerTreeCoordinatorProxy::createTileForLayer):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.h:
+        (LayerTreeCoordinatorProxy):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.messages.in:
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::createTile):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+        (LayerTreeRenderer):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::createTile):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (CoordinatedGraphicsLayerClient):
+        (CoordinatedGraphicsLayer):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedTile.cpp:
+        (WebKit::CoordinatedTile::updateBackBuffer):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedTile.h:
+        (CoordinatedTileClient):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::createTile):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.h:
+        (LayerTreeCoordinator):
+
+2012-11-09  Brady Eidson  <beidson@apple.com>
+
+        Implement NetworkProcess willSendRequest
+        https://bugs.webkit.org/show_bug.cgi?id=101812
+
+        Reviewed by Alexey Proskuryakov.
+
+        Message to the WebProcess to get the new request, if any.
+
+        Because network callbacks are coming in on a background thread we have to jump through hoops to synchronously
+        ask the WebProcess, but these hoops follow an established pattern of using async messaging with BlockingResourceMap.
+
+        * NetworkProcess/NetworkConnectionToWebProcess.cpp:
+        (WebKit::NetworkConnectionToWebProcess::willSendRequestHandled): Pass the new request back to NetworkRequest for handling.
+        * NetworkProcess/NetworkConnectionToWebProcess.h:
+        * NetworkProcess/NetworkConnectionToWebProcess.messages.in:
+
+        * NetworkProcess/NetworkRequest.cpp:
+        (WebKit::NetworkRequest::didFail):
+        (WebKit::responseMap):
+        (WebKit::generateWillSendRequestID):
+        (WebKit::didReceiveWillSendRequestHandled):
+        (WebKit::NetworkRequest::willSendRequest): Asynchronously message the WebProcess but synchronous wait for a reply back.
+        * NetworkProcess/NetworkRequest.h:
+
+        * WebProcess/Network/NetworkProcessConnection.cpp:
+        (WebKit::NetworkProcessConnection::willSendRequest): Ask the WebResourceLoadScheduler for the new request then
+          message back to the NetworkProcess with the reply.
+        * WebProcess/Network/NetworkProcessConnection.h:
+
+        * WebProcess/Network/NetworkProcessConnection.messages.in:
+
+        * WebProcess/Network/WebResourceLoadScheduler.cpp:
+        (WebKit::WebResourceLoadScheduler::willSendRequest):
+        * WebProcess/Network/WebResourceLoadScheduler.h:
+
+2012-11-09  Tim Horton  <timothy_horton@apple.com>
+
+        PDFPlugin should support clicking on external links
+        https://bugs.webkit.org/show_bug.cgi?id=101647
+        <rdar://problem/12555222>
+
+        Reviewed by Alexey Proskuryakov.
+
+        * WebProcess/Plugins/PDF/PDFLayerControllerDetails.h: Add details about clickedLinkWithURL: callback.
+        * WebProcess/Plugins/PDF/PDFPlugin.h:
+        (PDFPlugin): Add clickedLink() and storage for the last mouse event that was dispatched.
+        * WebProcess/Plugins/PDF/PDFPlugin.mm:
+        (-[WKPDFLayerControllerDelegate pdfLayerController:clickedLinkWithURL:]): Forward the URL to PDFPlugin.
+        (WebKit::PDFPlugin::handleMouseEvent): Store the last mouse event that was dispatched.
+        We use this to get the correct mouse button and modifier keys, so that command-clicking, etc. links works.
+        (WebKit::PDFPlugin::clickedLink): Request a load given the new URL.
+
+        * PluginProcess/PluginControllerProxy.h:
+        (PluginControllerProxy):
+        * WebProcess/Plugins/Netscape/NetscapePlugin.cpp:
+        (WebKit::NetscapePlugin::shouldAllowScripting):
+        * WebProcess/Plugins/Netscape/NetscapePlugin.h:
+        * WebProcess/Plugins/PDF/PDFLayerControllerDetails.h:
+        * WebProcess/Plugins/Plugin.h:
+        * WebProcess/Plugins/PluginProxy.cpp:
+        (WebKit::PluginProxy::shouldAllowScripting):
+        * WebProcess/Plugins/PluginProxy.h:
+        * WebProcess/Plugins/PluginView.cpp:
+        (WebKit::PluginView::shouldAllowScripting):
+        * WebProcess/Plugins/PluginView.h:
+        Add shouldAllowScripting() function to Plugin (and plumb through PluginProxy and PluginView, etc.)
+
+        * WebProcess/WebCoreSupport/WebFrameLoaderClient.cpp:
+        (WebKit::WebFrameLoaderClient::allowScript): Override allowScript(); if the frame is hosting a PluginDocument,
+        ask its plugin whether it should allow execution of JavaScript and JavaScript URLs or not.
+        * WebProcess/WebCoreSupport/WebFrameLoaderClient.h:
+
+        * WebProcess/Plugins/PDF/SimplePDFPlugin.h: Disable scripting for SimplePDFPlugin (and, by inheritance, PDFPlugin).
+
+2012-11-09  Brady Eidson  <beidson@apple.com>
+
+        Implement WebResourceBuffer::isEmpty()
+        https://bugs.webkit.org/show_bug.cgi?id=101805
+
+        Reviewed by Alexey Proskuryakov.
+
+        This is required to make the existing subresource loading in NetworkProcess work correctly,
+        as there's an isEmpty() check in the WebProcess that decides whether or not to actually deliver 
+        the data to the ResourceLoader.
+
+        * Shared/WebResourceBuffer.cpp:
+        (WebKit::WebResourceBuffer::isEmpty):
+        * Shared/WebResourceBuffer.h:
+
+2012-11-09  Hurnjoo Lee  <hurnjoo.lee@samsung.com>
+
+        [EFL][WK2][AC] Fixed layers are shaking when scrolling
+        https://bugs.webkit.org/show_bug.cgi?id=101549
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        At the time of adjusting positions for fixed layers, the locations of
+        fixed layers are calculated incorrectly because the contentsSize is empty.
+
+        * UIProcess/efl/PageViewportControllerClientEfl.cpp:
+        (WebKit::PageViewportControllerClientEfl::didChangeContentsSize): Call the
+        setContentsSize function in LayerTreeCoordinatorProxy in order to calculate
+        the locations of fixed layers correctly.
+
+2012-11-09  Brady Eidson  <beidson@apple.com>
+
+        NetworkRequest refactoring
+        https://bugs.webkit.org/show_bug.cgi?id=101777
+
+        Reviewed by Alexey Proskuryakov.
+
+        Move all of the ResourceHandleClient stubs from the .h to the .cpp in one patch
+        to make future patches cleaner.
+
+        Also completely remove the declaration for shouldCacheResponse() for now.
+
+        * NetworkProcess/NetworkRequest.cpp:
+        (WebKit::NetworkRequest::willSendRequest):
+        (WebKit::NetworkRequest::didSendData):
+        (WebKit::NetworkRequest::didReceiveCachedMetadata):
+        (WebKit::NetworkRequest::wasBlocked):
+        (WebKit::NetworkRequest::cannotShowURL):
+        (WebKit::NetworkRequest::willCacheResponse):
+        (WebKit::NetworkRequest::shouldUseCredentialStorage):
+        (WebKit::NetworkRequest::didReceiveAuthenticationChallenge):
+        (WebKit::NetworkRequest::didCancelAuthenticationChallenge):
+        (WebKit::NetworkRequest::receivedCancellation):
+        (WebKit::NetworkRequest::canAuthenticateAgainstProtectionSpace):
+        (WebKit::NetworkRequest::supportsDataArray):
+        (WebKit::NetworkRequest::didReceiveDataArray):
+        (WebKit::NetworkRequest::willStopBufferingData):
+        (WebKit::NetworkRequest::createAsyncFileStream):
+        * NetworkProcess/NetworkRequest.h:
+
+2012-11-09  Alexey Proskuryakov  <ap@apple.com>
+
+        CookieJar uses Document class, which is a layering violation
+        https://bugs.webkit.org/show_bug.cgi?id=101621
+
+        Reviewed by Brady Eidson.
+
+        * UIProcess/API/C/WKAPICast.h: Don't include CookieJar.h, its completely unnecessary.
+
+2012-11-09  peavo@outlook.com  <peavo@outlook.com>
+
+        WinCairo build fails to link
+        https://bugs.webkit.org/show_bug.cgi?id=101739
+
+        Reviewed by Kentaro Hara.
+
+        * win/WebKit2CFLite.def:
+
+2012-11-09  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [EFL][WK2] REGRESSION (r134043): API tests crashes
+        https://bugs.webkit.org/show_bug.cgi?id=101742
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Do not assert on PassRefPtr<WebContext> after it becomes 0.
+
+        * UIProcess/efl/BatteryProvider.cpp:
+        (BatteryProvider::BatteryProvider):
+        * UIProcess/efl/NetworkInfoProvider.cpp:
+        (NetworkInfoProvider::NetworkInfoProvider):
+
+2012-11-09  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][WK2][AC] Random crashes in layout tests on the bot
+        https://bugs.webkit.org/show_bug.cgi?id=101687
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Speculative fix for a crash on the bot.
+        If didCommitLoad() is called before the view size was set, we will
+        try to paint an empty area, and that will crash.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::update):
+
+2012-11-09  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL][WK2] Make classes for client use WebContext instead of WKContext
+        https://bugs.webkit.org/show_bug.cgi?id=101564
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        EwkContext class has been refactored to use WebContext instead of WKContext in r133844,
+        so this patch makes client classes use WebContext
+
+        * UIProcess/API/efl/ewk_context.cpp:
+        (EwkContext::EwkContext):
+        * UIProcess/efl/BatteryProvider.cpp:
+        (BatteryProvider::~BatteryProvider):
+        (BatteryProvider::create):
+        (BatteryProvider::BatteryProvider):
+        (BatteryProvider::didChangeBatteryStatus):
+        * UIProcess/efl/BatteryProvider.h:
+        (BatteryProvider):
+        * UIProcess/efl/ContextHistoryClientEfl.cpp:
+        (WebKit::ContextHistoryClientEfl::ContextHistoryClientEfl):
+        * UIProcess/efl/ContextHistoryClientEfl.h:
+        (WebKit::ContextHistoryClientEfl::create):
+        (ContextHistoryClientEfl):
+        * UIProcess/efl/NetworkInfoProvider.cpp:
+        (NetworkInfoProvider::create):
+        (NetworkInfoProvider::NetworkInfoProvider):
+        (NetworkInfoProvider::~NetworkInfoProvider):
+        * UIProcess/efl/NetworkInfoProvider.h:
+        (NetworkInfoProvider):
+
+2012-11-09  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL][WK2] Fix build warning in test_ewk2_context.cpp: [-Wwrite-strings]
+        https://bugs.webkit.org/show_bug.cgi?id=101666
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Use constant character pointer to fix [-Wwrite-strings] warning.
+
+        * UIProcess/API/efl/tests/test_ewk2_context.cpp:
+        (TEST_F):
+
+2012-11-09  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Add support for custom cursors
+        https://bugs.webkit.org/show_bug.cgi?id=101723
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        EwkViewImpl::setCursor() now properly handles custom
+        cursors.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::EwkViewImpl):
+        (EwkViewImpl::setCursor):
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (EwkViewImpl):
+
+2012-11-08  Grzegorz Czajkowski  <g.czajkowski@samsung.com>
+
+        [EFL] Add a method to the TextCheckerEnchant class to check whether any dictionary is loaded
+        https://bugs.webkit.org/show_bug.cgi?id=101570
+
+        Reviewed by Gustavo Noronha Silva.
+
+        To do not get the vector of loaded languages, WebKit2-EFL calls
+        TextCheckerEnchant::hasDictionary() method to check whether the
+        dictionaries vector is empty.
+
+        * UIProcess/API/efl/ewk_settings.cpp:
+        (ewk_settings_continuous_spell_checking_enabled_set):
+        * UIProcess/API/efl/ewk_text_checker.cpp:
+        (Ewk_Text_Checker::hasDictionary):
+        (Ewk_Text_Checker):
+        * UIProcess/API/efl/ewk_text_checker_private.h:
+        (Ewk_Text_Checker):
+
+2012-11-08  Timothy Hatcher  <timothy@apple.com>
+
+        Always use a textured window for the Web Inspector.
+
+        https://bugs.webkit.org/show_bug.cgi?id=101693
+
+        Reviewed by Joseph Pecoraro.
+
+        * UIProcess/mac/WebInspectorProxyMac.mm:
+        (WebKit::WebInspectorProxy::createInspectorWindow): Removed the conditional for a textured window.
+
+2012-11-08  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Don't send the messages for releasing resources during purging.
+        https://bugs.webkit.org/show_bug.cgi?id=101685
+
+        Reviewed by Noam Rosenthal.
+
+        We don't need to send the messages related to releasing resources to UI Process
+        during purging, because UI Process already had removed all resources.
+        This patch gives us reducing slight messaging overhead and increasing readability.
+
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.cpp:
+        (WebKit::LayerTreeCoordinatorProxy::purgeBackingStores):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::LayerTreeCoordinator):
+        (WebKit::LayerTreeCoordinator::purgeReleasedImages):
+        (WebKit::LayerTreeCoordinator::removeTile):
+        (WebKit::LayerTreeCoordinator::removeUpdateAtlas):
+        (WebKit::LayerTreeCoordinator::purgeBackingStores):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.h:
+        (LayerTreeCoordinator):
+
+2012-11-08  KyungTae Kim  <ktf.kim@samsung.com>
+
+        [WK2] Unused parameters on LayerTreeRenderer.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=101653
+
+        Reviewed by Noam Rosenthal.
+
+        Because the 'tileID' parameter is not used now,
+        comment out it to fix build warning -Wunused-parameter
+
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::removeBackingStoreIfNeeded):
+
 2012-11-08  Christophe Dumez  <christophe.dumez@intel.com>
 
         [EFL][WK2] Add proper support for fullscreen API to MiniBrowser

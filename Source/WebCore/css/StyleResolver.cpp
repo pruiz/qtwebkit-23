@@ -2680,6 +2680,7 @@ inline bool StyleResolver::isValidRegionStyleProperty(CSSPropertyID id)
     switch (id) {
     case CSSPropertyBackgroundColor:
     case CSSPropertyColor:
+    case CSSPropertyTextShadow:
         return true;
     default:
         break;
@@ -3852,6 +3853,7 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
 #if ENABLE(CSS3_TEXT)
     case CSSPropertyWebkitTextDecorationLine:
     case CSSPropertyWebkitTextDecorationStyle:
+    case CSSPropertyWebkitTextAlignLast:
 #endif // CSS3_TEXT
     case CSSPropertyWebkitTextEmphasisColor:
     case CSSPropertyWebkitTextEmphasisPosition:

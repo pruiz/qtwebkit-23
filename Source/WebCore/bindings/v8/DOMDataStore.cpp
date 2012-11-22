@@ -41,7 +41,6 @@ namespace WebCore {
 DOMDataStore::DOMDataStore(Type type)
     : m_type(type)
 {
-    m_domObjectMap = adoptPtr(new DOMWrapperMap<void>);
     V8PerIsolateData::current()->registerDOMDataStore(this);
 }
 
@@ -49,25 +48,25 @@ DOMDataStore::~DOMDataStore()
 {
     ASSERT(m_type != MainWorld); // We never actually destruct the main world's DOMDataStore.
     V8PerIsolateData::current()->unregisterDOMDataStore(this);
-    m_domObjectMap->clear();
+    m_wrapperMap.clear();
 }
 
 DOMDataStore* DOMDataStore::current(v8::Isolate* isolate)
 {
-    DEFINE_STATIC_LOCAL(DOMDataStore, defaultStore, (MainWorld));
+    DEFINE_STATIC_LOCAL(DOMDataStore, mainWorldDOMDataStore, (MainWorld));
     V8PerIsolateData* data = isolate ? V8PerIsolateData::from(isolate) : V8PerIsolateData::current();
     if (UNLIKELY(!!data->domDataStore()))
         return data->domDataStore();
     V8DOMWindowShell* context = V8DOMWindowShell::getEntered();
     if (UNLIKELY(!!context))
-        return context->world()->domDataStore();
-    return &defaultStore;
+        return context->world()->isolatedWorldDOMDataStore();
+    return &mainWorldDOMDataStore;
 }
 
 void DOMDataStore::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::Binding);
-    info.addMember(m_domObjectMap);
+    info.addMember(m_wrapperMap);
 }
 
 void DOMDataStore::weakCallback(v8::Persistent<v8::Value> value, void* context)

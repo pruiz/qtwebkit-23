@@ -1531,7 +1531,7 @@ sub launcherName()
     } elsif (isAppleWebKit()) {
         return "Safari";
     } elsif (isEfl()) {
-        return "EWebLauncher";
+        return "EWebLauncher/MiniBrowser";
     } elsif (isWinCE()) {
         return "WinCELauncher";
     }
@@ -1890,9 +1890,13 @@ sub retrieveQMakespecVar
 sub qtMakeCommand($)
 {
     my ($qmakebin) = @_;
-    chomp(my $mkspec = `$qmakebin -query QT_HOST_DATA`);
-    $mkspec .= "/mkspecs/default";
-    my $compiler = retrieveQMakespecVar("$mkspec/qmake.conf", "QMAKE_CC");
+    chomp(my $hostDataPath = `$qmakebin -query QT_HOST_DATA`);
+    my $mkspecPath = $hostDataPath . "/mkspecs/default/qmake.conf";
+    if (! -e $mkspecPath) {
+        chomp(my $mkspec= `$qmakebin -query QMAKE_XSPEC`);
+        $mkspecPath = $hostDataPath . "/mkspecs/" . $mkspec . "/qmake.conf";
+    }
+    my $compiler = retrieveQMakespecVar($mkspecPath, "QMAKE_CC");
 
     #print "default spec: " . $mkspec . "\n";
     #print "compiler found: " . $compiler . "\n";

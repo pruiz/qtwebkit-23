@@ -110,7 +110,7 @@ function localizeNumber(number) {
     return window.pagePopupController.localizeNumberString(number);
 }
 
-/*
+/**
  * @const
  * @type {number}
  */
@@ -202,6 +202,7 @@ function parseDateString(dateString) {
 }
 
 /**
+ * @constructor
  * @param {!number|Day} valueOrDayOrYear
  * @param {!number=} month
  * @param {!number=} date
@@ -326,7 +327,7 @@ function Week(valueOrWeekOrYear, week) {
             this.year = normalizedWeek.year;
             this.week = normalizedWeek.week;
         }
-    } else if (valueOrMonthOrYear instanceof Week) {
+    } else if (valueOrWeekOrYear instanceof Week) {
         this.year = valueOrWeekOrYear.year;
         this.week = valueOrWeekOrYear.week;
     } else {
@@ -471,6 +472,7 @@ Week.prototype.toString = function() {
 };
 
 /**
+ * @constructor
  * @param {!number|Month} valueOrMonthOrYear
  * @param {!number=} month
  */
@@ -1115,32 +1117,32 @@ YearMonthController.prototype._handleYearMonthChange = function() {
     this.picker.showMonth(Month.parse(selection.dataset.value));
 };
 
-/*
+/**
  * @const
  * @type {number}
  */
 YearMonthController.PreviousTenYears = -120;
-/*
+/**
  * @const
  * @type {number}
  */
 YearMonthController.PreviousYear = -12;
-/*
+/**
  * @const
  * @type {number}
  */
 YearMonthController.PreviousMonth = -1;
-/*
+/**
  * @const
  * @type {number}
  */
 YearMonthController.NextMonth = 1;
-/*
+/**
  * @const
  * @type {number}
  */
 YearMonthController.NextYear = 12;
-/*
+/**
  * @const
  * @type {number}
  */
@@ -1325,18 +1327,24 @@ DaysTable.prototype._renderMonth = function(month) {
  */
 DaysTable.prototype.navigateToMonth = function(month, navigationBehaviour) {
     var firstNodeInSelectedRange = this._firstNodeInSelectedRange();
-    if (navigationBehaviour & CalendarPicker.NavigationBehaviour.Animate) {
-        var daysStyle = this._daysContainer.style;
-        daysStyle.position = "relative";
-        daysStyle.webkitTransition = "left 0.1s ease";
-        daysStyle.left = (this.picker.currentMonth().valueOf() > month.valueOf() ? "" : "-") + this._daysContainer.offsetWidth + "px";
-    }
+    if (navigationBehaviour & CalendarPicker.NavigationBehaviour.Animate)
+        this._startMoveInAnimation(month);
     this._renderMonth(month);
     if (navigationBehaviour & CalendarPicker.NavigationBehaviour.KeepSelectionPosition && firstNodeInSelectedRange) {
         var x = parseInt(firstNodeInSelectedRange.dataset.positionX, 10);
         var y = parseInt(firstNodeInSelectedRange.dataset.positionY, 10);
         this._selectRangeAtPosition(x, y);
     }
+};
+
+/**
+ * @param {!Month} month
+ */
+DaysTable.prototype._startMoveInAnimation = function(month) {
+    var daysStyle = this._daysContainer.style;
+    daysStyle.position = "relative";
+    daysStyle.webkitTransition = "left 0.1s ease";
+    daysStyle.left = (this.picker.currentMonth().valueOf() > month.valueOf() ? "" : "-") + this._daysContainer.offsetWidth + "px";
 };
 
 DaysTable.prototype._moveInDays = function() {
@@ -1471,7 +1479,7 @@ DaysTable.prototype._maybeSetNextMonth = function(navigationBehaviour) {
  */
 DaysTable.prototype._handleDayClick = function(event) {
     if (event.target.classList.contains(ClassNames.Available))
-        this.picker.submitValue(event.target.dataset.submitValue);
+        this.picker.submitValue(this._rangeForNode(event.target).toString());
 };
 
 /**
@@ -1597,6 +1605,19 @@ function MonthPickerDaysTable(picker) {
     DaysTable.call(this, picker);
 }
 MonthPickerDaysTable.prototype = Object.create(DaysTable.prototype);
+
+/**
+ * @param {!Month} month
+ * @param {!CalendarPicker.NavigationBehaviour} navigationBehaviour
+ */
+MonthPickerDaysTable.prototype.navigateToMonth = function(month, navigationBehaviour) {
+    var hadSelection = this._hasSelection();
+    if (navigationBehaviour & CalendarPicker.NavigationBehaviour.Animate)
+        this._startMoveInAnimation(month);
+    this._renderMonth(month);
+    if (navigationBehaviour & CalendarPicker.NavigationBehaviour.KeepSelectionPosition && hadSelection)
+        this.selectRange(month);
+};
 
 /**
  * @param {!Month} month

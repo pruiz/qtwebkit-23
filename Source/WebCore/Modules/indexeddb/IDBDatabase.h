@@ -36,6 +36,7 @@
 #include "IDBMetadata.h"
 #include "IDBObjectStore.h"
 #include "IDBTransaction.h"
+#include "ScriptWrappable.h"
 #include <wtf/PassRefPtr.h>
 #include <wtf/RefCounted.h>
 #include <wtf/RefPtr.h>
@@ -49,7 +50,7 @@ class ScriptExecutionContext;
 
 typedef int ExceptionCode;
 
-class IDBDatabase : public RefCounted<IDBDatabase>, public EventTarget, public ActiveDOMObject {
+class IDBDatabase : public RefCounted<IDBDatabase>, public ScriptWrappable, public EventTarget, public ActiveDOMObject {
 public:
     static PassRefPtr<IDBDatabase> create(ScriptExecutionContext*, PassRefPtr<IDBDatabaseBackendInterface>, PassRefPtr<IDBDatabaseCallbacks>);
     ~IDBDatabase();
@@ -91,11 +92,18 @@ public:
     bool dispatchEvent(PassRefPtr<Event> event, ExceptionCode& ec) { return EventTarget::dispatchEvent(event, ec); }
     virtual bool dispatchEvent(PassRefPtr<Event>);
 
+    int64_t findObjectStoreId(const String& name) const;
+    bool containsObjectStore(const String& name) const
+    {
+        return findObjectStoreId(name) != IDBObjectStoreMetadata::InvalidId;
+    }
+
     using RefCounted<IDBDatabase>::ref;
     using RefCounted<IDBDatabase>::deref;
 
 private:
     IDBDatabase(ScriptExecutionContext*, PassRefPtr<IDBDatabaseBackendInterface>, PassRefPtr<IDBDatabaseCallbacks>);
+
 
     // EventTarget
     virtual void refEventTarget() { ref(); }

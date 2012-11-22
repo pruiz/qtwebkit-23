@@ -28,6 +28,7 @@
 
 #if ENABLE(NETWORK_PROCESS)
 
+#include "BlockingResponseMap.h"
 #include "Logging.h"
 #include "NetworkConnectionToWebProcess.h"
 #include "NetworkProcess.h"
@@ -35,6 +36,7 @@
 #include "RemoteNetworkingContext.h"
 #include "SharedMemory.h"
 #include "WebCoreArgumentCoders.h"
+#include <WebCore/NotImplemented.h>
 #include <WebCore/ResourceBuffer.h>
 #include <WebCore/ResourceHandle.h>
 #include <wtf/MainThread.h>
@@ -174,11 +176,141 @@ void NetworkRequest::didFinishLoading(ResourceHandle*, double finishTime)
     scheduleStopOnMainThread();
 }
 
-void NetworkRequest::didFail(WebCore::ResourceHandle*, const WebCore::ResourceError& error)
+void NetworkRequest::didFail(ResourceHandle*, const ResourceError& error)
 {
     connectionToWebProcess()->connection()->send(Messages::NetworkProcessConnection::DidFailResourceLoad(m_identifier, error), 0);
     scheduleStopOnMainThread();
 }
+
+// FIXME (NetworkProcess): Many of the following ResourceHandleClient methods definitely need implementations. A few will not.
+// Once we know what they are they can be removed.
+
+
+static BlockingResponseMap<ResourceRequest*>& responseMap()
+{
+    AtomicallyInitializedStatic(BlockingResponseMap<ResourceRequest*>&, responseMap = *new BlockingResponseMap<ResourceRequest*>);
+    return responseMap;
+}
+
+static uint64_t generateWillSendRequestID()
+{
+    static int64_t uniqueWillSendRequestID;
+    return OSAtomicIncrement64Barrier(&uniqueWillSendRequestID);
+}
+
+void didReceiveWillSendRequestHandled(uint64_t requestID, const ResourceRequest& request)
+{
+    responseMap().didReceiveResponse(requestID, adoptPtr(new ResourceRequest(request)));
+}
+
+void NetworkRequest::willSendRequest(ResourceHandle*, ResourceRequest& request, const ResourceResponse& redirectResponse)
+{
+    uint64_t requestID = generateWillSendRequestID();
+
+    if (!connectionToWebProcess()->connection()->send(Messages::NetworkProcessConnection::WillSendRequest(requestID, m_identifier, request, redirectResponse), 0)) {
+        // FIXME (NetworkProcess): What should we do if we can't send the message?
+        return;
+    }
+    
+    OwnPtr<ResourceRequest> newRequest = responseMap().waitForResponse(requestID);
+    request = *newRequest;
+}
+
+void NetworkRequest::didSendData(WebCore::ResourceHandle*, unsigned long long /*bytesSent*/, unsigned long long /*totalBytesToBeSent*/)
+{
+    notImplemented();
+}
+
+void NetworkRequest::didReceiveCachedMetadata(WebCore::ResourceHandle*, const char*, int)
+{
+    notImplemented();
+}
+
+void NetworkRequest::wasBlocked(WebCore::ResourceHandle*)
+{
+    notImplemented();
+}
+
+void NetworkRequest::cannotShowURL(WebCore::ResourceHandle*)
+{
+    notImplemented();
+}
+
+void NetworkRequest::willCacheResponse(WebCore::ResourceHandle*, WebCore::CacheStoragePolicy&)
+{
+    notImplemented();
+}
+
+bool NetworkRequest::shouldUseCredentialStorage(WebCore::ResourceHandle*)
+{
+    notImplemented();
+    return false;
+}
+
+void NetworkRequest::didReceiveAuthenticationChallenge(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&)
+{
+    notImplemented();
+}
+
+void NetworkRequest::didCancelAuthenticationChallenge(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&)
+{
+    notImplemented();
+}
+
+void NetworkRequest::receivedCancellation(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&)
+{
+    notImplemented();
+}
+
+#if USE(PROTECTION_SPACE_AUTH_CALLBACK)
+bool NetworkRequest::canAuthenticateAgainstProtectionSpace(WebCore::ResourceHandle*, const WebCore::ProtectionSpace&)
+{
+    notImplemented();
+    return false;
+}
+#endif
+
+#if HAVE(NETWORK_CFDATA_ARRAY_CALLBACK)
+bool NetworkRequest::supportsDataArray()
+{
+    notImplemented();
+    return false;
+}
+
+void NetworkRequest::didReceiveDataArray(WebCore::ResourceHandle*, CFArrayRef)
+{
+    notImplemented();
+}
+#endif
+
+#if PLATFORM(MAC)
+#if USE(CFNETWORK)
+CFCachedURLResponseRef NetworkRequest::willCacheResponse(WebCore::ResourceHandle*, CFCachedURLResponseRef response)
+{
+    notImplemented();
+    return response;
+}
+#else
+NSCachedURLResponse* NetworkRequest::willCacheResponse(WebCore::ResourceHandle*, NSCachedURLResponse* response)
+{
+    notImplemented();
+    return response;
+}
+#endif
+
+void NetworkRequest::willStopBufferingData(WebCore::ResourceHandle*, const char*, int)
+{
+    notImplemented();
+}
+#endif // PLATFORM(MAC)
+
+#if ENABLE(BLOB)
+WebCore::AsyncFileStream* NetworkRequest::createAsyncFileStream(WebCore::FileStreamClient*)
+{
+    notImplemented();
+    return 0;
+}
+#endif
 
 } // namespace WebKit
 

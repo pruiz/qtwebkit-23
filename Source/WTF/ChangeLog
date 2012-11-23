@@ -1,3 +1,121 @@
+2012-11-14  Michael Saboff  <msaboff@apple.com>
+
+        String::append() should handle two 8 bit strings without converting both to 16 bits
+        https://bugs.webkit.org/show_bug.cgi?id=102286
+
+        Reviewed by Oliver Hunt.
+
+        If both strings are 8 bit, then allocate and copy to a new 8 bit string.  Since most strings are
+        8 bit, this will save up to 3x the resulting string length in bytes.  2x is due to the possible
+        surviving 16 bit source string upconversion and 1x for the 16 bit result now being 8 bit.
+
+        * wtf/text/WTFString.cpp:
+        (WTF::String::append):
+
+2012-11-14  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt][ARM] Enable the DFG JIT on ARMv7(Thumb2)
+        https://bugs.webkit.org/show_bug.cgi?id=101747
+
+        Reviewed by Simon Hausmann.
+
+        * wtf/Platform.h:
+
+2012-11-13  Christophe Dumez  <christophe.dumez@intel.com>
+
+        Use prefix form of increment / decrement operators in WTF String classes when possible
+        https://bugs.webkit.org/show_bug.cgi?id=101859
+
+        Reviewed by Benjamin Poulain.
+
+        Use prefix form of increment / decrement operators whenever possible in
+        WTF String classes as this seems to be the convention in WebKit.
+
+        * wtf/text/ASCIIFastPath.h:
+        (WTF::copyLCharsFromUCharSource):
+        * wtf/text/AtomicString.cpp:
+        (WTF::AtomicString::add):
+        * wtf/text/Base64.cpp:
+        (WTF::base64Encode):
+        (WTF::base64DecodeInternal):
+        * wtf/text/StringBuilder.cpp:
+        (WTF::StringBuilder::allocateBufferUpConvert):
+        * wtf/text/StringConcatenate.h:
+        * wtf/text/StringImpl.cpp:
+        (WTF::StringImpl::getData16SlowCase):
+        (WTF::StringImpl::upconvertCharacters):
+        (WTF::StringImpl::containsOnlyWhitespace):
+        (WTF::StringImpl::lower):
+        (WTF::StringImpl::upper):
+        (WTF::StringImpl::foldCase):
+        (WTF::StringImpl::stripMatchedCharacters):
+        (WTF::StringImpl::removeCharacters):
+        (WTF::StringImpl::simplifyMatchedCharactersToSpace):
+        (WTF::reverseFindInner):
+        (WTF::reverseFindIgnoringCaseInner):
+        (WTF::StringImpl::replace):
+        (WTF::StringImpl::createWithTerminatingNullCharacter):
+        * wtf/text/StringImpl.h:
+        (WTF::codePointCompare):
+        * wtf/text/WTFString.cpp:
+        (WTF::String::String):
+        (WTF::toIntegralType):
+
+2012-11-13  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Build fix after r134490.
+
+        * wtf/FastMalloc.cpp:
+
+2012-11-13  Brent Fulgham  <bfulgham@webkit.org> and Alex Christensen <alex.christensen@flexsim.com>
+
+        Fix FastMalloc.cpp compile error for MSVC in 64-bit.
+        https://bugs.webkit.org/show_bug.cgi?id=88344
+
+        Reviewed by Ryosuke Niwa.
+
+        MSVC will not compile array declarations of zero size. The existing
+        padding math for TCMalloc_Central_FreeListPadded would evaluate
+        to zero on 64-bit machines, preventing the compile from finishing.
+
+        * wtf/FastMalloc.cpp:
+        (TCMalloc_Central_FreeListPadded_Template): Add new template (and
+        zero-size specialization) to provide proper behavior under 64-bit
+        Windows build.
+
+2012-11-13  Brent Fulgham <bfulgham@webkit.org> and Alex Christensen  <alex.christensen@flexsim.com>
+
+        FastMalloc.cpp needs to be reordered before padding bug can be fixed
+        https://bugs.webkit.org/show_bug.cgi?id=89366
+
+        Note: This file violates Style rules.  This change only moves
+        the TCMalloc_Central_FreeList class declaration and the various
+        FastMallocZone methods earlier in the file.
+
+        Reviewed by Ryosuke Niwa.
+
+        * wtf/FastMalloc.cpp:
+        Reordered definitions to prepare for adding specialized template
+        (WTF):
+        (TCMalloc_Central_FreeList):
+        (WTF::TCMalloc_Central_FreeList::length):
+        (WTF::TCMalloc_Central_FreeList::tc_length):
+        (WTF::TCMalloc_Central_FreeList::enumerateFreeObjects):
+        (TCMalloc_Central_FreeListPadded):
+        (FastMallocZone):
+        (WTF::FastMallocZone::goodSize):
+        (WTF::FastMallocZone::check):
+        (WTF::FastMallocZone::print):
+        (WTF::FastMallocZone::log):
+        (WTF::FastMallocZone::forceLock):
+        (WTF::FastMallocZone::forceUnlock):
+        (WTF::FastMallocZone::statistics):
+        (WTF::FastMallocZone::zoneValloc):
+        (WTF::FastMallocZone::zoneDestroy):
+        (WTF::KernelSupportsTLS):
+        (WTF::CheckIfKernelSupportsTLS):
+        (TCMalloc_ThreadCache):
+
 2012-11-11  Kenichi Ishibashi  <bashi@chromium.org>
 
         WTFString::utf8() should have a mode of conversion to use replacement character

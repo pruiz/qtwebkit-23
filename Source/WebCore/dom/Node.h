@@ -319,7 +319,6 @@ public:
     virtual void notifyLoadedSheetAndAllCriticalSubresources(bool /* error loading subresource */) { }
     virtual void startLoadingDynamicSheet() { ASSERT_NOT_REACHED(); }
 
-    bool attributeStyleDirty() const { return getFlag(AttributeStyleDirtyFlag); }
     bool hasName() const { return getFlag(HasNameFlag); }
     bool hasID() const;
     bool hasClass() const;
@@ -334,9 +333,6 @@ public:
     StyleChangeType styleChangeType() const { return static_cast<StyleChangeType>(m_nodeFlags & StyleChangeMask); }
     bool childNeedsStyleRecalc() const { return getFlag(ChildNeedsStyleRecalcFlag); }
     bool isLink() const { return getFlag(IsLinkFlag); }
-
-    void setAttributeStyleDirty() { setFlag(AttributeStyleDirtyFlag); }
-    void clearAttributeStyleDirty() { clearFlag(AttributeStyleDirtyFlag); }
 
     void setHasName(bool f) { setFlag(f, HasNameFlag); }
     void setChildNeedsStyleRecalc() { setFlag(ChildNeedsStyleRecalcFlag); }
@@ -361,6 +357,9 @@ public:
 
     bool hasEventTargetData() const { return getFlag(HasEventTargetDataFlag); }
     void setHasEventTargetData(bool flag) { setFlag(flag, HasEventTargetDataFlag); }
+
+    bool inEden() const { return getFlag(InEdenFlag); }
+    void setEden(bool flag) { setFlag(flag, InEdenFlag); }
 
     enum ShouldSetAttached {
         SetAttached,
@@ -723,18 +722,18 @@ private:
 
         HasNameFlag = 1 << 23,
 
-        AttributeStyleDirtyFlag = 1 << 24,
+        InNamedFlowFlag = 1 << 24,
+        HasSyntheticAttrChildNodesFlag = 1 << 25,
+        HasCustomCallbacksFlag = 1 << 26,
+        HasScopedHTMLStyleChildFlag = 1 << 27,
+        HasEventTargetDataFlag = 1 << 28,
+        InEdenFlag = 1 << 29,
 
 #if ENABLE(SVG)
         DefaultNodeFlags = IsParsingChildrenFinishedFlag | IsStyleAttributeValidFlag | AreSVGAttributesValidFlag,
 #else
         DefaultNodeFlags = IsParsingChildrenFinishedFlag | IsStyleAttributeValidFlag,
 #endif
-        InNamedFlowFlag = 1 << 26,
-        HasSyntheticAttrChildNodesFlag = 1 << 27,
-        HasCustomCallbacksFlag = 1 << 28,
-        HasScopedHTMLStyleChildFlag = 1 << 29,
-        HasEventTargetDataFlag = 1 << 30,
     };
 
     // 2 bits remaining

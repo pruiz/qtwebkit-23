@@ -629,6 +629,11 @@ void CodeBlock::dump(ExecState* exec, const Vector<Instruction>::const_iterator&
             dumpBytecodeCommentAndNewLine(location);
             break;
         }
+        case op_get_callee: {
+            int r0 = (++it)->u.operand;
+            dataLog("[%4d] op_get_callee %s\n", location, registerName(exec, r0).data());
+            break;
+        }
         case op_create_this: {
             int r0 = (++it)->u.operand;
             dataLog("[%4d] create_this %s", location, registerName(exec, r0).data());
@@ -1791,7 +1796,8 @@ CodeBlock::CodeBlock(ScriptExecutable* ownerExecutable, UnlinkedCodeBlock* unlin
         case op_resolve_with_base:
         case op_resolve_with_this:
         case op_get_by_id:
-        case op_call_put_result: {
+        case op_call_put_result:
+        case op_get_callee: {
             ValueProfile* profile = &m_valueProfiles[pc[i + opLength - 1].u.operand];
             ASSERT(profile->m_bytecodeOffset == -1);
             profile->m_bytecodeOffset = i;

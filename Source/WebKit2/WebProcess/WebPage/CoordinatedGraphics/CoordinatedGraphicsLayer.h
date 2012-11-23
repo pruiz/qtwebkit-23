@@ -50,7 +50,7 @@ namespace WebKit {
 class CoordinatedGraphicsLayerClient {
 public:
     // CoordinatedTileClient
-    virtual void createTile(WebLayerID, int tileID, const SurfaceUpdateInfo&, const WebCore::IntRect& tileRect, const WebCore::IntSize& backingSize) = 0;
+    virtual void createTile(WebLayerID, int tileID, const SurfaceUpdateInfo&, const WebCore::IntRect&) = 0;
     virtual void updateTile(WebLayerID, int tileID, const SurfaceUpdateInfo&, const WebCore::IntRect&) = 0;
     virtual void removeTile(WebLayerID, int tileID) = 0;
 
@@ -69,7 +69,6 @@ public:
 
     virtual void setLayerAnimations(WebLayerID, const WebCore::GraphicsLayerAnimations&) = 0;
 
-    virtual void attachLayer(WebCore::CoordinatedGraphicsLayer*) = 0;
     virtual void detachLayer(WebCore::CoordinatedGraphicsLayer*) = 0;
     virtual void syncFixedLayers() = 0;
     virtual PassOwnPtr<WebCore::GraphicsContext> beginContentUpdate(const WebCore::IntSize&, ShareableBitmap::Flags, int& atlasID, WebCore::IntPoint&) = 0;
@@ -82,7 +81,7 @@ class CoordinatedGraphicsLayer : public GraphicsLayer
     , public TiledBackingStoreClient
     , public WebKit::CoordinatedTileClient {
 public:
-    CoordinatedGraphicsLayer(GraphicsLayerClient*);
+    explicit CoordinatedGraphicsLayer(GraphicsLayerClient*);
     virtual ~CoordinatedGraphicsLayer();
 
     // Reimplementations from GraphicsLayer.h.
@@ -146,12 +145,12 @@ public:
     virtual Color tiledBackingStoreBackgroundColor() const OVERRIDE;
 
     // CoordinatedTileClient
-    virtual void createTile(int tileID, const WebKit::SurfaceUpdateInfo&, const WebCore::IntRect& tileRect, const WebCore::IntSize& backingSize) OVERRIDE;
+    virtual void createTile(int tileID, const WebKit::SurfaceUpdateInfo&, const IntRect&) OVERRIDE;
     virtual void updateTile(int tileID, const WebKit::SurfaceUpdateInfo&, const IntRect&) OVERRIDE;
     virtual void removeTile(int tileID) OVERRIDE;
     virtual PassOwnPtr<GraphicsContext> beginContentUpdate(const IntSize&, int& atlasID, IntPoint&) OVERRIDE;
 
-    void setCoordinatedGraphicsLayerClient(WebKit::CoordinatedGraphicsLayerClient*);
+    void setCoordinator(WebKit::CoordinatedGraphicsLayerClient*);
 
     void adjustVisibleRect();
     void purgeBackingStores();
@@ -161,7 +160,6 @@ private:
     bool fixedToViewport() const { return m_fixedToViewport; }
     void setMaskTarget(GraphicsLayer* layer) { m_maskTarget = layer; }
 
-    void notifyChange();
     void didChangeLayerState();
     void didChangeAnimations();
     void didChangeGeometry();
@@ -169,6 +167,7 @@ private:
 #if ENABLE(CSS_FILTERS)
     void didChangeFilters();
 #endif
+    void didChangeImageBacking();
 
     void syncLayerState();
     void syncAnimations();
@@ -176,12 +175,13 @@ private:
 #if ENABLE(CSS_FILTERS)
     void syncFilters();
 #endif
+    void syncImageBacking();
     void syncCanvas();
-    void ensureImageBackingStore();
     void computeTransformedVisibleRect();
     void updateContentBuffers();
 
     void createBackingStore();
+    void releaseImageBackingIfNeeded();
 
     bool selfOrAncestorHaveNonAffineTransforms();
     bool shouldUseTiledBackingStore();
@@ -194,26 +194,26 @@ private:
 
     WebKit::WebLayerID m_id;
     WebKit::WebLayerInfo m_layerInfo;
-    RefPtr<Image> m_image;
     GraphicsLayer* m_maskTarget;
-    FloatRect m_needsDisplayRect;
     GraphicsLayerTransform m_layerTransform;
     bool m_inUpdateMode : 1;
     bool m_shouldUpdateVisibleRect: 1;
     bool m_shouldSyncLayerState: 1;
     bool m_shouldSyncChildren: 1;
     bool m_shouldSyncFilters: 1;
+    bool m_shouldSyncImageBacking: 1;
     bool m_shouldSyncAnimations: 1;
     bool m_fixedToViewport : 1;
     bool m_canvasNeedsDisplay : 1;
 
-    float m_effectiveOpacity;
-    TransformationMatrix m_effectiveTransform;
-
-    WebKit::CoordinatedGraphicsLayerClient* m_CoordinatedGraphicsLayerClient;
+    WebKit::CoordinatedGraphicsLayerClient* m_coordinator;
     OwnPtr<TiledBackingStore> m_mainBackingStore;
     OwnPtr<TiledBackingStore> m_previousBackingStore;
     float m_contentsScale;
+
+    RefPtr<Image> m_compositedImage;
+    NativeImagePtr m_compositedNativeImagePtr;
+
     PlatformLayer* m_canvasPlatformLayer;
     Timer<CoordinatedGraphicsLayer> m_animationStartedTimer;
     GraphicsLayerAnimations m_animations;

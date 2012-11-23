@@ -1,3 +1,89 @@
+2012-11-15  Kent Tamura  <tkent@chromium.org>
+
+        Support stand-alone month names in calendar picker
+        https://bugs.webkit.org/show_bug.cgi?id=102196
+
+        Reviewed by Kentaro Hara.
+
+        * ManualTests/forms/calendar-picker.html:
+        - Remove monthLabels arguments.
+        - Add a mock implementation of pagePopupController.formatMonth.
+
+2012-11-14  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134741.
+        http://trac.webkit.org/changeset/134741
+        https://bugs.webkit.org/show_bug.cgi?id=102337
+
+        "Change is incorrect." (Requested by dydx on #webkit).
+
+        * Source/autotools/symbols.filter:
+
+2012-11-14  Daniel Bates  <dbates@webkit.org>
+
+        Attempt to fix the Apple Windows Debug and GTK builds after <http://trac.webkit.org/changeset/134691>
+        (https://bugs.webkit.org/show_bug.cgi?id=96818)
+
+        Export symbols similar to the ones we added to WebCore.exp.in in
+        <http://trac.webkit.org/changeset/134691>.
+
+        * Source/autotools/symbols.filter:
+
+2012-11-14  KyungTae Kim  <ktf.kim@samsung.com>
+
+        [EFL] Turn on error on warnings for "sign-compare"
+        https://bugs.webkit.org/show_bug.cgi?id=101761
+
+        Reviewed by Gyuyoung Kim.
+
+        Remove "-Wno-error=sign-compare" to turn on error on warnings for "sign-compare"
+
+        * Source/cmake/WebKitHelpers.cmake:
+
+2012-11-13  Hugo Parente Lima  <hugo.lima@openbossa.org>
+
+        FindGLIB.cmake fails do find glib gmodule module.
+        https://bugs.webkit.org/show_bug.cgi?id=101784
+
+        Reviewed by Caio Marcelo de Oliveira Filho.
+
+        * Source/cmake/FindGLIB.cmake:
+
+2012-11-13  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Directly composited animated GIFs only render the first image.
+        https://bugs.webkit.org/show_bug.cgi?id=102043
+
+        Reviewed by Noam Rosenthal.
+
+        Add a test to check that a gif animation can run on a compositing layer.
+
+        * ManualTests/animated-gif-on-compositing-layer.html: Added.
+
+2012-11-12  KyungTae Kim  <ktf.kim@samsung.com>
+
+        [EFL] Turn on errors on warnings for WebKit1 and WebKit2 libraries
+        https://bugs.webkit.org/show_bug.cgi?id=101762
+
+        Reviewed by Gyuyoung Kim.
+
+        In case of EFL, add ENABLE_WERROR to EXTRA_COMPILER_FLAGS for WEBKIT and WEBKIT2
+
+        * Source/CMakeLists.txt:
+
+2012-11-12  Joe Mason  <jmason@rim.com>
+
+        [BlackBerry] NetworkJob should not check if data is received with HEAD
+        https://bugs.webkit.org/show_bug.cgi?id=102034
+
+        Reviewed by George Staikos.
+
+        Internal PR: 241391
+
+        Add test that HEAD XMLHttpRequests return status 404 instead of calling onerror.
+
+        * ManualTests/blackberry/head-xhr-nonexistant-file.html: Added.
+
 2012-11-12  KyungTae Kim  <ktf.kim@samsung.com>
 
         [EFL] Turn on error on warnings for "switch"

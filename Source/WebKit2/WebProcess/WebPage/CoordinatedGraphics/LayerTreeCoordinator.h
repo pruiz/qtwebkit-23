@@ -70,7 +70,7 @@ public:
     virtual int64_t adoptImageBackingStore(WebCore::Image*);
     virtual void releaseImageBackingStore(int64_t);
 
-    virtual void createTile(WebLayerID, int tileID, const SurfaceUpdateInfo&, const WebCore::IntRect& tileRect, const WebCore::IntSize& backingSize);
+    virtual void createTile(WebLayerID, int tileID, const SurfaceUpdateInfo&, const WebCore::IntRect&);
     virtual void updateTile(WebLayerID, int tileID, const SurfaceUpdateInfo&, const WebCore::IntRect&);
     virtual void removeTile(WebLayerID, int tileID);
     virtual WebCore::IntRect visibleContentsRect() const;
@@ -90,7 +90,6 @@ public:
 #if USE(GRAPHICS_SURFACE)
     virtual void syncCanvas(WebLayerID, const WebCore::IntSize& canvasSize, const WebCore::GraphicsSurfaceToken&, uint32_t frontBuffer) OVERRIDE;
 #endif
-    virtual void attachLayer(WebCore::CoordinatedGraphicsLayer*);
     virtual void detachLayer(WebCore::CoordinatedGraphicsLayer*);
     virtual void syncFixedLayers();
 

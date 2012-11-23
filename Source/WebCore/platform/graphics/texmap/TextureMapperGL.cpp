@@ -42,6 +42,7 @@
 #include "CairoUtilities.h"
 #include "RefPtrCairo.h"
 #include <cairo.h>
+#include <wtf/text/CString.h>
 #endif
 
 #if ENABLE(CSS_SHADERS)
@@ -350,6 +351,39 @@ void TextureMapperGL::drawRepaintCounter(int value, int pointSize, const FloatPo
     const uchar* bits = image.bits();
     texture->updateContents(bits, sourceRect, IntPoint::zero(), image.bytesPerLine(), BitmapTexture::UpdateCanModifyOriginalImageData);
     drawTexture(*texture, targetRect, modelViewMatrix, 1.0f, 0, AllEdges);
+
+#elif USE(CAIRO)
+    CString counterString = String::number(value).ascii();
+    // cairo_text_extents() requires a cairo_t, so dimensions need to be guesstimated.
+    int width = counterString.length() * pointSize * 1.2;
+    int height = pointSize * 1.5;
+
+    cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, width, height);
+    cairo_t* cr = cairo_create(surface);
+    cairo_surface_destroy(surface);
+
+    cairo_set_source_rgb(cr, 1, 0, 0);
+    cairo_rectangle(cr, 0, 0, width, height);
+    cairo_fill(cr);
+
+    cairo_select_font_face(cr, "Monospace", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+    cairo_set_font_size(cr, pointSize);
+    cairo_set_source_rgb(cr, 1, 1, 1);
+    cairo_move_to(cr, 2, pointSize);
+    cairo_show_text(cr, counterString.data());
+
+    IntSize size(width, height);
+    IntRect sourceRect(IntPoint::zero(), size);
+    IntRect targetRect(roundedIntPoint(targetPoint), size);
+
+    RefPtr<BitmapTexture> texture = acquireTextureFromPool(size);
+    const unsigned char* bits = cairo_image_surface_get_data(surface);
+    int stride = cairo_image_surface_get_stride(surface);
+    texture->updateContents(bits, sourceRect, IntPoint::zero(), stride, BitmapTexture::UpdateCanModifyOriginalImageData);
+    drawTexture(*texture, targetRect, modelViewMatrix, 1.0f, 0, AllEdges);
+
+    cairo_destroy(cr);
+
 #else
     UNUSED_PARAM(value);
     UNUSED_PARAM(pointSize);
@@ -417,6 +451,18 @@ void TextureMapperGL::drawTexture(uint32_t texture, Flags flags, const IntSize& 
     m_context3D->useProgram(program->programID());
 
     drawTexturedQuadWithProgram(program.get(), texture, flags, targetRect, modelViewMatrix, opacity, maskTexture);
+}
+
+void TextureMapperGL::drawSolidColor(const FloatRect& rect, const TransformationMatrix& matrix, const Color& color)
+{
+    RefPtr<TextureMapperShaderProgram> program = data().sharedGLData().textureMapperShaderManager.getShaderProgram(TextureMapperShaderManager::SolidColor);
+    m_context3D->useProgram(program->programID());
+
+    float r, g, b, a;
+    color.getRGBA(r, g, b, a);
+    m_context3D->uniform4f(program->colorLocation(), r, g, b, a);
+
+    drawQuad(rect, matrix, program.get(), GraphicsContext3D::TRIANGLE_FAN, false);
 }
 
 static TransformationMatrix viewportMatrix(GraphicsContext3D* context3D)

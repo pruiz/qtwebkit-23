@@ -175,6 +175,8 @@ public:
     virtual LayoutRect visualOverflowRect() const { return m_overflow ? m_overflow->visualOverflowRect() : borderBoxRect(); }
     LayoutUnit logicalLeftVisualOverflow() const { return style()->isHorizontalWritingMode() ? visualOverflowRect().x() : visualOverflowRect().y(); }
     LayoutUnit logicalRightVisualOverflow() const { return style()->isHorizontalWritingMode() ? visualOverflowRect().maxX() : visualOverflowRect().maxY(); }
+
+    LayoutRect overflowRectForPaintRejection() const;
     
     void addLayoutOverflow(const LayoutRect&);
     void addVisualOverflow(const LayoutRect&);
@@ -433,6 +435,7 @@ public:
     bool scrollsOverflow() const { return scrollsOverflowX() || scrollsOverflowY(); }
     bool scrollsOverflowX() const { return hasOverflowClip() && (style()->overflowX() == OSCROLL || hasAutoHorizontalScrollbar()); }
     bool scrollsOverflowY() const { return hasOverflowClip() && (style()->overflowY() == OSCROLL || hasAutoVerticalScrollbar()); }
+    bool usesCompositedScrolling() const;
     
     bool hasUnsplittableScrollingOverflow() const;
     bool isUnsplittableForPagination() const;
@@ -567,6 +570,7 @@ protected:
     void paintMaskImages(const PaintInfo&, const LayoutRect&);
 
     BackgroundBleedAvoidance determineBackgroundBleedAvoidance(GraphicsContext*) const;
+    bool backgroundIsSingleOpaqueLayer() const;
 
 #if PLATFORM(MAC)
     void paintCustomHighlight(const LayoutPoint&, const AtomicString& type, bool behindText);

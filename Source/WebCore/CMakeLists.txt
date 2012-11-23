@@ -48,8 +48,9 @@ SET(WebCore_INCLUDE_DIRECTORIES
     "${WEBCORE_DIR}/platform/animation"
     "${WEBCORE_DIR}/platform/audio"
     "${WEBCORE_DIR}/platform/graphics"
+    "${WEBCORE_DIR}/platform/graphics/cpu/arm"
+    "${WEBCORE_DIR}/platform/graphics/cpu/arm/filters"
     "${WEBCORE_DIR}/platform/graphics/filters"
-    "${WEBCORE_DIR}/platform/graphics/filters/arm"
     "${WEBCORE_DIR}/platform/graphics/harfbuzz"
     "${WEBCORE_DIR}/platform/graphics/harfbuzz/ng"
     "${WEBCORE_DIR}/platform/graphics/opentype"
@@ -1537,7 +1538,7 @@ SET(WebCore_SOURCES
     html/shadow/InsertionPoint.cpp
     html/shadow/MediaControls.cpp
     html/shadow/MediaControlElements.cpp
-    html/shadow/MediaControlRootElement.cpp
+    html/shadow/MediaControlsApple.cpp
     html/shadow/MeterShadowElement.cpp
     html/shadow/ProgressShadowElement.cpp
     html/shadow/SelectRuleFeatureSet.cpp
@@ -1903,6 +1904,8 @@ SET(WebCore_SOURCES
     platform/graphics/TiledBackingStore.cpp
     platform/graphics/WidthIterator.cpp
 
+    platform/graphics/cpu/arm/filters/FELightingNEON.cpp
+
     platform/graphics/filters/CustomFilterCompiledProgram.cpp
     platform/graphics/filters/CustomFilterGlobalContext.cpp
     platform/graphics/filters/CustomFilterMesh.cpp
@@ -1939,8 +1942,6 @@ SET(WebCore_SOURCES
     platform/graphics/filters/SourceAlpha.cpp
     platform/graphics/filters/SourceGraphic.cpp
     platform/graphics/filters/SpotLightSource.cpp
-
-    platform/graphics/filters/arm/FELightingNEON.cpp
 
     platform/graphics/texmap/TextureMapper.cpp
     platform/graphics/texmap/TextureMapperBackingStore.cpp

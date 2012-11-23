@@ -232,10 +232,6 @@ http/tests/navigation/document-location-mouseover.html
 # Tests for features under development
 # ------------------------------------
 
-# HiDPI tests require test infrastructure enhancements
-fast/hidpi
-svg/as-image/image-respects-deviceScaleFactor.html
-
 # Skipped until new WebSocket protocol is implemented. http://webkit.org/b/50099
 http/tests/websocket/tests/hybi/
 
@@ -1504,35 +1500,6 @@ webkit.org/b/10890 fast/selectors/unqualified-hover-strict.html [ Failure Pass ]
 webkit.org/b/23166 fast/css/background-clip-radius-values.html [ Pass ImageOnlyFailure ]
 webkit.org/b/23166 ietestcenter/css3/bordersbackgrounds/border-radius-clip-002.htm [ Pass ImageOnlyFailure ]
 
-webkit.org/b/98666 fast/dom/HTMLInputElement/input-slider-update.html [ Failure ]
-webkit.org/b/98666 fast/dom/HTMLInputElement/input-slider-update-styled.html [ Failure ]
-webkit.org/b/98666 fast/forms/box-shadow-override.html [ Failure ]
-webkit.org/b/98666 fast/forms/input-appearance-height.html [ Failure ]
-webkit.org/b/98666 fast/forms/range/input-appearance-range.html [ Failure ]
-webkit.org/b/98666 fast/forms/range/range-thumb-height-percentage.html [ Failure ]
-webkit.org/b/98666 fast/forms/range/slider-padding.html [ Failure ]
-webkit.org/b/98666 fast/forms/range/slider-thumb-shared-style.html [ Failure ]
-webkit.org/b/98666 fast/forms/range/slider-thumb-stylability.html [ Failure ]
-webkit.org/b/98666 fast/multicol/client-rects.html [ Failure ]
-webkit.org/b/98666 fast/repaint/slider-thumb-drag-release.html [ Failure ]
-webkit.org/b/98666 fast/repaint/slider-thumb-float.html [ Failure ]
-webkit.org/b/98666 media/track/track-cue-rendering-vertical.html [ Failure ]
-webkit.org/b/98666 fast/layers/video-layer.html [ Failure ]
-webkit.org/b/98666 media/audio-controls-rendering.html [ Failure ]
-webkit.org/b/98666 media/audio-repaint.html [ Failure ]
-webkit.org/b/98666 media/controls-after-reload.html [ Failure ]
-webkit.org/b/98666 media/controls-strict.html [ Failure ]
-webkit.org/b/98666 media/controls-styling.html [ Failure ]
-webkit.org/b/98666 media/controls-styling-strict.html [ Failure ]
-webkit.org/b/98666 media/controls-without-preload.html [ Failure ]
-webkit.org/b/98666 media/media-controls-clone.html [ Failure ]
-webkit.org/b/98666 media/media-document-audio-repaint.html [ Failure ]
-webkit.org/b/98666 media/track/track-cue-rendering-horizontal.html [ Failure ]
-webkit.org/b/98666 media/video-display-toggle.html [ Failure ]
-webkit.org/b/98666 media/video-empty-source.html [ Failure ]
-webkit.org/b/98666 media/video-no-audio.html [ Failure ]
-webkit.org/b/98666 media/video-zoom-controls.html [ Failure ]
-
 # New inspector/profiler/memory-instrumentation-canvas.html fails on JSC platforms
 webkit.org/b/99001 inspector/profiler/memory-instrumentation-canvas.html
 
@@ -1687,6 +1654,10 @@ Bug(EFL) transforms/3d/point-mapping/3d-point-mapping-preserve-3d.html [ Missing
 Bug(EFL) transforms/3d/point-mapping/3d-point-mapping.html [ Missing ]
 Bug(EFL) transitions/negative-delay.html [ Failure Pass ]
 
+# Media paint regressions
+webkit.org/b/102068 media/audio-repaint.html [ ImageOnlyFailure ]
+webkit.org/b/102068 media/media-document-audio-repaint.html [ ImageOnlyFailure ]
+
 # It may even be the case that the tests themselves are wrong.
 webkit.org/b/100859 ietestcenter/css3/bordersbackgrounds/background-repeat-space-padding-box.htm [ ImageOnlyFailure Missing ]
 webkit.org/b/100857 ietestcenter/css3/text/textshadow-005.htm [ ImageOnlyFailure Missing ]
@@ -1702,3 +1673,19 @@ webkit.org/b/101456 fast/repaint/block-selection-gap-in-table-cell.html [ ImageO
 
 # Identical failures on GTK, EFL and Qt.
 webkit.org/b/101539 editing/execCommand/switch-list-type-with-orphaned-li.html [ Failure ]
+
+# Wrong video colors.
+webkit.org/b/102091 media/video-colorspace-yuv420.html [ Skip ]
+webkit.org/b/102091 media/video-colorspace-yuv422.html [ Skip ]
+
+# HiDPI tests are failing to render correctly.
+webkit.org/b/102097 fast/hidpi [ Skip ]
+webkit.org/b/102097 svg/as-image/animated-svg-repaints-completely-in-hidpi.html [ Skip ]
+webkit.org/b/102097 svg/as-image/image-respects-deviceScaleFactor.html [ Skip ]
+
+webkit.org/b/102100 svg/repaint/inner-svg-change-viewBox.svg [ ImageOnlyFailure ]
+
+webkit.org/b/102190 compositing/overflow/updating-scrolling-content.html [ Failure ]
+webkit.org/b/102190 fast/events/overflow-scroll-fake-mouse-move.html [ Failure ]
+
+webkit.org/b/102364 compositing/overflow/scrolling-without-painting.html [ Failure ]

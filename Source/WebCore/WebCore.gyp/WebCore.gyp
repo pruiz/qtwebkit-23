@@ -111,8 +111,9 @@
       '../platform/graphics',
       '../platform/graphics/chromium',
       '../platform/graphics/chromium/cc',
+      '../platform/graphics/cpu/arm',
+      '../platform/graphics/cpu/arm/filters',
       '../platform/graphics/filters',
-      '../platform/graphics/filters/arm',
       '../platform/graphics/filters/skia',
       '../platform/graphics/gpu',
       '../platform/graphics/opentype',
@@ -1663,7 +1664,7 @@
         ['exclude', 'platform/Theme\\.cpp$'],
         # *NEON.cpp files need special compile options.
         # They are moved to the webcore_arm_neon target.
-        ['exclude', 'platform/graphics/filters/arm/.*NEON\\.(cpp|h)'],
+        ['exclude', 'platform/graphics/cpu/arm/filters/.*NEON\\.(cpp|h)'],
         ['exclude', 'platform/image-encoders/JPEGImageEncoder\\.(cpp|h)$'],
         ['exclude', 'platform/image-encoders/PNGImageEncoder\\.(cpp|h)$'],
         ['exclude', 'platform/network/ResourceHandle\\.cpp$'],
@@ -1745,7 +1746,6 @@
           ],
           'sources': [
             '../editing/SmartReplaceCF.cpp',
-            '../rendering/RenderThemeMac.mm',
             '../../WebKit/mac/WebCoreSupport/WebSystemInterface.mm',
           ],
           'sources/': [
@@ -1766,7 +1766,6 @@
             # Cherry-pick some files that can't be included by broader regexps.
             # Some of these are used instead of Chromium platform files, see
             # the specific exclusions in the "exclude" list below.
-            ['include', 'rendering/RenderThemeMac\\.mm$'],
             ['include', 'platform/graphics/mac/ColorMac\\.mm$'],
             ['include', 'platform/graphics/mac/ComplexTextControllerCoreText\\.mm$'],
             ['include', 'platform/graphics/mac/FloatPointMac\\.mm$'],
@@ -1936,7 +1935,7 @@
           ],
           'sources/': [
             ['exclude', '.*'],
-            ['include', 'platform/graphics/filters/arm/.*NEON\\.(cpp|h)'],
+            ['include', 'platform/graphics/cpu/arm/filters/.*NEON\\.(cpp|h)'],
           ],
           'cflags': ['-marm'],
           'conditions': [
@@ -1966,7 +1965,8 @@
         # FIXME: Figure out how to store these patterns in a variable.
         ['exclude', '(cairo|ca|cf|cg|curl|efl|freetype|gstreamer|gtk|linux|mac|opengl|openvg|opentype|pango|posix|qt|soup|svg|symbian|texmap|iphone|win|wince|wx)/'],
         ['exclude', '(?<!Chromium)(Cairo|CF|CG|Curl|Gtk|JSC|Linux|Mac|OpenType|POSIX|Posix|Qt|Safari|Soup|Symbian|Win|WinCE|Wx)\\.(cpp|mm?)$'],
-
+        # Previous rule excludes things like ChromiumFooWin, include those.
+        ['include', 'rendering/.*Chromium.*\\.(cpp|mm?)$'],
         ['exclude', 'AllInOne\\.cpp$'],
       ],
       'conditions': [
@@ -1984,6 +1984,9 @@
             # RenderThemeChromiumSkia is not used on mac since RenderThemeChromiumMac
             # does not reference the Skia code that is used by Windows, Linux and Android.
             ['exclude', 'rendering/RenderThemeChromiumSkia\\.cpp$'],
+            # RenderThemeChromiumFontProvider is used by RenderThemeChromiumSkia.
+            ['exclude', 'rendering/RenderThemeChromiumFontProvider\\.cpp'],
+            ['exclude', 'rendering/RenderThemeChromiumFontProvider\\.h'],
           ],
         },{ # OS!="mac"
           'sources/': [['exclude', 'Mac\\.(cpp|mm?)$']]
@@ -2009,6 +2012,7 @@
         }],
         ['OS=="android"', {
           'sources/': [
+            ['include', 'rendering/RenderThemeChromiumFontProviderLinux\\.cpp$'],
             ['include', 'rendering/RenderThemeChromiumLinux\\.cpp$'],
           ],
         },{ # OS!="android"

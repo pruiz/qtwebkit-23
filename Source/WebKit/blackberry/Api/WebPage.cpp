@@ -72,6 +72,7 @@
 #include "HTTPParsers.h"
 #include "HistoryItem.h"
 #include "IconDatabaseClientBlackBerry.h"
+#include "ImageDocument.h"
 #include "InPageSearchManager.h"
 #include "InRegionScrollableArea.h"
 #include "InRegionScroller_p.h"
@@ -222,6 +223,7 @@ const IntSize minimumLayoutSize(10, 10); // Needs to be a small size, greater th
 const double minimumExpandingRatio = 0.15;
 
 const double minimumZoomToFitScale = 0.25;
+const double maximumImageDocumentZoomToFitScale = 2;
 
 // Helper function to parse a URL and fill in missing parts.
 static KURL parseUrl(const String& url)
@@ -1067,7 +1069,9 @@ void WebPagePrivate::setLoadState(LoadState state)
 #endif
 
             // Suspend screen update to avoid ui thread blitting while resetting backingstore.
-            m_backingStore->d->suspendScreenAndBackingStoreUpdates();
+            // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+            m_backingStore->d->suspendBackingStoreUpdates();
+            m_backingStore->d->suspendScreenUpdates();
 
             m_previousContentsSize = IntSize();
             m_backingStore->d->resetRenderQueue();
@@ -1123,7 +1127,9 @@ void WebPagePrivate::setLoadState(LoadState state)
             setScrollPosition(IntPoint::zero());
             notifyTransformedScrollChanged();
 
-            m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::None);
+            // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+            m_backingStore->d->resumeBackingStoreUpdates();
+            m_backingStore->d->resumeScreenUpdates(BackingStore::None);
 
             // Paints the visible backingstore as white. Note it is important we do
             // this strictly after re-setting the scroll position to origin and resetting
@@ -1225,7 +1231,9 @@ bool WebPagePrivate::zoomAboutPoint(double unclampedScale, const FloatPoint& anc
     *m_transformationMatrix = zoom;
 
     // Suspend all screen updates to the backingstore.
-    m_backingStore->d->suspendScreenAndBackingStoreUpdates();
+    // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+    m_backingStore->d->suspendBackingStoreUpdates();
+    m_backingStore->d->suspendScreenUpdates();
 
     updateViewportSize();
 
@@ -1265,13 +1273,16 @@ bool WebPagePrivate::zoomAboutPoint(double unclampedScale, const FloatPoint& anc
     if (m_pendingOrientation != -1)
         m_client->updateInteractionViews();
 
+    // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+    m_backingStore->d->resumeBackingStoreUpdates();
+
     // Clear window to make sure there are no artifacts.
     if (shouldRender) {
         // Resume all screen updates to the backingstore and render+blit visible contents to screen.
-        m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
+        m_backingStore->d->resumeScreenUpdates(BackingStore::RenderAndBlit);
     } else {
         // Resume all screen updates to the backingstore but do not blit to the screen because we not rendering.
-        m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::None);
+        m_backingStore->d->resumeScreenUpdates(BackingStore::None);
     }
 
     return true;
@@ -1662,12 +1673,24 @@ void WebPagePrivate::zoomToInitialScaleOnLoad()
 double WebPagePrivate::zoomToFitScale() const
 {
     int contentWidth = contentsSize().width();
-    int contentHeight = contentsSize().height();
+
+    // For image document, zoom to fit the screen based on the actual image width
+    // instead of the contents width within a maximum scale .
+    Document* doc = m_page->mainFrame()->document();
+    bool isImageDocument = doc && doc->isImageDocument();
+    if (isImageDocument)
+        contentWidth = static_cast<ImageDocument*>(doc)->imageSize().width();
+
     double zoomToFitScale = contentWidth > 0.0 ? static_cast<double>(m_actualVisibleWidth) / contentWidth : 1.0;
+    int contentHeight = contentsSize().height();
     if (contentHeight * zoomToFitScale < static_cast<double>(m_defaultLayoutSize.height()))
         zoomToFitScale = contentHeight > 0 ? static_cast<double>(m_defaultLayoutSize.height()) / contentHeight : 1.0;
+    zoomToFitScale = std::max(zoomToFitScale, minimumZoomToFitScale);
 
-    return std::max(zoomToFitScale, minimumZoomToFitScale);
+    if (!isImageDocument)
+        return zoomToFitScale;
+
+    return std::min(zoomToFitScale, maximumImageDocumentZoomToFitScale);
 }
 
 double WebPagePrivate::initialScale() const
@@ -2626,16 +2649,18 @@ PassRefPtr<Node> WebPagePrivate::contextNode(TargetDetectionStrategy strategy)
     if (isTouching && lastFatFingersResult.isTextInput())
         return lastFatFingersResult.node(FatFingersResult::ShadowContentNotAllowed);
 
+    if (strategy == RectBased) {
+        FatFingersResult result = FatFingers(this, lastFatFingersResult.adjustedPosition(), FatFingers::Text).findBestPoint();
+        return result.node(FatFingersResult::ShadowContentNotAllowed);
+    }
+    if (strategy == FocusBased)
+        return m_inputHandler->currentFocusElement();
+
     IntPoint contentPos;
     if (isTouching)
         contentPos = lastFatFingersResult.adjustedPosition();
     else
         contentPos = mapFromViewportToContents(m_lastMouseEvent.position());
-
-    if (strategy == RectBased) {
-        FatFingersResult result = FatFingers(this, lastFatFingersResult.adjustedPosition(), FatFingers::Text).findBestPoint();
-        return result.node(FatFingersResult::ShadowContentNotAllowed);
-    }
 
     HitTestResult result = eventHandler->hitTestResultAtPoint(contentPos, false /*allowShadowContent*/);
     return result.innerNode();
@@ -2934,7 +2959,9 @@ void WebPagePrivate::zoomBlock()
     zoom.scale(m_blockZoomFinalScale);
     *m_transformationMatrix = zoom;
     m_client->resetBitmapZoomScale(m_blockZoomFinalScale);
-    m_backingStore->d->suspendScreenAndBackingStoreUpdates();
+    // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+    m_backingStore->d->suspendBackingStoreUpdates();
+    m_backingStore->d->suspendScreenUpdates();
     updateViewportSize();
 
 #if ENABLE(VIEWPORT_REFLOW)
@@ -2991,7 +3018,9 @@ void WebPagePrivate::zoomBlock()
 
     notifyTransformChanged();
     m_client->scaleChanged();
-    m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
+    // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+    m_backingStore->d->resumeBackingStoreUpdates();
+    m_backingStore->d->resumeScreenUpdates(BackingStore::RenderAndBlit);
 }
 
 void WebPage::blockZoomAnimationFinished()
@@ -3028,7 +3057,9 @@ void WebPage::destroy()
     disableWebInspector();
 
     // WebPage::destroyWebPageCompositor()
-    d->m_backingStore->d->suspendScreenAndBackingStoreUpdates();
+    // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+    d->m_backingStore->d->suspendBackingStoreUpdates();
+    d->m_backingStore->d->suspendScreenUpdates();
 
     // Close the backforward list and release the cached pages.
     d->m_page->backForward()->close();
@@ -3563,7 +3594,9 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
 
     // Suspend all screen updates to the backingstore to make sure no-one tries to blit
     // while the window surface and the BackingStore are out of sync.
-    m_backingStore->d->suspendScreenAndBackingStoreUpdates();
+    // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+    m_backingStore->d->suspendBackingStoreUpdates();
+    m_backingStore->d->suspendScreenUpdates();
 
     // The screen rotation is a major state transition that in this case is not properly
     // communicated to the backing store, since it does early return in most methods when
@@ -3682,7 +3715,9 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
 
     // Need to resume so that the backingstore will start recording the invalidated
     // rects from below.
-    m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::None);
+    // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+    m_backingStore->d->resumeBackingStoreUpdates();
+    m_backingStore->d->resumeScreenUpdates(BackingStore::None);
 
     // We might need to layout here to get a correct contentsSize so that zoomToFit
     // is calculated correctly.
@@ -3755,7 +3790,9 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
     } else {
 
         // Suspend all screen updates to the backingstore.
-        m_backingStore->d->suspendScreenAndBackingStoreUpdates();
+        // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+        m_backingStore->d->suspendBackingStoreUpdates();
+        m_backingStore->d->suspendScreenUpdates();
 
         // If the zoom failed, then we should still preserve the special case of scroll position.
         IntPoint scrollPosition = this->scrollPosition();
@@ -3783,7 +3820,9 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
         }
 
         // If we need layout then render and blit, otherwise just blit as our viewport has changed.
-        m_backingStore->d->resumeScreenAndBackingStoreUpdates(needsLayout ? BackingStore::RenderAndBlit : BackingStore::Blit);
+        // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+        m_backingStore->d->resumeBackingStoreUpdates();
+        m_backingStore->d->resumeScreenUpdates(needsLayout ? BackingStore::RenderAndBlit : BackingStore::Blit);
     }
 }
 
@@ -5267,15 +5306,21 @@ void WebPagePrivate::setCompositor(PassRefPtr<WebPageCompositorPrivate> composit
     // That seems extremely likely to be the case, but let's assert just to make sure.
     ASSERT(webKitThreadMessageClient()->isCurrentThread());
 
-    if (m_compositor || m_client->window())
-        m_backingStore->d->suspendScreenAndBackingStoreUpdates();
+    if (m_compositor || m_client->window()) {
+        // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+        m_backingStore->d->suspendBackingStoreUpdates();
+        m_backingStore->d->suspendScreenUpdates();
+    }
 
     // The m_compositor member has to be modified during a sync call for thread
     // safe access to m_compositor and its refcount.
     userInterfaceThreadMessageClient()->dispatchSyncMessage(createMethodCallMessage(&WebPagePrivate::setCompositorHelper, this, compositor));
 
-    if (m_compositor || m_client->window()) // the new compositor, if one was set
-        m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
+    if (m_compositor || m_client->window()) { // the new compositor, if one was set
+        // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+        m_backingStore->d->resumeBackingStoreUpdates();
+        m_backingStore->d->resumeScreenUpdates(BackingStore::RenderAndBlit);
+    }
 }
 
 void WebPagePrivate::setCompositorHelper(PassRefPtr<WebPageCompositorPrivate> compositor)
@@ -5721,7 +5766,9 @@ void WebPagePrivate::exitFullScreenForElement(Element* element)
         // The Browser chrome has its own fullscreen video widget.
         exitFullscreenForNode(element);
     } else {
-        m_backingStore->d->suspendScreenAndBackingStoreUpdates();
+        // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+        m_backingStore->d->suspendBackingStoreUpdates();
+        m_backingStore->d->suspendScreenUpdates();
 
         // When leaving fullscreen mode, we need to restore the 'x' scroll position
         // before fullscreen.
@@ -5742,7 +5789,9 @@ void WebPagePrivate::exitFullScreenForElement(Element* element)
         }
 
         notifyTransformChanged();
-        m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
+        // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+        m_backingStore->d->resumeBackingStoreUpdates();
+        m_backingStore->d->resumeScreenUpdates(BackingStore::RenderAndBlit);
 
         // This is where we would restore the browser's chrome
         // if hidden above.
@@ -6056,7 +6105,9 @@ void WebPagePrivate::setTextZoomFactor(float textZoomFactor)
 void WebPagePrivate::restoreHistoryViewState(Platform::IntSize contentsSize, Platform::IntPoint scrollPosition, double scale, bool shouldReflowBlock)
 {
     if (!m_mainFrame) {
-        m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
+        // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+        m_backingStore->d->resumeBackingStoreUpdates();
+        m_backingStore->d->resumeScreenUpdates(BackingStore::RenderAndBlit);
         return;
     }
 
@@ -6074,7 +6125,9 @@ void WebPagePrivate::restoreHistoryViewState(Platform::IntSize contentsSize, Pla
     bool didZoom = zoomAboutPoint(scale, m_mainFrame->view()->scrollPosition(), true /* enforceScaleClamping */, true /*forceRendering*/, true /*isRestoringZoomLevel*/);
     // If we're already at that scale, then we should still force rendering
     // since our scroll position changed.
-    m_backingStore->d->resumeScreenAndBackingStoreUpdates(BackingStore::RenderAndBlit);
+    // FIXME: Do we really need to suspend/resume both backingstore and screen here?
+    m_backingStore->d->resumeBackingStoreUpdates();
+    m_backingStore->d->resumeScreenUpdates(BackingStore::RenderAndBlit);
 
     if (!didZoom) {
         // We need to notify the client of the scroll position and content size change(s) above even if we didn't scale.

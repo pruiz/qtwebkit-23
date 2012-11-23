@@ -351,17 +351,6 @@ private:
 };
 }
 
-PassRefPtr<IDBIndex> IDBObjectStore::createIndex(ScriptExecutionContext* context, const String& name, const String& keyPath, const Dictionary& options, ExceptionCode& ec)
-{
-    return createIndex(context, name, IDBKeyPath(keyPath), options, ec);
-}
-
-PassRefPtr<IDBIndex> IDBObjectStore::createIndex(ScriptExecutionContext* context, const String& name, PassRefPtr<DOMStringList> keyPath, const Dictionary& options, ExceptionCode& ec)
-{
-    return createIndex(context, name, IDBKeyPath(*keyPath), options, ec);
-}
-
-
 PassRefPtr<IDBIndex> IDBObjectStore::createIndex(ScriptExecutionContext* context, const String& name, const IDBKeyPath& keyPath, const Dictionary& options, ExceptionCode& ec)
 {
     IDB_TRACE("IDBObjectStore::createIndex");
@@ -378,7 +367,7 @@ PassRefPtr<IDBIndex> IDBObjectStore::createIndex(ScriptExecutionContext* context
         return 0;
     }
     if (name.isNull()) {
-        ec = NATIVE_TYPE_ERR;
+        ec = TypeError;
         return 0;
     }
     if (containsIndex(name)) {

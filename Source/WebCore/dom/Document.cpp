@@ -2215,11 +2215,11 @@ AXObjectCache* Document::axObjectCache() const
     // document.  This is because we need to be able to get from any WebCoreAXObject
     // to any other WebCoreAXObject on the same page.  Using a single cache allows
     // lookups across nested webareas (i.e. multiple documents).
-    Document* document = topDocument();
-    ASSERT(document == this || !m_axObjectCache);
-    if (!document->m_axObjectCache)
-        document->m_axObjectCache = adoptPtr(new AXObjectCache(this));
-    return document->m_axObjectCache.get();
+    Document* topDocument = this->topDocument();
+    ASSERT(topDocument == this || !m_axObjectCache);
+    if (!topDocument->m_axObjectCache)
+        topDocument->m_axObjectCache = adoptPtr(new AXObjectCache(this));
+    return topDocument->m_axObjectCache.get();
 }
 
 void Document::setVisuallyOrdered()
@@ -3473,11 +3473,15 @@ void Document::getFocusableNodes(Vector<RefPtr<Node> >& nodes)
   
 void Document::setCSSTarget(Element* n)
 {
-    if (m_cssTarget)
+    if (m_cssTarget) {
         m_cssTarget->setNeedsStyleRecalc();
+        invalidateParentDistributionIfNecessary(m_cssTarget, SelectRuleFeatureSet::RuleFeatureTarget);
+    }
     m_cssTarget = n;
-    if (n)
+    if (n) {
         n->setNeedsStyleRecalc();
+        invalidateParentDistributionIfNecessary(n, SelectRuleFeatureSet::RuleFeatureTarget);
+    }
 }
 
 void Document::registerNodeListCache(DynamicNodeListCacheBase* list)
@@ -5876,6 +5880,8 @@ void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
 {
     MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::DOM);
     ContainerNode::reportMemoryUsage(memoryObjectInfo);
+    TreeScope::reportMemoryUsage(memoryObjectInfo);
+    ScriptExecutionContext::reportMemoryUsage(memoryObjectInfo);
     info.addMember(m_styleResolver);
     info.addMember(m_url);
     info.addMember(m_baseURL);

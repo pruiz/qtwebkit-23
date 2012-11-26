@@ -202,13 +202,6 @@ if (isInitial) { \
     return; \
 }
 
-#define HANDLE_INHERIT_AND_INITIAL_WITH_VALUE(prop, Prop, Value) \
-HANDLE_INHERIT(prop, Prop) \
-if (isInitial) { \
-    m_style->set##Prop(RenderStyle::initial##Value());\
-    return;\
-}
-
 static RuleSet* defaultStyle;
 static RuleSet* defaultQuirksStyle;
 static RuleSet* defaultPrintStyle;
@@ -2817,13 +2810,14 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
     bool isInitial = value->isInitialValue() || (!m_parentNode && value->isInheritedValue());
 
     ASSERT(!isInherit || !isInitial); // isInherit -> !isInitial && isInitial -> !isInherit
+    ASSERT(!isInherit || (m_parentNode && m_parentStyle)); // isInherit -> (m_parentNode && m_parentStyle)
 
     if (!applyPropertyToRegularStyle() && (!applyPropertyToVisitedLinkStyle() || !isValidVisitedLinkProperty(id))) {
         // Limit the properties that can be applied to only the ones honored by :visited.
         return;
     }
 
-    if (isInherit && m_parentStyle && !m_parentStyle->hasExplicitlyInheritedProperties() && !CSSProperty::isInheritedProperty(id))
+    if (isInherit && !m_parentStyle->hasExplicitlyInheritedProperties() && !CSSProperty::isInheritedProperty(id))
         m_parentStyle->setHasExplicitlyInheritedProperties();
 
 #if ENABLE(CSS_VARIABLES)
@@ -2953,8 +2947,7 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
         }
     case CSSPropertyQuotes:
         if (isInherit) {
-            if (m_parentStyle)
-                m_style->setQuotes(m_parentStyle->quotes());
+            m_style->setQuotes(m_parentStyle->quotes());
             return;
         }
         if (isInitial) {

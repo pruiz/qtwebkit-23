@@ -35,7 +35,7 @@ namespace WebCore {
     // changed or removed from the specifications.
     enum {
         INDEX_SIZE_ERR = 1,
-        DOMSTRING_SIZE_ERR = 2,
+        DOMSTRING_SIZE_ERR = 2, // historical
         HIERARCHY_REQUEST_ERR = 3,
         WRONG_DOCUMENT_ERR = 4,
         INVALID_CHARACTER_ERR = 5,
@@ -53,7 +53,7 @@ namespace WebCore {
         INVALID_ACCESS_ERR = 15,
 
         // Introduced in DOM Level 3:
-        VALIDATION_ERR = 16,
+        VALIDATION_ERR = 16, // Historical
         TYPE_MISMATCH_ERR = 17,
 
         // XMLHttpRequest extension:

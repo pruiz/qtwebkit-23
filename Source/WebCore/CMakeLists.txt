@@ -1706,6 +1706,7 @@ SET(WebCore_SOURCES
     page/ContentSecurityPolicy.cpp
     page/ContextMenuController.cpp
     page/Crypto.cpp
+    page/DeviceController.cpp
     page/DiagnosticLoggingKeys.cpp
     page/DOMSecurityPolicy.cpp
     page/DOMSelection.cpp
@@ -2893,6 +2894,10 @@ ADD_SOURCE_WEBCORE_DERIVED_DEPENDENCIES(${WEBCORE_DIR}/dom/EventNames.cpp EventT
 
 GENERATE_EXCEPTION_CODE_DESCRIPTION(${WEBCORE_DIR}/dom/DOMExceptions.in ExceptionCodeDescription.cpp)
 LIST(APPEND WebCore_SOURCES ${DERIVED_SOURCES_WEBCORE_DIR}/ExceptionCodeDescription.cpp)
+
+
+GENERATE_SETTINGS_MACROS(${WEBCORE_DIR}/page/Settings.in SettingsMacros.h)
+LIST(APPEND WebCore_SOURCES ${DERIVED_SOURCES_WEBCORE_DIR}/SettingsMacros.h)
 
 
 GENERATE_FONT_NAMES(${WEBCORE_DIR}/css/WebKitFontFamilyNames.in)

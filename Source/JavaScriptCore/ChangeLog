@@ -1,3 +1,113 @@
+2012-11-15  Filip Pizlo  <fpizlo@apple.com>
+
+        ClassInfo.h should have correct indentation.
+
+        Rubber stamped by Mark Hahnenberg.
+
+        ClassInfo.h had some true creativity in its use of whitespace. Some things within
+        the namespace were indented four spaces and others where not. One #define had its
+        contents indented four spaces, while another didn't. I applied the following rule:
+        
+        - Non-macro things in the namespace should not be indented (that's our current
+          accepted practice).
+        
+        - Macros should never be indented but if they are multi-line then their subsequent
+          bodies should be indented four spaces. I believe that is consistent with what we
+          do elsewhere.
+
+        * runtime/ClassInfo.h:
+        (JSC):
+        (MethodTable):
+        (ClassInfo):
+        (JSC::ClassInfo::propHashTable):
+        (JSC::ClassInfo::isSubClassOf):
+        (JSC::ClassInfo::hasStaticProperties):
+
+2012-11-15  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG should copy propagate trivially no-op ConvertThis
+        https://bugs.webkit.org/show_bug.cgi?id=102445
+
+        Reviewed by Oliver Hunt.
+
+        Copy propagation is always a good thing, since it reveals must-alias relationships
+        to the CFA and CSE. This accomplishes copy propagation for ConvertThis by first
+        converting it to an Identity node (which is done by the constant folder since it
+        has access to CFA results) and then performing substitution of references to
+        Identity with references to Identity's child in the CSE.
+        
+        I'm not aiming for a big speed-up here; I just think that this will be useful for
+        the work on https://bugs.webkit.org/show_bug.cgi?id=102327.
+
+        * dfg/DFGAbstractState.cpp:
+        (JSC::DFG::AbstractState::execute):
+        * dfg/DFGCSEPhase.cpp:
+        (JSC::DFG::CSEPhase::performNodeCSE):
+        * dfg/DFGConstantFoldingPhase.cpp:
+        (JSC::DFG::ConstantFoldingPhase::foldConstants):
+        * dfg/DFGNodeType.h:
+        (DFG):
+        * dfg/DFGPredictionPropagationPhase.cpp:
+        (JSC::DFG::PredictionPropagationPhase::propagate):
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+        * dfg/DFGSpeculativeJIT64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+
+2012-11-15  Filip Pizlo  <fpizlo@apple.com>
+
+        CallData.h should have correct indentation.
+
+        Rubber stamped by Mark Hahneberg.
+
+        * runtime/CallData.h:
+        (JSC):
+
+2012-11-15  Filip Pizlo  <fpizlo@apple.com>
+
+        Remove methodCallDummy since it is not used anymore.
+
+        Rubber stamped by Mark Hahnenberg.
+
+        * runtime/JSGlobalObject.cpp:
+        (JSC::JSGlobalObject::reset):
+        (JSC):
+        (JSC::JSGlobalObject::visitChildren):
+        * runtime/JSGlobalObject.h:
+        (JSGlobalObject):
+
+2012-11-14  Filip Pizlo  <fpizlo@apple.com>
+
+        Structure should be able to easily tell if the prototype chain might intercept a store
+        https://bugs.webkit.org/show_bug.cgi?id=102326
+
+        Reviewed by Geoffrey Garen.
+
+        This improves our ability to reason about the correctness of the more optimized
+        prototype chain walk in JSObject::put(), while also making it straight forward to
+        check if the prototype chain will do strange things to a property store by just
+        looking at the structure.
+
+        * runtime/JSObject.cpp:
+        (JSC::JSObject::put):
+        * runtime/Structure.cpp:
+        (JSC::Structure::prototypeChainMayInterceptStoreTo):
+        (JSC):
+        * runtime/Structure.h:
+        (Structure):
+
+2012-11-15  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [CMake] Do not regenerate LLIntAssembly.h on every incremental build
+        https://bugs.webkit.org/show_bug.cgi?id=102248
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Update LLIntAssembly.h's mtime after running asm.rb to make the build
+        system dependency tracking consistent.
+
+        * CMakeLists.txt:
+
 2012-11-15  Thiago Marcos P. Santos  <thiago.santos@intel.com>
 
         Fix compiler warnings about signed/unsigned comparison on i386

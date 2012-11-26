@@ -87,6 +87,8 @@ webkit.org/b/24182 [ Debug ] fast/dom/css-delete-doc.html [ Pass Slow ]
 webkit.org/b/100272 [ Debug ] fast/media/w3c/test_media_queries.html [ Pass Slow ]
 webkit.org/b/70878 [ Linux Debug ] http/tests/xmlhttprequest/xmlhttprequest-test-send-flag.html [ Pass Slow ]
 webkit.org/b/102179 [ Win Debug ] platform/chromium/virtual/gpu/fast/hidpi/image-set-without-specified-width.html [ Pass Slow ]
+webkit.org/b/102463 [ Win Debug ] fast/forms/validation-message-appearance.html [ Pass ImageOnlyFailure ]
+webkit.org/b/102464 [ Debug ] fast/images/webgl-teximage2d.html [ Pass Slow ]
 
 # These tests started being slow when we switched to DRT.
 webkit.org/b/90488 [ Linux Win Debug ] inspector [ Pass Slow ]
@@ -1583,7 +1585,6 @@ crbug.com/23473 [ Mac ] fast/repaint/selection-clear.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/table-cell-overflow.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/table-extra-bottom-grow.html [ ImageOnlyFailure ]
 # Win/Linux also failed after r83514.
-crbug.com/23473 [ Mac ] fast/repaint/transform-replaced-shadows.html [ ImageOnlyFailure ]
 
 # -----------------------------------------------------------------
 # END MAC PORT TESTS
@@ -2043,7 +2044,7 @@ crbug.com/28005 [ Android Linux Win ] fast/css/color-correction-untagged-images.
 # Timeout on Debug.
 webkit.org/b/82954 [ SnowLeopard Lion Win Linux ] svg/hixie/perf/007.xml [ Pass Slow ]
 
-crbug.com/22700 [ Android Linux Win ] fast/canvas/canvas-shadow.html [ Failure ]
+crbug.com/22700 [ Android ] fast/canvas/canvas-shadow.html [ Failure ]
 
 # Failures from merge 50972:51042
 # The test requires DRT/Test Shell to support error page handling.
@@ -2260,7 +2261,7 @@ webkit.org/b/45991 [ Android Linux Win ] canvas/philip/tests/2d.path.arcTo.shape
 webkit.org/b/45991 [ Android Linux Win ] canvas/philip/tests/2d.pattern.paint.norepeat.coord3.html [ Failure ]
 webkit.org/b/45991 [ Android Linux Win ] canvas/philip/tests/2d.pattern.paint.repeatx.coord1.html [ Failure ]
 webkit.org/b/45991 [ Android Linux Win ] canvas/philip/tests/2d.pattern.paint.repeaty.coord1.html [ Failure ]
-webkit.org/b/45991 [ Android Linux Win ] canvas/philip/tests/2d.shadow.enable.blur.html [ Failure ]
+webkit.org/b/45991 [ Android ] canvas/philip/tests/2d.shadow.enable.blur.html [ Failure ]
 webkit.org/b/45991 [ Linux Win ] platform/chromium/virtual/gpu/canvas/philip/tests/2d.gradient.radial.outside3.html [ Failure ]
 webkit.org/b/45991 [ Linux Win ] platform/chromium/virtual/gpu/canvas/philip/tests/2d.path.arc.angle.3.html [ Failure ]
 webkit.org/b/45991 [ Linux Win ] platform/chromium/virtual/gpu/canvas/philip/tests/2d.path.arc.angle.5.html [ Failure ]
@@ -2675,7 +2676,7 @@ crbug.com/77494 [ Android Linux Win ] fast/repaint/layout-state-scrolloffset.htm
 crbug.com/77494 [ Android Linux Win ] fast/repaint/layout-state-scrolloffset2.html [ Failure ]
 crbug.com/77494 [ Android Linux Win ] fast/repaint/layout-state-scrolloffset3.html [ Failure ]
 # Not included in tests modified by 81992, but started failing at same time:
-crbug.com/77494 [ Android Linux Win ] fast/repaint/transform-replaced-shadows.html [ ImageOnlyFailure ]
+crbug.com/77494 [ Android ] fast/repaint/transform-replaced-shadows.html [ ImageOnlyFailure ]
 
 # Regression since r82001.
 crbug.com/77619 [ SnowLeopard ] plugins/plugin-javascript-access.html [ Failure ]
@@ -2819,12 +2820,6 @@ webkit.org/b/61169 [ Android Linux Win ] css3/images/optimize-contrast-image.htm
 webkit.org/b/96720 fast/forms/time-multiple-fields/time-multiple-fields-preserve-value-after-history-back.html [ Pass Timeout ]
 webkit.org/b/96720 fast/forms/date-multiple-fields/date-multiple-fields-preserve-value-after-history-back.html [ Pass Timeout ]
 webkit.org/b/98906 platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-mouse-operations.html [ Pass Failure ]
-
-# Need rebaseline
-webkit.org/b/102181 platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-ru.html [ Pass ImageOnlyFailure Missing ]
-webkit.org/b/102181 platform/chromium/fast/forms/suggestion-picker/month-suggestion-picker-appearance.html [ Pass ImageOnlyFailure Missing ]
-webkit.org/b/102181 platform/chromium/fast/forms/suggestion-picker/month-suggestion-picker-appearance-rtl.html [ Pass ImageOnlyFailure Missing ]
-webkit.org/b/102181 platform/chromium/fast/forms/suggestion-picker/month-suggestion-picker-appearance-with-scroll-bar.html [ Pass ImageOnlyFailure Missing ]
 
 # New test added in r87324
 crbug.com/83994 [ Win ] platform/win/plugins/call-javascript-that-destroys-plugin.html [ Failure ]
@@ -3088,12 +3083,6 @@ webkit.org/b/76727 fast/multicol/span/span-as-immediate-columns-child-removal.ht
 webkit.org/b/76572 http/tests/download [ Failure ]
 
 webkit.org/b/77314 [ Mac Win ] fast/events/touch/send-oncancel-event.html [ Failure Pass ]
-
-# Needs rebaselining after fix for bug 101974
-webkit.org/b/101974 fast/forms/validation-message-appearance.html [ ImageOnlyFailure Pass ]
-webkit.org/b/101974 svg/custom/svg-fonts-in-html.html [ ImageOnlyFailure Pass ]
-webkit.org/b/101974 fast/borders/border-radius-wide-border-01.html [ ImageOnlyFailure Pass ]
-webkit.org/b/101974 fast/borders/borderRadiusInset01.html [ ImageOnlyFailure Pass ]
 
 # Skipped until setTouchPointRadius get implemented
 webkit.org/b/91012 touchadjustment/focusout-on-touch.html [ Skip ]
@@ -3521,6 +3510,10 @@ webkit.org/b/91488 fast/dom/shadow/shadowdom-for-output-only-shadow.html [ Image
 webkit.org/b/91489 fast/dom/shadow/shadowdom-for-fieldset-complex-shadow.html [ ImageOnlyFailure ]
 webkit.org/b/91489 fast/dom/shadow/shadowdom-for-fieldset-only-shadow.html [ ImageOnlyFailure ]
 
+# a:enabled and area:enabled are not correctly implemented yet.
+webkit.org/b/102349 fast/dom/shadow/pseudoclass-update-enabled-anchor.html [ ImageOnlyFailure ]
+webkit.org/b/102349 fast/dom/shadow/pseudoclass-update-enabled-area.html [ ImageOnlyFailure ]
+
 # Requires setUseDeferredFrameLoading() API from LayoutTestController.
 webkit.org/b/87652 http/tests/appcache/load-from-appcache-defer-resume-crash.html
 
@@ -3600,13 +3593,6 @@ webkit.org/b/89936 [ XP ] fast/css/text-rendering.html [ Failure ]
 # Started timeout between r121233:r121239.
 webkit.org/b/90003 [ Win Debug ] fast/js/repeat-cached-vm-reentry.html [ Pass Timeout ]
 
-# Flaky. It also times out very frequently on Windows and Linux debug build, sometimes on Mac debug build.
-webkit.org/b/90207 [ Win Debug ] fast/forms/select/select-state-restore.html [ Failure Pass Slow ]
-webkit.org/b/90207 [ Linux Debug ] fast/forms/select/select-state-restore.html [ Failure Pass Slow ]
-webkit.org/b/90207 [ Android ] fast/forms/select/select-state-restore.html [ Failure Pass Timeout ]
-webkit.org/b/90207 [ Win Release ] fast/forms/select/select-state-restore.html [ Failure Pass Timeout ]
-webkit.org/b/90207 [ Mac Debug ] fast/forms/select/select-state-restore.html [ Pass Timeout ]
-
 # Flaky
 webkit.org/b/90430 inspector/timeline/timeline-receive-response-event.html [ Pass Timeout ]
 
@@ -3645,11 +3631,6 @@ webkit.org/b/93624 [ Win Release ] inspector/console/console-format-collections.
 
 # Started failing around r122770
 webkit.org/b/91445 [ Linux ] plugins/embed-attributes-style.html [ ImageOnlyFailure Pass ]
-
-webkit.org/b/101561 [ Win Linux ] platform/chromium/fast/forms/calendar-picker/month-picker-appearance.html [ Missing ]
-webkit.org/b/101561 [ Win Linux ] platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step.html [ Missing ]
-webkit.org/b/101561 [ Mac ] platform/chromium/fast/forms/calendar-picker/month-picker-appearance.html [ Image ]
-webkit.org/b/101561 [ Mac ] platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step.html [ Image ]
 
 # Needs rebaseline after bug 97217 is fixed
 webkit.org/b/97325 css3/masking/clip-path-circle-relative-overflow.html [ ImageOnlyFailure Pass ]
@@ -3910,12 +3891,8 @@ webkit.org/b/98086 [ Win Mac Linux ] platform/chromium/virtual/threaded/composit
 webkit.org/b/98086 platform/chromium/virtual/threaded/compositing/visibility/visibility-simple-video-layer.html [ ImageOnlyFailure Pass ]
 webkit.org/b/98086 [ Win Mac Linux ] platform/chromium/virtual/threaded/compositing/visibility/visibility-composited.html [ ImageOnlyFailure Pass ]
 webkit.org/b/98086 [ Win Mac Linux ] platform/chromium/virtual/threaded/compositing/visibility/layer-visible-content.html [ ImageOnlyFailure Pass ]
-webkit.org/b/98086 platform/chromium/virtual/threaded/compositing/webgl/webgl-nonpremultiplied-blend.html [ Crash Pass ]
-webkit.org/b/98086 platform/chromium/virtual/threaded/compositing/webgl/webgl-no-alpha.html [ Crash Pass ]
-webkit.org/b/98086 platform/chromium/virtual/threaded/compositing/webgl/webgl-reflection.html [ Crash Pass ]
-webkit.org/b/98086 platform/chromium/virtual/threaded/compositing/webgl/webgl-repaint.html [ Crash Pass ]
-webkit.org/b/98086 platform/chromium/virtual/threaded/compositing/visibility/visibility-simple-webgl-layer.html [ ImageOnlyFailure Crash Pass ]
-webkit.org/b/98086 platform/chromium/virtual/threaded/compositing/visibility/visibility-simple-canvas2d-layer.html [ ImageOnlyFailure Crash Pass ]
+webkit.org/b/98086 platform/chromium/virtual/threaded/compositing/visibility/visibility-simple-webgl-layer.html [ ImageOnlyFailure Pass ]
+webkit.org/b/98086 platform/chromium/virtual/threaded/compositing/visibility/visibility-simple-canvas2d-layer.html [ ImageOnlyFailure Pass ]
 
 webkit.org/b/98087 [ Linux ] fast/css/lang-mapped-to-webkit-locale-dynamic.xhtml [ Failure Pass ]
 
@@ -4168,9 +4145,6 @@ webkit.org/b/101377 [ Linux Debug ] platform/chromium-linux/fast/text/internatio
 
 webkit.org/b/101408 platform/chromium/fast/forms/calendar-picker/calendar-picker-key-operations.html [ Failure Pass ]
 
-webkit.org/b/101561 platform/chromium/fast/forms/calendar-picker/week-picker-appearance.html [ ImageOnlyFailure Pass ]
-webkit.org/b/101561 platform/chromium/fast/forms/calendar-picker/week-picker-appearance-step.html [ ImageOnlyFailure Pass ]
-
 webkit.org/b/101539 [ Linux Win ] editing/execCommand/switch-list-type-with-orphaned-li.html [ Failure ]
 
 webkit.org/b/101618 [ Win7 Debug ] http/tests/inspector/indexeddb/database-data.html [ Crash ]
@@ -4186,7 +4160,6 @@ webkit.org/b/101988 [ Linux Mac Win ] transforms/3d/point-mapping/3d-point-mappi
 webkit.org/b/101988 [ Linux Mac Win ] transforms/3d/point-mapping/3d-point-mapping-preserve-3d.html [ Pass Image ]
 webkit.org/b/101988 [ Linux Mac Win ] transforms/3d/point-mapping/3d-point-mapping.html [ Pass Image ]
 webkit.org/b/102131 [ Win ] fast/workers/worker-exception-during-navigation.html [ Pass Crash ]
-webkit.org/b/102247 platform/chromium/virtual/threaded/compositing/webgl/webgl-background-color.html [ ImageOnlyFailure ]
 webkit.org/b/102264 [ Debug ] css3/filters/custom/custom-filter-property-computed-style.html [ Pass Timeout ]
 webkit.org/b/102277 fast/events/frame-scroll-fake-mouse-move.html [ Pass Text ]
 webkit.org/b/102277 fast/events/overflow-scroll-fake-mouse-move.html [ Pass Text ]

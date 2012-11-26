@@ -48,9 +48,8 @@
           # Temporarily ignore fix to antialias coverage, until we can rebaseline
           'SK_USE_LEGACY_AA_COVERAGE',
 
-          # Temporarily ignore speedup for blurring rectangles, so that Chromium
-          # deps roll does not break tests. Will rebaseline within 5 days.
-          'SK_IGNORE_FAST_BLURRECT=1',
+          # When enabled yields a 10x speedup on some devices.
+          'SK_DISABLE_FAST_AA_STROKE_RECT',
         ],
       },
     },

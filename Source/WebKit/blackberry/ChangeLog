@@ -1,3 +1,92 @@
+2012-11-15  Andrew Lo  <anlo@rim.com>
+
+        [BlackBerry] Animate changes to viewport due to input focus changes.
+        https://bugs.webkit.org/show_bug.cgi?id=102410
+
+        Reviewed by Rob Buis.
+
+        When changing scroll position or zoom level for input field focus,
+        animate the change.
+        Internal PR 231937
+
+        Internally reviewed by Mike Fenton.
+
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::ensureFocusTextElementVisible):
+
+2012-11-15  Mike Fenton  <mifenton@rim.com>
+
+        [BlackBerry] Don't restore zoom and scroll when leaving an input field.
+        https://bugs.webkit.org/show_bug.cgi?id=102376
+
+        Reviewed by Yong Li.
+
+        Restoring the zoom causes undesirable behavior when switching between fields.
+
+        Reviewed Internally by Andrew Lo.
+
+        * WebKitSupport/InputHandler.cpp:
+        (BlackBerry::WebKit::InputHandler::InputHandler):
+        (BlackBerry::WebKit::InputHandler::ensureFocusTextElementVisible):
+        * WebKitSupport/InputHandler.h:
+        (InputHandler):
+
+2012-11-15  Jakob Petsovits  <jpetsovits@rim.com>
+
+        [BlackBerry] Fix suspend/resume assertion in setCompositor().
+        https://bugs.webkit.org/show_bug.cgi?id=102397
+        RIM PR 244701
+
+        Reviewed by Adam Treat.
+
+        If a compositor is used but no surface pool is ever
+        allocated (which is a perfectly valid use case), initial
+        suspension of the backingstore is skipped because of an
+        early return. This will cause an assertion to be triggered
+        and a bug. Fix this by suspending it before the return.
+
+        With Adam Treat's recent change to split suspension of
+        screen and backingstore into two different functions,
+        this can now be reduced to a mere screen (blitting)
+        suspension. That was the original intention of this code.
+
+        * Api/BackingStore.cpp:
+        (BlackBerry::WebKit::BackingStorePrivate::createSurfaces):
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::setCompositor):
+
+2012-11-15  Jakob Petsovits  <jpetsovits@rim.com>
+
+        [BlackBerry] Leave surface resizing to the client.
+        https://bugs.webkit.org/show_bug.cgi?id=102280
+        RIM PR 235034
+        RIM PR 160619
+
+        Reviewed by Adam Treat.
+
+        Now that we always blit on the user interface thread and
+        use the client's userInterfaceViewportAccessor() to determine
+        the destination rectangle for blitting, changing the viewport
+        size does not affect the window or target surface directly.
+        The only way that blitted output is affected is through
+        layout, scroll position or scale changes. None of these
+        require us to synchronize with the UI thread to resize its
+        target surface.
+
+        This commit simplifies setViewportSize() and removes a
+        blocking message dispatch by simply offloading all surface
+        resizing responsibilities to the client. This is safer,
+        cleaner and easier.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::WebPagePrivate):
+        (BlackBerry::WebKit::WebPage::setScreenOrientation):
+        (BlackBerry::WebKit::WebPagePrivate::setViewportSize):
+        * Api/WebPage.h:
+        * Api/WebPageClient.h:
+        * Api/WebPage_p.h:
+        (WebPagePrivate):
+
 2012-11-14  Nima Ghanavatian  <nghanavatian@rim.com>
 
         [BlackBerry] Do not clear the ProcessingChangeGuard state on DeleteBackward

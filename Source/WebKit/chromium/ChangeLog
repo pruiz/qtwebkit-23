@@ -1,3 +1,234 @@
+2012-11-16  Peter Beverloo  <peter@chromium.org>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-11-15  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed, rolling out r134880.
+        http://trac.webkit.org/changeset/134880
+        https://bugs.webkit.org/show_bug.cgi?id=102339
+
+        it broke Chromium Windows build
+
+        * WebKit.gyp:
+        * WebKit.gypi:
+        * public/WebNode.h:
+        (WebKit):
+        * public/WebPluginContainer.h:
+        (WebKit):
+        (WebPluginContainer):
+        * src/WebFrameImpl.cpp:
+        (WebKit::pluginContainerFromNode):
+        (WebKit):
+        (WebKit::WebFrameImpl::executeCommand):
+        (WebKit::WebFrameImpl::printBegin):
+        (WebKit::WebFrameImpl::isPrintScalingDisabledForPlugin):
+        * src/WebNode.cpp:
+        * src/WebPluginContainerImpl.cpp:
+        * src/WebPluginContainerImpl.h:
+        (WebPluginContainerImpl):
+        * tests/FakeWebPlugin.cpp: Removed.
+        * tests/FakeWebPlugin.h: Removed.
+        * tests/WebPluginContainerTest.cpp: Removed.
+        * tests/data/plugin_container.html: Removed.
+
+2012-11-15  Istiaque Ahmed  <lazyboy@chromium.org>
+
+        Provide page/window coordinates to plugin's local coordinates translation in WebPluginContainer.
+        https://bugs.webkit.org/show_bug.cgi?id=102339
+
+        Reviewed by Adam Barth.
+
+        This change will allow converting a page's window coordinates to plugins's local coordinates,
+        taking CSS transformations into account. Embedder page of the plugin can use this information
+        for targetting elements inside the plugin (e.g. devtools can inspect a specific element at the
+        local coordinate position inside plugin).
+
+        * WebKit.gyp:
+        * WebKit.gypi:
+        * public/WebNode.h:
+        (WebKit):
+        * public/WebPluginContainer.h:
+        (WebKit):
+        (WebPluginContainer):
+        * src/WebFrameImpl.cpp:
+        (WebKit::WebFrameImpl::executeCommand):
+        (WebKit::WebFrameImpl::printBegin):
+        (WebKit::WebFrameImpl::isPrintScalingDisabledForPlugin):
+        * src/WebNode.cpp:
+        (WebKit::WebNode::pluginContainer):
+        (WebKit):
+        * src/WebPluginContainerImpl.cpp:
+        (WebKit::WebPluginContainerImpl::windowToLocalPoint):
+        (WebKit):
+        * src/WebPluginContainerImpl.h:
+        (WebPluginContainerImpl):
+        * tests/FakeWebPlugin.cpp: Added.
+        (WebKit):
+        (WebKit::FakeWebPlugin::FakeWebPlugin):
+        (WebKit::FakeWebPlugin::~FakeWebPlugin):
+        (WebKit::FakeWebPlugin::initialize):
+        (WebKit::FakeWebPlugin::destroy):
+        * tests/FakeWebPlugin.h: Added.
+        (WebKit):
+        (FakeWebPlugin):
+        * tests/WebPluginContainerTest.cpp: Added.
+        (WebKit):
+        (WebPluginContainerTest):
+        (WebKit::WebPluginContainerTest::WebPluginContainerTest):
+        (WebKit::WebPluginContainerTest::TearDown):
+        (WebKit::getWebPluginContainer):
+        (WebKit::TEST_F):
+        * tests/data/plugin_container.html: Added.
+
+2012-11-15  Tien-Ren Chen  <trchen@chromium.org>
+
+        Add Settings to disable custom scrollbars on main frame
+        https://bugs.webkit.org/show_bug.cgi?id=102323
+
+        Reviewed by Adam Barth.
+
+        Custom scrollbars on main frame don't really work well on touch devices.
+        Add a setting to inhibit their creation.
+
+        * public/WebSettings.h:
+        * src/WebSettingsImpl.cpp:
+        (WebKit::WebSettingsImpl::setAllowCustomScrollbarInMainFrame):
+        (WebKit):
+        * src/WebSettingsImpl.h:
+        (WebSettingsImpl):
+
+2012-11-15  Yue Zhang  <zysxqn@google.com>
+
+        Ignore autocomplete=off for chrome generated passwords.
+        https://bugs.webkit.org/show_bug.cgi?id=102426
+
+        Reviewed by Adam Barth.
+
+        Record the autocomplete attribute in the web password form data,
+        so that we can handle autocomplete in chromium code. The
+        motivation/background is: we should ignore autocomplete=off field
+        for password forms with chrome generated passwords (has passed
+        security review). By handling autocomplete in chromium code we can
+        distinguish password forms with chrome generated passwords and
+        those normal password forms. Note that we haven't turned off
+        checking autocomplete=off in the Webkit code for now so there is
+        no behavior change after this CL, and we will turn off after we
+        make the chromium side change to be safe.
+
+        * public/WebPasswordFormData.h:
+        (WebPasswordFormData):
+        * src/WebPasswordFormData.cpp:
+
+2012-11-15  Scott Violet  <sky@chromium.org>
+
+        [chromium] Create default directory so that cq can apply patch
+        https://bugs.webkit.org/show_bug.cgi?id=102421
+
+        Reviewed by Tony Chang.
+
+        Done in hopes of patch that copies files to this directory working.
+
+        * public/platform/default: Added.
+
+2012-11-15  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134800 and r134805.
+        http://trac.webkit.org/changeset/134800
+        http://trac.webkit.org/changeset/134805
+        https://bugs.webkit.org/show_bug.cgi?id=102417
+
+        This patch broke chromium port (Requested by jianli on
+        #webkit).
+
+        * src/AssertMatchingEnums.cpp:
+
+2012-11-15  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        [chromium] Do not mark an event (mouse wheel, scroll update) as handled if nothing was scrolled.
+        https://bugs.webkit.org/show_bug.cgi?id=102246
+
+        Reviewed by James Robinson.
+
+        * src/WebCompositorInputHandlerImpl.cpp:
+        (WebKit::WebCompositorInputHandlerImpl::handleInputEventInternal):
+        * tests/WebCompositorInputHandlerImplTest.cpp:
+        (MockWebInputHandlerClient):
+        (WebKit::TEST_F):
+
+2012-11-15  Tommy Widenflycht  <tommyw@google.com>
+
+        MediaStream API: Update RTCPeerConnection states to match the latest editors draft
+        https://bugs.webkit.org/show_bug.cgi?id=102382
+
+        Reviewed by Adam Barth.
+
+        Updating readyState & iceState, and adding iceGatheringState.
+
+        * src/AssertMatchingEnums.cpp:
+
+2012-11-15  Tien-Ren Chen  <trchen@chromium.org>
+
+        Use correct unscaled document size when calculating scale limits
+        https://bugs.webkit.org/show_bug.cgi?id=102028
+
+        Reviewed by Adam Barth.
+
+        Fixes bug http://crbug.com/160581
+        Using contentsSize / pageScaleFactor as unscaled contents size results
+        in rounding errors. This can cause scale factor to oscillate indefinitely.
+
+        * src/WebViewImpl.cpp:
+        (WebKit::unscaledContentsSize):
+        (WebKit):
+        (WebKit::WebViewImpl::computePageScaleFactorLimits):
+        * tests/WebFrameTest.cpp:
+        * tests/data/scale_oscillate.html: Added.
+
+2012-11-15  Kenneth Russell  <kbr@google.com>
+
+        [chromium] Move allowWebGL query to WebFrameClient
+        https://bugs.webkit.org/show_bug.cgi?id=102319
+
+        Reviewed by Adam Barth.
+
+        Moved allowWebGL query to WebFrameClient to avoid polluting
+        content/ API.
+
+        * public/WebFrameClient.h:
+        (WebFrameClient):
+        (WebKit::WebFrameClient::allowWebGL):
+        * public/WebPermissionClient.h:
+        * src/FrameLoaderClientImpl.cpp:
+        (WebKit::FrameLoaderClientImpl::allowWebGL):
+
+2012-11-15  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed.  Rolled DEPS.
+
+        * DEPS:
+
+2012-11-15  Stephen Chenney  <schenney@chromium.org>
+
+        [Chromium] Move SK_DISABLE_FAST_AA_STROKE_RECT to skia_webkit.gyp
+
+        Unreviewed non-funtional, behavior-neutral change
+
+        * skia_webkit.gyp: Add SK_DISABLE_FAST_AA_STROKE_RECT=1 so that it can be removed from Chromium's skia.gyp
+
+2012-11-15  Stephen Chenney  <schenney@chromium.org>
+
+        [Chromium] Disable SK_IGNORE_FAST_BLURRECT
+
+        Unreviewed test update.
+
+        This flag is enabled purely to simplify rebaselining. I am now
+        removing it and doing the rebaslining.
+
+        * skia_webkit.gyp: Remove the line for SK_IGNORE_FAST_BLURRECT
+
 2012-11-15  Kent Tamura  <tkent@chromium.org>
 
         Support stand-alone month names in calendar picker

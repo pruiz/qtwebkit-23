@@ -1,3 +1,285 @@
+2012-11-16  Helder Correia  <helder.correia@nokia.com>
+
+        [CoordGfx] Follow coding style on explicit constructors
+        https://bugs.webkit.org/show_bug.cgi?id=102451
+
+        Reviewed by Noam Rosenthal.
+
+        Use the explicit keyword on single argument constructors.
+
+        No new tests needed.
+
+        * UIProcess/CoordinatedGraphics/CoordinatedBackingStore.h:
+        (WebKit::CoordinatedBackingStoreTile::CoordinatedBackingStoreTile):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedTile.h:
+        (CoordinatedTileBackend):
+
+2012-11-16  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134908.
+        http://trac.webkit.org/changeset/134908
+        https://bugs.webkit.org/show_bug.cgi?id=102473
+
+        Broke the Apple Windows Debug build. (Requested by dydx on
+        #webkit).
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-16  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134913.
+        http://trac.webkit.org/changeset/134913
+        https://bugs.webkit.org/show_bug.cgi?id=102472
+
+        Incorrect fix. (Requested by dydx on #webkit).
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-16  Daniel Bates  <dbates@webkit.org>
+
+        Attempt to fix the Apple Windows Debug build after http://trac.webkit.org/changeset/134908
+        (https://bugs.webkit.org/show_bug.cgi?id=102354).
+
+        Add symbol.
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-16  KyungTae Kim  <ktf.kim@samsung.com>
+
+        [WK2] Bug on ASSERT code in CoordinatedBackingStore.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=102465
+
+        Reviewed by Noam Rosenthal.
+
+        The ASSERT code should be fixed because the 'operator>=' is not defined for WebCore::IntSize.
+
+        * UIProcess/CoordinatedGraphics/CoordinatedBackingStore.cpp:
+        (WebKit::CoordinatedBackingStoreTile::swapBuffers):
+
+2012-11-16  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134865.
+        http://trac.webkit.org/changeset/134865
+        https://bugs.webkit.org/show_bug.cgi?id=102466
+
+        Broke the Apple Windows Debug build. (Requested by dydx on
+        #webkit).
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-16  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        Avoid copying of ViewportArguments in computeViewportAttributes function
+        https://bugs.webkit.org/show_bug.cgi?id=102354
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Update exported symbols.
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-15  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Refactor code related to directly composited images.
+        https://bugs.webkit.org/show_bug.cgi?id=101023
+
+        Reviewed by Noam Rosenthal.
+
+        Internal Review by Gwang Yoon Hwang and Jae Hyun Park.
+
+        Currently, LayerTreeCoordinator manages composited images using
+        ShareableBitmap. This patch introduces CoordinatedImageBacking which
+        plays a role in managing composited images. CoordinatedImageBacking makes us
+        gather code related to a directly composited image into a single class.
+
+        We create only one CoordinatedImageBacking per image. For example, in the leaves
+        demo, we create only 3 textures of leaves.
+
+        * CMakeLists.txt:
+        * Shared/WebLayerTreeInfo.h:
+        (WebKit::WebLayerInfo::WebLayerInfo):
+        (WebLayerInfo):
+        * Target.pri:
+        * UIProcess/CoordinatedGraphics/CoordinatedBackingStore.cpp:
+        (WebKit::CoordinatedBackingStoreTile::swapBuffers):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.cpp:
+        (WebKit::LayerTreeCoordinatorProxy::createImageBacking):
+        (WebKit::LayerTreeCoordinatorProxy::updateImageBacking):
+        (WebKit):
+        (WebKit::LayerTreeCoordinatorProxy::removeImageBacking):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.h:
+        (LayerTreeCoordinatorProxy):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.messages.in:
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::setLayerState):
+        (WebKit::LayerTreeRenderer::createImageBacking):
+        (WebKit::LayerTreeRenderer::updateImageBacking):
+        (WebKit::LayerTreeRenderer::removeImageBacking):
+        (WebKit):
+        (WebKit::LayerTreeRenderer::assignImageBackingToLayer):
+        (WebKit::LayerTreeRenderer::removeReleasedImageBackingsIfNeeded):
+        (WebKit::LayerTreeRenderer::flushLayerChanges):
+        (WebKit::LayerTreeRenderer::purgeGLResources):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+        (LayerTreeRenderer):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::setContentsToImage):
+        (WebCore::CoordinatedGraphicsLayer::syncImageBacking):
+        (WebCore::CoordinatedGraphicsLayer::releaseImageBackingIfNeeded):
+        (WebCore::CoordinatedGraphicsLayer::beginContentUpdate):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (CoordinatedGraphicsLayerClient):
+        (CoordinatedGraphicsLayer):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedImageBacking.cpp: Added.
+        (WebKit):
+        (WebKit::CoordinatedImageBacking::getCoordinatedImageBackingID):
+        (WebKit::CoordinatedImageBacking::create):
+        (WebKit::CoordinatedImageBacking::CoordinatedImageBacking):
+        (WebKit::CoordinatedImageBacking::~CoordinatedImageBacking):
+        (WebKit::CoordinatedImageBacking::addLayerClient):
+        (WebKit::CoordinatedImageBacking::removeLayerClient):
+        (WebKit::CoordinatedImageBacking::markDirty):
+        (WebKit::CoordinatedImageBacking::update):
+        (WebKit::CoordinatedImageBacking::releaseSurfaceIfNeeded):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedImageBacking.h: Added.
+        (WebCore):
+        (WebKit):
+        (CoordinatedImageBacking):
+        (Coordinator):
+        (WebKit::CoordinatedImageBacking::id):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::flushPendingLayerChanges):
+        (WebKit::LayerTreeCoordinator::createImageBackingIfNeeded):
+        (WebKit::LayerTreeCoordinator::createImageBacking):
+        (WebKit::LayerTreeCoordinator::updateImageBacking):
+        (WebKit::LayerTreeCoordinator::removeImageBacking):
+        (WebKit::LayerTreeCoordinator::flushPendingImageBackingChanges):
+        (WebKit::LayerTreeCoordinator::purgeBackingStores):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.h:
+        (LayerTreeCoordinator):
+
+2012-11-15  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: A Minor optimization of calculating transforms in CoordinagedGraphicsLayer.
+        https://bugs.webkit.org/show_bug.cgi?id=102309
+
+        We calculate an inverse transform each tiledBackingStoreVisibleRect() call by
+        a TiledBackingStore and every tiles.
+        This patch caches the inverse transform to reuse it.
+
+        Reviewed by Noam Rosenthal.
+
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::tiledBackingStoreVisibleRect):
+        (WebCore::CoordinatedGraphicsLayer::computeTransformedVisibleRect):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (CoordinatedGraphicsLayer):
+
+2012-11-15  Alec Flett  <alecflett@chromium.org>
+
+        Add tests for explicit serialization values
+        https://bugs.webkit.org/show_bug.cgi?id=96818
+
+        Reviewed by Adam Barth.
+
+        Add exports for SerializedScriptValue changes.
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-15  Gustavo Noronha Silva  <gns@gnome.org>
+
+        [GTK] Split WebCore/platform into a separate library
+        https://bugs.webkit.org/show_bug.cgi?id=94435
+
+        Reviewed by Martin Robinson.
+
+        More people have been reporting problems when linking WebCore because
+        the command line limit is being exceeded. Splitting WebCore a bit more
+        is in order.
+
+        * GNUmakefile.am: link libWebCorePlatform into libwebkit2gtk
+
+2012-11-15  Anders Carlsson  <andersca@apple.com>
+
+        Consolidate four accelerated compositing WKView methods into a single method
+        https://bugs.webkit.org/show_bug.cgi?id=102419
+
+        Reviewed by Andreas Kling.
+
+        Add a single -[WKView _setAcceleratedCompositingModeRootLayer:] method and have
+        the existing PageClientImpl member functions call it. Also, add a new
+        PageClient member function, setAcceleratedCompositingRootLayer.
+
+        * UIProcess/API/mac/PageClientImpl.h:
+        * UIProcess/API/mac/PageClientImpl.mm:
+        (WebKit::PageClientImpl::enterAcceleratedCompositingMode):
+        (WebKit::PageClientImpl::exitAcceleratedCompositingMode):
+        (WebKit::PageClientImpl::updateAcceleratedCompositingMode):
+        (WebKit::PageClientImpl::setAcceleratedCompositingRootLayer):
+        * UIProcess/API/mac/WKView.mm:
+        (-[WKView _processDidCrash]):
+        (-[WKView _setAcceleratedCompositingModeRootLayer:]):
+        * UIProcess/API/mac/WKViewInternal.h:
+        * UIProcess/PageClient.h:
+        * UIProcess/WebPageProxy.h:
+        * UIProcess/mac/RemoteLayerTreeHost.mm:
+        (WebKit::RemoteLayerTreeHost::commit):
+        * UIProcess/mac/WebPageProxyMac.mm:
+        (WebKit::WebPageProxy::setAcceleratedCompositingRootLayer):
+
+2012-11-15  Rick Byers  <rbyers@chromium.org>
+
+        No tests for changing mouse cursors
+        https://bugs.webkit.org/show_bug.cgi?id=100550
+
+        Reviewed by Brent Fulgham.
+
+        Add necessary exports for Internals::getCurrentCursorInfo
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-15  Kenneth Rohde Christiansen  <kenneth@webkit.org>
+
+        Remove initiallyFitToViewport attribute
+        https://bugs.webkit.org/show_bug.cgi?id=102392
+
+        Reviewed by Noam Rosenthal.
+
+        Remove the initiallyFitToViewport which shouldn't have been
+        added in the first place. We now reset userScalable to auto (-1)
+        in case it was not explicitly set by the web author.
+
+        Same behavior, covered by existing tests.
+
+        * UIProcess/PageViewportController.cpp:
+        (WebKit::PageViewportController::PageViewportController):
+        (WebKit::PageViewportController::pageTransitionViewportReady):
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::sendViewportAttributesChanged):
+
+2012-11-15  Balazs Kelemen  <kbalazs@webkit.org>
+
+        Coordinated Graphics: support the "freeze animations" API
+        https://bugs.webkit.org/show_bug.cgi?id=100703
+
+        Reviewed by Noam Rosenthal.
+
+        Implement suspendAnimations and resumeAnimations in CoordinatedGraphicsLayer.
+
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::suspendAnimations):
+        (WebCore):
+        (WebCore::CoordinatedGraphicsLayer::resumeAnimations):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (CoordinatedGraphicsLayer):
+
 2012-11-15  Yuni Jeong  <yhnet.jung@samsung.com>
 
         [EFL][WK2] Add APIs to get/set whether scripts can open new windows.

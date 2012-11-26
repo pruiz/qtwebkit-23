@@ -21,6 +21,7 @@
 #ifndef CoordinatedGraphicsLayer_h
 #define CoordinatedGraphicsLayer_h
 
+#include "CoordinatedImageBacking.h"
 #include "CoordinatedTile.h"
 #include "FloatPoint3D.h"
 #include "GraphicsLayer.h"
@@ -56,8 +57,7 @@ public:
 
     virtual WebCore::IntRect visibleContentsRect() const = 0;
     virtual bool layerTreeTileUpdatesAllowed() const = 0;
-    virtual int64_t adoptImageBackingStore(WebCore::Image*) = 0;
-    virtual void releaseImageBackingStore(int64_t) = 0;
+    virtual PassRefPtr<CoordinatedImageBacking> createImageBackingIfNeeded(WebCore::Image*) = 0;
     virtual void syncLayerState(WebLayerID, const WebLayerInfo&) = 0;
     virtual void syncLayerChildren(WebLayerID, const Vector<WebLayerID>&) = 0;
 #if ENABLE(CSS_FILTERS)
@@ -121,6 +121,8 @@ public:
     virtual bool addAnimation(const KeyframeValueList&, const IntSize&, const Animation*, const String&, double) OVERRIDE;
     virtual void pauseAnimation(const String&, double) OVERRIDE;
     virtual void removeAnimation(const String&) OVERRIDE;
+    virtual void suspendAnimations(double time) OVERRIDE;
+    virtual void resumeAnimations() OVERRIDE;
     
     void setContentsScale(float);
     void setVisibleContentRectTrajectoryVector(const FloatPoint&);
@@ -196,6 +198,7 @@ private:
     WebKit::WebLayerInfo m_layerInfo;
     GraphicsLayer* m_maskTarget;
     GraphicsLayerTransform m_layerTransform;
+    TransformationMatrix m_cachedInverseTransform;
     bool m_inUpdateMode : 1;
     bool m_shouldUpdateVisibleRect: 1;
     bool m_shouldSyncLayerState: 1;
@@ -213,6 +216,7 @@ private:
 
     RefPtr<Image> m_compositedImage;
     NativeImagePtr m_compositedNativeImagePtr;
+    RefPtr<WebKit::CoordinatedImageBacking> m_coordinatedImageBacking;
 
     PlatformLayer* m_canvasPlatformLayer;
     Timer<CoordinatedGraphicsLayer> m_animationStartedTimer;

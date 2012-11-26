@@ -419,7 +419,6 @@ WebPagePrivate::WebPagePrivate(WebPage* webPage, WebPageClient* client, const In
     , m_needsCommit(false)
     , m_suspendRootLayerCommit(false)
 #endif
-    , m_hasPendingSurfaceSizeChange(false)
     , m_pendingOrientation(-1)
     , m_fullscreenVideoNode(0)
     , m_hasInRegionScrollableAreas(false)
@@ -3558,12 +3557,6 @@ void WebPagePrivate::setScreenOrientation(int orientation)
 void WebPage::setScreenOrientation(int orientation)
 {
     d->m_pendingOrientation = orientation;
-    d->m_hasPendingSurfaceSizeChange = true;
-}
-
-void WebPage::setHasPendingSurfaceSizeChange()
-{
-    d->m_hasPendingSurfaceSizeChange = true;
 }
 
 void WebPage::applyPendingOrientationIfNeeded()
@@ -3572,24 +3565,9 @@ void WebPage::applyPendingOrientationIfNeeded()
         d->setScreenOrientation(d->m_pendingOrientation);
 }
 
-void WebPagePrivate::resizeSurfaceIfNeeded()
-{
-    // This call will cause the client to reallocate the window buffer to new size,
-    // which needs to be serialized with usage of the window buffer. Accomplish
-    // this by sending a sync message to the compositing thread. All other usage of
-    // the window buffer happens on the compositing thread.
-    if (!Platform::userInterfaceThreadMessageClient()->isCurrentThread()) {
-        Platform::userInterfaceThreadMessageClient()->dispatchSyncMessage(
-            Platform::createMethodCallMessage(&WebPagePrivate::resizeSurfaceIfNeeded, this));
-        return;
-    }
-
-    m_client->resizeSurfaceIfNeeded();
-}
-
 void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize, bool ensureFocusElementVisible)
 {
-    if (m_pendingOrientation == -1 && !m_hasPendingSurfaceSizeChange && transformedActualVisibleSize == this->transformedActualVisibleSize())
+    if (m_pendingOrientation == -1 && transformedActualVisibleSize == this->transformedActualVisibleSize())
         return;
 
     // Suspend all screen updates to the backingstore to make sure no-one tries to blit
@@ -3605,11 +3583,6 @@ void WebPagePrivate::setViewportSize(const IntSize& transformedActualVisibleSize
         setShouldResetTilesWhenShown(true);
 
     bool hasPendingOrientation = m_pendingOrientation != -1;
-
-    if (m_hasPendingSurfaceSizeChange) {
-        resizeSurfaceIfNeeded();
-        m_hasPendingSurfaceSizeChange = false;
-    }
 
     // The window buffers might have been recreated, cleared, moved, etc., so:
     m_backingStore->d->windowFrontBufferState()->clearBlittedRegion();
@@ -5306,21 +5279,15 @@ void WebPagePrivate::setCompositor(PassRefPtr<WebPageCompositorPrivate> composit
     // That seems extremely likely to be the case, but let's assert just to make sure.
     ASSERT(webKitThreadMessageClient()->isCurrentThread());
 
-    if (m_compositor || m_client->window()) {
-        // FIXME: Do we really need to suspend/resume both backingstore and screen here?
-        m_backingStore->d->suspendBackingStoreUpdates();
+    if (m_compositor || m_client->window())
         m_backingStore->d->suspendScreenUpdates();
-    }
 
     // The m_compositor member has to be modified during a sync call for thread
     // safe access to m_compositor and its refcount.
     userInterfaceThreadMessageClient()->dispatchSyncMessage(createMethodCallMessage(&WebPagePrivate::setCompositorHelper, this, compositor));
 
-    if (m_compositor || m_client->window()) { // the new compositor, if one was set
-        // FIXME: Do we really need to suspend/resume both backingstore and screen here?
-        m_backingStore->d->resumeBackingStoreUpdates();
+    if (m_compositor || m_client->window()) // the new compositor, if one was set
         m_backingStore->d->resumeScreenUpdates(BackingStore::RenderAndBlit);
-    }
 }
 
 void WebPagePrivate::setCompositorHelper(PassRefPtr<WebPageCompositorPrivate> compositor)

@@ -106,7 +106,7 @@ public:
 
     const FontPlatformData& platformData() const { return m_platformData; }
 #if ENABLE(OPENTYPE_VERTICAL)
-    const OpenTypeVerticalData* verticalData() const { return m_verticalData; }
+    const OpenTypeVerticalData* verticalData() const { return m_verticalData.get(); }
 #endif
 
     PassRefPtr<SimpleFontData> smallCapsFontData(const FontDescription&) const;
@@ -281,7 +281,7 @@ private:
     bool m_isTextOrientationFallback;
     bool m_isBrokenIdeographFallback;
 #if ENABLE(OPENTYPE_VERTICAL)
-    const OpenTypeVerticalData* m_verticalData;
+    RefPtr<OpenTypeVerticalData> m_verticalData;
 #endif
     bool m_hasVerticalGlyphs;
     

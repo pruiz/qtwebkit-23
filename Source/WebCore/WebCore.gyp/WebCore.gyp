@@ -879,6 +879,23 @@
           ],
         },
         {
+          'action_name': 'Settings',
+          'inputs': [
+            '../page/make_settings.pl',
+            '../page/Settings.in',
+          ],
+          'outputs': [
+            '<(SHARED_INTERMEDIATE_DIR)/webkit/SettingsMacros.h',
+          ],
+          'action': [
+            'python',
+            'scripts/action_makenames.py',
+            '<@(_outputs)',
+            '--',
+            '<@(_inputs)',
+          ],
+        },
+        {
           'action_name': 'UserAgentStyleSheets',
           'variables': {
             'scripts': [
@@ -937,7 +954,7 @@
           'action': [
             'python',
             '../make-file-arrays.py',
-            '--condition=ENABLE(CALENDAR_PICKER)',
+            '--condition=ENABLE(CALENDAR_PICKER) OR ENABLE(INPUT_TYPE_COLOR)',
             '--out-h=<(SHARED_INTERMEDIATE_DIR)/webkit/PickerCommon.h',
             '--out-cpp=<(SHARED_INTERMEDIATE_DIR)/webkit/PickerCommon.cpp',
             '<@(_inputs)',
@@ -995,7 +1012,7 @@
           'action': [
             'python',
             '../make-file-arrays.py',
-            '--condition=ENABLE(INPUT_TYPE_COLOR) AND ENABLE(DATALIST_ELEMENT) AND ENABLE(PAGE_POPUP)',
+            '--condition=ENABLE(INPUT_TYPE_COLOR)',
             '--out-h=<(SHARED_INTERMEDIATE_DIR)/webkit/ColorSuggestionPicker.h',
             '--out-cpp=<(SHARED_INTERMEDIATE_DIR)/webkit/ColorSuggestionPicker.cpp',
             '<@(_inputs)',

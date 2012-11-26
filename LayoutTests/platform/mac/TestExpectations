@@ -706,7 +706,7 @@ media/audio-repaint.html
 fast/forms/file/file-input-capture.html
 
 # https://bugs.webkit.org/show_bug.cgi?id=85522
-http/tests/security/sandboxed-iframe-modify-self.html
+http/tests/security/sandboxed-iframe-form-top.html
 
 # https://bugs.webkit.org/show_bug.cgi?id=85523
 fullscreen/full-screen-iframe-legacy.html
@@ -1182,3 +1182,9 @@ webkit.org/b/100846 inspector-protocol/debugger-terminate-dedicated-worker-while
 webkit.org/b/100142 css3/filters/effect-reference-hw.html [ Fail ]
 webkit.org/b/100142 css3/filters/effect-reference-ordering-hw.html [ Fail ]
 webkit.org/b/100142 css3/filters/effect-reference.html [ Fail ]
+
+# Mountain Lion and prior do not support custom media data loading
+Bug(jernoble) [ MountainLion Lion SnowLeopard ] media/video-src-blob.html
+
+# Hangs safari apparently due to an issue with weird multi-frame CUR image files
+webkit.org/b/101811 fast/events/mouse-cursor-multiframecur.html [ Skip ]

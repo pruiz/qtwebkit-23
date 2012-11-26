@@ -1,3 +1,142 @@
+2012-11-15  Yury Semikhatsky  <yurys@chromium.org>
+
+        Memory instrumentation: add code for reporting stack traces of unknown instrumented objects
+        https://bugs.webkit.org/show_bug.cgi?id=102384
+
+        Reviewed by Pavel Feldman.
+
+        Updated return type in accord with the changes in MemoryInstrumentationClient.
+
+        * TestWebKitAPI/Tests/WTF/MemoryInstrumentationTest.cpp:
+
+2012-11-15  Gustavo Noronha Silva  <gns@gnome.org>
+
+        [GTK] Split WebCore/platform into a separate library
+        https://bugs.webkit.org/show_bug.cgi?id=94435
+
+        Reviewed by Martin Robinson.
+
+        More people have been reporting problems when linking WebCore because
+        the command line limit is being exceeded. Splitting WebCore a bit more
+        is in order.
+
+        * GNUmakefile.am: link libWebCorePlatform into DRT
+
+2012-11-15  Dana Jansens  <danakj@chromium.org>
+
+        [chromium] Stop using the WebCompositorSupport methods for changing settings
+        https://bugs.webkit.org/show_bug.cgi?id=101968
+
+        Reviewed by James Robinson.
+
+        * DumpRenderTree/chromium/TestShell.cpp:
+        * DumpRenderTree/chromium/TestShell.h:
+        (TestShell::setPerTilePaintingEnabled):
+        (TestShell::setAcceleratedAnimationEnabled):
+
+2012-11-15  Tony Chang  <tony@chromium.org>
+
+        Generate Settings from a .in file
+        https://bugs.webkit.org/show_bug.cgi?id=100393
+
+        Reviewed by Adam Barth.
+
+        Add the generated WebCore files to the include dir.
+
+        * TestWebKitAPI/CMakeLists.txt:
+        * WebKitTestRunner/CMakeLists.txt:
+
+2012-11-15  Roger Fong  <roger_fong@apple.com>
+
+        Make old-run-webkit-tests handle setting the results directory properly.
+        https://bugs.webkit.org/show_bug.cgi?id=102273
+        <rdar://problem/11571607>
+
+        Reviewed by Timothy Horton.
+
+        A call to chdirWebkit in old-run-webkit-tests set the current working directory to the OpenSource folder.
+        Thus setting --results-directory to OpenSource/layout-test-results would create OpenSource/layout-test-results inside the main OpenSource folder.
+        This caused many other problems including failure to upload test results and failed future test runs.
+        The solution is to save the current working directory before calling chdirWebKit and then reconstructing the full path to the results directory 
+        using the saved directory when setting $testResultsDirectory.
+
+        * Scripts/old-run-webkit-tests:
+
+2012-11-15  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134800 and r134805.
+        http://trac.webkit.org/changeset/134800
+        http://trac.webkit.org/changeset/134805
+        https://bugs.webkit.org/show_bug.cgi?id=102417
+
+        This patch broke chromium port (Requested by jianli on
+        #webkit).
+
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.cpp:
+        (MockWebRTCPeerConnectionHandler::openDataChannel):
+
+2012-11-15  Tommy Widenflycht  <tommyw@google.com>
+
+        [chromium] MediaStream API: Add missing WebRTCPeerConnectionHandlerClient::didAddRemoteDataChannel
+        https://bugs.webkit.org/show_bug.cgi?id=102386
+
+        Reviewed by Adam Barth.
+
+        Adding mock data channel functionality.
+
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.cpp:
+        (MockWebRTCPeerConnectionHandler::openDataChannel):
+
+2012-11-15  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134649 and r134665.
+        http://trac.webkit.org/changeset/134649
+        http://trac.webkit.org/changeset/134665
+        https://bugs.webkit.org/show_bug.cgi?id=102413
+
+        Broke a ton of downstream chromium tests (Requested by japhet
+        on #webkit).
+
+        * DumpRenderTree/chromium/WebViewHost.cpp:
+        (WebViewHost::updateForCommittedLoad):
+
+2012-11-15  Andreas Kling  <akling@apple.com>
+
+        Update my e-mail address.
+
+        Rubber-stamped by Anders Koivisto.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-15  Dominik Röttsches  <dominik.rottsches@intel.com>
+
+        [EFL] Bump Harfbuzz to allow fixing bug 101009 on EFL
+        https://bugs.webkit.org/show_bug.cgi?id=101323
+
+        Reviewed by Martin Robinson.
+
+        Bumping Harfbuzz to newer version so that we can remove the
+        ifdef round the fix for bug 101009 for EFL, too.
+        We're using the zip snapshot since jhbuild can fallback to the previously
+        downloaded blob in case of network failures which leads to better
+        buildbot robustness. This zip snapshot currently needs to be locally
+        patched to fix ICU detection on systems that don't have icu pkg-config files.
+        The patch is suggested for merging into HarfBuzz. We can remove it locally
+        once it's accepted into HarfBuzz upstream.
+
+        * efl/patches/harfbuzz-icu-detection-fix.patch: Applied after retrieving source to fix harfbuzz detection on systems that don't have pkg-config files for it.
+        * efl/jhbuild.modules: Bumping harfbuzz version.
+
+2012-11-15  Alexey Proskuryakov  <ap@apple.com>
+
+        [Mac] Implement WTR --no-timeout-at-all option
+        https://bugs.webkit.org/show_bug.cgi?id=102251
+
+        Reviewed by Eric Carlson.
+
+        * WebKitTestRunner/mac/TestControllerMac.mm: (WTR::TestController::platformRunUntil):
+        Just do it, and convert to Objective C on the way for simplicity.
+
 2012-11-14  Ryuan Choi  <ryuan.choi@gmail.com>
 
         [EFL] Port tiled backing store

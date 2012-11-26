@@ -280,7 +280,6 @@ public:
     ShadowRoot* userAgentShadowRoot() const;
 
     virtual const AtomicString& shadowPseudoId() const;
-    void setShadowPseudoId(const AtomicString&, ExceptionCode& = ASSERT_NO_EXCEPTION);
 
     RenderStyle* computedStyle(PseudoId = NOPSEUDO);
 
@@ -311,6 +310,9 @@ public:
     String outerText();
  
     virtual String title() const;
+
+    const AtomicString& pseudo() const;
+    void setPseudo(const AtomicString&);
 
     void updateId(const AtomicString& oldId, const AtomicString& newId);
     void updateId(TreeScope*, const AtomicString& oldId, const AtomicString& newId);
@@ -434,13 +436,7 @@ public:
     IntSize savedLayerScrollOffset() const;
     void setSavedLayerScrollOffset(const IntSize&);
 
-    virtual void reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
-    {
-        MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::DOM);
-        ContainerNode::reportMemoryUsage(memoryObjectInfo);
-        info.addMember(m_tagName);
-        info.addMember(m_attributeData);
-    }
+    virtual void reportMemoryUsage(MemoryObjectInfo*) const OVERRIDE;
 
 protected:
     Element(const QualifiedName& tagName, Document* document, ConstructionType type)
@@ -530,6 +526,9 @@ private:
 private:
     ElementRareData* elementRareData() const;
     ElementRareData* ensureElementRareData();
+
+    void detachAllAttrNodesFromElement();
+    void detachAttrNodeFromElementWithValue(Attr*, const AtomicString& value);
 
     RefPtr<ElementAttributeData> m_attributeData;
 };

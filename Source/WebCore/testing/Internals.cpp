@@ -315,6 +315,25 @@ bool Internals::hasShadowInsertionPoint(const Node* root, ExceptionCode& ec) con
     return 0;
 }
 
+bool Internals::hasContentElement(const Node* root, ExceptionCode& ec) const
+{
+    if (root && root->isShadowRoot())
+        return toShadowRoot(root)->hasContentElement();
+
+    ec = INVALID_ACCESS_ERR;
+    return 0;
+}
+
+size_t Internals::countElementShadow(const Node* root, ExceptionCode& ec) const
+{
+    if (!root || !root->isShadowRoot()) {
+        ec = INVALID_ACCESS_ERR;
+        return 0;
+    }
+
+    return toShadowRoot(root)->countElementShadow();
+}
+
 bool Internals::attached(Node* node, ExceptionCode& ec)
 {
     if (!node) {
@@ -473,6 +492,24 @@ Internals::ShadowRootIfShadowDOMEnabledOrNode* Internals::olderShadowRoot(Node* 
     return toShadowRoot(shadow)->olderShadowRoot();
 }
 
+String Internals::shadowRootType(const Node* root, ExceptionCode& ec) const
+{
+    if (!root || !root->isShadowRoot()) {
+        ec = INVALID_ACCESS_ERR;
+        return String();
+    }
+
+    switch (toShadowRoot(root)->type()) {
+    case ShadowRoot::UserAgentShadowRoot:
+        return String("UserAgentShadowRoot");
+    case ShadowRoot::AuthorShadowRoot:
+        return String("AuthorShadowRoot");
+    default:
+        ASSERT_NOT_REACHED();
+        return String("Unknown");
+    }
+}
+
 Element* Internals::includerFor(Node* node, ExceptionCode& ec)
 {
     if (!node) {
@@ -500,7 +537,7 @@ void Internals::setShadowPseudoId(Element* element, const String& id, ExceptionC
         return;
     }
 
-    return element->setShadowPseudoId(id, ec);
+    return element->setPseudo(id);
 }
 
 String Internals::visiblePlaceholder(Element* element)
@@ -1259,6 +1296,8 @@ String Internals::layerTreeAsText(Document* document, unsigned flags, ExceptionC
         layerTreeFlags |= LayerTreeFlagsIncludeVisibleRects;
     if (flags & LAYER_TREE_INCLUDES_TILE_CACHES)
         layerTreeFlags |= LayerTreeFlagsIncludeTileCaches;
+    if (flags & LAYER_TREE_INCLUDES_REPAINT_RECTS)
+        layerTreeFlags |= LayerTreeFlagsIncludeRepaintRects;
 
     return document->frame()->layerTreeAsText(layerTreeFlags);
 }

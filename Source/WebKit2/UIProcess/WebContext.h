@@ -69,9 +69,6 @@ class WebResourceCacheManagerProxy;
 #if USE(SOUP)
 class WebSoupRequestManagerProxy;
 #endif
-#if ENABLE(VIBRATION)
-class WebVibrationProxy;
-#endif
 struct StatisticsData;
 struct WebProcessCreationParameters;
     
@@ -203,9 +200,6 @@ public:
 #if USE(SOUP)
     WebSoupRequestManagerProxy* soupRequestManagerProxy() const { return m_soupRequestManagerProxy.get(); }
 #endif
-#if ENABLE(VIBRATION)
-    WebVibrationProxy* vibrationProxy() const { return m_vibrationProxy.get(); }
-#endif
 
     struct Statistics {
         unsigned wkViewCount;
@@ -247,6 +241,10 @@ public:
     void textCheckerStateChanged();
 
     void setUsesNetworkProcess(bool);
+
+#if PLATFORM(MAC)
+    static bool applicationIsOccluded() { return s_applicationIsOccluded; }
+#endif
 
 private:
     WebContext(ProcessModel, const String& injectedBundlePath);
@@ -301,6 +299,13 @@ private:
 
     String cookieStorageDirectory() const;
     String platformDefaultCookieStorageDirectory() const;
+
+#if PLATFORM(MAC)
+    static void applicationBecameVisible(uint32_t, void*, uint32_t, void*, uint32_t);
+    static void applicationBecameOccluded(uint32_t, void*, uint32_t, void*, uint32_t);
+    static void initializeProcessSuppressionSupport();
+    static void registerOcclusionNotificationHandlers();
+#endif
 
     ProcessModel m_processModel;
     
@@ -368,9 +373,6 @@ private:
 #if USE(SOUP)
     RefPtr<WebSoupRequestManagerProxy> m_soupRequestManagerProxy;
 #endif
-#if ENABLE(VIBRATION)
-    RefPtr<WebVibrationProxy> m_vibrationProxy;
-#endif
 
 #if PLATFORM(WIN)
     bool m_shouldPaintNativeControls;
@@ -396,6 +398,10 @@ private:
     HashMap<uint64_t, RefPtr<DictionaryCallback> > m_dictionaryCallbacks;
 
     CoreIPC::MessageReceiverMap m_messageReceiverMap;
+
+#if PLATFORM(MAC)
+    static bool s_applicationIsOccluded;
+#endif
 };
 
 template<typename U> inline void WebContext::sendToAllProcesses(const U& message)

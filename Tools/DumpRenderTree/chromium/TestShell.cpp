@@ -110,6 +110,7 @@ TestShell::TestShell()
     , m_dumpPixelsForCurrentTest(false)
     , m_allowExternalPages(false)
     , m_acceleratedCompositingForVideoEnabled(false)
+    , m_acceleratedCompositingForFixedPositionEnabled(false)
     , m_softwareCompositingEnabled(false)
     , m_threadedCompositingEnabled(false)
     , m_forceCompositingMode(false)
@@ -145,6 +146,7 @@ TestShell::TestShell()
     WebRuntimeFeatures::enableShadowDOM(true);
     WebRuntimeFeatures::enableStyleScoped(true);
     WebRuntimeFeatures::enableScriptedSpeech(true);
+    WebRuntimeFeatures::enableRequestAutocomplete(true);
 
     // 30 second is the same as the value in Mac DRT.
     // If we use a value smaller than the timeout value of
@@ -229,6 +231,7 @@ void TestShell::resetWebSettings(WebView& webView)
     m_prefs.reset();
     m_prefs.acceleratedCompositingEnabled = true;
     m_prefs.acceleratedCompositingForVideoEnabled = m_acceleratedCompositingForVideoEnabled;
+    m_prefs.acceleratedCompositingForFixedPositionEnabled = m_acceleratedCompositingForFixedPositionEnabled;
     m_prefs.forceCompositingMode = m_forceCompositingMode;
     m_prefs.accelerated2dCanvasEnabled = m_accelerated2dCanvasEnabled;
     m_prefs.deferred2dCanvasEnabled = m_deferred2dCanvasEnabled;
@@ -252,8 +255,9 @@ void TestShell::runFileTest(const TestParams& params, bool shouldDumpPixels)
         m_testRunner->setShouldDumpFrameLoadCallbacks(true);
 
     if (testUrl.find("compositing/") != string::npos || testUrl.find("compositing\\") != string::npos) {
+        if (!m_softwareCompositingEnabled)
+            m_prefs.accelerated2dCanvasEnabled = true;
         m_prefs.acceleratedCompositingForVideoEnabled = true;
-        m_prefs.accelerated2dCanvasEnabled = true;
         m_prefs.deferred2dCanvasEnabled = true;
         m_prefs.mockScrollbarsEnabled = true;
         m_prefs.applyTo(m_webView);

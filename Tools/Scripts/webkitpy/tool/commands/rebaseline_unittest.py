@@ -29,11 +29,12 @@
 import unittest
 
 from webkitpy.common.system.outputcapture import OutputCapture
+from webkitpy.common.checkout.baselineoptimizer import BaselineOptimizer
+from webkitpy.common.net.buildbot.buildbot_mock import MockBuilder
+from webkitpy.common.system.executive_mock import MockExecutive2
 from webkitpy.thirdparty.mock import Mock
 from webkitpy.tool.commands.rebaseline import *
 from webkitpy.tool.mocktool import MockTool, MockOptions
-from webkitpy.common.net.buildbot.buildbot_mock import MockBuilder
-from webkitpy.common.system.executive_mock import MockExecutive2
 
 
 class _BaseTestCase(unittest.TestCase):
@@ -44,7 +45,7 @@ class _BaseTestCase(unittest.TestCase):
 
     def setUp(self):
         self.tool = MockTool()
-        self.command = self.command_constructor()
+        self.command = self.command_constructor()  # lint warns that command_constructor might not be set, but this is intentional; pylint: disable-msg=E1102
         self.command.bind_to_tool(self.tool)
         self.lion_port = self.tool.port_factory.get_from_builder_name("WebKit Mac10.7")
         self.lion_expectations_path = self.lion_port.path_to_test_expectations_file()
@@ -75,6 +76,11 @@ class _BaseTestCase(unittest.TestCase):
 class TestRebaselineTest(_BaseTestCase):
     command_constructor = RebaselineTest  # AKA webkit-patch rebaseline-test-internal
 
+    def setUp(self):
+        super(TestRebaselineTest, self).setUp()
+        self.options = MockOptions(builder="WebKit Mac10.7", test="userscripts/another-test.html", suffixes="txt",
+                                   move_overwritten_baselines_to=None, results_directory=None)
+
     def test_baseline_directory(self):
         command = self.command
         self.assertEqual(command._baseline_directory("Apple Win XP Debug (Tests)"), "/mock-checkout/LayoutTests/platform/win-xp")
@@ -96,7 +102,8 @@ Bug(A) [ Debug ] : fast/css/large-list-of-rules-crash.html [ Failure ]
         self._write("fast/css/large-list-of-rules-crash.html", "Dummy test contents")
         self._write("userscripts/another-test.html", "Dummy test contents")
 
-        self.command._rebaseline_test_and_update_expectations("WebKit Mac10.7", "userscripts/another-test.html", None, self.WEB_PREFIX)
+        self.options.suffixes = "png,wav,txt"
+        self.command._rebaseline_test_and_update_expectations(self.options)
 
         self.assertEquals(self.tool.web.urls_fetched,
             [self.WEB_PREFIX + '/userscripts/another-test-actual.png',
@@ -111,7 +118,8 @@ Bug(A) [ Debug ] : fast/css/large-list-of-rules-crash.html [ Failure ]
         self._write(self.lion_expectations_path, "Bug(x) [ Mac ] userscripts/another-test.html [ ImageOnlyFailure ]\nbug(z) [ Linux ] userscripts/another-test.html [ ImageOnlyFailure ]\n")
         self._write("userscripts/another-test.html", "Dummy test contents")
 
-        self.command._rebaseline_test_and_update_expectations("WebKit Mac10.7", "userscripts/another-test.html", None, self.WEB_PREFIX)
+        self.options.suffixes = 'png,wav,txt'
+        self.command._rebaseline_test_and_update_expectations(self.options)
 
         self.assertEquals(self.tool.web.urls_fetched,
             [self.WEB_PREFIX + '/userscripts/another-test-actual.png',
@@ -125,7 +133,8 @@ Bug(A) [ Debug ] : fast/css/large-list-of-rules-crash.html [ Failure ]
         self._write(self.lion_port.path_from_chromium_base('skia', 'skia_test_expectations.txt'), "Bug(y) [ Mac ] other-test.html [ Failure ]\n")
         self._write("userscripts/another-test.html", "Dummy test contents")
 
-        self.command._rebaseline_test_and_update_expectations("WebKit Mac10.7", "userscripts/another-test.html", None, self.WEB_PREFIX)
+        self.options.suffixes = 'png,wav,txt'
+        self.command._rebaseline_test_and_update_expectations(self.options)
 
         self.assertEquals(self.tool.web.urls_fetched,
             [self.WEB_PREFIX + '/userscripts/another-test-actual.png',
@@ -140,8 +149,10 @@ Bug(A) [ Debug ] : fast/css/large-list-of-rules-crash.html [ Failure ]
         self.assertEquals(self.tool.web.urls_fetched, [self.WEB_PREFIX + '/userscripts/another-test-actual.txt'])
 
     def test_rebaseline_test_with_results_directory(self):
-        self.command._rebaseline_test("WebKit Linux", "userscripts/another-test.html", None, "txt", '/tmp')
-        self.assertEquals(self.tool.web.urls_fetched, ['/tmp/userscripts/another-test-actual.txt'])
+        self._write(self.lion_expectations_path, "Bug(x) [ Mac ] userscripts/another-test.html [ ImageOnlyFailure ]\nbug(z) [ Linux ] userscripts/another-test.html [ ImageOnlyFailure ]\n")
+        self.options.results_directory = '/tmp'
+        self.command._rebaseline_test_and_update_expectations(self.options)
+        self.assertEquals(self.tool.web.urls_fetched, ['file:///tmp/userscripts/another-test-actual.txt'])
 
     def test_rebaseline_test_and_print_scm_changes(self):
         self.command._print_scm_changes = True
@@ -271,29 +282,21 @@ class TestRebaselineJson(_BaseTestCase):
 
         # Note that we have only one run_in_parallel() call
         self.assertEquals(self.tool.executive.calls,
-            [[['echo', 'rebaseline-test-internal', '--suffixes', 'txt,png', '--builder', 'MOCK builder', '--test', 'user-scripts/another-test.html', '--results_directory', '/tmp', '--verbose']]])
+            [[['echo', 'rebaseline-test-internal', '--suffixes', 'txt,png', '--builder', 'MOCK builder', '--test', 'user-scripts/another-test.html', '--results-directory', '/tmp', '--verbose']]])
 
 
 class TestRebaseline(_BaseTestCase):
     # This command shares most of its logic with RebaselineJson, so these tests just test what is different.
 
-    command_constructor = Rebaseline  # AKA webkit-patch rebaseline-test
+    command_constructor = Rebaseline  # AKA webkit-patch rebaseline
 
     def test_tests_to_update(self):
         build = Mock()
         OutputCapture().assert_outputs(self, self.command._tests_to_update, [build])
 
     def test_rebaseline(self):
-        # This test basically tests the path from command.execute() to command._rebaseline();
-        # it doesn't test that _rebaseline() actually does anything (that is tested in TestRebaselineJson.
-        self.test_list = {}
-
-        def rebaseline_stub(options, test_list):
-            self.test_list = test_list
-
         self.command._builders_to_pull_from = lambda: [MockBuilder('MOCK builder')]
         self.command._tests_to_update = lambda builder: ['mock/path/to/test.html']
-        self.command._rebaseline = rebaseline_stub
 
         self._zero_out_test_expectations()
 
@@ -304,12 +307,14 @@ class TestRebaseline(_BaseTestCase):
                 "MOCK builder": {"port_name": "test-mac-leopard", "specifiers": set(["mock-specifier"])},
             }
             oc.capture_output()
-            self.command.execute(MockOptions(optimize=True, builders=None, suffixes=["txt"], verbose=True), [], self.tool)
+            self.command.execute(MockOptions(optimize=False, builders=None, suffixes="txt,png", verbose=True, move_overwritten_baselines=False), [], self.tool)
         finally:
             oc.restore_output()
             builders._exact_matches = old_exact_matches
 
-        self.assertEquals(self.test_list, {'mock/path/to/test.html': {'MOCK builder': ['txt']}})
+        calls = filter(lambda x: x != ['qmake', '-v'] and x[0] != 'perl', self.tool.executive.calls)
+        self.assertEquals(calls,
+            [[['echo', 'rebaseline-test-internal', '--suffixes', 'txt,png', '--builder', 'MOCK builder', '--test', 'mock/path/to/test.html', '--verbose']]])
 
 
 class TestRebaselineExpectations(_BaseTestCase):
@@ -317,7 +322,8 @@ class TestRebaselineExpectations(_BaseTestCase):
 
     def setUp(self):
         super(TestRebaselineExpectations, self).setUp()
-        self.options = MockOptions(optimize=True, builders=None, suffixes=['txt'], verbose=False)
+        self.options = MockOptions(optimize=False, builders=None, suffixes=['txt'], verbose=False, platform=None,
+                                   move_overwritten_baselines=False, results_directory=None)
 
     def test_rebaseline_expectations(self):
         self._zero_out_test_expectations()
@@ -325,7 +331,7 @@ class TestRebaselineExpectations(_BaseTestCase):
         self.tool.executive = MockExecutive2()
 
         self.command._tests_to_rebaseline = lambda port: {'userscripts/another-test.html': set(['txt']), 'userscripts/images.svg': set(['png'])}
-        self.command.execute(MockOptions(optimize=False, verbose=False, move_overwritten_baselines=False, results_directory=None), [], self.tool)
+        self.command.execute(self.options, [], self.tool)
 
         # FIXME: change this to use the test- ports.
         calls = filter(lambda x: x != ['qmake', '-v'], self.tool.executive.calls)
@@ -360,3 +366,36 @@ class TestRebaselineExpectations(_BaseTestCase):
         self.assertEquals(self._read(self.lion_expectations_path), '')
 
 
+class _FakeOptimizer(BaselineOptimizer):
+    def read_results_by_directory(self, baseline_name):
+        if baseline_name.endswith('txt'):
+            return {'LayoutTests/passes/text.html': '123456',
+                    'LayoutTests/platform/test-mac-leopard/passes/text.html': 'abcdef'}
+        return {}
+
+
+class TestAnalyzeBaselines(_BaseTestCase):
+    command_constructor = AnalyzeBaselines
+
+    def setUp(self):
+        super(TestAnalyzeBaselines, self).setUp()
+        self.port = self.tool.port_factory.get('test')
+        self.tool.port_factory.get = (lambda port_name=None, options=None: self.port)
+        self.lines = []
+        self.command._optimizer_class = _FakeOptimizer
+        self.command._write = (lambda msg: self.lines.append(msg))  # pylint bug warning about unnecessary lambda? pylint: disable-msg=W0108
+
+    def test_default(self):
+        self.command.execute(MockOptions(suffixes='txt', missing=False, platform=None), ['passes/text.html'], self.tool)
+        self.assertEquals(self.lines,
+            ['passes/text-expected.txt:',
+             '  (generic): 123456',
+             '  test-mac-leopard: abcdef'])
+
+    def test_missing_baselines(self):
+        self.command.execute(MockOptions(suffixes='png,txt', missing=True, platform=None), ['passes/text.html'], self.tool)
+        self.assertEquals(self.lines,
+            ['passes/text-expected.png: (no baselines found)',
+             'passes/text-expected.txt:',
+             '  (generic): 123456',
+             '  test-mac-leopard: abcdef'])

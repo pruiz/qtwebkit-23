@@ -283,8 +283,9 @@ void InjectedBundle::setPopupBlockingEnabled(WebPageGroupProxy* pageGroup, bool 
 
 void InjectedBundle::switchNetworkLoaderToNewTestingSession()
 {
-#if USE(CFURLSTORAGESESSIONS)
+#if PLATFORM(MAC) || USE(CFNETWORK)
     // Set a private session for testing to avoid interfering with global cookies. This should be different from private browsing session.
+    // FIXME (NetworkProcess): Do this in network process, too.
     RetainPtr<CFURLStorageSessionRef> session = ResourceHandle::createPrivateBrowsingStorageSession(CFSTR("Private WebKit Session"));
     ResourceHandle::setDefaultStorageSession(session.get());
 #endif

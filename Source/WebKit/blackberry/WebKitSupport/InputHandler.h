@@ -141,7 +141,7 @@ public:
     void spellCheckingRequestCancelled(int32_t transactionId);
 
     bool shouldRequestSpellCheckingOptionsForPoint(Platform::IntPoint&, const WebCore::Element*, imf_sp_text_t&);
-    void requestSpellingCheckingOptions(imf_sp_text_t&);
+    void requestSpellingCheckingOptions(imf_sp_text_t&, const WebCore::IntSize& screenOffset);
 
 private:
     enum PendingKeyboardStateChange { NoChange, Visible, NotVisible };
@@ -225,6 +225,8 @@ private:
 
     double m_focusZoomScale;
     WebCore::FloatPoint m_focusZoomLocation;
+
+    bool m_receivedBackspaceKeyDown;
 };
 
 }

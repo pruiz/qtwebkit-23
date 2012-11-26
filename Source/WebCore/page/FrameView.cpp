@@ -267,6 +267,7 @@ void FrameView::reset()
     m_doFullRepaint = true;
     m_layoutSchedulingEnabled = true;
     m_inLayout = false;
+    m_doingPreLayoutStyleUpdate = false;
     m_inSynchronousPostLayout = false;
     m_layoutCount = 0;
     m_nestedLayoutCount = 0;
@@ -707,6 +708,10 @@ void FrameView::updateCompositingLayersAfterStyleChange()
     if (!root)
         return;
 
+    // If we expect to update compositing after an incipient layout, don't do so here.
+    if (m_doingPreLayoutStyleUpdate || layoutPending() || root->needsLayout())
+        return;
+
     // This call will make sure the cached hasAcceleratedCompositing is updated from the pref
     root->compositor()->cacheAcceleratedCompositingFlags();
     root->compositor()->updateCompositingLayers(CompositingUpdateAfterStyleChange);
@@ -1065,6 +1070,7 @@ void FrameView::layout(bool allowSubtree)
 
         // Always ensure our style info is up-to-date. This can happen in situations where
         // the layout beats any sort of style recalc update that needs to occur.
+        TemporaryChange<bool> changeDoingPreLayoutStyleUpdate(m_doingPreLayoutStyleUpdate, true);
         document->updateStyleIfNeeded();
 
         subtree = m_layoutRoot;
@@ -1845,13 +1851,44 @@ void FrameView::repaintFixedElementsAfterScrolling()
     }
 }
 
+bool FrameView::shouldUpdateFixedElementsAfterScrolling()
+{
+#if ENABLE(THREADED_SCROLLING)
+    Page* page = m_frame->page();
+    if (!page)
+        return true;
+
+    // If the scrolling thread is updating the fixed elements, then the FrameView should not update them as well.
+    if (page->mainFrame() != m_frame)
+        return true;
+
+    ScrollingCoordinator* scrollingCoordinator = page->scrollingCoordinator();
+    if (!scrollingCoordinator)
+        return true;
+
+    if (!scrollingCoordinator->supportsFixedPositionLayers())
+        return true;
+
+    if (scrollingCoordinator->shouldUpdateScrollLayerPositionOnMainThread())
+        return true;
+
+    if (inProgrammaticScroll())
+        return true;
+
+    return false;
+#endif
+    return true;
+}
+
 void FrameView::updateFixedElementsAfterScrolling()
 {
 #if USE(ACCELERATED_COMPOSITING)
+    if (!shouldUpdateFixedElementsAfterScrolling())
+        return;
+
     if (m_nestedLayoutCount <= 1 && hasViewportConstrainedObjects()) {
-        if (RenderView* root = rootRenderer(this)) {
+        if (RenderView* root = rootRenderer(this))
             root->compositor()->updateCompositingLayers(CompositingUpdateOnScroll);
-        }
     }
 #endif
 }
@@ -2008,8 +2045,11 @@ void FrameView::startDeferredRepaintTimer(double delay)
     m_deferredRepaintTimer.startOneShot(delay);
 }
 
-void FrameView::checkFlushDeferredRepaintsAfterLoadComplete()
+void FrameView::handleLoadCompleted()
 {
+    // Once loading has completed, allow autoSize one last opportunity to
+    // reduce the size of the frame.
+    autoSizeIfEnabled();
     if (shouldUseLoadTimeDeferredRepaintDelay())
         return;
     m_deferredRepaintDelay = s_normalDeferredRepaintDelay;
@@ -2614,12 +2654,12 @@ void FrameView::autoSizeIfEnabled()
         if (newSize == size)
             continue;
 
-        // Avoid doing resizing to a smaller size while the frame is loading to avoid switching to a small size
-        // during an intermediate state (and then changing back to a bigger size as the load progresses).
-        if (!frame()->loader()->isComplete() && (newSize.height() < size.height() || newSize.width() < size.width()))
+        // While loading only allow the size to increase (to avoid twitching during intermediate smaller states)
+        // unless autoresize has just been turned on or the maximum size is smaller than the current size.
+        if (m_didRunAutosize && size.height() <= m_maxAutoSize.height() && size.width() <= m_maxAutoSize.width()
+            && !frame()->loader()->isComplete() && (newSize.height() < size.height() || newSize.width() < size.width()))
             break;
-        else if (document->processingLoadEvent())
-            newSize = newSize.expandedTo(size);
+
         resize(newSize.width(), newSize.height());
         // Force the scrollbar state to avoid the scrollbar code adding them and causing them to be needed. For example,
         // a vertical scrollbar may cause text to wrap and thus increase the height (which is the only reason the scollbar is needed).
@@ -3183,10 +3223,6 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect)
         p->fillRect(rect, Color(0xFF, 0, 0), ColorSpaceDeviceRGB);
 #endif
 
-    bool isTopLevelPainter = !sCurrentPaintTimeStamp;
-    if (isTopLevelPainter)
-        sCurrentPaintTimeStamp = currentTime();
-    
     RenderView* root = rootRenderer(this);
     if (!root) {
         LOG_ERROR("called FrameView::paint with nil renderer");
@@ -3196,6 +3232,10 @@ void FrameView::paintContents(GraphicsContext* p, const IntRect& rect)
     ASSERT(!needsLayout());
     if (needsLayout())
         return;
+
+    bool isTopLevelPainter = !sCurrentPaintTimeStamp;
+    if (isTopLevelPainter)
+        sCurrentPaintTimeStamp = currentTime();
 
     FontCachePurgePreventer fontCachePurgePreventer;
 
@@ -3640,9 +3680,27 @@ void FrameView::setTracksRepaints(bool trackRepaints)
 {
     if (trackRepaints == m_isTrackingRepaints)
         return;
-    
+
+#if USE(ACCELERATED_COMPOSITING)
+    for (Frame* frame = m_frame->tree()->top(); frame; frame = frame->tree()->traverseNext()) {
+        if (RenderView* renderView = frame->contentRenderer())
+            renderView->compositor()->setTracksRepaints(trackRepaints);
+    }
+#endif
+
     resetTrackedRepaints();
     m_isTrackingRepaints = trackRepaints;
+}
+
+void FrameView::resetTrackedRepaints()
+{
+    m_trackedRepaintRects.clear();
+#if USE(ACCELERATED_COMPOSITING)
+    if (RenderView* root = rootRenderer(this)) {
+        RenderLayerCompositor* compositor = root->compositor();
+        compositor->resetTrackedRepaintRects();
+    }
+#endif
 }
 
 String FrameView::trackedRepaintRectsAsText() const

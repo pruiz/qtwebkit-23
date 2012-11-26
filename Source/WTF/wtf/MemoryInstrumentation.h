@@ -100,9 +100,9 @@ public:
     explicit MemoryInstrumentation(MemoryInstrumentationClient* client) : m_client(client) { }
     virtual ~MemoryInstrumentation() { }
 
-    template <typename T> void addRootObject(const T& t)
+    template <typename T> void addRootObject(const T& t, MemoryObjectType objectType = 0)
     {
-        addObject(t, 0);
+        addObject(t, objectType);
         processDeferredInstrumentedPointers();
     }
 
@@ -230,7 +230,6 @@ void MemoryInstrumentation::addObjectImpl(const T* const& object, MemoryObjectTy
     } else {
         if (!object || visited(object))
             return;
-        checkCountedObject(object);
         deferInstrumentedPointer(adoptPtr(new InstrumentedPointer<T>(object, ownerObjectType)));
     }
 }
@@ -262,6 +261,7 @@ void MemoryInstrumentation::InstrumentedPointer<T>::process(MemoryInstrumentatio
     if (pointer != m_pointer && memoryInstrumentation->visited(pointer))
         return;
     memoryInstrumentation->countObjectSize(pointer, memoryObjectInfo.objectType(), memoryObjectInfo.objectSize());
+    memoryInstrumentation->checkCountedObject(pointer);
 }
 
 // Link time guard for classes with external memory instrumentation.

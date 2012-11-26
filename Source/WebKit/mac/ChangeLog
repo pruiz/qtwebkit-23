@@ -1,3 +1,120 @@
+2012-11-07  Andreas Kling  <akling@apple.com>
+
+        Remove build-webkit dependency on Java SDK for Apple Mac WebKit.
+        <http://webkit.org/b/101492>
+
+        Reviewed by Anders Carlsson.
+
+        * Plugins/WebJavaPlugIn.h: Removed.
+
+2012-11-06  Adam Barth  <abarth@webkit.org>
+
+        Unreviewed attempt to fix the chromium-mac build.
+
+        * WebCoreSupport/WebSystemInterface.mm:
+        (InitWebCoreSystemInterface):
+
+2012-11-06  Anders Carlsson  <andersca@apple.com>
+
+        Update Java related WKSI function names
+        https://bugs.webkit.org/show_bug.cgi?id=101414
+
+        Reviewed by Sam Weinig.
+
+        * WebCoreSupport/WebChromeClient.mm:
+        (WebChromeClient::unavailablePluginButtonClicked):
+        * WebCoreSupport/WebFrameLoaderClient.mm:
+        (isPlugInInactive):
+
+2012-11-06  Alexey Proskuryakov  <ap@apple.com>
+
+        Clean up which storage cookie jar functions use
+        https://bugs.webkit.org/show_bug.cgi?id=101395
+
+        Reviewed by Brady Eidson.
+
+        * WebCoreSupport/WebSystemInterface.mm: (InitWebCoreSystemInterface): Updated for
+        two new functions.
+
+2012-11-06  Andrey Lushnikov  <lushnikov@google.com>
+
+        Added console.clear() method
+
+        Web Inspector: add console.clear()
+        https://bugs.webkit.org/show_bug.cgi?id=101021
+
+        Reviewed by Vsevolod Vlasov.
+
+        * WebCoreSupport/WebChromeClient.mm:
+        (stringForMessageType): Added ClearMessageType case to switch
+
+2012-11-05  Alexey Proskuryakov  <ap@apple.com>
+
+        Get rid of setCookieStoragePrivateBrowsingEnabled.
+        https://bugs.webkit.org/show_bug.cgi?id=101247
+
+        Reviewed by Brady Eidson.
+
+        * WebCoreSupport/WebSystemInterface.mm: (InitWebCoreSystemInterface): We no longer
+        have this function.
+
+2012-11-03  Alexey Proskuryakov  <ap@apple.com>
+
+        Get rid of USE(CFURLSTORAGESESSIONS)
+        https://bugs.webkit.org/show_bug.cgi?id=101131
+
+        Reviewed by Sam Weinig.
+
+        * WebView/WebPreferences.mm:
+        (+[WebPreferences _switchNetworkLoaderToNewTestingSession]):
+        (+[WebPreferences _setCurrentNetworkLoaderSessionCookieAcceptPolicy:]):
+        * WebView/WebView.mm:
+        (-[WebView _cachedResponseForURL:]):
+
+2012-11-02  Anders Carlsson  <andersca@apple.com>
+
+        Don't instantiate the Java plug-in if it's inactive
+        https://bugs.webkit.org/show_bug.cgi?id=101102
+        <rdar://problem/12595679>
+
+        Reviewed by Andreas Kling.
+
+        * WebCoreSupport/WebChromeClient.mm:
+        (WebChromeClient::shouldUnavailablePluginMessageBeButton):
+        The RenderEmbeddedObject::PluginInactive reason should always result in a button being shown.
+
+        (WebChromeClient::unavailablePluginButtonClicked):
+        If the Java plug-in is inactive, call WKJLReportWebComponentsUsed() to reactivate the plug-in and
+        then reload the page.
+
+        * WebCoreSupport/WebFrameLoaderClient.mm:
+        (isOracleJavaPlugIn):
+        (isPlugInInactive):
+        Helper functions.
+
+        (WebFrameLoaderClient::createPlugin):
+        If the plug-in is inactive, set the appropriate unavailability reason on the renderer.
+
+2012-11-02  Simon Fraser  <simon.fraser@apple.com>
+
+        Enable SUBPIXEL_LAYOUT on Mac
+        https://bugs.webkit.org/show_bug.cgi?id=101076
+
+        Reviewed by Dave Hyatt.
+
+        Define ENABLE_SUBPIXEL_LAYOUT and include it in FEATURE_DEFINES.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-11-02  Adam Barth  <abarth@webkit.org>
+
+        ENABLE(UNDO_MANAGER) is disabled everywhere and is not under active development
+        https://bugs.webkit.org/show_bug.cgi?id=100711
+
+        Reviewed by Eric Seidel.
+
+        * Configurations/FeatureDefines.xcconfig:
+
 2012-11-01  Adam Roben  <aroben@webkit.org>
 
         [WK1] Fixed-position elements jiggle up and down slightly during scrolling on a Retina display

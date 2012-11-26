@@ -1516,13 +1516,21 @@ void AccessibilityRenderObject::setFocused(bool on)
     if (!canSetFocusAttribute())
         return;
     
+    Document* document = this->document();
     if (!on)
-        m_renderer->document()->setFocusedNode(0);
+        document->setFocusedNode(0);
     else {
-        if (m_renderer->node()->isElementNode())
-            static_cast<Element*>(m_renderer->node())->focus();
-        else
-            m_renderer->document()->setFocusedNode(m_renderer->node());
+        Node* node = this->node();
+        if (node && node->isElementNode()) {
+            // If this node is already the currently focused node, then calling focus() won't do anything.
+            // That is a problem when focus is removed from the webpage to chrome, and then returns.
+            // In these cases, we need to do what keyboard and mouse focus do, which is reset focus first.
+            if (document->focusedNode() == node)
+                document->setFocusedNode(0);
+            
+            toElement(node)->focus();
+        } else
+            document->setFocusedNode(node);
     }
 }
 
@@ -1891,20 +1899,16 @@ VisiblePosition AccessibilityRenderObject::visiblePositionForPoint(const IntPoin
 {
     if (!m_renderer)
         return VisiblePosition();
-    
+
     // convert absolute point to view coordinates
-    Document* topDoc = topDocument();
-    if (!topDoc || !topDoc->renderer() || !topDoc->renderer()->view())
-        return VisiblePosition();
-    
-    FrameView* frameView = topDoc->renderer()->view()->frameView();
-    if (!frameView)
-        return VisiblePosition();
-    
     RenderView* renderView = topRenderer();
     if (!renderView)
         return VisiblePosition();
-    
+
+    FrameView* frameView = renderView->frameView();
+    if (!frameView)
+        return VisiblePosition();
+
     Node* innerNode = 0;
     
     // locate the node containing the point

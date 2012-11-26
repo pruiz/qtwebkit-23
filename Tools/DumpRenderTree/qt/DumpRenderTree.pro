@@ -15,6 +15,7 @@ WEBKIT += wtf webcore
 INCLUDEPATH += \
     $$PWD/ \
     $$PWD/.. \
+    $${ROOT_WEBKIT_DIR}/Source/WebCore/platform/qt \
     $${ROOT_WEBKIT_DIR}/Source/WebKit/qt/WebCoreSupport \
     $${ROOT_WEBKIT_DIR}/Source/WTF
 
@@ -24,9 +25,6 @@ haveQt(5) {
     contains(DEFINES, HAVE_QTPRINTSUPPORT=1): QT += printsupport
 }
 macx: QT += xml
-haveQt(5): QT += widgets printsupport
-
-contains(DEFINES, HAVE_FONTCONFIG=1): PKGCONFIG += fontconfig
 
 HEADERS += \
     $$PWD/../WorkQueue.h \
@@ -37,7 +35,6 @@ HEADERS += \
     WorkQueueItemQt.h \
     TestRunnerQt.h \
     GCControllerQt.h \
-    QtInitializeTestFonts.h \
     testplugin.h
 
 SOURCES += \
@@ -49,7 +46,6 @@ SOURCES += \
     WorkQueueItemQt.cpp \
     TestRunnerQt.cpp \
     GCControllerQt.cpp \
-    QtInitializeTestFonts.cpp \
     testplugin.cpp \
     DumpRenderTreeMain.cpp
 

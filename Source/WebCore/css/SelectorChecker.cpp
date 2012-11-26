@@ -51,6 +51,7 @@
 #include "RenderStyle.h"
 #include "ScrollableArea.h"
 #include "ScrollbarTheme.h"
+#include "ShadowRoot.h"
 #include "SiblingTraversalStrategies.h"
 #include "StyledElement.h"
 #include "Text.h"
@@ -446,8 +447,14 @@ SelectorChecker::SelectorMatch SelectorChecker::checkSelector(const SelectorChec
         return SelectorFailsLocally;
 
     if (context.selector->m_match == CSSSelector::PseudoElement) {
-        if (context.selector->isUnknownPseudoElement()) {
-            if (context.element->shadowPseudoId() != context.selector->value())
+        if (context.selector->isCustomPseudoElement()) {
+            if (ShadowRoot* root = context.element->shadowRoot()) {
+                if (context.element->shadowPseudoId() != context.selector->value())
+                    return SelectorFailsLocally;
+
+                if (context.selector->pseudoType() == CSSSelector::PseudoWebKitCustomElement && root->type() != ShadowRoot::UserAgentShadowRoot)
+                    return SelectorFailsLocally;
+            } else
                 return SelectorFailsLocally;
         } else {
             if ((!context.elementStyle && m_mode == ResolvingStyle) || m_mode == QueryingRules)

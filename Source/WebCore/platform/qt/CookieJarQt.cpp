@@ -199,6 +199,29 @@ void SharedCookieJarQt::getHostnamesWithCookies(HashSet<String>& hostnames)
         hostnames.add(networkCookie.domain());
 }
 
+bool SharedCookieJarQt::deleteCookie(const QNetworkCookie& cookie)
+{
+#if HAVE(QT5)
+    if (!QNetworkCookieJar::deleteCookie(cookie))
+        return false;
+#else
+    QList<QNetworkCookie> cookies = allCookies();
+    if (!cookies.removeOne(cookie))
+        return false;
+    setAllCookies(cookies);
+#endif
+
+    if (!m_database.isOpen())
+        return false;
+
+    QSqlQuery sqlQuery(m_database);
+    sqlQuery.prepare(QLatin1String("DELETE FROM cookies WHERE cookieId=:cookieIdvalue"));
+    sqlQuery.bindValue(QLatin1String(":cookieIdvalue"), cookie.domain().append(QLatin1String(cookie.name())));
+    sqlQuery.exec();
+
+    return true;
+}
+
 void SharedCookieJarQt::deleteCookiesForHostname(const String& hostname)
 {
     if (!m_database.isOpen())

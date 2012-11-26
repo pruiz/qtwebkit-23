@@ -50,6 +50,7 @@ LIST(APPEND WebKit2_SOURCES
     UIProcess/API/efl/ewk_color_picker.cpp
     UIProcess/API/efl/ewk_context.cpp
     UIProcess/API/efl/ewk_cookie_manager.cpp
+    UIProcess/API/efl/ewk_database_manager.cpp
     UIProcess/API/efl/ewk_download_job.cpp
     UIProcess/API/efl/ewk_error.cpp
     UIProcess/API/efl/ewk_favicon_database.cpp
@@ -60,10 +61,13 @@ LIST(APPEND WebKit2_SOURCES
     UIProcess/API/efl/ewk_main.cpp
     UIProcess/API/efl/ewk_navigation_data.cpp
     UIProcess/API/efl/ewk_navigation_policy_decision.cpp
+    UIProcess/API/efl/ewk_object.cpp
     UIProcess/API/efl/ewk_popup_menu.cpp
     UIProcess/API/efl/ewk_popup_menu_item.cpp
     UIProcess/API/efl/ewk_resource.cpp
+    UIProcess/API/efl/ewk_security_origin.cpp
     UIProcess/API/efl/ewk_settings.cpp
+    UIProcess/API/efl/ewk_storage_manager.cpp
     UIProcess/API/efl/ewk_text_checker.cpp
     UIProcess/API/efl/ewk_url_request.cpp
     UIProcess/API/efl/ewk_url_response.cpp
@@ -79,7 +83,9 @@ LIST(APPEND WebKit2_SOURCES
     UIProcess/efl/FormClientEfl.cpp
     UIProcess/efl/InputMethodContextEfl.cpp
     UIProcess/efl/NetworkInfoProvider.cpp
-    UIProcess/efl/PageClientImpl.cpp
+    UIProcess/efl/PageClientBase.cpp
+    UIProcess/efl/PageClientLegacyImpl.cpp
+    UIProcess/efl/PageClientDefaultImpl.cpp
     UIProcess/efl/PageLoadClientEfl.cpp
     UIProcess/efl/PagePolicyClientEfl.cpp
     UIProcess/efl/PageUIClientEfl.cpp
@@ -87,7 +93,7 @@ LIST(APPEND WebKit2_SOURCES
     UIProcess/efl/RequestManagerClientEfl.cpp
     UIProcess/efl/ResourceLoadClientEfl.cpp
     UIProcess/efl/TextCheckerEfl.cpp
-    UIProcess/efl/VibrationProvider.cpp
+    UIProcess/efl/VibrationClientEfl.cpp
     UIProcess/efl/WebContextEfl.cpp
     UIProcess/efl/WebFullScreenManagerProxyEfl.cpp
     UIProcess/efl/WebInspectorProxyEfl.cpp
@@ -199,8 +205,8 @@ LIST(APPEND WebKit2_LIBRARIES
     ${OPENGL_LIBRARIES}
     ${SQLITE_LIBRARIES}
     ${FONTCONFIG_LIBRARIES}
-    ${PNG_LIBRARY}
-    ${JPEG_LIBRARY}
+    ${PNG_LIBRARIES}
+    ${JPEG_LIBRARIES}
     ${CMAKE_DL_LIBS}
     ${GLIB_LIBRARIES}
     ${GLIB_GIO_LIBRARIES}
@@ -249,6 +255,7 @@ SET (EWebKit2_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_color_picker.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_context.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_cookie_manager.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_database_manager.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_download_job.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_error.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_favicon_database.h"
@@ -259,10 +266,13 @@ SET (EWebKit2_HEADERS
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_main.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_navigation_data.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_navigation_policy_decision.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_object.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_popup_menu.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_popup_menu_item.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_resource.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_security_origin.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_settings.h"
+    "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_storage_manager.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_text_checker.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_touch.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/UIProcess/API/efl/ewk_url_request.h"
@@ -353,14 +363,17 @@ SET(EWK2UnitTests_BINARIES
     test_ewk2_context
     test_ewk2_context_history_callbacks
     test_ewk2_cookie_manager
+    test_ewk2_database_manager
     test_ewk2_download_job
     test_ewk2_eina_shared_string
     test_ewk2_favicon_database
     test_ewk2_file_chooser_request
-    test_ewk2_refptr_evas_object
     test_ewk2_intents
+    test_ewk2_object
     test_ewk2_popup_menu
+    test_ewk2_refptr_evas_object
     test_ewk2_settings
+    test_ewk2_storage_manager
     test_ewk2_text_checker
     test_ewk2_view
 )

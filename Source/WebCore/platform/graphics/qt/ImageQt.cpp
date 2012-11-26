@@ -52,7 +52,9 @@
 #include <math.h>
 
 #if OS(WINDOWS) && HAVE(QT5)
+QT_BEGIN_NAMESPACE
 Q_GUI_EXPORT QPixmap qt_pixmapFromWinHBITMAP(HBITMAP, int hbitmapFormat = 0);
+QT_END_NAMESPACE
 #endif
 
 typedef QHash<QByteArray, QPixmap> WebGraphicHash;

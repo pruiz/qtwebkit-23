@@ -72,7 +72,7 @@ public:
     virtual void attachLayer(WebCore::CoordinatedGraphicsLayer*) = 0;
     virtual void detachLayer(WebCore::CoordinatedGraphicsLayer*) = 0;
     virtual void syncFixedLayers() = 0;
-    virtual PassOwnPtr<WebCore::GraphicsContext> beginContentUpdate(const WebCore::IntSize&, ShareableBitmap::Flags, ShareableSurface::Handle&, WebCore::IntPoint&) = 0;
+    virtual PassOwnPtr<WebCore::GraphicsContext> beginContentUpdate(const WebCore::IntSize&, ShareableBitmap::Flags, int& atlasID, WebCore::IntPoint&) = 0;
 };
 }
 
@@ -113,8 +113,6 @@ public:
     virtual void setNeedsDisplay() OVERRIDE;
     virtual void setNeedsDisplayInRect(const FloatRect&) OVERRIDE;
     virtual void setContentsNeedsDisplay() OVERRIDE;
-    virtual void setContentsScale(float) OVERRIDE;
-    virtual void setVisibleContentRectTrajectoryVector(const FloatPoint&) OVERRIDE;
     virtual void flushCompositingState(const FloatRect&) OVERRIDE;
     virtual void flushCompositingStateForThisLayerOnly() OVERRIDE;
 #if ENABLE(CSS_FILTERS)
@@ -123,6 +121,9 @@ public:
     virtual bool addAnimation(const KeyframeValueList&, const IntSize&, const Animation*, const String&, double) OVERRIDE;
     virtual void pauseAnimation(const String&, double) OVERRIDE;
     virtual void removeAnimation(const String&) OVERRIDE;
+    
+    void setContentsScale(float);
+    void setVisibleContentRectTrajectoryVector(const FloatPoint&);
 
     void setRootLayer(bool);
 
@@ -147,7 +148,7 @@ public:
     virtual void createTile(int tileID, const WebKit::SurfaceUpdateInfo&, const IntRect&) OVERRIDE;
     virtual void updateTile(int tileID, const WebKit::SurfaceUpdateInfo&, const IntRect&) OVERRIDE;
     virtual void removeTile(int tileID) OVERRIDE;
-    virtual PassOwnPtr<GraphicsContext> beginContentUpdate(const IntSize&, WebKit::ShareableSurface::Handle&, IntPoint&) OVERRIDE;
+    virtual PassOwnPtr<GraphicsContext> beginContentUpdate(const IntSize&, int& atlasID, IntPoint&) OVERRIDE;
 
     void setCoordinatedGraphicsLayerClient(WebKit::CoordinatedGraphicsLayerClient*);
 

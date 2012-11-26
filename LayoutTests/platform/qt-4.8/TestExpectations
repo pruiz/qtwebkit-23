@@ -55,14 +55,57 @@ editing/selection/click-left-of-rtl-wrapping-text.html
 #################################################
 
 #################################################
-# Moved from qt/Skipped after:
-# [Qt] Add configure test for zlib and set WTF_USE_ZLIB if found
-# USE(ZLIB) is disabled.
-http/tests/websocket/tests/hybi/compressed-control-frame.html
-http/tests/websocket/tests/hybi/deflate-frame-invalid-parameter.html
-http/tests/websocket/tests/hybi/deflate-frame-parameter.html
-http/tests/websocket/tests/hybi/extensions.html
-http/tests/websocket/tests/hybi/handshake-fail-by-extensions-header.html
+# Fails with Qt xmlpatterns, but pass with libxml2:
+
+# [Qt4] Five http/tests/xmlviewer/dumpAsText tests fails
+# https://bugs.webkit.org/show_bug.cgi?id=99014
+#webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/svg.xml [ Failure ]
+#webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer-charset-cp1251.xml [ Failure ]
+#webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer-charset-utf8.xml [ Failure ]
+#webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer.xml [ Failure ]
+#webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xsl-stylesheet.xml [ Failure ]
+
+# [Qt] REGRESSION(r114059): It made these tests fail
+#webkit.org/b/83432 fast/dom/dom-parse-serialize-display.html [ Failure ]
+#webkit.org/b/83432 fast/dom/dom-parse-serialize-xmldecl.html [ Failure ]
+#webkit.org/b/83432 fast/dom/dom-parse-serialize.html [ Failure ]
+#webkit.org/b/83432 fast/xmlhttprequest/xmlhttprequest-get.xhtml [ Failure ]
+
+#svg/custom/junk-data.svg [ Failure ]
+#svg/custom/missing-xlink.svg [ Failure ]
+#svg/custom/path-bad-data.svg [ Failure ]
+#svg/custom/use-invalid-pattern.svg [ Failure ]
+#svg/hixie/error/012.xml [ Failure ]
+#webkit.org/b/46093 svg/custom/use-font-face-crash.svg [ Failure ]
+#webkit.org/b/78128 svg/zoom/page/zoom-coords-viewattr-01-b.svg [ Failure ]
+#svg/W3C-SVG-1.1/coords-viewattr-01-b.svg [ Failure ]
+#svg/W3C-SVG-1.1/coords-viewattr-02-b.svg [ Failure ]
+#svg/custom/use-referencing-style-crash.svg [ Failure ]
+
+#fast/encoding/invalid-xml.html [ Failure ]
+#fast/parser/external-entities-in-xslt.xml [ Failure ]
+#fast/parser/innerhtml-with-prefixed-elements.xhtml [ Failure ]
+#fast/parser/xhtml-innerhtml-null-byte.xhtml [ Failure ]
+#fast/xsl/default-html.html [ Failure ]
+#fast/xsl/document-function.xml [ Failure ]
+#fast/xsl/dtd-in-source-document.xml [ Failure ]
+#fast/xsl/exslt-node-set.xml [ Failure ]
+#fast/xsl/import-after-comment.xml [ Failure ]
+#fast/xsl/import-non-document-node.xhtml [ Failure ]
+#fast/xsl/mozilla-tests.xml [ Failure ]
+#fast/xsl/sort-unicode.xml [ Failure ]
+#fast/xsl/xslt-doc-enc.xml [ Failure ]
+#fast/xsl/xslt-nested-stylesheets.xml [ Failure ]
+#fast/xsl/xslt-processor.html [ Failure ]
+#fast/xsl/xslt-second-level-import.xml [ Failure ]
+#fast/xsl/xslt-url.xml [ Failure ]
+#fast/xsl/xslt-entity.xml [ Failure ]
+
+# Tests with changed output after switching to libxml2:
+fast/xsl/sort-unicode.xml [ Failure ]
+http/tests/security/xss-DENIED-xsl-document-redirect.xml [ Failure ]
+http/tests/security/xss-DENIED-xsl-external-entity-redirect.xml [ Failure ]
+http/tests/xmlviewer/dumpAsText/mathml.xml [ Failure ]
 #################################################
 
 #################################################
@@ -177,23 +220,6 @@ svg/text/text-text-06-t.svg
 svg/text/text-vkern-on-horizontal-text.svg
 svg/text/text-vkern.svg
 http/tests/misc/SVGFont-delayed-load.html
-
-# Fail with QtXmlPatterns (used by Qt 4.8 buid), but pass with libxslt (used by Qt 5 build)
-fast/parser/external-entities-in-xslt.xml [ Failure ]
-fast/parser/innerhtml-with-prefixed-elements.xhtml [ Failure ]
-fast/parser/xhtml-innerhtml-null-byte.xhtml [ Failure ]
-fast/xsl/default-html.html [ Failure ]
-fast/xsl/dtd-in-source-document.xml [ Failure ]
-fast/xsl/exslt-node-set.xml [ Failure ]
-fast/xsl/import-after-comment.xml [ Failure ]
-fast/xsl/import-non-document-node.xhtml [ Failure ]
-fast/xsl/mozilla-tests.xml [ Failure ]
-fast/xsl/sort-unicode.xml [ Failure ]
-fast/xsl/xslt-doc-enc.xml [ Failure ]
-fast/xsl/xslt-nested-stylesheets.xml [ Failure ]
-fast/xsl/xslt-processor.html [ Failure ]
-fast/xsl/xslt-second-level-import.xml [ Failure ]
-fast/xsl/xslt-url.xml [ Failure ]
 
 # [Qt] REGRESSION(r96779): It made svg/as-image/svg-nested.html timeout
 svg/as-image/svg-nested.html
@@ -330,7 +356,6 @@ fast/forms/fieldset-align.html [ Failure ]
 fast/forms/focus-selection-textarea.html [ Failure ]
 fast/forms/form-element-geometry.html [ Failure ]
 fast/forms/input-align.html [ Failure ]
-fast/forms/input-appearance-bkcolor.htm [ Failure ]l
 fast/forms/input-appearance-default-bkcolor.html [ Failure ]
 fast/forms/input-appearance-disabled.html [ Failure ]
 fast/forms/input-appearance-focus.html [ Failure ]
@@ -416,8 +441,6 @@ fast/text/textIteratorNilRenderer.html [ Failure ]
 fast/text/whitespace/028.html [ Failure ]
 fast/transforms/transformed-focused-text-input.html [ Failure ]
 fast/writing-mode/fallback-orientation.html [ Failure ]
-fast/xsl/document-function.xml [ Failure ]
-fast/xsl/xslt-entity.xml [ Failure ]
 http/tests/misc/location-replace-crossdomain.html [ Failure ]
 http/tests/navigation/javascriptlink-frames.html [ Failure ]
 http/tests/navigation/postredirect-basic.html [ Failure ]
@@ -586,10 +609,6 @@ webkit.org/b/85310 ietestcenter/css3/valuesandunits/units-010.htm [ ImageOnlyFai
 # IETC namespace failures
 webkit.org/b/86142 ietestcenter/css3/namespaces/syntax-021.xml [ ImageOnlyFailure ]
 
-# CSS Variables are not yet enabled.
-webkit.org/b/85580 fast/css/variables [ Skip ]
-webkit.org/b/85580 inspector/styles/variables [ Skip ]
-
 # Need rebaseline after https://bugs.webkit.org/show_bug.cgi?id=6033
 webkit.org/b/6033 css3/filters/add-filter-rendering.html [ ImageOnlyFailure ]
 webkit.org/b/6033 css3/filters/crash-filter-change.html [ ImageOnlyFailure ]
@@ -679,22 +698,21 @@ webkit.org/b/94005 css2.1/20110323/word-spacing-remove-space-003.htm [ ImageOnly
 webkit.org/b/94005 css2.1/20110323/word-spacing-remove-space-006.htm [ ImageOnlyFailure ]
 webkit.org/b/94006 fast/css/word-spacing-characters-complex-text.html [ ImageOnlyFailure ]
 
-// Tests failing on QtWebKit 2.3 since merge of August 17th
-// Probably added by bug 89826 and related to bugs 94004-94006
+# Tests failing on QtWebKit 2.3 since merge of August 17th
+# Probably added by bug 89826 and related to bugs 94004-94006
 css2.1/20110323/word-spacing-characters-002.htm [ ImageOnlyFailure ]
 css2.1/20110323/word-spacing-remove-space-002.htm [ ImageOnlyFailure ]
 css2.1/20110323/word-spacing-remove-space-004.htm [ ImageOnlyFailure ]
 css2.1/20110323/word-spacing-remove-space-005.htm [ ImageOnlyFailure ]
 
-// New test introduced in https://bugs.webkit.org/show_bug.cgi?id=77772 fails
+# New test introduced in https://bugs.webkit.org/show_bug.cgi?id=77772 fails
 webkit.org/b/96505 css3/flexbox/inline-flex-crash2.html [ Failure ]
 
-// New test introduced in https://bugs.webkit.org/show_bug.cgi?id=94449 fails
+# New test introduced in https://bugs.webkit.org/show_bug.cgi?id=94449 fails
 webkit.org/b/94449 touchadjustment/context-menu-text-subtargets.html [ Failure ]
 
-// Tests failing on QtWebKit 2.3 since merge of September 11th
+# Test failing on QtWebKit 2.3 since merge of September 11th
 fast/encoding/frame-default-enc.html [ Failure ]
-fast/encoding/invalid-xml.html [ Failure ]
 
 # [Qt][WK1] New touchadjustment/focusout-on-touch.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=95205
@@ -710,7 +728,6 @@ fast/workers/storage/interrupt-database.html [ Slow ]
 fast/events/dispatch-message-string-data.html [ Slow ]
 editing/selection/hit-test-on-text-with-line-height.html [ Slow ]
 fast/forms/search-disabled-readonly.html [ Slow Pass ]
-fast/events/popup-blocking-timers.html [ Slow Pass ]
 editing/selection/select-line-break-with-opposite-directionality.html [ Slow Pass ]
 http/tests/navigation/slowtimerredirect-basic.html [ Slow Pass ]
 http/tests/navigation/slowmetaredirect-basic.html  [ Slow Pass ]
@@ -729,18 +746,11 @@ css2.1/20110323/inline-non-replaced-height-002.htm [ Missing ]
 fast/text/word-space.html [ Missing ]
 fast/events/touch/gesture/context-menu-on-long-press.html [ Missing ]
 fast/events/touch/gesture/right-click-gestures-set-cursor-at-correct-position.html [ Missing ]
+css3/filters/effect-reference-ordering-hw.html [ Missing ]
 
 # [Qt4] editing/selection/5354455-1.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=99013
 webkit.org/b/99013 editing/selection/5354455-1.html [ Failure ]
-
-# [Qt4] Five http/tests/xmlviewer/dumpAsText tests fails
-# https://bugs.webkit.org/show_bug.cgi?id=99014
-webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/svg.xml [ Failure ]
-webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer-charset-cp1251.xml [ Failure ]
-webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer-charset-utf8.xml [ Failure ]
-webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xmlviewer.xml [ Failure ]
-webkit.org/b/99014 http/tests/xmlviewer/dumpAsText/xsl-stylesheet.xml [ Failure ]
 
 # New test failing added by https://bugs.webkit.org/show_bug.cgi?id=97639
 fast/js/string-localeCompare.html [ Failure ]
@@ -751,10 +761,10 @@ http/tests/security/cross-origin-local-storage-wk1.html
 # [Qt][WK1] ERROR:  TestRunner::overridePreference() does not support the 'WebKitPageCacheSupportsPluginsPreferenceKey' preference
 plugins/frameset-with-plugin-frame.html
 
-// Test passing on text since merge of October 8th
+# Test passing on text since merge of October 8th
 fast/text/font-kerning.html [ ImageOnlyFailure ]
 
-// Re-skipping tests unskipped in Qt trunk, but still failing in QtWebKit2.3
+# Re-skipping tests unskipped in Qt trunk, but still failing in QtWebKit2.3
 editing/selection/caret-rtl-2-left.html [ Failure ]
 editing/selection/caret-rtl-right.html [ Failure ]
 tables/mozilla/bugs/bug12384.html [ Failure ]
@@ -780,8 +790,6 @@ fast/inline/inline-box-background-repeat-x.html [ Failure ]
 fast/inline/inline-box-background-repeat-y.html [ Failure ]
 fast/inline/inline-box-background.html [ Failure ]
 webkit.org/b/65266 svg/W3C-SVG-1.1-SE/styling-pres-02-f.svg [ Failure ]
-svg/W3C-SVG-1.1/coords-viewattr-01-b.svg [ Failure ]
-svg/W3C-SVG-1.1/coords-viewattr-02-b.svg [ Failure ]
 svg/W3C-SVG-1.1/fonts-desc-02-t.svg [ Failure ]
 svg/W3C-SVG-1.1/fonts-glyph-04-t.svg [ Failure ]
 svg/batik/text/textLayout.svg [ Failure ]
@@ -792,13 +800,7 @@ svg/custom/feComponentTransfer-Discrete.svg [ Failure ]
 svg/custom/feComponentTransfer-Gamma.svg [ Failure ]
 svg/custom/feComponentTransfer-Linear.svg [ Failure ]
 svg/custom/feComponentTransfer-Table.svg [ Failure ]
-svg/custom/junk-data.svg [ Failure ]
-svg/custom/missing-xlink.svg [ Failure ]
-svg/custom/path-bad-data.svg [ Failure ]
-webkit.org/b/46093 svg/custom/use-font-face-crash.svg [ Failure ]
 webkit.org/b/46093 svg/zoom/text/zoom-coords-viewattr-01-b.svg [ Failure ]
-svg/custom/use-invalid-pattern.svg [ Failure ]
-svg/hixie/error/012.xml [ Failure ]
 svg/text/select-textLength-spacingAndGlyphs-squeeze-1.svg [ Failure ]
 svg/text/select-textLength-spacingAndGlyphs-squeeze-2.svg [ Failure ]
 svg/text/select-textLength-spacingAndGlyphs-squeeze-3.svg [ Failure ]
@@ -806,7 +808,6 @@ svg/text/select-textLength-spacingAndGlyphs-squeeze-4.svg [ Failure ]
 svg/text/select-textLength-spacingAndGlyphs-stretch-1.svg [ Failure ]
 svg/text/select-textLength-spacingAndGlyphs-stretch-2.svg [ Failure ]
 svg/text/select-textLength-spacingAndGlyphs-stretch-3.svg [ Failure ]
-webkit.org/b/78128 svg/zoom/page/zoom-coords-viewattr-01-b.svg [ Failure ]
 css3/filters/composited-during-animation-layertree.html [ Failure Pass ]
 
 # This test fails because Qt does not support conditionals in unicode special casing.
@@ -816,20 +817,12 @@ fast/css/case-transform.html [ Failure ]
 # New fast/dom/Window/mozilla-focus-blur.html introduced in r118916 fails
 webkit.org/b/87956 fast/dom/Window/mozilla-focus-blur.html [ Failure ]
 
-# [Qt] REGRESSION(r114059): It made these tests fail
-webkit.org/b/83432 fast/dom/dom-parse-serialize-display.html [ Failure ]
-webkit.org/b/83432 fast/dom/dom-parse-serialize-xmldecl.html [ Failure ]
-webkit.org/b/83432 fast/dom/dom-parse-serialize.html [ Failure ]
-webkit.org/b/83432 fast/xmlhttprequest/xmlhttprequest-get.xhtml [ Failure ]
 
 webkit.org/b/35973 fast/multicol/hit-test-above-or-below.html [ Failure ]
 css2.1/t051201-c23-first-line-00-b.html [ Failure ]
 
 # [Qt] svg/custom/svg-fonts-no-latin-glyph.html fails
 webkit.org/b/74847 svg/custom/svg-fonts-no-latin-glyph.html [ Failure ]
-
-# Crashes due to debug assert until we fix issues with style elements in SVG
-svg/custom/use-referencing-style-crash.svg [ Failure ]
 
 #### End reskipped tests
 
@@ -850,3 +843,10 @@ media/video-playing-and-pause.html [ Slow Failure ]
 fast/dom/HTMLAnchorElement/anchor-no-multiple-windows.html [ Failure ]
 fast/dom/Window/window-open-no-multiple-windows.html [ Failure ]
 fast/forms/post-popup-no-multiple-windows.html [ Failure ]
+
+# Test has error output, so skip it.
+media/video-playing-and-pause.html
+
+# New test failing after merge of November 4th-6th
+fast/js/string-capitalization.html [ Failure ]
+fast/text/international/combining-marks-position.html [ Failure ]

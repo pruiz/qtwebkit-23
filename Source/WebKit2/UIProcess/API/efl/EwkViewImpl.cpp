@@ -27,12 +27,12 @@
 #include "InputMethodContextEfl.h"
 #include "LayerTreeCoordinatorProxy.h"
 #include "LayerTreeRenderer.h"
-#include "PageClientImpl.h"
+#include "PageClientBase.h"
+#include "PageClientDefaultImpl.h"
+#include "PageClientLegacyImpl.h"
 #include "PageLoadClientEfl.h"
 #include "PagePolicyClientEfl.h"
 #include "PageUIClientEfl.h"
-#include "PageViewportController.h"
-#include "PageViewportControllerClientEfl.h"
 #include "ResourceLoadClientEfl.h"
 #include "WKString.h"
 #include "WebContext.h"
@@ -47,13 +47,18 @@
 #include "ewk_popup_menu_item_private.h"
 #include "ewk_popup_menu_private.h"
 #include "ewk_private.h"
+#include "ewk_security_origin_private.h"
 #include "ewk_settings_private.h"
 #include "ewk_view.h"
 #include "ewk_view_private.h"
 #include <Ecore_Evas.h>
+#include <Ecore_X.h>
 #include <Edje.h>
 #include <WebCore/Cursor.h>
 
+#if ENABLE(VIBRATION)
+#include "VibrationClientEfl.h"
+#endif
 
 #if ENABLE(FULLSCREEN_API)
 #include "WebFullScreenManagerProxy.h"
@@ -63,6 +68,7 @@
 #include <Evas_GL.h>
 #endif
 
+using namespace EwkViewCallbacks;
 using namespace WebCore;
 using namespace WebKit;
 
@@ -95,21 +101,23 @@ const Evas_Object* EwkViewImpl::viewFromPageViewMap(const WKPageRef page)
     return pageViewMap().get(page);
 }
 
-EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<Ewk_Context> context, PassRefPtr<WebPageGroup> pageGroup)
+EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<EwkContext> context, PassRefPtr<WebPageGroup> pageGroup, ViewBehavior behavior)
     : m_view(view)
     , m_context(context)
-    , m_pageClient(PageClientImpl::create(this))
-    , m_pageProxy(toImpl(m_context->wkContext())->createWebPage(m_pageClient.get(), pageGroup.get()))
+    , m_pageClient(behavior == DefaultBehavior ? PageClientDefaultImpl::create(this) : PageClientLegacyImpl::create(this))
+    , m_pageProxy(m_context->webContext()->createWebPage(m_pageClient.get(), pageGroup.get()))
     , m_pageLoadClient(PageLoadClientEfl::create(this))
     , m_pagePolicyClient(PagePolicyClientEfl::create(this))
     , m_pageUIClient(PageUIClientEfl::create(this))
     , m_resourceLoadClient(ResourceLoadClientEfl::create(this))
     , m_findClient(FindClientEfl::create(this))
     , m_formClient(FormClientEfl::create(this))
+#if ENABLE(VIBRATION)
+    , m_vibrationClient(VibrationClientEfl::create(this))
+#endif
     , m_backForwardList(Ewk_Back_Forward_List::create(toAPI(m_pageProxy->backForwardList())))
 #if USE(TILED_BACKING_STORE)
-    , m_pageViewportControllerClient(PageViewportControllerClientEfl::create(this))
-    , m_pageViewportController(adoptPtr(new PageViewportController(m_pageProxy.get(), m_pageViewportControllerClient.get())))
+    , m_scaleFactor(1)
 #endif
     , m_settings(Ewk_Settings::create(this))
     , m_cursorGroup(0)
@@ -130,14 +138,11 @@ EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<Ewk_Context> context, Pas
 #if ENABLE(WEBGL)
     m_pageProxy->pageGroup()->preferences()->setWebGLEnabled(true);
 #endif
-    m_pageProxy->setUseFixedLayout(true);
+    if (behavior == DefaultBehavior)
+        m_pageProxy->setUseFixedLayout(true);
 #endif
 
     m_pageProxy->initializeWebPage();
-
-#if USE(TILED_BACKING_STORE)
-    m_pageClient->setPageViewportController(m_pageViewportController.get());
-#endif
 
 #if ENABLE(FULLSCREEN_API)
     m_pageProxy->fullScreenManager()->setWebView(m_view);
@@ -158,6 +163,8 @@ EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<Ewk_Context> context, Pas
 
 EwkViewImpl::~EwkViewImpl()
 {
+    m_pageProxy->close();
+
     // Unregister icon change callback.
     Ewk_Favicon_Database* iconDatabase = m_context->faviconDatabase();
     ASSERT(iconDatabase);
@@ -167,7 +174,7 @@ EwkViewImpl::~EwkViewImpl()
     EwkViewImpl::removeFromPageViewMap(this);
 }
 
-Ewk_View_Smart_Data* EwkViewImpl::smartData()
+Ewk_View_Smart_Data* EwkViewImpl::smartData() const
 {
     return static_cast<Ewk_View_Smart_Data*>(evas_object_smart_data_get(m_view));
 }
@@ -237,6 +244,54 @@ void EwkViewImpl::setCursor(const Cursor& cursor)
     ecore_evas_object_cursor_set(ecoreEvas, cursorObject.release().leakRef(), EVAS_LAYER_MAX, hotspotX, hotspotY);
 }
 
+AffineTransform EwkViewImpl::transformFromScene() const
+{
+    AffineTransform transform;
+
+#if USE(TILED_BACKING_STORE)
+    transform.translate(m_scrollPosition.x(), m_scrollPosition.y());
+    transform.scale(1 / m_scaleFactor);
+#endif
+
+    Ewk_View_Smart_Data* sd = smartData();
+    transform.translate(-sd->view.x, -sd->view.y);
+
+    return transform;
+}
+
+AffineTransform EwkViewImpl::transformToScene() const
+{
+    return transformFromScene().inverse();
+}
+
+AffineTransform EwkViewImpl::transformToScreen() const
+{
+    AffineTransform transform;
+
+    int windowGlobalX = 0;
+    int windowGlobalY = 0;
+
+    Ewk_View_Smart_Data* sd = smartData();
+
+#ifdef HAVE_ECORE_X
+    Ecore_Evas* ecoreEvas = ecore_evas_ecore_evas_get(sd->base.evas);
+    Ecore_X_Window window = ecore_evas_software_x11_window_get(ecoreEvas); // Returns 0 if none.
+
+    int x, y; // x, y are relative to parent (in a reparenting window manager).
+    while (window) {
+        ecore_x_window_geometry_get(window, &x, &y, 0, 0);
+        windowGlobalX += x;
+        windowGlobalY += y;
+        window = ecore_x_window_parent_get(window);
+    }
+#endif
+
+    transform.translate(-sd->view.x, -sd->view.y);
+    transform.translate(windowGlobalX, windowGlobalY);
+
+    return transform;
+}
+
 void EwkViewImpl::displayTimerFired(Timer<EwkViewImpl>*)
 {
 #if USE(COORDINATED_GRAPHICS)
@@ -247,19 +302,11 @@ void EwkViewImpl::displayTimerFired(Timer<EwkViewImpl>*)
     // We are supposed to clip to the actual viewport, nothing less.
     IntRect viewport(sd->view.x, sd->view.y, sd->view.w, sd->view.h);
 
-    IntPoint scrollPosition = m_pageViewportControllerClient->scrollPosition();
-    float scaleFactor = m_pageViewportControllerClient->scaleFactor();
-
-    WebCore::TransformationMatrix matrix;
-    matrix.translate(viewport.x(), viewport.y());
-    matrix.scale(scaleFactor);
-    matrix.translate(-scrollPosition.x(), -scrollPosition.y());
-
     LayerTreeRenderer* renderer = page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer();
     renderer->setActive(true);
     renderer->syncRemoteContent();
 
-    renderer->paintToCurrentGLContext(matrix, /* opacity */ 1, viewport);
+    renderer->paintToCurrentGLContext(transformToScene().toTransformationMatrix(), /* opacity */ 1, viewport);
 
     evas_object_image_data_update_add(sd->image, viewport.x(), viewport.y(), viewport.width(), viewport.height());
 #endif
@@ -291,7 +338,9 @@ void EwkViewImpl::enterFullScreen()
 {
     Ewk_View_Smart_Data* sd = smartData();
 
-    if (!sd->api->fullscreen_enter || !sd->api->fullscreen_enter(sd)) {
+    RefPtr<EwkSecurityOrigin> origin = EwkSecurityOrigin::create(KURL(ParsedURLString, String::fromUTF8(m_url)));
+
+    if (!sd->api->fullscreen_enter || !sd->api->fullscreen_enter(sd, origin.get())) {
         Ecore_Evas* ecoreEvas = ecore_evas_ecore_evas_get(sd->base.evas);
         ecore_evas_fullscreen_set(ecoreEvas, true);
     }
@@ -312,6 +361,29 @@ void EwkViewImpl::exitFullScreen()
 }
 #endif
 
+WKRect EwkViewImpl::windowGeometry() const
+{
+    Evas_Coord x, y, width, height;
+    Ewk_View_Smart_Data* sd = smartData();
+
+    if (!sd->api->window_geometry_get || !sd->api->window_geometry_get(sd, &x, &y, &width, &height)) {
+        Ecore_Evas* ee = ecore_evas_ecore_evas_get(sd->base.evas);
+        ecore_evas_request_geometry_get(ee, &x, &y, &width, &height);
+    }
+
+    return WKRectMake(x, y, width, height);
+}
+
+void EwkViewImpl::setWindowGeometry(const WKRect& rect)
+{
+    Ewk_View_Smart_Data* sd = smartData();
+
+    if (!sd->api->window_geometry_set || !sd->api->window_geometry_set(sd, rect.origin.x, rect.origin.y, rect.size.width, rect.size.height)) {
+        Ecore_Evas* ee = ecore_evas_ecore_evas_get(sd->base.evas);
+        ecore_evas_move_resize(ee, rect.origin.x, rect.origin.y, rect.size.width, rect.size.height);
+    }
+}
+
 void EwkViewImpl::setImageData(void* imageData, const IntSize& size)
 {
     Ewk_View_Smart_Data* sd = smartData();
@@ -326,7 +398,7 @@ void EwkViewImpl::setImageData(void* imageData, const IntSize& size)
 #if USE(TILED_BACKING_STORE)
 void EwkViewImpl::informLoadCommitted()
 {
-    m_pageViewportController->didCommitLoad();
+    m_pageClient->didCommitLoad();
 }
 #endif
 
@@ -456,12 +528,27 @@ void EwkViewImpl::informIconChange()
     ASSERT(iconDatabase);
 
     m_faviconURL = ewk_favicon_database_icon_url_get(iconDatabase, m_url);
-    evas_object_smart_callback_call(m_view, "icon,changed", 0);
+    smartCallback<IconChanged>().call();
 }
 
 #if USE(ACCELERATED_COMPOSITING)
 bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
 {
+    if (!m_evasGL) {
+        Evas* evas = evas_object_evas_get(m_view);
+        m_evasGL = adoptPtr(evas_gl_new(evas));
+        if (!m_evasGL)
+            return false;
+    }
+
+    if (!m_evasGLContext) {
+        m_evasGLContext = EvasGLContext::create(evasGL());
+        if (!m_evasGLContext) {
+            WARN("Failed to create GLContext.");
+            return false;
+        }
+    }
+
     Ewk_View_Smart_Data* sd = smartData();
 
     Evas_GL_Config evasGLConfig = {
@@ -491,42 +578,19 @@ bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
 
 bool EwkViewImpl::enterAcceleratedCompositingMode()
 {
-    if (m_evasGL) {
-        EINA_LOG_DOM_WARN(_ewk_log_dom, "Accelerated compositing mode already entered.");
-        return false;
+    if (!m_evasGLSurface) {
+        if (!createGLSurface(size())) {
+            WARN("Failed to create GLSurface.");
+            return false;
+        }
     }
 
-    Evas* evas = evas_object_evas_get(m_view);
-    m_evasGL = adoptPtr(evas_gl_new(evas));
-    if (!m_evasGL)
-        return false;
-
-    m_evasGLContext = EvasGLContext::create(evasGL());
-    if (!m_evasGLContext) {
-        EINA_LOG_DOM_WARN(_ewk_log_dom, "Failed to create GLContext.");
-        m_evasGL.clear();
-        return false;
-    }
-
-    if (!createGLSurface(size())) {
-        EINA_LOG_DOM_WARN(_ewk_log_dom, "Failed to create GLSurface.");
-        m_evasGLContext.clear();
-        m_evasGL.clear();
-        return false;
-    }
-
-    m_pageViewportControllerClient->setRendererActive(true);
+    page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer()->setActive(true);
     return true;
 }
 
 bool EwkViewImpl::exitAcceleratedCompositingMode()
 {
-    EINA_SAFETY_ON_NULL_RETURN_VAL(m_evasGL, false);
-
-    m_evasGLSurface.clear();
-    m_evasGLContext.clear();
-    m_evasGL.clear();
-
     return true;
 }
 #endif
@@ -574,7 +638,7 @@ void EwkViewImpl::dismissColorPicker()
 void EwkViewImpl::informContentsSizeChange(const IntSize& size)
 {
 #if USE(COORDINATED_GRAPHICS)
-    m_pageViewportControllerClient->didChangeContentsSize(size);
+    m_pageClient->didChangeContentsSize(size);
 #else
     UNUSED_PARAM(size);
 #endif
@@ -695,8 +759,7 @@ void EwkViewImpl::informURLChange()
         return;
 
     m_url = rawActiveURL.data();
-    const char* callbackArgument = static_cast<const char*>(m_url);
-    evas_object_smart_callback_call(m_view, "url,changed", const_cast<char*>(callbackArgument));
+    smartCallback<URLChanged>().call(m_url);
 
     // Update the view's favicon.
     informIconChange();
@@ -705,7 +768,7 @@ void EwkViewImpl::informURLChange()
 WKPageRef EwkViewImpl::createNewPage()
 {
     Evas_Object* newEwkView = 0;
-    evas_object_smart_callback_call(m_view, "create,window", &newEwkView);
+    smartCallback<CreateWindow>().call(&newEwkView);
 
     if (!newEwkView)
         return 0;
@@ -718,7 +781,7 @@ WKPageRef EwkViewImpl::createNewPage()
 
 void EwkViewImpl::closePage()
 {
-    evas_object_smart_callback_call(m_view, "close,window", 0);
+    smartCallback<CloseWindow>().call();
 }
 
 void EwkViewImpl::onMouseDown(void* data, Evas*, Evas_Object*, void* eventInfo)

@@ -424,7 +424,10 @@ bool AbstractState::execute(unsigned indexInBlock)
             break;
         }
         speculateNumberUnary(node);
-        forNode(nodeIndex).set(SpecDouble);
+        if (isInt32Speculation(forNode(node.child1()).m_type))
+            forNode(nodeIndex).set(SpecDoubleReal);
+        else
+            forNode(nodeIndex).set(SpecDouble);
         break;
     }
         
@@ -448,9 +451,13 @@ bool AbstractState::execute(unsigned indexInBlock)
             forNode(nodeIndex).set(SpecInt32);
             break;
         }
-        if (Node::shouldSpeculateNumber(m_graph[node.child1()], m_graph[node.child2()])) {
+        if (Node::shouldSpeculateNumberExpectingDefined(m_graph[node.child1()], m_graph[node.child2()])) {
             speculateNumberBinary(node);
-            forNode(nodeIndex).set(SpecDouble);
+            if (isRealNumberSpeculation(forNode(node.child1()).m_type)
+                && isRealNumberSpeculation(forNode(node.child2()).m_type))
+                forNode(nodeIndex).set(SpecDoubleReal);
+            else
+                forNode(nodeIndex).set(SpecDouble);
             break;
         }
         if (node.op() == ValueAdd) {
@@ -522,7 +529,11 @@ bool AbstractState::execute(unsigned indexInBlock)
             break;
         }
         speculateNumberBinary(node);
-        forNode(nodeIndex).set(SpecDouble);
+        if (isRealNumberSpeculation(forNode(node.child1()).m_type)
+            || isRealNumberSpeculation(forNode(node.child2()).m_type))
+            forNode(nodeIndex).set(SpecDoubleReal);
+        else
+            forNode(nodeIndex).set(SpecDouble);
         break;
     }
         
@@ -560,7 +571,7 @@ bool AbstractState::execute(unsigned indexInBlock)
                 break;
             }
         }
-        if (Node::shouldSpeculateInteger(
+        if (Node::shouldSpeculateIntegerForArithmetic(
                 m_graph[node.child1()], m_graph[node.child2()])
             && node.canSpeculateInteger()) {
             speculateInt32Binary(node, true); // forcing can-exit, which is a bit on the conservative side.
@@ -580,7 +591,7 @@ bool AbstractState::execute(unsigned indexInBlock)
             node.setCanExit(false);
             break;
         }
-        if (m_graph[node.child1()].shouldSpeculateInteger()
+        if (m_graph[node.child1()].shouldSpeculateIntegerForArithmetic()
             && node.canSpeculateInteger()) {
             speculateInt32Unary(node, true);
             forNode(nodeIndex).set(SpecInt32);
@@ -842,6 +853,7 @@ bool AbstractState::execute(unsigned indexInBlock)
         switch (node.arrayMode().type()) {
         case Array::SelectUsingPredictions:
         case Array::Unprofiled:
+        case Array::Undecided:
             ASSERT_NOT_REACHED();
             break;
         case Array::ForceExit:
@@ -858,6 +870,22 @@ bool AbstractState::execute(unsigned indexInBlock)
         case Array::Arguments:
             forNode(node.child2()).filter(SpecInt32);
             forNode(nodeIndex).makeTop();
+            break;
+        case Array::Int32:
+            forNode(node.child2()).filter(SpecInt32);
+            if (node.arrayMode().isOutOfBounds()) {
+                clobberWorld(node.codeOrigin, indexInBlock);
+                forNode(nodeIndex).makeTop();
+            } else
+                forNode(nodeIndex).set(SpecInt32);
+            break;
+        case Array::Double:
+            forNode(node.child2()).filter(SpecInt32);
+            if (node.arrayMode().isOutOfBounds()) {
+                clobberWorld(node.codeOrigin, indexInBlock);
+                forNode(nodeIndex).makeTop();
+            } else
+                forNode(nodeIndex).set(SpecDoubleReal);
             break;
         case Array::Contiguous:
         case Array::ArrayStorage:
@@ -925,6 +953,20 @@ bool AbstractState::execute(unsigned indexInBlock)
             break;
         case Array::Generic:
             clobberWorld(node.codeOrigin, indexInBlock);
+            break;
+        case Array::Int32:
+            forNode(child1).filter(SpecCell);
+            forNode(child2).filter(SpecInt32);
+            forNode(child3).filter(SpecInt32);
+            if (node.arrayMode().isOutOfBounds())
+                clobberWorld(node.codeOrigin, indexInBlock);
+            break;
+        case Array::Double:
+            forNode(child1).filter(SpecCell);
+            forNode(child2).filter(SpecInt32);
+            forNode(child3).filter(SpecRealNumber);
+            if (node.arrayMode().isOutOfBounds())
+                clobberWorld(node.codeOrigin, indexInBlock);
             break;
         case Array::Contiguous:
         case Array::ArrayStorage:
@@ -1018,6 +1060,16 @@ bool AbstractState::execute(unsigned indexInBlock)
             
     case ArrayPush:
         node.setCanExit(true);
+        switch (node.arrayMode().type()) {
+        case Array::Int32:
+            forNode(node.child2()).filter(SpecInt32);
+            break;
+        case Array::Double:
+            forNode(node.child2()).filter(SpecRealNumber);
+            break;
+        default:
+            break;
+        }
         clobberWorld(node.codeOrigin, indexInBlock);
         forNode(nodeIndex).set(SpecNumber);
         break;
@@ -1122,13 +1174,13 @@ bool AbstractState::execute(unsigned indexInBlock)
             
     case NewArray:
         node.setCanExit(true);
-        forNode(nodeIndex).set(m_graph.globalObjectFor(node.codeOrigin)->arrayStructure());
+        forNode(nodeIndex).set(m_graph.globalObjectFor(node.codeOrigin)->arrayStructureForIndexingTypeDuringAllocation(node.indexingType()));
         m_haveStructures = true;
         break;
         
     case NewArrayBuffer:
         node.setCanExit(true);
-        forNode(nodeIndex).set(m_graph.globalObjectFor(node.codeOrigin)->arrayStructure());
+        forNode(nodeIndex).set(m_graph.globalObjectFor(node.codeOrigin)->arrayStructureForIndexingTypeDuringAllocation(node.indexingType()));
         m_haveStructures = true;
         break;
 
@@ -1384,11 +1436,11 @@ bool AbstractState::execute(unsigned indexInBlock)
         case Array::String:
             forNode(node.child1()).filter(SpecString);
             break;
+        case Array::Int32:
+        case Array::Double:
         case Array::Contiguous:
         case Array::ArrayStorage:
         case Array::SlowPutArrayStorage:
-            // This doesn't filter anything meaningful right now. We may want to add
-            // CFA tracking of array mode speculations, but we don't have that, yet.
             forNode(node.child1()).filter(SpecCell);
             break;
         case Array::Arguments:

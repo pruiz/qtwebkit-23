@@ -367,6 +367,16 @@ PassRefPtr<CoordinatedBackingStore> LayerTreeRenderer::getBackingStore(WebLayerI
     return backingStore;
 }
 
+void LayerTreeRenderer::removeBackingStoreIfNeeded(WebLayerID layerID, int tileID)
+{
+    TextureMapperLayer* layer = toTextureMapperLayer(layerByID(layerID));
+    ASSERT(layer);
+    RefPtr<CoordinatedBackingStore> backingStore = static_cast<CoordinatedBackingStore*>(layer->backingStore().get());
+    ASSERT(backingStore);
+    if (backingStore->isEmpty())
+        layer->setBackingStore(0);
+}
+
 void LayerTreeRenderer::createTile(WebLayerID layerID, int tileID, float scale)
 {
     getBackingStore(layerID)->createTile(tileID, scale);
@@ -375,6 +385,7 @@ void LayerTreeRenderer::createTile(WebLayerID layerID, int tileID, float scale)
 void LayerTreeRenderer::removeTile(WebLayerID layerID, int tileID)
 {
     getBackingStore(layerID)->removeTile(tileID);
+    removeBackingStoreIfNeeded(layerID, tileID);
 }
 
 void LayerTreeRenderer::updateTile(WebLayerID layerID, int tileID, const TileUpdate& update)
@@ -462,8 +473,16 @@ void LayerTreeRenderer::syncRemoteContent()
     // We enqueue messages and execute them during paint, as they require an active GL context.
     ensureRootLayer();
 
-    for (size_t i = 0; i < m_renderQueue.size(); ++i)
-        m_renderQueue[i]();
+    Vector<Function<void()> > renderQueue;
+    bool calledOnMainThread = WTF::isMainThread();
+    if (!calledOnMainThread)
+        m_renderQueueMutex.lock();
+    renderQueue.swap(m_renderQueue);
+    if (!calledOnMainThread)
+        m_renderQueueMutex.unlock();
+
+    for (size_t i = 0; i < renderQueue.size(); ++i)
+        renderQueue[i]();
 
     m_renderQueue.clear();
 }
@@ -522,6 +541,8 @@ void LayerTreeRenderer::appendUpdate(const Function<void()>& function)
     if (!m_isActive)
         return;
 
+    ASSERT(isMainThread());
+    MutexLocker locker(m_renderQueueMutex);
     m_renderQueue.append(function);
 }
 

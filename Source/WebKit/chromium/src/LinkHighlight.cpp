@@ -30,7 +30,6 @@
 #include "Color.h"
 #include "Frame.h"
 #include "FrameView.h"
-#include "LayoutTypes.h"
 #include "Node.h"
 #include "NonCompositedContentHost.h"
 #include "PlatformContextSkia.h"
@@ -226,7 +225,7 @@ bool LinkHighlight::computeHighlightLayerPathAndPosition(RenderLayer* compositin
     return pathHasChanged;
 }
 
-void LinkHighlight::paintContents(WebCanvas* canvas, const WebRect& webClipRect, WebFloatRect&)
+void LinkHighlight::paintContents(WebCanvas* canvas, const WebRect& webClipRect, bool, WebFloatRect&)
 {
     if (!m_node || !m_node->renderer())
         return;
@@ -303,6 +302,9 @@ void LinkHighlight::updateGeometry()
         // We only need to invalidate the layer if the highlight size has changed, otherwise
         // we can just re-position the layer without needing to repaint.
         m_contentLayer->layer()->invalidate();
+
+        if (m_currentGraphicsLayer)
+            m_currentGraphicsLayer->addRepaintRect(FloatRect(layer()->position().x, layer()->position().y, layer()->bounds().width, layer()->bounds().height));
     }
 }
 

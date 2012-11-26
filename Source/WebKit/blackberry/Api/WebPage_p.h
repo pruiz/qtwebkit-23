@@ -152,7 +152,6 @@ public:
     WebCore::IntPoint scrollPosition() const;
     WebCore::IntPoint maximumScrollPosition() const;
     void setScrollPosition(const WebCore::IntPoint&);
-    void scrollBy(int deltaX, int deltaY);
 
     void notifyInRegionScrollStopped();
     void setScrollOriginPoint(const Platform::IntPoint&);
@@ -218,7 +217,7 @@ public:
     void overflowExceedsContentsSize() { m_overflowExceedsContentsSize = true; }
     void layoutFinished();
     void setNeedTouchEvents(bool);
-    void notifyPopupAutofillDialog(const Vector<String>&, const WebCore::IntRect&);
+    void notifyPopupAutofillDialog(const Vector<String>&);
     void notifyDismissAutofillDialog();
 
     bool shouldZoomToInitialScaleOnLoad() const { return loadState() == Committed || m_shouldZoomToInitialScaleAfterLoadFinished; }
@@ -304,9 +303,6 @@ public:
     double newScaleForBlockZoomRect(const WebCore::IntRect&, double oldScale, double margin);
     double maxBlockZoomScale() const;
 
-    // Plugin Methods.
-    void notifyPluginRectChanged(int id, const WebCore::IntRect& rectChanged);
-
     // Context Methods.
     Platform::WebContext webContext(TargetDetectionStrategy);
     PassRefPtr<WebCore::Node> contextNode(TargetDetectionStrategy);
@@ -347,7 +343,7 @@ public:
 #endif
 
     void dispatchViewportPropertiesDidChange(const WebCore::ViewportArguments&);
-    WebCore::IntSize recomputeVirtualViewportFromViewportArguments();
+    Platform::IntSize recomputeVirtualViewportFromViewportArguments();
 
     void resetBlockZoom();
 
@@ -378,9 +374,6 @@ public:
     void willDeferLoading();
     void didResumeLoading();
 
-    // Returns true if the escape key handler should zoom.
-    bool shouldZoomOnEscape() const;
-
     WebCore::TransformationMatrix* transformationMatrix() const
     {
         return m_transformationMatrix;
@@ -401,8 +394,6 @@ public:
     virtual void notifyAnimationStarted(const WebCore::GraphicsLayer*, double time) { }
     virtual void notifyFlushRequired(const WebCore::GraphicsLayer*);
     virtual void paintContents(const WebCore::GraphicsLayer*, WebCore::GraphicsContext&, WebCore::GraphicsLayerPaintingPhase, const WebCore::IntRect& inClip) { }
-    virtual bool showDebugBorders(const WebCore::GraphicsLayer*) const;
-    virtual bool showRepaintCounter(const WebCore::GraphicsLayer*) const;
 
     // WebKit thread, plumbed through from ChromeClientBlackBerry.
     void setRootLayerWebKitThread(WebCore::Frame*, WebCore::LayerWebKitThread*);
@@ -468,6 +459,9 @@ public:
 
     WebCore::IntSize screenSize() const;
 
+    void willComposite();
+    void didComposite();
+
     WebPage* m_webPage;
     WebPageClient* m_client;
     WebCore::InspectorClientBlackBerry* m_inspectorClient;
@@ -500,8 +494,7 @@ public:
     WebCore::IntSize m_previousContentsSize;
     int m_actualVisibleWidth;
     int m_actualVisibleHeight;
-    int m_virtualViewportWidth;
-    int m_virtualViewportHeight;
+    WebCore::IntSize m_virtualViewportSize;
     WebCore::IntSize m_defaultLayoutSize;
     WebCore::ViewportArguments m_viewportArguments; // We keep this around since we may need to re-evaluate the arguments on rotation.
     WebCore::ViewportArguments m_userViewportArguments; // A fallback set of Viewport Arguments supplied by the WebPageClient

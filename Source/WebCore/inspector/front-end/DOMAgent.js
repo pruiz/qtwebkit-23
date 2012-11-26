@@ -772,7 +772,7 @@ WebInspector.DOMDocument = function(domAgent, payload)
 {
     WebInspector.DOMNode.call(this, domAgent, this, false, payload);
     this.documentURL = payload.documentURL || "";
-    this.baseURL = /** @type {string} */ payload.baseURL;
+    this.baseURL = /** @type {string} */ (payload.baseURL);
     console.assert(this.baseURL);
     this.xmlVersion = payload.xmlVersion;
     this._listeners = {};
@@ -1242,7 +1242,7 @@ WebInspector.DOMAgent.prototype = {
     _buildHighlightConfig: function(mode)
     {
         mode = mode || "all";
-        var highlightConfig = { showInfo: mode === "all" };
+        var highlightConfig = { showInfo: mode === "all", showRulers: WebInspector.settings.showMetricsRulers.get() };
         if (mode === "all" || mode === "content")
             highlightConfig.contentColor = WebInspector.Color.PageHighlight.Content.toProtocolRGBA();
 

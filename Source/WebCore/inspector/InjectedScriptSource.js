@@ -33,6 +33,9 @@
  */
 (function (InjectedScriptHost, inspectedWindow, injectedScriptId) {
 
+// Protect against Object overwritten by the user code.
+var Object = {}.constructor;
+
 /**
  * @param {Arguments} array
  * @param {number=} index
@@ -48,7 +51,7 @@ function slice(array, index)
 
 /**
  * Please use this bind, not the one from Function.prototype
- * @param {function()} func
+ * @param {function(...)} func
  * @param {Object} thisObject
  * @param {...number} var_args
  */
@@ -552,7 +555,7 @@ InjectedScript.prototype = {
         var callFrame = this._callFrameForId(topCallFrame, callFrameId);
         if (!callFrame)
             return "Could not find call frame with given id";
-        return this._evaluateAndWrap(callFrame.evaluate, callFrame, expression, objectGroup, true, injectCommandLineAPI, returnByValue);
+        return this._evaluateAndWrap(callFrame.evaluate, callFrame, expression, objectGroup, true, injectCommandLineAPI, returnByValue, generatePreview);
     },
 
     /**
@@ -614,7 +617,7 @@ InjectedScript.prototype = {
         var object = this.findObjectById(objectId);
         if (!object || this._subtype(object) !== "node")
             return null;
-        return /** @type {Node} */ object;
+        return /** @type {Node} */ (object);
     },
 
     /**
@@ -705,7 +708,7 @@ InjectedScript.prototype = {
         if (this.isPrimitiveValue(obj))
             return null;
 
-        obj = /** @type {Object} */ obj;
+        obj = /** @type {Object} */ (obj);
 
         // Type is object, get subtype.
         var subtype = this._subtype(obj);
@@ -792,7 +795,7 @@ InjectedScript.RemoteObject = function(object, objectGroupName, forceValueType, 
         return;
     }
 
-    object = /** @type {Object} */ object;
+    object = /** @type {Object} */ (object);
 
     this.objectId = injectedScript._bind(object, objectGroupName);
     var subtype = injectedScript._subtype(object);

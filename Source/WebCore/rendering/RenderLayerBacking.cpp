@@ -203,6 +203,31 @@ void RenderLayerBacking::adjustTileCacheCoverage()
     tiledBacking()->setTileCoverage(tileCoverage);
 }
 
+void RenderLayerBacking::updateDebugIndicators(bool showBorder, bool showRepaintCounter)
+{
+    m_graphicsLayer->setShowDebugBorder(showBorder);
+    m_graphicsLayer->setShowRepaintCounter(showRepaintCounter);
+    
+    if (m_ancestorClippingLayer)
+        m_ancestorClippingLayer->setShowDebugBorder(showBorder);
+
+    if (m_foregroundLayer) {
+        m_foregroundLayer->setShowDebugBorder(showBorder);
+        m_foregroundLayer->setShowRepaintCounter(showRepaintCounter);
+    }
+
+    if (m_maskLayer) {
+        m_maskLayer->setShowDebugBorder(showBorder);
+        m_maskLayer->setShowRepaintCounter(showRepaintCounter);
+    }
+
+    if (m_scrollingLayer)
+        m_scrollingLayer->setShowDebugBorder(showBorder);
+
+    if (m_scrollingContentsLayer)
+        m_scrollingContentsLayer->setShowDebugBorder(showBorder);
+}
+
 void RenderLayerBacking::createPrimaryGraphicsLayer()
 {
     String layerName;
@@ -1012,7 +1037,14 @@ void RenderLayerBacking::attachToScrollingCoordinator(RenderLayerBacking* parent
     if (!scrollingCoordinator)
         return;
 
-    ScrollingNodeType nodeType = ScrollingNode;
+    // FIXME: When we support overflow areas, we will have to refine this for overflow areas that are also
+    // positon:fixed.
+    ScrollingNodeType nodeType;
+    if (renderer()->style()->position() == FixedPosition)
+        nodeType = FixedNode;
+    else
+        nodeType = ScrollingNode;
+
     ScrollingNodeID parentID = parent ? parent->scrollLayerID() : 0;
     m_scrollLayerID = scrollingCoordinator->attachToStateTree(nodeType, scrollingCoordinator->uniqueScrollLayerID(), parentID);
 }
@@ -1586,14 +1618,10 @@ bool RenderLayerBacking::getCurrentTransform(const GraphicsLayer* graphicsLayer,
     return false;
 }
 
-bool RenderLayerBacking::showDebugBorders(const GraphicsLayer*) const
+bool RenderLayerBacking::isTrackingRepaints() const
 {
-    return compositor() ? compositor()->compositorShowDebugBorders() : false;
-}
-
-bool RenderLayerBacking::showRepaintCounter(const GraphicsLayer*) const
-{
-    return compositor() ? compositor()->compositorShowRepaintCounter() : false;
+    GraphicsLayerClient* client = compositor();
+    return client ? client->isTrackingRepaints() : false;
 }
 
 #ifndef NDEBUG

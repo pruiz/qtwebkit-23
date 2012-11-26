@@ -103,12 +103,12 @@ class FontPlatformData {
 public:
     FontPlatformData(float size, bool bold, bool oblique);
     FontPlatformData(const FontDescription&, const AtomicString& familyName, int wordSpacing = 0, int letterSpacing = 0);
+    FontPlatformData(const FontPlatformData&, float size);
 #if !HAVE(QRAWFONT)
     FontPlatformData(const QFont& font)
         : m_data(adoptRef(new FontPlatformDataPrivate(font)))
     { }
 #else
-    FontPlatformData(const FontPlatformData&, float size);
     FontPlatformData(const QRawFont& rawFont)
         : m_data(adoptRef(new FontPlatformDataPrivate(rawFont)))
     { }

@@ -502,8 +502,7 @@ END
 v8::Handle<v8::Object> ${className}::wrap(${nativeType}* impl, v8::Handle<v8::Object> creationContext, v8::Isolate* isolate)
 {
 END
-    my $domMapFunction = GetDomMapFunction($dataNode, $interfaceName, "isolate");
-    my $getCachedWrapper = IsNodeSubType($dataNode) ? "V8DOMWrapper::getCachedWrapper(impl)" : "${domMapFunction}.get(impl)";
+    my $getCachedWrapper = IsNodeSubType($dataNode) ? "V8DOMWrapper::getCachedWrapper(impl)" : "DOMDataStore::current(isolate)->get(impl)";
     push(@headerContent, <<END);
         v8::Handle<v8::Object> wrapper = $getCachedWrapper;
         if (!wrapper.IsEmpty())
@@ -1037,8 +1036,7 @@ END
         # Check for a wrapper in the wrapper cache. If there is one, we know that a hidden reference has already
         # been created. If we don't find a wrapper, we create both a wrapper and a hidden reference.
         push(@implContentDecls, "    RefPtr<$returnType> result = ${getterString};\n");
-        my $domMapFunction = GetDomMapFunction($dataNode, $interfaceName, "info.GetIsolate()");
-        push(@implContentDecls, "    v8::Handle<v8::Value> wrapper = result.get() ? ${domMapFunction}.get(result.get()) : v8Undefined();\n");
+        push(@implContentDecls, "    v8::Handle<v8::Value> wrapper = result.get() ? v8::Handle<v8::Value>(DOMDataStore::current(info.GetIsolate())->get(result.get())) : v8Undefined();\n");
         push(@implContentDecls, "    if (wrapper.IsEmpty()) {\n");
         push(@implContentDecls, "        wrapper = toV8(result.get(), info.Holder(), info.GetIsolate());\n");
         push(@implContentDecls, "        if (!wrapper.IsEmpty())\n");
@@ -1585,7 +1583,7 @@ END
     my $raisesExceptions = @{$function->raisesExceptions};
     if (!$raisesExceptions) {
         foreach my $parameter (@{$function->parameters}) {
-            if ((!$parameter->extendedAttributes->{"Callback"} and TypeCanFailConversion($parameter)) or $parameter->extendedAttributes->{"IsIndex"}) {
+            if ($parameter->extendedAttributes->{"IsIndex"}) {
                 $raisesExceptions = 1;
             }
         }
@@ -1747,12 +1745,12 @@ sub GenerateParametersCheck
                 $parameterCheckString .= "    RefPtr<" . $parameter->type . "> $parameterName;\n";
                 $parameterCheckString .= "    if (args.Length() > $paramIndex && !args[$paramIndex]->IsNull() && !args[$paramIndex]->IsUndefined()) {\n";
                 $parameterCheckString .= "        if (!args[$paramIndex]->IsFunction())\n";
-                $parameterCheckString .= "            return setDOMException(TYPE_MISMATCH_ERR, args.GetIsolate());\n";
+                $parameterCheckString .= "            return throwTypeError(0, args.GetIsolate());\n";
                 $parameterCheckString .= "        $parameterName = ${className}::create(args[$paramIndex], getScriptExecutionContext());\n";
                 $parameterCheckString .= "    }\n";
             } else {
                 $parameterCheckString .= "    if (args.Length() <= $paramIndex || !args[$paramIndex]->IsFunction())\n";
-                $parameterCheckString .= "        return setDOMException(TYPE_MISMATCH_ERR, args.GetIsolate());\n";
+                $parameterCheckString .= "        return throwTypeError(0, args.GetIsolate());\n";
                 $parameterCheckString .= "    RefPtr<" . $parameter->type . "> $parameterName = ${className}::create(args[$paramIndex], getScriptExecutionContext());\n";
             }
         } elsif ($parameter->extendedAttributes->{"Clamp"}) {
@@ -1799,13 +1797,6 @@ sub GenerateParametersCheck
             }
             $parameterCheckString .= "    if (${parameterName}DidThrow)\n";
             $parameterCheckString .= "        return v8Undefined();\n";
-        } elsif (TypeCanFailConversion($parameter)) {
-            $parameterCheckString .= "    $nativeType $parameterName = " .
-                 JSValueToNative($parameter, "args[$paramIndex]", "args.GetIsolate()") . ";\n";
-            $parameterCheckString .= "    if (UNLIKELY(!$parameterName)) {\n";
-            $parameterCheckString .= "        ec = TYPE_MISMATCH_ERR;\n";
-            $parameterCheckString .= "        goto fail;\n";
-            $parameterCheckString .= "    }\n";
         } elsif ($parameter->isVariadic) {
             my $nativeElementType = GetNativeType($parameter->type);
             if ($nativeElementType =~ />$/) {
@@ -1873,7 +1864,7 @@ sub GenerateConstructorCallback
     }
     if (!$raisesExceptions) {
         foreach my $parameter (@{$function->parameters}) {
-            if ((!$parameter->extendedAttributes->{"Callback"} and TypeCanFailConversion($parameter)) or $parameter->extendedAttributes->{"IsIndex"}) {
+            if ($parameter->extendedAttributes->{"IsIndex"}) {
                 $raisesExceptions = 1;
             }
         }
@@ -1942,11 +1933,10 @@ END
         push(@implContent, "        goto fail;\n");
     }
 
-    my $DOMObject = GetDomMapName($dataNode, $implClassName);
     push(@implContent, <<END);
 
     V8DOMWrapper::setDOMWrapper(wrapper, &info, impl.get());
-    V8DOMWrapper::setJSWrapperFor${DOMObject}(impl.release(), wrapper, args.GetIsolate());
+    V8DOMWrapper::setJSWrapperForDOMObject(impl.release(), wrapper, args.GetIsolate());
     return wrapper;
 END
 
@@ -2052,7 +2042,7 @@ sub GenerateNamedConstructorCallback
     }
     if (!$raisesExceptions) {
         foreach my $parameter (@{$function->parameters}) {
-            if ((!$parameter->extendedAttributes->{"Callback"} and TypeCanFailConversion($parameter)) or $parameter->extendedAttributes->{"IsIndex"}) {
+            if ($parameter->extendedAttributes->{"IsIndex"}) {
                 $raisesExceptions = 1;
             }
         }
@@ -2063,20 +2053,15 @@ sub GenerateNamedConstructorCallback
     my @beforeArgumentList;
     my @afterArgumentList;
 
+    my $toActiveDOMObject = "0";
     if ($dataNode->extendedAttributes->{"ActiveDOMObject"}) {
-        push(@implContent, <<END);
-WrapperTypeInfo V8${implClassName}Constructor::info = { V8${implClassName}Constructor::GetTemplate, V8${implClassName}::derefObject, V8${implClassName}::toActiveDOMObject, 0, V8${implClassName}::installPerContextPrototypeProperties, 0, WrapperTypeObjectPrototype };
-
-END
-    } else {
-        push(@implContent, <<END);
-WrapperTypeInfo V8${implClassName}Constructor::info = { V8${implClassName}Constructor::GetTemplate, 0, 0, 0, V8${implClassName}::installPerContextPrototypeProperties, 0, WrapperTypeObjectPrototype };
-
-END
+        $toActiveDOMObject = "V8${implClassName}::toActiveDOMObject";
     }
-
     AddToImplIncludes("Frame.h");
+
     push(@implContent, <<END);
+WrapperTypeInfo V8${implClassName}Constructor::info = { V8${implClassName}Constructor::GetTemplate, V8${implClassName}::derefObject, ${toActiveDOMObject}, 0, V8${implClassName}::installPerContextPrototypeProperties, 0, WrapperTypeObjectPrototype };
+
 static v8::Handle<v8::Value> V8${implClassName}ConstructorCallback(const v8::Arguments& args)
 {
     INC_STATS("DOM.${implClassName}.Constructor");
@@ -2134,11 +2119,10 @@ END
         push(@implContent, "        goto fail;\n");
     }
 
-    my $DOMObject = GetDomMapName($dataNode, $implClassName);
     push(@implContent, <<END);
 
     V8DOMWrapper::setDOMWrapper(wrapper, &V8${implClassName}Constructor::info, impl.get());
-    V8DOMWrapper::setJSWrapperFor${DOMObject}(impl.release(), wrapper, args.GetIsolate());
+    V8DOMWrapper::setJSWrapperForDOMObject(impl.release(), wrapper, args.GetIsolate());
     return wrapper;
 END
 
@@ -3402,7 +3386,6 @@ sub GenerateToV8Converters
     my $className = shift;
     my $nativeType = shift;
 
-    my $domMapName = GetDomMapName($dataNode, $interfaceName);
     my $wrapSlowArgumentType = GetPassRefPtrType($nativeType);
     my $baseType = BaseInterfaceName($dataNode);
 
@@ -3463,30 +3446,12 @@ END
         return wrapper;
 
     installPerContextProperties(wrapper, impl.get());
-    v8::Persistent<v8::Object> wrapperHandle = V8DOMWrapper::setJSWrapperFor${domMapName}(impl, wrapper, isolate);
+    v8::Persistent<v8::Object> wrapperHandle = V8DOMWrapper::setJSWrapperForDOMObject(impl, wrapper, isolate);
     if (!hasDependentLifetime)
         wrapperHandle.MarkIndependent();
     return wrapper;
 }
 END
-}
-
-sub GetDomMapFunction
-{
-    my $dataNode = shift;
-    my $interfaceName = shift;
-    my $getIsolate = shift;
-
-    return "get" . GetDomMapName($dataNode, $interfaceName) . "Map(" . $getIsolate . ")";
-}
-
-sub GetDomMapName
-{
-    my $dataNode = shift;
-    my $type = shift;
-
-    return "DOMNode" if IsNodeSubType($dataNode);
-    return "DOMObject";
 }
 
 sub GetNativeTypeForConversions
@@ -3757,17 +3722,6 @@ sub TranslateParameter
     if ($signature->type eq "TimeoutHandler") {
       $signature->type("DOMString");
     }
-}
-
-sub TypeCanFailConversion
-{
-    my $signature = shift;
-
-    my $type = GetTypeFromSignature($signature);
-
-    AddToImplIncludes("ExceptionCode.h") if $type eq "Attr";
-    return 1 if $type eq "Attr";
-    return 0;
 }
 
 sub JSValueToNative

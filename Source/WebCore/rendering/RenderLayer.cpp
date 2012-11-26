@@ -1885,10 +1885,27 @@ void RenderLayer::scrollRectToVisible(const LayoutRect& rect, const ScrollAlignm
         frameView->resumeScheduledEvents();
 }
 
+#if USE(ACCELERATED_COMPOSITING)
+static FrameView* frameViewFromLayer(const RenderLayer* layer)
+{
+    Frame* frame = layer->renderer()->frame();
+    if (!frame)
+        return 0;
+
+    return frame->view();
+}
+#endif
+
 void RenderLayer::updateCompositingLayersAfterScroll()
 {
 #if USE(ACCELERATED_COMPOSITING)
     if (compositor()->inCompositingMode()) {
+        // If we're in the middle of layout, we'll just update compositiong once layout has finished.
+        if (FrameView* frameView = frameViewFromLayer(this)) {
+            if (frameView->isInLayout())
+                return;
+        }
+
         // Our stacking context is guaranteed to contain all of our descendants that may need
         // repositioning, so update compositing layers from there.
         if (RenderLayer* compositingAncestor = stackingContext()->enclosingCompositingLayer()) {
@@ -2040,7 +2057,7 @@ void RenderLayer::resize(const PlatformMouseEvent& evt, const LayoutSize& oldOff
             styledElement->setInlineStyleProperty(CSSPropertyMarginLeft, String::number(renderer->marginLeft() / zoomFactor) + "px", false);
             styledElement->setInlineStyleProperty(CSSPropertyMarginRight, String::number(renderer->marginRight() / zoomFactor) + "px", false);
         }
-        LayoutUnit baseWidth = renderer->width() - (isBoxSizingBorder ? ZERO_LAYOUT_UNIT : renderer->borderAndPaddingWidth());
+        LayoutUnit baseWidth = renderer->width() - (isBoxSizingBorder ? LayoutUnit() : renderer->borderAndPaddingWidth());
         baseWidth = baseWidth / zoomFactor;
         styledElement->setInlineStyleProperty(CSSPropertyWidth, String::number(roundToInt(baseWidth + difference.width())) + "px", false);
     }
@@ -2051,7 +2068,7 @@ void RenderLayer::resize(const PlatformMouseEvent& evt, const LayoutSize& oldOff
             styledElement->setInlineStyleProperty(CSSPropertyMarginTop, String::number(renderer->marginTop() / zoomFactor) + "px", false);
             styledElement->setInlineStyleProperty(CSSPropertyMarginBottom, String::number(renderer->marginBottom() / zoomFactor) + "px", false);
         }
-        LayoutUnit baseHeight = renderer->height() - (isBoxSizingBorder ? ZERO_LAYOUT_UNIT : renderer->borderAndPaddingHeight());
+        LayoutUnit baseHeight = renderer->height() - (isBoxSizingBorder ? LayoutUnit() : renderer->borderAndPaddingHeight());
         baseHeight = baseHeight / zoomFactor;
         styledElement->setInlineStyleProperty(CSSPropertyHeight, String::number(roundToInt(baseHeight + difference.height())) + "px", false);
     }
@@ -5128,7 +5145,7 @@ FilterOperations RenderLayer::computeFilterOperations(const RenderStyle* style)
                 continue;
 
             RefPtr<ValidatedCustomFilterOperation> validatedOperation = ValidatedCustomFilterOperation::create(validatedProgram.release(), 
-                customOperation->parameters(), customOperation->meshRows(), customOperation->meshColumns(), customOperation->meshType());
+                customOperation->parameters(), customOperation->meshRows(), customOperation->meshColumns(), customOperation->meshBoxType(), customOperation->meshType());
             outputFilters.operations().append(validatedOperation.release());
             continue;
         }
@@ -5170,7 +5187,12 @@ void RenderLayer::updateOrRemoveFilterEffectRenderer()
         // for loading CSS shader files.
         if (RenderLayerFilterInfo* filterInfo = this->filterInfo())
             filterInfo->setRenderer(0);
-        return;
+
+        // Early-return only if we *don't* have reference filters.
+        // For reference filters, we still want the FilterEffect graph built
+        // for us, even if we're composited.
+        if (!renderer()->style()->filter().hasReferenceFilter())
+            return;
     }
     
     RenderLayerFilterInfo* filterInfo = ensureFilterInfo();

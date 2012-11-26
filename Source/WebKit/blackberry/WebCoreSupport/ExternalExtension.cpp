@@ -46,7 +46,7 @@ static JSValueRef addSearchProviderMethod(
 
     // Double check if page chrome client exists
     Frame* frame = reinterpret_cast<Frame*>(JSObjectGetPrivate(thisObject));
-    if (!frame) {
+    if (frame) {
         Page* page = frame->page();
         if (!page || !page->chrome())
             return jsRetVal;
@@ -75,7 +75,7 @@ static JSValueRef IsSearchProviderInstalledMethod(
 
     // Double check if page chrome client exists
     Frame* frame = reinterpret_cast<Frame*>(JSObjectGetPrivate(thisObject));
-    if (!frame) {
+    if (frame) {
         Page* page = frame->page();
         if (!page || !page->chrome())
             return jsRetVal;
@@ -108,8 +108,8 @@ static void externalExtensionFinalize(JSObjectRef object)
 }
 
 static JSStaticFunction externalExtensionStaticFunctions[] = {
-    { "addSearchProvider", addSearchProviderMethod, kJSPropertyAttributeNone },
-    { "isSearchProviderInstalled", IsSearchProviderInstalledMethod, kJSPropertyAttributeReadOnly },
+    { "AddSearchProvider", addSearchProviderMethod, kJSPropertyAttributeNone },
+    { "IsSearchProviderInstalled", IsSearchProviderInstalledMethod, kJSPropertyAttributeReadOnly },
     { 0, 0, 0 }
 };
 

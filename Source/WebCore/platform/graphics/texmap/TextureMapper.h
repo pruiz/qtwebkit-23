@@ -50,6 +50,7 @@
 
 namespace WebCore {
 
+class BitmapTexturePool;
 class TextureMapper;
 
 // A 2D texture that can be the target of software or GL rendering.
@@ -118,7 +119,7 @@ public:
     typedef unsigned PaintFlags;
 
     static PassOwnPtr<TextureMapper> create(AccelerationMode newMode = SoftwareMode);
-    virtual ~TextureMapper() { }
+    virtual ~TextureMapper();
 
     enum ExposedEdges {
         NoEdges = 0,
@@ -153,15 +154,10 @@ public:
 
     virtual IntSize maxTextureSize() const { return IntSize(INT_MAX, INT_MAX); }
 
-    // A surface is released implicitly when dereferenced.
     virtual PassRefPtr<BitmapTexture> acquireTextureFromPool(const IntSize&);
 
 protected:
-    TextureMapper(AccelerationMode accelerationMode)
-        : m_interpolationQuality(InterpolationDefault)
-        , m_textDrawingMode(TextModeFill)
-        , m_accelerationMode(accelerationMode)
-    {}
+    TextureMapper(AccelerationMode);
 
 private:
 #if USE(TEXTURE_MAPPER_GL)
@@ -174,7 +170,7 @@ private:
 #endif
     InterpolationQuality m_interpolationQuality;
     TextDrawingModeFlags m_textDrawingMode;
-    Vector<RefPtr<BitmapTexture> > m_texturePool;
+    OwnPtr<BitmapTexturePool> m_texturePool;
     GraphicsContext* m_context;
     AccelerationMode m_accelerationMode;
 };

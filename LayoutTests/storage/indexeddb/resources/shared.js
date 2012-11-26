@@ -64,9 +64,9 @@ function unexpectedCompleteCallback()
     finishJSTest();
 }
 
-function unexpectedBlockedCallback()
+function unexpectedBlockedCallback(e)
 {
-    testFailed("onblocked called unexpectedly");
+    testFailed("onblocked called unexpectedly. oldVersion = " + e.oldVersion + ", newVersion = " + e.newVersion);
     finishJSTest();
 }
 
@@ -201,5 +201,7 @@ function indexedDBTest(upgradeCallback, optionalOpenCallback, optionalParameters
         if (optionalOpenCallback)
             openRequest.onsuccess = optionalOpenCallback;
         delete self.openRequest;
+        if (optionalParameters && 'runAfterOpen' in optionalParameters)
+            (optionalParameters['runAfterOpen'])();
     };
 }

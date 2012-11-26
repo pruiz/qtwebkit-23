@@ -88,7 +88,8 @@ webkit.org/b/100272 [ Debug ] fast/media/w3c/test_media_queries.html [ Pass Slow
 webkit.org/b/70878 [ Linux Debug ] http/tests/xmlhttprequest/xmlhttprequest-test-send-flag.html [ Pass Slow ]
 webkit.org/b/102179 [ Win Debug ] platform/chromium/virtual/gpu/fast/hidpi/image-set-without-specified-width.html [ Pass Slow ]
 webkit.org/b/102463 [ Win Debug ] fast/forms/validation-message-appearance.html [ Pass ImageOnlyFailure ]
-webkit.org/b/102464 [ Debug ] fast/images/webgl-teximage2d.html [ Pass Slow ]
+webkit.org/b/102464 [ Debug ] fast/images/webgl-teximage2d.html [ Pass Timeout ]
+webkit.org/b/102464 [ Debug ] platform/chromium/virtual/deferred/fast/images/webgl-teximage2d.html [ Pass Timeout ]
 
 # These tests started being slow when we switched to DRT.
 webkit.org/b/90488 [ Linux Win Debug ] inspector [ Pass Slow ]
@@ -170,6 +171,12 @@ webkit.org/b/63933 fast/canvas/canvas-webkitLineDash.html [ Failure ]
 webkit.org/b/63933 fast/canvas/canvas-webkitLineDash-invalid.html [ Failure ]
 webkit.org/b/63933 platform/chromium/virtual/gpu/fast/canvas/canvas-webkitLineDash.html [ Failure ]
 webkit.org/b/63933 platform/chromium/virtual/gpu/fast/canvas/canvas-webkitLineDash-invalid.html [ Failure ]
+
+# Overflowing LayoutUnits cause RenderGeometryMap assertions 
+webkit.org/b/67434 [ Debug ] fast/overflow/overflow-height-float-not-removed-crash.html [ Skip ] 
+webkit.org/b/67434 [ Debug ] fast/overflow/overflow-height-float-not-removed-crash2.html [ Skip ] 
+webkit.org/b/67434 [ Debug ] fast/overflow/overflow-height-float-not-removed-crash3.html [ Skip ] 
+webkit.org/b/67434 [ Debug ] fast/block/float/overhanging-tall-block.html [ Skip ] 
 
 # Microdata DOM API is not yet enabled.
 webkit.org/b/68610 fast/dom/MicroData
@@ -982,9 +989,6 @@ crbug.com/24197 fast/css/disabled-author-styles.html
 
 # Test itself passes, but causes subsequent tests to fail.
 webkit.org/b/83260 fast/text/international/embed-bidi-style-in-isolate-crash.html
-
-# The test needs to be reworked to work with sub-pixel layout before being rebaselined.
-webkit.org/b/58898 fast/block/float/overhanging-tall-block.html [ Failure ]
 
 # New test added that needs platform specific results
 webkit.org/b/98452 [ Linux Win ] fast/text/vertical-rl-rtl-linebreak.html [ Failure ]
@@ -2821,6 +2825,11 @@ webkit.org/b/96720 fast/forms/time-multiple-fields/time-multiple-fields-preserve
 webkit.org/b/96720 fast/forms/date-multiple-fields/date-multiple-fields-preserve-value-after-history-back.html [ Pass Timeout ]
 webkit.org/b/98906 platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-mouse-operations.html [ Pass Failure ]
 
+# Needs rebaseline
+webkit.org/b/99421 platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl.html [ Pass ImageOnlyFailure Missing ]
+webkit.org/b/99421 platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-with-scroll-bar.html [ Pass ImageOnlyFailure Missing ]
+webkit.org/b/99421 platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance.html [ Pass ImageOnlyFailure Missing ]
+
 # New test added in r87324
 crbug.com/83994 [ Win ] platform/win/plugins/call-javascript-that-destroys-plugin.html [ Failure ]
 
@@ -3627,7 +3636,7 @@ webkit.org/b/91255 [ Lion ] fast/multicol/table-vertical-align.html [ Failure ]
 webkit.org/b/91372 [ Win ] css2.1/20110323/vertical-align-boxes-001.htm [ ImageOnlyFailure ]
 
 # Fails on Win
-webkit.org/b/93624 [ Win Release ] inspector/console/console-format-collections.html [ Failure Pass ]
+webkit.org/b/93624 [ Win Linux ] inspector/console/console-format-collections.html [ Failure Pass ]
 
 # Started failing around r122770
 webkit.org/b/91445 [ Linux ] plugins/embed-attributes-style.html [ ImageOnlyFailure Pass ]
@@ -4112,6 +4121,10 @@ webkit.org/b/79446 svg/repaint/image-with-clip-path.svg [ Pass ImageOnlyFailure 
 webkit.org/b/100142 css3/filters/effect-reference-hw.html [ Failure ImageOnlyFailure ]
 webkit.org/b/100142 css3/filters/effect-reference-ordering-hw.html [ Failure ImageOnlyFailure Missing ]
 
+# Only ready for JSC so far, not fixed in v8 yet.
+webkit.org/b/97499 http/tests/security/script-crossorigin-onerror-information.html [ Failure ]
+webkit.org/b/97499 http/tests/security/script-no-crossorigin-onerror-should-be-sanitized.html [ Failure ]
+
 # This test is probably either Failure or ImageOnlyFailure depending on which fonts are installed.
 webkit.org/b/99749 [ MountainLion ] fast/text/midword-break-before-surrogate-pair.html [ Failure ImageOnlyFailure ]
 
@@ -4166,3 +4179,8 @@ webkit.org/b/102277 fast/events/overflow-scroll-fake-mouse-move.html [ Pass Text
 webkit.org/b/102294 platform/chromium/virtual/deferred/fast/images/exif-orientation.html [ ImageOnlyFailure ]
 webkit.org/b/102294 platform/chromium/virtual/deferred/fast/images/exif-orientation-css.html [ ImageOnlyFailure ]
 webkit.org/b/102294 platform/chromium/virtual/deferred/fast/images/gray-scale-jpeg-with-color-profile.html [ ImageOnlyFailure ]
+
+# This test is consistently leaking state into the next test.
+webkit.org/b/85522 http/tests/security/sandboxed-iframe-form-top.html [ Skip ]
+webkit.org/b/102542 [ Win7 ] platform/chromium/virtual/softwarecompositing/checkerboard.html [ Image ]
+webkit.org/b/102542 [ Linux Mac Win ] compositing/checkerboard.html [ Image ]

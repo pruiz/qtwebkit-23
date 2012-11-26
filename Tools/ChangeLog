@@ -1,3 +1,250 @@
+2012-11-19  Kentaro Hara  <haraken@chromium.org>
+
+        Remove IDLStructure.pm
+        https://bugs.webkit.org/show_bug.cgi?id=102642
+
+        Reviewed by Adam Barth.
+
+        Previously IDLStructure.pm was full of regular expressions to
+        parse IDL files. Now a new IDL parser is implemented, IDLStructure.pm
+        just contains several data structures for the IDL parser. We can
+        move them to IDLParser.pm and thus remove IDLStructure.pm.
+
+        No tests. No change in generated code.
+
+        * WebKitTestRunner/DerivedSources.make:
+        * WebKitTestRunner/GNUmakefile.am:
+        * WebKitTestRunner/InjectedBundle/DerivedSources.pri:
+
+2012-11-18  KyungTae Kim  <ktf.kim@samsung.com>
+
+        [EFL] Not to include "ewk_view_private.h" in Tools
+        https://bugs.webkit.org/show_bug.cgi?id=102644
+
+        Reviewed by Gyuyoung Kim.
+
+        Include ewk_view.h instead of ewk_view_private.h in Tools
+
+        * DumpRenderTree/efl/PixelDumpSupportEfl.cpp:
+
+2012-11-18  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r135104.
+        http://trac.webkit.org/changeset/135104
+        https://bugs.webkit.org/show_bug.cgi?id=102638
+
+        Should not use commit queue to add people to committer list.
+        (Requested by ap_ on #webkit).
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-18  Vivek Galatage  <vivek.vg@samsung.com>
+
+        Add myself to committers.py
+        https://bugs.webkit.org/show_bug.cgi?id=102636
+
+        Reviewed by Laszlo Gombos.
+
+        Add myself to committers.py
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-18  Genevieve Mak  <gmak@rim.com>
+
+        [BlackBerry] Enable Touch Sliders
+        https://bugs.webkit.org/show_bug.cgi?id=102516
+
+        Reviewed by Rob Buis.
+
+        Enabled for BlackBerry only
+        PR #242781
+        PR #176014
+
+        * Scripts/webkitperl/FeatureList.pm:
+
+2012-11-17  Dimitri Glazkov  <dglazkov@chromium.org>
+
+        Remove unused code I wrote a long time ago from gardeningserver.py
+        https://bugs.webkit.org/show_bug.cgi?id=102605
+
+        Reviewed by Adam Barth.
+
+        * Scripts/webkitpy/tool/servers/gardeningserver.py: Removed.
+        * Scripts/webkitpy/tool/servers/gardeningserver_unittest.py: Removed.
+
+2012-11-16  Tony Chang  <tony@chromium.org>
+
+        Remove ENABLE_CSS_HIERARCHIES since it's no longer in use
+        https://bugs.webkit.org/show_bug.cgi?id=102554
+
+        Reviewed by Andreas Kling.
+
+        As mentioned in https://bugs.webkit.org/show_bug.cgi?id=79939#c41 ,
+        we're going to revist this feature once additional vendor support is
+        achieved.
+
+        * Scripts/webkitperl/FeatureList.pm:
+
+2012-11-16  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] move stubs from DRTTestRunner to TestRunner
+        https://bugs.webkit.org/show_bug.cgi?id=102489
+
+        Reviewed by Adam Barth.
+
+        This is part of moving all methods from DRTTestRunner to TestRunner.
+        Instead of keeping one stub per method, I'm using a shared stub to
+        clean up the code.
+
+        * DumpRenderTree/chromium/DRTTestRunner.cpp:
+        (DRTTestRunner::DRTTestRunner):
+        * DumpRenderTree/chromium/DRTTestRunner.h:
+        (DRTTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/TestRunner.cpp:
+        (WebTestRunner::TestRunner::TestRunner):
+        (WebTestRunner):
+        (WebTestRunner::TestRunner::fallbackMethod):
+        (WebTestRunner::TestRunner::notImplemented):
+        * DumpRenderTree/chromium/TestRunner/src/TestRunner.h:
+        (WebTestRunner):
+        (TestRunner):
+        (WebTestRunner::TestRunner::setDelegate):
+        * DumpRenderTree/chromium/TestShell.cpp:
+        (TestShell::createMainWindow):
+        (TestShell::~TestShell):
+
+2012-11-16  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] fake drag drop operations in the WebTestProxyBase instead of the WebViewHost
+        https://bugs.webkit.org/show_bug.cgi?id=102495
+
+        Reviewed by Adam Barth.
+
+        When a drag operation is initiated in a layout test, we need to
+        simulate a corresponding drop event, otherwise the WebViewImpl will sit
+        there waiting for it. Instead of having the embedder taking care of
+        this, move this into the TestRunner library.
+
+        * DumpRenderTree/chromium/TestRunner/public/WebTestProxy.h:
+        (WebKit):
+        (WebTestProxyBase):
+        (WebTestRunner::WebTestProxy::startDragging):
+        * DumpRenderTree/chromium/TestRunner/src/WebTestProxy.cpp:
+        (WebTestRunner::WebTestProxyBase::startDragging):
+        (WebTestRunner):
+        * DumpRenderTree/chromium/WebViewHost.cpp:
+        * DumpRenderTree/chromium/WebViewHost.h:
+        (WebViewHost):
+
+2012-11-16  Tien-Ren Chen  <trchen@chromium.org>
+
+        Rename applyDefaultDeviceScaleFactorInCompositor to setApplyDeviceScaleFactorInCompositor
+        https://bugs.webkit.org/show_bug.cgi?id=102462
+
+        Reviewed by James Robinson.
+
+        As we no longer have this "default" device scale factor.
+
+        * DumpRenderTree/chromium/WebPreferences.cpp:
+        (WebPreferences::applyTo):
+
+2012-11-15  Takashi Sakamoto  <tasak@google.com>
+
+        [Win] key event's location does not work on Windows platform.
+        https://bugs.webkit.org/show_bug.cgi?id=89742
+
+        Reviewed by Brent Fulgham.
+
+        Modified keyDownCallback to use lparam to specify left-hand keys or
+        right-hand keys.
+
+        * DumpRenderTree/win/EventSender.cpp:
+        (makeKeyDataForScanCode):
+        Given a virtual keycode, generate scancode and extended key bit of
+        lparam.
+        (keyDownCallback):
+        Use lparam for left-hand and right-hand keys, because Windows doesn't
+        directly provide a virtual keycode which distinguishes between
+        left-hand and right-hand. For example, when control key is pressed,
+        wparam has VK_CONTROL, neither VK_RCONTROL nor VK_LCONTROL.
+
+2012-11-16  Tommy Widenflycht  <tommyw@google.com>
+
+        [chromium] MediaStream API: Add missing WebRTCPeerConnectionHandlerClient::didAddRemoteDataChannel
+        https://bugs.webkit.org/show_bug.cgi?id=102386
+
+        Reviewed by Adam Barth.
+
+        Adding mock data channel functionality.
+
+        * DumpRenderTree/chromium/MockWebRTCPeerConnectionHandler.cpp:
+        (MockWebRTCPeerConnectionHandler::openDataChannel):
+
+2012-11-16  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] delete unused testRunner methods
+        https://bugs.webkit.org/show_bug.cgi?id=102479
+
+        Reviewed by Adam Barth.
+
+        These methods aren't used by any layout test. Remove them to avoid bit rot
+
+        * DumpRenderTree/chromium/DRTTestRunner.cpp:
+        (DRTTestRunner::DRTTestRunner):
+        (DRTTestRunner::reset):
+        * DumpRenderTree/chromium/DRTTestRunner.h:
+        (DRTTestRunner):
+        * DumpRenderTree/chromium/WebViewHost.cpp:
+        (WebViewHost::shouldBeginEditing):
+        (WebViewHost::shouldEndEditing):
+        (WebViewHost::shouldInsertNode):
+        (WebViewHost::shouldInsertText):
+        (WebViewHost::shouldChangeSelectedRange):
+        (WebViewHost::shouldDeleteRange):
+        (WebViewHost::shouldApplyStyle):
+        (WebViewHost::startDragging):
+        (WebViewHost::enterFullScreenNow):
+        (WebViewHost::exitFullScreenNow):
+
+2012-11-15  Alexey Proskuryakov  <ap@apple.com>
+
+        Private Browsing is a per-page setting that sets a global value
+        https://bugs.webkit.org/show_bug.cgi?id=67870
+
+        Reviewed by Sam Weinig.
+
+        * DumpRenderTree/mac/DumpRenderTree.mm: (setDefaultsToConsistentValuesForTesting):
+        Call _switchNetworkLoaderToNewTestingSession before making other settings, so that
+        they would actually apply to the testing session.
+
+        * WebKitTestRunner/InjectedBundle/InjectedBundle.cpp:
+        (WTR::InjectedBundle::initialize):
+        (WTR::InjectedBundle::beginTesting):
+        Only call WKBundleSwitchNetworkLoaderToNewTestingSession once per process, matching
+        WebKit1. I'm not fully sure what is going wrong, but apparently creating mutiple
+        sessions with the same identifier doesn't quite work.
+
+2012-11-16  Yael Aharon  <yael.aharon@intel.com>
+
+        Unreviewed. Help bugzilla find me.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-16  Peter Beverloo  <peter@chromium.org>
+
+        Running TestWebKitAPI and webkit_unit_tests for Chromium Android should defer to the Chromium-sided test runner
+        https://bugs.webkit.org/show_bug.cgi?id=102245
+
+        Reviewed by Tony Chang.
+
+        When running TestWebKitAPI and webkit_unit_test for Chromium Android, defer
+        the actual running part to the test runner which lives on the Chromium side.
+        Re-implementing or even generalizing the device-interaction part in WebKit
+        is error prone and not worth the effort.
+
+        * Scripts/run-api-tests:
+        * Scripts/run-chromium-webkit-unit-tests:
+
 2012-11-15  Yury Semikhatsky  <yurys@chromium.org>
 
         Memory instrumentation: add code for reporting stack traces of unknown instrumented objects

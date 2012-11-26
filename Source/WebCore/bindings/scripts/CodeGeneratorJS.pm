@@ -32,7 +32,6 @@ use constant FileNamePrefix => "JS";
 
 my $codeGenerator;
 
-my $module = "";
 my $outputDir = "";
 my $writeDependencies = 0;
 
@@ -169,15 +168,6 @@ END
     return JSValue::encode(jsUndefined());
 END
     return @GenerateEventListenerImpl;
-}
-
-# Params: 'idlDocument' struct
-sub GenerateModule
-{
-    my $object = shift;
-    my $dataNode = shift;
-
-    $module = $dataNode->module;
 }
 
 sub GetParentClassName
@@ -408,7 +398,7 @@ sub GenerateGetOwnPropertySlotBody
 
     my @getOwnPropertySlotImpl = ();
 
-    if ($interfaceName eq "NamedNodeMap" or $interfaceName eq "HTMLCollection" or $interfaceName eq "HTMLAllCollection" or $interfaceName eq "HTMLPropertiesCollection") {
+    if ($interfaceName eq "NamedNodeMap" or $interfaceName =~ /^HTML\w*Collection$/) {
         push(@getOwnPropertySlotImpl, "    ${namespaceMaybe}JSValue proto = thisObject->prototype();\n");
         push(@getOwnPropertySlotImpl, "    if (proto.isObject() && jsCast<${namespaceMaybe}JSObject*>(asObject(proto))->hasProperty(exec, propertyName))\n");
         push(@getOwnPropertySlotImpl, "        return false;\n\n");
@@ -500,7 +490,7 @@ sub GenerateGetOwnPropertyDescriptorBody
         push(@implContent, "        return false;\n");
     }
     
-    if ($interfaceName eq "NamedNodeMap" or $interfaceName eq "HTMLCollection" or $interfaceName eq "HTMLAllCollection" or $interfaceName eq "HTMLPropertiesCollection") {
+    if ($interfaceName eq "NamedNodeMap" or $interfaceName =~ /^HTML\w*Collection$/) {
         push(@getOwnPropertyDescriptorImpl, "    ${namespaceMaybe}JSValue proto = thisObject->prototype();\n");
         push(@getOwnPropertyDescriptorImpl, "    if (proto.isObject() && jsCast<${namespaceMaybe}JSObject*>(asObject(proto))->hasProperty(exec, propertyName))\n");
         push(@getOwnPropertyDescriptorImpl, "        return false;\n\n");
@@ -1051,7 +1041,13 @@ sub GenerateHeader
         GetCustomIsReachable($dataNode) ||
         $dataNode->extendedAttributes->{"JSCustomFinalize"} ||
         $dataNode->extendedAttributes->{"ActiveDOMObject"}) {
-        push(@headerContent, "class JS${implClassName}Owner : public JSC::WeakHandleOwner {\n");
+        if ($implClassName ne "Node" && $codeGenerator->IsSubType($dataNode, "Node")) {
+            $headerIncludes{"JSNode.h"} = 1;
+            push(@headerContent, "class JS${implClassName}Owner : public JSNodeOwner {\n");
+        } else {
+            push(@headerContent, "class JS${implClassName}Owner : public JSC::WeakHandleOwner {\n");
+        }
+        push(@headerContent, "public:\n");
         push(@headerContent, "    virtual bool isReachableFromOpaqueRoots(JSC::Handle<JSC::Unknown>, void* context, JSC::SlotVisitor&);\n");
         push(@headerContent, "    virtual void finalize(JSC::Handle<JSC::Unknown>, void* context);\n");
         push(@headerContent, "};\n");
@@ -1419,7 +1415,7 @@ sub GenerateImplementation
     my $hasParent = $hasLegacyParent || $hasRealParent;
     my $parentClassName = GetParentClassName($dataNode);
     my $visibleInterfaceName = $codeGenerator->GetVisibleInterfaceName($dataNode);
-    my $eventTarget = $dataNode->extendedAttributes->{"EventTarget"} || $codeGenerator->IsStrictSubtype($dataNode, "EventTarget");
+    my $eventTarget = $dataNode->extendedAttributes->{"EventTarget"} || ($codeGenerator->IsSubType($dataNode, "EventTarget") && $dataNode->name ne "EventTarget");
     my $needsMarkChildren = $dataNode->extendedAttributes->{"JSCustomMarkFunction"} || $dataNode->extendedAttributes->{"EventTarget"} || $dataNode->name eq "EventTarget";
 
     # - Add default header template
@@ -2434,7 +2430,7 @@ sub GenerateImplementation
             push(@implContent, "    return toJS(exec, thisObj->globalObject(), static_cast<$implClassName*>(thisObj->impl())->item(index));\n");
         }
         push(@implContent, "}\n\n");
-        if ($interfaceName eq "HTMLCollection" or $interfaceName eq "HTMLAllCollection" or $interfaceName eq "RadioNodeList") {
+        if ($interfaceName =~ /^HTML\w*Collection$/ or $interfaceName eq "RadioNodeList") {
             $implIncludes{"JSNode.h"} = 1;
             $implIncludes{"Node.h"} = 1;
         }
@@ -2450,7 +2446,7 @@ sub GenerateImplementation
         push(@implContent, "        return jsNaN();\n");
         push(@implContent, "    return JSValue(result);\n");
         push(@implContent, "}\n\n");
-        if ($interfaceName eq "HTMLCollection" or $interfaceName eq "HTMLAllCollection") {
+        if ($interfaceName =~ /^HTML\w*Collection$/) {
             $implIncludes{"JSNode.h"} = 1;
             $implIncludes{"Node.h"} = 1;
         }
@@ -2494,6 +2490,10 @@ sub GenerateImplementation
         # check below the isObservable check.
         if ($dataNode->extendedAttributes->{"ActiveDOMObject"}) {
             push(@implContent, "    if (js${implClassName}->impl()->hasPendingActivity())\n");
+            push(@implContent, "        return true;\n");
+        }
+        if ($codeGenerator->IsSubType($dataNode, "Node")) {
+            push(@implContent, "    if (JSNodeOwner::isReachableFromOpaqueRoots(handle, 0, visitor))\n");
             push(@implContent, "        return true;\n");
         }
         push(@implContent, "    if (!isObservable(js${implClassName}))\n");
@@ -2593,13 +2593,8 @@ sub GenerateCallWith
     if ($function and $codeGenerator->ExtendedAttributeContains($callWith, "ScriptArguments")) {
         push(@$outputArray, "    RefPtr<ScriptArguments> scriptArguments(createScriptArguments(exec, " . @{$function->parameters} . "));\n");
         $implIncludes{"ScriptArguments.h"} = 1;
-        push(@callWithArgs, "scriptArguments");
-    }
-    if ($codeGenerator->ExtendedAttributeContains($callWith, "CallStack")) {
-        push(@$outputArray, "    RefPtr<ScriptCallStack> callStack(createScriptCallStackForConsole(exec));\n");
-        $implIncludes{"ScriptCallStack.h"} = 1;
         $implIncludes{"ScriptCallStackFactory.h"} = 1;
-        push(@callWithArgs, "callStack");
+        push(@callWithArgs, "scriptArguments.release()");
     }
     return @callWithArgs;
 }

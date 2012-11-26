@@ -359,6 +359,7 @@ IDL_BINDINGS += \
     $$PWD/html/HTMLEmbedElement.idl \
     $$PWD/html/HTMLFieldSetElement.idl \
     $$PWD/html/HTMLFontElement.idl \
+    $$PWD/html/HTMLFormControlsCollection.idl \
     $$PWD/html/HTMLFormElement.idl \
     $$PWD/html/HTMLFrameElement.idl \
     $$PWD/html/HTMLFrameSetElement.idl \
@@ -768,7 +769,6 @@ generateBindings.depends = ${QMAKE_FUNC_FILE_OUT_PATH}/$$SUPPLEMENTAL_DEPENDENCY
                            $$PWD/bindings/scripts/CodeGenerator.pm \
                            $$PWD/bindings/scripts/CodeGeneratorJS.pm \
                            $$PWD/bindings/scripts/IDLParser.pm \
-                           $$PWD/bindings/scripts/IDLStructure.pm \
                            $$PWD/bindings/scripts/InFilesParser.pm \
                            $$PWD/bindings/scripts/preprocessor.pm
 GENERATORS += generateBindings

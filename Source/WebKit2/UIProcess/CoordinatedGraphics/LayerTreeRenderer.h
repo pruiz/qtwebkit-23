@@ -38,6 +38,11 @@
 #include <wtf/HashSet.h>
 #include <wtf/ThreadingPrimitives.h>
 
+namespace WebCore {
+class CustomFilterProgram;
+class CustomFilterProgramInfo;
+}
+
 namespace WebKit {
 
 class CoordinatedBackingStore;
@@ -84,6 +89,11 @@ public:
 #if ENABLE(CSS_FILTERS)
     void setLayerFilters(WebLayerID, const WebCore::FilterOperations&);
 #endif
+#if ENABLE(CSS_SHADERS)
+    void injectCachedCustomFilterPrograms(const WebCore::FilterOperations& filters) const;
+    void createCustomFilterProgram(int id, const WebCore::CustomFilterProgramInfo&);
+    void removeCustomFilterProgram(int id);
+#endif
 
     void createTile(WebLayerID, int, float scale);
     void removeTile(WebLayerID, int);
@@ -94,6 +104,8 @@ public:
     void removeImageBacking(CoordinatedImageBackingID);
     void setLayerAnimations(WebLayerID, const WebCore::GraphicsLayerAnimations&);
     void setAnimationsLocked(bool);
+    void setBackgroundColor(const WebCore::Color&);
+    void setDrawsBackground(bool enable) { m_setDrawsBackground = enable; }
 
 #if ENABLE(REQUEST_ANIMATION_FRAME)
     void requestAnimationFrame();
@@ -167,6 +179,13 @@ private:
     bool m_animationFrameRequested;
 #endif
     WebCore::TextureMapper::AccelerationMode m_accelerationMode;
+    WebCore::Color m_backgroundColor;
+    bool m_setDrawsBackground;
+
+#if ENABLE(CSS_SHADERS)
+    typedef HashMap<int, RefPtr<WebCore::CustomFilterProgram> > CustomFilterProgramMap;
+    CustomFilterProgramMap m_customFilterPrograms;
+#endif
 };
 
 };

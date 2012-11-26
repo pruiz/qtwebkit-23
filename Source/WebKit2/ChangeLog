@@ -1,3 +1,699 @@
+2012-11-19  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        [GTK] Test /webkit2/WebKitWebView/create-ready-close is failing after r134586
+        https://bugs.webkit.org/show_bug.cgi?id=102668
+
+        Reviewed by Philippe Normand.
+
+        Check only that window properties match when creating a new window
+        if the expected window properties has been set. Also remove a
+        FIXME and actually check that x and y are equal to the expected
+        one, now that the issue is fixed.
+
+        * UIProcess/API/gtk/tests/TestWebKitWebView.cpp:
+
+2012-11-19  Balazs Kelemen  <kbalazs@webkit.org>
+
+        Unreviewed buildfix.
+
+        Fix -Wdelete-non-virtual-destructor error with gcc 4.7 after r135056.
+
+        * Shared/CoordinatedGraphics/WebCustomFilterProgramProxy.h:
+        (WebCustomFilterProgramProxy): This is a polymorphic derived class
+        so the destructor should be virtual.
+
+2012-11-19  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [CG][WK2] Assertion in CoordinatedGraphicsLayer::setContentsToImage(WebCore::Image*)
+        https://bugs.webkit.org/show_bug.cgi?id=102652
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Handle null return of nativeImageForCurrentFrame similarly to Chromium
+        port in r130610. This can happen if there is an error early in the
+        decoding of an image.
+
+        Test: Already covered by compositing/images/truncated-direct-png-image.html
+
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::setContentsToImage):
+
+2012-11-18  Jaehun Lim  <ljaehun.lim@samsung.com>
+
+        [EFL][WK2] Remove underscore characters in Ewk class names.
+        https://bugs.webkit.org/show_bug.cgi?id=102641
+
+        Reviewed by Gyuyoung Kim.
+
+        WebKit EFL doesn't use '_' in C++ class names.
+
+        * UIProcess/API/efl/EwkViewCallbacks.h:
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (EwkViewImpl::settings):
+        (EwkViewImpl::backForwardList):
+        (EwkViewImpl):
+        * UIProcess/API/efl/ewk_auth_request.h:
+        * UIProcess/API/efl/ewk_auth_request_private.h:
+        * UIProcess/API/efl/ewk_back_forward_list.cpp:
+        (EwkBackForwardList::EwkBackForwardList):
+        (EwkBackForwardList::nextItem):
+        (EwkBackForwardList::previousItem):
+        (EwkBackForwardList::currentItem):
+        (EwkBackForwardList::itemAt):
+        (EwkBackForwardList::size):
+        (EwkBackForwardList::backList):
+        (EwkBackForwardList::forwardList):
+        (EwkBackForwardList::getFromCacheOrCreate):
+        (EwkBackForwardList::createEinaList):
+        (EwkBackForwardList::update):
+        * UIProcess/API/efl/ewk_back_forward_list.h:
+        * UIProcess/API/efl/ewk_back_forward_list_item.h:
+        * UIProcess/API/efl/ewk_back_forward_list_item_private.h:
+        * UIProcess/API/efl/ewk_back_forward_list_private.h:
+        (EwkBackForwardList::create):
+        (EwkBackForwardList):
+        * UIProcess/API/efl/ewk_color_picker.cpp:
+        (EwkColorPicker::EwkColorPicker):
+        (EwkColorPicker::setColor):
+        (EwkColorPicker::color):
+        * UIProcess/API/efl/ewk_color_picker.h:
+        * UIProcess/API/efl/ewk_color_picker_private.h:
+        (EwkColorPicker::create):
+        (EwkColorPicker):
+        * UIProcess/API/efl/ewk_context.h:
+        * UIProcess/API/efl/ewk_context_private.h:
+        * UIProcess/API/efl/ewk_cookie_manager.cpp:
+        (EwkCookieManager::EwkCookieManager):
+        (EwkCookieManager::~EwkCookieManager):
+        (EwkCookieManager::setPersistentStorage):
+        (EwkCookieManager::setHTTPAcceptPolicy):
+        (EwkCookieManager::clearHostnameCookies):
+        (EwkCookieManager::clearAllCookies):
+        (EwkCookieManager::watchChanges):
+        (EwkCookieManager::isWatchingForChanges):
+        (EwkCookieManager::getHostNamesWithCookies):
+        (EwkCookieManager::getHTTPAcceptPolicy):
+        (EwkCookieManager::cookiesDidChange):
+        * UIProcess/API/efl/ewk_cookie_manager.h:
+        * UIProcess/API/efl/ewk_cookie_manager_private.h:
+        (EwkCookieManager::create):
+        (EwkCookieManager):
+        * UIProcess/API/efl/ewk_database_manager.cpp:
+        (EwkDatabaseManager::EwkDatabaseManager):
+        (EwkDatabaseManager::getDatabaseOrigins):
+        (EwkDatabaseManager::createOriginList):
+        * UIProcess/API/efl/ewk_database_manager.h:
+        * UIProcess/API/efl/ewk_database_manager_private.h:
+        (EwkDatabaseManager::create):
+        (EwkDatabaseManager):
+        * UIProcess/API/efl/ewk_download_job.h:
+        * UIProcess/API/efl/ewk_download_job_private.h:
+        * UIProcess/API/efl/ewk_error.cpp:
+        (EwkError::EwkError):
+        (EwkError::url):
+        (EwkError::description):
+        (EwkError::domain):
+        (EwkError::errorCode):
+        (EwkError::isCancellation):
+        * UIProcess/API/efl/ewk_error.h:
+        * UIProcess/API/efl/ewk_error_private.h:
+        (EwkError::create):
+        (EwkError):
+        * UIProcess/API/efl/ewk_favicon_database.cpp:
+        (EwkFaviconDatabase::EwkFaviconDatabase):
+        (EwkFaviconDatabase::~EwkFaviconDatabase):
+        (EwkFaviconDatabase::iconURLForPageURL):
+        (EwkFaviconDatabase::watchChanges):
+        (EwkFaviconDatabase::unwatchChanges):
+        (EwkFaviconDatabase::iconForPageURL):
+        (EwkFaviconDatabase::didChangeIconForPageURL):
+        (EwkFaviconDatabase::getIconSurfaceSynchronously):
+        (EwkFaviconDatabase::iconDataReadyForPageURL):
+        * UIProcess/API/efl/ewk_favicon_database.h:
+        * UIProcess/API/efl/ewk_favicon_database_private.h:
+        (EwkFaviconDatabase::create):
+        (EwkFaviconDatabase):
+        * UIProcess/API/efl/ewk_file_chooser_request.h:
+        * UIProcess/API/efl/ewk_file_chooser_request_private.h:
+        * UIProcess/API/efl/ewk_form_submission_request.h:
+        * UIProcess/API/efl/ewk_form_submission_request_private.h:
+        * UIProcess/API/efl/ewk_intent.h:
+        * UIProcess/API/efl/ewk_intent_private.h:
+        * UIProcess/API/efl/ewk_intent_service.h:
+        * UIProcess/API/efl/ewk_intent_service_private.h:
+        * UIProcess/API/efl/ewk_navigation_data.h:
+        * UIProcess/API/efl/ewk_navigation_data_private.h:
+        * UIProcess/API/efl/ewk_navigation_policy_decision.h:
+        * UIProcess/API/efl/ewk_navigation_policy_decision_private.h:
+        * UIProcess/API/efl/ewk_object.h:
+        * UIProcess/API/efl/ewk_object_private.h:
+        (EwkObject::~EwkObject):
+        (ewk_object_is_of_type):
+        (ewk_object_cast_check):
+        (ewk_object_cast):
+        * UIProcess/API/efl/ewk_popup_menu.cpp:
+        (EwkPopupMenu::EwkPopupMenu):
+        (EwkPopupMenu::~EwkPopupMenu):
+        (EwkPopupMenu::close):
+        (EwkPopupMenu::items):
+        (EwkPopupMenu::selectedIndex):
+        (EwkPopupMenu::setSelectedIndex):
+        * UIProcess/API/efl/ewk_popup_menu.h:
+        * UIProcess/API/efl/ewk_popup_menu_item.cpp:
+        (EwkPopupMenuItem::EwkPopupMenuItem):
+        (EwkPopupMenuItem::type):
+        (EwkPopupMenuItem::textDirection):
+        (EwkPopupMenuItem::text):
+        (EwkPopupMenuItem::tooltipText):
+        (EwkPopupMenuItem::accessibilityText):
+        (EwkPopupMenuItem::hasTextDirectionOverride):
+        (EwkPopupMenuItem::isEnabled):
+        (EwkPopupMenuItem::isLabel):
+        (EwkPopupMenuItem::isSelected):
+        * UIProcess/API/efl/ewk_popup_menu_item.h:
+        * UIProcess/API/efl/ewk_popup_menu_item_private.h:
+        (EwkPopupMenuItem::create):
+        (EwkPopupMenuItem):
+        * UIProcess/API/efl/ewk_popup_menu_private.h:
+        (EwkPopupMenu::create):
+        (EwkPopupMenu):
+        * UIProcess/API/efl/ewk_resource.h:
+        * UIProcess/API/efl/ewk_resource_private.h:
+        * UIProcess/API/efl/ewk_security_origin.h:
+        * UIProcess/API/efl/ewk_security_origin_private.h:
+        * UIProcess/API/efl/ewk_settings.cpp:
+        (EwkSettings::preferences):
+        * UIProcess/API/efl/ewk_settings.h:
+        * UIProcess/API/efl/ewk_settings_private.h:
+        (EwkSettings::create):
+        (EwkSettings::EwkSettings):
+        * UIProcess/API/efl/ewk_storage_manager.cpp:
+        (EwkStorageManager::EwkStorageManager):
+        (EwkStorageManager::getStorageOrigins):
+        (EwkStorageManager::createOriginList):
+        * UIProcess/API/efl/ewk_storage_manager.h:
+        * UIProcess/API/efl/ewk_storage_manager_private.h:
+        (EwkStorageManager::create):
+        (EwkStorageManager):
+        * UIProcess/API/efl/ewk_url_request.h:
+        * UIProcess/API/efl/ewk_url_request_private.h:
+        * UIProcess/API/efl/ewk_url_response.h:
+        * UIProcess/API/efl/ewk_url_response_private.h:
+        * UIProcess/API/efl/ewk_url_scheme_request.h:
+        * UIProcess/API/efl/ewk_url_scheme_request_private.h:
+        * UIProcess/API/efl/tests/test_ewk2_object.cpp:
+        (TEST_F):
+
+2012-11-18  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][WK2] Wrong transform when using software path.
+        https://bugs.webkit.org/show_bug.cgi?id=102549
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        When using the software path, our transform is not correct and results 
+        in drawing the wrong part of the page. This becomes more obvious after scrolling.
+
+        * UIProcess/efl/WebInspectorProxyEfl.cpp:
+        (WebKit::WebInspectorProxy::platformCreateInspectorPage):
+
+2012-11-18  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        [WK2] REGRESSION: After web process crash a new web process is created for every existing page
+        https://bugs.webkit.org/show_bug.cgi?id=102520
+
+        Reviewed by Alexey Proskuryakov.
+
+        When process model is SharedSecondaryProcess a new shared process
+        should be created instead of a new process per page.
+
+        * UIProcess/WebContext.cpp:
+        (WebKit::WebContext::ensureSharedWebProcess): Ensure a shared web
+        process and return it.
+        (WebKit::WebContext::createWebPage): Update to change in
+        ensureSharedWebProcess() that returns the shared web process now.
+        * UIProcess/WebContext.h:
+        (WebContext): Remove relaunchProcessIfNecessary().
+        (WebKit::WebContext::sendToAllProcessesRelaunchingThemIfNecessary):
+        Use ensureSharedWebProcess() instead of relaunchProcessIfNecessary().
+        * UIProcess/WebPageProxy.cpp:
+        (WebKit::WebPageProxy::reattachToWebProcess): Ensure a shared web
+        process for SharedSecondaryProcess model or create a new web
+        process for multi-process models.
+
+2012-11-17  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        Remove 8-bit related assertion from NetscapePluginModuleX11.
+        https://bugs.webkit.org/show_bug.cgi?id=102588
+
+        Reviewed by Andreas Kling.
+
+        Follow-up to r135043: since String::fromUTF8() is not guaranteed
+        to give us a 16-bit string, the assertion in
+        truncateToSingleLine() will fail in that case.
+
+        This should make the EFL WK2 Debug bot stop failing all
+        plugin-related tests because "WebKit Test Plugin" is returned as
+        an 8-bit string.
+
+        * Shared/Plugins/Netscape/x11/NetscapePluginModuleX11.cpp:
+        (WebKit::truncateToSingleLine):
+
+2012-11-17  Alexandru Chiculita  <achicu@adobe.com>
+
+        [Texmap][CSS Shaders] Reuse the precompiled shader for custom filters in TextureMapperGL
+        https://bugs.webkit.org/show_bug.cgi?id=101801
+
+        Reviewed by Noam Rosenthal.
+
+        Changed the encoding code for ValidatedCustomFilterOperation to only encode the ID of the program.
+        LayerTreeCoordinator makes sure to send the programs in full before the encoder runs.
+        LayerTreeRenderer will maintain a HashMap from these IDs to the real CustomFilterProgram.
+        The UI process will also receive a message from the WebProcess when the shader is no longer in needed.
+        LayerTreeRenderer calls the TextureMapper's removeCachedCustomFilterProgram to notify
+        about the removed CustomFilterProgram.
+
+        * Shared/CoordinatedGraphics/CoordinatedGraphicsArgumentCoders.cpp:
+        (CoreIPC::::encode):
+        (CoreIPC::::decode):
+        (CoreIPC):
+        * Shared/CoordinatedGraphics/CoordinatedGraphicsArgumentCoders.h:
+        (WebCore):
+        * Shared/CoordinatedGraphics/WebCustomFilterOperation.h: Added.
+        (WebCore):
+        (WebCustomFilterOperation):
+        (WebCore::WebCustomFilterOperation::create):
+        (WebCore::WebCustomFilterOperation::programID):
+        (WebCore::WebCustomFilterOperation::WebCustomFilterOperation):
+        * Shared/CoordinatedGraphics/WebCustomFilterProgramProxy.h:
+        (WebKit::WebCustomFilterProgramProxy::create):
+        (WebKit::WebCustomFilterProgramProxy::WebCustomFilterProgramProxy):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.cpp:
+        (WebKit):
+        (WebKit::LayerTreeCoordinatorProxy::removeCustomFilterProgram):
+        (WebKit::LayerTreeCoordinatorProxy::createCustomFilterProgram):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.h:
+        (LayerTreeCoordinatorProxy):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.messages.in:
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::setLayerFilters):
+        (WebKit):
+        (WebKit::LayerTreeRenderer::injectCachedCustomFilterPrograms):
+        (WebKit::LayerTreeRenderer::createCustomFilterProgram):
+        (WebKit::LayerTreeRenderer::removeCustomFilterProgram):
+        (WebKit::LayerTreeRenderer::setLayerAnimations):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+        (WebCore):
+        (LayerTreeRenderer):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::checkCustomFilterProgramProxies):
+        (WebKit::LayerTreeCoordinator::removeCustomFilterProgramProxy):
+        (WebKit::LayerTreeCoordinator::setLayerAnimations):
+
+2012-11-17  Brady Eidson  <beidson@apple.com>
+
+        Add an integer identifier field to AuthenticationChallengeBase.
+        https://bugs.webkit.org/show_bug.cgi?id=102593
+
+        Reviewed by Darin Adler.
+
+        Properly encode/decode the identifier when sending the challenge over CoreIPC.
+
+        * Shared/WebCoreArgumentCoders.cpp:
+        (CoreIPC::::encode):
+        (CoreIPC::::decode):
+
+2012-11-17  Balazs Kelemen  <kbalazs@webkit.org>
+
+        8bit-unaware String usage in NetscapePluginModuleX11.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=102482
+
+        Reviewed by Michael Saboff.
+
+        String::fromUTF8 is not guaranteed to give a 16 bit string.
+
+        * Shared/Plugins/Netscape/x11/NetscapePluginModuleX11.cpp:
+        (WebKit::truncateToSingleLine): Do an explicit 16 bit conversion.
+
+2012-11-16  Jaehun Lim  <ljaehun.lim@samsung.com>
+
+        [EFL][WK2] Remove unnecessary #include statemtns
+        https://bugs.webkit.org/show_bug.cgi?id=102577
+
+        Reviewed by Anders Carlsson.
+
+        ewk_*_private.h doesn't need to include RefCounted.h after Ewk_Object refactoring.
+
+        * UIProcess/API/efl/ewk_auth_request_private.h:
+        * UIProcess/API/efl/ewk_database_manager.cpp:
+        * UIProcess/API/efl/ewk_file_chooser_request_private.h:
+        * UIProcess/API/efl/ewk_form_submission_request_private.h:
+        * UIProcess/API/efl/ewk_navigation_data_private.h:
+        * UIProcess/API/efl/ewk_resource_private.h:
+        * UIProcess/API/efl/ewk_storage_manager.cpp:
+
+2012-11-16  Sam Weinig  <weinig@apple.com>
+
+        Fix the windows build.
+
+        * WebProcess/Cookies/cf/WebCookieManagerCFNet.cpp:
+        (WebKit::WebCookieManager::platformSetHTTPCookieAcceptPolicy):
+        (WebKit::WebCookieManager::platformGetHTTPCookieAcceptPolicy):
+        * WebProcess/InjectedBundle/InjectedBundle.cpp:
+        (WebKit::InjectedBundle::setPrivateBrowsingEnabled):
+        (WebKit::InjectedBundle::switchNetworkLoaderToNewTestingSession):
+        * WebProcess/WebCoreSupport/WebPlatformStrategies.cpp:
+        (WebKit::WebPlatformStrategies::defaultCookieStorage):
+        * WebProcess/WebCoreSupport/win/WebFrameNetworkingContext.h:
+        (WebFrameNetworkingContext):
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::updatePreferences):
+        * WebProcess/WebPage/win/WebPageWin.cpp:
+        (WebKit::cachedResponseForURL):
+        * WebProcess/WebProcess.cpp:
+        (WebKit::WebProcess::initializeWebProcess):
+        * WebProcess/win/WebProcessWin.cpp:
+        (WebKit::WebProcess::platformSetCacheModel):
+        (WebKit::WebProcess::platformClearResourceCaches):
+        (WebKit::WebProcess::platformInitializeWebProcess):
+
+2012-11-16  Alec Flett  <alecflett@chromium.org>
+
+        Add tests for explicit serialization values
+        https://bugs.webkit.org/show_bug.cgi?id=96818
+
+        Reviewed by Adam Barth.
+
+        Add exports for SerializedScriptValue changes.
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-16  Kiran Muppala  <cmuppala@apple.com>
+
+        Set task priority of WebKit2 processes to zero on Mac
+        https://bugs.webkit.org/show_bug.cgi?id=102567
+
+        Reviewed by Mark Rowe.
+
+        Explicitly set task priority of WebKit2 processes to zero, to
+        override automatic priority determination by the system.
+
+        * Shared/ChildProcess.cpp:
+        (WebKit::ChildProcess::ChildProcess): Add call to platformInitialize() and
+        move MAC specific call to disableProcessSuppression to platformInitialize.
+        (WebKit::ChildProcess::platformInitialize): Dummy for non MAC platforms.
+        * Shared/ChildProcess.h:
+        * Shared/mac/ChildProcessMac.mm:
+        (WebKit::ChildProcess::platformInitialize): Add call to setpriority().
+
+2012-11-16  Brady Eidson  <beidson@apple.com>
+
+        Move resource loader messaging from NetworkConnectionToWebProcess directly to NetworkResourceLoader
+        https://bugs.webkit.org/show_bug.cgi?id=102570
+
+        Reviewed by Alexey Proskuryakov.
+
+        This patch adds the ability for WebResourceLoader to message NetworkResourceLoader directly.
+
+        This further cements the 1-to-1 relationship between the two classes and makes it easy to add/change
+        loader related messaging going forward.
+
+        Build/infrastructure stuff:
+        * Platform/CoreIPC/MessageID.h:
+        * WebKit2.xcodeproj/project.pbxproj:
+        * DerivedSources.make:
+
+        Remove the WillSendRequestHandled message, and forward NetworkResourceLoader messages on to the correct object:
+        * NetworkProcess/NetworkConnectionToWebProcess.cpp:
+        (WebKit::NetworkConnectionToWebProcess::didReceiveMessage):
+        * NetworkProcess/NetworkConnectionToWebProcess.h:
+        * NetworkProcess/NetworkConnectionToWebProcess.messages.in:
+
+        Hang on to a master map of identifiers to NetworkResourceLoaders:
+        * NetworkProcess/NetworkResourceLoadScheduler.cpp:
+        (WebKit::NetworkResourceLoadScheduler::scheduleResourceLoad):
+        (WebKit::NetworkResourceLoadScheduler::removeLoadIdentifier):
+        (WebKit::NetworkResourceLoadScheduler::networkResourceLoaderForIdentifier):
+        * NetworkProcess/NetworkResourceLoadScheduler.h:
+
+        Change the way "willSendRequestHandled" comes in to be a direct message:
+        * NetworkProcess/NetworkResourceLoader.cpp:
+        (WebKit::NetworkResourceLoader::willSendRequest):
+        (WebKit::NetworkResourceLoader::willSendRequestHandled):
+        * NetworkProcess/NetworkResourceLoader.h:
+        * NetworkProcess/NetworkResourceLoader.messages.in:
+
+        Make WebResourceLoader a MessageSender:
+        * WebProcess/Network/WebResourceLoader.cpp:
+        (WebKit::WebResourceLoader::connection):
+        (WebKit::WebResourceLoader::destinationID):
+        (WebKit::WebResourceLoader::willSendRequest): Use MessageSender abilities to message the NetworkResourceLoader.
+        * WebProcess/Network/WebResourceLoader.h:
+
+2012-11-16  Tony Chang  <tony@chromium.org>
+
+        Remove ENABLE_CSS_HIERARCHIES since it's no longer in use
+        https://bugs.webkit.org/show_bug.cgi?id=102554
+
+        Reviewed by Andreas Kling.
+
+        As mentioned in https://bugs.webkit.org/show_bug.cgi?id=79939#c41 ,
+        we're going to revist this feature once additional vendor support is
+        achieved.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-11-16  Brent Fulgham  <bfulgham@webkit.org>
+
+        [WinCairo] Build correction after r134960.
+
+        * WebProcess/WebCoreSupport/WebPlatformStrategies.cpp:  Stub out
+        calls to CFNetwork-based implementation.
+
+2012-11-16  Martin Robinson  <mrobinson@igalia.com>
+
+        Move authentication dialog to the UIProcess
+
+        [GTK] [WebKit2] Move GtkAuthenticationDialog to the UIProcess
+        https://bugs.webkit.org/show_bug.cgi?id=101843
+
+        Reviewed by Gustavo Noronha Silva.
+
+        Move the use of GtkAuthenticationDialog to the UIProcess along with the rest of
+        the GTK+ widgets. This will allow us to to embed the dialog into the WebView
+        in the future and to test authentication with the WebKit2 C API.
+
+        * GNUmakefile.list.am: Add the new class to the source list and remove the
+        GTK+-only WebFrameLoader implementation file.
+        * UIProcess/API/gtk/WebKit2GtkAuthenticationDialog.cpp: Added. A subclass of GtkAuthenticationDialog
+        which uses the WebKit2 classes to do the UIProcess-side authentication.
+        * UIProcess/API/gtk/WebKit2GtkAuthenticationDialog.h: Added.
+        * UIProcess/API/gtk/WebKitLoaderClient.cpp: Add a callback for didReceiveAuthenticationChallengeInFrame.
+        (didReceiveAuthenticationChallengeInFrame): Added.
+        (attachLoaderClientToView): Use the new callback.
+        * UIProcess/Authentication/AuthenticationChallengeProxy.h:
+        (WebKit::AuthenticationChallengeProxy::core): Add this getter for the WebCore class.
+        * WebProcess/WebCoreSupport/WebFrameLoaderClient.cpp:
+        (WebKit::WebFrameLoaderClient::dispatchDidReceiveAuthenticationChallenge): Share the implementation
+        again.
+        * WebProcess/WebCoreSupport/gtk/WebFrameLoaderClientGtk.cpp: Removed.
+
+2012-11-15  Alexey Proskuryakov  <ap@apple.com>
+
+        Private Browsing is a per-page setting that sets a global value
+        https://bugs.webkit.org/show_bug.cgi?id=67870
+
+        Reviewed by Sam Weinig.
+
+        * NetworkProcess/mac/RemoteNetworkingContext.h: Added storageSession().
+
+        * NetworkProcess/mac/RemoteNetworkingContext.mm:
+        (WebKit::RemoteNetworkingContext::storageSession): Just always fall back to default
+        so far.
+
+        * WebKit2.xcodeproj/project.pbxproj: Added WebPlatformStrategiesMac.mm for strategy
+        code that uses Objective C.
+
+        * WebProcess/Cookies/mac/WebCookieManagerMac.mm:
+        (WebKit::WebCookieManager::platformSetHTTPCookieAcceptPolicy): Use WebFrameNetworkingContext
+        instead of hardcoding access to sessiosn here.
+
+        * WebProcess/InjectedBundle/InjectedBundle.cpp:
+        (WebKit::InjectedBundle::setPrivateBrowsingEnabled): Create and destroy private
+        browsing session as appropriate.
+        (WebKit::InjectedBundle::switchNetworkLoaderToNewTestingSession): Use WebFrameNetworkingContext
+        instead of hardcoding access to sessiosn here.
+
+        * WebProcess/WebCoreSupport/WebPlatformStrategies.h:
+        * WebProcess/WebCoreSupport/mac/WebPlatformStrategiesMac.mm: Added.
+        (WebKit::WebPlatformStrategies::defaultCookieStorage):
+        * WebProcess/WebCoreSupport/WebPlatformStrategies.cpp:
+        (WebKit::WebPlatformStrategies::defaultCookieStorage):
+        Implemented defaultCookieStorage() through WebFrameNetworkingContext.
+
+        * WebProcess/WebCoreSupport/mac/WebFrameNetworkingContext.h:
+        * WebProcess/WebCoreSupport/mac/WebFrameNetworkingContext.mm:
+        Moved code for dealing with global contexts here from WebCore.
+
+        * WebProcess/WebPage/WebPage.cpp: (WebKit::WebPage::updatePreferences):
+        Create a global private session when any page enters private browsing, and
+        delete it when any page exits private browsing. This is handling a preference
+        change, so all pages get it once.
+
+        * WebProcess/WebPage/mac/WebPageMac.mm:
+        (WebKit::WebPage::platformHasLocalDataForURL): Use main frame's context.
+        (WebKit::cachedResponseForURL): Ditto.
+
+        * WebProcess/WebProcess.cpp: (WebKit::WebProcess::initializeWebProcess): Updated
+        to talk to WebFrameNetworkingContext instead of ResourceHandle for global session.
+
+2012-11-16  Viatcheslav Ostapenko  <v.ostapenko@samsung.com>
+
+        [EFL][WK2] White flicker when scrolling big pages with dark background on slower hardware.
+        https://bugs.webkit.org/show_bug.cgi?id=102000
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Add matching of view background color to the page background. This helps to reduce 
+        visibility of flicker during scrolling/scaling/repainting where page tiles are not
+        ready. View background color matching is disabled by default and can be enabled 
+        with new API function ewk_view_draws_page_background_set .
+        View background color can interfere with semi-transparent pages and should be
+        disabled by default.
+        Upstreaming changes by Youngtaeck Song(youngtaeck.song@samsung.com).
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::EwkViewImpl):
+        (EwkViewImpl::displayTimerFired):
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (EwkViewImpl::setDrawsBackground):
+        (EwkViewImpl):
+        * UIProcess/API/efl/ewk_view.cpp:
+        (ewk_view_draws_page_background_set):
+        * UIProcess/API/efl/ewk_view.h:
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.cpp:
+        (WebKit::LayerTreeCoordinatorProxy::setBackgroundColor):
+        (WebKit):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.h:
+        (LayerTreeCoordinatorProxy):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.messages.in:
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::LayerTreeRenderer):
+        (WebKit::LayerTreeRenderer::paintToCurrentGLContext):
+        (WebKit::LayerTreeRenderer::paintToGraphicsContext):
+        (WebKit::LayerTreeRenderer::setBackgroundColor):
+        (WebKit):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+        (LayerTreeRenderer):
+        (WebKit::LayerTreeRenderer::setDrawsBackground):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::setBackgroundColor):
+        (WebKit):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.h:
+        (LayerTreeCoordinator):
+        * WebProcess/WebPage/LayerTreeHost.h:
+        (WebKit::LayerTreeHost::setBackgroundColor):
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::WebPage):
+        (WebKit::WebPage::mainFrameDidLayout):
+        * WebProcess/WebPage/WebPage.h:
+        (WebPage):
+
+2012-11-16  Krzysztof Czech  <k.czech@samsung.com>
+
+        [WK2][GTK][EFL] Share WebKit2-GTK's WebProcess Accessibility implementation with other WebKit ports.
+        https://bugs.webkit.org/show_bug.cgi?id=101748
+
+        Reviewed by Martin Robinson.
+
+        Remove and rename files related to Accessibility from WebPage/gtk to WebPage/atk.
+
+        * GNUmakefile.am:
+        * GNUmakefile.list.am:
+        * WebProcess/WebPage/atk/WebPageAccessibilityObject.h: Renamed from Source/WebKit2/WebProcess/WebPage/gtk/WebPageAccessibilityObject.h.
+        (WebKit):
+        (_WebPageAccessibilityObject):
+        (_WebPageAccessibilityObjectClass):
+        * WebProcess/WebPage/atk/WebPageAccessibilityObjectAtk.cpp: Renamed from Source/WebKit2/WebProcess/WebPage/gtk/WebPageAccessibilityObject.cpp.
+        (accessibilityRootObjectWrapper):
+        (webPageAccessibilityObjectInitialize):
+        (webPageAccessibilityObjectGetIndexInParent):
+        (webPageAccessibilityObjectGetNChildren):
+        (webPageAccessibilityObjectRefChild):
+        (web_page_accessibility_object_init):
+        (web_page_accessibility_object_class_init):
+        (webPageAccessibilityObjectNew):
+        (webPageAccessibilityObjectRefresh):
+
+2012-11-16  Alexandru Chiculita  <achicu@adobe.com>
+
+        [Texmap][CSS Shaders] Make the CustomFilterValidatedProgram maintain the platform compiled program
+        https://bugs.webkit.org/show_bug.cgi?id=102414
+
+        Reviewed by Noam Rosenthal.
+
+        This is the first part of shader caching implementation for the Custom Filters in WK2 LayerTreeCoordinator.
+        In this patch it will just make the LayerTreeCoordinator knowledgeable about the life-time
+        of the custom filter programs. It can allocate IDs for the filters and it also gets a callback when the
+        filters are not needed anymore.
+
+        The UI process is still recreating the shader every time, but https://bugs.webkit.org/show_bug.cgi?id=101801
+        will fix that and try to reuse existing custom filters.
+
+        * CMakeLists.txt:
+        * Shared/CoordinatedGraphics/CoordinatedGraphicsArgumentCoders.cpp:
+        (CoreIPC::::encode):
+        * Shared/CoordinatedGraphics/WebCustomFilterProgramProxy.cpp: Added.
+        (WebKit):
+        (WebKit::WebCustomFilterProgramProxy::~WebCustomFilterProgramProxy):
+        * Shared/CoordinatedGraphics/WebCustomFilterProgramProxy.h: Added.
+        (WebKit):
+        (WebCustomFilterProgramProxyClient):
+        (WebCustomFilterProgramProxy):
+        (WebKit::WebCustomFilterProgramProxy::create):
+        (WebKit::WebCustomFilterProgramProxy::id):
+        (WebKit::WebCustomFilterProgramProxy::refFromValidatedProgram):
+        (WebKit::WebCustomFilterProgramProxy::derefFromValidatedProgram):
+        (WebKit::WebCustomFilterProgramProxy::setClient):
+        (WebKit::WebCustomFilterProgramProxy::client):
+        (WebKit::WebCustomFilterProgramProxy::WebCustomFilterProgramProxy):
+        * Target.pri:
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::~LayerTreeCoordinator):
+        (WebKit::LayerTreeCoordinator::syncLayerFilters):
+        (WebKit):
+        (WebKit::LayerTreeCoordinator::checkCustomFilterProgramProxies):
+        (WebKit::LayerTreeCoordinator::removeCustomFilterProgramProxy):
+        (WebKit::LayerTreeCoordinator::disconnectCustomFilterPrograms):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.h:
+        (LayerTreeCoordinator):
+
+2012-11-16  Peter Gal  <galpeter@inf.u-szeged.hu>
+
+        [Qt][Mac] Fix the build after r124873
+        https://bugs.webkit.org/show_bug.cgi?id=102475
+
+        Reviewed by Noam Rosenthal.
+
+        Change the CoordinatedImageBackingID typedef from uintptr_t to uint64_t.
+
+        * Shared/WebLayerTreeInfo.h:
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.messages.in:
+
+2012-11-16  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [EFL][WK2] Unset the tooltip when the web process has crashed
+        https://bugs.webkit.org/show_bug.cgi?id=102232
+
+        Reviewed by Gyuyoung Kim.
+
+        Emit 'tooltip,text,unset' signal to unset the tooltip
+        when the web process has crashed.
+
+        * UIProcess/efl/PageClientBase.cpp:
+        (WebKit::PageClientBase::processDidCrash):
+
 2012-11-16  Helder Correia  <helder.correia@nokia.com>
 
         [CoordGfx] Follow coding style on explicit constructors

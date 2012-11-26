@@ -73,9 +73,6 @@ my $licenceTemplate = << "EOF";
 */
 EOF
 
-sub GenerateModule {
-}
-
 sub GetParentClassName {
     my $dataNode = shift;
 
@@ -240,6 +237,10 @@ sub SkipFunction {
     }
 
     if ($function->signature->name eq "setRangeText" && @{$function->parameters} == 1) {
+        return 1;
+    }
+
+    if ($function->signature->name eq "timeEnd") {
         return 1;
     }
 

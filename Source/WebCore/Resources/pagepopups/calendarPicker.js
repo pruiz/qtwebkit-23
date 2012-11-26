@@ -1219,7 +1219,8 @@ DaysTable.prototype.attachTo = function(element) {
  * @return {!boolean}
  */
 CalendarPicker.prototype._stepMismatch = function(value) {
-    return (value - this.stepBase) % this.step != 0;
+    var nextAllowedValue = Math.ceil((value - this.stepBase) / this.step) * this.step + this.stepBase;
+    return nextAllowedValue >= value + this.selectionConstructor.DefaultStep
 }
 
 /**
@@ -1348,7 +1349,7 @@ DaysTable.prototype._markRangeAsSelected = function(day) {
 DaysTable.prototype.selectRange = function(day) {
     this._deselect();
     if (this.startDate() > day.startDate() || this.endDate() < day.endDate())
-        this.picker.showMonth(Month.createFromDate(day.startDate()));
+        this.picker.showMonth(Month.createFromDate(day.startDate()), CalendarPicker.NavigationBehaviour.Animate);
     this._markRangeAsSelected(day);
 };
 

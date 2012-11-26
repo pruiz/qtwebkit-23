@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003, 2009 Apple Inc. All rights reserved.
+ * Copyright (C) 2003, 2009, 2012 Apple Inc. All rights reserved.
  *
  * Portions are Copyright (C) 1998 Netscape Communications Corporation.
  *
@@ -62,6 +62,7 @@ class FilterOperations;
 class HitTestRequest;
 class HitTestResult;
 class HitTestingTransformState;
+class RenderGeometryMap;
 class RenderMarquee;
 class RenderReplica;
 class RenderScrollbarPart;
@@ -390,7 +391,7 @@ public:
     bool canRender3DTransforms() const;
 
     void updateLayerPosition();
-    
+
     enum UpdateLayerPositionsFlag {
         CheckForRepaint = 1,
         IsCompositingUpdateRoot = 1 << 1,
@@ -399,9 +400,9 @@ public:
     };
     typedef unsigned UpdateLayerPositionsFlags;
     static const UpdateLayerPositionsFlags defaultFlags = CheckForRepaint | IsCompositingUpdateRoot | UpdateCompositingLayers;
-    // Providing |cachedOffset| prevents a outlineBoxForRepaint from walking back to the root for each layer in our subtree.
-    // This is an optimistic optimization that is not guaranteed to succeed.
-    void updateLayerPositions(LayoutPoint* offsetFromRoot, UpdateLayerPositionsFlags = defaultFlags);
+
+    void updateLayerPositionsAfterLayout(const RenderLayer* rootLayer, UpdateLayerPositionsFlags);
+    void updateLayerPositionsAfterScroll();
     
     bool isPaginated() const { return m_isPaginated; }
 
@@ -490,7 +491,7 @@ public:
     bool canUseConvertToLayerCoords() const
     {
         // These RenderObject have an impact on their layers' without them knowing about it.
-        return !renderer()->hasColumns() && !renderer()->hasTransform() && !isComposited()
+        return !renderer()->hasColumns() && !renderer()->hasTransform()
 #if ENABLE(SVG)
             && !renderer()->isSVGRoot()
 #endif
@@ -531,21 +532,39 @@ public:
 
     enum ShouldRespectOverflowClip { IgnoreOverflowClip, RespectOverflowClip };
 
+    struct ClipRectsContext {
+        ClipRectsContext(const RenderLayer* inRootLayer, RenderRegion* inRegion, ClipRectsType inClipRectsType, OverlayScrollbarSizeRelevancy inOverlayScrollbarSizeRelevancy = IgnoreOverlayScrollbarSize, ShouldRespectOverflowClip inRespectOverflowClip = RespectOverflowClip)
+            : rootLayer(inRootLayer)
+            , region(inRegion)
+            , clipRectsType(inClipRectsType)
+            , overlayScrollbarSizeRelevancy(inOverlayScrollbarSizeRelevancy)
+            , respectOverflowClip(inRespectOverflowClip)
+        { }
+        const RenderLayer* rootLayer;
+        RenderRegion* region;
+        ClipRectsType clipRectsType;
+        OverlayScrollbarSizeRelevancy overlayScrollbarSizeRelevancy;
+        ShouldRespectOverflowClip respectOverflowClip;
+    };
+
     // This method figures out our layerBounds in coordinates relative to
     // |rootLayer}.  It also computes our background and foreground clip rects
     // for painting/event handling.
     // Pass offsetFromRoot if known.
-    void calculateRects(const RenderLayer* rootLayer, RenderRegion*, ClipRectsType, const LayoutRect& paintDirtyRect, LayoutRect& layerBounds,
-                        ClipRect& backgroundRect, ClipRect& foregroundRect, ClipRect& outlineRect, const LayoutPoint* offsetFromRoot = 0,
-                        OverlayScrollbarSizeRelevancy = IgnoreOverlayScrollbarSize, ShouldRespectOverflowClip = RespectOverflowClip) const;
+    void calculateRects(const ClipRectsContext&, const LayoutRect& paintDirtyRect, LayoutRect& layerBounds,
+        ClipRect& backgroundRect, ClipRect& foregroundRect, ClipRect& outlineRect, const LayoutPoint* offsetFromRoot = 0) const;
 
     // Compute and cache clip rects computed with the given layer as the root
-    void updateClipRects(const RenderLayer* rootLayer, RenderRegion*, ClipRectsType, OverlayScrollbarSizeRelevancy = IgnoreOverlayScrollbarSize, ShouldRespectOverflowClip = RespectOverflowClip);
+    void updateClipRects(const ClipRectsContext&);
     // Compute and return the clip rects. If useCached is true, will used previously computed clip rects on ancestors
     // (rather than computing them all from scratch up the parent chain).
-    void calculateClipRects(const RenderLayer* rootLayer, RenderRegion*, ClipRectsType, ClipRects&, OverlayScrollbarSizeRelevancy = IgnoreOverlayScrollbarSize, ShouldRespectOverflowClip = RespectOverflowClip) const;
+    void calculateClipRects(const ClipRectsContext&, ClipRects&) const;
 
-    ClipRects* clipRects(ClipRectsType type) const { ASSERT(type < NumCachedClipRectsTypes); return m_clipRectsCache ? m_clipRectsCache->m_clipRects[type].get() : 0; }
+    ClipRects* clipRects(ClipRectsType type) const
+    {
+        ASSERT(type < NumCachedClipRectsTypes);
+        return m_clipRectsCache ? m_clipRectsCache->m_clipRects[type].get() : 0;
+    }
 
     LayoutRect childrenClipRect() const; // Returns the foreground clip rect of the layer in the document's coordinate space.
     LayoutRect selfClipRect() const; // Returns the background clip rect of the layer in the document's coordinate space.
@@ -579,14 +598,6 @@ public:
     LayoutRect repaintRect() const { return m_repaintRect; }
     LayoutRect repaintRectIncludingNonCompositingDescendants() const;
 
-    enum UpdateLayerPositionsAfterScrollFlag {
-        NoFlag = 0,
-        HasSeenViewportConstrainedAncestor = 1 << 0,
-        HasSeenAncestorWithOverflowClip = 1 << 1
-    };
-
-    typedef unsigned UpdateLayerPositionsAfterScrollFlags;
-    void updateLayerPositionsAfterScroll(UpdateLayerPositionsAfterScrollFlags = NoFlag);
     void setRepaintStatus(RepaintStatus status) { m_repaintStatus = status; }
 
     LayoutUnit staticInlinePosition() const { return m_staticInlinePosition; }
@@ -704,7 +715,7 @@ private:
     void setAncestorChainHasSelfPaintingLayerDescendant();
     void dirtyAncestorChainHasSelfPaintingLayerDescendantStatus();
 
-    void computeRepaintRects(const RenderLayerModelObject* repaintContainer, LayoutPoint* offsetFromRoot = 0);
+    void computeRepaintRects(const RenderLayerModelObject* repaintContainer, const RenderGeometryMap* = 0);
     void computeRepaintRectsIncludingDescendants();
     void clearRepaintRects();
 
@@ -719,6 +730,16 @@ private:
 
     void updateScrollbarsAfterStyleChange(const RenderStyle* oldStyle);
     void updateScrollbarsAfterLayout();
+
+    void updateLayerPositions(RenderGeometryMap* = 0, UpdateLayerPositionsFlags = defaultFlags);
+
+    enum UpdateLayerPositionsAfterScrollFlag {
+        NoFlag = 0,
+        HasSeenViewportConstrainedAncestor = 1 << 0,
+        HasSeenAncestorWithOverflowClip = 1 << 1
+    };
+    typedef unsigned UpdateLayerPositionsAfterScrollFlags;
+    void updateLayerPositionsAfterScroll(RenderGeometryMap*, UpdateLayerPositionsAfterScrollFlags = NoFlag);
 
     friend IntSize RenderBox::scrolledContentOffset() const;
     IntSize scrolledContentOffset() const { return m_scrollOffset; }
@@ -860,8 +881,9 @@ private:
     void updateOrRemoveFilterEffectRenderer();
 #endif
 
-    void parentClipRects(const RenderLayer* rootLayer, RenderRegion*, ClipRectsType, ClipRects&, OverlayScrollbarSizeRelevancy = IgnoreOverlayScrollbarSize, ShouldRespectOverflowClip = RespectOverflowClip) const;
-    ClipRect backgroundClipRect(const RenderLayer* rootLayer, RenderRegion*, ClipRectsType, OverlayScrollbarSizeRelevancy = IgnoreOverlayScrollbarSize, ShouldRespectOverflowClip = RespectOverflowClip) const;
+    void parentClipRects(const ClipRectsContext&, ClipRects&) const;
+    ClipRect backgroundClipRect(const ClipRectsContext&) const;
+
     LayoutRect paintingExtent(const RenderLayer* rootLayer, const LayoutRect& paintDirtyRect, PaintBehavior);
 
     RenderLayer* enclosingTransformedAncestor() const;
@@ -908,8 +930,13 @@ private:
     LayoutUnit overflowLeft() const;
     LayoutUnit overflowRight() const;
 
+    IntRect rectForHorizontalScrollbar(const IntRect& borderBoxRect) const;
+    IntRect rectForVerticalScrollbar(const IntRect& borderBoxRect) const;
+
     LayoutUnit verticalScrollbarStart(int minX, int maxX) const;
     LayoutUnit horizontalScrollbarStart(int minX) const;
+
+    bool overflowControlsIntersectRect(const IntRect& localRect) const;
 
 protected:
     // The bitfields are up here so they will fall into the padding from ScrollableArea on 64-bit.

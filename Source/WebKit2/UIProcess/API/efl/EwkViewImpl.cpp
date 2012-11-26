@@ -132,6 +132,7 @@ EwkViewImpl::EwkViewImpl(Evas_Object* view, PassRefPtr<EwkContext> context, Pass
     , m_displayTimer(this, &EwkViewImpl::displayTimerFired)
     , m_inputMethodContext(InputMethodContextEfl::create(this, smartData()->base.evas))
     , m_isHardwareAccelerated(true)
+    , m_setDrawsBackground(false)
 {
     ASSERT(m_view);
     ASSERT(m_context);
@@ -338,6 +339,7 @@ void EwkViewImpl::displayTimerFired(Timer<EwkViewImpl>*)
 
     LayerTreeRenderer* renderer = page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer();
     renderer->setActive(true);
+    renderer->setDrawsBackground(m_setDrawsBackground);
     renderer->syncRemoteContent();
     if (m_isHardwareAccelerated) {
         renderer->paintToCurrentGLContext(transformToScene().toTransformationMatrix(), /* opacity */ 1, viewport);
@@ -350,8 +352,8 @@ void EwkViewImpl::displayTimerFired(Timer<EwkViewImpl>*)
             return;
 
         RefPtr<cairo_t> graphicsContext = adoptRef(cairo_create(surface.get()));
-        cairo_translate(graphicsContext.get(), -m_scrollPosition.x(), -m_scrollPosition.y());
         cairo_scale(graphicsContext.get(), m_scaleFactor, m_scaleFactor);
+        cairo_translate(graphicsContext.get(), -m_scrollPosition.x(), -m_scrollPosition.y());
         renderer->paintToGraphicsContext(graphicsContext.get());
         evas_object_image_data_update_add(sd->image, 0, 0, viewport.width(), viewport.height());
     }

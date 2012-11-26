@@ -127,6 +127,7 @@ my (
     $textAutosizingSupport,
     $tiledBackingStoreSupport,
     $touchEventsSupport,
+    $touchSliderSupport,
     $touchIconLoadingSupport,
     $vibrationSupport,
     $videoSupport,
@@ -179,9 +180,6 @@ my @features = (
 
     { option => "css3-text", desc => "Toggle CSS3 Text support",
       define => "ENABLE_CSS3_TEXT", default => isEfl(), value => \$css3TextSupport },
-
-    { option => "css-hierarchies", desc => "Toggle CSS Hierarchy support",
-      define => "ENABLE_CSS_HIERARCHIES", default => 0, value => \$cssHierarchiesSupport },
 
     { option => "css-box-decoration-break", desc => "Toggle CSS box-decoration-break support",
       define => "ENABLE_CSS_BOX_DECORATION_BREAK", default => 1, value => \$cssBoxDecorationBreakSupport },
@@ -395,6 +393,9 @@ my @features = (
 
     { option => "touch-events", desc => "Toggle Touch Events support",
       define => "ENABLE_TOUCH_EVENTS", default => (isQt() || isBlackBerry() || isEfl()), value => \$touchEventsSupport },
+
+    { option => "touch-slider", desc => "Toggle Touch Slider support",
+      define => "ENABLE_TOUCH_SLIDER", default => isBlackBerry(), value => \$touchSliderSupport },
 
     { option => "touch-icon-loading", desc => "Toggle Touch Icon Loading Support",
       define => "ENABLE_TOUCH_ICON_LOADING", default => 0, value => \$touchIconLoadingSupport },

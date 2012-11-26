@@ -300,6 +300,7 @@ BINDING_IDLS = \
     $(WebCore)/html/HTMLEmbedElement.idl \
     $(WebCore)/html/HTMLFieldSetElement.idl \
     $(WebCore)/html/HTMLFontElement.idl \
+    $(WebCore)/html/HTMLFormControlsCollection.idl \
     $(WebCore)/html/HTMLFormElement.idl \
     $(WebCore)/html/HTMLFrameElement.idl \
     $(WebCore)/html/HTMLFrameSetElement.idl \
@@ -937,7 +938,6 @@ SettingsMacros.h : page/make_settings.pl page/Settings.in
 GENERATE_SCRIPTS = \
     bindings/scripts/CodeGenerator.pm \
     bindings/scripts/IDLParser.pm \
-    bindings/scripts/IDLStructure.pm \
     bindings/scripts/generate-bindings.pl \
     bindings/scripts/preprocessor.pm
 

@@ -57,6 +57,7 @@ webcore_cppflags += \
 	-I$(srcdir)/Source/WebCore/platform/graphics/cpu/arm \
 	-I$(srcdir)/Source/WebCore/platform/graphics/cpu/arm/filters/ \
 	-I$(srcdir)/Source/WebCore/platform/graphics/filters \
+	-I$(srcdir)/Source/WebCore/platform/graphics/filters/texmap \
 	-I$(srcdir)/Source/WebCore/platform/graphics/gpu \
 	-I$(srcdir)/Source/WebCore/platform/graphics/opengl \
 	-I$(srcdir)/Source/WebCore/platform/graphics/opentype \
@@ -106,7 +107,7 @@ webcore_cppflags += \
 webcoregtk_cppflags += \
 	-DWEBKITGTK_API_VERSION_STRING=\"@WEBKITGTK_API_VERSION@\" \
 	-DWTF_USE_SOUP=1 \
-	-I$(srcdir)/Source/WebCore/accessibility/gtk \
+	-I$(srcdir)/Source/WebCore/accessibility/atk \
 	-I$(srcdir)/Source/WebCore/loader/gtk \
 	-I$(srcdir)/Source/WebCore/page/gtk \
 	-I$(srcdir)/Source/WebCore/platform/cairo \
@@ -461,7 +462,6 @@ USER_AGENT_STYLE_SHEETS = \
 SCRIPTS_FOR_GENERATE_BINDINGS = \
 	$(WebCore)/bindings/scripts/CodeGenerator.pm \
 	$(WebCore)/bindings/scripts/IDLParser.pm \
-	$(WebCore)/bindings/scripts/IDLStructure.pm \
 	$(WebCore)/bindings/scripts/InFilesCompiler.pm \
 	$(WebCore)/bindings/scripts/InFilesParser.pm \
 	$(WebCore)/bindings/scripts/generate-bindings.pl \
@@ -796,7 +796,6 @@ EXTRA_DIST += \
 	Source/WebCore/bindings/scripts/CodeGenerator.pm \
 	Source/WebCore/bindings/scripts/IDLAttributes.txt \
 	Source/WebCore/bindings/scripts/IDLParser.pm \
-	Source/WebCore/bindings/scripts/IDLStructure.pm \
 	Source/WebCore/bindings/scripts/InFilesCompiler.pm \
 	Source/WebCore/bindings/scripts/InFilesParser.pm \
 	Source/WebCore/bindings/scripts/generate-bindings.pl \

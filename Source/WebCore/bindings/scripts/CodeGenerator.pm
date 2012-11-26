@@ -133,9 +133,6 @@ sub ProcessDocument
         return;
     }
 
-    # Start the actual code generation!
-    $codeGenerator->GenerateModule($useDocument, $defines);
-
     my $classes = $useDocument->classes;
     foreach my $class (@$classes) {
         print "Generating $useGenerator bindings code for IDL interface \"" . $class->name . "\"...\n" if $verbose;
@@ -690,13 +687,14 @@ sub GetVisibleInterfaceName
     return $interfaceName ? $interfaceName : $dataNode->name;
 }
 
-sub IsStrictSubtype
+sub IsSubType
 {
     my $object = shift;
     my $dataNode = shift;
     my $interfaceName = shift;
     my $found = 0;
 
+    return 1 if $interfaceName eq $dataNode->name;
     $object->ForAllParents($dataNode, sub {
         my $interface = shift;
         if ($interface->name eq $interfaceName) {

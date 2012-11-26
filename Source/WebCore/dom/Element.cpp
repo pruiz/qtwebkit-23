@@ -46,7 +46,7 @@
 #include "HTMLCollection.h"
 #include "HTMLDocument.h"
 #include "HTMLElement.h"
-#include "HTMLFormCollection.h"
+#include "HTMLFormControlsCollection.h"
 #include "HTMLFrameOwnerElement.h"
 #include "HTMLLabelElement.h"
 #include "HTMLNames.h"
@@ -304,7 +304,7 @@ bool Element::hasAttribute(const QualifiedName& name) const
 
 const AtomicString& Element::getAttribute(const QualifiedName& name) const
 {
-    if (UNLIKELY(name == styleAttr) && !isStyleAttributeValid())
+    if (UNLIKELY(name == styleAttr) && attributeData() && attributeData()->m_styleAttributeIsDirty)
         updateStyleAttribute();
 
 #if ENABLE(SVG)
@@ -662,7 +662,7 @@ const AtomicString& Element::getAttribute(const AtomicString& name) const
     bool ignoreCase = shouldIgnoreAttributeCase(this);
 
     // Update the 'style' attribute if it's invalid and being requested:
-    if (!isStyleAttributeValid() && equalPossiblyIgnoringCase(name, styleAttr.localName(), ignoreCase))
+    if (attributeData() && attributeData()->m_styleAttributeIsDirty && equalPossiblyIgnoringCase(name, styleAttr.localName(), ignoreCase))
         updateStyleAttribute();
 
 #if ENABLE(SVG)
@@ -758,7 +758,7 @@ static bool checkNeedsStyleInvalidationForIdChange(const AtomicString& oldId, co
 
 void Element::attributeChanged(const QualifiedName& name, const AtomicString& newValue)
 {
-    parseAttribute(Attribute(name, newValue));
+    parseAttribute(name, newValue);
 
     document()->incDOMTreeVersion();
 
@@ -773,7 +773,9 @@ void Element::attributeChanged(const QualifiedName& name, const AtomicString& ne
             attributeData()->setIdForStyleResolution(newId);
             shouldInvalidateStyle = testShouldInvalidateStyle && checkNeedsStyleInvalidationForIdChange(oldId, newId, styleResolver);
         }
-    } else if (name == HTMLNames::nameAttr)
+    } else if (name == classAttr)
+        classAttributeChanged(newValue);
+    else if (name == HTMLNames::nameAttr)
         setHasName(!newValue.isNull());
     else if (name == HTMLNames::pseudoAttr)
         shouldInvalidateStyle |= testShouldInvalidateStyle && isInShadowTree();
@@ -787,12 +789,6 @@ void Element::attributeChanged(const QualifiedName& name, const AtomicString& ne
 
     if (AXObjectCache::accessibilityEnabled())
         document()->axObjectCache()->handleAttributeChanged(name, this);
-}
-
-void Element::parseAttribute(const Attribute& attribute)
-{
-    if (attribute.name() == classAttr)
-        classAttributeChanged(attribute.value());
 }
 
 template <typename CharacterType>
@@ -960,6 +956,8 @@ bool Element::hasEquivalentAttributes(const Element* other) const
 {
     const ElementAttributeData* attributeData = updatedAttributeData();
     const ElementAttributeData* otherAttributeData = other->updatedAttributeData();
+    if (attributeData == otherAttributeData)
+        return true;
     if (attributeData)
         return attributeData->isEquivalent(otherAttributeData);
     if (otherAttributeData)
@@ -1650,7 +1648,7 @@ void Element::removeAttribute(const AtomicString& name)
     AtomicString localName = shouldIgnoreAttributeCase(this) ? name.lower() : name;
     size_t index = attributeData()->getAttributeItemIndex(localName, false);
     if (index == notFound) {
-        if (UNLIKELY(localName == styleAttr) && !isStyleAttributeValid() && isStyledElement())
+        if (UNLIKELY(localName == styleAttr) && attributeData()->m_styleAttributeIsDirty && isStyledElement())
             static_cast<StyledElement*>(this)->removeAllInlineStyleProperties();
         return;
     }
@@ -2335,7 +2333,7 @@ PassRefPtr<HTMLCollection> ElementRareData::ensureCachedHTMLCollection(Element* 
         collection = HTMLOptionsCollection::create(element);
     } else if (type == FormControls) {
         ASSERT(element->hasTagName(formTag) || element->hasTagName(fieldsetTag));
-        collection = HTMLFormCollection::create(element);
+        collection = HTMLFormControlsCollection::create(element);
 #if ENABLE(MICRODATA)
     } else if (type == ItemProperties) {
         collection = HTMLPropertiesCollection::create(element);
@@ -2442,8 +2440,6 @@ void Element::cloneAttributesFromElement(const Element& other)
     if (hasSyntheticAttrChildNodes())
         detachAllAttrNodesFromElement();
 
-    setIsStyleAttributeValid(other.isStyleAttributeValid());
-
     other.updateInvalidAttributes();
     if (!other.m_attributeData) {
         m_attributeData.clear();
@@ -2474,11 +2470,6 @@ void Element::cloneAttributesFromElement(const Element& other)
 
     for (unsigned i = 0; i < m_attributeData->length(); ++i) {
         const Attribute* attribute = const_cast<const ElementAttributeData*>(m_attributeData.get())->attributeItem(i);
-        // This optimization isn't very nicely factored, but a huge win for cloning elements with inline style.
-        if (isStyledElement() && attribute->name() == HTMLNames::styleAttr) {
-            static_cast<StyledElement*>(this)->styleAttributeChanged(attribute->value(), StyledElement::DoNotReparseStyleAttribute);
-            continue;
-        }
         attributeChanged(attribute->name(), attribute->value());
     }
 }

@@ -1,3 +1,818 @@
+2012-11-19  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed gardening.
+
+        * platform/chromium-linux/fast/forms/month-multiple-fields/month-multiple-fields-value-set-empty-expected.txt: Added.
+
+2012-11-19  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-19  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed, rolling out r135111.
+        http://trac.webkit.org/changeset/135111
+        https://bugs.webkit.org/show_bug.cgi?id=102356
+
+        The patch caused crashes in several layout tests
+
+        * inspector-protocol/nmi-webaudio-leak-test-expected.txt: Removed.
+        * inspector-protocol/nmi-webaudio-leak-test.html: Removed.
+        * platform/chromium-android/TestExpectations:
+        * platform/efl-wk2/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+
+2012-11-19  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-19  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-19  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-19  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed. Rebaselined a text dump.
+
+        * platform/chromium-win/fast/forms/month-multiple-fields/month-multiple-fields-value-set-empty-expected.txt: Added.
+
+2012-11-19  Kristóf Kosztyó  <kkristof@inf.u-szeged.hu>
+
+        [Qt] Unreviewed gardening.
+
+        Update test expectation and skip a new failing test.
+
+        * platform/qt-5.0/fast/js/global-constructors-expected.txt:
+        * platform/qt/TestExpectations:
+
+2012-11-19  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        [EFL][WK2] Enable media tests that pass after r135063
+        https://bugs.webkit.org/show_bug.cgi?id=102657
+
+        Unreviewed gardening, these test no longer crash after
+        https://bugs.webkit.org/show_bug.cgi?id=101428.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-11-19  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening, rebaselining after r135093.
+
+        * platform/gtk/fast/js/global-constructors-expected.txt:
+
+2012-11-19  Kent Tamura  <tkent@chromium.org>
+
+        input.value="" should clear date/time input elements with partial values
+        https://bugs.webkit.org/show_bug.cgi?id=102645
+
+        Reviewed by Kentaro Hara.
+
+        - Add tests for each of date/time input types.
+        - Add them to TextExpectations for platforms without ENABLE_INPUT_MULTIPLE_FIELDS_UI.
+
+        * fast/forms/date-multiple-fields/date-multiple-fields-value-set-empty-expected.txt: Added.
+        * fast/forms/date-multiple-fields/date-multiple-fields-value-set-empty.html: Added.
+        * fast/forms/datetime-multiple-fields/datetime-multiple-fields-value-set-empty-expected.txt: Added.
+        * fast/forms/datetime-multiple-fields/datetime-multiple-fields-value-set-empty.html: Added.
+        * fast/forms/datetimelocal-multiple-fields/datetimelocal-multiple-fields-value-set-empty-expected.txt: Added.
+        * fast/forms/datetimelocal-multiple-fields/datetimelocal-multiple-fields-value-set-empty.html: Added.
+        * fast/forms/month-multiple-fields/month-multiple-fields-value-set-empty-expected.txt: Added.
+        * fast/forms/month-multiple-fields/month-multiple-fields-value-set-empty.html: Added.
+        * fast/forms/resources/multiple-fields-value-set-empty.js: Added.
+        * fast/forms/time-multiple-fields/time-multiple-fields-value-set-empty-expected.txt: Added.
+        * fast/forms/time-multiple-fields/time-multiple-fields-value-set-empty.html: Added.
+        * fast/forms/week-multiple-fields/week-multiple-fields-value-set-empty-expected.txt: Added.
+        * fast/forms/week-multiple-fields/week-multiple-fields-value-set-empty.html: Added.
+        * platform/chromium-android/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+
+2012-11-19  Alexei Filippov  <alph@chromium.org>
+
+        Web Inspector: refine time and bytes output formatting
+        https://bugs.webkit.org/show_bug.cgi?id=102265
+
+        Reviewed by Yury Semikhatsky.
+
+        Add a space between number and unit, otherwise it's hard to read things like 88B.
+        Reduce a number of decimal digits in KB and MB formats. 1023.45KB seems to be too detailed.
+
+        * inspector/audits/audits-panel-functional-expected.txt:
+        * inspector/audits/audits-panel-noimages-functional-expected.txt:
+
+2012-11-19  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL] Update expectation for fast/js/global-constructors.html after r135093
+        https://bugs.webkit.org/show_bug.cgi?id=102653
+
+        Unreviewed EFL gardening.
+
+        Update EFL baseline for fast/js/global-constructors.html after r135093.
+
+        * platform/efl/fast/js/global-constructors-expected.txt: Added.
+
+2012-11-18  Keishi Hattori  <keishi@webkit.org>
+
+        [Chromium] Add tests for week suggestion picker
+        https://bugs.webkit.org/show_bug.cgi?id=102039
+
+        Reviewed by Kent Tamura.
+
+        Adding tests for datalist UI for <input type=week>.
+
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-with-scroll-bar-expected.png: Added.
+        * platform/chromium-win/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-key-operations-expected.txt: Added.
+        * platform/chromium/TestExpectations:
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-expected.txt: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl-expected.txt: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl.html: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-with-scroll-bar-expected.txt: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-with-scroll-bar.html: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance.html: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-key-operations-expected.txt: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-key-operations.html: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-min-max-attribute-expected.txt: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-min-max-attribute.html: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-mouse-operations-expected.txt: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-mouse-operations.html: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-reset-value-after-reload-expected.txt: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-reset-value-after-reload.html: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-step-attribute-expected.txt: Added.
+        * platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-step-attribute.html: Added.
+
+2012-11-18  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Skip networkinformation tests wrongly unskipped in r135096
+        https://bugs.webkit.org/show_bug.cgi?id=102650
+
+        Unreviewed EFL gardening.
+
+        Skip again for EFL Debug bots several networkinformation tests
+        that were wrongly unskipped in r135096 as they still hit an
+        assertion.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-11-18  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        Unreviewed: add missed test files for r135111.
+
+        * inspector-protocol/resources/audio-context.html: Added.
+        * inspector-protocol/resources/blank.html: Added.
+
+2012-11-16  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        webaudio: leak: AudioContext objects are leaking. They retain 36mb of shared data.
+        https://bugs.webkit.org/show_bug.cgi?id=102356
+
+        Reviewed by Adam Barth.
+
+        A clean-up code was moved from uninitialize to clear method.
+        AudioContext marks itself as hasPendingActivity in method constructCommon and unmarks itself in method clear.
+        m_isStopScheduled filters out second ActiveDOMObject::stop call.
+        markForDeletion appends AudioNode pointer to m_nodesToDelete array if there is no active audio thread.
+        adoptRef was added in createOfflineContext method.
+
+        * inspector-protocol/nmi-webaudio-leak-test-expected.txt: Added.
+        * inspector-protocol/nmi-webaudio-leak-test.html: Added.
+
+2012-11-18  Kunihiko Sakamoto  <ksakamoto@chromium.org>
+
+        min/max/step support for calendar picker on datetime/datetime-local
+        https://bugs.webkit.org/show_bug.cgi?id=102628
+
+        Reviewed by Kent Tamura.
+
+        Verify that calendar picker has correct available dates when
+        min/max/step attributes are set in datetime input.
+
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-datetime-with-step-expected.txt: Added.
+        * platform/chromium/fast/forms/calendar-picker/calendar-picker-datetime-with-step.html: Added.
+
+2012-11-18  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed. Rebaselined images.
+
+        * platform/chromium-linux-x86/fast/block/float/overhanging-tall-block-expected.txt: Added.
+        * platform/chromium-linux/fast/block/float/overhanging-tall-block-expected.png: Added.
+        * platform/chromium-linux/fast/block/float/overhanging-tall-block-expected.txt: Added.
+        * platform/chromium-mac-lion/fast/block/float/overhanging-tall-block-expected.txt: Added.
+        * platform/chromium-mac-snowleopard/fast/block/float/overhanging-tall-block-expected.txt: Added.
+        * platform/chromium-win-xp/fast/block/float/overhanging-tall-block-expected.png: Added.
+        * platform/chromium-win-xp/fast/block/float/overhanging-tall-block-expected.txt: Added.
+        * platform/efl-wk1/fast/block/float/overhanging-tall-block-expected.png: Renamed from LayoutTests/platform/efl/fast/block/float/overhanging-tall-block-expected.png.
+
+2012-11-18  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Chromium rebaseline after r135093.
+
+        * platform/chromium-linux/inspector: Added.
+        * platform/chromium-linux/inspector/console: Added.
+        * platform/chromium-linux/inspector/console/console-format-collections-expected.txt: Added.
+
+2012-11-18  KwangYong Choi  <ky0.choi@samsung.com>
+
+        [EFL] Gardening, unskip passing tests
+        https://bugs.webkit.org/show_bug.cgi?id=102460
+
+        Unreviewed EFL gardening.
+
+        The tests marked Crash by r132469 are passing now.
+
+        fast/dom/nested-script-exceptions.html, networkinformation/multiple-frames.html,
+        networkinformation/basic-all-types-of-events.html, networkinformation/updates.html,
+        networkinformation/add-listener-from-callback.html, networkinformation/basic-operation.html
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-11-18  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed. Removed a duplicated entry.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-18  Ryosuke Niwa  <rniwa@webkit.org>
+
+        Make namedItem return a node list only in HTMLFormControlsCollection and HTMLOptionsCollection
+        https://bugs.webkit.org/show_bug.cgi?id=101311
+
+        Reviewed by Darin Adler.
+
+        Added a regression test to ensure form.elements and select.options use correct interfaces,
+        and named getter for those two properties return a NodeList when there are multiple matches.
+
+        Also added appropriate IDL options to HTMLOptionsCollection.idl.
+
+        * fast/dom/collection-nameditem-move-between-documents-expected.txt: Rebaselined since namedItem
+        now correctly returns null when there is no match. This test result demonstrates a bug that
+        HTMLAllCollection doesn't inherit from HTMLCollection.
+        * fast/dom/collection-nameditem-move-between-documents.html: Ditto.
+        * fast/dom/dom-constructors-expected.txt: Rebaselined.
+        * fast/dom/html-collections-named-getter-expected.txt: Added.
+        * fast/dom/html-collections-named-getter.html: Added.
+        * fast/dom/wrapper-classes-expected.txt: Rebaselined. Since we're exposing HTMLOptionsCollection
+        on the window object, the constructor property of an instance of HTMLOptionsCollection object
+        shows up as a function. We should update the test to support this behavior in the future.
+        * inspector/console/console-format-collections-expected.txt: Rebaselined.
+        * platform/chromium/fast/dom/gc-9-expected.txt: Rebaselined since a test case for
+        HTMLOptionsCollection now passes.
+
+2012-11-18  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed.
+        r135025 marked a couple of tests as SKIP in Mac.
+        This patch marks the tests as SKIP in Chormium.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-18  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed. Marked platform/chromium/virtual/deferred/fast/images/webgl-teximage2d.html as TIMEOUT.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-18  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed. Marked fast/images/webgl-teximage2d.html as TIMEOUT.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-18  Simon Fraser  <simon.fraser@apple.com>
+
+        Rebaselines.
+
+        * platform/mac/fast/media/mq-js-media-except-02-expected.txt:
+        * platform/mac/fast/media/mq-js-media-except-03-expected.txt:
+        * platform/mac/svg/custom/baseval-animval-equality-expected.txt:
+
+2012-11-18  Antti Koivisto  <antti@apple.com>
+
+        REGRESSION(r129644): User StyleSheet not applying
+        https://bugs.webkit.org/show_bug.cgi?id=102110
+
+        Reviewed by Andreas Kling.
+
+        * inspector/timeline/timeline-script-tag-1-expected.txt:
+        
+            Update the test result. The style invalidation log is slightly different.
+
+        * userscripts/user-stylesheet-invalidate-expected.txt: Added.
+        * userscripts/user-stylesheet-invalidate.html: Added.
+
+2012-11-17  Adam Barth  <abarth@webkit.org>
+
+        REGRESSION (r133633): ASSERTION FAILED: m_wrapper || !m_jsFunction
+        https://bugs.webkit.org/show_bug.cgi?id=101428
+
+        Reviewed by Geoffrey Garen.
+
+        Add two calls to gc() to make an ASSERT trigger on every run. One call
+        to gc() does not appear to be sufficient for reasons I don't fully
+        understand.
+
+        * media/media-continues-playing-after-replace-source.html:
+
+2012-11-17  Simon Fraser  <simon.fraser@apple.com>
+
+        Simplify bounds computation for the RenderView's layer
+        https://bugs.webkit.org/show_bug.cgi?id=102597
+
+        Reviewed by Anders Carlsson.
+
+        Progressions as a result of this change:
+
+        * compositing/layer-creation/fixed-position-out-of-view-expected.txt: The height
+        is now the page height, since the page is scrollable.
+        * compositing/tiling/tile-cache-zoomed-expected.txt: The main layer now is not
+        affected by the page scale transform.
+        * platform/mac/compositing/tiling/tile-cache-zoomed-expected.txt: Ditto.
+
+2012-11-17  Simon Fraser  <simon.fraser@apple.com>
+
+        Rebaseline three tests affected by the dumping of tile grid extent.
+
+        * platform/mac/compositing/tiling/rotated-tiled-clamped-expected.txt:
+        * platform/mac/compositing/tiling/rotated-tiled-preserve3d-clamped-expected.txt:
+        * platform/mac/compositing/tiling/tile-cache-zoomed-expected.txt:
+
+2012-11-17  Simon Fraser  <simon.fraser@apple.com>
+
+        Dump the tile cache extent in layout tests
+        https://bugs.webkit.org/show_bug.cgi?id=102600
+
+        Reviewed by Anders Carlsson.
+
+        New results which contain tile cache extents.
+
+        * platform/mac/tiled-drawing/tile-coverage-after-scroll-expected.txt:
+        * platform/mac/tiled-drawing/tile-coverage-scroll-to-bottom-expected.txt:
+        * platform/mac/tiled-drawing/tile-coverage-slow-scrolling-expected.txt:
+        * platform/mac/tiled-drawing/tiled-drawing-zoom-expected.txt:
+        * platform/mac/tiled-drawing/tiled-drawing-zoom-scrolled-expected.txt:
+        * platform/mac/tiled-drawing/use-tiled-drawing-expected.txt:
+
+2012-11-17  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening. Fixing a test that's failing due to changes
+        made in r134949 and wasn't updated yet.
+
+        * http/tests/websocket/tests/hybi/workers/close-expected.txt:
+        * http/tests/websocket/tests/hybi/workers/resources/close.js:
+
+2012-11-17  Li Yin  <li.yin@intel.com>
+
+        biquadfilternode-basic.html test should cover default value of frequency, Q and gain.
+        https://bugs.webkit.org/show_bug.cgi?id=102305
+
+        Reviewed by Chris Rogers.
+
+        Spec: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html#BiquadFilterNode
+        The default values of frequency, Q and gain are clearly specified, we should
+        have related sub test to over them.
+
+        * webaudio/biquadfilternode-basic-expected.txt:
+        * webaudio/biquadfilternode-basic.html:
+
+2012-11-17  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening.
+
+        * platform/gtk/TestExpectations:
+
+2012-11-17  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed gardening. Fixing a test that's failing since r134859.
+
+        * http/tests/websocket/tests/hybi/workers/close-expected.txt:
+        * http/tests/websocket/tests/hybi/workers/resources/close.js:
+        (runInvalidStringTest):
+
+2012-11-17  Mike West  <mkwst@chromium.org>
+
+        Web Inspector: http/tests/inspector/stacktraces/* are flakey in JSC
+        https://bugs.webkit.org/show_bug.cgi?id=102380
+
+        Reviewed by Yury Semikhatsky.
+
+        The inspector stacktrace tests are quite flakey at the moment under JSC.
+        This patch drops detail out of the test that a) isn't relevent to what's
+        being tested, and b) varies under JSC for no discernable reason. A side
+        benifit of this change is that we can drop most platform-specific test
+        results, as we're now only looking at data that JSC and V8 agree upon.
+
+        * http/tests/inspector/stacktraces/csp-injected-content-warning-contains-stacktrace-expected.txt:
+        * http/tests/inspector/stacktraces/csp-inline-warning-contains-stacktrace-expected.txt:
+        * http/tests/inspector/stacktraces/csp-setInterval-warning-contains-stacktrace-expected.txt:
+        * http/tests/inspector/stacktraces/csp-setTimeout-warning-contains-stacktrace-expected.txt:
+            Reset tests based on the new level of detail.
+        * http/tests/inspector/stacktraces/resources/stacktrace-test.js:
+        (test.addMessage):
+        (test):
+            Limit the detail of the output to the top frame of the stack, and
+            drop the column number (which was always 0 in JSC).
+        * platform/chromium/http/tests/inspector/stacktraces/csp-injected-content-warning-contains-stacktrace-expected.txt: Removed.
+        * platform/chromium/http/tests/inspector/stacktraces/csp-setInterval-warning-contains-stacktrace-expected.txt: Removed.
+        * platform/chromium/http/tests/inspector/stacktraces/csp-setTimeout-warning-contains-stacktrace-expected.txt: Removed.
+            Dropping these platform-specific tests, as this patch limits the test
+            output detail to a subset that V8 and JSC agree upon.
+        * platform/chromium/http/tests/inspector/stacktraces/csp-inline-warning-contains-stacktrace-expected.txt:
+            Can't drop this one, sadly.
+
+2012-11-16  Simon Fraser  <simon.fraser@apple.com>
+
+        Rebaseline.
+
+        * platform/mac-wk2/svg/zoom/page/zoom-svg-through-object-with-absolute-size-expected.txt:
+        * platform/mac-wk2/svg/zoom/page/zoom-svg-through-object-with-huge-size-expected.txt:
+        * platform/mac-wk2/svg/zoom/page/zoom-svg-through-object-with-override-size-expected.txt:
+
+2012-11-16  Simon Fraser  <simon.fraser@apple.com>
+
+        Rebaseline some editing tests.
+
+        * platform/mac-wk2/editing/selection/caret-ltr-right-expected.txt: Removed.
+        * platform/mac-wk2/editing/selection/caret-rtl-right-expected.txt: Removed.
+        * platform/mac/TestExpectations:
+        * platform/mac/editing/pasteboard/innerText-inline-table-expected.txt:
+        * platform/mac/editing/selection/iframe-expected.txt:
+        * platform/mac/editing/selection/inline-table-expected.txt:
+        * platform/mac/editing/selection/table-caret-3-expected.txt:
+
+2012-11-16  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: setVersion excision batch 10
+        https://bugs.webkit.org/show_bug.cgi?id=102565
+
+        Reviewed by Tony Chang.
+
+        * storage/indexeddb/mozilla/resources/versionchange.js: Removed.
+          Very similar to a lot of our other tests.
+
+        * storage/indexeddb/resources/set_version_queue.js: Removed.
+          Tests 4 already-open connections calling setVersion, no longer
+          applicable. Though something similar will be set up when we
+          implement 4.1.3#Note2:
+          if two databases with the same name and origin, but with different
+          versions, are being opened at the same time, the one with the highest
+          version will attempt to be opened first.
+
+        * storage/indexeddb/resources/setversion-blocks-open.js: Removed.
+          Tests the same thing as version-change-exclusive, even though
+          version-change-exclusive's description had been inaccurate.
+
+        * storage/indexeddb/resources/setversion-blocks-setversion.js: Removed.
+          Behavior under test is no longer possible. (multiple setVersion
+          calls from same connection.)
+
+        * storage/indexeddb/resources/shared.js:
+        (indexedDBTest):
+        Added another optional parameter for version-change-exclusive.
+
+        * storage/indexeddb/resources/three-setversion-calls.js: Removed.
+          Behavior under test is no longer possible. (multiple setVersion
+          calls from same connection.)
+
+        * storage/indexeddb/resources/two-version-changes.js: Removed.
+          Behavior under test is no longer possible. (multiple setVersion
+          calls from same connection.)
+
+        * storage/indexeddb/resources/version-change-abort.js:
+          Straightforward conversion.
+
+        * storage/indexeddb/resources/version-change-exclusive.js:
+          The previous description didn't accurately describe the test.
+
+        --Corresponding .html and -expected files also removed.
+
+2012-11-16  Joshua Bell  <jsbell@chromium.org>
+
+        IndexedDB: Assert hit when getting non-existent object store in version change transaction
+        https://bugs.webkit.org/show_bug.cgi?id=102547
+
+        Reviewed by Tony Chang.
+
+        Regression test - make sure that .objectStore() and .index() fail on unknown names
+        in "versionchange" transactions.
+
+        * storage/indexeddb/object-lookups-in-versionchange-expected.txt: Added.
+        * storage/indexeddb/object-lookups-in-versionchange.html: Added.
+
+2012-11-16  Simon Fraser  <simon.fraser@apple.com>
+
+        Eliminate ancestor tree walk computing outlineBoundsForRepaint() when updating layer positions
+        https://bugs.webkit.org/show_bug.cgi?id=101874
+
+        Reviewed by Dave Hyatt.
+
+        In debug, skip tests that assert because of LayoutUnit truncation.
+
+        * platform/mac/TestExpectations:
+
+2012-11-16  Alec Flett  <alecflett@chromium.org>
+
+        Add tests for explicit serialization values
+        https://bugs.webkit.org/show_bug.cgi?id=96818
+
+        Reviewed by Adam Barth.
+
+        Make sure SerializedScriptValues are backward compatible with future changes.
+
+        * platform/chromium/fast/storage/serialized-script-value.html: Added.
+        * platform/chromium/fast/storage/serialized-script-value.txt: Added.
+
+2012-11-16  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: setVersion excision batch 9
+        https://bugs.webkit.org/show_bug.cgi?id=102455
+
+        Reviewed by Tony Chang.
+
+        * storage/indexeddb/persistence-expected.txt:
+        * storage/indexeddb/resources/persistence.js:
+        (prepareDatabase):
+        Little awkwardness to get the initial version number to be 0 (actually,
+        because of a bug it's "") so that first() will trigger a
+        versionchange.
+        (first):
+
+        * storage/indexeddb/resources/set_version_blocked.js:
+          Small "blocked" test. It's probably redundant due to our crazier
+          tests, but it is nice to have a succinct test that checks one thing.
+
+        * storage/indexeddb/resources/shared.js:
+        (unexpectedBlockedCallback):
+        * storage/indexeddb/resources/transaction-basics.js:
+          This test is a mess, obviously written near the dawn of IDB when no
+          one knew how to write an effective test for it. In the interests of
+          preventing the diff from exploding I didn't take all the
+          clarification opportunities that were there.
+
+        * storage/indexeddb/resources/transaction-error.js:
+        * storage/indexeddb/set_version_blocked-expected.txt:
+        * storage/indexeddb/transaction-basics-expected.txt:
+        * storage/indexeddb/transaction-error-expected.txt:
+
+2012-11-16  Dimitri Glazkov  <dglazkov@chromium.org>
+
+        [Chromium] Removed unnecessary expectation.
+
+        * platform/chromium-win/fast/canvas/canvas-shadow-expected.txt: Removed.
+
+2012-11-16  Pablo Flouret  <pablof@motorola.com>
+
+        [JSC] Don't sanitize window.onerror information on crossorigin-enabled scripts
+        https://bugs.webkit.org/show_bug.cgi?id=70574
+
+        Reviewed by Geoffrey Garen.
+
+        * http/tests/security/resources/cors-script.php:
+        * http/tests/security/script-crossorigin-onerror-information-expected.txt: Added.
+        * http/tests/security/script-crossorigin-onerror-information.html: Added.
+        * http/tests/security/script-no-crossorigin-onerror-should-be-sanitized-expected.txt: Added.
+        * http/tests/security/script-no-crossorigin-onerror-should-be-sanitized.html: Added.
+
+        * platform/chromium/TestExpectations:
+            This patch only deals with JSC right now, skip the new tests.
+
+2012-11-16  Dimitri Glazkov  <dglazkov@chromium.org>
+
+        [Chromium] Remaining bits of Win7 rebaselines.
+
+2012-11-16  Dimitri Glazkov  <dglazkov@chromium.org>
+
+        [Chromium] Massive rebaseline after Win7 came back up.
+
+2012-11-16  Dimitri Glazkov  <dglazkov@chromium.org>
+
+        Unreviewed, rolling out r134986.
+        http://trac.webkit.org/changeset/134986
+        https://bugs.webkit.org/show_bug.cgi?id=102110
+
+        Triggered ASSERT in fast/frames/seamless/seamless-inherited-
+        origin.html.
+
+        * userscripts/user-stylesheet-invalidate-expected.txt: Removed.
+        * userscripts/user-stylesheet-invalidate.html: Removed.
+
+2012-11-16  Antti Koivisto  <antti@apple.com>
+
+        REGRESSION(r129644): User StyleSheet not applying
+        https://bugs.webkit.org/show_bug.cgi?id=102110
+
+        Reviewed by Andreas Kling.
+
+        * userscripts/user-stylesheet-invalidate-expected.txt: Added.
+        * userscripts/user-stylesheet-invalidate.html: Added.
+
+2012-11-15  Brent Fulgham  <bfulgham@webkit.org>
+
+        [WinCairo] Sync with Windows test expectations.
+
+        * platform/wincairo/TestExpectations: Update to match Windows.
+
+2012-11-16  Dimitri Glazkov  <dglazkov@chromium.org>
+
+        [Chromium] adjusting expectations for checkerboard.html
+
+2012-11-16  Li Yin  <li.yin@intel.com>
+
+        audiopannernode-basic.html should cover default value of attribute.
+        https://bugs.webkit.org/show_bug.cgi?id=102332
+
+        Reviewed by Chris Rogers.
+
+        Spec: https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html#PannerNode
+        Currently almost all attributes of PannerNode are specified default value clearly,
+        the test should cover them.
+
+        * webaudio/audiopannernode-basic-expected.txt:
+        * webaudio/audiopannernode-basic.html:
+
+2012-11-16  Tommy Widenflycht  <tommyw@google.com>
+
+        [chromium] MediaStream API: Add missing WebRTCPeerConnectionHandlerClient::didAddRemoteDataChannel
+        https://bugs.webkit.org/show_bug.cgi?id=102386
+
+        Reviewed by Adam Barth.
+
+        * fast/mediastream/RTCPeerConnection-datachannel.html:
+        * fast/mediastream/RTCPeerConnection-datachannel-expected.txt:
+
+2012-11-16  Robert Flack  <flackr@chromium.org>
+
+        Handle gesture events on scrollbars.
+        https://bugs.webkit.org/show_bug.cgi?id=101516
+
+        Reviewed by Antonio Gomes.
+
+        Adds a gesture event handler to scrollbars and sends gestures beginning
+        over a scrollbar to this handler to allow touch scrolling scrollbars.
+
+        * fast/events/touch/gesture/gesture-scrollbar-expected.txt: Added.
+        * fast/events/touch/gesture/gesture-scrollbar.html: Added.
+
+2012-11-16  Dimitri Glazkov  <dglazkov@chromium.org>
+
+        [Chromium] Removed incorrect baseline.
+
+        * platform/chromium-mac/canvas/philip/tests/2d.shadow.enable.blur-expected.txt: Removed.
+
+2012-11-16  Erik Arvidsson  <arv@chromium.org>
+
+        Update DOMException name: TypeMismatchError
+        https://bugs.webkit.org/show_bug.cgi?id=102418
+
+        Reviewed by Kentaro Hara.
+
+        Updated tests and expectations.
+
+        * editing/selection/extend-expected.txt:
+        * fast/dom/Element/attr-param-typechecking-expected.txt:
+        * fast/dom/Geolocation/argument-types-expected.txt:
+        * fast/dom/Geolocation/not-enough-arguments-expected.txt:
+        * fast/dom/Geolocation/script-tests/argument-types.js:
+        (test):
+        * fast/dom/HTMLSelectElement/select-selectedIndex-expected.txt:
+        * fast/dom/HTMLSelectElement/select-selectedIndex-multiple-expected.txt:
+        * fast/js/select-options-add-expected.txt:
+        * fast/mediastream/RTCIceCandidate-expected.txt:
+        * fast/mediastream/RTCPeerConnection-expected.txt:
+        * fast/mediastream/RTCSessionDescription-expected.txt:
+        * platform/chromium/fast/dynamic/insertAdjacentElement-expected.txt:
+        * platform/efl/fast/dynamic/insertAdjacentElement-expected.txt:
+        * platform/gtk/fast/dynamic/insertAdjacentElement-expected.txt:
+        * platform/mac/fast/dynamic/insertAdjacentElement-expected.txt:
+        * platform/qt/fast/dynamic/insertAdjacentElement-expected.txt:
+        * security/crypto-random-values-types-expected.txt:
+        * svg/dom/SVGTransformList-expected.txt:
+
+2012-11-16  Erik Arvidsson  <arv@chromium.org>
+
+        Update DOMException name: InvalidAccessError
+        https://bugs.webkit.org/show_bug.cgi?id=102400
+
+        Reviewed by Kentaro Hara.
+
+        Updated tests and expectations.
+
+        * editing/undomanager/undomanager-reenter-expected.txt:
+        * editing/undomanager/undomanager-reenter.html:
+        * editing/undomanager/undoscopehost-use-after-free-expected.txt:
+        * editing/undomanager/undoscopehost-use-after-free.html:
+        * fast/css/CSSPrimitiveValue-exceptions-expected.txt:
+        * fast/css/getFloatValueForUnit-expected.txt:
+        * fast/css/getFloatValueForUnit.html:
+        * fast/css/resources/CSSPrimitiveValue-exceptions.js:
+        * fast/dom/XMLSerializer-doctype2-expected.txt:
+        * fast/dom/XMLSerializer-doctype2.html:
+        * fast/dom/setPrimitiveValue-exceptions-expected.txt:
+        * fast/xmlhttprequest/xmlhttprequest-responsetype-before-open-sync-request-expected.txt:
+        * fast/xmlhttprequest/xmlhttprequest-responsetype-sync-request-expected.txt:
+        * fast/xmlhttprequest/xmlhttprequest-sync-disabled-expected.txt:
+        * http/tests/media/media-source/video-media-source-add-and-remove-buffers-expected.txt:
+        * http/tests/media/media-source/video-media-source-duration-changed-expected.txt:
+        * http/tests/websocket/tests/hybi/close-expected.txt:
+        * http/tests/websocket/tests/hybi/close.html:
+        * platform/chromium-mac/fast/dom/setPrimitiveValue-exceptions-expected.txt:
+        * platform/chromium-win/fast/dom/setPrimitiveValue-exceptions-expected.txt:
+        * webintents/web-intents-api-expected.txt:
+        * webintents/web-intents-api.html:
+
+2012-11-16  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [EFL] Gardening failure cases on EFL build bots
+        https://bugs.webkit.org/show_bug.cgi?id=102496
+
+        Unreviewed EFL gardening.
+
+        * platform/efl-wk1/fast/media/mq-js-media-except-02-expected.png: Removed.
+        * platform/efl-wk1/fast/media/mq-js-media-except-03-expected.png: Removed.
+        * platform/efl-wk2/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/efl/fast/media/mq-js-media-except-02-expected.png: Added.
+        * platform/efl/fast/media/mq-js-media-except-02-expected.txt: Added.
+        * platform/efl/fast/media/mq-js-media-except-03-expected.png: Added.
+        * platform/efl/fast/media/mq-js-media-except-03-expected.txt: Added.
+
+2012-11-16  Zan Dobersek  <zandobersek@gmail.com>
+
+        Unreviewed GTK gardening, rebaselining after r134859.
+
+        * platform/gtk/fast/media/mq-js-media-except-02-expected.txt: Added.
+        * platform/gtk/fast/media/mq-js-media-except-03-expected.txt: Added.
+
+2012-11-16  Shinya Kawanaka  <shinyak@chromium.org>
+
+        Changing pseudoClass (:indeterminate) should cause distribution
+        https://bugs.webkit.org/show_bug.cgi?id=101903
+
+        Reviewed by Dimitri Glazkov.
+
+        I've used "-webkit-appearance: none" for progress element because of Bug 102459.
+        It prevents from testing progress element on Windows.
+
+        * fast/dom/shadow/pseudoclass-update-indeterminate-input-expected.html: Added.
+        * fast/dom/shadow/pseudoclass-update-indeterminate-input.html: Added.
+        * fast/dom/shadow/pseudoclass-update-indeterminate-progress-expected.html: Added.
+        * fast/dom/shadow/pseudoclass-update-indeterminate-progress.html: Added.
+
+2012-11-16  Mike West  <mkwst@chromium.org>
+
+        [chromium] Unreviewed gardening.
+
+        http/tests/security/sandboxed-iframe-form-top.html is leaking state into
+        the next test, and should have been skipped for Chromium as well as mac
+        in r134789. This patch remedies that oversight.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-16  Yury Semikhatsky  <yurys@chromium.org>
+
+        Web Inspector: don't show an Error when evaluating a watch expression results in an exception
+        https://bugs.webkit.org/show_bug.cgi?id=102470
+
+        Reviewed by Vsevolod Vlasov.
+
+        Check that watch expression has value "<not available>" in case of exception
+        during its evaluation instead of a special style class tha has been removed.
+
+        * inspector/debugger/error-in-watch-expressions.html:
+
+2012-11-16  Elliott Sprehn  <esprehn@chromium.org>
+
+        REGRESSION (r134774-r134779): fast/frames/detached-shadow-frame.html failing on Apple Win 7 Release (Tests)
+        https://bugs.webkit.org/show_bug.cgi?id=102433
+
+        Reviewed by Dimitri Glazkov.
+
+        Need to include the Shadow DOM polyfill.js since not all ports
+        web expose the WebkitShadowRoot constructor.
+
+        * fast/frames/detached-shadow-frame.html:
+
 2012-11-16  Csaba Osztrogonác  <ossy@webkit.org>
 
         [Qt] Unreviewed gardening.

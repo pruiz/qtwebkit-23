@@ -95,7 +95,6 @@
 #include "PlatformContextSkia.h"
 #include "PlatformKeyboardEvent.h"
 #include "PlatformMouseEvent.h"
-#include "PlatformThemeChromiumLinux.h"
 #include "PlatformWheelEvent.h"
 #include "PointerLockController.h"
 #include "PopupContainer.h"
@@ -165,6 +164,11 @@
 #include <wtf/TemporaryChange.h>
 #include <wtf/Uint8ClampedArray.h>
 
+#if ENABLE(DEFAULT_RENDER_THEME)
+#include "PlatformThemeChromiumDefault.h"
+#include "RenderThemeChromiumDefault.h"
+#endif
+
 #if ENABLE(GESTURE_EVENTS)
 #include "PlatformGestureCurveFactory.h"
 #include "PlatformGestureEvent.h"
@@ -172,9 +176,12 @@
 #endif
 
 #if OS(WINDOWS)
+#if !ENABLE(DEFAULT_RENDER_THEME)
 #include "RenderThemeChromiumWin.h"
+#endif
 #else
-#if OS(UNIX) && !OS(DARWIN)
+#if OS(UNIX) && !OS(DARWIN) && !ENABLE(DEFAULT_RENDER_THEME)
+#include "PlatformThemeChromiumLinux.h"
 #include "RenderThemeChromiumLinux.h"
 #endif
 #include "RenderTheme.h"
@@ -692,6 +699,8 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
 
     switch (event.type) {
     case WebInputEvent::GestureFlingStart: {
+        if (mainFrameImpl()->frame()->eventHandler()->isScrollbarHandlingGestures())
+            break;
         m_client->cancelScheduledContentIntents();
         m_lastWheelPosition = WebPoint(event.x, event.y);
         m_lastWheelGlobalPosition = WebPoint(event.globalX, event.globalY);
@@ -2925,7 +2934,7 @@ void WebViewImpl::setDeviceScaleFactor(float scaleFactor)
 
     page()->setDeviceScaleFactor(scaleFactor);
 
-    if (m_layerTreeView && m_webSettings->applyDefaultDeviceScaleFactorInCompositor()) {
+    if (m_layerTreeView && m_webSettings->applyDeviceScaleFactorInCompositor()) {
         m_deviceScaleInCompositor = page()->deviceScaleFactor();
         m_layerTreeView->setDeviceScaleFactor(m_deviceScaleInCompositor);
     }
@@ -3552,7 +3561,9 @@ void WebViewImpl::setDomainRelaxationForbidden(bool forbidden, const WebString& 
 void WebViewImpl::setScrollbarColors(unsigned inactiveColor,
                                      unsigned activeColor,
                                      unsigned trackColor) {
-#if OS(UNIX) && !OS(DARWIN) && !OS(ANDROID)
+#if ENABLE(DEFAULT_RENDER_THEME)
+    PlatformThemeChromiumDefault::setScrollbarColors(inactiveColor, activeColor, trackColor);
+#elif OS(UNIX) && !OS(DARWIN) && !OS(ANDROID)
     PlatformThemeChromiumLinux::setScrollbarColors(inactiveColor, activeColor, trackColor);
 #endif
 }
@@ -3561,11 +3572,11 @@ void WebViewImpl::setSelectionColors(unsigned activeBackgroundColor,
                                      unsigned activeForegroundColor,
                                      unsigned inactiveBackgroundColor,
                                      unsigned inactiveForegroundColor) {
-#if OS(UNIX) && !OS(DARWIN) && !OS(ANDROID)
-    RenderThemeChromiumLinux::setSelectionColors(activeBackgroundColor,
-                                                 activeForegroundColor,
-                                                 inactiveBackgroundColor,
-                                                 inactiveForegroundColor);
+#if ENABLE(DEFAULT_RENDER_THEME)
+    RenderThemeChromiumDefault::setSelectionColors(activeBackgroundColor, activeForegroundColor, inactiveBackgroundColor, inactiveForegroundColor);
+    theme()->platformColorsDidChange();
+#elif OS(UNIX) && !OS(DARWIN) && !OS(ANDROID)
+    RenderThemeChromiumLinux::setSelectionColors(activeBackgroundColor, activeForegroundColor, inactiveBackgroundColor, inactiveForegroundColor);
     theme()->platformColorsDidChange();
 #endif
 }
@@ -4001,7 +4012,7 @@ void WebViewImpl::setIsAcceleratedCompositingActive(bool active)
 
         m_layerTreeView = adoptPtr(Platform::current()->compositorSupport()->createLayerTreeView(this, *m_rootLayer, layerTreeViewSettings));
         if (m_layerTreeView) {
-            if (m_webSettings->applyDefaultDeviceScaleFactorInCompositor() && page()->deviceScaleFactor() != 1) {
+            if (m_webSettings->applyDeviceScaleFactorInCompositor() && page()->deviceScaleFactor() != 1) {
                 ASSERT(page()->deviceScaleFactor());
 
                 m_deviceScaleInCompositor = page()->deviceScaleFactor();

@@ -22,6 +22,7 @@
 #define EwkViewImpl_h
 
 #include "EwkViewCallbacks.h"
+#include "ImmutableDictionary.h"
 #include "RefPtrEfl.h"
 #include "WKEinaSharedString.h"
 #include "WKGeometry.h"
@@ -62,6 +63,10 @@ class WebPopupMenuProxyEfl;
 #if ENABLE(VIBRATION)
 class VibrationClientEfl;
 #endif
+
+#if USE(COORDINATED_GRAPHICS)
+class LayerTreeRenderer;
+#endif
 }
 
 namespace WebCore {
@@ -76,6 +81,7 @@ class EwkBackForwardList;
 class EwkColorPicker;
 class EwkPopupMenu;
 class EwkSettings;
+class EwkWindowFeatures;
 
 #if USE(ACCELERATED_COMPOSITING)
 typedef struct _Evas_GL_Context Evas_GL_Context;
@@ -102,6 +108,7 @@ public:
     EwkContext* ewkContext() { return m_context.get(); }
     EwkSettings* settings() { return m_settings.get(); }
     EwkBackForwardList* backForwardList() { return m_backForwardList.get(); }
+    EwkWindowFeatures* windowFeatures();
 
     WebCore::IntSize size() const;
     bool isFocused() const;
@@ -156,7 +163,7 @@ public:
     void dismissColorPicker();
 #endif
 
-    WKPageRef createNewPage(WKDictionaryRef windowFeatures);
+    WKPageRef createNewPage(WebKit::ImmutableDictionary* windowFeatures);
     void closePage();
 
     void requestPopupMenu(WebKit::WebPopupMenuProxyEfl*, const WebCore::IntRect&, WebCore::TextDirection, double pageScaleFactor, const Vector<WebKit::WebPopupItem>& items, int32_t selectedIndex);
@@ -206,6 +213,10 @@ private:
     inline Ewk_View_Smart_Data* smartData() const;
     void displayTimerFired(WebCore::Timer<EwkViewImpl>*);
 
+#if USE(COORDINATED_GRAPHICS)
+    WebKit::LayerTreeRenderer* layerTreeRenderer();
+#endif
+
     void informIconChange();
 
     static void onMouseDown(void* data, Evas*, Evas_Object*, void* eventInfo);
@@ -244,6 +255,7 @@ private:
     WebCore::IntPoint m_scrollPosition;
 #endif
     OwnPtr<EwkSettings> m_settings;
+    RefPtr<EwkWindowFeatures> m_windowFeatures;
     const void* m_cursorIdentifier; // This is an address, do not free it.
     WKEinaSharedString m_faviconURL;
     WKEinaSharedString m_url;

@@ -403,6 +403,7 @@ fast/dom/HTMLAnchorElement/anchor-download-unset.html
 # For now, Web Audio API is disabled
 webaudio/
 webkit.org/b/101729 inspector-protocol/nmi-webaudio.html
+webkit.org/b/101729 inspector-protocol/nmi-webaudio-leak-test.html
 
 # [Qt] Enable WebGL by default for QtWebKit
 # https://bugs.webkit.org/show_bug.cgi?id=65998
@@ -1885,10 +1886,6 @@ css2.1/20110323/inline-non-replaced-height-002.htm
 # Regressions occured after Qt version update
 # ============================================================================= #
 
-# [Qt] fast/forms/textarea-appearance-wrap.html fails with Qt >= 4.7.1
-# https://bugs.webkit.org/show_bug.cgi?id=50145
-fast/forms/textarea-appearance-wrap.html
-
 # [Qt] 4 css2.1/t1202-counter tests fail with Qt >= 4.7.1
 # https://bugs.webkit.org/show_bug.cgi?id=50146
 css2.1/t1202-counter-09-b.html [ Failure ]
@@ -1998,13 +1995,6 @@ fast/loader/form-submission-after-beforeunload-cancel.html
 
 # This test verifies that a mismatch reftest will fail as intended if both results are same.
 fast/harness/sample-fail-mismatch-reftest.html
-
-# [Qt] REGRESSION(r93937): 4 failing and 3 flaky tests
-# https://bugs.webkit.org/show_bug.cgi?id=67118
-# Flaky
-fast/forms/number/number-large-padding.html
-fast/forms/number/number-spinbutton-capturing.html
-fast/forms/number/number-spinbutton-change-and-input-events.html
 
 # [Qt] fast/text/line-initial-and-final-swashes.html fails
 # https://bugs.webkit.org/show_bug.cgi?id=69719
@@ -2382,3 +2372,9 @@ webkit.org/b/98523 fast/images/repaint-subrect-grid.html
 
 # [Qt] New css3/filters/effect-reference-ordering-hw.html crashes
 webkit.org/b/101925 css3/filters/effect-reference-ordering-hw.html
+
+# [Qt] fast/block/float/overhanging-tall-block.html asserts after r135025
+webkit.org/b/102675 [ Debug ] fast/block/float/overhanging-tall-block.html
+
+# [Qt] New fast/frames/frame-unload-crash2.html fails with timeout
+webkit.org/b/102877 fast/frames/frame-unload-crash2.html

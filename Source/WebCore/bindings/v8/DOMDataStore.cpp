@@ -54,12 +54,17 @@ DOMDataStore::~DOMDataStore()
 DOMDataStore* DOMDataStore::current(v8::Isolate* isolate)
 {
     DEFINE_STATIC_LOCAL(DOMDataStore, mainWorldDOMDataStore, (MainWorld));
+
     V8PerIsolateData* data = isolate ? V8PerIsolateData::from(isolate) : V8PerIsolateData::current();
     if (UNLIKELY(!!data->domDataStore()))
         return data->domDataStore();
-    V8DOMWindowShell* context = V8DOMWindowShell::getEntered();
-    if (UNLIKELY(!!context))
-        return context->world()->isolatedWorldDOMDataStore();
+
+    if (DOMWrapperWorld::isolatedWorldsExist()) {
+        V8DOMWindowShell* shell = V8DOMWindowShell::isolated(v8::Context::GetEntered());
+        if (UNLIKELY(!!shell))
+            return shell->world()->isolatedWorldDOMDataStore();
+    }
+
     return &mainWorldDOMDataStore;
 }
 

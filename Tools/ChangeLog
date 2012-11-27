@@ -1,3 +1,461 @@
+2012-11-21  Yael Aharon  <yael.aharon@intel.com>, Gyuyoung Kim <gyuyoung.kim@samsung.com>
+
+        [EFL] Turn on WTF_USE_TILED_BACKING_STORE by default
+        https://bugs.webkit.org/show_bug.cgi?id=101526
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Turn on WTF_USE_TILED_BACKING_STORE for EFL port.
+
+        * Scripts/webkitperl/FeatureList.pm:
+        * TestWebKitAPI/CMakeLists.txt: No include KURL.cpp because of API test crash.
+
+2012-11-21  Jongseok Yang  <js45.yang@samsung.com>
+
+        [EFL][WK2] Rename ewk_view_setting_encoding_custom_XXX to ewk_view_custom_encoding_XXX
+        https://bugs.webkit.org/show_bug.cgi?id=102867
+
+        Reviewed by Gyuyoung Kim.
+
+        Rename ewk_view_setting_encoding_custom_XXX to ewk_view_custom_encoding_XXX.
+
+        ewk_view_setting_encoding_custom_XXX APIs might be misunderstanded as the "setting" word
+        because ewk_view_setting_encoding_custom_set triggers the "reload" operation.
+        And ewk_view_setting_XXX is not correct because there is ewk_settings object for settings.
+
+        * MiniBrowser/efl/main.c:
+        (on_key_down):
+
+2012-11-20  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r133859.
+        http://trac.webkit.org/changeset/133859
+        https://bugs.webkit.org/show_bug.cgi?id=102875
+
+        This patch makes API test broken (Requested by gyuyoung on
+        #webkit).
+
+        * Scripts/webkitperl/FeatureList.pm:
+
+2012-11-20  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL][WK2] Add Ewk_Window_Features API and related UI callbacks
+        https://bugs.webkit.org/show_bug.cgi?id=99114
+
+        Reviewed by Gyuyoung Kim.
+
+        Implemented window_create and window_close smartcallback functions.
+
+        * MiniBrowser/efl/main.c:
+        (on_window_create):
+        (on_window_close):
+        (window_create):
+
+2012-11-20  Ojan Vafai  <ojan@chromium.org>
+
+        Simplify builder filters now that we have lists of which builders run which tests
+        https://bugs.webkit.org/show_bug.cgi?id=102849
+
+        Reviewed by Dirk Pranke.
+
+        We only need filters when we load the same master for multiple groups in the
+        same test type, i.e. when we need to only include some of the builders that run
+        a given test suite on a given master.
+
+        Also, get rid of the DEFAULT_BUILDER enum. We were always using the first builder anyways.
+        Now just make it a method on BuilderGroup.
+
+        * TestResultServer/static-dashboards/builders.js:
+        (BuilderGroup.prototype.append):
+        (BuilderGroup.prototype.setup):
+        (BuilderGroup.prototype._defaultBuilder):
+        (BuilderGroup.prototype.master):
+        (requestBuilderList):
+        (isChromiumWebkitTipOfTreeTestRunner):
+        (isChromiumWebkitDepsTestRunner):
+        (loadBuildersList):
+        * TestResultServer/static-dashboards/flakiness_dashboard_unittests.js:
+        (test):
+
+2012-11-20  Ojan Vafai  <ojan@chromium.org>
+
+        Remove perfav master for webkit_unit_tests and test_shell_tests.
+        There are no bots on this master that run these tests.
+        * TestResultServer/static-dashboards/builders.js:
+
+2012-11-20  Ojan Vafai  <ojan@chromium.org>
+
+        Remove special case for layout tests when builders fail to load
+        https://bugs.webkit.org/show_bug.cgi?id=102842
+
+        Reviewed by Tony Chang.
+
+        Now that we load only builders that actually run the given test
+        type, we can reliably show errors to the users because it
+        represents a broken bot.
+        * TestResultServer/static-dashboards/loader.js:
+
+2012-11-15  Ojan Vafai  <ojan@chromium.org>
+
+        Generate a list of builders/test suites from the buildbot json
+        https://bugs.webkit.org/show_bug.cgi?id=102443
+
+        Reviewed by Dirk Pranke.
+
+        Instead of the cludgy things we do now to track which bots run which tests,
+        we generate all that data from the buildbots' json files.
+        This is the minimal amount to keep everything working. Once this lands,
+        we can also do a bunch of followup cleanup.
+
+        For now we commit the generated data. In theory, in the future, we could
+        have the test results server generate the data on the fly.
+
+        For the sake of easily understanding what changes when we run the generate script,
+        also checkin a pretty printed version of the output. The pretty printed version
+        is too large to serve as part of the flakiness dashboard though.
+
+        This also has the benefit of making the dashboard load much faster since
+        we no longer ever need to block on requests to buildbot.
+
+        * TestResultServer/generate_builders_json.py: Added.
+        (master_json_url):
+        (builder_json_url):
+        (cached_build_json_url):
+        (fetch_json):
+        (insert_builder_and_test_data):
+        (main):
+        * TestResultServer/generate_builders_json_unittest.py: Added.
+        (GenerateBuildersJsonTest):
+        (GenerateBuildersJsonTest.test_master_json_url):
+        (GenerateBuildersJsonTest.test_builder_json_url):
+        (GenerateBuildersJsonTest.test_cached_build_json_url):
+        (GenerateBuildersJsonTest.test_generate_json_data):
+        (GenerateBuildersJsonTest.test_generate_json_data.dummy_fetch_json):
+        * TestResultServer/static-dashboards/builders-pretty.jsonp: Added.
+        * TestResultServer/static-dashboards/builders.js:
+        (LOAD_BUILDBOT_DATA):
+        (BuilderGroup):
+        (BuilderGroup.prototype.append):
+        (BuilderGroup.prototype.master):
+        (requestBuilderList):
+        * TestResultServer/static-dashboards/builders.jsonp: Added.
+        * TestResultServer/static-dashboards/builders_unittests.js: Added.
+        * TestResultServer/static-dashboards/dashboard_base.js:
+        * TestResultServer/static-dashboards/flakiness_dashboard.js:
+        (showPopupForBuild):
+        (htmlForTestResults):
+        (htmlForIndividualTestOnAllBuildersWithResultsLinks):
+        (loadExpectationsLayoutTests):
+        * TestResultServer/static-dashboards/flakiness_dashboard_unittests.js:
+        (resetGlobals):
+        (test):
+        * TestResultServer/static-dashboards/loader.js:
+        * TestResultServer/static-dashboards/loader_unittests.js:
+        * TestResultServer/static-dashboards/run-embedded-unittests.html:
+        * TestResultServer/static-dashboards/run-unittests.html:
+        * TestResultServer/static-dashboards/timeline_explorer.html:
+
+2012-11-20  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [WTR][Qt] Enable fixedLayout when needed by the test
+        https://bugs.webkit.org/show_bug.cgi?id=102811
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Create a flickable view for CSS Device Adaptation tests. This is
+        crucial for testing them since they will change the size of the
+        viewport.
+
+        * WebKitTestRunner/PlatformWebView.h:
+        (PlatformWebView):
+        * WebKitTestRunner/qt/PlatformWebViewQt.cpp:
+        (WTR::PlatformWebView::PlatformWebView):
+        (WTR::PlatformWebView::viewSupportsOptions):
+        (WTR):
+        * WebKitTestRunner/qt/main.cpp:
+        (main):
+
+2012-11-20  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [WTR] WebKitTestRunner should be able to run tests using fixed layout
+        https://bugs.webkit.org/show_bug.cgi?id=102517
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        WTR will now request the creation of a view that has a page using
+        fixed layout for CSS Device Adaptation tests, but this feature might
+        be used in the future by any other test that requires a mobile-like type
+        of viewport (i.e. Viewport META tests should be ported).
+
+        The viewport type of the other tests remains unchanged and is restored
+        when the runner leaves the device-adapt/ folder.
+
+        * WebKitTestRunner/PlatformWebView.h:
+        (PlatformWebView):
+        * WebKitTestRunner/TestInvocation.cpp:
+        (WTR):
+        (WTR::shouldUseFixedLayout):
+        (WTR::updateLayoutType):
+        (WTR::TestInvocation::invoke):
+        * WebKitTestRunner/efl/PlatformWebViewEfl.cpp:
+        (WTR::PlatformWebView::PlatformWebView):
+        (WTR::PlatformWebView::viewSupportsOptions):
+        (WTR):
+
+2012-11-20  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] REGRESSION(r128174): Fast build path doesn't work now
+        https://bugs.webkit.org/show_bug.cgi?id=100360
+
+        Reviewed by Tor Arne Vestbø.
+
+        Use a separated .builtRevisions.cache file instead of .qmake.cache to cache built SVN revisions.
+
+        * Scripts/webkitdirs.pm:
+        (buildQMakeProjects):
+
+2012-11-20  Mateusz Leszko  <m.leszko@samsung.com>
+
+        [EFL][GTK]Sharing accessibility support in WebKitTestRunner.
+        https://bugs.webkit.org/show_bug.cgi?id=99011
+
+        Reviewed by Martin Robinson.
+
+        Accessibility files from gtk folder are moved to atk folder due to common implementation. Event Type naming changed to default, from Gtk to ATK.
+
+        * WebKitTestRunner/InjectedBundle/atk/AccessibilityControllerAtk.cpp: Renamed from Tools/WebKitTestRunner/InjectedBundle/gtk/AccessibilityControllerGtk.cpp.
+        (WTR::AccessibilityController::logAccessibilityEvents):
+        * WebKitTestRunner/InjectedBundle/atk/AccessibilityUIElementAtk.cpp: Renamed from Tools/WebKitTestRunner/InjectedBundle/gtk/AccessibilityUIElementGtk.cpp.
+
+2012-11-20  Zan Dobersek  <zandobersek@gmail.com>
+
+        webkitpy unit tests should run serially when checking code coverage
+        https://bugs.webkit.org/show_bug.cgi?id=102693
+
+        Reviewed by Dirk Pranke.
+
+        When checking code coverage, the unit tests should not be run in parallel
+        as this causes the tracing functions (set via sys.settrace in the coverage
+        module) being overriden, resulting in incorrect coverage reports.
+
+        * Scripts/webkitpy/test/main.py:
+        (Tester._run_tests):
+
+2012-11-19  Viatcheslav Ostapenko  <v.ostapenko@samsung.com>
+
+        [EFL] Add fallback for WebkitTestRunner if opengl is not available.
+        https://bugs.webkit.org/show_bug.cgi?id=102704
+
+        Reviewed by Laszlo Gombos.
+
+        Add fallback to non-opengl evas engine in WebkitTestRunner if opengl is not available.
+
+        * WebKitTestRunner/efl/PlatformWebViewEfl.cpp:
+        (WTR::initEcoreEvas):
+
+2012-11-19  Dimitri Glazkov  <dglazkov@chromium.org>
+
+        [garden-o-matic] Switch frontend to use the gardeningserver.
+        https://bugs.webkit.org/show_bug.cgi?id=102712
+
+        Reviewed by Dirk Pranke.
+
+        Instead of serving garden-o-matic frontend as file, we now serve it from the gardening server. This enables
+        using garden-o-matic in a Chrome OS device, with a separate machine as a headless server.
+
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/garden-o-matic.html: Changed CSP policy to use 'self'.
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/checkout.js: Removed now-unnecessary references to kLocalServerURL.
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/checkout_unittests.js: Tweaked the test expectation.
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/config.js: Removed kLocalServerURL.
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/controllers.js: Spuriously updated the name of the webkit-patch command.
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/results.js: Removed kLocalServerURL.
+        * Scripts/webkitpy/tool/servers/gardeningserver.py: Changed to use the new launch URL.
+
+2012-11-19  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r135172.
+        http://trac.webkit.org/changeset/135172
+        https://bugs.webkit.org/show_bug.cgi?id=102710
+
+        Broke some WebKit2 api tests :( (Requested by japhet on
+        #webkit).
+
+        * DumpRenderTree/chromium/WebViewHost.cpp:
+        (WebViewHost::updateForCommittedLoad):
+
+2012-11-19  Dimitri Glazkov  <dglazkov@chromium.org>
+
+        [garden-o-matic] Enable serving garden-o-matic with gardeningserver.
+        https://bugs.webkit.org/show_bug.cgi?id=102703
+
+        Reviewed by Ojan Vafai.
+
+        To enable gardening from a Chrome OS device, we need the ability to serve garden-o-matic
+        from the same origin as the gardening server. This change gently massages the current
+        logic to adapt an extension-sniffing-based approach of identifying static files,
+        rather than requiring an explicit list.
+
+        * Scripts/webkitpy/tool/servers/reflectionhandler.py:
+        (ReflectionHandler): Replaced STATIC_FILE_NAMES with STATIC_FILE_EXTENSIONS.
+        (ReflectionHandler._handle_request): Changed the logic to smell for extensions, rather than specific files.
+        * Scripts/webkitpy/tool/servers/reflectionhandler_unittest.py: Added.
+
+2012-11-19  Ojan Vafai  <ojan@chromium.org>
+
+        Add DOM and HTML watchlists and add myself to a bunch of lists
+        https://bugs.webkit.org/show_bug.cgi?id=102707
+
+        Reviewed by Eric Seidel.
+
+        * Scripts/webkitpy/common/config/watchlist:
+
+2012-11-19  Jochen Eisinger  <jochen@chromium.org>
+
+        [chromium] move methods that only use the WebKit API from DRTTestRunner to TestRunner
+        https://bugs.webkit.org/show_bug.cgi?id=102676
+
+        Reviewed by Tony Chang.
+
+        In addition, I've replaced parsePageNumber with the more commonly used
+        cppVariantToInt32, moved abortModal to the list of stubbed out methods,
+        and removed setAutomaticLinkDetectionEnabled which wasn't used
+        anywhere.
+
+        * DumpRenderTree/chromium/DRTTestRunner.cpp:
+        (DRTTestRunner::DRTTestRunner):
+        (DRTTestRunner::reset):
+        (DRTTestRunner::overridePreference):
+        * DumpRenderTree/chromium/DRTTestRunner.h:
+        (DRTTestRunner):
+        * DumpRenderTree/chromium/TestRunner/src/TestRunner.cpp:
+        (WebTestRunner::TestRunner::TestRunner):
+        (WebTestRunner::TestRunner::reset):
+        (WebTestRunner):
+        (WebTestRunner::TestRunner::setTabKeyCyclesThroughElements):
+        (WebTestRunner::TestRunner::setAsynchronousSpellCheckingEnabled):
+        (WebTestRunner::TestRunner::execCommand):
+        (WebTestRunner::TestRunner::isCommandEnabled):
+        (WebTestRunner::TestRunner::pauseAnimationAtTimeOnElementWithId):
+        (WebTestRunner::TestRunner::pauseTransitionAtTimeOnElementWithId):
+        (WebTestRunner::TestRunner::elementDoesAutoCompleteForElementWithId):
+        (WebTestRunner::TestRunner::numberOfActiveAnimations):
+        (WebTestRunner::TestRunner::callShouldCloseOnWebView):
+        (WebTestRunner::TestRunner::setDomainRelaxationForbiddenForURLScheme):
+        (WebTestRunner::TestRunner::evaluateScriptInIsolatedWorldAndReturnValue):
+        (WebTestRunner::TestRunner::evaluateScriptInIsolatedWorld):
+        (WebTestRunner::TestRunner::setIsolatedWorldSecurityOrigin):
+        (WebTestRunner::TestRunner::setIsolatedWorldContentSecurityPolicy):
+        (WebTestRunner::TestRunner::addOriginAccessWhitelistEntry):
+        (WebTestRunner::TestRunner::removeOriginAccessWhitelistEntry):
+        (WebTestRunner::TestRunner::hasCustomPageSizeStyle):
+        (WebTestRunner::TestRunner::forceRedSelectionColors):
+        (WebTestRunner::TestRunner::addUserScript):
+        (WebTestRunner::TestRunner::addUserStyleSheet):
+        (WebTestRunner::TestRunner::startSpeechInput):
+        (WebTestRunner::TestRunner::loseCompositorContext):
+        (WebTestRunner::TestRunner::markerTextForListItem):
+        (WebTestRunner::TestRunner::findString):
+        (WebTestRunner::TestRunner::setMinimumTimerInterval):
+        (WebTestRunner::TestRunner::setAutofilled):
+        (WebTestRunner::TestRunner::setValueForUser):
+        (WebTestRunner::TestRunner::enableFixedLayoutMode):
+        (WebTestRunner::TestRunner::setFixedLayoutSize):
+        (WebTestRunner::TestRunner::selectionAsMarkup):
+        (WebTestRunner::TestRunner::setTextSubpixelPositioning):
+        (WebTestRunner::TestRunner::resetPageVisibility):
+        (WebTestRunner::TestRunner::setPageVisibility):
+        (WebTestRunner::TestRunner::setTextDirection):
+        (WebTestRunner::TestRunner::textSurroundingNode):
+        (WebTestRunner::TestRunner::workerThreadCount):
+        (WebTestRunner::TestRunner::cppVariantToBool):
+        (WebTestRunner::TestRunner::cppVariantToInt32):
+        (WebTestRunner::TestRunner::cppVariantToWebString):
+        (WebTestRunner::TestRunner::cppVariantToWebStringArray):
+        (WebTestRunner::TestRunner::printErrorMessage): formerly logErrorToConsole
+        (WebTestRunner::TestRunner::fallbackMethod):
+        * DumpRenderTree/chromium/TestRunner/src/TestRunner.h:
+        (WebKit):
+        (WebTestRunner::TestRunner::setWebView):
+        (TestRunner):
+        * DumpRenderTree/chromium/TestShell.cpp:
+        (TestShell::createMainWindow):
+        (TestShell::~TestShell):
+
+2012-11-19  Yusuke Sato  <yusukes@chromium.org>
+
+        [Chromium] Flash cannot receive scroll events when threaded compositing is in use
+        https://bugs.webkit.org/show_bug.cgi?id=101423
+
+        Reviewed by James Robinson.
+
+        Call setWantsWheelEvents(true) in initialize() so that gesture-events and transformed-events tests in
+        LayoutTests/platform/chromium/plugins/ will not fail even if a buildbot introduces threaded compositing
+        in the future.
+
+        * DumpRenderTree/chromium/TestWebPlugin.cpp:
+        (TestWebPlugin::initialize):
+
+2012-11-19  Nate Chapin  <japhet@chromium.org>
+
+        Move empty loading to DocumentLoader, simplify FrameLoader::init()
+        https://bugs.webkit.org/show_bug.cgi?id=101512
+
+        Reviewed by Adam Barth.
+
+        Chromium DRT has some code that doesn't play nicely with empty urls and incorrectly
+        interprets them as a non-empty load. This ensures
+        http/tests/navigation/new-window-redirect-history.html continues to pass
+        in chromium.
+
+        * DumpRenderTree/chromium/WebViewHost.cpp:
+        (WebViewHost::updateForCommittedLoad):
+
+2012-11-19  Vincent Scheib  <scheib@chromium.org>
+
+        [Chromium] Remove WebKit::WebRuntimeFeatures::enablePointerLock.
+        https://bugs.webkit.org/show_bug.cgi?id=96946
+
+        Reviewed by Adam Barth.
+
+        The runtime flag functionality has already been removed.
+        Now that Chromium no longer has a compile dependency on this
+        API, it can be removed as well.
+
+        * DumpRenderTree/chromium/TestShell.cpp:
+        (TestShell::TestShell):
+
+2012-11-19  Kihong Kwon  <kihong.kwon@samsung.com>
+
+        Add PROXIMITY_EVENTS feature
+        https://bugs.webkit.org/show_bug.cgi?id=102658
+
+        Reviewed by Kentaro Hara.
+
+        Add PROXIMITY_EVENTS feature to FeatureList and qmake.
+
+        * Scripts/webkitperl/FeatureList.pm:
+        * qmake/mkspecs/features/features.pri:
+
+2012-11-19  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [WK2][WTR] Memory leak in TestController::initialize()
+        https://bugs.webkit.org/show_bug.cgi?id=102616
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Remove call to WKStringCreateWithUTF8CString() to construct
+        the icon database path which was leaking memory since the
+        returned WKStringRef was not adopted. The code now uses
+        WTF::String instead of std::string and converts it to a
+        WKStringRef using toWK().
+
+        * WebKitTestRunner/StringFunctions.h:
+        (WTR::toWK): Overload toWK() to take a WTF::String in
+        argument.
+        (WTR):
+        * WebKitTestRunner/TestController.cpp:
+        (WTR::TestController::initialize):
+
 2012-11-19  Kentaro Hara  <haraken@chromium.org>
 
         Remove IDLStructure.pm

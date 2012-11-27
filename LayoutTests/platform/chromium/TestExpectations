@@ -1677,7 +1677,6 @@ webkit.org/b/98647 [ Android ] css3/filters/effect-invert-hw.html [ ImageOnlyFai
 webkit.org/b/98647 [ Android ] css3/filters/effect-opacity-hw.html [ ImageOnlyFailure ]
 # Commented out until more generalized failure below is fixed & rebaselined.
 # webkit.org/b/98647 [ Android ] css3/filters/effect-reference-hw.html [ ImageOnlyFailure ]
-webkit.org/b/98647 [ Android ] css3/filters/effect-saturate-hw.html [ ImageOnlyFailure ]
 webkit.org/b/98647 [ Android ] css3/filters/effect-sepia-hw.html [ ImageOnlyFailure ]
 webkit.org/b/98647 [ Android ] css3/filters/filter-change-repaint-composited.html [ ImageOnlyFailure ]
 webkit.org/b/98647 [ Android ] css3/filters/filter-change-repaint.html [ ImageOnlyFailure ]
@@ -1698,7 +1697,6 @@ webkit.org/b/98762 [ Android ] compositing/iframes/composited-iframe-alignment.h
 webkit.org/b/98762 [ Android ] compositing/overflow/ancestor-overflow.html [ ImageOnlyFailure ]
 webkit.org/b/98762 [ Android ] compositing/overflow/overflow-positioning.html [ ImageOnlyFailure ]
 webkit.org/b/98762 [ Android ] compositing/overflow/scrollbar-painting.html [ ImageOnlyFailure ]
-webkit.org/b/98762 [ Android ] compositing/shadows/shadow-drawing.html [ ImageOnlyFailure ]
 webkit.org/b/98762 [ Android ] compositing/transitions/singular-scale-transition.html [ ImageOnlyFailure ]
 webkit.org/b/98762 [ Android ] compositing/z-order/negative-z-index.html [ ImageOnlyFailure ]
 
@@ -1977,7 +1975,6 @@ crbug.com/9798 [ Win ] http/tests/misc/refresh-headers.php [ Pass Slow ]
 crbug.com/9798 [ Win ] http/tests/xmlhttprequest/access-control-basic-allow-preflight-cache-timeout.html [ Pass Timeout ]
 crbug.com/9798 [ Win Debug ] http/tests/xmlhttprequest/encode-request-url-2.html [ Pass Timeout ]
 crbug.com/9797 crbug.com/9798 [ Win Release ] http/tests/xmlhttprequest/state-after-network-error.html [ Pass Slow ]
-crbug.com/9797 [ Android Linux ] svg/carto.net/colourpicker.svg [ ImageOnlyFailure Pass ]
 crbug.com/9798 [ Android Linux Release ] transitions/transition-timing-function.html [ Pass Slow ]
 # This test definitely times out (i.e. is not just slow).
 crbug.com/9798 [ Win Release ] http/tests/xmlhttprequest/small-chunks-response-text.html [ Pass Timeout ]
@@ -2196,6 +2193,37 @@ crbug.com/42875 sputnik [ WontFix ]
 
 # WebKit roll 58791:58807
 crbug.com/43319 [ Android Linux Debug ] fast/forms/select-empty-option-height.html [ Pass Timeout ]
+
+# To be rebaselined for https://code.google.com/p/skia/source/detail?r=6483
+crbug.com/161899 webkit.org/b/98762 compositing/shadows/shadow-drawing.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/box-shadow/basic-shadows.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/box-shadow/box-shadow-clipped-slices.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/box-shadow/box-shadow-radius.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/box-shadow/box-shadow-transformed.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/box-shadow/inset-box-shadow-radius.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/box-shadow/inset-box-shadows.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/box-shadow/inset.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/box-shadow/scaled-box-shadow.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/box-shadow/single-pixel-shadow.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/repaint/box-shadow-h.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/repaint/box-shadow-v.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/repaint/shadow-multiple-vertical.html [ Failure ImageOnlyFailure ]
+# Not included in tests modified by 81992, but started failing on Android at same time:
+crbug.com/161899 crbug.com/77494 fast/repaint/transform-replaced-shadows.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  fast/transforms/shadows.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-ru.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  platform/chromium/fast/forms/calendar-picker/month-picker-appearance.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  platform/chromium/fast/forms/calendar-picker/week-picker-appearance-step.html [ Failure ImageOnlyFailure ]
+crbug.com/161899 webkit.org/b/99421 platform/chromium/fast/forms/calendar-picker/week-picker-appearance.html [ Failure ImageOnlyFailure Pass Missing ]
+crbug.com/161899  platform/chromium/fast/forms/color/color-suggestion-picker-appearance.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  platform/chromium/fast/forms/color/color-suggestion-picker-one-row-appearance.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  platform/chromium/fast/forms/color/color-suggestion-picker-two-row-appearance.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  platform/chromium/fast/forms/color/color-suggestion-picker-with-scrollbar-appearance.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  platform/chromium/virtual/softwarecompositing/shadows/shadow-drawing.html [ Failure ImageOnlyFailure ]
+crbug.com/161899  svg/filters/shadow-on-rect-with-filter.svg [ Failure ImageOnlyFailure ]
 
 crbug.com/43890 [ Win ] http/tests/loading/basic.html [ Failure Pass ]
 
@@ -2679,8 +2707,6 @@ crbug.com/77468 fast/forms/file/input-file-directory-upload.html [ Timeout ]
 crbug.com/77494 [ Android Linux Win ] fast/repaint/layout-state-scrolloffset.html [ Failure ]
 crbug.com/77494 [ Android Linux Win ] fast/repaint/layout-state-scrolloffset2.html [ Failure ]
 crbug.com/77494 [ Android Linux Win ] fast/repaint/layout-state-scrolloffset3.html [ Failure ]
-# Not included in tests modified by 81992, but started failing at same time:
-crbug.com/77494 [ Android ] fast/repaint/transform-replaced-shadows.html [ ImageOnlyFailure ]
 
 # Regression since r82001.
 crbug.com/77619 [ SnowLeopard ] plugins/plugin-javascript-access.html [ Failure ]
@@ -2829,6 +2855,9 @@ webkit.org/b/98906 platform/chromium/fast/forms/suggestion-picker/date-suggestio
 webkit.org/b/99421 platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl.html [ Pass ImageOnlyFailure Missing ]
 webkit.org/b/99421 platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-with-scroll-bar.html [ Pass ImageOnlyFailure Missing ]
 webkit.org/b/99421 platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance.html [ Pass ImageOnlyFailure Missing ]
+
+# Needs rebaseline
+webkit.org/b/102769 fast/forms/datetime/datetime-appearance-l10n.html [ Pass ImageOnlyFailure Missing ]
 
 # New test added in r87324
 crbug.com/83994 [ Win ] platform/win/plugins/call-javascript-that-destroys-plugin.html [ Failure ]
@@ -3331,6 +3360,7 @@ webkit.org/b/82717 [ SnowLeopard ] storage/websql/database-lock-after-reload.htm
 webkit.org/b/82776 storage/indexeddb/dont-commit-on-blocked.html
 webkit.org/b/82776 storage/indexeddb/pending-version-change-stuck.html
 webkit.org/b/82776 storage/indexeddb/pending-version-change-stuck-works-with-terminate.html
+webkit.org/b/82776 storage/indexeddb/pending-version-change-on-exit.html
 
 webkit.org/b/ [ Win Release ] http/tests/xmlhttprequest/redirect-cross-origin-post.html [ Failure Pass ]
 
@@ -3456,6 +3486,7 @@ webkit.org/b/86674 [ Debug ] fast/dom/HTMLObjectElement/beforeload-set-text-cras
 
 webkit.org/b/86683 [ Linux Win Debug ] inspector/profiler/heap-snapshot-summary-show-ranges.html [ Failure Slow ]
 webkit.org/b/86683 [ Linux Win Release ] inspector/profiler/heap-snapshot-summary-show-ranges.html [ Failure Pass Slow ]
+webkit.org/b/102781 [ Linux Win DEBUG ] inspector/profiler/cpu-profiler-profiling-without-inspector.html [ Crash Pass ]
 
 webkit.org/b/86908 [ Win ] http/tests/security/cross-frame-access-put.html [ Failure Pass ]
 
@@ -3500,9 +3531,6 @@ webkit.org/b/102164 [ MountainLion ] fast/regions/region-style-image-background-
 webkit.org/b/102164 [ MountainLion ] fast/regions/render-region-custom-style-mark.html [ ImageOnlyFailure ]
 
 webkit.org/b/87273 [ Release ] webaudio/audioparam-connect-audioratesignal.html [ Pass Timeout ]
-
-webkit.org/b/97439 [ Release ] webaudio/biquad-getFrequencyResponse.html [ Failure Pass ]
-webkit.org/b/97439 [ Debug ] webaudio/biquad-getFrequencyResponse.html [ Crash Pass ]
 
 webkit.org/b/87321 [ XP ] fast/history/history-subframe-with-name.html [ Failure Pass ]
 webkit.org/b/87321 [ XP ] fast/history/history-traversal-is-asynchronous.html [ Failure Pass ]
@@ -4184,3 +4212,10 @@ webkit.org/b/102294 platform/chromium/virtual/deferred/fast/images/gray-scale-jp
 webkit.org/b/85522 http/tests/security/sandboxed-iframe-form-top.html [ Skip ]
 webkit.org/b/102542 [ Win7 ] platform/chromium/virtual/softwarecompositing/checkerboard.html [ Image ]
 webkit.org/b/102542 [ Linux Mac Win ] compositing/checkerboard.html [ Image ]
+
+webkit.org/b/102724 crbug.com/9797 crbug.com/161762 [ Debug ] svg/carto.net/colourpicker.svg [ Crash ]
+webkit.org/b/102724 crbug.com/9797 crbug.com/161762 [ Release ] svg/carto.net/colourpicker.svg [ ImageOnlyFailure ]
+webkit.org/b/102724 crbug.com/161762 [ Debug ] svg/custom/gradient-stop-corner-cases.svg [ Crash ]
+webkit.org/b/102724 crbug.com/161762 [ Release ] svg/custom/gradient-stop-corner-cases.svg [ ImageOnlyFailure ]
+
+webkit.org/b/102898 webkit.org/b/98647 css3/filters/effect-saturate-hw.html [ Crash ]

@@ -337,6 +337,7 @@ SOURCES += \
     css/StyleSheet.cpp \
     css/StyleSheetContents.cpp \
     css/StyleSheetList.cpp \
+    css/ViewportStyleResolver.cpp \
     css/WebKitCSSArrayFunctionValue.cpp \
     css/WebKitCSSFilterValue.cpp \
     css/WebKitCSSKeyframeRule.cpp \
@@ -1053,7 +1054,6 @@ SOURCES += \
     platform/network/BlobResourceHandle.cpp \
     platform/network/Credential.cpp \
     platform/network/CredentialStorage.cpp \
-    platform/network/ContentTypeParser.cpp \
     platform/network/FormData.cpp \
     platform/network/FormDataBuilder.cpp \
     platform/network/HTTPHeaderMap.cpp \
@@ -1062,6 +1062,7 @@ SOURCES += \
     platform/network/HTTPValidation.cpp \
     platform/network/MIMEHeader.cpp \
     platform/network/NetworkStateNotifier.cpp \
+    platform/network/ParsedContentType.cpp \
     platform/network/ProtectionSpace.cpp \
     platform/network/ProxyServer.cpp \
     platform/network/ResourceErrorBase.cpp \
@@ -1513,6 +1514,7 @@ HEADERS += \
     css/StyleSheet.h \
     css/StyleSheetContents.h \
     css/StyleSheetList.h \
+    css/ViewportStyleResolver.h \
     css/WebKitCSSArrayFunctionValue.h \
     css/WebKitCSSFilterValue.h \
     css/WebKitCSSKeyframeRule.h \
@@ -2241,7 +2243,6 @@ HEADERS += \
     platform/network/CookieStorage.h \
     platform/network/Credential.h \
     platform/network/CredentialStorage.h \
-    platform/network/ContentTypeParser.h \
     platform/network/DNSResolveQueue.h \
     platform/network/FormDataBuilder.h \
     platform/network/FormData.h \
@@ -2253,6 +2254,7 @@ HEADERS += \
     platform/network/MIMESniffing.h \
     platform/network/NetworkingContext.h \
     platform/network/NetworkStateNotifier.h \
+    platform/network/ParsedContentType.h \
     platform/network/PlatformCookieJar.h \
     platform/network/ProtectionSpace.h \
     platform/network/ProxyServer.h \
@@ -2448,6 +2450,7 @@ HEADERS += \
     rendering/style/CounterDirectives.h \
     rendering/style/CursorData.h \
     rendering/style/CursorList.h \
+    rendering/style/ExclusionShapeValue.h \
     rendering/style/FillLayer.h \
     rendering/style/KeyframeList.h \
     rendering/style/NinePieceImage.h \

@@ -53,6 +53,10 @@ public:
     using NodeRareData::containsFullScreenElement;
     using NodeRareData::setContainsFullScreenElement;
 #endif
+#if ENABLE(DIALOG_ELEMENT)
+    using NodeRareData::isInTopLayer;
+    using NodeRareData::setIsInTopLayer;
+#endif
 
     bool hasCachedHTMLCollections() const
     {
@@ -80,13 +84,9 @@ public:
         if (!m_cachedCollections)
             return;
 
-        bool shouldIgnoreType = !attrName || *attrName == HTMLNames::idAttr || *attrName == HTMLNames::nameAttr;
-
         for (unsigned i = 0; i < (*m_cachedCollections).size(); i++) {
-            if (HTMLCollection* collection = (*m_cachedCollections)[i]) {
-                if (shouldIgnoreType || DynamicNodeListCacheBase::shouldInvalidateTypeOnAttributeChange(collection->invalidationType(), *attrName))
-                    collection->invalidateCache();
-            }
+            if (HTMLCollection* collection = (*m_cachedCollections)[i])
+                collection->invalidateCache(attrName);
         }
     }
 

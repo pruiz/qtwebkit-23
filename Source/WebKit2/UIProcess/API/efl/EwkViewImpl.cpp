@@ -54,6 +54,7 @@
 #include "ewk_settings_private.h"
 #include "ewk_view.h"
 #include "ewk_view_private.h"
+#include "ewk_window_features_private.h"
 #include <Ecore_Evas.h>
 #include <Ecore_X.h>
 #include <Edje.h>
@@ -327,6 +328,21 @@ AffineTransform EwkViewImpl::transformToScreen() const
     return transform;
 }
 
+#if USE(COORDINATED_GRAPHICS)
+LayerTreeRenderer* EwkViewImpl::layerTreeRenderer()
+{
+    DrawingAreaProxy* drawingArea = page()->drawingArea();
+    if (!drawingArea)
+        return 0;
+
+    WebKit::LayerTreeCoordinatorProxy* layerTreeCoordinatorProxy = drawingArea->layerTreeCoordinatorProxy();
+    if (!layerTreeCoordinatorProxy)
+        return 0;
+
+    return layerTreeCoordinatorProxy->layerTreeRenderer();
+}
+#endif
+
 void EwkViewImpl::displayTimerFired(Timer<EwkViewImpl>*)
 {
 #if USE(COORDINATED_GRAPHICS)
@@ -337,7 +353,10 @@ void EwkViewImpl::displayTimerFired(Timer<EwkViewImpl>*)
     // We are supposed to clip to the actual viewport, nothing less.
     IntRect viewport(sd->view.x, sd->view.y, sd->view.w, sd->view.h);
 
-    LayerTreeRenderer* renderer = page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer();
+    LayerTreeRenderer* renderer = layerTreeRenderer();
+    if (!renderer)
+        return;
+
     renderer->setActive(true);
     renderer->setDrawsBackground(m_setDrawsBackground);
     renderer->syncRemoteContent();
@@ -596,7 +615,7 @@ bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
         if (!m_evasGL) {
             WARN("Failed to create Evas_GL, falling back to software mode.");
             m_isHardwareAccelerated = false;
-            page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer()->setAccelerationMode(TextureMapper::SoftwareMode);
+            layerTreeRenderer()->setAccelerationMode(TextureMapper::SoftwareMode);
 #if ENABLE(WEBGL)
             m_pageProxy->pageGroup()->preferences()->setWebGLEnabled(false);
 #endif
@@ -641,7 +660,7 @@ bool EwkViewImpl::createGLSurface(const IntSize& viewSize)
 
 bool EwkViewImpl::enterAcceleratedCompositingMode()
 {
-    page()->drawingArea()->layerTreeCoordinatorProxy()->layerTreeRenderer()->setActive(true);
+    layerTreeRenderer()->setActive(true);
 
     if (!m_isHardwareAccelerated)
         return true;
@@ -832,37 +851,45 @@ void EwkViewImpl::informURLChange()
     informIconChange();
 }
 
-WKPageRef EwkViewImpl::createNewPage(WKDictionaryRef windowFeatures)
+EwkWindowFeatures* EwkViewImpl::windowFeatures()
+{
+    if (!m_windowFeatures)
+        m_windowFeatures = EwkWindowFeatures::create(0, this);
+
+    return m_windowFeatures.get();
+}
+
+WKPageRef EwkViewImpl::createNewPage(ImmutableDictionary* windowFeatures)
 {
     Ewk_View_Smart_Data* sd = smartData();
     ASSERT(sd->api);
 
-    Evas_Object* newEwkView = 0;
-
-    // Extract the width and height from the window attributes and pass them along to the embedder.
-    WKRetainPtr<WKStringRef> widthStr(AdoptWK, WKStringCreateWithUTF8CString("width"));
-    WKRetainPtr<WKStringRef> heightStr(AdoptWK, WKStringCreateWithUTF8CString("height"));
-
-    WKTypeRef ref = WKDictionaryGetItemForKey(windowFeatures, widthStr.get());
-    unsigned width = ref ? WKDoubleGetValue(static_cast<WKDoubleRef>(ref)) : 0;
-    ref = WKDictionaryGetItemForKey(windowFeatures, heightStr.get());
-    unsigned height = ref ? WKDoubleGetValue(static_cast<WKDoubleRef>(ref)) : 0;
-
-    if (!sd->api->window_create_new)
+    if (!sd->api->window_create)
         return 0;
 
-    if (!(newEwkView = sd->api->window_create_new(sd, width, height)))
+    RefPtr<EwkWindowFeatures> ewkWindowFeatures = EwkWindowFeatures::create(windowFeatures, this);
+
+    Evas_Object* newEwkView = sd->api->window_create(sd, ewkWindowFeatures.get());
+    if (!newEwkView)
         return 0;
 
     EwkViewImpl* newViewImpl = EwkViewImpl::fromEvasObject(newEwkView);
     ASSERT(newViewImpl);
+
+    newViewImpl->m_windowFeatures = ewkWindowFeatures;
 
     return static_cast<WKPageRef>(WKRetain(newViewImpl->page()));
 }
 
 void EwkViewImpl::closePage()
 {
-    smartCallback<CloseWindow>().call();
+    Ewk_View_Smart_Data* sd = smartData();
+    ASSERT(sd->api);
+
+    if (!sd->api->window_close)
+        return;
+
+    sd->api->window_close(sd);
 }
 
 void EwkViewImpl::onMouseDown(void* data, Evas*, Evas_Object*, void* eventInfo)

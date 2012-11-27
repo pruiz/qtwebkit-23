@@ -41,50 +41,52 @@ template <typename StringType>
 StringType v8StringToWebCoreString(v8::Handle<v8::String>, ExternalMode);
 String int32ToWebCoreString(int value);
 
-class V8ParameterBase {
+// V8Parameter is an adapter class that converts V8 values to Strings
+// or AtomicStrings as appropriate, using multiple typecast operators.
+enum V8ParameterMode {
+    DefaultMode,
+    WithNullCheck,
+    WithUndefinedOrNullCheck
+};
+
+template <V8ParameterMode Mode = DefaultMode>
+class V8Parameter {
 public:
+    V8Parameter()
+        : m_mode(Externalize)
+        , m_string()
+    {
+    }
+
+    // This can throw. You must use this through the
+    // EXCEPTION_BLOCK() macro.
+    V8Parameter& operator=(v8::Local<v8::Value>);
     operator String() { return toString<String>(); }
     operator AtomicString() { return toString<AtomicString>(); }
 
-protected:
-    V8ParameterBase(v8::Local<v8::Value> object) : m_v8Object(object), m_mode(Externalize), m_string() { }
-
-    bool prepareBase()
+private:
+    void prepareBase()
     {
         if (m_v8Object.IsEmpty())
-            return true;
+            return;
 
         if (LIKELY(m_v8Object->IsString()))
-            return true;
+            return;
 
         if (LIKELY(m_v8Object->IsInt32())) {
             setString(int32ToWebCoreString(m_v8Object->Int32Value()));
-            return true;
+            return;
         }
 
         m_mode = DoNotExternalize;
-        v8::TryCatch block;
         m_v8Object = m_v8Object->ToString();
-        // Handle the case where an exception is thrown as part of invoking toString on the object.
-        if (block.HasCaught()) {
-            block.ReThrow();
-            return false;
-        }
-        return true;
     }
-
-    v8::Local<v8::Value> object() { return m_v8Object; }
 
     void setString(const String& string)
     {
         m_string = string;
         m_v8Object.Clear(); // To signal that String is ready.
     }
-
-private:
-    v8::Local<v8::Value> m_v8Object;
-    ExternalMode m_mode;
-    String m_string;
 
     template <class StringType>
     StringType toString()
@@ -94,48 +96,37 @@ private:
 
         return StringType(m_string);
     }
+
+    v8::Local<v8::Value> m_v8Object;
+    ExternalMode m_mode;
+    String m_string;
 };
 
-// V8Parameter is an adapter class that converts V8 values to Strings
-// or AtomicStrings as appropriate, using multiple typecast operators.
-enum V8ParameterMode {
-    DefaultMode,
-    WithNullCheck,
-    WithUndefinedOrNullCheck
-};
-
-template <V8ParameterMode MODE = DefaultMode>
-class V8Parameter: public V8ParameterBase {
-public:
-    V8Parameter(v8::Local<v8::Value> object) : V8ParameterBase(object) { }
-    V8Parameter(v8::Local<v8::Value> object, bool) : V8ParameterBase(object) { prepare(); }
-
-    bool prepare();
-};
-
-template<> inline bool V8Parameter<DefaultMode>::prepare()
+template<> inline V8Parameter<DefaultMode>& V8Parameter<DefaultMode>::operator=(v8::Local<v8::Value> object)
 {
-    return V8ParameterBase::prepareBase();
+    m_v8Object = object;
+    prepareBase();
+    return *this;
 }
 
-template<> inline bool V8Parameter<WithNullCheck>::prepare()
+template<> inline V8Parameter<WithNullCheck>& V8Parameter<WithNullCheck>::operator=(v8::Local<v8::Value> object)
 {
-    if (object().IsEmpty() || object()->IsNull()) {
+    m_v8Object = object;
+    if (m_v8Object.IsEmpty() || m_v8Object->IsNull())
         setString(String());
-        return true;
-    }
-
-    return V8ParameterBase::prepareBase();
+    else
+        prepareBase();
+    return *this;
 }
 
-template<> inline bool V8Parameter<WithUndefinedOrNullCheck>::prepare()
+template<> inline V8Parameter<WithUndefinedOrNullCheck>& V8Parameter<WithUndefinedOrNullCheck>::operator=(v8::Local<v8::Value> object)
 {
-    if (object().IsEmpty() || object()->IsNull() || object()->IsUndefined()) {
+    m_v8Object = object;
+    if (m_v8Object.IsEmpty() || m_v8Object->IsNull() || m_v8Object->IsUndefined())
         setString(String());
-        return true;
-    }
-
-    return V8ParameterBase::prepareBase();
+    else
+        prepareBase();
+    return *this;
 }
     
 } // namespace WebCore

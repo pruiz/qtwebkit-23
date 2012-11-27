@@ -1,3 +1,643 @@
+2012-11-21  Jongseok Yang  <js45.yang@samsung.com>
+
+        [EFL][WK2] Rename ewk_view_setting_encoding_custom_XXX to ewk_view_custom_encoding_XXX
+        https://bugs.webkit.org/show_bug.cgi?id=102867
+
+        Reviewed by Gyuyoung Kim.
+
+        Rename ewk_view_setting_encoding_custom_XXX to ewk_view_custom_encoding_XXX.
+
+        ewk_view_setting_encoding_custom_XXX APIs might be misunderstanded as the "setting" word
+        because ewk_view_setting_encoding_custom_set triggers the "reload" operation.
+        And ewk_view_setting_XXX is not correct because there is ewk_settings object for settings.
+
+        * UIProcess/API/efl/ewk_view.cpp:
+        (ewk_view_encoding_custom_get):
+        (ewk_view_encoding_custom_set):
+        * UIProcess/API/efl/ewk_view.h:
+        * UIProcess/API/efl/tests/test_ewk2_view.cpp:
+        (TEST_F):
+
+2012-11-20  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL][WK2] Remove unnecessary #include in API test
+        https://bugs.webkit.org/show_bug.cgi?id=102674
+
+        Reviewed by Laszlo Gombos.
+
+        Removed duplicated header files from the API test cases.
+        Now, EWK2UnitTestBase.h includes the basic header files, 
+        so test cases may only include this one and add the addtional
+        header files if necessary.
+
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestBase.h:
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestEnvironment.h:
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestMain.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_auth_request.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_back_forward_list.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_color_picker.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_context.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_context_history_callbacks.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_cookie_manager.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_database_manager.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_download_job.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_eina_shared_string.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_favicon_database.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_file_chooser_request.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_intents.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_object.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_popup_menu.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_refptr_evas_object.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_settings.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_storage_manager.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_text_checker.cpp:
+        * UIProcess/API/efl/tests/test_ewk2_view.cpp:
+
+2012-11-19  Sam Weinig  <sam@webkit.org>
+
+        Simplify WebConnection by removing its underlying CoreIPC::Connection
+        https://bugs.webkit.org/show_bug.cgi?id=102771
+
+        Reviewed by Anders Carlsson.
+
+        Instead of having WebConnection subclasses own the CoreIPC::Connection,
+        move back to having the WebProcess and WebProcessProxy own it (and be
+        its Connection::Client) and use the new MessageReceiver class to vend
+        messages to the WebConnection.
+
+        * Shared/WebConnection.cpp:
+        (WebKit::WebConnection::WebConnection):
+        (WebKit::WebConnection::postMessage):
+        (WebKit::WebConnection::didClose):
+        (WebKit::WebConnection::didReceiveMessage):
+        * Shared/WebConnection.h:
+        Make WebConnection both a MessageReceiver and MessageSender
+        and add virtual functions for derived classes to fill in.
+
+        * UIProcess/WebConnectionToWebProcess.cpp:
+        (WebKit::WebConnectionToWebProcess::create):
+        (WebKit::WebConnectionToWebProcess::WebConnectionToWebProcess):
+        (WebKit::WebConnectionToWebProcess::invalidate):
+        (WebKit::WebConnectionToWebProcess::decodeMessageBody):
+        (WebKit::WebConnectionToWebProcess::connection):
+        (WebKit::WebConnectionToWebProcess::destinationID):
+        (WebKit::WebConnectionToWebProcess::hasValidConnection):
+        * UIProcess/WebConnectionToWebProcess.h:
+        * UIProcess/WebProcessProxy.cpp:
+        (WebKit::WebProcessProxy::~WebProcessProxy):
+        (WebKit::WebProcessProxy::fromConnection):
+        (WebKit::WebProcessProxy::disconnect):
+        (WebKit::WebProcessProxy::addMessageReceiver):
+        (WebKit::WebProcessProxy::didClose):
+        (WebKit::WebProcessProxy::didReceiveInvalidMessage):
+        (WebKit::WebProcessProxy::didFinishLaunching):
+        * UIProcess/WebProcessProxy.h:
+        (WebKit::WebProcessProxy::connection):
+        (WebProcessProxy):
+        (WebKit::WebProcessProxy::webConnection):
+        * WebProcess/WebConnectionToUIProcess.cpp:
+        (WebKit::WebConnectionToUIProcess::create):
+        (WebKit::WebConnectionToUIProcess::WebConnectionToUIProcess):
+        (WebKit):
+        (WebKit::WebConnectionToUIProcess::invalidate):
+        (WebKit::WebConnectionToUIProcess::connection):
+        (WebKit::WebConnectionToUIProcess::destinationID):
+        (WebKit::WebConnectionToUIProcess::hasValidConnection):
+        * WebProcess/WebConnectionToUIProcess.h:
+        (WebConnectionToUIProcess):
+        * WebProcess/WebProcess.cpp:
+        (WebKit::WebProcess::initialize):
+        (WebKit::WebProcess::terminate):
+        * WebProcess/WebProcess.h:
+        (WebKit::WebProcess::connection):
+        (WebKit::WebProcess::webConnectionToUIProcess):
+        Move the CoreIPC::Connection back to the processes.
+
+2012-11-20  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL][WK2] Add Ewk_Window_Features API and related UI callbacks
+        https://bugs.webkit.org/show_bug.cgi?id=99114
+
+        Reviewed by Gyuyoung Kim.
+
+        Added Ewk_Window_Features API so that we can create new windows
+        with various window features such as location, size, toolbar, menubar,
+        statusbar, locationbar, scrollbar, resizable, and fullscreen.
+
+        UI client callbacks related to window features also implemented
+        so that it is possible to retrieve the window object property values.
+
+        * PlatformEfl.cmake:
+        * UIProcess/API/efl/EWebKit2.h:
+        * UIProcess/API/efl/EwkViewCallbacks.h:
+        (EwkViewCallbacks):
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::windowFeatures):
+        (EwkViewImpl::createNewPage):
+        (EwkViewImpl::closePage):
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (EwkViewImpl):
+        * UIProcess/API/efl/ewk_view.h:
+        * UIProcess/efl/PageUIClientEfl.cpp:
+        (WebKit::PageUIClientEfl::createNewPage):
+        (WebKit::PageUIClientEfl::toolbarsAreVisible):
+        (WebKit):
+        (WebKit::PageUIClientEfl::setToolbarsAreVisible):
+        (WebKit::PageUIClientEfl::menuBarIsVisible):
+        (WebKit::PageUIClientEfl::setMenuBarIsVisible):
+        (WebKit::PageUIClientEfl::statusBarIsVisible):
+        (WebKit::PageUIClientEfl::setStatusBarIsVisible):
+        (WebKit::PageUIClientEfl::isResizable):
+        (WebKit::PageUIClientEfl::setIsResizable):
+        (WebKit::PageUIClientEfl::PageUIClientEfl):
+        * UIProcess/efl/PageUIClientEfl.h:
+        (PageUIClientEfl):
+
+2012-11-20  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r135295.
+        http://trac.webkit.org/changeset/135295
+        https://bugs.webkit.org/show_bug.cgi?id=102834
+
+        This patch causes assertion to some layout tests on chromium
+        (Requested by jianli on #webkit).
+
+        * WebProcess/Plugins/PluginView.cpp:
+        (WebKit::PluginView::performFrameLoadURLRequest):
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::loadURLRequest):
+        (WebKit::WebPage::loadData):
+        (WebKit::WebPage::linkClicked):
+
+2012-11-20  James Simonsen  <simonjam@chromium.org>
+
+        Consolidate FrameLoader::load() into one function taking a FrameLoadRequest
+        https://bugs.webkit.org/show_bug.cgi?id=102151
+
+        Reviewed by Adam Barth.
+
+        * WebProcess/Plugins/PluginView.cpp:
+        (WebKit::PluginView::performFrameLoadURLRequest):
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::loadURLRequest):
+        (WebKit::WebPage::loadData):
+
+2012-11-20  peavo@outlook.com  <peavo@outlook.com>
+
+        WinCairo build fails to link.
+        https://bugs.webkit.org/show_bug.cgi?id=102804
+
+        Reviewed by Alexey Proskuryakov.
+
+        * win/WebKit2CFLite.def:
+
+2012-11-20  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [WTR] WebKitTestRunner should be able to run tests using fixed layout
+        https://bugs.webkit.org/show_bug.cgi?id=102517
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Update EFL private API so we can create a view with fixed layout. We
+        can keep this as private as I don't see a real life use case for it
+        outside WTR and the WebInspector.
+
+        * UIProcess/API/C/efl/WKView.cpp:
+        (WKViewCreate):
+        (WKViewCreateWithFixedLayout):
+        * UIProcess/API/C/efl/WKView.h:
+        * UIProcess/API/efl/ewk_view.cpp:
+        (ewk_view_base_add):
+        * UIProcess/API/efl/ewk_view_private.h:
+        * UIProcess/efl/WebInspectorProxyEfl.cpp:
+        (WebKit::WebInspectorProxy::platformCreateInspectorPage):
+
+2012-11-20  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] PageViewportControllerClient::didChangeViewportAttributes called twice
+        https://bugs.webkit.org/show_bug.cgi?id=102790
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Change updateMinimumScaleToFit to no longer call PageViewportControllerClient::didChangeViewportAttributes,
+        but instead return whether it has changed the minimumScaleToFit.
+
+        * UIProcess/PageViewportController.cpp:
+        (WebKit::PageViewportController::didChangeContentsSize):
+        (WebKit::PageViewportController::updateMinimumScaleToFit):
+        * UIProcess/PageViewportController.h:
+        (PageViewportController):
+
+2012-11-20  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] No test of double-click to zoom out
+        https://bugs.webkit.org/show_bug.cgi?id=102810
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Adds tests of zoom-stack behaviour, the ability to restore previous zoom levels. It tests
+        that zoom out always goes to lower zoom levels.
+
+        * UIProcess/API/qt/tests/qmltests/WebView/tst_doubleTapToZoom.qml:
+
+2012-11-20  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Large areas highlighted on touch
+        https://bugs.webkit.org/show_bug.cgi?id=97216
+
+        Reviewed by Simon Hausmann.
+
+        Restrict highlighting of scripted event-handlers to inline elements only.
+
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::highlightPotentialActivation):
+
+2012-11-20  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Zoom logic confused by page and pinch resize
+        https://bugs.webkit.org/show_bug.cgi?id=102803
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Clear the zoom-out stack after page resize, and ensure the zoom logic can still detect
+        zoom-out and zoom-back when the zoom-out stack is empty.
+
+        * UIProcess/qt/PageViewportControllerClientQt.cpp:
+        (WebKit::PageViewportControllerClientQt::zoomToAreaGestureEnded):
+        (WebKit::PageViewportControllerClientQt::clearRelativeZoomState):
+        (WebKit::PageViewportControllerClientQt::setContentsScale):
+        (WebKit::PageViewportControllerClientQt::pinchGestureStarted):
+        (WebKit::PageViewportControllerClientQt::didChangeViewportAttributes):
+        * UIProcess/qt/PageViewportControllerClientQt.h:
+        (PageViewportControllerClientQt):
+
+2012-11-19  KyungTae Kim  <ktf.kim@samsung.com>
+
+        [WK2] Unused parameters on CoordinatedGraphicsLayer.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=102760
+
+        Reviewed by Laszlo Gombos.
+
+        Because the 'platformLayer' parameter is not used when !USE(GRAPHICS_SURFACE),
+        use UNUSED_PARAM macro to fix build warning -Wunused-parameter
+
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::setContentsToCanvas):
+
+2012-11-19  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Remove tiles of a layer when they are off the viewport.
+        https://bugs.webkit.org/show_bug.cgi?id=102313
+
+        Reviewed by Noam Rosenthal.
+
+        Currently, we don't remove tiles of the layer with the special properties: a
+        transform animation and non affine transform. If a page has a lot of layers with
+        a transform animation, we will encounter OOM. So this patch removes the
+        privilege of the layer.
+
+        There are two changes.
+        1. computeTransformedVisibleRect() calculates a layer transform using the
+        current local transform which a transform animation applied.
+        2. tiledBackingStoreVisibleRect() calculates a visible
+        rect of all layers, even if the layer includes the property: a transform
+        animation or non affine transform.
+
+        Test: animations/animation-offscreen-to-onscreen.html
+
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::effectiveContentsScale):
+        (WebCore::CoordinatedGraphicsLayer::tiledBackingStoreVisibleRect):
+        (WebCore::CoordinatedGraphicsLayer::hasPendingVisibleChanges):
+        (WebCore::CoordinatedGraphicsLayer::computeTransformedVisibleRect):
+        (WebCore::CoordinatedGraphicsLayer::selfOrAncestorHasActiveTransformAnimation):
+        (WebCore):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (CoordinatedGraphicsLayer):
+
+2012-11-19  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Remove a texture if an direct composited image is off the viewport.
+        https://bugs.webkit.org/show_bug.cgi?id=102449
+
+        Reviewed by Noam Rosenthal.
+
+        Currently, once uploading textures for composited images, Coordinated Graphics
+        does not release the textures until all layers using images are destroyed.
+
+        This patch removes a texture if we don't need to render an image. This mechanism
+        is similar how TiledBackingStore removes invisible tiles.
+
+        When all layers are invisible, we wait 3 seconds to remove the content
+        of the image, because we want to prevent a transform animation from
+        creating and destroying a texture over and over again.
+
+        * UIProcess/CoordinatedGraphics/CoordinatedBackingStore.cpp:
+        (WebKit::CoordinatedBackingStore::removeAllTiles):
+        (WebKit):
+        * UIProcess/CoordinatedGraphics/CoordinatedBackingStore.h:
+        (CoordinatedBackingStore):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.cpp:
+        (WebKit::LayerTreeCoordinatorProxy::clearImageBackingContents):
+        (WebKit):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.h:
+        (LayerTreeCoordinatorProxy):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.messages.in:
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::clearImageBackingContents):
+        (WebKit):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+        (LayerTreeRenderer):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::syncImageBacking):
+        (WebCore::CoordinatedGraphicsLayer::imageBackingVisible):
+        (WebCore):
+        (WebCore::CoordinatedGraphicsLayer::releaseImageBackingIfNeeded):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (CoordinatedGraphicsLayer):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedImageBacking.cpp:
+        (WebKit::CoordinatedImageBacking::CoordinatedImageBacking):
+        (WebKit::CoordinatedImageBacking::addHost):
+        (WebKit::CoordinatedImageBacking::removeHost):
+        (WebKit::CoordinatedImageBacking::update):
+        (WebKit):
+        (WebKit::CoordinatedImageBacking::updateVisibilityIfNeeded):
+        (WebKit::CoordinatedImageBacking::clearContentsTimerFired):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedImageBacking.h:
+        (Coordinator):
+        (Host):
+        (CoordinatedImageBacking):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::clearImageBackingContents):
+        (WebKit):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.h:
+        (LayerTreeCoordinator):
+
+2012-11-19  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r135201.
+        http://trac.webkit.org/changeset/135201
+        https://bugs.webkit.org/show_bug.cgi?id=102725
+
+        Broke all non-Mac WK2 builds. (Requested by rakuco on
+        #webkit).
+
+        * Shared/mac/PlatformCertificateInfo.h:
+        * Shared/mac/PlatformCertificateInfo.mm:
+        (WebKit):
+        * WebKit2.xcodeproj/project.pbxproj:
+        * WebProcess/Authentication/AuthenticationManager.cpp:
+        * WebProcess/Authentication/AuthenticationManager.h:
+        (AuthenticationManager):
+        * WebProcess/Authentication/mac/AuthenticationManager.mac.mm: Copied from Source/WebKit2/Shared/mac/PlatformCertificateInfo.mm.
+        (WebKit):
+        (WebKit::AuthenticationManager::tryUsePlatformCertificateInfoForChallenge):
+
+2012-11-19  Brady Eidson  <beidson@apple.com>
+
+        Move tryUsePlatformCertificateInfoForChallenge from AuthenticationManager to PlatformCertificateInfo.
+        https://bugs.webkit.org/show_bug.cgi?id=102718
+
+        Reviewed by Sam Weinig.
+
+        Add the shared PlatformCertificateInfo version of the method:
+        * Shared/mac/PlatformCertificateInfo.h:
+        * Shared/mac/PlatformCertificateInfo.mm:
+        (WebKit::tryUsePlatformCertificateInfoForChallenge):
+
+        Use the new shared version:
+        * WebProcess/Authentication/AuthenticationManager.cpp:
+
+        Remove the old member version:
+        * WebProcess/Authentication/AuthenticationManager.h:
+        * WebProcess/Authentication/mac/AuthenticationManager.mac.mm: Removed.
+        * WebKit2.xcodeproj/project.pbxproj:
+
+2012-11-19  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: refactor syncCanvas to handle the lifecycle clearly.
+        https://bugs.webkit.org/show_bug.cgi?id=102664
+
+        Reviewed by Noam Rosenthal.
+
+        This patch makes sync canvas code handle the lifecycle of the canvas
+        GraphicsSurface in the similar style to a directly image compositing and
+        an update atlas code. This patch moves the canvas lifecycle handling
+        code from LayerTreeRenderer to CoordinatedGraphicsLayer, because
+        CoordinatedGraphicsLayer knows best when to create and remove the canvas
+        GraphicsSurface.
+
+        After this patch, we can remove the canvas GraphicsSurface in UI Process as soon
+        as the canvas platform layer is unset in Web Process.
+
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.cpp:
+        (WebKit::LayerTreeCoordinatorProxy::createCanvas):
+        (WebKit):
+        (WebKit::LayerTreeCoordinatorProxy::syncCanvas):
+        (WebKit::LayerTreeCoordinatorProxy::destroyCanvas):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.h:
+        (LayerTreeCoordinatorProxy):
+        * UIProcess/CoordinatedGraphics/LayerTreeCoordinatorProxy.messages.in:
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::createCanvas):
+        (WebKit):
+        (WebKit::LayerTreeRenderer::syncCanvas):
+        (WebKit::LayerTreeRenderer::destroyCanvas):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+        (LayerTreeRenderer):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::CoordinatedGraphicsLayer):
+        (WebCore::CoordinatedGraphicsLayer::setContentsNeedsDisplay):
+        (WebCore::CoordinatedGraphicsLayer::setContentsToCanvas):
+        (WebCore::CoordinatedGraphicsLayer::syncCanvas):
+        (WebCore):
+        (WebCore::CoordinatedGraphicsLayer::destroyCanvasIfNeeded):
+        (WebCore::CoordinatedGraphicsLayer::createCanvasIfNeeded):
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.h:
+        (CoordinatedGraphicsLayerClient):
+        (CoordinatedGraphicsLayer):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.cpp:
+        (WebKit::LayerTreeCoordinator::createCanvas):
+        (WebKit):
+        (WebKit::LayerTreeCoordinator::syncCanvas):
+        (WebKit::LayerTreeCoordinator::destroyCanvas):
+        * WebProcess/WebPage/CoordinatedGraphics/LayerTreeCoordinator.h:
+        (LayerTreeCoordinator):
+
+2012-11-19  Brady Eidson  <beidson@apple.com>
+
+        Replace an unneeded #include with a forward declaration after r135179.
+
+        Reviewed by nobody, but suggested by Alexey Proskuryakov.
+
+        * WebProcess/Network/WebResourceLoader.h:
+
+2012-11-19  Martin Robinson  <mrobinson@igalia.com>
+
+        [GTK] REGRESSION(r134955): Plugins are broken due to unresolved symbol in plugin process
+        https://bugs.webkit.org/show_bug.cgi?id=102613
+
+        Unreviewed build fix.
+
+        * GNUmakefile.am: Fix the build after one of my previous patches introduced
+        a link dependency on libsecret.
+
+2012-11-19  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][WK2] Web Inspector crashes if evas_gl is not available
+        https://bugs.webkit.org/show_bug.cgi?id=102531
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Teach Web Inspector to fallback gracefully to the software path when evas_gl engine is not available.
+
+        * UIProcess/efl/WebInspectorProxyEfl.cpp:
+        (WebKit::WebInspectorProxy::platformCreateInspectorPage):
+
+2012-11-19  Brady Eidson  <beidson@apple.com>
+
+        Remove the source files for NetworkRequest from the repository.
+        They were obsoleted and removed from the project file awhile ago, but I forgot to nuke the source.
+
+        Unreviewed.
+
+        * NetworkProcess/NetworkRequest.cpp: Removed.
+        * NetworkProcess/NetworkRequest.h: Removed.
+
+2012-11-19  Brady Eidson  <beidson@apple.com>
+
+        Add 64-bit specializations for atomicIncrement and atomicDecrement
+        https://bugs.webkit.org/show_bug.cgi?id=102702
+
+        Reviewed by Eric Carlson.
+
+        Move away from the Darwin-specific OSAtomicIncrement64Barrier and use WTF::atomicIncrement instead.
+
+        * NetworkProcess/NetworkResourceLoader.cpp:
+        (WebKit::generateWillSendRequestID): Adopt WTF::atomicIncrement.
+        (WebKit::generateCanAuthenticateAgainstProtectionSpaceID): Ditto.
+
+        * WebProcess/mac/KeychainItemShimMethods.mm:
+        (WebKit::generateSecKeychainItemRequestID): Ditto.
+
+        * WebProcess/mac/SecItemShimMethods.mm:
+        (WebKit::generateSecItemRequestID): Ditto.
+
+2012-11-19  Brady Eidson  <beidson@apple.com>
+
+        NetworkProcess Authentication.
+        https://bugs.webkit.org/show_bug.cgi?id=102592
+
+        Reviewed by Alexey Proskuryakov.
+
+        This get's basic HTTP authentication working with the NetworkProcess by dispatching authentication
+        related events to the WebProcess and relying on existing client APIs to answer them.
+
+        Implement ResourceHandleClient methods related to auth challenges and message them to the WebProcess.
+        Also implement messaging back from the WebProcess to response to those auth challenges:
+        * NetworkProcess/NetworkResourceLoader.cpp:
+        (WebKit::willSendRequestResponseMap):
+        (WebKit::NetworkResourceLoader::willSendRequest):
+        (WebKit::NetworkResourceLoader::willSendRequestHandled):
+        (WebKit::NetworkResourceLoader::shouldUseCredentialStorage):
+        (WebKit::NetworkResourceLoader::didReceiveAuthenticationChallenge):
+        (WebKit::NetworkResourceLoader::didCancelAuthenticationChallenge):
+        (WebKit::NetworkResourceLoader::receivedCancellation):
+        (WebKit::NetworkResourceLoader::receivedAuthenticationCredential):
+        (WebKit::NetworkResourceLoader::receivedRequestToContinueWithoutAuthenticationCredential):
+        (WebKit::NetworkResourceLoader::receivedAuthenticationCancellation):
+        (WebKit::canAuthenticateAgainstProtectionSpaceResponseMap):
+        (WebKit::generateCanAuthenticateAgainstProtectionSpaceID):
+        (WebKit::NetworkResourceLoader::canAuthenticateAgainstProtectionSpace):
+        (WebKit::NetworkResourceLoader::canAuthenticateAgainstProtectionSpaceHandled):
+        * NetworkProcess/NetworkResourceLoader.h:
+        * NetworkProcess/NetworkResourceLoader.messages.in:
+
+        Implement messaging to response to auth challenges from the NetworkProcess, and implement
+        AuthenticationClient to response to auth responses from WebProcess clients:
+        * WebProcess/Network/WebResourceLoader.cpp:
+        (WebKit::WebResourceLoader::canAuthenticateAgainstProtectionSpace):
+        (WebKit::WebResourceLoader::didReceiveAuthenticationChallenge):
+        (WebKit::WebResourceLoader::didCancelAuthenticationChallenge):
+        (WebKit::WebResourceLoader::receivedCredential):
+        (WebKit::WebResourceLoader::receivedRequestToContinueWithoutCredential):
+        (WebKit::WebResourceLoader::receivedCancellation):
+        * WebProcess/Network/WebResourceLoader.h:
+        (WebKit::WebResourceLoader::refAuthenticationClient):
+        (WebKit::WebResourceLoader::derefAuthenticationClient):
+        * WebProcess/Network/WebResourceLoader.messages.in:
+
+        Add a BlockingResponseMap for bool responses, which don't need OwnPtr trickery:
+        * Shared/BlockingResponseMap.h:
+        (BlockingBoolResponseMap::waitForResponse):
+        (BlockingBoolResponseMap::didReceiveResponse):
+
+        Add "allowsStoredCredentials" to NetworkResourceLoadParameters so the NetworkProcess
+        already has the answer when the question is asked:
+        * Shared/Network/NetworkResourceLoadParameters.cpp:
+        (WebKit::NetworkResourceLoadParameters::NetworkResourceLoadParameters):
+        (WebKit::NetworkResourceLoadParameters::encode):
+        (WebKit::NetworkResourceLoadParameters::decode):
+        * Shared/Network/NetworkResourceLoadParameters.h:
+        (WebKit::NetworkResourceLoadParameters::allowStoredCredentials):
+
+        Grab the value for "allowsStoredCredentials" when scheduling the load in the NetworkProcess:
+        * WebProcess/Network/WebResourceLoadScheduler.cpp:
+        (WebKit::WebResourceLoadScheduler::scheduleLoad):
+
+        Add a FIXME for client certs:
+        * WebProcess/Authentication/mac/AuthenticationManager.mac.mm:
+        (WebKit::AuthenticationManager::tryUsePlatformCertificateInfoForChallenge):
+
+        Add a FIXME for downloads:
+        * WebProcess/Downloads/mac/DownloadMac.mm:
+
+        Remove unused messaging related methods:
+        * WebProcess/Network/NetworkProcessConnection.cpp:
+        * WebProcess/Network/NetworkProcessConnection.h:
+
+2012-11-19  Kihong Kwon  <kihong.kwon@samsung.com>
+
+        Add PROXIMITY_EVENTS feature
+        https://bugs.webkit.org/show_bug.cgi?id=102658
+
+        Reviewed by Kentaro Hara.
+
+        Add PROXIMITY_EVENTS feature to xcode project for WebKit2.
+
+        * Configurations/FeatureDefines.xcconfig:
+
+2012-11-19  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [EFL][WK2] Fix possible crash in EwkViewImpl::displayTimerFired()
+        https://bugs.webkit.org/show_bug.cgi?id=102682
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Add NULL check for DrawingAreaProxy and LayerTreeCoordinatorProxy
+        in displayTimerFired() to avoid crashing if those have already
+        been destroyed by the time to timer is fired.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::layerTreeRenderer):
+        (EwkViewImpl::displayTimerFired):
+        (EwkViewImpl::createGLSurface):
+        (EwkViewImpl::enterAcceleratedCompositingMode):
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (WebKit):
+        (EwkViewImpl):
+
+2012-11-19  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [WK2][WTR] Memory leak in TestController::initialize()
+        https://bugs.webkit.org/show_bug.cgi?id=102616
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Export a few additional WTF symbols for windows port.
+
+        * win/WebKit2.def:
+
 2012-11-19  Carlos Garcia Campos  <cgarcia@igalia.com>
 
         [GTK] Test /webkit2/WebKitWebView/create-ready-close is failing after r134586

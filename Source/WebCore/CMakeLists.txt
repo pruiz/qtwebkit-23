@@ -1088,6 +1088,7 @@ SET(WebCore_SOURCES
     css/SVGCSSComputedStyleDeclaration.cpp
     css/SVGCSSParser.cpp
     css/SVGCSSStyleSelector.cpp
+    css/ViewportStyleResolver.cpp
     css/WebKitCSSFilterValue.cpp
     css/WebKitCSSKeyframeRule.cpp
     css/WebKitCSSKeyframesRule.cpp
@@ -1999,7 +2000,6 @@ SET(WebCore_SOURCES
     platform/network/BlobResourceHandle.cpp
     platform/network/Credential.cpp
     platform/network/CredentialStorage.cpp
-    platform/network/ContentTypeParser.cpp
     platform/network/DataURL.cpp
     platform/network/DNSResolveQueue.cpp
     platform/network/FormDataBuilder.cpp
@@ -2010,6 +2010,7 @@ SET(WebCore_SOURCES
     platform/network/HTTPValidation.cpp
     platform/network/MIMEHeader.cpp
     platform/network/NetworkStateNotifier.cpp
+    platform/network/ParsedContentType.cpp
     platform/network/ProtectionSpace.cpp
     platform/network/ProxyServer.cpp
     platform/network/ResourceErrorBase.cpp

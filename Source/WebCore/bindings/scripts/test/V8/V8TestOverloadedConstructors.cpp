@@ -88,7 +88,7 @@ v8::Handle<v8::Value> V8TestOverloadedConstructors::constructor4Callback(const v
 {
     INC_STATS("DOM.TestOverloadedConstructors.Constructor4");
     
-    STRING_TO_V8PARAMETER_EXCEPTION_BLOCK(V8Parameter<>, string, MAYBE_MISSING_PARAMETER(args, 0, DefaultIsUndefined));
+    EXCEPTION_BLOCK(V8Parameter<>, string, MAYBE_MISSING_PARAMETER(args, 0, DefaultIsUndefined));
 
     RefPtr<TestOverloadedConstructors> impl = TestOverloadedConstructors::create(string);
     v8::Handle<v8::Object> wrapper = args.Holder();
@@ -105,7 +105,6 @@ v8::Handle<v8::Value> V8TestOverloadedConstructors::constructorCallback(const v8
 
     if (ConstructorMode::current() == ConstructorMode::WrapExistingObject)
         return args.Holder();
-
     if ((args.Length() == 1 && (V8ArrayBuffer::HasInstance(args[0]))))
         return constructor1Callback(args);
     if ((args.Length() == 1 && (V8ArrayBufferView::HasInstance(args[0]))))

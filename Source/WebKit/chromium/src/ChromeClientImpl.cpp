@@ -37,7 +37,11 @@
 #if ENABLE(INPUT_TYPE_COLOR)
 #include "ColorChooser.h"
 #include "ColorChooserClient.h"
+#if ENABLE(PAGE_POPUP)
+#include "ColorChooserPopupUIController.h"
+#else
 #include "ColorChooserUIController.h"
+#endif
 #endif
 #include "Console.h"
 #include "Cursor.h"
@@ -621,10 +625,6 @@ void ChromeClientImpl::dispatchViewportPropertiesDidChange(const ViewportArgumen
     if (!m_webView->settings()->viewportEnabled() || !m_webView->isFixedLayoutModeEnabled() || !m_webView->client() || !m_webView->page())
         return;
 
-    FrameView* frameView = m_webView->mainFrameImpl()->frameView();
-    int dpi = screenHorizontalDPI(frameView);
-    ASSERT(dpi > 0);
-
     WebViewClient* client = m_webView->client();
     WebRect deviceRect = client->windowRect();
     // If the window size has not been set yet don't attempt to set the viewport
@@ -632,7 +632,7 @@ void ChromeClientImpl::dispatchViewportPropertiesDidChange(const ViewportArgumen
         return;
 
     Settings* settings = m_webView->page()->settings();
-    float devicePixelRatio = dpi / ViewportArguments::deprecatedTargetDPI;
+    float devicePixelRatio = client->screenInfo().deviceScaleFactor;
     // Call the common viewport computing logic in ViewportArguments.cpp.
     ViewportAttributes computed = computeViewportAttributes(
         arguments, settings->layoutFallbackWidth(), deviceRect.width, deviceRect.height,
@@ -681,7 +681,14 @@ void ChromeClientImpl::reachedApplicationCacheOriginQuota(SecurityOrigin*, int64
 #if ENABLE(INPUT_TYPE_COLOR)
 PassOwnPtr<ColorChooser> ChromeClientImpl::createColorChooser(ColorChooserClient* chooserClient, const Color&)
 {
-    return adoptPtr(new ColorChooserUIController(this, chooserClient));
+    OwnPtr<ColorChooserUIController> controller;
+#if ENABLE(PAGE_POPUP)
+    controller = adoptPtr(new ColorChooserPopupUIController(this, chooserClient));
+#else
+    controller = adoptPtr(new ColorChooserUIController(this, chooserClient));
+#endif
+    controller->openUI();
+    return controller.release();
 }
 PassOwnPtr<WebColorChooser> ChromeClientImpl::createWebColorChooser(WebColorChooserClient* chooserClient, const WebColor& initialColor)
 {

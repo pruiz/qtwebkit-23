@@ -1,3 +1,106 @@
+2012-11-22  Cosmin Truta  <ctruta@rim.com>
+
+        Move URL-checking code into Frame
+        https://bugs.webkit.org/show_bug.cgi?id=103014
+
+        Reviewed by Ojan Vafai.
+
+        Move the common URL checking logic from HTMLFrameElementBase::isURLAllowed
+        and HTMLPlugInImageElement::allowedToLoadFrameURL into Frame::isURLAllowed.
+
+        No new tests. Refactoring.
+
+        * html/HTMLFrameElementBase.cpp:
+        (WebCore::HTMLFrameElementBase::isURLAllowed): Call Frame::isURLAllowed.
+        * html/HTMLPlugInImageElement.cpp:
+        (WebCore::HTMLPlugInImageElement::allowedToLoadFrameURL): Call Frame::isURLAllowed.
+        * page/Frame.cpp:
+        (WebCore::Frame::isURLAllowed): Added.
+        * page/Frame.h:
+        (Frame): Added isURLAllowed.
+
+2012-11-22  Kentaro Hara  <haraken@chromium.org>
+
+        [V8] Rename toWebCoreStringWithNullOrUndefinedCheck() with toWebCoreStringWithUndefinedOrNullCheck()
+        https://bugs.webkit.org/show_bug.cgi?id=103013
+
+        Reviewed by Adam Barth.
+
+        IDL attributes and other V8 and JSC files use "UndefinedOrNull" instead of "NullOrUndefined".
+
+        No tests. No change in behavior.
+
+        * bindings/v8/JavaScriptCallFrame.cpp:
+        (WebCore::JavaScriptCallFrame::functionName):
+        * bindings/v8/ScriptDebugServer.cpp:
+        (WebCore::ScriptDebugServer::setScriptSource):
+        (WebCore::ScriptDebugServer::dispatchDidParseSource):
+        (WebCore::ScriptDebugServer::compileScript):
+        (WebCore::ScriptDebugServer::runScript):
+        * bindings/v8/ScriptEventListener.cpp:
+        (WebCore::eventListenerHandlerLocation):
+        * bindings/v8/V8Binding.h:
+        (WebCore::toWebCoreStringWithUndefinedOrNullCheck):
+        * bindings/v8/custom/V8DOMWindowCustom.cpp:
+        (WebCore::V8DOMWindow::showModalDialogCallback):
+        (WebCore::V8DOMWindow::openCallback):
+        * bindings/v8/custom/V8JavaScriptCallFrameCustom.cpp:
+        (WebCore::V8JavaScriptCallFrame::evaluateCallback):
+
+2012-11-22  Harald Alvestrand  <hta@google.com>
+
+        Name enumerator function for GetStats RTCStatsElement
+        https://bugs.webkit.org/show_bug.cgi?id=102933
+
+        Reviewed by Adam Barth.
+
+        Tested by extensions to the RTCPeerConnection-stats test.
+
+        * Modules/mediastream/RTCStatsElement.cpp:
+        (WebCore::RTCStatsElement::names):
+        (WebCore):
+        * Modules/mediastream/RTCStatsElement.h:
+        (RTCStatsElement):
+        * Modules/mediastream/RTCStatsElement.idl:
+
+2012-11-22  Kentaro Hara  <haraken@chromium.org>
+
+        Rename the "eden" bit to something more descriptive
+        https://bugs.webkit.org/show_bug.cgi?id=102985
+
+        Reviewed by Adam Barth.
+
+        InEdenFlag is not descriptive. Per the discussion in IRC,
+        we rename InEdenFlag to V8CollectableDuringMinorGCFlag.
+
+        No tests. No change in behavior.
+
+        * bindings/v8/V8GCController.cpp:
+        (WebCore::gcTree):
+        (WebCore::V8GCController::didCreateWrapperForNode):
+        (WebCore::V8GCController::minorGCPrologue):
+        * dom/Node.h:
+        (WebCore::Node::isV8CollectableDuringMinorGC):
+        (WebCore::Node::setV8CollectableDuringMinorGC):
+
+2012-11-22  Kentaro Hara  <haraken@chromium.org>
+
+        [V8] Move AddMessageListener() from WorkerContextExecutionProxy::initializeIfNeeded() to WorkerContextExecutionProxy::initIsolate()
+        https://bugs.webkit.org/show_bug.cgi?id=102998
+
+        Reviewed by Adam Barth.
+
+        This is an incremental step for moving initializeIfNeeded()
+        to V8Initializer.h. Given that AddMessageListener() needs to
+        be called once per Isolate, we can move AddMessageListener()
+        from initializeIfNeeded() to initIsolate().
+
+        No tests. No change in behavior.
+
+        * bindings/v8/WorkerContextExecutionProxy.cpp:
+        (WebCore::WorkerContextExecutionProxy::initIsolate):
+        (WebCore::WorkerContextExecutionProxy::initializeIfNeeded):
+
 2012-11-22  Michael Saboff  <msaboff@apple.com>
 
         HTML integer parsing functions don't natively handle 8 bit strings

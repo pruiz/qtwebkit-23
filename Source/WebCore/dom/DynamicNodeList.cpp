@@ -28,6 +28,7 @@
 #include "HTMLCollection.h"
 #include "HTMLPropertiesCollection.h"
 #include "PropertyNodeList.h"
+#include "WebCoreMemoryInstrumentation.h"
 
 namespace WebCore {
 
@@ -56,7 +57,7 @@ void DynamicNodeListCacheBase::invalidateCache() const
     m_isItemCacheValid = false;
     m_isNameCacheValid = false;
     m_isItemRefElementsCacheValid = false;
-    if (type() == NodeListCollectionType)
+    if (isNodeList(type()))
         return;
 
     const HTMLCollectionCacheBase* cacheBase = static_cast<const HTMLCollectionCacheBase*>(this);
@@ -73,10 +74,30 @@ void DynamicNodeListCacheBase::invalidateCache() const
 
 void DynamicNodeListCacheBase::invalidateIdNameCacheMaps() const
 {
-    ASSERT(type() != NodeListCollectionType);
+    ASSERT(hasIdNameCache());
     const HTMLCollectionCacheBase* cacheBase = static_cast<const HTMLCollectionCacheBase*>(this);
     cacheBase->m_idCache.clear();
     cacheBase->m_nameCache.clear();
+}
+
+void DynamicNodeListCacheBase::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
+{
+    MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::DOM);
+    info.addMember(m_ownerNode);
+    info.addWeakPointer(m_cachedItem);
+}
+
+void DynamicNodeList::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
+{
+    MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::DOM);
+    NodeList::reportMemoryUsage(memoryObjectInfo);
+    DynamicNodeListCacheBase::reportMemoryUsage(memoryObjectInfo);
+}
+
+void DynamicSubtreeNodeList::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
+{
+    MemoryClassInfo info(memoryObjectInfo, this, WebCoreMemoryTypes::DOM);
+    DynamicNodeList::reportMemoryUsage(memoryObjectInfo);
 }
 
 unsigned DynamicNodeList::length() const
@@ -95,7 +116,7 @@ Node* DynamicNodeList::itemWithName(const AtomicString& elementId) const
 
     if (rootNode->inDocument()) {
 #if ENABLE(MICRODATA)
-        if (rootType() == NodeListIsRootedAtDocumentIfOwnerHasItemrefAttr)
+        if (type() == PropertyNodeListType)
             static_cast<const PropertyNodeList*>(this)->updateRefElements();
 #endif
 

@@ -1873,6 +1873,8 @@ HEADERS += \
     html/shadow/HTMLShadowElement.h \
     html/shadow/MediaControlElements.h \
     html/shadow/DetailsMarkerControl.h \
+    html/track/InbandTextTrack.h \
+    html/track/InbandTextTrackPrivate.h \
     html/track/LoadableTextTrack.h \
     html/track/TextTrack.h \
     html/track/TextTrackCue.h \

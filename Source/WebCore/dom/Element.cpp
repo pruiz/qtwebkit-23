@@ -1022,11 +1022,11 @@ void Element::parserSetAttributes(const Vector<Attribute>& attributeVector, Frag
     }
 
     // When the document is in parsing state, we cache immutable ElementAttributeData objects with the
-    // input attribute vector (and the tag name) as key. (This cache is held by Document.)
+    // input attribute vector as key. (This cache is held by Document.)
     if (!document() || !document()->parsing())
         m_attributeData = ElementAttributeData::createImmutable(filteredAttributes);
     else
-        m_attributeData = document()->cachedImmutableAttributeData(this, filteredAttributes);
+        m_attributeData = document()->cachedImmutableAttributeData(filteredAttributes);
 
     // Iterate over the set of attributes we already have on the stack in case
     // attributeChanged mutates m_attributeData.
@@ -2419,33 +2419,25 @@ PassRefPtr<HTMLCollection> Element::ensureCachedHTMLCollection(CollectionType ty
 
 PassRefPtr<HTMLCollection> ElementRareData::ensureCachedHTMLCollection(Element* element, CollectionType type)
 {
-    if (!m_cachedCollections) {
-        m_cachedCollections = adoptPtr(new CachedHTMLCollectionArray);
-        for (unsigned i = 0; i < NumNodeCollectionTypes; i++)
-            (*m_cachedCollections)[i] = 0;
-    }
-
-    if (HTMLCollection* collection = (*m_cachedCollections)[type - FirstNodeCollectionType])
+    if (HTMLCollection* collection = cachedHTMLCollection(type))
         return collection;
 
     RefPtr<HTMLCollection> collection;
     if (type == TableRows) {
         ASSERT(element->hasTagName(tableTag));
-        collection = HTMLTableRowsCollection::create(element);
+        return ensureNodeLists()->addCacheWithAtomicName<HTMLTableRowsCollection>(element, type);
     } else if (type == SelectOptions) {
         ASSERT(element->hasTagName(selectTag));
-        collection = HTMLOptionsCollection::create(element);
+        return ensureNodeLists()->addCacheWithAtomicName<HTMLOptionsCollection>(element, type);
     } else if (type == FormControls) {
         ASSERT(element->hasTagName(formTag) || element->hasTagName(fieldsetTag));
-        collection = HTMLFormControlsCollection::create(element);
+        return ensureNodeLists()->addCacheWithAtomicName<HTMLFormControlsCollection>(element, type);
 #if ENABLE(MICRODATA)
     } else if (type == ItemProperties) {
-        collection = HTMLPropertiesCollection::create(element);
+        return ensureNodeLists()->addCacheWithAtomicName<HTMLPropertiesCollection>(element, type);
 #endif
-    } else
-        collection = HTMLCollection::create(element, type);
-    (*m_cachedCollections)[type - FirstNodeCollectionType] = collection.get();
-    return collection.release();
+    }
+    return ensureNodeLists()->addCacheWithAtomicName<HTMLCollection>(element, type);
 }
 
 HTMLCollection* Element::cachedHTMLCollection(CollectionType type)
@@ -2563,8 +2555,10 @@ void Element::cloneAttributesFromElement(const Element& other)
         updateName(oldName, newName);
 
     // If 'other' has a mutable ElementAttributeData, convert it to an immutable one so we can share it between both elements.
-    // We can only do this if there is no CSSOM wrapper for other's inline style (the isMutable() check.)
-    if (other.m_attributeData->isMutable() && (!other.m_attributeData->inlineStyle() || !other.m_attributeData->inlineStyle()->isMutable()))
+    // We can only do this if there is no CSSOM wrapper for other's inline style, and there are no presentation attributes.
+    if (other.m_attributeData->isMutable()
+        && !other.m_attributeData->presentationAttributeStyle()
+        && (!other.m_attributeData->inlineStyle() || !other.m_attributeData->inlineStyle()->hasCSSOMWrapper()))
         const_cast<Element&>(other).m_attributeData = other.m_attributeData->makeImmutableCopy();
 
     if (!other.m_attributeData->isMutable())

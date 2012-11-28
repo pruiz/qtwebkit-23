@@ -1163,7 +1163,7 @@ static inline bool haveIdenticalStyleAffectingAttributes(StyledElement* a, Style
                 return false;
         } else
 #endif
-        if (a->fastGetAttribute(classAttr) != b->fastGetAttribute(classAttr))
+        if (a->attributeData()->classNames() != b->attributeData()->classNames())
             return false;
     }
 
@@ -2559,17 +2559,23 @@ static void collectCSSOMWrappers(HashMap<StyleRule*, RefPtr<CSSStyleRule> >& wra
     unsigned size = listType->length();
     for (unsigned i = 0; i < size; ++i) {
         CSSRule* cssRule = listType->item(i);
-        if (cssRule->isImportRule())
+        switch (cssRule->type()) {
+        case CSSRule::IMPORT_RULE:
             collectCSSOMWrappers(wrapperMap, static_cast<CSSImportRule*>(cssRule)->styleSheet());
-        else if (cssRule->isMediaRule())
+            break;
+        case CSSRule::MEDIA_RULE:
             collectCSSOMWrappers(wrapperMap, static_cast<CSSMediaRule*>(cssRule));
+            break;
 #if ENABLE(CSS_REGIONS)
-        else if (cssRule->isRegionRule())
+        case CSSRule::WEBKIT_REGION_RULE:
             collectCSSOMWrappers(wrapperMap, static_cast<WebKitCSSRegionRule*>(cssRule));
+            break;
 #endif
-        else if (cssRule->isStyleRule()) {
-            CSSStyleRule* cssStyleRule = static_cast<CSSStyleRule*>(cssRule);
-            wrapperMap.add(cssStyleRule->styleRule(), cssStyleRule);
+        case CSSRule::STYLE_RULE:
+            wrapperMap.add(static_cast<CSSStyleRule*>(cssRule)->styleRule(), static_cast<CSSStyleRule*>(cssRule));
+            break;
+        default:
+            break;
         }
     }
 }
@@ -4588,7 +4594,7 @@ void StyleResolver::loadPendingSVGDocuments()
                 continue;
 
             // Stash the CachedSVGDocument on the reference filter.
-            referenceFilter->setData(adoptPtr(new CachedSVGDocumentReference(cachedDocument)));
+            referenceFilter->setCachedSVGDocumentReference(adoptPtr(new CachedSVGDocumentReference(cachedDocument)));
         }
     }
     m_pendingSVGDocuments.clear();
@@ -4933,7 +4939,7 @@ bool StyleResolver::createFilterOperations(CSSValue* inValue, RenderStyle* style
                 if (!svgDocumentValue->loadRequested())
                     m_pendingSVGDocuments.set(operation.get(), svgDocumentValue);
                 else if (svgDocumentValue->cachedSVGDocument())
-                    operation->setData(adoptPtr(new CachedSVGDocumentReference(svgDocumentValue->cachedSVGDocument())));
+                    operation->setCachedSVGDocumentReference(adoptPtr(new CachedSVGDocumentReference(svgDocumentValue->cachedSVGDocument())));
             }
             operations.operations().append(operation);
 #endif

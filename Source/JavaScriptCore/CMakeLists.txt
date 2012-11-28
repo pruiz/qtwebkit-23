@@ -104,6 +104,8 @@ SET(JavaScriptCore_SOURCES
     dfg/DFGVariableEventStream.cpp
     dfg/DFGValidate.cpp
     dfg/DFGVirtualRegisterAllocationPhase.cpp
+    
+    disassembler/Disassembler.cpp
 
     heap/BlockAllocator.cpp
     heap/CopiedSpace.cpp
@@ -148,6 +150,7 @@ SET(JavaScriptCore_SOURCES
     jit/JITCall32_64.cpp
     jit/JITCall.cpp
     jit/JIT.cpp
+    jit/JITDisassembler.cpp
     jit/JITExceptions.cpp
     jit/JITOpcodes32_64.cpp
     jit/JITOpcodes.cpp

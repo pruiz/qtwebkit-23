@@ -27,10 +27,113 @@
 #define V8StringResource_h
 
 #include <v8.h>
+#include <wtf/Threading.h>
 #include <wtf/text/AtomicString.h>
 #include <wtf/text/WTFString.h>
 
 namespace WebCore {
+
+class ExternalStringVisitor;
+
+// WebCoreStringResource is a helper class for v8ExternalString. It is used
+// to manage the life-cycle of the underlying buffer of the external string.
+class WebCoreStringResourceBase {
+public:
+    static WebCoreStringResourceBase* toWebCoreStringResourceBase(v8::Handle<v8::String>);
+
+    explicit WebCoreStringResourceBase(const String& string)
+        : m_plainString(string)
+    {
+#ifndef NDEBUG
+        m_threadId = WTF::currentThread();
+#endif
+        ASSERT(!string.isNull());
+        v8::V8::AdjustAmountOfExternalAllocatedMemory(memoryConsumption(string));
+    }
+
+    explicit WebCoreStringResourceBase(const AtomicString& string)
+        : m_plainString(string.string())
+        , m_atomicString(string)
+    {
+#ifndef NDEBUG
+        m_threadId = WTF::currentThread();
+#endif
+        ASSERT(!string.isNull());
+        v8::V8::AdjustAmountOfExternalAllocatedMemory(memoryConsumption(string));
+    }
+
+    virtual ~WebCoreStringResourceBase()
+    {
+#ifndef NDEBUG
+        ASSERT(m_threadId == WTF::currentThread());
+#endif
+        int reducedExternalMemory = -memoryConsumption(m_plainString);
+        if (m_plainString.impl() != m_atomicString.impl() && !m_atomicString.isNull())
+            reducedExternalMemory -= memoryConsumption(m_atomicString.string());
+        v8::V8::AdjustAmountOfExternalAllocatedMemory(reducedExternalMemory);
+    }
+
+    const String& webcoreString() { return m_plainString; }
+
+    const AtomicString& atomicString()
+    {
+#ifndef NDEBUG
+        ASSERT(m_threadId == WTF::currentThread());
+#endif
+        if (m_atomicString.isNull()) {
+            m_atomicString = AtomicString(m_plainString);
+            ASSERT(!m_atomicString.isNull());
+            if (m_plainString.impl() != m_atomicString.impl())
+                v8::V8::AdjustAmountOfExternalAllocatedMemory(memoryConsumption(m_atomicString.string()));
+        }
+        return m_atomicString;
+    }
+
+    void visitStrings(ExternalStringVisitor*);
+
+protected:
+    // A shallow copy of the string. Keeps the string buffer alive until the V8 engine garbage collects it.
+    String m_plainString;
+    // If this string is atomic or has been made atomic earlier the
+    // atomic string is held here. In the case where the string starts
+    // off non-atomic and becomes atomic later it is necessary to keep
+    // the original string alive because v8 may keep derived pointers
+    // into that string.
+    AtomicString m_atomicString;
+
+private:
+    static int memoryConsumption(const String& string)
+    {
+        return string.length() * (string.is8Bit() ? sizeof(LChar) : sizeof(UChar));
+    }
+#ifndef NDEBUG
+    WTF::ThreadIdentifier m_threadId;
+#endif
+};
+
+class WebCoreStringResource16 : public WebCoreStringResourceBase, public v8::String::ExternalStringResource {
+public:
+    explicit WebCoreStringResource16(const String& string) : WebCoreStringResourceBase(string) { }
+    explicit WebCoreStringResource16(const AtomicString& string) : WebCoreStringResourceBase(string) { }
+
+    virtual size_t length() const OVERRIDE { return m_plainString.impl()->length(); }
+    virtual const uint16_t* data() const OVERRIDE
+    {
+        return reinterpret_cast<const uint16_t*>(m_plainString.impl()->characters());
+    }
+};
+
+class WebCoreStringResource8 : public WebCoreStringResourceBase, public v8::String::ExternalAsciiStringResource {
+public:
+    explicit WebCoreStringResource8(const String& string) : WebCoreStringResourceBase(string) { }
+    explicit WebCoreStringResource8(const AtomicString& string) : WebCoreStringResourceBase(string) { }
+
+    virtual size_t length() const OVERRIDE { return m_plainString.impl()->length(); }
+    virtual const char* data() const OVERRIDE
+    {
+        return reinterpret_cast<const char*>(m_plainString.impl()->characters8());
+    }
+};
 
 enum ExternalMode {
     Externalize,
@@ -52,35 +155,43 @@ enum V8ParameterMode {
 template <V8ParameterMode Mode = DefaultMode>
 class V8Parameter {
 public:
-    V8Parameter()
-        : m_mode(Externalize)
+    V8Parameter(v8::Local<v8::Value> object)
+        : m_v8Object(object)
+        , m_mode(Externalize)
         , m_string()
     {
     }
 
-    // This can throw. You must use this through the
-    // EXCEPTION_BLOCK() macro.
-    V8Parameter& operator=(v8::Local<v8::Value>);
+    bool prepare();
     operator String() { return toString<String>(); }
     operator AtomicString() { return toString<AtomicString>(); }
 
 private:
-    void prepareBase()
+    bool prepareBase()
     {
         if (m_v8Object.IsEmpty())
-            return;
+            return true;
 
         if (LIKELY(m_v8Object->IsString()))
-            return;
+            return true;
 
         if (LIKELY(m_v8Object->IsInt32())) {
             setString(int32ToWebCoreString(m_v8Object->Int32Value()));
-            return;
+            return true;
         }
 
         m_mode = DoNotExternalize;
+        v8::TryCatch block;
         m_v8Object = m_v8Object->ToString();
+        // Handle the case where an exception is thrown as part of invoking toString on the object.
+        if (block.HasCaught()) {
+            block.ReThrow();
+            return false;
+        }
+        return true;
     }
+
+    v8::Local<v8::Value> object() { return m_v8Object; }
 
     void setString(const String& string)
     {
@@ -102,31 +213,27 @@ private:
     String m_string;
 };
 
-template<> inline V8Parameter<DefaultMode>& V8Parameter<DefaultMode>::operator=(v8::Local<v8::Value> object)
+template<> inline bool V8Parameter<DefaultMode>::prepare()
 {
-    m_v8Object = object;
-    prepareBase();
-    return *this;
+    return prepareBase();
 }
 
-template<> inline V8Parameter<WithNullCheck>& V8Parameter<WithNullCheck>::operator=(v8::Local<v8::Value> object)
+template<> inline bool V8Parameter<WithNullCheck>::prepare()
 {
-    m_v8Object = object;
-    if (m_v8Object.IsEmpty() || m_v8Object->IsNull())
+    if (object().IsEmpty() || object()->IsNull()) {
         setString(String());
-    else
-        prepareBase();
-    return *this;
+        return true;
+    }
+    return prepareBase();
 }
 
-template<> inline V8Parameter<WithUndefinedOrNullCheck>& V8Parameter<WithUndefinedOrNullCheck>::operator=(v8::Local<v8::Value> object)
+template<> inline bool V8Parameter<WithUndefinedOrNullCheck>::prepare()
 {
-    m_v8Object = object;
-    if (m_v8Object.IsEmpty() || m_v8Object->IsNull() || m_v8Object->IsUndefined())
+    if (object().IsEmpty() || object()->IsNull() || object()->IsUndefined()) {
         setString(String());
-    else
-        prepareBase();
-    return *this;
+        return true;
+    }
+    return prepareBase();
 }
     
 } // namespace WebCore

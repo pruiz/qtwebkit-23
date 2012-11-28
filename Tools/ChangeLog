@@ -1,3 +1,99 @@
+2012-11-22  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [EFL][WK2] Enable WKPreferences and AboutBlankLoad API tests
+        https://bugs.webkit.org/show_bug.cgi?id=102926
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Add missing bits needed by WKPreferences and AboutBlankLoad API
+        tests in the test harness and enable these tests on EFL port.
+
+        * TestWebKitAPI/PlatformEfl.cmake:
+        * TestWebKitAPI/Tests/WebKit2/WKPreferences.cpp:
+        (TestWebKitAPI::TEST):
+        * TestWebKitAPI/efl/PlatformUtilities.cpp:
+        (TestWebKitAPI::Util::MIMETypeForWKURLResponse):
+        (Util):
+
+2012-11-21  Zan Dobersek  <zandobersek@gmail.com>
+
+        [GTK][WTR] Implement AccessibilityUIElement::stringValue
+        https://bugs.webkit.org/show_bug.cgi?id=102951
+
+        Reviewed by Martin Robinson.
+
+        Implement AccessibilityUIElement::stringValue in the ATK backend
+        in the same manner it is implemented in DumpRenderTree.
+
+        * WebKitTestRunner/InjectedBundle/atk/AccessibilityUIElementAtk.cpp:
+        (WTR::replaceCharactersForResults):
+        (WTR):
+        (WTR::AccessibilityUIElement::stringValue):
+
+2012-11-21  Vineet Chaudhary  <rgf748@motorola.com>
+
+        Unreviewed. Adding myself to committers.py.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-21  Tien-Ren Chen  <trchen@chromium.org>
+
+        [chromium] Device scale factor should be no-op when applyDeviceScaleFactorInCompositor == 0
+        https://bugs.webkit.org/show_bug.cgi?id=100061
+
+        Reviewed by Adam Barth.
+
+        On Android we're using a different pixel scaling implementation
+        (WebCore::Settings::applyDefaultDeviceScaleFactorInCompositor() == 0) than other
+        platforms. In this mode, we don't make use of device-independent pixels. Device
+        scale factor is provided to WebKit and get merged into page scale factor. Other
+        than that device scale factor should have no effects on rendering.
+
+        * DumpRenderTree/chromium/WebPreferences.cpp:
+        (WebPreferences::applyTo):
+
+2012-11-21  Fady Samuel  <fsamuel@chromium.org>
+
+        Clear MousePressed state on context menu to avoid initiating a drag
+        https://bugs.webkit.org/show_bug.cgi?id=101786
+
+        Reviewed by Ojan Vafai.
+
+        * DumpRenderTree/chromium/TestRunner/src/EventSender.cpp:
+        (WebTestRunner):
+        (WebTestRunner::EventSender::EventSender):
+        (WebTestRunner::EventSender::contextClick):
+        Only send a MouseUp on Windows. Keep the current mouse pressed state when
+        calling up a context menu.
+
+2012-11-21  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        [EFL] KURL unit test crashing when tiled backing store is enabled on Release Bots
+        https://bugs.webkit.org/show_bug.cgi?id=102895
+
+        Reviewed by Gyuyoung Kim.
+
+        Change the link order so it wont override the new operator on gtest.
+        Looks like it was crashing because an allocator mismatch (using libc's
+        new and later fastMalloc delete. Thanks to Kangil Han for hinting on
+        the fastMalloc issue.
+
+        * TestWebKitAPI/CMakeLists.txt:
+
+2012-11-21  Kentaro Hara  <haraken@chromium.org>
+
+        Unreviewed, rolling out r135340.
+        http://trac.webkit.org/changeset/135340
+        https://bugs.webkit.org/show_bug.cgi?id=102492
+
+        It broke Safari's internal build
+
+        * WebKitTestRunner/InjectedBundle/Bindings/CodeGeneratorTestRunner.pm:
+        (new):
+        (GenerateModule):
+        (GenerateInterface):
+        (finish):
+
 2012-11-21  Yael Aharon  <yael.aharon@intel.com>, Gyuyoung Kim <gyuyoung.kim@samsung.com>
 
         [EFL] Turn on WTF_USE_TILED_BACKING_STORE by default

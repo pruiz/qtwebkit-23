@@ -1,3 +1,62 @@
+2012-11-22  Michael Saboff  <msaboff@apple.com>
+
+        HTML integer parsing functions don't natively handle 8 bit strings
+        https://bugs.webkit.org/show_bug.cgi?id=102997
+
+        Reviewed by Filip Pizlo.
+
+        Added exports to the LChar* versions of charactersToIntStrict() and charactersToUIntStrict()
+        to support the changes made to parseHTMLInteger() and parseHTMLNonNegativeInteger().
+
+        * wtf/text/WTFString.h:
+        (WTF::charactersToIntStrict): Added export
+        (WTF::charactersToUIntStrict): Added export
+
+2012-11-21  Filip Pizlo  <fpizlo@apple.com>
+
+        Rename dataLog() and dataLogV() to dataLogF() and dataLogFV()
+        https://bugs.webkit.org/show_bug.cgi?id=103001
+
+        Rubber stamped by Dan Bernstein.
+
+        * wtf/DataLog.cpp:
+        (WTF::dataLogFV):
+        (WTF::dataLogF):
+        (WTF::dataLogFString):
+        * wtf/DataLog.h:
+        (WTF):
+        * wtf/HashTable.cpp:
+        (WTF::HashTableStats::dumpStats):
+        * wtf/HashTable.h:
+        (WTF::HashTable::Stats::dumpStats):
+        * wtf/MetaAllocator.cpp:
+        (WTF::MetaAllocator::dumpProfile):
+        * wtf/StackStats.cpp:
+        (WTF::StackStats::initialize):
+        (WTF::StackStats::PerThreadStats::PerThreadStats):
+        (WTF::StackStats::CheckPoint::CheckPoint):
+        (WTF::StackStats::CheckPoint::~CheckPoint):
+        (WTF::StackStats::probe):
+        (WTF::StackStats::LayoutCheckPoint::LayoutCheckPoint):
+        * wtf/text/WTFString.cpp:
+        (String::show):
+
+2012-11-21  Anthony G. Basile  <blueness@gentoo.org>
+
+        Source/WTF/wtf/Assertions.cpp: fix build on a uClibc system
+        https://bugs.webkit.org/show_bug.cgi?id=102946
+
+        Reviewed by Tony Chang.
+
+        Webkit-Gtk fails to build on a uClibc system because
+        Assertions.cpp assumes that all Linux systems have execinfo.h
+        and provide backtrace(). This is not necessarily the case for
+        uClibc which can be configured without these.  This patch
+        refines the check for OS(LINUX) to prevent this breakage.
+        Originally reported at https://bugs.gentoo.org/441674
+
+        * wtf/Assertions.cpp:
+
 2012-11-19  Filip Pizlo  <fpizlo@apple.com>
 
         DFG should be able to cache closure calls

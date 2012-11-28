@@ -118,6 +118,9 @@ webkit.org/b/101362 [ Debug ] fast/dom/Window/customized-property-survives-gc.ht
 # TEMPORARILY SKIPPED TESTS
 # -----------------------------------------------------------------
 
+# Context menu behavior differs on Mac. This test needs to be adjusted for Mac.
+webkit.org/b/102987 [ Mac ] fast/events/context-nodrag.html [ Skip ]
+
 # Fails due to different window.close() rules.  We need to decide whether we
 # ever expect to pass this.
 crbug.com/24189 fast/dom/open-and-close-by-DOM.html [ Skip ]
@@ -1338,8 +1341,6 @@ webkit.org/b/82594 [ SnowLeopard ] svg/text/exs-display-none.svg [ ImageOnlyFail
 webkit.org/b/82594 [ SnowLeopard ] svg/text/ems-display-none.svg [ Failure ImageOnlyFailure Pass ]
 
 # Failing on Skia platforms
-webkit.org/b/83051 [ Android ] svg/css/group-with-shadow.svg [ ImageOnlyFailure ]
-
 webkit.org/b/83183 [ Mac ] svg/as-image/animated-svg-as-image-no-fixed-intrinsic-size.html [ ImageOnlyFailure Pass ]
 
 webkit.org/b/99893 svg/animations/mozilla/animateMotion-mpath-targetChange-1.svg [ ImageOnlyFailure ]
@@ -1362,7 +1363,6 @@ webkit.org/b/83303 [ Win ] svg/custom/mouse-move-on-svg-container-standalone.svg
 webkit.org/b/83303 [ Win ] svg/custom/mouse-move-on-svg-container.xhtml [ ImageOnlyFailure Pass ]
 webkit.org/b/83303 [ Win ] svg/custom/mouse-move-on-svg-root-standalone.svg [ ImageOnlyFailure Pass ]
 webkit.org/b/83303 [ Win ] svg/custom/mouse-move-on-svg-root.xhtml [ ImageOnlyFailure Pass ]
-webkit.org/b/83303 [ Android Linux ] svg/transforms/text-with-pattern-with-svg-transform.svg [ ImageOnlyFailure Pass ]
 
 # This fails image 5-10% of the time. Probably a race condition on timers.
 webkit.org/b/83471 svg/as-image/animated-svg-as-image-same-image.html [ ImageOnlyFailure Pass ]
@@ -1677,6 +1677,7 @@ webkit.org/b/98647 [ Android ] css3/filters/effect-invert-hw.html [ ImageOnlyFai
 webkit.org/b/98647 [ Android ] css3/filters/effect-opacity-hw.html [ ImageOnlyFailure ]
 # Commented out until more generalized failure below is fixed & rebaselined.
 # webkit.org/b/98647 [ Android ] css3/filters/effect-reference-hw.html [ ImageOnlyFailure ]
+webkit.org/b/98647 [ Android ] css3/filters/effect-saturate-hw.html [ ImageOnlyFailure ]
 webkit.org/b/98647 [ Android ] css3/filters/effect-sepia-hw.html [ ImageOnlyFailure ]
 webkit.org/b/98647 [ Android ] css3/filters/filter-change-repaint-composited.html [ ImageOnlyFailure ]
 webkit.org/b/98647 [ Android ] css3/filters/filter-change-repaint.html [ ImageOnlyFailure ]
@@ -2211,19 +2212,25 @@ crbug.com/161899  fast/repaint/shadow-multiple-vertical.html [ Failure ImageOnly
 # Not included in tests modified by 81992, but started failing on Android at same time:
 crbug.com/161899 crbug.com/77494 fast/repaint/transform-replaced-shadows.html [ Failure ImageOnlyFailure ]
 crbug.com/161899  fast/transforms/shadows.html [ Failure ImageOnlyFailure ]
-crbug.com/161899  platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-ru.html [ Failure ImageOnlyFailure ]
-crbug.com/161899  platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step.html [ Failure ImageOnlyFailure ]
-crbug.com/161899  platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance.html [ Failure ImageOnlyFailure ]
-crbug.com/161899  platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step.html [ Failure ImageOnlyFailure ]
-crbug.com/161899  platform/chromium/fast/forms/calendar-picker/month-picker-appearance.html [ Failure ImageOnlyFailure ]
-crbug.com/161899  platform/chromium/fast/forms/calendar-picker/week-picker-appearance-step.html [ Failure ImageOnlyFailure ]
-crbug.com/161899 webkit.org/b/99421 platform/chromium/fast/forms/calendar-picker/week-picker-appearance.html [ Failure ImageOnlyFailure Pass Missing ]
 crbug.com/161899  platform/chromium/fast/forms/color/color-suggestion-picker-appearance.html [ Failure ImageOnlyFailure ]
 crbug.com/161899  platform/chromium/fast/forms/color/color-suggestion-picker-one-row-appearance.html [ Failure ImageOnlyFailure ]
 crbug.com/161899  platform/chromium/fast/forms/color/color-suggestion-picker-two-row-appearance.html [ Failure ImageOnlyFailure ]
 crbug.com/161899  platform/chromium/fast/forms/color/color-suggestion-picker-with-scrollbar-appearance.html [ Failure ImageOnlyFailure ]
 crbug.com/161899  platform/chromium/virtual/softwarecompositing/shadows/shadow-drawing.html [ Failure ImageOnlyFailure ]
 crbug.com/161899  svg/filters/shadow-on-rect-with-filter.svg [ Failure ImageOnlyFailure ]
+
+# To be rebaselined after skia rev. 6530 has landed in webkit
+crbug.com/162247  fast/canvas/canvas-incremental-repaint.html [ ImageOnlyFailure ]
+crbug.com/162247  svg/W3C-SVG-1.1/animate-elem-81-t.svg [ ImageOnlyFailure ]
+crbug.com/162247  svg/W3C-SVG-1.1/animate-elem-82-t.svg [ ImageOnlyFailure ]
+crbug.com/162247  svg/W3C-SVG-1.1/painting-stroke-02-t.svg [ ImageOnlyFailure ]
+crbug.com/162247  svg/css/group-with-shadow.svg [ ImageOnlyFailure ]
+crbug.com/162247  svg/custom/linking-a-03-b-transform.svg [ ImageOnlyFailure ]
+crbug.com/162247  svg/custom/linking-a-03-b-viewBox-transform.svg [ ImageOnlyFailure ]
+crbug.com/162247  svg/custom/pattern-rotate.svg [ ImageOnlyFailure ]
+crbug.com/162247  svg/custom/stroke-width-large.svg [ ImageOnlyFailure ]
+crbug.com/162247  svg/custom/use-transform.svg [ ImageOnlyFailure ]
+crbug.com/162247  svg/transforms/text-with-pattern-with-svg-transform.svg [ ImageOnlyFailure ]
 
 crbug.com/43890 [ Win ] http/tests/loading/basic.html [ Failure Pass ]
 
@@ -2850,14 +2857,6 @@ webkit.org/b/61169 [ Android Linux Win ] css3/images/optimize-contrast-image.htm
 webkit.org/b/96720 fast/forms/time-multiple-fields/time-multiple-fields-preserve-value-after-history-back.html [ Pass Timeout ]
 webkit.org/b/96720 fast/forms/date-multiple-fields/date-multiple-fields-preserve-value-after-history-back.html [ Pass Timeout ]
 webkit.org/b/98906 platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-mouse-operations.html [ Pass Failure ]
-
-# Needs rebaseline
-webkit.org/b/99421 platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl.html [ Pass ImageOnlyFailure Missing ]
-webkit.org/b/99421 platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-with-scroll-bar.html [ Pass ImageOnlyFailure Missing ]
-webkit.org/b/99421 platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance.html [ Pass ImageOnlyFailure Missing ]
-
-# Needs rebaseline
-webkit.org/b/102769 fast/forms/datetime/datetime-appearance-l10n.html [ Pass ImageOnlyFailure Missing ]
 
 # New test added in r87324
 crbug.com/83994 [ Win ] platform/win/plugins/call-javascript-that-destroys-plugin.html [ Failure ]
@@ -4218,4 +4217,5 @@ webkit.org/b/102724 crbug.com/9797 crbug.com/161762 [ Release ] svg/carto.net/co
 webkit.org/b/102724 crbug.com/161762 [ Debug ] svg/custom/gradient-stop-corner-cases.svg [ Crash ]
 webkit.org/b/102724 crbug.com/161762 [ Release ] svg/custom/gradient-stop-corner-cases.svg [ ImageOnlyFailure ]
 
-webkit.org/b/102898 webkit.org/b/98647 css3/filters/effect-saturate-hw.html [ Crash ]
+# Fails until we enable the Resource Timing API.
+webkit.org/b/61138 http/tests/w3c/webperf/submission/resource-timing [ Skip ]

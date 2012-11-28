@@ -1389,7 +1389,7 @@ PassRefPtr<NodeList> Document::nodesFromRect(int centerX, int centerY, unsigned 
     // When ignoreClipping is false, this method returns null for coordinates outside of the viewport.
     if (ignoreClipping)
         type |= HitTestRequest::IgnoreClipping;
-    else if (!frameView->visibleContentRect().intersects(HitTestResult::rectForPoint(point, topPadding, rightPadding, bottomPadding, leftPadding)))
+    else if (!frameView->visibleContentRect().intersects(HitTestLocation::rectForPoint(point, topPadding, rightPadding, bottomPadding, leftPadding)))
         return 0;
     if (allowShadowContent)
         type |= HitTestRequest::AllowShadowContent;
@@ -3462,7 +3462,7 @@ void Document::setCSSTarget(Element* n)
 
 void Document::registerNodeListCache(DynamicNodeListCacheBase* list)
 {
-    if (list->type() != NodeListCollectionType)
+    if (list->hasIdNameCache())
         m_nodeListCounts[InvalidateOnIdNameAttrChange]++;
     m_nodeListCounts[list->invalidationType()]++;
     if (list->isRootedAtDocument())
@@ -3471,7 +3471,7 @@ void Document::registerNodeListCache(DynamicNodeListCacheBase* list)
 
 void Document::unregisterNodeListCache(DynamicNodeListCacheBase* list)
 {
-    if (list->type() != NodeListCollectionType)
+    if (list->hasIdNameCache())
         m_nodeListCounts[InvalidateOnIdNameAttrChange]--;
     m_nodeListCounts[list->invalidationType()]--;
     if (list->isRootedAtDocument()) {
@@ -5682,7 +5682,7 @@ PassRefPtr<NodeList> Document::getItems(const String& typeNames)
     // In this case we need to create an empty string identifier to map such request in the cache.
     String localTypeNames = typeNames.isNull() ? MicroDataItemList::undefinedItemType() : typeNames;
 
-    return ensureRareData()->ensureNodeLists()->addCacheWithName<MicroDataItemList>(this, DynamicNodeList::MicroDataItemListType, localTypeNames);
+    return ensureRareData()->ensureNodeLists()->addCacheWithName<MicroDataItemList>(this, MicroDataItemListType, localTypeNames);
 }
 #endif
 
@@ -5906,20 +5906,21 @@ void Document::reportMemoryUsage(MemoryObjectInfo* memoryObjectInfo) const
     info.addMember(m_eventQueue);
     info.addMember(m_mediaCanStartListeners);
     info.addMember(m_pendingTasks);
+#if ENABLE(LINK_PRERENDER)
+    info.addMember(m_prerenderer);
+#endif
+    info.addMember(m_listsInvalidatedAtDocument);
 }
 
 class ImmutableAttributeDataCacheKey {
 public:
-    ImmutableAttributeDataCacheKey(const QualifiedName& tagName, const Attribute* attributes, unsigned attributeCount)
-        : m_tagQName(tagName)
-        , m_attributes(attributes)
+    ImmutableAttributeDataCacheKey(const Attribute* attributes, unsigned attributeCount)
+        : m_attributes(attributes)
         , m_attributeCount(attributeCount)
     { }
 
     bool operator!=(const ImmutableAttributeDataCacheKey& other) const
     {
-        if (m_tagQName != other.m_tagQName)
-            return true;
         if (m_attributeCount != other.m_attributeCount)
             return true;
         return memcmp(m_attributes, other.m_attributes, sizeof(Attribute) * m_attributeCount);
@@ -5927,12 +5928,10 @@ public:
 
     unsigned hash() const
     {
-        unsigned attributeHash = StringHasher::hashMemory(m_attributes, m_attributeCount * sizeof(Attribute));
-        return WTF::pairIntHash(m_tagQName.localName().impl()->existingHash(), attributeHash);
+        return StringHasher::hashMemory(m_attributes, m_attributeCount * sizeof(Attribute));
     }
 
 private:
-    QualifiedName m_tagQName;
     const Attribute* m_attributes;
     unsigned m_attributeCount;
 };
@@ -5947,11 +5946,11 @@ struct ImmutableAttributeDataCacheEntry {
     RefPtr<ElementAttributeData> value;
 };
 
-PassRefPtr<ElementAttributeData> Document::cachedImmutableAttributeData(const Element* element, const Vector<Attribute>& attributes)
+PassRefPtr<ElementAttributeData> Document::cachedImmutableAttributeData(const Vector<Attribute>& attributes)
 {
     ASSERT(!attributes.isEmpty());
 
-    ImmutableAttributeDataCacheKey cacheKey(element->tagQName(), attributes.data(), attributes.size());
+    ImmutableAttributeDataCacheKey cacheKey(attributes.data(), attributes.size());
     unsigned cacheHash = cacheKey.hash();
 
     ImmutableAttributeDataCache::iterator cacheIterator = m_immutableAttributeDataCache.add(cacheHash, nullptr).iterator;
@@ -5967,7 +5966,7 @@ PassRefPtr<ElementAttributeData> Document::cachedImmutableAttributeData(const El
     if (!cacheHash || cacheIterator->value)
         return attributeData.release();
 
-    cacheIterator->value = adoptPtr(new ImmutableAttributeDataCacheEntry(ImmutableAttributeDataCacheKey(element->tagQName(), attributeData->immutableAttributeArray(), attributeData->length()), attributeData));
+    cacheIterator->value = adoptPtr(new ImmutableAttributeDataCacheEntry(ImmutableAttributeDataCacheKey(attributeData->immutableAttributeArray(), attributeData->length()), attributeData));
 
     return attributeData.release();
 }

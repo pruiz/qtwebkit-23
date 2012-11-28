@@ -1,3 +1,468 @@
+2012-11-22  Yury Semikhatsky  <yurys@chromium.org>
+
+        Unreviewed. Rebaselined new tests added in r135454.
+
+        * platform/chromium/fast/js/concat-large-strings-crash-expected.txt: Added.
+        * platform/chromium/fast/js/concat-large-strings-crash2-expected.txt: Added.
+
+2012-11-21  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r135464.
+        http://trac.webkit.org/changeset/135464
+        https://bugs.webkit.org/show_bug.cgi?id=103026
+
+        breaks gtk bot (Requested by morrita on #webkit).
+
+        * fast/dom/shadow/shadow-aware-create-shadow-root-expected.txt: Removed.
+        * fast/dom/shadow/shadow-aware-create-shadow-root.html: Removed.
+
+2012-11-21  Cosmin Truta  <ctruta@rim.com>
+
+        Numeric identifiers of events should not be globally sequential
+        https://bugs.webkit.org/show_bug.cgi?id=102244
+
+        Reviewed by Alexey Proskuryakov.
+
+        Ensured that the results of setTimeout(), setInterval() and
+        navigator.geolocation.watchPosition() are strictly positive
+        and unique within their script execution context.
+
+        * fast/dom/Geolocation/watchPosition-unique-expected.txt: Added.
+        * fast/dom/Geolocation/watchPosition-unique.html: Added.
+        * fast/dom/Window/setTimeout-setInterval-unique-expected.txt: Added.
+        * fast/dom/Window/setTimeout-setInterval-unique.html: Added.
+
+2012-11-21  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Correct svn:mime-type for platform/chromium*/**/*.png
+
+        * <Omit the file list>
+
+2012-11-21  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Correct svn:mime-type for platform/chromium-linux/**/*.png
+
+        * <Omit the file list>
+
+2012-11-21  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Correct svn:mime-type for platform/chromium-win/**/*.png
+
+        * <Omit the file list>
+
+2012-11-21  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Correct svn:mime-type for platform/chromium-mac/**/*.png
+
+        * <Omit the file list>
+
+2012-11-21  Kent Tamura  <tkent@chromium.org>
+
+        [Chromium] Rebaselin for recent forms changes.
+
+        * platform/chromium-linux-x86/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl-expected.png: Added.
+        * platform/chromium-linux/fast/forms/datetime/datetime-appearance-l10n-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-ru-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-step-expected.png:
+        * platform/chromium-linux/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl-expected.png: Added.
+        * platform/chromium-linux/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-with-scroll-bar-expected.png: Added.
+        * platform/chromium-mac-lion/fast/forms/datetime/datetime-appearance-l10n-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png:
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-ru-expected.png:
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png:
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-expected.png:
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step-expected.png:
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-expected.png:
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-step-expected.png:
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl-expected.png: Added.
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-with-scroll-bar-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/forms/datetime/datetime-appearance-l10n-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-ru-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-step-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl-expected.png: Added.
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-with-scroll-bar-expected.png: Added.
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-ru-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-step-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-with-scroll-bar-expected.png:
+        * platform/chromium-win-xp/fast/forms/datetime/datetime-appearance-l10n-expected.png: Added.
+        * platform/chromium-win-xp/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-ru-expected.png:
+        * platform/chromium-win-xp/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl-expected.png: Added.
+        * platform/chromium-win/fast/forms/datetime/datetime-appearance-l10n-expected.png: Added.
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-ru-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-step-expected.png:
+        * platform/chromium-win/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-expected.png: Added.
+        * platform/chromium-win/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-rtl-expected.png: Added.
+        * platform/chromium-win/platform/chromium/fast/forms/suggestion-picker/week-suggestion-picker-appearance-with-scroll-bar-expected.png: Added.
+        * platform/chromium/TestExpectations:
+
+2012-11-21  Hajime Morrita  <morrita@google.com>
+
+        [Shadow DOM] Implement Element::createShadowRoot()
+        https://bugs.webkit.org/show_bug.cgi?id=102911
+
+        Reviewed by Kentaro Hara.
+
+        The coverage might not seem comprehensive at a glance. However,
+        this is just an alias of ShadowRoot constructor and there are
+        bunch of test cases which cover it.
+
+        As bug 102913 will convert such callsites to use createShadowRoot(),
+        the API will get be covered well then.
+
+        * fast/dom/shadow/shadow-aware-create-shdow-root-expected.txt: Added.
+        * fast/dom/shadow/shadow-aware-create-shdow-root.html: Added.
+          Further ShadowAware API will come here.
+
+2012-11-21  Dana Jansens  <danakj@chromium.org>
+
+        Remove crashing expectation for css3/filters/effect-reference-ordering-hw.html
+        https://bugs.webkit.org/show_bug.cgi?id=102898
+
+        Unreviewed test expectations.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-21  Hajime Morrita  <morrita@google.com>
+
+        [Shadow DOM][V8] Assertion failure when shadow host is reclaimed before ShadowRoot
+        https://bugs.webkit.org/show_bug.cgi?id=102893
+
+        Reviewed by Kentaro Hara.
+
+        * fast/dom/shadow/host-wrapper-reclaimed-expected.txt: Added.
+        * fast/dom/shadow/host-wrapper-reclaimed.html: Added.
+
+2012-11-21  Daniel Bates  <dbates@webkit.org>
+
+        JavaScript fails to concatenate large strings
+        <https://bugs.webkit.org/show_bug.cgi?id=102963>
+
+        Reviewed by Michael Saboff.
+
+        Add tests to ensure that we handle concatenating large strings.
+
+        * fast/js/concat-large-strings-crash-expected.txt: Added.
+        * fast/js/concat-large-strings-crash.html: Added.
+        * fast/js/concat-large-strings-crash2-expected.txt: Added.
+        * fast/js/concat-large-strings-crash2.html: Added.
+
+2012-11-21  Fady Samuel  <fsamuel@chromium.org>
+
+        Add fast/events/context-nodrag.html to Chromium Mac TestExpectations
+
+        No review.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-21  James Simonsen  <simonjam@chromium.org>
+
+        [Resource Timing] Create W3C-style test suite
+        https://bugs.webkit.org/show_bug.cgi?id=84883
+
+        Reviewed by Tony Gentilcore.
+
+        The tests are designed to be upstreamed. Eventually, the local ones will be replaced by the official upstream versions.
+
+        * http/tests/w3c/webperf/resources/Ahem.ttf: Added.
+        * http/tests/w3c/webperf/resources/all_resource_types.htm: Added.
+        * http/tests/w3c/webperf/resources/blank_image.png: Added.
+        * http/tests/w3c/webperf/resources/empty_script.js: Added.
+        * http/tests/w3c/webperf/resources/generate_resource.php: Added.
+        * http/tests/w3c/webperf/resources/gray_bg.css: Added.
+        (body):
+        * http/tests/w3c/webperf/resources/green_frame.htm: Added.
+        * http/tests/w3c/webperf/resources/inject_resource_test.html: Added.
+        * http/tests/w3c/webperf/resources/nested.css: Added.
+        (@font-face):
+        (ol):
+        * http/tests/w3c/webperf/resources/webperftestharness.js:
+        (test_greater_or_equals):
+        (test_fail):
+        (test_resource_entries):
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_attribute_order-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_attribute_order.html: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_dynamic_insertion-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_dynamic_insertion.html: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_frame_initiator_type-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_frame_initiator_type.html: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_initiator_types-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_initiator_types.html: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_redirects-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_redirects.html: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_reparenting-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_reparenting.html: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_script_types-expected.txt: Added.
+        * http/tests/w3c/webperf/submission/resource-timing/html/test_resource_script_types.html: Added.
+        * platform/chromium/TestExpectations: Skip these new tests until the flag is flipped.
+
+2012-11-21  Fady Samuel  <fsamuel@chromium.org>
+
+        Add fast/events/context-nodrag.html to Mac TestExpectations
+
+        No review.
+
+        * platform/mac/TestExpectations:
+
+2012-11-21  Rick Byers  <rbyers@chromium.org>
+
+        Multi-frame CUR file test hangs on mac port 
+        https://bugs.webkit.org/show_bug.cgi?id=101811
+
+        Reviewed by Alexey Proskuryakov.
+
+        Fix tests to not hang on unexpected image load failure.
+        Expect multi-frame CUR files to fail to load on Mac.
+
+        * fast/events/mouse-cursor.html:
+        * fast/events/mouse-cursor-multiframecur.html:
+        * platform/mac/TestExpectations:
+        * platform/mac/fast/events/mouse-cursor-multiframecur-expected.txt: Added.
+
+2012-11-21  Tien-Ren Chen  <trchen@chromium.org>
+
+        Invalidate non-composited content host when page scale factor changes
+        https://bugs.webkit.org/show_bug.cgi?id=100718
+
+        Reviewed by Adam Barth.
+
+        During a scale change, non-composited content layer doesn't get invalidated
+        automatically by the transformation change on RenderView. Need to force
+        update non-composited contents ourself.
+
+        * compositing/repaint/page-scale-repaint-expected.png: Added.
+        * compositing/repaint/page-scale-repaint-expected.txt: Added.
+        * compositing/repaint/page-scale-repaint.html: Added.
+        * compositing/repaint/resources/grid.png: Added.
+
+2012-11-21  Fady Samuel  <fsamuel@chromium.org>
+
+        Clear MousePressed state on context menu to avoid initiating a drag
+        https://bugs.webkit.org/show_bug.cgi?id=101786
+
+        Reviewed by Ojan Vafai.
+
+        If a user initiates a drag via left mouse down, brings up the context menu,
+        and then cancels the context menu while keeping the left mouse button down,
+        then the drag operation will continue. This does not match the platform
+        conventions on Windows, Linux or Mac .
+
+        This change cancels the drag if the context menu is about to be displayed.
+
+        * fast/events/context-nodrag.html: Added.
+        * fast/events/context-nodrag-expected.txt: Added.
+
+2012-11-21  Huang Dongsung  <luxtella@company100.net>
+
+        REGRESSION(r135212): Fix crash due to an infinite rect.
+        https://bugs.webkit.org/show_bug.cgi?id=102891
+
+        Reviewed by Noam Rosenthal.
+
+        fast/multicol/span/positioned-child-not-removed-crash.html now passes on
+        EFL.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-11-21  Jian Li  <jianli@chromium.org>
+
+        Unreviewed. Updated chromium test expectations to resolve lint failures.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-21  Joshua Bell  <jsbell@chromium.org>
+
+        Remove IDBDatabaseException
+        https://bugs.webkit.org/show_bug.cgi?id=102514
+
+        Reviewed by Adam Barth.
+
+        Remove references to IDBDatabaseException - DOMExceptions should be thrown with code 0 and
+        a name. Remove references to IDBRequest.errorCode - IDBRequest.error is the new hawtness,
+        and already tested for. Ensure those objects/properties are gone in removed.html
+
+        * storage/indexeddb/basics-expected.txt:
+        * storage/indexeddb/basics-workers-expected.txt:
+        * storage/indexeddb/constants.html: Removed.
+        * storage/indexeddb/constants-expected.txt: Removed.
+        * storage/indexeddb/create-and-remove-object-store-expected.txt:
+        * storage/indexeddb/cursor-continue-dir-expected.txt:
+        * storage/indexeddb/cursor-continue-expected.txt:
+        * storage/indexeddb/cursor-update-expected.txt:
+        * storage/indexeddb/deleteIndex-expected.txt:
+        * storage/indexeddb/exceptions-expected.txt:
+        * storage/indexeddb/factory-cmp-expected.txt:
+        * storage/indexeddb/get-keyrange-expected.txt:
+        * storage/indexeddb/index-basics-expected.txt:
+        * storage/indexeddb/index-basics-workers-expected.txt:
+        * storage/indexeddb/index-count-expected.txt:
+        * storage/indexeddb/index-unique-expected.txt:
+        * storage/indexeddb/intversion-close-in-upgradeneeded-expected.txt:
+        * storage/indexeddb/invalid-keys-expected.txt:
+        * storage/indexeddb/key-generator-expected.txt:
+        * storage/indexeddb/key-type-array-expected.txt:
+        * storage/indexeddb/keypath-edges-expected.txt:
+        * storage/indexeddb/keyrange-expected.txt:
+        * storage/indexeddb/mozilla/add-twice-failure-expected.txt:
+        * storage/indexeddb/mozilla/bad-keypath-expected.txt:
+        * storage/indexeddb/mozilla/clear-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-delete-null-key-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-inline-and-passed-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-put-no-key-expected.txt:
+        * storage/indexeddb/mozilla/key-requirements-put-null-key-expected.txt:
+        * storage/indexeddb/mozilla/readonly-transactions-expected.txt:
+        * storage/indexeddb/mozilla/resources/add-twice-failure.js:
+        * storage/indexeddb/mozilla/resources/bad-keypath.js:
+        * storage/indexeddb/mozilla/resources/clear.js:
+        * storage/indexeddb/mozilla/resources/indexes.js: Elide obsolete comment.
+        * storage/indexeddb/mozilla/resources/key-requirements-delete-null-key.js:
+        * storage/indexeddb/mozilla/resources/key-requirements-inline-and-passed.js:
+        * storage/indexeddb/mozilla/resources/key-requirements-put-no-key.js:
+        * storage/indexeddb/mozilla/resources/key-requirements-put-null-key.js:
+        * storage/indexeddb/mozilla/resources/readonly-transactions.js:
+        * storage/indexeddb/objectstore-autoincrement-expected.txt:
+        * storage/indexeddb/objectstore-basics-expected.txt:
+        * storage/indexeddb/objectstore-basics-workers-expected.txt:
+        * storage/indexeddb/objectstore-count-expected.txt:
+        * storage/indexeddb/open-cursor-expected.txt:
+        * storage/indexeddb/readonly-expected.txt:
+        * storage/indexeddb/removed-expected.txt:
+        * storage/indexeddb/resources/basics.js:
+        * storage/indexeddb/resources/constants.js: Removed.
+        * storage/indexeddb/resources/create-and-remove-object-store.js:
+        * storage/indexeddb/resources/cursor-continue-dir.js:
+        * storage/indexeddb/resources/cursor-continue.js:
+        * storage/indexeddb/resources/cursor-update.js:
+        * storage/indexeddb/resources/deleteIndex.js:
+        * storage/indexeddb/resources/exceptions.js:
+        * storage/indexeddb/resources/factory-cmp.js:
+        * storage/indexeddb/resources/get-keyrange.js:
+        * storage/indexeddb/resources/index-basics.js:
+        * storage/indexeddb/resources/index-count.js:
+        * storage/indexeddb/resources/index-unique.js:
+        * storage/indexeddb/resources/intversion-close-in-upgradeneeded.js:
+        * storage/indexeddb/resources/invalid-keys.js:
+        * storage/indexeddb/resources/key-generator.js:
+        * storage/indexeddb/resources/key-type-array.js:
+        * storage/indexeddb/resources/keypath-edges.js:
+        * storage/indexeddb/resources/keyrange.js:
+        * storage/indexeddb/resources/objectstore-autoincrement.js:
+        * storage/indexeddb/resources/objectstore-basics.js:
+        * storage/indexeddb/resources/objectstore-count.js:
+        * storage/indexeddb/resources/open-cursor.js:
+        * storage/indexeddb/resources/readonly.js:
+        * storage/indexeddb/resources/removed.js:
+        * storage/indexeddb/resources/shared.js:
+        * storage/indexeddb/resources/transaction-abort.js:
+        * storage/indexeddb/resources/transaction-active-flag.js:
+        * storage/indexeddb/resources/transaction-basics.js:
+        * storage/indexeddb/resources/transaction-complete-workers.js:
+        * storage/indexeddb/resources/transaction-error.js:
+        * storage/indexeddb/resources/transaction-read-only.js:
+        * storage/indexeddb/transaction-abort-expected.txt:
+        * storage/indexeddb/transaction-active-flag-expected.txt:
+        * storage/indexeddb/transaction-basics-expected.txt:
+        * storage/indexeddb/transaction-complete-workers-expected.txt:
+        * storage/indexeddb/transaction-error-expected.txt:
+        * storage/indexeddb/transaction-read-only-expected.txt:
+
+2012-11-21  Mike Reed  <reed@google.com>
+
+        update expectations in advance of skia deps roll
+        https://bugs.webkit.org/show_bug.cgi?id=102964
+
+        Reviewed by NOBODY. expectations change only.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-21  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        [EFL][WK2] gardening: fast/writing-mode/japanese-ruby-* are flaky
+        https://bugs.webkit.org/show_bug.cgi?id=102921
+
+        Unreviewed gardening: several tests fail if run after any test that
+        changes font family mappings. Mark them flaky.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-11-21  Yury Semikhatsky  <yurys@chromium.org>
+
+        Unreviewed. Reverted expectation changes from r135380 and marked css3/filters/effect-reference-ordering-hw.html as crashing
+        https://bugs.webkit.org/show_bug.cgi?id=102898
+
+        * platform/chromium/TestExpectations:
+
+2012-11-21  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        [EFL] Gardening: svg/foreignObject/viewport-foreignobject-crash.html is flaky
+        https://bugs.webkit.org/show_bug.cgi?id=102931
+
+        Unreviewed gardening.
+
+        * platform/efl/TestExpectations:
+
+2012-11-21  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        [EFL][WK2] Gardening: css3/device-adapt/opera/constrain-006 and -007 fail
+        https://bugs.webkit.org/show_bug.cgi?id=102923
+
+        Unreviewed gardening: these two still fail after using fixed layout in WTR.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-11-21  Csaba Osztrogonác  <ossy@webkit.org>
+
+        Unreviewed gardening, unskip a now passing test.
+
+        * platform/mac-wk2/TestExpectations:
+        * platform/qt-5.0-wk2/TestExpectations:
+
+2012-11-21  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, unskip a now passing test.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt/TestExpectations:
+
+2012-11-21  Pavel Feldman  <pfeldman@chromium.org>
+
+        Web Inspector: reparenting view does not detach from the previous parent.
+        https://bugs.webkit.org/show_bug.cgi?id=102902
+
+        Reviewed by Vsevolod Vlasov.
+
+        * inspector/view-events.html:
+
+2012-11-21  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, unskip now passing tests.
+
+        * platform/qt-5.0/TestExpectations:
+
 2012-11-21  Csaba Osztrogonác  <ossy@webkit.org>
 
         [Qt] Unreviewed gardening, unskip a now passing test, update an expected file.

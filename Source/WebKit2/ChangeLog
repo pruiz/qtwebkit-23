@@ -1,3 +1,332 @@
+2012-11-22  Eunmi Lee  <eunmi15.lee@samsung.com>
+
+        [EFL][WK2] Correct the parameters of WebPlatformTouchPoint.
+        https://bugs.webkit.org/show_bug.cgi?id=102865
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Set the screen position as a third parameter and contents position as
+        a fourth parameter of WebPlatformTouchPoint().
+
+        * Shared/efl/WebEventFactory.cpp:
+        (WebKit::WebEventFactory::createWebTouchEvent):
+
+2012-11-22  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Remove an invisible TiledBackingStore of CoordinatedGraphicsLayer.
+        https://bugs.webkit.org/show_bug.cgi?id=102894
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        CoordinatedGraphicsLayer does not need to have a backing store
+        if (!drawsContent() || !contentsAreVisible() || m_size.isEmpty()).
+
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::updateContentBuffers):
+
+2012-11-22  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: refactor LayerTreeRenderer.
+        https://bugs.webkit.org/show_bug.cgi?id=103004
+
+        Reviewed by Noam Rosenthal.
+
+        This patch changes two subjects.
+        1. Add ASSERT(isMainThread()) in all methods that are called in the main thread.
+        In addition, make dispatchOnMainThread() use callOnMainThread(const Function<void()>&
+        function) instead of its own implementation.
+
+        2. Remove setAccelerationMode() because we don't use m_accelerationMode member
+        except for the setter.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::createGLSurface):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit):
+        (WebKit::LayerTreeRenderer::dispatchOnMainThread):
+        (WebKit::LayerTreeRenderer::LayerTreeRenderer):
+        (WebKit::LayerTreeRenderer::animationFrameReady):
+        (WebKit::LayerTreeRenderer::updateViewport):
+        (WebKit::LayerTreeRenderer::renderNextFrame):
+        (WebKit::LayerTreeRenderer::purgeGLResources):
+        (WebKit::LayerTreeRenderer::detach):
+        (WebKit::LayerTreeRenderer::setActive):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+        (LayerTreeRenderer):
+        * UIProcess/efl/PageClientBase.cpp:
+        (WebKit::PageClientBase::createDrawingAreaProxy):
+
+2012-11-21  Jinwoo Song  <jinwoo7.song@samsung.com>
+
+        [EFL][WK2] Use consistent class names in the clients
+        https://bugs.webkit.org/show_bug.cgi?id=102684
+
+        Reviewed by Gyuyoung Kim.
+
+        WebKit EFL classes do not use '_' since r135117 but '_' is still remained
+        in some clients classes. This patch removed the '_' to make class names
+        to be consistent.
+
+        * UIProcess/efl/ContextHistoryClientEfl.cpp:
+        (WebKit::ContextHistoryClientEfl::didNavigateWithNavigationData):
+        * UIProcess/efl/DownloadManagerEfl.cpp:
+        (WebKit::DownloadManagerEfl::didFail):
+        * UIProcess/efl/FormClientEfl.cpp:
+        (WebKit::FormClientEfl::willSubmitForm):
+        * UIProcess/efl/PageLoadClientEfl.cpp:
+        (WebKit::PageLoadClientEfl::didReceiveIntentForFrame):
+        (WebKit::PageLoadClientEfl::registerIntentServiceForFrame):
+        (WebKit::PageLoadClientEfl::didFailLoadWithErrorForFrame):
+        (WebKit::PageLoadClientEfl::didFailProvisionalLoadWithErrorForFrame):
+        (WebKit::PageLoadClientEfl::didReceiveAuthenticationChallengeInFrame):
+        * UIProcess/efl/PagePolicyClientEfl.cpp:
+        (WebKit::PagePolicyClientEfl::decidePolicyForNavigationAction):
+        (WebKit::PagePolicyClientEfl::decidePolicyForNewWindowAction):
+        * UIProcess/efl/PageUIClientEfl.cpp:
+        (WebKit::PageUIClientEfl::runOpenPanel):
+        * UIProcess/efl/RequestManagerClientEfl.cpp:
+        (WebKit::EwkUrlSchemeHandler::EwkUrlSchemeHandler):
+        (WebKit::RequestManagerClientEfl::didReceiveURIRequest):
+        (WebKit::RequestManagerClientEfl::registerURLSchemeHandler):
+        * UIProcess/efl/RequestManagerClientEfl.h:
+        (RequestManagerClientEfl):
+        * UIProcess/efl/ResourceLoadClientEfl.cpp:
+        (WebKit::ResourceLoadClientEfl::didInitiateLoadForResource):
+        (WebKit::ResourceLoadClientEfl::didSendRequestForResource):
+        (WebKit::ResourceLoadClientEfl::didReceiveResponseForResource):
+        (WebKit::ResourceLoadClientEfl::didFinishLoadForResource):
+        (WebKit::ResourceLoadClientEfl::didFailLoadForResource):
+        * UIProcess/efl/ResourceLoadClientEfl.h:
+        (ResourceLoadClientEfl):
+
+2012-11-21  Jaehun Lim  <ljaehun.lim@samsung.com>
+
+        [EFL][WK2] Remove #include "ewk_view_private.h" in PageViewportControllerClientEfl.cpp
+        https://bugs.webkit.org/show_bug.cgi?id=102773
+
+        Reviewed by Gyuyoung Kim.
+
+        PageViewportControllerClientEfl.cpp doesn't need to include ewk_view_private.h.
+
+        * UIProcess/efl/PageViewportControllerClientEfl.cpp:
+
+2012-11-21  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: refactor changing children code in CoordinatedGraphicsLayer.
+        https://bugs.webkit.org/show_bug.cgi?id=102896
+
+        Reviewed by Noam Rosenthal.
+
+        When changing children, we don't need to sync a layer state because
+        there is no more need to send the parent ID every time the layer tree
+        hierarchy changes. So this patch removes didChangeLayerState() in
+        methods which change children.
+
+        In addition, purgeBackingStores() does not need to call didChangeChildren()
+        because purgeBackingStores() does not change children.
+
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::CoordinatedGraphicsLayer::setChildren):
+        (WebCore::CoordinatedGraphicsLayer::addChild):
+        (WebCore::CoordinatedGraphicsLayer::addChildAtIndex):
+        (WebCore::CoordinatedGraphicsLayer::addChildAbove):
+        (WebCore::CoordinatedGraphicsLayer::addChildBelow):
+        (WebCore::CoordinatedGraphicsLayer::replaceChild):
+        (WebCore::CoordinatedGraphicsLayer::removeFromParent):
+        (WebCore::CoordinatedGraphicsLayer::purgeBackingStores):
+
+2012-11-21  Huang Dongsung  <luxtella@company100.net>
+
+        REGRESSION(r135212): Fix crash due to an infinite rect.
+        https://bugs.webkit.org/show_bug.cgi?id=102891
+
+        Reviewed by Noam Rosenthal.
+
+        When CoordinatedGraphicsLayer has a 3D transform, tiledBackingStoreVisibleRect()
+        can calculate an infinite rect. However, TiledBackingStore cannot handle the
+        infinite rect. This patch clamps the infinite rect to avoid crash in
+        TiledBackingStore.
+
+        * WebProcess/WebPage/CoordinatedGraphics/CoordinatedGraphicsLayer.cpp:
+        (WebCore::clampToContentsRectIfRectIsInfinite):
+        (WebCore):
+        (WebCore::CoordinatedGraphicsLayer::tiledBackingStoreVisibleRect):
+
+2012-11-21  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        Disambiguate innerNodeFramePoint and mainFramePoint
+        https://bugs.webkit.org/show_bug.cgi?id=98139
+
+        Reviewed by Julien Chaffraix.
+
+        Switch to using HitTestResult::innerNodeFrame and HitTestResult::innerNodeFramePoint.
+
+        * WebProcess/WebPage/WebContextMenu.cpp:
+        (WebKit::WebContextMenu::show):
+        * WebProcess/WebPage/mac/WebPageMac.mm:
+        (WebKit::WebPage::characterIndexForPoint):
+
+2012-11-21  Simon Hausmann  <simon.hausmann@digia.com>
+
+        Unreviewed Qt/Windows build fix.
+        https://bugs.webkit.org/show_bug.cgi?id=102787
+
+        Remove inclusion of QtQml, which drags in QtNetwork, which drags in qnetworksession.h, which
+        defines a member function called "interface". Since windows headers also define a pre-processor
+        macro called "interface", it has to do that. However we have now a dependency between combaseapi.h,
+        which #defines interface and is included earlier (before qnetworksession.h) and shlwapi.h, which _needs_
+        the interface macro and is included afterwards. Since this module-wide QtQml inclusion is unnecessary
+        and just slows down the build, this patch removes it.
+
+        * UIProcess/API/qt/qwebkittest_p.h:
+
+2012-11-21  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: refactor LayerTreeRenderer::syncRemoteContent().
+        https://bugs.webkit.org/show_bug.cgi?id=102900
+
+        Reviewed by Noam Rosenthal.
+
+        Currently, QQuickWebPage::updatePaintNode() calls
+        LayerTreeRenderer::syncRemoteContent() with locking the main thread.
+        syncRemoteContent() is heavy, so we should not call syncRemoteContent() in
+        updatePaintNode(). Calling syncRemoteContent() in the painting thread is
+        thread-safe because syncRemoteContent() does not access any data
+        structures, which the main thread use.
+
+        After this patch, syncRemoteContent() is used only internally, so
+        syncRemoteContent() becomes private.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::displayTimerFired):
+        * UIProcess/API/qt/qquickwebpage.cpp:
+        (QQuickWebPage::updatePaintNode):
+        * UIProcess/API/qt/raw/qrawwebview.cpp:
+        (QRawWebView::paint):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::paintToCurrentGLContext):
+        (WebKit::LayerTreeRenderer::ensureRootLayer):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+        (LayerTreeRenderer):
+
+2012-11-21  Andras Becsi  <andras.becsi@digia.com>
+
+        [WK2] Viewport meta tag broken after r134801
+        https://bugs.webkit.org/show_bug.cgi?id=102801
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        If the initial-scale attribute is not explicitly specified it is left -1 by the
+        viewport meta algorithm and if the content is not scalable the min and max scales
+        are restricted by restrictScaleFactorToInitialScaleIfNotUserScalable() which resulted
+        in negative scales on the UI side.
+        Make sure that the minimum scale to fit the viewport is calculated before restricting
+        the scales and use this scale as the initial scale if no explicit initial scale was set.
+
+        * UIProcess/PageViewportController.cpp:
+        (WebKit::PageViewportController::PageViewportController):
+        (WebKit::PageViewportController::pageTransitionViewportReady):
+        (WebKit::PageViewportController::didChangeViewportAttributes):
+        (WebKit::PageViewportController::updateMinimumScaleToFit):
+
+2012-11-21  Gyuyoung Kim  <gyuyoung.kim@samsung.com>
+
+        [EFL][WK2] Support Context Menu
+        https://bugs.webkit.org/show_bug.cgi?id=96200
+
+        Reviewed by Laszlo Gombos.
+
+        This patch supports WK2 EFL's context menu as WK1 implementation because we can't use elementary in inside WebKit.
+        Only basic functionalities of context menu are supported. Beside this implementation follows GTK's implementation.
+        For example, ewk_context_menu_new, ewk_context_menu_item_append, ewk_context_menu_item_remove are supported.
+
+        In addition, ewk_defines.h file is added in order to support cross inclusion as GTK port.
+
+        * PlatformEfl.cmake:
+        * UIProcess/API/efl/EWebKit2.h:
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::EwkViewImpl):
+        (EwkViewImpl::showContextMenu):
+        (EwkViewImpl::hideContextMenu):
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (WebKit):
+        (EwkViewImpl):
+        * UIProcess/API/efl/ewk_context_menu.cpp: Added.
+        (EwkContextMenu::EwkContextMenu):
+        (EwkContextMenu::~EwkContextMenu):
+        (EwkContextMenu::hide):
+        (Ewk_Context_Menu::appendItem):
+        (Ewk_Context_Menu::removeItem):
+        (EwkContextMenu::contextMenuItemSelected):
+        (ewk_context_menu_new):
+        (ewk_context_menu_new_with_items):
+        (ewk_context_menu_item_append):
+        (ewk_context_menu_item_remove):
+        (ewk_context_menu_hide):
+        (ewk_context_menu_items_get):
+        (ewk_context_menu_item_select):
+        * UIProcess/API/efl/ewk_context_menu.h: Added.
+        * UIProcess/API/efl/ewk_context_menu_item.cpp: Added.
+        (EwkContextMenuItem::EwkContextMenuItem):
+        (ewk_context_menu_item_new):
+        (ewk_context_menu_item_new_with_submenu):
+        (ewk_context_menu_item_type_get):
+        (ewk_context_menu_item_type_set):
+        (ewk_context_menu_item_action_get):
+        (ewk_context_menu_item_action_set):
+        (ewk_context_menu_item_title_get):
+        (ewk_context_menu_item_title_set):
+        (ewk_context_menu_item_checked_get):
+        (ewk_context_menu_item_checked_set):
+        (ewk_context_menu_item_enabled_get):
+        (ewk_context_menu_item_enabled_set):
+        * UIProcess/API/efl/ewk_context_menu_item.h: Added.
+        * UIProcess/API/efl/ewk_context_menu_item_private.h: Added.
+        (EwkContextMenuItem):
+        (EwkContextMenuItem::create):
+        (EwkContextMenuItem::action):
+        (EwkContextMenuItem::setAction):
+        (EwkContextMenuItem::title):
+        (EwkContextMenuItem::setTitle):
+        (EwkContextMenuItem::type):
+        (EwkContextMenuItem::setType):
+        (EwkContextMenuItem::checked):
+        (EwkContextMenuItem::setChecked):
+        (EwkContextMenuItem::enabled):
+        (EwkContextMenuItem::setEnabled):
+        * UIProcess/API/efl/ewk_context_menu_private.h: Added.
+        (WebKit):
+        (EwkContextMenu):
+        (EwkContextMenu::create):
+        (EwkContextMenu::items):
+        * UIProcess/API/efl/ewk_defines.h: Added.
+        * UIProcess/API/efl/ewk_view.h:
+        * UIProcess/API/efl/tests/test_ewk2_context_menu.cpp: Added.
+        (checkBasicContextMenuItem):
+        (showContextMenu):
+        (TEST_F):
+        * UIProcess/efl/ContextMenuClientEfl.cpp: Added.
+        (toContextClientEfl):
+        (ContextMenuClientEfl::ContextMenuClientEfl):
+        (ContextMenuClientEfl::getContextMenuFromProposedMenu):
+        * UIProcess/efl/ContextMenuClientEfl.h: Added.
+        (WebKit):
+        (ContextMenuClientEfl):
+        (WebKit::ContextMenuClientEfl::create):
+        * UIProcess/efl/PageClientBase.cpp:
+        (WebKit::PageClientBase::createContextMenuProxy):
+        * UIProcess/efl/WebContextMenuProxyEfl.cpp: Added.
+        (WebKit):
+        (WebKit::WebContextMenuProxyEfl::WebContextMenuProxyEfl):
+        (WebKit::WebContextMenuProxyEfl::~WebContextMenuProxyEfl):
+        (WebKit::WebContextMenuProxyEfl::showContextMenu):
+        (WebKit::WebContextMenuProxyEfl::hideContextMenu):
+        (WebKit::WebContextMenuProxyEfl::contextMenuItemSelected):
+        * UIProcess/efl/WebContextMenuProxyEfl.h: Added.
+        (WebKit):
+        (WebContextMenuProxyEfl):
+        (WebKit::WebContextMenuProxyEfl::create):
+
 2012-11-21  Jongseok Yang  <js45.yang@samsung.com>
 
         [EFL][WK2] Rename ewk_view_setting_encoding_custom_XXX to ewk_view_custom_encoding_XXX

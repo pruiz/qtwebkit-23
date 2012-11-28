@@ -140,6 +140,7 @@ SOURCES += \
     dfg/DFGVariableEventStream.cpp \
     dfg/DFGValidate.cpp \
     dfg/DFGVirtualRegisterAllocationPhase.cpp \
+    disassembler/Disassembler.cpp \
     interpreter/AbstractPC.cpp \
     interpreter/CallFrame.cpp \
     interpreter/Interpreter.cpp \
@@ -154,6 +155,7 @@ SOURCES += \
     jit/JITCall.cpp \
     jit/JITCall32_64.cpp \
     jit/JIT.cpp \
+    jit/JITDisassembler.cpp \
     jit/JITExceptions.cpp \
     jit/JITOpcodes.cpp \
     jit/JITOpcodes32_64.cpp \

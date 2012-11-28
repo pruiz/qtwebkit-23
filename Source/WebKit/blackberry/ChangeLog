@@ -1,3 +1,80 @@
+2012-11-21  Genevieve Mak  <gmak@rim.com>
+
+        [BlackBerry] Drop Synchronous Mouse Events
+        https://bugs.webkit.org/show_bug.cgi?id=102980
+
+        Reviewed by Rob Buis.
+
+        Reviewed Internally by George Staikos, Mike Lattanzio and Mike Fenton.
+        Get rid of unneeded methods and simplify code.
+        Send click if getting context over an empty text field
+        so that it will be focused and have a caret.
+        PR #242781
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPagePrivate::webContext):
+        (BlackBerry::WebKit::WebPage::touchEvent):
+        (BlackBerry::WebKit::WebPage::touchPointAsMouseEvent):
+        (BlackBerry::WebKit::WebPage::touchEventCancel):
+        * Api/WebPage.h:
+        * WebKitSupport/TouchEventHandler.cpp:
+        (BlackBerry::WebKit::TouchEventHandler::TouchEventHandler):
+        (BlackBerry::WebKit::TouchEventHandler::doFatFingers):
+        (BlackBerry::WebKit::TouchEventHandler::sendClickAtFatFingersPoint):
+        (BlackBerry::WebKit::TouchEventHandler::handleTouchPoint):
+        (BlackBerry::WebKit::TouchEventHandler::handleFatFingerPressed):
+        * WebKitSupport/TouchEventHandler.h:
+        (TouchEventHandler):
+
+2012-11-21  Konrad Piascik  <kpiascik@rim.com>
+
+        [BlackBerry] Prevent screen from dimming on device when inspector front-end is connected
+        https://bugs.webkit.org/show_bug.cgi?id=102978
+
+        Reviewed by Rob Buis.
+
+        Internal PR 200848
+        We prevent screen from going dim when the front-end is connected and return to normal when
+        the front-end disconnects.
+
+        * Api/WebPage.cpp:
+        (BlackBerry::WebKit::WebPage::enableWebInspector):
+        (BlackBerry::WebKit::WebPage::disableWebInspector):
+
+2012-11-21  Konrad Piascik  <kpiascik@rim.com>
+
+        [BlackBerry] Don't add empty rects to the tap highlight region.
+        https://bugs.webkit.org/show_bug.cgi?id=102966
+
+        Reviewed by George Staikos.
+
+        Internal PR 246960
+        Tap highlight is way too large sometimes.
+        When we add an empty rect it inflates by 2 and causes the tap region to extend to the origin.
+
+        * WebKitSupport/TouchEventHandler.cpp:
+        (BlackBerry::WebKit::TouchEventHandler::drawTapHighlight):
+
+2012-11-21  Mike Fenton  <mifenton@rim.com>
+
+        [BlackBerry] Switch to point instead of VisiblePosition comparison for input bounds check
+        https://bugs.webkit.org/show_bug.cgi?id=102962
+
+        Reviewed by Rob Buis.
+
+        PR 247270.
+
+        Switch from using VisiblePosition to determine if we are in a node
+        to a comparison of the field bounds.  This fixes the case where
+        there is no node before the target node to match.
+
+        Reviewed Internally by Gen Mak.
+
+        * WebKitSupport/DOMSupport.cpp:
+        * WebKitSupport/DOMSupport.h:
+        * WebKitSupport/SelectionHandler.cpp:
+        (BlackBerry::WebKit::SelectionHandler::setCaretPosition):
+
 2012-11-20  Andrew Lo  <anlo@rim.com>
 
         [BlackBerry] Animated gifs pause on scroll or zoom and sometimes don't resume after scroll or zoom completes

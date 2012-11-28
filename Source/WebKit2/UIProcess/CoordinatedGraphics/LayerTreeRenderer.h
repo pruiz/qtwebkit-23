@@ -70,7 +70,6 @@ public:
     void purgeGLResources();
     void paintToCurrentGLContext(const WebCore::TransformationMatrix&, float, const WebCore::FloatRect&, WebCore::TextureMapper::PaintFlags = 0);
     void paintToGraphicsContext(BackingStore::PlatformGraphicsContext);
-    void syncRemoteContent();
     void setContentsSize(const WebCore::FloatSize&);
     void setVisibleContentsRect(const WebCore::FloatRect&);
     void didChangeScrollPosition(const WebCore::IntPoint& position);
@@ -115,22 +114,19 @@ public:
     void animationFrameReady();
 #endif
 
-    void setAccelerationMode(WebCore::TextureMapper::AccelerationMode mode)
-    {
-        // The acceleration mode is set only before TextureMapper was created.
-        ASSERT(!m_textureMapper);
-        m_accelerationMode = mode;
-    }
 private:
     PassOwnPtr<WebCore::GraphicsLayer> createLayer(WebLayerID);
 
     WebCore::GraphicsLayer* layerByID(WebLayerID id) { return (id == InvalidWebLayerID) ? 0 : m_layers.get(id); }
     WebCore::GraphicsLayer* rootLayer() { return m_rootLayer.get(); }
 
+    void syncRemoteContent();
+
     // Reimplementations from WebCore::GraphicsLayerClient.
     virtual void notifyAnimationStarted(const WebCore::GraphicsLayer*, double) { }
     virtual void notifyFlushRequired(const WebCore::GraphicsLayer*) { }
-    void paintContents(const WebCore::GraphicsLayer*, WebCore::GraphicsContext&, WebCore::GraphicsLayerPaintingPhase, const WebCore::IntRect&) { }
+    virtual void paintContents(const WebCore::GraphicsLayer*, WebCore::GraphicsContext&, WebCore::GraphicsLayerPaintingPhase, const WebCore::IntRect&) OVERRIDE { }
+
     void updateViewport();
     void dispatchOnMainThread(const Function<void()>&);
     void adjustPositionForFixedLayers();
@@ -141,7 +137,6 @@ private:
     void ensureLayer(WebLayerID);
     void commitTileOperations();
     void renderNextFrame();
-    void purgeBackingStores();
 
     PassRefPtr<CoordinatedBackingStore> getBackingStore(WebCore::GraphicsLayer*);
     void removeBackingStoreIfNeeded(WebCore::GraphicsLayer*);
@@ -181,7 +176,6 @@ private:
 #if ENABLE(REQUEST_ANIMATION_FRAME)
     bool m_animationFrameRequested;
 #endif
-    WebCore::TextureMapper::AccelerationMode m_accelerationMode;
     WebCore::Color m_backgroundColor;
     bool m_setDrawsBackground;
 

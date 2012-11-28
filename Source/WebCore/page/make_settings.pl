@@ -83,7 +83,6 @@ sub generateHeader($)
 
     print $file "#ifndef SettingsMacros_h\n";
     print $file "#define SettingsMacros_h\n\n";
-    print $file "#include <wtf/Platform.h>\n\n";
 
     printConditionalMacros($file, \%settingsByConditional, $parsedItemsRef);
 

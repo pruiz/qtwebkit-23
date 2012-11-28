@@ -895,6 +895,7 @@ GENERATORS += exceptioncodedescription
 
 # GENERATOR 5-H:
 settingsmacros.output = SettingsMacros.h
+settingsmacros.add_output_to_sources = false
 settingsmacros.input = SETTINGS_MACROS
 settingsmacros.script = $$PWD/page/make_settings.pl
 settingsmacros.commands = perl -I$$PWD/bindings/scripts $$settingsmacros.script --input $$SETTINGS_MACROS --outputDir ${QMAKE_FUNC_FILE_OUT_PATH}

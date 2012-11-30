@@ -42,10 +42,8 @@ FullScreenVideoWindow::FullScreenVideoWindow()
     setAttribute(Qt::WA_NativeWindow);
     setAttribute(Qt::WA_NoSystemBackground, true);
     setAttribute(Qt::WA_PaintOnScreen, true);
-    setWindowModality(Qt::ApplicationModal);
-#else
-    setModality(Qt::ApplicationModal);
 #endif
+    setWindowModality(Qt::ApplicationModal);
 
 #ifndef QT_NO_CURSOR
     m_cursorTimer.setSingleShot(true);
@@ -132,11 +130,9 @@ PlatformVideoWindow::PlatformVideoWindow()
 {
     Base* win = new FullScreenVideoWindow();
     m_window = win;
-#if HAVE(QT5)
-    win->setFlags(win->flags() | Qt::FramelessWindowHint);
-    // FIXME: Port to Qt 5.
-#else
     win->setWindowFlags(win->windowFlags() | Qt::FramelessWindowHint);
+    // FIXME: Port to Qt 5.
+#if !HAVE(QT5)
     QPalette p;
     p.setColor(QPalette::Base, Qt::black);
     p.setColor(QPalette::Window, Qt::black);

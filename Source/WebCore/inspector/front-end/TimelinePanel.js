@@ -61,8 +61,8 @@ WebInspector.TimelinePanel = function()
     this._sidebarBackgroundElement.className = "sidebar split-view-sidebar-left timeline-sidebar-background";
     this.element.appendChild(this._sidebarBackgroundElement);
 
-    this.createSplitViewWithSidebarTree();
-    this.element.appendChild(this.splitView.sidebarResizerElement);
+    this.createSidebarViewWithTree();
+    this.element.appendChild(this.splitView.resizerElement());
 
     this._containerElement = this.splitView.element;
     this._containerElement.id = "timeline-container";
@@ -72,7 +72,7 @@ WebInspector.TimelinePanel = function()
     this._timelineMemorySplitter.id = "timeline-memory-splitter";
     WebInspector.installDragHandle(this._timelineMemorySplitter, this._startSplitterDragging.bind(this), this._splitterDragging.bind(this), this._endSplitterDragging.bind(this), "ns-resize");
     this._timelineMemorySplitter.addStyleClass("hidden");
-    this._memoryStatistics = new WebInspector.MemoryStatistics(this, this._model, this.splitView.preferredSidebarWidth());
+    this._memoryStatistics = new WebInspector.MemoryStatistics(this, this._model, this.splitView.sidebarWidth());
     WebInspector.settings.memoryCounterGraphsHeight = WebInspector.settings.createSetting("memoryCounterGraphsHeight", 150);
 
     var itemsTreeElement = new WebInspector.SidebarSectionTreeElement(WebInspector.UIString("RECORDS"), {}, true);
@@ -303,8 +303,8 @@ WebInspector.TimelinePanel.prototype = {
     {
         this._operationInProgress = !!indicator;
         for (var i = 0; i < this._statusBarButtons.length; ++i)
-            this._statusBarButtons[i].disabled = this._operationInProgress;
-        this._glueParentButton.disabled = this._operationInProgress || !!this._frameController;
+            this._statusBarButtons[i].setEnabled(!this._operationInProgress);
+        this._glueParentButton.setEnabled(!this._operationInProgress && !this._frameController);
         this._miscStatusBarItems.removeChildren();
         this._miscStatusBarItems.appendChild(indicator ? indicator.element : this._statusBarFilters);
     },
@@ -508,7 +508,7 @@ WebInspector.TimelinePanel.prototype = {
         this._overviewModeSetting.set(mode);
         if (frameMode !== this._frameMode) {
             this._frameMode = frameMode;
-            this._glueParentButton.disabled = frameMode;
+            this._glueParentButton.setEnabled(!frameMode);
             this._presentationModel.setGlueRecords(this._glueParentButton.toggled && !frameMode);
             this._repopulateRecords();
 

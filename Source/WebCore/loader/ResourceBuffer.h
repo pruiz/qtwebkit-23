@@ -52,7 +52,7 @@ public:
 
     virtual const char* data() const;
     virtual unsigned size() const;
-    bool isEmpty() const;
+    virtual bool isEmpty() const;
 
     void append(const char*, unsigned);
     void clear();
@@ -63,6 +63,7 @@ public:
     PassRefPtr<ResourceBuffer> copy() const;
 
     bool hasPurgeableBuffer() const;
+    void createPurgeableBuffer() const;
     
     // Ensure this buffer has no other clients before calling this.
     PassOwnPtr<PurgeableBuffer> releasePurgeableBuffer();

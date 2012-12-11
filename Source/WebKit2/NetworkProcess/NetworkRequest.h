@@ -30,6 +30,7 @@
 
 #include "NetworkConnectionToWebProcess.h"
 #include <WebCore/ResourceHandleClient.h>
+#include <WebCore/ResourceLoaderOptions.h>
 #include <WebCore/ResourceRequest.h>
 
 namespace WebCore {
@@ -44,9 +45,9 @@ typedef uint64_t ResourceLoadIdentifier;
 
 class NetworkRequest : public RefCounted<NetworkRequest>, public NetworkConnectionToWebProcessObserver, public WebCore::ResourceHandleClient {
 public:
-    static RefPtr<NetworkRequest> create(const WebCore::ResourceRequest& request, ResourceLoadIdentifier identifier, NetworkConnectionToWebProcess* connection)
+    static RefPtr<NetworkRequest> create(const WebCore::ResourceRequest& request, ResourceLoadIdentifier identifier, WebCore::ContentSniffingPolicy contentSniffingPolicy, NetworkConnectionToWebProcess* connection)
     {
-        return adoptRef(new NetworkRequest(request, identifier, connection));
+        return adoptRef(new NetworkRequest(request, identifier, contentSniffingPolicy, connection));
     }
     
     ~NetworkRequest();
@@ -60,46 +61,45 @@ public:
     NetworkConnectionToWebProcess* connectionToWebProcess() { return m_connection.get(); }
 
     // ResourceHandleClient methods
-    virtual void willSendRequest(WebCore::ResourceHandle*, WebCore::ResourceRequest&, const WebCore::ResourceResponse& /*redirectResponse*/) OVERRIDE { }
-    virtual void didSendData(WebCore::ResourceHandle*, unsigned long long /*bytesSent*/, unsigned long long /*totalBytesToBeSent*/) OVERRIDE { }
+    virtual void willSendRequest(WebCore::ResourceHandle*, WebCore::ResourceRequest&, const WebCore::ResourceResponse& /*redirectResponse*/) OVERRIDE;
+    virtual void didSendData(WebCore::ResourceHandle*, unsigned long long /*bytesSent*/, unsigned long long /*totalBytesToBeSent*/) OVERRIDE;
     virtual void didReceiveResponse(WebCore::ResourceHandle*, const WebCore::ResourceResponse&) OVERRIDE;
     virtual void didReceiveData(WebCore::ResourceHandle*, const char*, int, int /*encodedDataLength*/) OVERRIDE;
-    virtual void didReceiveCachedMetadata(WebCore::ResourceHandle*, const char*, int) OVERRIDE { }
+    virtual void didReceiveCachedMetadata(WebCore::ResourceHandle*, const char*, int) OVERRIDE;
     virtual void didFinishLoading(WebCore::ResourceHandle*, double /*finishTime*/) OVERRIDE;
     virtual void didFail(WebCore::ResourceHandle*, const WebCore::ResourceError&) OVERRIDE;
-    virtual void wasBlocked(WebCore::ResourceHandle*) OVERRIDE { }
-    virtual void cannotShowURL(WebCore::ResourceHandle*) OVERRIDE { }
-#if HAVE(NETWORK_CFDATA_ARRAY_CALLBACK)
-    virtual bool supportsDataArray() OVERRIDE { return false; }
-    virtual void didReceiveDataArray(WebCore::ResourceHandle*, CFArrayRef) OVERRIDE { }
-#endif
-    virtual void willCacheResponse(WebCore::ResourceHandle*, WebCore::CacheStoragePolicy&) OVERRIDE { }
-    virtual bool shouldUseCredentialStorage(WebCore::ResourceHandle*) OVERRIDE { return false; }
-    virtual void didReceiveAuthenticationChallenge(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&) OVERRIDE { }
-    virtual void didCancelAuthenticationChallenge(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&) OVERRIDE { }
+    virtual void wasBlocked(WebCore::ResourceHandle*) OVERRIDE;
+    virtual void cannotShowURL(WebCore::ResourceHandle*) OVERRIDE;
+    virtual void willCacheResponse(WebCore::ResourceHandle*, WebCore::CacheStoragePolicy&) OVERRIDE;
+    virtual bool shouldUseCredentialStorage(WebCore::ResourceHandle*) OVERRIDE;
+    virtual void didReceiveAuthenticationChallenge(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&) OVERRIDE;
+    virtual void didCancelAuthenticationChallenge(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&) OVERRIDE;
+    virtual void receivedCancellation(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&) OVERRIDE;
+
 #if USE(PROTECTION_SPACE_AUTH_CALLBACK)
-    virtual bool canAuthenticateAgainstProtectionSpace(WebCore::ResourceHandle*, const WebCore::ProtectionSpace&) OVERRIDE { return false; }
+    virtual bool canAuthenticateAgainstProtectionSpace(WebCore::ResourceHandle*, const WebCore::ProtectionSpace&) OVERRIDE;
 #endif
-    virtual void receivedCancellation(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&) OVERRIDE { }
+
+#if HAVE(NETWORK_CFDATA_ARRAY_CALLBACK)
+    virtual bool supportsDataArray() OVERRIDE;
+    virtual void didReceiveDataArray(WebCore::ResourceHandle*, CFArrayRef) OVERRIDE;
+#endif
+
 #if PLATFORM(MAC)
 #if USE(CFNETWORK)
-    virtual CFCachedURLResponseRef willCacheResponse(WebCore::ResourceHandle*, CFCachedURLResponseRef response) OVERRIDE { return response; }
+    virtual CFCachedURLResponseRef willCacheResponse(WebCore::ResourceHandle*, CFCachedURLResponseRef) OVERRIDE;
 #else
-    virtual NSCachedURLResponse* willCacheResponse(WebCore::ResourceHandle*, NSCachedURLResponse* response) OVERRIDE { return response; }
+    virtual NSCachedURLResponse* willCacheResponse(WebCore::ResourceHandle*, NSCachedURLResponse*) OVERRIDE;
 #endif
-    virtual void willStopBufferingData(WebCore::ResourceHandle*, const char*, int) OVERRIDE { }
+    virtual void willStopBufferingData(WebCore::ResourceHandle*, const char*, int) OVERRIDE;
 #endif // PLATFORM(MAC)
 
-#if PLATFORM(WIN) && USE(CFNETWORK)
-    virtual bool shouldCacheResponse(WebCore::ResourceHandle*, CFCachedURLResponseRef) OVERRIDE { return true; }
-#endif
-
 #if ENABLE(BLOB)
-    virtual WebCore::AsyncFileStream* createAsyncFileStream(WebCore::FileStreamClient*) OVERRIDE { return 0; }
+    virtual WebCore::AsyncFileStream* createAsyncFileStream(WebCore::FileStreamClient*) OVERRIDE;
 #endif
 
 private:
-    NetworkRequest(const WebCore::ResourceRequest&, ResourceLoadIdentifier, NetworkConnectionToWebProcess*);
+    NetworkRequest(const WebCore::ResourceRequest&, ResourceLoadIdentifier, WebCore::ContentSniffingPolicy, NetworkConnectionToWebProcess*);
 
     void scheduleStopOnMainThread();
     static void performStops(void*);
@@ -111,12 +111,14 @@ private:
 
     RefPtr<RemoteNetworkingContext> m_networkingContext;
     RefPtr<WebCore::ResourceHandle> m_handle;
-
+    WebCore::ContentSniffingPolicy m_contentSniffingPolicy;
     RefPtr<NetworkConnectionToWebProcess> m_connection;
 
     // FIXME (NetworkProcess): Response data lifetime should be managed outside NetworkRequest.
     RefPtr<WebCore::ResourceBuffer> m_buffer;
 };
+
+void didReceiveWillSendRequestHandled(uint64_t requestID, const WebCore::ResourceRequest&);
 
 } // namespace WebKit
 

@@ -27,9 +27,9 @@
 #include "DFGOperations.h"
 
 #include "Arguments.h"
-#include "ButterflyInlineMethods.h"
+#include "ButterflyInlines.h"
 #include "CodeBlock.h"
-#include "CopiedSpaceInlineMethods.h"
+#include "CopiedSpaceInlines.h"
 #include "DFGOSRExit.h"
 #include "DFGRepatch.h"
 #include "DFGThunks.h"
@@ -302,12 +302,12 @@ JSCell* DFG_OPERATION operationCreateThis(ExecState* exec, JSCell* constructor)
     return constructEmptyObject(exec, jsCast<JSFunction*>(constructor)->cachedInheritorID(exec));
 }
 
-JSCell* DFG_OPERATION operationNewObject(ExecState* exec)
+JSCell* DFG_OPERATION operationNewObject(ExecState* exec, Structure* structure)
 {
     JSGlobalData* globalData = &exec->globalData();
     NativeCallFrameTracer tracer(globalData, exec);
     
-    return constructEmptyObject(exec);
+    return constructEmptyObject(exec, structure);
 }
 
 EncodedJSValue DFG_OPERATION operationValueAdd(ExecState* exec, EncodedJSValue encodedOp1, EncodedJSValue encodedOp2)

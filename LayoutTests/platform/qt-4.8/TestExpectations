@@ -631,6 +631,9 @@ webkit.org/b/6033 css3/filters/nested-filters.html [ ImageOnlyFailure ]
 webkit.org/b/6033 css3/filters/regions-expanding.html [ ImageOnlyFailure ]
 webkit.org/b/6033 css3/filters/simple-filter-rendering.html [ ImageOnlyFailure ]
 
+# CSS shaders only work in qt-wk2
+css3/filters/custom
+
 # UndoManager is not yet enabled.
 webkit.org/b/87908 editing/undomanager [ Skip ]
 
@@ -642,6 +645,7 @@ webkit.org/b/89052 fast/css/image-orientation [ Skip ]
 
 # CSS3 Text support is not yet enabled (needs ENABLE_CSS3_TEXT).
 webkit.org/b/58491 fast/css3-text/css3-text-decoration
+webkit.org/b/76173 fast/css3-text/css3-text-align-last
 
 # Needs rebaseline after bug 86441
 # failing new tests
@@ -685,6 +689,7 @@ svg/custom/use-instanceRoot-event-listeners.xhtml [ Skip ]
 svg/dom/SVGScriptElement/script-change-externalResourcesRequired-while-loading.svg [ Skip ]
 fast/loader/javascript-url-in-embed.html [ Failure Pass ]
 editing/pasteboard/smart-paste-004.html [ Failure Pass ]
+http/tests/security/sandboxed-iframe-invalid.html [ Failure Pass ]
 
 webkit.org/b/93247 [ Debug ] fast/lists/list-marker-remove-crash.html [ Crash ]
 
@@ -850,3 +855,10 @@ media/video-playing-and-pause.html
 # New test failing after merge of November 4th-6th
 fast/js/string-capitalization.html [ Failure ]
 fast/text/international/combining-marks-position.html [ Failure ]
+
+# Tests crashing after merge of November 15th-16th
+http/tests/security/video-poster-cross-origin-crash.html [ Skip ]
+fast/images/webgl-teximage2d.html [ Skip ]
+
+# With new features being enabled, fast/js/global-constructors will need a new baseline soon.
+fast/js/global-constructors.html [ Failure ]

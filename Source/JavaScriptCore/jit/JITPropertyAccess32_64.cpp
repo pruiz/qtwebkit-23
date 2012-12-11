@@ -32,7 +32,7 @@
 #include "CodeBlock.h"
 #include "GCAwareJITStubRoutine.h"
 #include "Interpreter.h"
-#include "JITInlineMethods.h"
+#include "JITInlines.h"
 #include "JITStubCall.h"
 #include "JSArray.h"
 #include "JSFunction.h"
@@ -317,8 +317,7 @@ void JIT::emit_op_put_by_val(Instruction* currentInstruction)
     m_byValCompilationInfo.append(ByValCompilationInfo(m_bytecodeOffset, badType, mode, done));
 }
 
-template<IndexingType indexingShape>
-JIT::JumpList JIT::emitGenericContiguousPutByVal(Instruction* currentInstruction, PatchableJump& badType)
+JIT::JumpList JIT::emitGenericContiguousPutByVal(Instruction* currentInstruction, PatchableJump& badType, IndexingType indexingShape)
 {
     unsigned value = currentInstruction[3].u.operand;
     ArrayProfile* profile = currentInstruction[4].u.arrayProfile;

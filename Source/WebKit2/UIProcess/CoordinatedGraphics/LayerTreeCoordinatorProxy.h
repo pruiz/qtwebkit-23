@@ -57,6 +57,10 @@ public:
 #if ENABLE(CSS_FILTERS)
     void setCompositingLayerFilters(WebLayerID, const WebCore::FilterOperations&);
 #endif
+#if ENABLE(CSS_SHADERS)
+    void createCustomFilterProgram(int id, const WebCore::CustomFilterProgramInfo&);
+    void removeCustomFilterProgram(int id);
+#endif
     void deleteCompositingLayer(WebLayerID);
     void setRootCompositingLayer(WebLayerID);
     void setContentsSize(const WebCore::FloatSize&);
@@ -67,8 +71,9 @@ public:
     void removeTileForLayer(int layerID, int tileID);
     void createUpdateAtlas(int atlasID, const ShareableSurface::Handle&);
     void removeUpdateAtlas(int atlasID);
-    void createDirectlyCompositedImage(int64_t, const WebKit::ShareableBitmap::Handle&);
-    void destroyDirectlyCompositedImage(int64_t);
+    void createImageBacking(CoordinatedImageBackingID);
+    void updateImageBacking(CoordinatedImageBackingID, const ShareableSurface::Handle&);
+    void removeImageBacking(CoordinatedImageBackingID);
     void didReceiveLayerTreeCoordinatorProxyMessage(CoreIPC::Connection*, CoreIPC::MessageID, CoreIPC::MessageDecoder&);
     void updateViewport();
     void renderNextFrame();
@@ -84,6 +89,7 @@ public:
     void requestAnimationFrame();
     void animationFrameReady();
 #endif
+    void setBackgroundColor(const WebCore::Color&);
 
 protected:
     void dispatchUpdate(const Function<void()>&);

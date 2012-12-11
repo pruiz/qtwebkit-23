@@ -28,6 +28,7 @@
 
 #if ENABLE(NETWORK_PROCESS)
 
+#include "BlockingResponseMap.h"
 #include "Logging.h"
 #include "NetworkConnectionToWebProcess.h"
 #include "NetworkProcess.h"
@@ -35,6 +36,7 @@
 #include "RemoteNetworkingContext.h"
 #include "SharedMemory.h"
 #include "WebCoreArgumentCoders.h"
+#include <WebCore/NotImplemented.h>
 #include <WebCore/ResourceBuffer.h>
 #include <WebCore/ResourceHandle.h>
 #include <wtf/MainThread.h>
@@ -43,9 +45,10 @@ using namespace WebCore;
 
 namespace WebKit {
 
-NetworkRequest::NetworkRequest(const WebCore::ResourceRequest& request, ResourceLoadIdentifier identifier, NetworkConnectionToWebProcess* connection)
+NetworkRequest::NetworkRequest(const WebCore::ResourceRequest& request, ResourceLoadIdentifier identifier, ContentSniffingPolicy contentSniffingPolicy, NetworkConnectionToWebProcess* connection)
     : m_request(request)
     , m_identifier(identifier)
+    , m_contentSniffingPolicy(contentSniffingPolicy)
     , m_connection(connection)
 {
     ASSERT(isMainThread());
@@ -70,8 +73,8 @@ void NetworkRequest::start()
     // FIXME (NetworkProcess): Create RemoteNetworkingContext with actual settings.
     m_networkingContext = RemoteNetworkingContext::create(false, false);
 
-    // FIXME (NetworkProcess): Pass an actual value for shouldContentSniff (XMLHttpRequest needs that).
-    m_handle = ResourceHandle::create(m_networkingContext.get(), m_request, this, false, false);
+    // FIXME (NetworkProcess): Pass an actual value for defersLoading
+    m_handle = ResourceHandle::create(m_networkingContext.get(), m_request, this, false /* defersLoading */, m_contentSniffingPolicy == SniffContent);
 }
 
 static bool stopRequestsCalled = false;
@@ -174,11 +177,146 @@ void NetworkRequest::didFinishLoading(ResourceHandle*, double finishTime)
     scheduleStopOnMainThread();
 }
 
-void NetworkRequest::didFail(WebCore::ResourceHandle*, const WebCore::ResourceError& error)
+void NetworkRequest::didFail(ResourceHandle*, const ResourceError& error)
 {
     connectionToWebProcess()->connection()->send(Messages::NetworkProcessConnection::DidFailResourceLoad(m_identifier, error), 0);
     scheduleStopOnMainThread();
 }
+
+// FIXME (NetworkProcess): Many of the following ResourceHandleClient methods definitely need implementations. A few will not.
+// Once we know what they are they can be removed.
+
+
+static BlockingResponseMap<ResourceRequest*>& responseMap()
+{
+    AtomicallyInitializedStatic(BlockingResponseMap<ResourceRequest*>&, responseMap = *new BlockingResponseMap<ResourceRequest*>);
+    return responseMap;
+}
+
+static uint64_t generateWillSendRequestID()
+{
+    static int64_t uniqueWillSendRequestID;
+    return OSAtomicIncrement64Barrier(&uniqueWillSendRequestID);
+}
+
+void didReceiveWillSendRequestHandled(uint64_t requestID, const ResourceRequest& request)
+{
+    responseMap().didReceiveResponse(requestID, adoptPtr(new ResourceRequest(request)));
+}
+
+void NetworkRequest::willSendRequest(ResourceHandle*, ResourceRequest& request, const ResourceResponse& redirectResponse)
+{
+    // We only expect to get the willSendRequest callback from ResourceHandle as the result of a redirect
+    ASSERT(!redirectResponse.isNull());
+
+    uint64_t requestID = generateWillSendRequestID();
+
+    if (!connectionToWebProcess()->connection()->send(Messages::NetworkProcessConnection::WillSendRequest(requestID, m_identifier, request, redirectResponse), 0)) {
+        // FIXME (NetworkProcess): What should we do if we can't send the message?
+        return;
+    }
+    
+    OwnPtr<ResourceRequest> newRequest = responseMap().waitForResponse(requestID);
+    request = *newRequest;
+
+    NetworkProcess::shared().networkResourceLoadScheduler().receivedRedirect(m_identifier, request.url());
+}
+
+void NetworkRequest::didSendData(WebCore::ResourceHandle*, unsigned long long /*bytesSent*/, unsigned long long /*totalBytesToBeSent*/)
+{
+    notImplemented();
+}
+
+void NetworkRequest::didReceiveCachedMetadata(WebCore::ResourceHandle*, const char*, int)
+{
+    notImplemented();
+}
+
+void NetworkRequest::wasBlocked(WebCore::ResourceHandle*)
+{
+    notImplemented();
+}
+
+void NetworkRequest::cannotShowURL(WebCore::ResourceHandle*)
+{
+    notImplemented();
+}
+
+void NetworkRequest::willCacheResponse(WebCore::ResourceHandle*, WebCore::CacheStoragePolicy&)
+{
+    notImplemented();
+}
+
+bool NetworkRequest::shouldUseCredentialStorage(WebCore::ResourceHandle*)
+{
+    notImplemented();
+    return false;
+}
+
+void NetworkRequest::didReceiveAuthenticationChallenge(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&)
+{
+    notImplemented();
+}
+
+void NetworkRequest::didCancelAuthenticationChallenge(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&)
+{
+    notImplemented();
+}
+
+void NetworkRequest::receivedCancellation(WebCore::ResourceHandle*, const WebCore::AuthenticationChallenge&)
+{
+    notImplemented();
+}
+
+#if USE(PROTECTION_SPACE_AUTH_CALLBACK)
+bool NetworkRequest::canAuthenticateAgainstProtectionSpace(WebCore::ResourceHandle*, const WebCore::ProtectionSpace&)
+{
+    notImplemented();
+    return false;
+}
+#endif
+
+#if HAVE(NETWORK_CFDATA_ARRAY_CALLBACK)
+bool NetworkRequest::supportsDataArray()
+{
+    notImplemented();
+    return false;
+}
+
+void NetworkRequest::didReceiveDataArray(WebCore::ResourceHandle*, CFArrayRef)
+{
+    notImplemented();
+}
+#endif
+
+#if PLATFORM(MAC)
+#if USE(CFNETWORK)
+CFCachedURLResponseRef NetworkRequest::willCacheResponse(WebCore::ResourceHandle*, CFCachedURLResponseRef response)
+{
+    notImplemented();
+    return response;
+}
+#else
+NSCachedURLResponse* NetworkRequest::willCacheResponse(WebCore::ResourceHandle*, NSCachedURLResponse* response)
+{
+    notImplemented();
+    return response;
+}
+#endif
+
+void NetworkRequest::willStopBufferingData(WebCore::ResourceHandle*, const char*, int)
+{
+    notImplemented();
+}
+#endif // PLATFORM(MAC)
+
+#if ENABLE(BLOB)
+WebCore::AsyncFileStream* NetworkRequest::createAsyncFileStream(WebCore::FileStreamClient*)
+{
+    notImplemented();
+    return 0;
+}
+#endif
 
 } // namespace WebKit
 

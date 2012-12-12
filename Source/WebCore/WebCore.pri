@@ -245,7 +245,11 @@ contains(DEFINES, WTF_USE_GRAPHICS_SURFACE=1) {
 }
 
 contains(DEFINES, HAVE_SQLITE3=1) {
-    PKGCONFIG += sqlite3
+    mac {
+        LIBS += -lsqlite3
+    } else
+        PKGCONFIG += sqlite3
+    }
 } else {
     SQLITE3SRCDIR = $$(SQLITE3SRCDIR)
     isEmpty(SQLITE3SRCDIR): SQLITE3SRCDIR = ../../../qtbase/src/3rdparty/sqlite/

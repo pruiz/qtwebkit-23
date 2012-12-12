@@ -207,7 +207,7 @@ haveQt(4) {
 }
 
 # Try to use an system wide SQlite installation
-!contains(QT_CONFIG, no-pkg-config):packagesExist("sqlite3") {
+if(!contains(QT_CONFIG, no-pkg-config):packagesExist("sqlite3"))|mac {
     DEFINES += HAVE_SQLITE3=1
 } else {
     SQLITE3SRCDIR = $$(SQLITE3SRCDIR)

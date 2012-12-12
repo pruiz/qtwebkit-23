@@ -247,7 +247,7 @@ contains(DEFINES, WTF_USE_GRAPHICS_SURFACE=1) {
 contains(DEFINES, HAVE_SQLITE3=1) {
     mac {
         LIBS += -lsqlite3
-    } else
+    } else {
         PKGCONFIG += sqlite3
     }
 } else {

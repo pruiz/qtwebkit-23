@@ -1,3 +1,51 @@
+2012-11-19  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG should be able to cache closure calls
+        https://bugs.webkit.org/show_bug.cgi?id=102662
+
+        Reviewed by Gavin Barraclough.
+
+        Added support to the meta allocator for easily querying whether an address falls within
+        a certain allocated chunk. Also added a useful debug routine to SentinelLinkedList,
+        which can be used to check if a node is on a particular list.
+
+        * wtf/MetaAllocatorHandle.h:
+        (MetaAllocatorHandle):
+        (WTF::MetaAllocatorHandle::containsIntegerAddress):
+        (WTF::MetaAllocatorHandle::contains):
+        * wtf/SentinelLinkedList.h:
+        (SentinelLinkedList):
+        (WTF::::isOnList):
+        (WTF):
+
+2012-11-19  Laszlo Gombos  <l.gombos@samsung.com>
+
+        Remove ReadWriteLock
+        https://bugs.webkit.org/show_bug.cgi?id=101637
+
+        Reviewed by Darin Adler.
+
+        Remove ReadWriteLock as it does not seems to be used.
+
+        * wtf/Platform.h: Remove the definition of HAVE_PTHREAD_RWLOCK.
+
+        * wtf/ThreadingPrimitives.h: Remove the PlatformReadWriteLock type 
+        and the ReadWriteLock class.
+
+        * wtf/ThreadingPthreads.cpp: Remove the implementation of
+        the ReadWriteLock class using pthreads.
+
+2012-11-19  Brady Eidson  <beidson@apple.com>
+
+        Add 64-bit specializations for atomicIncrement and atomicDecrement
+        https://bugs.webkit.org/show_bug.cgi?id=102702
+
+        Reviewed by Eric Carlson.
+
+        * wtf/Atomics.h:
+        (WTF::atomicIncrement): Add A 64-bit version for Darwin.
+        (WTF::atomicDecrement): Ditto.
+
 2012-11-18  Laszlo Gombos  <l.gombos@samsung.com>
 
         Remove non-existent directories from the make system

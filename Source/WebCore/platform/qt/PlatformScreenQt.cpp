@@ -49,18 +49,6 @@
 
 namespace WebCore {
 
-int screenHorizontalDPI(Widget* widget)
-{
-    notImplemented();
-    return 0;
-}
-
-int screenVerticalDPI(Widget* widget)
-{
-    notImplemented();
-    return 0;
-}
-
 static int screenNumber(Widget* w)
 {
     if (!w)

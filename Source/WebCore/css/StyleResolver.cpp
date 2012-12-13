@@ -123,6 +123,7 @@
 #include "TransformationMatrix.h"
 #include "TranslateTransformOperation.h"
 #include "UserAgentStyleSheets.h"
+#include "ViewportStyleResolver.h"
 #include "WebCoreMemoryInstrumentation.h"
 #include "WebKitCSSKeyframeRule.h"
 #include "WebKitCSSKeyframesRule.h"
@@ -276,6 +277,9 @@ StyleResolver::StyleResolver(Document* document, bool matchAuthorAndUserStyles)
     , m_sameOriginOnly(false)
     , m_distributedToInsertionPoint(false)
     , m_fontSelector(CSSFontSelector::create(document))
+#if ENABLE(CSS_DEVICE_ADAPTATION)
+    , m_viewportStyleResolver(ViewportStyleResolver::create(document))
+#endif
     , m_applyPropertyToRegularStyle(true)
     , m_applyPropertyToVisitedLinkStyle(false)
     , m_styleBuilder(StyleBuilder::sharedStyleBuilder())
@@ -293,17 +297,8 @@ StyleResolver::StyleResolver(Document* document, bool matchAuthorAndUserStyles)
             loadFullDefaultStyle();
     }
 
-    // construct document root element default style. this is needed
-    // to evaluate media queries that contain relative constraints, like "screen and (max-width: 10em)"
-    // This is here instead of constructor, because when constructor is run,
-    // document doesn't have documentElement
-    // NOTE: this assumes that element that gets passed to styleForElement -call
-    // is always from the document that owns the style selector
     FrameView* view = document->view();
-    if (view)
-        m_medium = adoptPtr(new MediaQueryEvaluator(view->mediaType()));
-    else
-        m_medium = adoptPtr(new MediaQueryEvaluator("all"));
+    m_medium = adoptPtr(new MediaQueryEvaluator(view ? view->mediaType() : "all"));
 
     if (root)
         m_rootDefaultStyle = styleForElement(root, 0, DisallowStyleSharing, MatchOnlyUserAgentRules);
@@ -312,15 +307,6 @@ StyleResolver::StyleResolver(Document* document, bool matchAuthorAndUserStyles)
         m_medium = adoptPtr(new MediaQueryEvaluator(view->mediaType(), view->frame(), m_rootDefaultStyle.get()));
 
     resetAuthorStyle();
-
-    DocumentStyleSheetCollection* styleSheetCollection = document->styleSheetCollection();
-    OwnPtr<RuleSet> tempUserStyle = RuleSet::create();
-    if (CSSStyleSheet* pageUserSheet = styleSheetCollection->pageUserSheet())
-        tempUserStyle->addRulesFromSheet(pageUserSheet->contents(), *m_medium, this);
-    collectRulesFromUserStyleSheets(styleSheetCollection->injectedUserStyleSheets(), *tempUserStyle);
-    collectRulesFromUserStyleSheets(styleSheetCollection->documentUserStyleSheets(), *tempUserStyle);
-    if (tempUserStyle->m_ruleCount > 0 || tempUserStyle->m_pageRules.size() > 0)
-        m_userStyle = tempUserStyle.release();
 
 #if ENABLE(SVG_FONTS)
     if (document->svgExtensions()) {
@@ -331,15 +317,20 @@ StyleResolver::StyleResolver(Document* document, bool matchAuthorAndUserStyles)
     }
 #endif
 
+    DocumentStyleSheetCollection* styleSheetCollection = document->styleSheetCollection();
+    collectRulesFromUserStyleSheets(styleSheetCollection->activeUserStyleSheets());
     appendAuthorStyleSheets(0, styleSheetCollection->activeAuthorStyleSheets());
 }
 
-void StyleResolver::collectRulesFromUserStyleSheets(const Vector<RefPtr<CSSStyleSheet> >& userSheets, RuleSet& userStyle)
+void StyleResolver::collectRulesFromUserStyleSheets(const Vector<RefPtr<CSSStyleSheet> >& userSheets)
 {
+    OwnPtr<RuleSet> userStyleRuleSet = RuleSet::create();
     for (unsigned i = 0; i < userSheets.size(); ++i) {
         ASSERT(userSheets[i]->contents()->isUserStyleSheet());
-        userStyle.addRulesFromSheet(userSheets[i]->contents(), *m_medium, this);
+        userStyleRuleSet->addRulesFromSheet(userSheets[i]->contents(), *m_medium, this);
     }
+    if (userStyleRuleSet->m_ruleCount > 0 || userStyleRuleSet->m_pageRules.size() > 0)
+        m_userStyle = userStyleRuleSet.release();
 }
 
 static PassOwnPtr<RuleSet> makeRuleSet(const Vector<RuleFeature>& rules)
@@ -404,6 +395,10 @@ void StyleResolver::appendAuthorStyleSheets(unsigned firstNew, const Vector<RefP
     
     if (document()->renderer() && document()->renderer()->style())
         document()->renderer()->style()->font().update(fontSelector());
+
+#if ENABLE(CSS_DEVICE_ADAPTATION)
+    viewportStyleResolver()->resolve();
+#endif
 }
 
 void StyleResolver::pushParentElement(Element* parent)
@@ -458,6 +453,10 @@ void StyleResolver::addKeyframeStyle(PassRefPtr<StyleRuleKeyframes> rule)
 StyleResolver::~StyleResolver()
 {
     m_fontSelector->clearDocument();
+
+#if ENABLE(CSS_DEVICE_ADAPTATION)
+    m_viewportStyleResolver->clearDocument();
+#endif
 }
 
 void StyleResolver::sweepMatchedPropertiesCache(Timer<StyleResolver>*)
@@ -1971,6 +1970,9 @@ void StyleResolver::adjustRenderStyle(RenderStyle* style, RenderStyle* parentSty
         // Touch overflow scrolling creates a stacking context.
         || ((style->overflowX() != OHIDDEN || style->overflowY() != OHIDDEN) && style->useTouchOverflowScrolling())
 #endif
+#if ENABLE(DIALOG_ELEMENT)
+        || (e && e->isInTopLayer())
+#endif
         ))
         style->setZIndex(0);
 
@@ -2590,9 +2592,7 @@ static void collectCSSOMWrappers(HashMap<StyleRule*, RefPtr<CSSStyleRule> >& wra
 static void collectCSSOMWrappers(HashMap<StyleRule*, RefPtr<CSSStyleRule> >& wrapperMap, DocumentStyleSheetCollection* styleSheetCollection)
 {
     collectCSSOMWrappers(wrapperMap, styleSheetCollection->activeAuthorStyleSheets());
-    collectCSSOMWrappers(wrapperMap, styleSheetCollection->pageUserSheet());
-    collectCSSOMWrappers(wrapperMap, styleSheetCollection->injectedUserStyleSheets());
-    collectCSSOMWrappers(wrapperMap, styleSheetCollection->documentUserStyleSheets());
+    collectCSSOMWrappers(wrapperMap, styleSheetCollection->activeUserStyleSheets());
 }
 
 CSSStyleRule* StyleResolver::ensureFullCSSOMWrapperForInspector(StyleRule* rule)
@@ -2731,7 +2731,7 @@ static bool createGridTrackList(CSSValue* value, Vector<Length>& lengths, StyleR
 }
 
 
-static bool createGridPosition(CSSValue* value, Length& position)
+static bool createGridPosition(CSSValue* value, GridPosition& position)
 {
     // For now, we only accept: <integer> | 'auto'
     if (!value->isPrimitiveValue())
@@ -2742,7 +2742,7 @@ static bool createGridPosition(CSSValue* value, Length& position)
         return true;
 
     ASSERT(primitiveValue->isNumber());
-    position.setValue(primitiveValue->getIntValue());
+    position.setIntegerPosition(primitiveValue->getIntValue());
     return true;
 }
 
@@ -3587,14 +3587,14 @@ void StyleResolver::applyProperty(CSSPropertyID id, CSSValue* value)
     }
 
     case CSSPropertyWebkitGridColumn: {
-        Length column;
+        GridPosition column;
         if (!createGridPosition(value, column))
             return;
         m_style->setGridItemColumn(column);
         return;
     }
     case CSSPropertyWebkitGridRow: {
-        Length row;
+        GridPosition row;
         if (!createGridPosition(value, row))
             return;
         m_style->setGridItemRow(row);

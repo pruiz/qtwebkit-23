@@ -413,6 +413,11 @@ public:
     void webkitRequestFullscreen();
 #endif
 
+#if ENABLE(DIALOG_ELEMENT)
+    virtual bool isInTopLayer() const;
+    virtual void setIsInTopLayer(bool);
+#endif
+
 #if ENABLE(POINTER_LOCK)
     void webkitRequestPointerLock();
 #endif
@@ -522,6 +527,8 @@ private:
     void unregisterNamedFlowContentNode();
 
     void createMutableAttributeData();
+
+    bool shouldInvalidateDistributionWhenAttributeChanged(ElementShadow*, const QualifiedName&, const AtomicString&);
 
 private:
     ElementRareData* elementRareData() const;

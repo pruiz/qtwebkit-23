@@ -64,6 +64,10 @@
 #include "WebKitFontFamilyNames.h"
 #include <wtf/text/StringBuilder.h>
 
+#if ENABLE(CSS_EXCLUSIONS)
+#include "ExclusionShapeValue.h"
+#endif
+
 #if ENABLE(CSS_SHADERS)
 #include "CustomFilterArrayParameter.h"
 #include "CustomFilterNumberParameter.h"
@@ -1004,13 +1008,12 @@ static PassRefPtr<CSSValue> valueForGridTrackList(const Vector<Length>& trackLen
     return list.release();
 }
 
-static PassRefPtr<CSSValue> valueForGridPosition(const Length& position)
+static PassRefPtr<CSSValue> valueForGridPosition(const GridPosition& position)
 {
     if (position.isAuto())
         return cssValuePool().createIdentifierValue(CSSValueAuto);
 
-    ASSERT(position.isFixed());
-    return cssValuePool().createValue(position.value(), CSSPrimitiveValue::CSS_NUMBER);
+    return cssValuePool().createValue(position.integerPosition(), CSSPrimitiveValue::CSS_NUMBER);
 }
 
 static PassRefPtr<CSSValue> getDelayValue(const AnimationList* animList)
@@ -2505,11 +2508,15 @@ PassRefPtr<CSSValue> CSSComputedStyleDeclaration::getPropertyCSSValue(CSSPropert
         case CSSPropertyWebkitShapeInside:
             if (!style->shapeInside())
                 return cssValuePool().createIdentifierValue(CSSValueAuto);
-            return valueForBasicShape(style->shapeInside());
+            else if (style->shapeInside()->type() == ExclusionShapeValue::OUTSIDE)
+                return cssValuePool().createIdentifierValue(CSSValueOutsideShape);
+            ASSERT(style->shapeInside()->type() == ExclusionShapeValue::SHAPE);
+            return valueForBasicShape(style->shapeInside()->shape());
         case CSSPropertyWebkitShapeOutside:
             if (!style->shapeOutside())
                 return cssValuePool().createIdentifierValue(CSSValueAuto);
-            return valueForBasicShape(style->shapeOutside());
+            ASSERT(style->shapeOutside()->type() == ExclusionShapeValue::SHAPE);
+            return valueForBasicShape(style->shapeOutside()->shape());
         case CSSPropertyWebkitWrapThrough:
             return cssValuePool().createValue(style->wrapThrough());
 #endif

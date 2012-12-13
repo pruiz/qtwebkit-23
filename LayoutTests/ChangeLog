@@ -1,3 +1,898 @@
+2012-11-21  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, unskip a now passing test, update an expected file.
+
+        * platform/qt-5.0/TestExpectations:
+        * platform/qt-5.0/editing/selection/click-left-of-rtl-wrapping-text-expected.txt:
+
+2012-11-21  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, unskip now passing tests.
+
+        * platform/qt/TestExpectations:
+
+2012-11-21  Yury Semikhatsky  <yurys@chromium.org>
+
+        Unreviewed. Mark css3/filters/effect-reference-ordering-hw.html as crashing after crrev.com/168998
+
+        * platform/chromium/TestExpectations:
+
+2012-11-21  Alexander Pavlov  <apavlov@chromium.org>
+
+        Turn -webkit-text-emphasis into a shorthand property
+        https://bugs.webkit.org/show_bug.cgi?id=102879
+
+        Reviewed by Antti Koivisto.
+
+        Update expected results.
+
+        * fast/css/parsing-text-emphasis-expected.txt:
+        * fast/css/parsing-text-emphasis.html:
+
+2012-11-21  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, unskip a now passing test.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt/TestExpectations:
+
+2012-11-21  Csaba Osztrogonác  <ossy@webkit.org>
+
+
+        * platform/qt-5.0-wk2/TestExpectations:
+
+2012-11-21  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: remove setVersion from inspector tests
+        https://bugs.webkit.org/show_bug.cgi?id=102850
+
+        Reviewed by Vsevolod Vlasov.
+
+        setVersion was contained so the conversion to upgradeneeded was
+        straightforward.
+
+        * http/tests/inspector/indexeddb/database-data-expected.txt:
+        * http/tests/inspector/indexeddb/database-structure-expected.txt:
+        * http/tests/inspector/indexeddb/indexeddb-test.js:
+        (.request.onsuccess.onSuccess.request.onupgradeneeded):
+        (.request.onsuccess.onSuccess.request.onsuccess):
+        (.request.onsuccess):
+        (doWithVersionTransaction):
+        * http/tests/inspector/indexeddb/resources-panel-expected.txt:
+
+2012-11-21  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r135307.
+        http://trac.webkit.org/changeset/135307
+        https://bugs.webkit.org/show_bug.cgi?id=102905
+
+        Jussi said this doesn't definitively fix things, so revert for
+        now. (Requested by rakuco on #webkit).
+
+        * animations/resources/stop-animation-on-suspend-subframe.html:
+        * animations/stop-animation-on-suspend.html:
+        * platform/chromium-mac/animations/stop-animation-on-suspend-expected.txt: Added.
+        * platform/chromium/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt-arm/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+
+2012-11-21  Yury Semikhatsky  <yurys@chromium.org>
+
+        Unreviewed. Updated test expectations.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-21  Kunihiko Sakamoto  <ksakamoto@chromium.org>
+
+        Enable datalist UI for input types datetime and datetime-local
+        https://bugs.webkit.org/show_bug.cgi?id=102882
+
+        Reviewed by Kent Tamura.
+
+        Removed expectation of failure.
+
+        * platform/chromium/fast/forms/datalist/input-list-expected.txt: Removed.
+
+2012-11-20  Yury Semikhatsky  <yurys@chromium.org>
+
+        Unreviewed. Fixed webkit_lint complaints about overlapping entries in Chromium TestExpectations.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-20  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed morning gardening, skip a new security
+        timeouting test to paint the bots green.
+
+        * platform/qt/TestExpectations:
+
+2012-11-20  Kangil Han  <kangil.han@samsung.com>
+
+        [EFL][WK2][WTR] Unskip passed cases under css3/device-adapt/opera/
+        https://bugs.webkit.org/show_bug.cgi?id=102868
+
+        Unreviewed, EFL gardening.
+
+        As BUG 102517 has been resolved, we can move those from EFL common to WK1 only.
+
+        * platform/efl-wk1/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-11-20  Kentaro Hara  <haraken@chromium.org>
+
+        [V8] Introduce constructorCallbackCustom()
+        https://bugs.webkit.org/show_bug.cgi?id=102763
+
+        Reviewed by Adam Barth.
+
+        Updated a test result.
+
+        * platform/chromium/fast/dom/call-a-constructor-as-a-function-expected.txt:
+
+2012-11-20  Adam Klein  <adamk@chromium.org>
+
+        [JSC] MutationObserver wrapper should not be collected while still observing
+        https://bugs.webkit.org/show_bug.cgi?id=102744
+
+        Reviewed by Adam Barth.
+
+        Remove suppressions for wrapper dropoff tests.
+
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+
+2012-11-20  Ryosuke Niwa  <rniwa@webkit.org>
+
+        REGRESSION(r131106): magnitude-perf.js calls bind on undefined
+        https://bugs.webkit.org/show_bug.cgi?id=102848
+
+        Reviewed by Tony Gentilcore.
+
+        Check the existence of performance.now before calling bind on it.
+
+        * resources/magnitude-perf.js:
+        (Magnitude._runIteration):
+
+2012-11-20  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: remove setVersion from pending-version-change-on-exit.html
+        https://bugs.webkit.org/show_bug.cgi?id=102457
+
+        Reviewed by Tony Chang.
+
+        This test doesn't work in single-process mode because of
+        http://wkb.ug/82776. We run it in content_shell in chromium.
+
+        * platform/chromium/TestExpectations:
+        * storage/indexeddb/pending-version-change-on-exit-expected.txt:
+        * storage/indexeddb/pending-version-change-on-exit.html:
+        * storage/indexeddb/resources/pending-version-change-on-exit.js:
+        (request.onblocked):
+
+2012-11-20  Bear Travis  <betravis@adobe.com>
+
+        [CSS Exclusions] Support outside-shape value on shape-inside
+        https://bugs.webkit.org/show_bug.cgi?id=101108
+
+        Reviewed by Dirk Schulze.
+
+        Adding tests to make sure the 'outside-shape' value properly applies only to the
+        shape-inside property.
+
+        * fast/exclusions/parsing-wrap-shape-inside-expected.txt:
+        * fast/exclusions/parsing-wrap-shape-outside-expected.txt:
+        * fast/exclusions/script-tests/parsing-wrap-shape-inside.js:
+        * fast/exclusions/script-tests/parsing-wrap-shape-outside.js:
+
+2012-11-20  Jian Li  <jianli@chromium.org>
+
+        Unreviewed. Updated chromium test expectations.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-20  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: Remove legacy enum-based constants from IDL
+        https://bugs.webkit.org/show_bug.cgi?id=85315
+
+        Reviewed by Adam Barth.
+
+        * storage/indexeddb/constants-expected.txt:
+        * storage/indexeddb/cursor-overloads-expected.txt:
+        * storage/indexeddb/cursor-overloads.html:
+        * storage/indexeddb/legacy-constants-expected.txt:
+        * storage/indexeddb/resources/constants.js:
+        (test):
+        * storage/indexeddb/resources/legacy-constants.js:
+        (testObsoleteConstants):
+
+2012-11-20  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        animations/stop-animation-on-suspend.html sometimes fails on all platforms
+        https://bugs.webkit.org/show_bug.cgi?id=49182
+
+        Reviewed by Antti Koivisto.
+
+        stop-animation-on-suspend incorrectly assumed that animation in a subframe would start
+        roughly at document load. Keep both animations (one in main frame, one in iframe) paused
+        until the iframe is loaded: this way they should run synchronised enough.
+
+        Also increase the tolerance of the test slightly: measuring timing like this is inherently flaky.
+
+        Remove failure expectation from all TestExpectations and remove the clearly wrong expected
+        result for chromium-mac.
+
+        * animations/resources/stop-animation-on-suspend-subframe.html:
+        * animations/stop-animation-on-suspend.html:
+        * platform/chromium/TestExpectations:
+        * platform/chromium-mac/animations/stop-animation-on-suspend-expected.txt:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt-arm/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+
+2012-11-20  Mike Reed  <reed@google.com>
+
+        update TestExpectations before a skia change
+        https://bugs.webkit.org/show_bug.cgi?id=102829
+
+        Reviewed by NOBODY. expectations change only.
+
+        optimization for rectangular blurs (with holes) changes some images in the low bit. mark for rebaselining.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-20  Abhishek Arya  <inferno@chromium.org>
+
+        Crash in FrameLoader::stopLoading.
+        https://bugs.webkit.org/show_bug.cgi?id=99504
+
+        Reviewed by Nate Chapin.
+
+        * fast/frames/frame-unload-crash2-expected.txt: Added.
+        * fast/frames/frame-unload-crash2.html: Added.
+
+2012-11-20  Tom Sepez  <tsepez@chromium.org>
+
+        XSSAuditor::decodedSnippetForJavaScript stopping when comma encountered.
+        https://bugs.webkit.org/show_bug.cgi?id=102587
+
+        Reviewed by Adam Barth.
+
+        * http/tests/security/xssAuditor/script-tag-with-actual-comma-expected.txt: Added.
+        * http/tests/security/xssAuditor/script-tag-with-actual-comma.html: Added.
+
+2012-11-20  Hans Muller  <hmuller@adobe.com>
+
+        [CSS Exclusions] writing-mode:vertical-rl shape-inside tests are incorrectly configured
+        https://bugs.webkit.org/show_bug.cgi?id=102729
+
+        Reviewed by Dirk Schulze.
+
+        Corrected the dimensions of the border elements in two exclusions tests.  They
+        define a rectangle that's five pixels larger than the tests' rectangular
+        shape-inside exclusions shapes.  They now enclose the shape-inside element's
+        text contents.
+
+        * fast/exclusions/shape-inside/shape-inside-polygon-rectangle-expected.html:
+        * fast/exclusions/shape-inside/shape-inside-polygon-rectangle.html:
+        * fast/exclusions/shape-inside/shape-inside-vertical-text-expected.html:
+        * fast/exclusions/shape-inside/shape-inside-vertical-text.html:
+
+2012-11-20  Xabier Rodriguez Calvar  <calvaris@igalia.com>
+
+        [GTK] fast/hidpi/video-controls-in-hidpi.html and fast/layers/video-layer.html need new baseline
+        https://bugs.webkit.org/show_bug.cgi?id=102815
+
+        Reviewed by Philippe Normand.
+
+        Added new GTK baseline for those tests.
+
+        * platform/gtk/fast/hidpi/video-controls-in-hidpi-expected.txt:
+        New GTK baseline
+        * platform/gtk/fast/layers/video-layer-expected.txt: New GTK
+        baseline
+
+2012-11-20  Raphael Kubo da Costa  <raphael.kubo.da.costa@intel.com>
+
+        [EFL] Gardening.
+
+        Temporarily mark fast/multicol/span/positioned-child-not-removed-crash.html
+        as crashing while the regression is addressed.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-11-20  Yael Aharon  <yael.aharon@intel.com>
+
+        Unreviewed gardening.
+        Update results for compositing/geometry/vertical-scroll-composited.html after 133898.
+        Mark animations/negative-delay.html as flaky.
+        Remove a few passing tests from TextExpectations.
+
+        * platform/efl/TestExpectations:
+        * platform/efl/compositing/geometry/vertical-scroll-composited-expected.png: Added.
+        * platform/efl/compositing/geometry/vertical-scroll-composited-expected.txt:
+
+2012-11-20  Stephen Chenney  <schenney@chromium.org>
+
+        [Chromium] Expectations update
+
+        Unreviewed test expectations update.
+
+        Some results for calendar and month picker may not be up-to-date for the slow bots.
+
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png:
+        * platform/chromium-mac-lion/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png:
+        * platform/chromium-mac-snowleopard/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/calendar-picker-appearance-step-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/month-picker-appearance-step-expected.png:
+        * platform/chromium-win-xp/fast/block/float/overhanging-tall-block-expected.png: Removed.
+        * platform/chromium-win/fast/block/float/overhanging-tall-block-expected.png:
+        * platform/chromium-win/fast/block/float/overhanging-tall-block-expected.txt:
+
+2012-11-20  Keishi Hattori  <keishi@webkit.org>
+
+        Week picker width is too small
+        https://bugs.webkit.org/show_bug.cgi?id=102766
+
+        Reviewed by Kent Tamura.
+
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-expected.png:
+        * platform/chromium-mac/platform/chromium/fast/forms/calendar-picker/week-picker-appearance-step-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-11-20  Xabier Rodriguez Calvar  <calvaris@igalia.com>
+
+        [GTK] no volume slider in HTML5 media element controls
+        https://bugs.webkit.org/show_bug.cgi?id=97192
+
+        Reviewed by Philippe Normand.
+
+        r115829 was causing this regression so it was partially
+        reverted. The revert causes some small regressions, in the tests
+        but it is better to have the volume slider shown.
+
+        * platform/gtk-wk2/TestExpectations: Updated because it causes
+        some new regressions
+        * platform/gtk/TestExpectations: Updated because it causes some
+        new regressions
+        * platform/gtk/media/audio-controls-rendering-expected.txt: Updated
+        * platform/gtk/media/controls-after-reload-expected.txt: Updated
+        * platform/gtk/media/controls-strict-expected.txt: Updated
+        * platform/gtk/media/controls-styling-expected.txt: Updated
+        * platform/gtk/media/controls-styling-strict-expected.txt: Updated
+        * platform/gtk/media/controls-without-preload-expected.txt: Updated
+        * platform/gtk/media/media-controls-clone-expected.txt: Updated
+        * platform/gtk/media/video-controls-rendering-expected.txt: Updated
+        * platform/gtk/media/video-display-toggle-expected.txt: Updated
+        * platform/gtk/media/video-empty-source-expected.txt: Updated
+        * platform/gtk/media/video-no-audio-expected.txt: Updated
+        * platform/gtk/media/video-volume-slider-expected.txt: Updated
+        * platform/gtk/media/video-zoom-controls-expected.txt: Updated
+
+2012-11-20  Yury Semikhatsky  <yurys@chromium.org>
+
+        Unreviewed. Mark inspector/profiler/cpu-profiler-profiling-without-inspector.html
+        as crashing.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-20  Kunihiko Sakamoto  <ksakamoto@chromium.org>
+
+        Use localized date-time format in datetime input
+        https://bugs.webkit.org/show_bug.cgi?id=102769
+
+        Reviewed by Kent Tamura.
+
+        * fast/forms/datetime/datetime-appearance-l10n-expected.txt: Added.
+        * fast/forms/datetime/datetime-appearance-l10n.html: Added. We can confirm vi-vn have time-date ordering.
+        * platform/chromium-mac/fast/forms/datetime/datetime-appearance-l10n-expected.png: Added.
+        * platform/chromium/TestExpectations:
+
+2012-11-19  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Refactoring] Remove shadowPseudoId() and use setPseudo() in <progress> ElementShadow.
+        https://bugs.webkit.org/show_bug.cgi?id=101703
+
+        Reviewed by Hajime Morita.
+
+        * editing/style/apply-style-atomic-expected.txt:
+        * fast/dom/HTMLProgressElement/progress-element-markup-expected.txt:
+
+2012-11-19  Yury Semikhatsky  <yurys@chromium.org>
+
+        Unreviewed. Reenable webaudio/biquad-getFrequencyResponse.html test as it should pass after r129418
+        https://bugs.webkit.org/show_bug.cgi?id=97439
+
+        * platform/chromium/TestExpectations:
+
+2012-11-19  Matt Falkenhagen  <falken@chromium.org>
+
+        Implement the new stacking layer needed by the Fullscreen API and the new <dialog> element
+        https://bugs.webkit.org/show_bug.cgi?id=84796
+
+        Reviewed by Julien Chaffraix.
+
+        Add tests for top layer stacking and rendering.
+
+        * fast/dom/HTMLDialogElement/top-layer-containing-block-expected.html: Added.
+        * fast/dom/HTMLDialogElement/top-layer-containing-block.html: Added.
+        * fast/dom/HTMLDialogElement/top-layer-display-none-expected.html: Added.
+        * fast/dom/HTMLDialogElement/top-layer-display-none.html: Added.
+        * fast/dom/HTMLDialogElement/top-layer-nesting-expected.html: Added.
+        * fast/dom/HTMLDialogElement/top-layer-nesting.html: Added.
+        * fast/dom/HTMLDialogElement/top-layer-stacking-dynamic-expected.html: Added.
+        * fast/dom/HTMLDialogElement/top-layer-stacking-dynamic.html: Added.
+        * fast/dom/HTMLDialogElement/top-layer-stacking-expected.html: Added.
+        * fast/dom/HTMLDialogElement/top-layer-stacking.html: Added.
+
+2012-11-19  Yury Semikhatsky  <yurys@chromium.org>
+
+        Unreviewed. Fix lint errors on chromium TextExpectations after r135205.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-19  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Shadow] attribute pseudo should return empty string instead of null when nothing is specified.
+        https://bugs.webkit.org/show_bug.cgi?id=102753
+
+        Reviewed by Hajime Morita.
+
+        * fast/dom/shadow/pseudo-attribute-expected.txt:
+        * fast/dom/shadow/pseudo-attribute.html:
+
+2012-11-19  Adam Klein  <adamk@chromium.org>
+
+        MutationObserver wrapper should not be collected while still observing
+        https://bugs.webkit.org/show_bug.cgi?id=102328
+
+        Reviewed by Adam Barth.
+
+        Tests showing that observers are kept alive, both in the simple case
+        and in the transient registered observer case (where the original
+        registration node is GCed but the transient observation node is still
+        alive).
+
+        * fast/mutation/observer-wrapper-dropoff-expected.txt: Added.
+        * fast/mutation/observer-wrapper-dropoff-transient-expected.txt: Added.
+        * fast/mutation/observer-wrapper-dropoff-transient.html: Added.
+        * fast/mutation/observer-wrapper-dropoff.html: Added.
+
+2012-11-19  Tony Chang  <tony@chromium.org>
+
+        Move more non-settings out of InternalSettings
+        https://bugs.webkit.org/show_bug.cgi?id=102711
+
+        Reviewed by Adam Barth.
+
+        Move static values out of InternalSettings.
+
+        * fast/scrolling/scrollbar-tickmarks-hittest.html: Move setUsesOverlayScrollbars to internals.
+
+2012-11-19  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: Complex series of opens/deleteDatabase fails an ASSERT
+        https://bugs.webkit.org/show_bug.cgi?id=101810
+
+        Reviewed by Tony Chang.
+
+        Removed use of setVersion. Surprisingly straightforward conversion
+        given how gnarly this test is.
+
+        * storage/indexeddb/deletedatabase-delayed-by-versionchange-expected.txt:
+        * storage/indexeddb/resources/deletedatabase-delayed-by-versionchange.js:
+        (h1OpenSuccess.h1.onversionchange):
+        (h1OpenSuccess.request.onsuccess.h2OpenSuccess.h2.onversionchange):
+        (h1OpenSuccess.request.onsuccess.h2OpenSuccess.request.onsuccess):
+        (h1OpenSuccess.request.onsuccess.h2OpenSuccess.request.onblocked.h3Blocked.request.onsuccess):
+        (h1OpenSuccess.request.onsuccess.h2OpenSuccess.request.onblocked):
+        (h1OpenSuccess.request.onsuccess.h2OpenSuccess.request.onupgradeneeded.h3OnUpgradeneeded.transaction.oncomplete):
+        (h1OpenSuccess.request.onsuccess.h2OpenSuccess.request.onupgradeneeded):
+        (h1OpenSuccess.request.onsuccess):
+        (h1OpenSuccess):
+
+2012-11-19  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: last setVersion excision batch
+        https://bugs.webkit.org/show_bug.cgi?id=102713
+
+        Reviewed by Tony Chang.
+
+        * storage/indexeddb/resources/setversion-blocked-by-versionchange-close-in-blocked.js: Removed.
+          The crucial part of this test was a connection closing itself in its
+          blocked callback. This is no longer possible as there's now only a
+          handle to the connection after the blocked event is dealt with.
+
+        * storage/indexeddb/resources/setversion-blocked-by-versionchange-close.js:
+          This test exposes a cascade of errors. h2's should receive 0 blocked
+          errors. Instead it receives 2.
+
+        * storage/indexeddb/resources/setversion-blocked.js: Removed.
+          Tests the same thing as set_version_blocked.
+
+        * storage/indexeddb/resources/setversion-not-blocked.js:
+          Now h2 is the version change connection and h1 is the blocker.
+
+        * storage/indexeddb/setversion-blocked-by-versionchange-close-in-blocked.html: Removed.
+        * storage/indexeddb/setversion-blocked.html: Removed.
+
+2012-11-19  David Grogan  <dgrogan@chromium.org>
+
+        IndexedDB: convert delete-closed-database-object to upgradeneeded
+        https://bugs.webkit.org/show_bug.cgi?id=102458
+
+        Reviewed by Tony Chang.
+
+        This test relies on gc behavior and seems flaky in content_shell.
+
+        * storage/indexeddb/delete-closed-database-object-expected.txt:
+        * storage/indexeddb/resources/delete-closed-database-object.js:
+        (prepareDatabase):
+        (openSuccess.openRequest.onsuccess):
+        (openSuccess):
+        (setVersion):
+
+2012-11-19  Chris Rogers  <crogers@google.com>
+
+        Implement .detune attribute for BiquadFilterNode
+        https://bugs.webkit.org/show_bug.cgi?id=102737
+
+        Reviewed by Kenneth Russell.
+
+        * webaudio/biquad-lowpass.html:
+        * webaudio/resources/biquad-testing.js:
+        (createTestAndRun):
+        (generateReference):
+
+2012-11-19  Huang Dongsung  <luxtella@company100.net>
+
+        Coordinated Graphics: Remove tiles of a layer when they are off the viewport.
+        https://bugs.webkit.org/show_bug.cgi?id=102313
+
+        Reviewed by Noam Rosenthal.
+
+        This test checks that a compositing layer is rendered if the layer is
+        originally transformed off the viewport.
+
+        * animations/animation-offscreen-to-onscreen-expected.png: Added.
+        * animations/animation-offscreen-to-onscreen-expected.txt: Added.
+        * animations/animation-offscreen-to-onscreen.html: Added.
+
+2012-11-19  Jian Li  <jianli@chromium.org>
+
+        Unreviewed. Mark 2 tests as failed on chromium.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-19  Eric Carlson  <eric.carlson@apple.com>
+
+        HTMLMediaElement::configureTextTracks should configure all text tracks
+        https://bugs.webkit.org/show_bug.cgi?id=102561
+
+        Reviewed by Philippe Normand.
+
+        Update test and results to check that dynamically added tracks are configured correctly.
+
+        * media/track/track-mode-not-changed-by-new-track-expected.txt:
+        * media/track/track-mode-not-changed-by-new-track.html:
+
+2012-11-19  Abhishek Arya  <inferno@chromium.org>
+
+        Crash in ApplyStyleCommand::cleanupUnstyledAppleStyleSpans.
+        https://bugs.webkit.org/show_bug.cgi?id=100150
+
+        Reviewed by Ryosuke Niwa.
+
+        * editing/style/apply-style-crash-expected.txt: Added.
+        * editing/style/apply-style-crash.html: Added.
+
+2012-11-19  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r135172.
+        http://trac.webkit.org/changeset/135172
+        https://bugs.webkit.org/show_bug.cgi?id=102710
+
+        Broke some WebKit2 api tests :( (Requested by japhet on
+        #webkit).
+
+        * http/tests/inspector/network/network-iframe-load-and-delete.html:
+        * http/tests/loading/redirect-methods-expected.txt:
+        * http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-expected.txt:
+        * http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-in-body-expected.txt:
+        * http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-parent-same-origin-deny-expected.txt:
+
+2012-11-19  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r134830.
+        http://trac.webkit.org/changeset/134830
+        https://bugs.webkit.org/show_bug.cgi?id=102701
+
+        ActiveDOMObject is not applicable to MutationObservers due to
+        being tied to a Document (Requested by aklein on #webkit).
+
+        * fast/mutation/observer-wrapper-dropoff-expected.txt: Removed.
+        * fast/mutation/observer-wrapper-dropoff.html: Removed.
+
+2012-11-19  Yael Aharon  <yael.aharon@intel.com>
+
+        Unreviewed gardening after r133898.
+        Cleanup the list of compositing tests failures.
+
+        * platform/efl/TestExpectations:
+
+2012-11-19  Shinya Kawanaka  <shinyak@chromium.org>
+
+        Changing id, className, or attribute should invalidate distribution
+        https://bugs.webkit.org/show_bug.cgi?id=100738
+
+        Reviewed by Dimitri Glazkov.
+
+        We have test cases that id/class/attribute is changed, and thier reprojection cases.
+
+        * fast/dom/shadow/distribution-attribute-modified-expected.html: Added.
+        * fast/dom/shadow/distribution-attribute-modified.html: Added.
+        * fast/dom/shadow/distribution-className-modified-expected.html: Added.
+        * fast/dom/shadow/distribution-className-modified.html: Added.
+        * fast/dom/shadow/distribution-id-modified-expected.html: Added.
+        * fast/dom/shadow/distribution-id-modified.html: Added.
+        * fast/dom/shadow/reprojection-attribute-modified-expected.html: Added.
+        * fast/dom/shadow/reprojection-attribute-modified.html: Added.
+        * fast/dom/shadow/reprojection-className-modified-expected.html: Added.
+        * fast/dom/shadow/reprojection-className-modified.html: Added.
+        * fast/dom/shadow/reprojection-id-modified-expected.html: Added.
+        * fast/dom/shadow/reprojection-id-modified.html: Added.
+
+2012-11-19  Nate Chapin  <japhet@chromium.org>
+
+        Move empty loading to DocumentLoader, simplify FrameLoader::init()
+        https://bugs.webkit.org/show_bug.cgi?id=101512
+
+        Reviewed by Adam Barth.
+
+        Don't expect resource load callbacks for empty loads.
+
+        * http/tests/inspector/network/network-iframe-load-and-delete.html:
+        * http/tests/loading/redirect-methods-expected.txt:
+        * http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-expected.txt:
+        * http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-in-body-expected.txt:
+        * http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-parent-same-origin-deny-expected.txt:
+
+2012-11-19  Balazs Kelemen  <kbalazs@webkit.org>
+
+        [Qt][WK2] REGRESSION(r132907): It made animations/negative-delay.html flaky
+        https://bugs.webkit.org/show_bug.cgi?id=100769
+
+        Unreviewed gardening (Qt).
+
+        These tests are rather flaky, mark them as so.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+
+2012-11-19  Erik Arvidsson  <arv@chromium.org>
+
+        Update DOMException name: DataCloneError
+        https://bugs.webkit.org/show_bug.cgi?id=102521
+
+        Reviewed by Kentaro Hara.
+
+        Updated tests and expectations.
+
+        * fast/dom/Window/anonymous-slot-with-changes-expected.txt:
+        * fast/dom/Window/window-postmessage-clone-expected.txt:
+        * fast/dom/shadow/shadowroot-clonenode-expected.txt:
+        * fast/dom/shadow/shadowroot-clonenode.html:
+        * fast/events/message-port-multi-expected.txt:
+        * fast/filesystem/filesystem-unserializable-expected.txt:
+        * platform/chromium/fast/dom/Window/window-postmessage-clone-expected.txt:
+        * platform/chromium/fast/dom/Window/window-postmessage-clone-really-deep-array-expected.txt:
+        * platform/gtk/fast/dom/Window/window-postmessage-clone-expected.txt:
+        * webintents/web-intents-obj-constructor-expected.txt:
+        * webintents/web-intents-obj-constructor.html:
+
+2012-11-19  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        Apply the resolved viewport rules
+        https://bugs.webkit.org/show_bug.cgi?id=95964
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Imported some of the CSS Device Adaptation tests submitted by
+        Opera to W3C CSS Test Suite. These tests are not yet approved but
+        they have a pretty good coverage of the specification.
+
+        Tests using Math.floor() where modified from the original version
+        using Math.round(), the reason being the round() version fails by
+        1px when the pixel ratio is different from 1.
+
+        Despite the fact they are all passing on the EFL MiniBrowser, I could
+        not enable them yet. WebKitTestRunner does not support fixed layout,
+        but that is the next goal.
+
+        * css3/device-adapt/opera/cascading-001-expected.txt: Added.
+        * css3/device-adapt/opera/cascading-001.xhtml: Added.
+        * css3/device-adapt/opera/cascading-002-expected.txt: Added.
+        * css3/device-adapt/opera/cascading-002.xhtml: Added.
+        * css3/device-adapt/opera/cascading-003-expected.txt: Added.
+        * css3/device-adapt/opera/cascading-003.xhtml: Added.
+        * css3/device-adapt/opera/cascading-004-expected.txt: Added.
+        * css3/device-adapt/opera/cascading-004.xhtml: Added.
+        * css3/device-adapt/opera/constrain-001-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-001.xhtml: Added.
+        * css3/device-adapt/opera/constrain-002-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-002.xhtml: Added.
+        * css3/device-adapt/opera/constrain-003-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-003.xhtml: Added.
+        * css3/device-adapt/opera/constrain-004-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-004.xhtml: Added.
+        * css3/device-adapt/opera/constrain-005-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-005.xhtml: Added.
+        * css3/device-adapt/opera/constrain-006-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-006.xhtml: Added.
+        * css3/device-adapt/opera/constrain-007-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-007.xhtml: Added.
+        * css3/device-adapt/opera/constrain-008-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-008.xhtml: Added.
+        * css3/device-adapt/opera/constrain-009-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-009.xhtml: Added.
+        * css3/device-adapt/opera/constrain-010-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-010.xhtml: Added.
+        * css3/device-adapt/opera/constrain-011-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-011.xhtml: Added.
+        * css3/device-adapt/opera/constrain-012-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-012.xhtml: Added.
+        * css3/device-adapt/opera/constrain-013-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-013.xhtml: Added.
+        * css3/device-adapt/opera/constrain-014-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-014.xhtml: Added.
+        * css3/device-adapt/opera/constrain-015-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-015.xhtml: Added.
+        * css3/device-adapt/opera/constrain-016-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-016.xhtml: Added.
+        * css3/device-adapt/opera/constrain-017-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-017.xhtml: Added.
+        * css3/device-adapt/opera/constrain-020-expected.txt: Added.
+        * css3/device-adapt/opera/constrain-020.xhtml: Added.
+        * css3/device-adapt/opera/syntax-001-expected.txt: Added.
+        * css3/device-adapt/opera/syntax-001.xhtml: Added.
+        * css3/device-adapt/opera/syntax-002-expected.txt: Added.
+        * css3/device-adapt/opera/syntax-002.xhtml: Added.
+        * css3/device-adapt/opera/syntax-003-expected.txt: Added.
+        * css3/device-adapt/opera/syntax-003.xhtml: Added.
+        * platform/efl/TestExpectations:
+
+2012-11-19  Erik Arvidsson  <arv@chromium.org>
+
+        Update DOMException name: SecurityError
+        https://bugs.webkit.org/show_bug.cgi?id=102437
+
+        Reviewed by Kentaro Hara.
+
+        Updated tests and expectations.
+
+        * fast/canvas/svg-taint-expected.txt:
+        * fast/dom/Document/invalid-domain-change-throws-exception-expected.txt:
+        * fast/dom/Document/script-tests/invalid-domain-change-throws-exception.js:
+        * fast/dom/register-protocol-handler.html:
+        * fast/frames/resources/sandboxed-iframe-storage-disallowed.html:
+        * fast/frames/sandboxed-iframe-storage-expected.txt:
+        * http/tests/loading/state-object-security-exception-expected.txt:
+        * http/tests/notifications/legacy/show-expected.txt:
+        * http/tests/security/canvas-remote-read-remote-image-blocked-no-crossorigin-expected.txt:
+        * http/tests/security/canvas-remote-read-remote-image-expected.txt:
+        * http/tests/security/canvas-remote-read-remote-image-redirect-expected.txt:
+        * http/tests/security/contentSecurityPolicy/worker-script-src-expected.txt:
+        * http/tests/security/cross-origin-local-storage-expected.txt:
+        * http/tests/security/cross-origin-session-storage-expected.txt:
+        * http/tests/security/cross-origin-websql-expected.txt:
+        * http/tests/security/cross-origin-worker-websql-expected.txt:
+        * http/tests/security/resources/sandboxed-iframe-document-cookie-read-denied.html:
+        * http/tests/security/same-origin-storage-blocked-expected.txt:
+        * http/tests/security/same-origin-websql-blocked-expected.txt:
+        * http/tests/security/setDomainRelaxationForbiddenForURLScheme-expected.txt:
+        * http/tests/security/storage-blocking-loosened-local-storage-expected.txt:
+        * http/tests/security/storage-blocking-loosened-websql-expected.txt:
+        * http/tests/security/storage-blocking-strengthened-local-storage-expected.txt:
+        * http/tests/security/storage-blocking-strengthened-websql-expected.txt:
+        * http/tests/security/webgl-remote-read-remote-image-blocked-no-crossorigin-expected.txt:
+        * http/tests/websocket/tests/hybi/url-parsing-expected.txt:
+        * http/tests/workers/shared-worker-redirect-expected.txt:
+        * http/tests/workers/worker-redirect-expected.txt:
+        * platform/chromium-win/websocket/tests/url-parsing-expected.txt:
+        * platform/chromium/fast/dom/register-protocol-handler-expected.txt:
+        * platform/chromium/http/tests/websocket/tests/hixie76/url-parsing-expected.txt:
+        * platform/chromium/http/tests/websocket/tests/hybi/url-parsing-expected.txt:
+        * platform/chromium/permissionclient/storage-permission-expected.txt:
+        * platform/win-wk2/http/tests/inspector-enabled/database-open-expected.txt:
+
+2012-11-19  Yael Aharon  <yael.aharon@intel.com>
+
+        Unreviewed gardening after r133898.
+        Added expected results for animation tests that are now passing.
+
+        * platform/efl/TestExpectations:
+        * platform/efl/animations/3d: Added.
+        * platform/efl/animations/3d/change-transform-in-end-event-expected.png: Added.
+        * platform/efl/animations/3d/change-transform-in-end-event-expected.txt: Added.
+        * platform/efl/animations/3d/matrix-transform-type-animation-expected.png: Added.
+        * platform/efl/animations/3d/matrix-transform-type-animation-expected.txt: Added.
+        * platform/efl/animations/3d/state-at-end-event-transform-expected.png: Added.
+        * platform/efl/animations/3d/state-at-end-event-transform-expected.txt: Added.
+
+2012-11-19  Erik Arvidsson  <arv@chromium.org>
+
+        Update DOMException name: URLMismatchError
+        https://bugs.webkit.org/show_bug.cgi?id=102511
+
+        Reviewed by Kentaro Hara.
+
+        Updated tests and expectations.
+
+        * fast/workers/shared-worker-shared-expected.txt:
+
+2012-11-19  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt][WK2] Unreviewed gardening, unskip a now passing test.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+
+2012-11-19  Csaba Osztrogonác  <ossy@webkit.org>
+
+        [Qt] Unreviewed gardening, skip new failing tests.
+
+        * platform/qt-5.0-wk2/TestExpectations:
+        * platform/qt-5.0-wk2/compositing/layer-creation/fixed-position-out-of-view-expected.txt: Removed, because it is unnecessary.
+        * platform/qt/TestExpectations:
+
+2012-11-19  Ilya Tikhonovsky  <loislo@chromium.org>
+
+        webaudio: leak: AudioContext objects are leaking. They retain 36mb of shared data.
+        https://bugs.webkit.org/show_bug.cgi?id=102356
+
+        Reviewed by Adam Barth.
+
+        A clean-up code was moved from uninitialize to clear method.
+        AudioContext marks itself as hasPendingActivity in method constructCommon and unmarks itself in method clear.
+        m_isStopScheduled filters out second ActiveDOMObject::stop call.
+        markForDeletion appends AudioNode pointer to m_nodesToDelete array if there is no active audio thread.
+        adoptRef was added in createOfflineContext method.
+        A guard was added into deleteMarkedNodes.
+
+        * inspector-protocol/nmi-webaudio-leak-test-expected.txt: Added.
+        * inspector-protocol/nmi-webaudio-leak-test.html: Added.
+        * platform/chromium-android/TestExpectations:
+        * platform/efl-wk2/TestExpectations:
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+        * platform/wincairo/TestExpectations:
+
+2012-11-19  Erik Arvidsson  <arv@chromium.org>
+
+        Update DOMException name: QuotaExceededError
+        https://bugs.webkit.org/show_bug.cgi?id=102512
+
+        Reviewed by Kentaro Hara.
+
+        Updated tests and expectations.
+
+        * security/crypto-random-values-limits-expected.txt:
+        * storage/domstorage/localstorage/private-browsing-affects-storage-expected.txt:
+        * storage/domstorage/sessionstorage/private-browsing-affects-storage-expected.txt:
+
 2012-11-19  Kentaro Hara  <haraken@chromium.org>
 
         Unreviewed gardening.

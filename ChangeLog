@@ -1,3 +1,63 @@
+2012-11-21  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL] Turn on WTF_USE_TILED_BACKING_STORE by default
+        https://bugs.webkit.org/show_bug.cgi?id=101526
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Separate out ENABLE_WEBGL. It is not ready to be enabled by default.
+
+        * Source/cmake/OptionsEfl.cmake:
+
+2012-11-20  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r133859.
+        http://trac.webkit.org/changeset/133859
+        https://bugs.webkit.org/show_bug.cgi?id=102875
+
+        This patch makes API test broken (Requested by gyuyoung on
+        #webkit).
+
+        * Source/cmake/OptionsEfl.cmake:
+
+2012-11-20  Elliott Sprehn  <esprehn@chromium.org>
+
+        Store MutationObserver callback in a hidden property for V8
+        https://bugs.webkit.org/show_bug.cgi?id=102555
+
+        Reviewed by Adam Barth.
+
+        Test for reference cycle leaks with mutation observers. There doesn't seem
+        to be a way to check this for v8, but if you manually run you can see if it
+        leaks observers.
+
+        * ManualTests/leak-cycle-observer-wrapper.html: Added.
+
+2012-11-20  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        Unreviewed. Update NEWS and configure.ac for 1.11.2 release
+
+        * configure.ac: Bump tarball version number, not updated in
+        previous commit by mistake.
+
+2012-11-20  Carlos Garcia Campos  <cgarcia@igalia.com>
+
+        Unreviewed. Update NEWS and configure.ac for 1.11.2 release
+
+        * configure.ac: Bump version numbers.
+
+2012-11-19  Kihong Kwon  <kihong.kwon@samsung.com>
+
+        Add PROXIMITY_EVENTS feature
+        https://bugs.webkit.org/show_bug.cgi?id=102658
+
+        Reviewed by Kentaro Hara.
+
+        Add PROXIMITY_EVENTS feature to cmake.
+
+        * Source/cmake/WebKitFeatures.cmake:
+        * Source/cmakeconfig.h.cmake:
+
 2012-11-18  Laszlo Gombos  <l.gombos@samsung.com>
 
         Remove non-existent directories from the make system

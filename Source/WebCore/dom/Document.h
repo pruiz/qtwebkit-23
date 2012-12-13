@@ -323,6 +323,7 @@ public:
     DEFINE_ATTRIBUTE_EVENT_LISTENER(webkitvisibilitychange);
 #endif
 
+    void setViewportArguments(const ViewportArguments& viewportArguments) { m_viewportArguments = viewportArguments; }
     ViewportArguments viewportArguments() const { return m_viewportArguments; }
 #ifndef NDEBUG
     bool didDispatchViewportPropertiesChanged() const { return m_didDispatchViewportPropertiesChanged; }
@@ -1167,6 +1168,12 @@ public:
     // Return a Locale for the default locale if the argument is null or empty.
     Locale& getCachedLocale(const AtomicString& locale = nullAtom);
 
+#if ENABLE(DIALOG_ELEMENT)
+    void addToTopLayer(Element*);
+    void removeFromTopLayer(Element*);
+    const Vector<RefPtr<Element> >& topLayerElements() const { return m_topLayerElements; }
+#endif
+
 protected:
     Document(Frame*, const KURL&, bool isXHTML, bool isHTML);
 
@@ -1465,6 +1472,10 @@ private:
     bool m_isAnimatingFullScreen;
     LayoutRect m_savedPlaceholderFrameRect;
     RefPtr<RenderStyle> m_savedPlaceholderRenderStyle;
+#endif
+
+#if ENABLE(DIALOG_ELEMENT)
+    Vector<RefPtr<Element> > m_topLayerElements;
 #endif
 
     int m_loadEventDelayCount;

@@ -129,7 +129,6 @@ TestShell::TestShell()
     WebRuntimeFeatures::enableDataTransferItems(true);
     WebRuntimeFeatures::enableDeviceMotion(false);
     WebRuntimeFeatures::enableGeolocation(true);
-    WebRuntimeFeatures::enablePointerLock(true);
     WebRuntimeFeatures::enableIndexedDatabase(true);
     WebRuntimeFeatures::enableInputTypeDateTime(true);
     WebRuntimeFeatures::enableInputTypeDateTimeLocal(true);
@@ -186,6 +185,7 @@ void TestShell::createMainWindow()
     m_testInterfaces->setDelegate(m_webViewHost.get());
     m_testInterfaces->setWebView(m_webView);
     m_testRunner->setDelegate(m_webViewHost.get());
+    m_testRunner->setWebView(m_webView);
     m_drtDevToolsAgent->setWebView(m_webView);
 }
 
@@ -194,6 +194,7 @@ TestShell::~TestShell()
     m_testInterfaces->setDelegate(0);
     m_testInterfaces->setWebView(0);
     m_testRunner->setDelegate(0);
+    m_testRunner->setWebView(0);
     m_drtDevToolsAgent->setWebView(0);
 }
 

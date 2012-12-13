@@ -337,7 +337,7 @@ int Font::offsetForPositionForSimpleText(const TextRun& run, float position, boo
             if (delta + charWidth / 2 <= 0)
                 break;
         } else {
-            if (delta + charWidth <= 0)
+            if (delta <= 0)
                 break;
         }
     } while (++curPos < string.size());

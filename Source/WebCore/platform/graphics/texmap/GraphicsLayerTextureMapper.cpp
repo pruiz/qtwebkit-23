@@ -191,6 +191,11 @@ void GraphicsLayerTextureMapper::setMaskLayer(GraphicsLayer* value)
         return;
     GraphicsLayer::setMaskLayer(value);
     notifyChange(TextureMapperLayer::MaskLayerChange);
+
+    if (!value)
+        return;
+    value->setSize(size());
+    value->setContentsVisible(contentsAreVisible());
 }
 
 
@@ -232,6 +237,8 @@ void GraphicsLayerTextureMapper::setSize(const FloatSize& value)
         return;
 
     GraphicsLayer::setSize(value);
+    if (maskLayer())
+        maskLayer()->setSize(value);
     notifyChange(TextureMapperLayer::SizeChange);
 }
 
@@ -294,6 +301,8 @@ void GraphicsLayerTextureMapper::setContentsVisible(bool value)
         return;
     notifyChange(TextureMapperLayer::ContentsVisibleChange);
     GraphicsLayer::setContentsVisible(value);
+    if (maskLayer())
+        maskLayer()->setContentsVisible(value);
 }
 
 /* \reimp (GraphicsLayer.h)

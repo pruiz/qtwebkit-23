@@ -329,6 +329,12 @@ unix|win32-g++* {
     haveQt(5): QMAKE_PKGCONFIG_REQUIRES += QtWidgets
 }
 
+contains(DEFINES, ENABLE_OPENCL=1) {
+    LIBS += -lOpenCL
+
+    INCLUDEPATH += $$SOURCE_DIR/platform/graphics/gpu/opencl
+}
+
 # Disable C++0x mode in WebCore for those who enabled it in their Qt's mkspec
 *-g++*:QMAKE_CXXFLAGS -= -std=c++0x -std=gnu++0x
 

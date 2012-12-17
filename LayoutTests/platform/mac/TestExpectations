@@ -363,6 +363,9 @@ fast/events/drag-customData.html
 # https://bugs.webkit.org/show_bug.cgi?id=55944
 fast/dom/Geolocation/page-reload-cancel-permission-requests.html
 
+# https://bugs.webkit.org/show_bug.cgi?id=103435
+fast/backgrounds/background-opaque-images-over-color.html
+
 # https://bugs.webkit.org/show_bug.cgi?id=56685
 webarchive/test-link-rel-icon.html
 
@@ -467,9 +470,6 @@ media/track/track-cue-rendering-horizontal.html
 media/track/track-cue-rendering-snap-to-lines-not-set.html
 media/track/track-cue-rendering-vertical.html
 media/track/track-webvtt-tc028-unsupported-markup.html
-
-# Test needs new baselines https://bugs.webkit.org/show_bug.cgi?id=102557
-fast/backgrounds/background-opaque-images-over-color.html
 
 # Tests for MediaSource API. Feature is not yet functional.
 # https://bugs.webkit.org/show_bug.cgi?id=64731
@@ -1161,6 +1161,29 @@ webkit.org/b/98560 fast/writing-mode/vertical-subst-font-vert-no-dflt.html [ Ima
 # This test is failing and causing subsequent tests to time out.
 webkit.org/b/98837 http/tests/security/svg-image-leak.html [ Skip ]
 
+# Needs rebaseline. A div should be removed, but the rendering should be the same.
+webkit.org/b/102993 fast/dom/HTMLInputElement/input-slider-update.html [ Failure ]
+webkit.org/b/102993 fast/dom/HTMLInputElement/input-slider-update-styled.html [ Failure ]
+webkit.org/b/102993 fast/forms/box-shadow-override.html [ Failure ]
+webkit.org/b/102993 fast/forms/input-appearance-height.html [ Failure ]
+webkit.org/b/102993 fast/forms/range/input-appearance-range.html [ Failure ]
+webkit.org/b/102993 fast/forms/range/range-thumb-height-percentage.html [ Failure ]
+webkit.org/b/102993 fast/forms/range/slider-padding.html [ Failure ]
+webkit.org/b/102993 fast/forms/range/slider-thumb-shared-style.html [ Failure ]
+webkit.org/b/102993 fast/forms/range/slider-thumb-stylability.html [ Failure ]
+webkit.org/b/102993 fast/multicol/client-rects.html [ Failure ]
+webkit.org/b/102993 fast/repaint/slider-thumb-drag-release.html [ Failure ]
+webkit.org/b/102993 fast/repaint/slider-thumb-float.html [ Failure ]
+webkit.org/b/102993 media/audio-controls-rendering.html [ Failure ]
+webkit.org/b/102993 media/controls-after-reload.html [ Failure ]
+webkit.org/b/102993 media/controls-strict.html [ Failure ]
+webkit.org/b/102993 media/controls-styling-strict.html [ Failure ]
+webkit.org/b/102993 media/controls-without-preload.html [ Failure ]
+webkit.org/b/102993 media/video-controls-rendering.html [ Failure ]
+webkit.org/b/102993 media/video-display-toggle.html [ Failure ]
+webkit.org/b/102993 media/video-no-audio.html [ Failure ]
+webkit.org/b/102993 media/video-playing-and-pause.html [ Failure ]
+
 # Should never have been a ref test.
 webkit.org/b/98456 compositing/images/truncated-direct-png-image.html [ ImageOnlyFailure ]
 
@@ -1190,6 +1213,9 @@ webkit.org/b/100846 inspector-protocol/debugger-terminate-dedicated-worker-while
 webkit.org/b/100142 css3/filters/effect-reference-hw.html [ Fail ]
 webkit.org/b/100142 css3/filters/effect-reference-ordering-hw.html [ Fail ]
 webkit.org/b/100142 css3/filters/effect-reference.html [ Fail ]
+
+# Mac doesn't have a toggle for CC any more, it's based on a menu of choices.
+webkit.org/b/101670 media/video-controls-captions.html [ Skip ]
 
 # Overflowing LayoutUnits cause RenderGeometryMap assertions
 webkit.org/b/67434 [ Debug ] fast/overflow/overflow-height-float-not-removed-crash.html [ Skip ]

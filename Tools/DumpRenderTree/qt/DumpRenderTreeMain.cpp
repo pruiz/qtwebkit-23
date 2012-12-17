@@ -35,10 +35,11 @@
 #include <qdir.h>
 #include <qfont.h>
 #include <qstringlist.h>
+#include <qstylefactory.h>
 #include <qtimer.h>
 #include <qurl.h>
 #include <qwebdatabase.h>
-#include <qwindowsstyle.h>
+
 
 #include <wtf/AlwaysInline.h>
 #include <wtf/ExportMacros.h>

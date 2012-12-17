@@ -293,6 +293,9 @@ fast/events/touch/gesture/gesture-scrollbar.html
 # Don't have width/height on GestureLongPress necessary to enable adjustment
 touchadjustment/touch-links-longpress.html
 
+# Don't have gestureLongTap event type
+fast/events/touch/gesture/context-menu-on-long-tap.html
+
 # ENABLE(HIDDEN_PAGE_DOM_TIMER_THROTTLING) is disabled
 fast/dom/timer-throttling-hidden-page.html
 
@@ -440,6 +443,7 @@ fast/events/page-visibility-iframe-move-test.html
 fast/events/page-visibility-iframe-propagation-test.html
 fast/events/page-visibility-null-view.html
 fast/events/page-visibility-transition-test.html
+fast/frames/page-visibility-crash.html
 
 # No CORS support for media elements is implemented yet.
 http/tests/security/video-cross-origin-readback.html
@@ -483,6 +487,7 @@ editing/pasteboard/drag-drop-url-with-style.html
 editing/pasteboard/file-drag-to-editable.html
 editing/pasteboard/file-input-files-access.html
 fast/events/prevent-drag-to-navigate.html
+fast/events/touch/gesture/long-press-on-draggable-element-triggers-drag.html
 fast/forms/file/input-file-re-render.html
 http/tests/security/clipboard/clipboard-file-access.html
 
@@ -1747,9 +1752,9 @@ fast/writing-mode/vertical-subst-font-vert-no-dflt.html
 # https://bugs.webkit.org/show_bug.cgi?id=98751
 fast/xmlhttprequest/xmlhttprequest-nonexistent-file.html
 
-# [Qt] new fast/backgrounds/background-opaque-images-over-color.html fails since r135629
-# https://bugs.webkit.org/show_bug.cgi?id=103227
-fast/backgrounds/background-opaque-images-over-color.html
+# LayoutTests/fast/table/css-table-max-height.html failing on Qt Linux
+# https://bugs.webkit.org/show_bug.cgi?id=103453
+fast/table/css-table-max-height.html [ Text ]
 
 # ============================================================================= #
 # failing security tests
@@ -2366,6 +2371,9 @@ webkit.org/b/101539 editing/execCommand/switch-list-type-with-orphaned-li.html [
 webkit.org/b/100846 inspector-protocol/debugger-pause-dedicated-worker.html [ Skip ]
 webkit.org/b/100846 inspector-protocol/debugger-terminate-dedicated-worker-while-paused.html [ Skip ]
 
+# QT still has the CC toggle button, not the menu of tracks.
+webkit.org/b/101670 media/video-controls-captions-trackmenu.html [ Skip ]
+
 # New, but failing test
 webkit.org/b/101035 fast/images/exif-orientation-image-document.html
 
@@ -2390,3 +2398,6 @@ webkit.org/b/102877 fast/frames/frame-unload-crash2.html
 
 # Fails until we enable the Resource Timing API.
 webkit.org/b/61138 http/tests/w3c/webperf/submission/resource-timing [ Skip ]
+
+# [Qt] A new compositing bug uncovered by r135859
+webkit.org/b/103424 fast/backgrounds/background-opaque-images-over-color.html

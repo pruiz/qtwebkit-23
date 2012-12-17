@@ -305,18 +305,19 @@ bool Element::hasAttribute(const QualifiedName& name) const
 
 const AtomicString& Element::getAttribute(const QualifiedName& name) const
 {
-    if (UNLIKELY(name == styleAttr) && attributeData() && attributeData()->m_styleAttributeIsDirty)
+    if (!attributeData())
+        return nullAtom;
+
+    if (UNLIKELY(name == styleAttr && attributeData()->m_styleAttributeIsDirty))
         updateStyleAttribute();
 
 #if ENABLE(SVG)
-    if (UNLIKELY(!areSVGAttributesValid()))
+    if (UNLIKELY(attributeData()->m_animatedSVGAttributesAreDirty))
         updateAnimatedSVGAttribute(name);
 #endif
 
-    if (attributeData()) {
-        if (const Attribute* attribute = getAttributeItem(name))
-            return attribute->value();
-    }
+    if (const Attribute* attribute = getAttributeItem(name))
+        return attribute->value();
     return nullAtom;
 }
 
@@ -660,24 +661,24 @@ static inline bool shouldIgnoreAttributeCase(const Element* e)
 
 const AtomicString& Element::getAttribute(const AtomicString& name) const
 {
+    if (!attributeData())
+        return nullAtom;
+
     bool ignoreCase = shouldIgnoreAttributeCase(this);
 
     // Update the 'style' attribute if it's invalid and being requested:
-    if (attributeData() && attributeData()->m_styleAttributeIsDirty && equalPossiblyIgnoringCase(name, styleAttr.localName(), ignoreCase))
+    if (attributeData()->m_styleAttributeIsDirty && equalPossiblyIgnoringCase(name, styleAttr.localName(), ignoreCase))
         updateStyleAttribute();
 
 #if ENABLE(SVG)
-    if (!areSVGAttributesValid()) {
+    if (attributeData()->m_animatedSVGAttributesAreDirty) {
         // We're not passing a namespace argument on purpose. SVGNames::*Attr are defined w/o namespaces as well.
         updateAnimatedSVGAttribute(QualifiedName(nullAtom, name, nullAtom));
     }
 #endif
 
-    if (attributeData()) {
-        if (const Attribute* attribute = attributeData()->getAttributeItem(name, ignoreCase))
-            return attribute->value();
-    }
-
+    if (const Attribute* attribute = attributeData()->getAttributeItem(name, ignoreCase))
+        return attribute->value();
     return nullAtom;
 }
 
@@ -824,49 +825,23 @@ static inline bool classStringHasClassName(const AtomicString& newClassString)
     return classStringHasClassName(newClassString.characters16(), length);
 }
 
-struct HasSelectorForClassStyleFunctor {
-    explicit HasSelectorForClassStyleFunctor(StyleResolver* resolver)
-        : styleResolver(resolver)
-    { }
-
-    bool operator()(const AtomicString& className) const
-    {
-        return styleResolver->hasSelectorForClass(className);
-    }
-
-    StyleResolver* styleResolver;
-};
-
-struct HasSelectorForClassDistributionFunctor {
-    explicit HasSelectorForClassDistributionFunctor(ElementShadow* elementShadow)
-        : elementShadow(elementShadow)
-    { }
-
-    bool operator()(const AtomicString& className) const
-    {
-        return elementShadow->selectRuleFeatureSet().hasSelectorForClass(className);
-    }
-
-    ElementShadow* elementShadow;
-};
-
-template<typename Functor>
-static bool checkFunctorForClassChange(const SpaceSplitString& changedClasses, Functor functor)
+template<typename Checker>
+static bool checkSelectorForClassChange(const SpaceSplitString& changedClasses, const Checker& checker)
 {
     unsigned changedSize = changedClasses.size();
     for (unsigned i = 0; i < changedSize; ++i) {
-        if (functor(changedClasses[i]))
+        if (checker.hasSelectorForClass(changedClasses[i]))
             return true;
     }
     return false;
 }
 
-template<typename Functor>
-static bool checkFunctorForClassChange(const SpaceSplitString& oldClasses, const SpaceSplitString& newClasses, Functor functor)
+template<typename Checker>
+static bool checkSelectorForClassChange(const SpaceSplitString& oldClasses, const SpaceSplitString& newClasses, const Checker& checker)
 {
     unsigned oldSize = oldClasses.size();
     if (!oldSize)
-        return checkFunctorForClassChange(newClasses, functor);
+        return checkSelectorForClassChange(newClasses, checker);
     BitVector remainingClassBits;
     remainingClassBits.ensureSize(oldSize);
     // Class vectors tend to be very short. This is faster than using a hash table.
@@ -878,37 +853,17 @@ static bool checkFunctorForClassChange(const SpaceSplitString& oldClasses, const
                 continue;
             }
         }
-        if (functor(newClasses[i]))
+        if (checker.hasSelectorForClass(newClasses[i]))
             return true;
     }
     for (unsigned i = 0; i < oldSize; ++i) {
         // If the bit is not set the the corresponding class has been removed.
         if (remainingClassBits.quickGet(i))
             continue;
-        if (functor(oldClasses[i]))
+        if (checker.hasSelectorForClass(oldClasses[i]))
             return true;
     }
     return false;
-}
-
-static inline bool checkNeedsStyleInvalidationForClassChange(const SpaceSplitString& changedClasses, StyleResolver* styleResolver)
-{
-    return checkFunctorForClassChange(changedClasses, HasSelectorForClassStyleFunctor(styleResolver));
-}
-
-static inline bool checkNeedsStyleInvalidationForClassChange(const SpaceSplitString& oldClasses, const SpaceSplitString& newClasses, StyleResolver* styleResolver)
-{
-    return checkFunctorForClassChange(oldClasses, newClasses, HasSelectorForClassStyleFunctor(styleResolver));
-}
-
-static inline bool checkNeedsDistributionInvalidationForClassChange(const SpaceSplitString& changedClasses, ElementShadow* elementShadow)
-{
-    return checkFunctorForClassChange(changedClasses, HasSelectorForClassDistributionFunctor(elementShadow));
-}
-
-static inline bool checkNeedsDistributionInvalidationForClassChange(const SpaceSplitString& oldClasses, const SpaceSplitString& newClasses, ElementShadow* elementShadow)
-{
-    return checkFunctorForClassChange(oldClasses, newClasses, HasSelectorForClassDistributionFunctor(elementShadow));
 }
 
 void Element::classAttributeChanged(const AtomicString& newClassString)
@@ -925,10 +880,10 @@ void Element::classAttributeChanged(const AtomicString& newClassString)
         attributeData->setClass(newClassString, shouldFoldCase);
 
         const SpaceSplitString& newClasses = attributeData->classNames();
-        shouldInvalidateStyle = testShouldInvalidateStyle && checkNeedsStyleInvalidationForClassChange(oldClasses, newClasses, styleResolver);
+        shouldInvalidateStyle = testShouldInvalidateStyle && checkSelectorForClassChange(oldClasses, newClasses, *styleResolver);
     } else if (const ElementAttributeData* attributeData = this->attributeData()) {
         const SpaceSplitString& oldClasses = attributeData->classNames();
-        shouldInvalidateStyle = testShouldInvalidateStyle && checkNeedsStyleInvalidationForClassChange(oldClasses, styleResolver);
+        shouldInvalidateStyle = testShouldInvalidateStyle && checkSelectorForClassChange(oldClasses, *styleResolver);
 
         attributeData->clearClass();
     }
@@ -963,11 +918,11 @@ bool Element::shouldInvalidateDistributionWhenAttributeChanged(ElementShadow* el
             const bool shouldFoldCase = document()->inQuirksMode();
             const SpaceSplitString& oldClasses = attributeData->classNames();
             const SpaceSplitString newClasses(newClassString, shouldFoldCase);
-            if (checkNeedsDistributionInvalidationForClassChange(oldClasses, newClasses, elementShadow))
+            if (checkSelectorForClassChange(oldClasses, newClasses, elementShadow->selectRuleFeatureSet()))
                 return true;
         } else if (const ElementAttributeData* attributeData = this->attributeData()) {
             const SpaceSplitString& oldClasses = attributeData->classNames();
-            if (checkNeedsDistributionInvalidationForClassChange(oldClasses, elementShadow))
+            if (checkSelectorForClassChange(oldClasses, elementShadow->selectRuleFeatureSet()))
                 return true;
         }
     }
@@ -1197,34 +1152,34 @@ void Element::createRendererIfNeeded()
 void Element::attach()
 {
     suspendPostAttachCallbacks();
-    WidgetHierarchyUpdatesSuspensionScope suspendWidgetHierarchyUpdates;
+    {
+        WidgetHierarchyUpdatesSuspensionScope suspendWidgetHierarchyUpdates;
+        createRendererIfNeeded();
 
-    createRendererIfNeeded();
+        StyleResolverParentPusher parentPusher(this);
 
-    StyleResolverParentPusher parentPusher(this);
+        if (parentElement() && parentElement()->isInCanvasSubtree())
+            setIsInCanvasSubtree(true);
 
-    if (parentElement() && parentElement()->isInCanvasSubtree())
-        setIsInCanvasSubtree(true);
-
-    // When a shadow root exists, it does the work of attaching the children.
-    if (ElementShadow* shadow = this->shadow()) {
-        parentPusher.push();
-        shadow->attach();
-    } else {
-        if (firstChild())
+        // When a shadow root exists, it does the work of attaching the children.
+        if (ElementShadow* shadow = this->shadow()) {
             parentPusher.push();
-    }
-    ContainerNode::attach();
+            shadow->attach();
+        } else {
+            if (firstChild())
+                parentPusher.push();
+        }
+        ContainerNode::attach();
 
-    if (hasRareData()) {   
-        ElementRareData* data = elementRareData();
-        if (data->needsFocusAppearanceUpdateSoonAfterAttach()) {
-            if (isFocusable() && document()->focusedNode() == this)
-                document()->updateFocusAppearanceSoon(false /* don't restore selection */);
-            data->setNeedsFocusAppearanceUpdateSoonAfterAttach(false);
+        if (hasRareData()) {   
+            ElementRareData* data = elementRareData();
+            if (data->needsFocusAppearanceUpdateSoonAfterAttach()) {
+                if (isFocusable() && document()->focusedNode() == this)
+                    document()->updateFocusAppearanceSoon(false /* don't restore selection */);
+                data->setNeedsFocusAppearanceUpdateSoonAfterAttach(false);
+            }
         }
     }
-
     resumePostAttachCallbacks();
 }
 
@@ -2430,41 +2385,30 @@ void Element::updateExtraNamedItemRegistration(const AtomicString& oldId, const 
 
 PassRefPtr<HTMLCollection> Element::ensureCachedHTMLCollection(CollectionType type)
 {
-    return ensureElementRareData()->ensureCachedHTMLCollection(this, type);
-}
-
-PassRefPtr<HTMLCollection> ElementRareData::ensureCachedHTMLCollection(Element* element, CollectionType type)
-{
     if (HTMLCollection* collection = cachedHTMLCollection(type))
         return collection;
 
     RefPtr<HTMLCollection> collection;
     if (type == TableRows) {
-        ASSERT(element->hasTagName(tableTag));
-        return ensureNodeLists()->addCacheWithAtomicName<HTMLTableRowsCollection>(element, type);
+        ASSERT(hasTagName(tableTag));
+        return ensureRareData()->ensureNodeLists()->addCacheWithAtomicName<HTMLTableRowsCollection>(this, type);
     } else if (type == SelectOptions) {
-        ASSERT(element->hasTagName(selectTag));
-        return ensureNodeLists()->addCacheWithAtomicName<HTMLOptionsCollection>(element, type);
+        ASSERT(hasTagName(selectTag));
+        return ensureRareData()->ensureNodeLists()->addCacheWithAtomicName<HTMLOptionsCollection>(this, type);
     } else if (type == FormControls) {
-        ASSERT(element->hasTagName(formTag) || element->hasTagName(fieldsetTag));
-        return ensureNodeLists()->addCacheWithAtomicName<HTMLFormControlsCollection>(element, type);
+        ASSERT(hasTagName(formTag) || hasTagName(fieldsetTag));
+        return ensureRareData()->ensureNodeLists()->addCacheWithAtomicName<HTMLFormControlsCollection>(this, type);
 #if ENABLE(MICRODATA)
     } else if (type == ItemProperties) {
-        return ensureNodeLists()->addCacheWithAtomicName<HTMLPropertiesCollection>(element, type);
+        return ensureRareData()->ensureNodeLists()->addCacheWithAtomicName<HTMLPropertiesCollection>(this, type);
 #endif
     }
-    return ensureNodeLists()->addCacheWithAtomicName<HTMLCollection>(element, type);
+    return ensureRareData()->ensureNodeLists()->addCacheWithAtomicName<HTMLCollection>(this, type);
 }
 
 HTMLCollection* Element::cachedHTMLCollection(CollectionType type)
 {
-    return hasRareData() ? elementRareData()->cachedHTMLCollection(type) : 0;
-}
-
-void Element::removeCachedHTMLCollection(HTMLCollection* collection, CollectionType type)
-{
-    ASSERT(hasRareData());
-    elementRareData()->removeCachedHTMLCollection(collection, type);
+    return hasRareData() && rareData()->nodeLists() ? rareData()->nodeLists()->cacheWithAtomicName<HTMLCollection>(type) : 0;
 }
 
 IntSize Element::savedLayerScrollOffset() const

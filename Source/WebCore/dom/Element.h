@@ -383,7 +383,6 @@ public:
     virtual bool isDefaultButtonForForm() const { return false; }
     virtual bool willValidate() const { return false; }
     virtual bool isValidFormControlElement() { return false; }
-    virtual bool hasUnacceptableValue() const { return false; }
     virtual bool isInRange() const { return false; }
     virtual bool isOutOfRange() const { return false; }
     virtual bool isFrameElementBase() const { return false; }
@@ -743,11 +742,14 @@ inline Attribute* Element::getAttributeItem(const QualifiedName& name)
 
 inline void Element::updateInvalidAttributes() const
 {
-    if (attributeData() && attributeData()->m_styleAttributeIsDirty)
+    if (!attributeData())
+        return;
+
+    if (attributeData()->m_styleAttributeIsDirty)
         updateStyleAttribute();
 
 #if ENABLE(SVG)
-    if (!areSVGAttributesValid())
+    if (attributeData()->m_animatedSVGAttributesAreDirty)
         updateAnimatedSVGAttribute(anyQName());
 #endif
 }

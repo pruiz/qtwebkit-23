@@ -1636,7 +1636,6 @@ void WebPagePrivate::zoomToInitialScaleOnLoad()
         BBLOG(Platform::LogLevelInfo, "WebPagePrivate::zoomToInitialScaleOnLoad content is empty!");
 #endif
         requestLayoutIfNeeded();
-        m_client->resetBitmapZoomScale(currentScale());
         notifyTransformedContentsSizeChanged();
         return;
     }
@@ -1667,7 +1666,6 @@ void WebPagePrivate::zoomToInitialScaleOnLoad()
     if (!performedZoom) {
         // We only notify if we didn't perform zoom, because zoom will notify on
         // its own...
-        m_client->resetBitmapZoomScale(currentScale());
         notifyTransformedContentsSizeChanged();
     }
 }
@@ -2959,7 +2957,6 @@ void WebPagePrivate::zoomBlock()
     TransformationMatrix zoom;
     zoom.scale(m_blockZoomFinalScale);
     *m_transformationMatrix = zoom;
-    m_client->resetBitmapZoomScale(m_blockZoomFinalScale);
     // FIXME: Do we really need to suspend/resume both backingstore and screen here?
     m_backingStore->d->suspendBackingStoreUpdates();
     m_backingStore->d->suspendScreenUpdates();
@@ -3467,7 +3464,14 @@ void WebPagePrivate::dispatchViewportPropertiesDidChange(const ViewportArguments
     Platform::IntSize virtualViewport = recomputeVirtualViewportFromViewportArguments();
     m_webPage->setVirtualViewportSize(virtualViewport);
 
-    if (loadState() == WebKit::WebPagePrivate::Committed)
+    // Reset m_userPerformedManualZoom and enable m_shouldZoomToInitialScaleAfterLoadFinished so that we can relayout
+    // the page and zoom it to fit the screen when we dynamically change the meta viewport after the load is finished.
+    bool isLoadFinished = loadState() == Finished;
+    if (isLoadFinished) {
+        m_userPerformedManualZoom = false;
+        setShouldZoomToInitialScaleAfterLoadFinished(true);
+    }
+    if (loadState() == Committed || isLoadFinished)
         zoomToInitialScaleOnLoad();
 }
 

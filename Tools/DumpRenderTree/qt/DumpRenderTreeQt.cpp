@@ -36,6 +36,7 @@
 #include "DumpRenderTreeSupportQt.h"
 #include "EventSenderQt.h"
 #include "GCControllerQt.h"
+#include "InitWebCoreQt.h"
 #include "QtTestSupport.h"
 #include "TestRunnerQt.h"
 #include "TextInputControllerQt.h"
@@ -399,6 +400,7 @@ DumpRenderTree::DumpRenderTree()
     if (viewMode == "graphics")
         setGraphicsBased(true);
 
+    WebCore::initializeWebCoreQt();
     DumpRenderTreeSupportQt::initialize();
 
     // Set running in DRT mode for qwebpage to create testable objects.

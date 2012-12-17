@@ -216,6 +216,9 @@ webkit.org/b/89052 fast/css/image-orientation
 webkit.org/b/58491 fast/css3-text/css3-text-decoration
 webkit.org/b/76173 fast/css3-text/css3-text-align-last
 
+# CSS3 Background is not yet enabled (needs ENABLE_CSS3_BACKGROUND).
+webkit.org/b/37514 fast/backgrounds/background-position-parsing-2.html [ Text ]
+
 # Chromium does not support smart pasting in text controls yet.
 webkit.org/b/60830 editing/pasteboard/smart-paste-in-text-control.html
 
@@ -1263,6 +1266,9 @@ webkit.org/b/25817 svg/dom/SVGScriptElement/script-load-and-error-events.svg [ F
 
 webkit.org/b/60118 [ Mac ] svg/dom/SVGScriptElement/script-set-href.svg [ Failure Pass ]
 
+# New test in need of new baselines
+webkit.org/b/102557 fast/backgrounds/background-opaque-images-over-color.html [ Pass ImageOnlyFailure Failure Missing ]
+
 # Introduced due to BUGWK53512, fails under Skia right now
 webkit.org/b/65939 svg/custom/getBBox-path.svg [ Failure ]
 
@@ -2044,7 +2050,7 @@ crbug.com/28005 [ Android Win ] fast/css/color-correction-on-background-image.ht
 crbug.com/28005 [ Android XP ] fast/css/color-correction-untagged-images.html [ Failure ]
 
 # Timeout on Debug.
-webkit.org/b/82954 [ SnowLeopard Lion Win Linux ] svg/hixie/perf/007.xml [ Pass Slow ]
+webkit.org/b/82954 [ Mac Win Linux ] svg/hixie/perf/007.xml [ ImageOnlyFailure Pass Slow ]
 
 crbug.com/22700 [ Android ] fast/canvas/canvas-shadow.html [ Failure ]
 
@@ -2156,6 +2162,9 @@ crbug.com/40680 fast/media/media-query-list-06.html
 crbug.com/40680 fast/media/media-query-list-07.html
 
 crbug.com/117597 svg/batik/filters/feTile.svg [ ImageOnlyFailure ] 
+
+# Test needing new baselines
+webkit.org/b/103089 fast/backgrounds/gradient-background-leakage-2.html [ Pass Missing ImageOnlyFailure Failure ]
 
 # Caused by http://trac.webkit.org/changeset/56394.
 crbug.com/143475 [ Win ] http/tests/xmlhttprequest/xmlhttprequest-50ms-download-dispatch.html [ Failure Pass Timeout ]
@@ -2857,6 +2866,14 @@ webkit.org/b/61169 [ Android Linux Win ] css3/images/optimize-contrast-image.htm
 webkit.org/b/96720 fast/forms/time-multiple-fields/time-multiple-fields-preserve-value-after-history-back.html [ Pass Timeout ]
 webkit.org/b/96720 fast/forms/date-multiple-fields/date-multiple-fields-preserve-value-after-history-back.html [ Pass Timeout ]
 webkit.org/b/98906 platform/chromium/fast/forms/suggestion-picker/date-suggestion-picker-mouse-operations.html [ Pass Failure ]
+
+# Needs rebaseline
+webkit.org/b/102888 platform/chromium/fast/forms/suggestion-picker/datetimelocal-suggestion-picker-appearance.html [ Pass ImageOnlyFailure Missing ]
+webkit.org/b/102888 platform/chromium/fast/forms/suggestion-picker/datetimelocal-suggestion-picker-appearance-rtl.html [ Pass ImageOnlyFailure Missing ]
+webkit.org/b/102888 platform/chromium/fast/forms/suggestion-picker/datetimelocal-suggestion-picker-appearance-with-scroll-bar.html [ Pass ImageOnlyFailure Missing ]
+webkit.org/b/102888 platform/chromium/fast/forms/suggestion-picker/datetime-suggestion-picker-appearance.html [ Pass ImageOnlyFailure Missing ]
+webkit.org/b/102888 platform/chromium/fast/forms/suggestion-picker/datetime-suggestion-picker-appearance-rtl.html [ Pass ImageOnlyFailure Missing ]
+webkit.org/b/102888 platform/chromium/fast/forms/suggestion-picker/datetime-suggestion-picker-appearance-with-scroll-bar.html [ Pass ImageOnlyFailure Missing ]
 
 # New test added in r87324
 crbug.com/83994 [ Win ] platform/win/plugins/call-javascript-that-destroys-plugin.html [ Failure ]
@@ -4185,7 +4202,7 @@ webkit.org/b/101408 platform/chromium/fast/forms/calendar-picker/calendar-picker
 
 webkit.org/b/101539 [ Linux Win ] editing/execCommand/switch-list-type-with-orphaned-li.html [ Failure ]
 
-webkit.org/b/101618 [ Win7 Debug ] http/tests/inspector/indexeddb/database-data.html [ Crash ]
+webkit.org/b/101618 [ Win ] http/tests/inspector/indexeddb/database-data.html [ Crash ]
 
 webkit.org/b/90022 fast/canvas/canvas-resize-reset-pixelRatio.html [ WontFix ]
 webkit.org/b/90022 platform/chromium/virtual/gpu/fast/canvas/canvas-resize-reset-pixelRatio.html [ WontFix ]
@@ -4222,3 +4239,19 @@ webkit.org/b/103062 [ Debug ] fast/canvas/canvas-strokePath-gradient-shadow.html
 webkit.org/b/103062 [ Debug ] fast/canvas/canvas-strokeRect-gradient-shadow.html [ Crash ]
 
 webkit.org/b/103093 [ MountainLion ] media/video-preload.html [ Crash ]
+webkit.org/b/103148 [ Win Mac ] fast/frames/iframe-scaling-with-scroll.html [ ImageOnlyFailure ]
+webkit.org/b/103148 [ Lion ] fast/frames/iframe-scrolling-attribute.html [ ImageOnlyFailure ]
+webkit.org/b/103148 [ Lion ] fast/table/border-collapsing/004-vertical.html [ ImageOnlyFailure ]
+webkit.org/b/103149 [ Lion SnowLeopard Win7 Debug ] fast/events/stopPropagation-submit.html [ Pass Failure ]
+webkit.org/b/103152 [ Mac Win ] fast/forms/week-multiple-fields/week-multiple-fields-preserve-value-after-history-back.html [ Pass Timeout ]
+webkit.org/b/103154 [ Win7 SnowLeopard Lion Linux Debug ] fast/frames/frame-unload-crash2.html [ Pass Timeout ]
+webkit.org/b/103148 [ Lion ] fast/text/large-text-composed-char.html [ ImageOnlyFailure ]
+webkit.org/b/103148 [ Lion ] fast/text/text-letter-spacing.html [ ImageOnlyFailure ]
+webkit.org/b/103161 [ Linux Win ] inspector/console/command-line-api-inspect.html [ Pass Failure ]
+webkit.org/b/103161 [ Linux Win ] inspector/runtime/runtime-localStorage-getProperties.html [ Pass Failure ]
+webkit.org/b/103148 [ Linux Win Mac ] svg/batik/text/textPosition2.svg [ ImageOnlyFailure ]
+webkit.org/b/103181 [ Win7 ] http/tests/local/drag-over-remote-content.html [ Pass Crash Timeout ]
+webkit.org/b/103183 [ Win7 SnowLeopard ] media/video-seek-past-end-playing.html [ Pass Crash ]
+
+# This test results are date-dependent, see bug.
+webkit.org/b/103225 platform/chromium/fast/forms/calendar-picker/week-picker-key-operations.html [ Pass Failure ]

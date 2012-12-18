@@ -1,3 +1,303 @@
+2012-11-29  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [EFL][WK2] Add support for PlatformWebView::simulateMouseMove() in TestWebKitAPI
+        https://bugs.webkit.org/show_bug.cgi?id=103252
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Add support for PlatformWebView::simulateMouseMove() and enable
+        WebKit2 API test MouseMoveAfterCrash.
+
+        * TestWebKitAPI/PlatformEfl.cmake: Enable MouseMoveAfterCrash API
+        test.
+        * TestWebKitAPI/efl/PlatformWebView.cpp:
+        (TestWebKitAPI::onWebProcessCrashed): Handle 'webprocess,crashed' signal
+        to prevent loading an error page since the test case is reloading actual
+        page after web process has terminated and recovered.
+        (TestWebKitAPI):
+        (TestWebKitAPI::PlatformWebView::PlatformWebView):
+        (TestWebKitAPI::PlatformWebView::simulateMouseMove): Implemented.
+
+2012-11-29  Andras Becsi  <andras.becsi@digia.com>
+
+        [Qt] Fix installation of QtWebProcess binary
+        https://bugs.webkit.org/show_bug.cgi?id=101735
+
+        Reviewed by Simon Hausmann.
+
+        Add config test to detect the availability of support
+        for "program executables" in Qt (libexec).
+
+        This test can be removed after the Qt5 release.
+
+        * Tools.pro:
+        * qmake/mkspecs/features/features.prf:
+        * qmake/config.tests/libexecdir/libexecdir.cpp:
+        * qmake/config.tests/libexecdir/libexecdir.pro:
+
+2012-11-29  Eric Seidel  <eric@webkit.org>
+
+        run-perf-tests does not work when the layout test directory does not exist
+        https://bugs.webkit.org/show_bug.cgi?id=103572
+
+        Reviewed by Ryosuke Niwa.
+
+        Make sure that Profiler() calls maybe_make_directory for the output_dir
+        before ever using it.  It's a little awkward to create the directory
+        from the constructor, but its simplest that way as the various subclasses
+        all use the directory at different times.
+
+        Since this required having a filesystem in Profiler (and I didn't want
+        to grab inside Workspace to get one), I just made Profiler expect a
+        SystemHost instead of a separate filesystem, executive and workspace.
+
+        * Scripts/webkitpy/common/system/profiler.py:
+        (ProfilerFactory.create_profiler):
+        (Profiler.__init__):
+        (SingleFileOutputProfiler.__init__):
+        (GooglePProf.__init__):
+        (GooglePProf.profile_after_exit):
+        (Instruments.__init__):
+        (Instruments.attach_to_pid):
+        * Scripts/webkitpy/common/system/profiler_unittest.py:
+        (ProfilerFactoryTest.test_basic):
+
+2012-11-28  Vivek Galatage  <vivek.vg@samsung.com>
+
+        Adding secondary email id
+        https://bugs.webkit.org/show_bug.cgi?id=103594
+
+        Unreviewed. Adding secondary email.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-28  Kent Tamura  <tkent@chromium.org>
+
+        garden-o-matic: Use indeterminate <progress> in the status area
+        https://bugs.webkit.org/show_bug.cgi?id=103494
+
+        Reviewed by Adam Barth.
+
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/ui.js:
+        Wrap the "Processing..." message with an indeterminate progress bar.
+        We keep the message as a fallback content.
+        * BuildSlaveSupport/build.webkit.org-config/public_html/TestFailures/scripts/ui_unittests.js:
+        Follow the above change.
+
+2012-11-28  Nima Ghanavatian  <nghanavatian@rim.com>
+
+        Adding Nima Ghanavatian to committers.py
+        https://bugs.webkit.org/show_bug.cgi?id=103533
+
+        Reviewed by Rob Buis.
+
+        Adding myself to committers.py as a Committer.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-28  peavo@outlook.com  <peavo@outlook.com>
+
+        [WinCairo] Crash when requesting favicon.
+        https://bugs.webkit.org/show_bug.cgi?id=102689
+
+        Reviewed by Brent Fulgham.
+
+        * TestWebKitAPI/Tests/WebCore/win: Added.
+        * TestWebKitAPI/Tests/WebCore/win/BitmapImage.cpp: Added.
+        (TestWebKitAPI::BitmapImageTest::BitmapImageTest): Allocate frame in constructor.
+        (TestWebKitAPI::BitmapImageTest::frameCount): Override frameCount() method.
+        (TestWebKitAPI::TEST): Added new test.
+        * TestWebKitAPI/config.h: Make sure defines are correct for WinCairo.
+       * TestWebKitAPI/win/TestWebKitAPI.vcproj: Added new test.
+
+2012-11-28  Eric Seidel  <eric@webkit.org>
+
+        run-perf-tests should have a --profile option for easy profiling
+        https://bugs.webkit.org/show_bug.cgi?id=99517
+
+        Reviewed by Adam Barth.
+
+        This is a very basic implementation which works on Mac and Linux
+        and makes it trivial for anyone to profile a PerformanceTest.
+
+        Currently it's not "hard" to profile a PerformanceTest
+        but lowering the barriers to entry here allows all of us to focus
+        less on the tools and more on the code.
+
+        This also paves the way for adding easy mobile-profiling (e.g. chromium-android)
+        which is actually "hard", and this option will make much easier.
+
+        * Scripts/webkitpy/common/system/profiler.py: Added.
+        (ProfilerFactory):
+        (ProfilerFactory.create_profiler):
+        (Profiler):
+        (Profiler.__init__):
+        (Profiler.adjusted_environment):
+        (Profiler.attach_to_pid):
+        (Profiler.did_stop):
+        (SingleFileOutputProfiler):
+        (SingleFileOutputProfiler.__init__):
+        (GooglePProf):
+        (GooglePProf.__init__):
+        (GooglePProf.adjusted_environment):
+        (GooglePProf.did_stop):
+        (Instruments):
+        (Instruments.__init__):
+        (Instruments.attach_to_pid):
+        * Scripts/webkitpy/common/system/profiler_unittest.py: Added.
+        (ProfilerFactoryTest):
+        (ProfilerFactoryTest.test_basic):
+        * Scripts/webkitpy/layout_tests/port/driver.py:
+        (Driver.__init__):
+        (Driver._start):
+        (Driver.stop):
+        (Driver.cmd_line):
+        * Scripts/webkitpy/performance_tests/perftest.py:
+        (PerfTest.parse_output):
+        * Scripts/webkitpy/performance_tests/perftest_unittest.py:
+        (MainTest.test_parse_output):
+        (MainTest.test_parse_output_with_failing_line):
+        * Scripts/webkitpy/performance_tests/perftestsrunner.py:
+        (PerfTestsRunner._parse_args):
+        (PerfTestsRunner.run):
+
+2012-11-28  Zan Dobersek  <zandobersek@gmail.com>
+
+        Remove deprecated logging usage from QueueEngine
+        https://bugs.webkit.org/show_bug.cgi?id=103532
+
+        Reviewed by Dirk Pranke.
+
+        Replace usage of deprecated logging in webkitpy.tool.bot.queueengine with
+        logging through the Logger object. The unit test is modified to reflect
+        these changes.
+
+        After these changes the deprecated logging (i.e. logging to stderr) is not
+        used anymore through webkitpy and can be removed.
+
+        * Scripts/webkitpy/tool/bot/queueengine.py:
+        (QueueEngine.exit_after_handled_error):
+        (QueueEngine.run):
+        (QueueEngine._stopping):
+        (QueueEngine._sleep):
+        * Scripts/webkitpy/tool/bot/queueengine_unittest.py:
+        (QueueEngineTest._run_engine):
+
+2012-11-28  Nate Chapin  <japhet@chromium.org>
+
+        Move empty loading to DocumentLoader, simplify FrameLoader::init()
+        https://bugs.webkit.org/show_bug.cgi?id=101512
+
+        Reviewed by Adam Barth.
+
+        * DumpRenderTree/chromium/WebViewHost.cpp:
+        (WebViewHost::updateForCommittedLoad): This function doesn't play nicely with empty urls and incorrectly
+            interprets them as a non-empty load. This change is required for
+             http/tests/navigation/new-window-redirect-history.html to continue to pass in chromium.
+        * TestWebKitAPI/Tests/WebKit2/AboutBlankLoad.cpp: This test relies on a callback that no longer
+             is sent for about:blank loads.  Hook into didFinishLoadForFrame() instead.
+        (TestWebKitAPI::didFinishLoadForFrame):
+        (TestWebKitAPI::TEST):
+
+2012-11-28  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        [chromium] Allow plugins to opt-in to receive synthetic mouse events out of touch events.
+        https://bugs.webkit.org/show_bug.cgi?id=103092
+
+        Reviewed by Tony Chang.
+
+        Update the test web-plugin to be able to opt-in to receive synthesized mouse events created
+        from touch events.
+
+        * DumpRenderTree/chromium/TestWebPlugin.cpp:
+        (parseTouchEventRequestType):
+        (TestWebPlugin::TestWebPlugin):
+        (TestWebPlugin::initialize):
+        * DumpRenderTree/chromium/TestWebPlugin.h:
+        (TestWebPlugin):
+
+2012-11-28  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
+
+        [EFL][WK2] Add support for PlatformWebView::simulateSpacebarKeyPress() in TestWebKitAPI
+        https://bugs.webkit.org/show_bug.cgi?id=103123
+
+        Reviewed by Laszlo Gombos.
+
+        Add support for PlatformWebView::simulateSpacebarKeyPress().
+        This functionality is needed by WebKit2 API test MouseMoveAfterCrash
+        which is going to be unskipped in bug #103252.
+
+        * TestWebKitAPI/efl/PlatformUtilities.cpp:
+        (TestWebKitAPI::Util::sleep):
+        * TestWebKitAPI/efl/PlatformWebView.cpp: Use usleep() instead of
+        sleep().
+        (TestWebKitAPI::PlatformWebView::simulateSpacebarKeyPress):
+        (TestWebKitAPI):
+
+2012-11-28  Yael Aharon  <yael.aharon@intel.com>
+
+        Minor cleanup in TestInvocation
+        https://bugs.webkit.org/show_bug.cgi?id=103512
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Remove a function declaration that is not defined and not used.
+        Fix spelling error in m_webProcessIsUnresponsive.
+
+        * WebKitTestRunner/TestInvocation.cpp:
+        (WTR::TestInvocation::TestInvocation):
+        (WTR::TestInvocation::invoke):
+        * WebKitTestRunner/TestInvocation.h:
+        (TestInvocation):
+        * WebKitTestRunner/cairo/TestInvocationCairo.cpp:
+        (WTR::TestInvocation::dumpPixelsAndCompareWithExpected):
+        * WebKitTestRunner/qt/TestInvocationQt.cpp:
+        (WTR::TestInvocation::dumpPixelsAndCompareWithExpected):
+
+2012-11-28  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        Unreviewed. Use my personal email as bugzilla email.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-28  Thiago Marcos P. Santos  <thiago.santos@intel.com>
+
+        Unreviewed. Adding myself to committers.py.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-26  Andrey Adaikin  <aandrey@chromium.org>
+
+        Unreviewed. Adding myself to committers.py.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-28  Tommy Widenflycht  <tommyw@google.com>
+
+        Add basic implementation for MediaStreamAudioDestinationNode
+        https://bugs.webkit.org/show_bug.cgi?id=101815
+
+        Reviewed by Chris Rogers.
+
+        Adds a bit of code that exercises the WebKit API.
+
+        * DumpRenderTree/chromium/MockWebMediaStreamCenter.cpp:
+        (MockWebMediaStreamSourceConsumer):
+        (MockWebMediaStreamSourceConsumer::~MockWebMediaStreamSourceConsumer):
+        (MockWebMediaStreamCenter::didCreateMediaStream):
+
+2012-11-28  Matt Falkenhagen  <falken@chromium.org>
+
+        Unreviewed. Adding myself to committers list.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
+2012-11-27  Li Yin  <li.yin@intel.com>
+
+        Unreviewed. Adding myself to committers list.
+
+        * Scripts/webkitpy/common/config/committers.py:
+
 2012-11-27  Christophe Dumez  <christophe.dumez@intel.com>
 
         Unreviewed. Adding myself to committers.py.

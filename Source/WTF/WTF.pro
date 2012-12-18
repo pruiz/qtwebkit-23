@@ -132,6 +132,7 @@ HEADERS += \
     PrintStream.h \
     RandomNumber.h \
     RandomNumberSeed.h \
+    RawPointer.h \
     RedBlackTree.h \
     RefCounted.h \
     RefCountedLeakCounter.h \
@@ -146,6 +147,7 @@ HEADERS += \
     StdLibExtras.h \
     StringExtras.h \
     StringHasher.h \
+    StringPrintStream.h \
     TCPackedCache.h \
     TCSpinLock.h \
     TCSystemAlloc.h \
@@ -235,6 +237,7 @@ SOURCES += \
     RefCountedLeakCounter.cpp \
     SHA1.cpp \
     StackBounds.cpp \
+    StringPrintStream.cpp \
     TCSystemAlloc.cpp \
     Threading.cpp \
     TypeTraits.cpp \

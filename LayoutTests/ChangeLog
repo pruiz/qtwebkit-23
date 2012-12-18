@@ -1,3 +1,780 @@
+2012-11-29  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        [EFL][WK2] flaky reftests after r135935
+        https://bugs.webkit.org/show_bug.cgi?id=103618
+
+        Unreviewed gardening, mark more reftests flaky after r135935.
+
+        * platform/efl-wk2/TestExpectations:
+
+2012-11-29  Nandor Huszka  <hnandor@inf.u-szeged.hu>
+
+        [Qt] Unreviewed gardening.
+        Rebase 3 tests. Skip one test because it needs Qt implementation.
+
+        * platform/qt/TestExpectations:
+        * platform/qt/http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-expected.txt:
+        * platform/qt/http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-in-body-expected.txt:
+        * platform/qt/http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-parent-same-origin-deny-expected.txt:
+
+2012-11-29  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        [EFL] remove failure expectations from passing tests
+        https://bugs.webkit.org/show_bug.cgi?id=103523
+
+        Unreviewed gardening, remove failure expectations:
+        http/tests/security/isolatedWorld/world-reuse.html was fixed in
+        r135871 and the rest have been passing for a long while according
+        to flakiness dashboard.
+
+        * platform/efl-wk2/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-11-29  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r136111.
+        http://trac.webkit.org/changeset/136111
+        https://bugs.webkit.org/show_bug.cgi?id=103620
+
+        Broke compilation on Mac (unused private field m_matchMode)
+        (Requested by apavlov on #webkit).
+
+        * fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events-expected.txt:
+        * fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events.html:
+
+2012-11-29  Mike West  <mkwst@chromium.org>
+
+        [Chromium] Unreviewed gardening.
+
+        * platform/chromium/TestExpectations:
+            Skipping 'http/tests/inspector/network/script-as-text-loading-long-url.html'
+            on WinXP.
+
+2012-11-29  Keishi Hattori  <keishi@webkit.org>
+
+        Better type ahead for DateTimeSymbolicFieldElement
+        https://bugs.webkit.org/show_bug.cgi?id=103031
+
+        Reviewed by Kent Tamura.
+
+        * fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events-expected.txt:
+        * fast/forms/month-multiple-fields/month-multiple-fields-keyboard-events.html: Added tests for typeahead.
+
+2012-11-29  Kent Tamura  <tkent@chromium.org>
+
+        Convert *-appearance-pseudo-classes.html to dumpAsText tests
+        https://bugs.webkit.org/show_bug.cgi?id=103602
+
+        Reviewed by Kentaro Hara.
+
+        fast/forms/*/*-appearance-pseudo-classes.html doesn't need to be a pixel
+        test because "how css properties are applied" is tested in
+        fast/forms/*/*-appearance-basic.html. Checking querySelectorAll result
+        is enough to check pseudo classes support, and we can convert the test
+        to a dumpAsText test. We imporve test coverage in the new dumpAsText tests.
+
+        Also, this patch adds missing datetimelocal-pseudo-classes.html.
+
+        * fast/forms/date/date-pseudo-classes-expected.txt:
+        * fast/forms/date/date-pseudo-classes.html: Add :in-range -> :out-of-range cases.
+        * fast/forms/datetimelocal/datetimelocal-pseudo-classes-expected.txt: Added.
+        * fast/forms/datetimelocal/datetimelocal-pseudo-classes.html: Added.
+        * fast/forms/month/month-appearance-pseudo-classes-expected.txt: Removed.
+        * fast/forms/month/month-appearance-pseudo-classes.html: Removed.
+        * fast/forms/month/month-pseudo-classes-expected.txt: Added.
+        * fast/forms/month/month-pseudo-classes.html: Added.
+        * fast/forms/time/time-appearance-pseudo-classes-expected.txt: Removed.
+        * fast/forms/time/time-appearance-pseudo-classes.html: Removed.
+        * fast/forms/time/time-pseudo-classes-expected.txt: Added.
+        * fast/forms/time/time-pseudo-classes.html: Added.
+        * fast/forms/week/week-appearance-pseudo-classes-expected.txt: Removed.
+        * fast/forms/week/week-appearance-pseudo-classes.html: Removed.
+        * fast/forms/week/week-pseudo-classes-expected.txt: Added.
+        * fast/forms/week/week-pseudo-classes.html: Added.
+        * platform/chromium-linux/fast/forms/month/month-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/time/time-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-linux/fast/forms/week/week-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/month/month-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/time/time-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/week/week-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/month/month-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/time/time-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/week/week-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/month/month-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/time/time-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/week/week-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-win/fast/forms/month/month-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-win/fast/forms/time/time-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-win/fast/forms/week/week-appearance-pseudo-classes-expected.png: Removed.
+
+2012-11-29  Alexander Pavlov  <apavlov@chromium.org>
+
+        [Chromium] Unreviewed, mark fast/regions tests failing after r136045 as failing, since they are actually reftests.
+
+        * platform/chromium-mac/fast/regions/autoheight-dynamic-update-expected.png: Removed.
+        * platform/chromium-mac/fast/regions/firstletter-inside-flowthread-expected.png: Removed.
+        * platform/chromium-mac/fast/regions/listmarker-inside-flowthread-expected.png: Removed.
+        * platform/chromium/TestExpectations:
+
+2012-11-29  Andrei Bucur  <abucur@adobe.com>
+
+        [CSS Regions] Fix content node renderers ordering inside the named flow thread
+        https://bugs.webkit.org/show_bug.cgi?id=103501
+
+        Reviewed by David Hyatt.
+
+        The first two ref tests cover the issue with incorrectly computing the insertion position for a content node renderer.
+        The third ref test covers the issue with nextRenderer and previousRenderer skipping valid nodes.
+
+        * fast/regions/named-flow-content-order-1-expected.html: Added.
+        * fast/regions/named-flow-content-order-1.html: Added.
+        * fast/regions/named-flow-content-order-2-expected.html: Added.
+        * fast/regions/named-flow-content-order-2.html: Added.
+        * fast/regions/named-flow-content-order-3-expected.html: Added.
+        * fast/regions/named-flow-content-order-3.html: Added.
+
+2012-11-28  Mike West  <mkwst@chromium.org>
+
+        Add a test to ensure that 'seamless' iframes do not inherit contenteditable.
+        https://bugs.webkit.org/show_bug.cgi?id=95890
+
+        Reviewed by Ojan Vafai.
+
+        * fast/frames/seamless/seamless-contenteditable-not-inherited-expected.txt: Added.
+        * fast/frames/seamless/seamless-contenteditable-not-inherited.html: Added.
+
+2012-11-28  Mike West  <mkwst@chromium.org>
+
+        Web Inspector: Console message's anchor element should be trimmed for readability.
+        https://bugs.webkit.org/show_bug.cgi?id=100095
+
+        Reviewed by Pavel Feldman.
+
+        * http/tests/inspector/network/resources/script-as-text-with-a-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-url.php: Added.
+        * http/tests/inspector/network/script-as-text-loading-long-url-expected.txt: Added.
+        * http/tests/inspector/network/script-as-text-loading-long-url.html: Added.
+        * platform/chromium/http/tests/inspector/network/script-as-text-loading-long-url-expected.txt: Added.
+            JSC vs V8.
+
+012-11-28  Alexander Pavlov  <apavlov@chromium.org>
+
+        [Chromium] Unreviewed, rebaseline CSS regions test expectations for Mac 10.8 after r136045.
+
+        * platform/chromium-mac/fast/regions/autoheight-dynamic-update-expected.png: Added.
+        * platform/chromium-mac/fast/regions/firstletter-inside-flowthread-expected.png: Added.
+        * platform/chromium-mac/fast/regions/listmarker-inside-flowthread-expected.png: Added.
+
+2012-11-28  Hajime Morrita  <morrita@google.com>
+
+        [Shadow DOM] Element.createShadowRoot() should be prefixed.
+        https://bugs.webkit.org/show_bug.cgi?id=103595
+
+        Reviewed by Kentaro Hara.
+
+        * fast/dom/shadow/shadow-aware-create-shadow-root.html:
+
+2012-11-28  Hayato Ito <hayato@chromium.org>
+
+        Test the return value from Node::compareDocumentPositionMake more strictly.
+        https://bugs.webkit.org/show_bug.cgi?id=103590
+
+        Reviewed by Dimitri Glazkov.
+
+        * fast/dom/shadow/compare-document-position-expected.txt:
+        * fast/dom/shadow/compare-document-position.html:
+
+2012-11-28  Yael Aharon  <yael.aharon@intel.com>
+
+        [EFL][WK2] input-with-validation-without-shadow.html makes following tests crash after r135935
+        https://bugs.webkit.org/show_bug.cgi?id=103508
+
+        Reviewed by Kent Tamura.
+
+        Do not submit the form in the ref test, as it is also not submitted by the
+        original test. This also fixes the timeout in EFL's tests.
+        Remove the test from TestEexpectations as the test is passing now.
+
+        * fast/dom/shadow/input-with-validation-without-shadow-expected.html:
+        * platform/efl-wk2/TestExpectations:
+
+2012-11-28  Hayato Ito  <hayato@chromium.org>
+
+        Node::compareDocumentPosition returns wrong value for a node in the different shadow tree.
+        https://bugs.webkit.org/show_bug.cgi?id=103502
+
+        Reviewed by Dimitri Glazkov.
+
+        * fast/dom/shadow/compare-document-position-expected.txt: Added.
+        * fast/dom/shadow/compare-document-position.html: Added.
+
+2012-11-28  Noel Gordon  <noel.gordon@gmail.com>
+
+        Unreviewed test fix: chromium/fast/storage/serialized-script-value.html
+
+        This test produces an undefined error if the test fails.
+
+        * platform/chromium/fast/storage/serialized-script-value.html: Use bufferView
+        instead of view (view is not defined).
+
+2012-11-28  Joshua Bell  <jsbell@chromium.org>
+
+        [Chromium] IndexedDB: Assert/crash in indexing layout tests in content_shell
+        https://bugs.webkit.org/show_bug.cgi?id=103562
+
+        Reviewed by Tony Chang.
+
+        Fix an expectation glitch that may arise in multi-process ports (an error on
+        the open request may arrive before logging has stopped; safe to ignore it).
+
+        * storage/indexeddb/resources/transaction-error.js:
+
+2012-11-23  Dirk Schulze  <krit@webkit.org>
+
+        Remove -webkit-mask-attachment
+        https://bugs.webkit.org/show_bug.cgi?id=67137
+
+        Reviewed by David Hyatt.
+
+        Added negative tests for '-webkit-mask' shorthand property attachment keywords.
+
+        * fast/css/getComputedStyle/computed-style-expected.txt: 
+        * fast/css/getComputedStyle/computed-style-without-renderer-expected.txt:
+        * fast/css/remove-shorthand.html: Corrected syntax for -webkit-mask test.
+        * fast/masking/parsing-mask-expected.txt:
+        * fast/masking/parsing-mask.html: Added negative tests for attachment property keywords.
+        * svg/css/getComputedStyle-basic-expected.txt:
+
+2012-11-28  Kenichi Ishibashi  <bashi@chromium.org>
+
+        StyleResolver should not set NaN to font size
+        https://bugs.webkit.org/show_bug.cgi?id=99506
+
+        Reviewed by Abhishek Arya.
+
+        * fast/css/font-size-nan-expected.txt: Added.
+        * fast/css/font-size-nan.svg: Added.
+
+2012-11-23  Dirk Schulze  <krit@webkit.org>
+
+        CSS parser does not support -webkit-mask-size for -webkit-mask shorthand
+        https://bugs.webkit.org/show_bug.cgi?id=103020
+
+        Reviewed by David Hyatt.
+
+        Added new subtests to exisiting test for the changed syntax of '-webkit-mask' shorthand property.
+
+        * fast/masking/parsing-mask-expected.txt:
+        * fast/masking/parsing-mask.html:
+
+2012-11-28  Tom Sepez  <tsepez@chromium.org>
+
+        XSSAuditor bypass with script src=data: URL ending in <!--
+        https://bugs.webkit.org/show_bug.cgi?id=103548
+
+        Reviewed by Adam Barth.
+
+        * http/tests/security/xssAuditor/script-tag-with-source-data-url3-expected.txt: Added.
+        * http/tests/security/xssAuditor/script-tag-with-source-data-url3.html: Added.
+
+2012-11-28  Abhishek Arya  <inferno@chromium.org>
+
+        Heap-use-after-free in WebCore::RenderLayerModelObject::hasSelfPaintingLayer
+        https://bugs.webkit.org/show_bug.cgi?id=101970
+
+        Reviewed by David Hyatt.
+
+        * fast/block/float/float-not-removed-from-pre-block-expected.txt: Added.
+        * fast/block/float/float-not-removed-from-pre-block.html: Added.
+
+2012-11-28  Tony Chang  <tony@chromium.org>
+
+        Move internals.settings.setPageScaleFactor to internals.setPageScaleFactor
+        https://bugs.webkit.org/show_bug.cgi?id=103559
+
+        Reviewed by Jochen Eisinger.
+
+        This method doesn't alter the Settings object, so move it to internals.
+        Update the tests to call the right version.
+
+        * compositing/geometry/fixed-position-composited-page-scale-down.html:
+        * compositing/geometry/fixed-position-composited-page-scale-scroll.html:
+        * compositing/geometry/fixed-position-composited-page-scale.html:
+        * compositing/geometry/fixed-position-iframe-composited-page-scale-down.html:
+        * compositing/geometry/fixed-position-iframe-composited-page-scale.html:
+        * compositing/geometry/fixed-position-transform-composited-page-scale-down.html:
+        * compositing/geometry/fixed-position-transform-composited-page-scale.html:
+        * compositing/overflow/overflow-scaled-descendant-overlapping.html:
+        * compositing/repaint/page-scale-repaint.html:
+        * compositing/scaling/tiled-layer-recursion.html:
+        * fast/dom/Element/scale-page-bounding-client-rect-in-frame.html:
+        * fast/dom/Element/scale-page-bounding-client-rect.html:
+        * fast/dom/Element/scale-page-client-rects-in-frame.html:
+        * fast/dom/Element/scale-page-client-rects.html:
+        * fast/dom/Range/scale-page-bounding-client-rect.html:
+        * fast/dom/Range/scale-page-client-rects.html:
+        * fast/dom/elementFromPoint-scaled-scrolled.html:
+        * fast/dom/iframe-inner-size-scaling.html:
+        * fast/dom/window-inner-size-scaling.html:
+        * fast/dom/window-scroll-scaling.html:
+        * fast/events/scale-and-scroll-body.html:
+        * fast/events/scale-and-scroll-iframe-body.html:
+        * fast/events/scale-and-scroll-iframe-window.html:
+        * fast/events/scale-and-scroll-window.html:
+        * fast/events/script-tests/page-scaled-mouse-click-iframe.js:
+        (iframeLoaded):
+        * fast/events/script-tests/page-scaled-mouse-click.js:
+        * fast/events/scroll-in-scaled-page-with-overflow-hidden.html:
+        * fast/events/touch/page-scaled-touch-gesture-click.html:
+        * fast/events/touch/touch-scaled-scrolled.html:
+        * fast/frames/frame-set-rotation-hit.html:
+        * fast/frames/frame-set-scaling-hit.html:
+        * fast/frames/iframe-double-scale-contents.html:
+        * fast/repaint/background-scaling.html:
+        * fast/repaint/scale-page-shrink.html:
+        * fast/text/descent-clip-in-scaled-page-expected.html:
+        * fast/text/descent-clip-in-scaled-page.html:
+        * fast/transforms/selection-bounds-in-transformed-view.html:
+        * inspector/elements/highlight-node-scaled.html:
+        * platform/chromium-linux/compositing/gestures/gesture-tapHighlight-simple-scaled-document.html:
+        * svg/as-image/image-respects-pageScaleFactor-change.html:
+        * svg/as-image/image-respects-pageScaleFactor.html:
+
+2012-11-28  Christophe Dumez  <christophe.dumez@intel.com>
+
+        CSS3 Multicolumn: column-span should accept value 'none' (instead of '1')
+        https://bugs.webkit.org/show_bug.cgi?id=101462
+
+        Reviewed by David Hyatt.
+
+        Update expected results for several test cases now that the
+        default value for column-span property was renamed from 1
+        to none.
+
+        * fast/css/getComputedStyle/computed-style-expected.txt:
+        * fast/css/getComputedStyle/computed-style-without-renderer-expected.txt:
+        * svg/css/getComputedStyle-basic-expected.txt:
+
+2012-11-28  Stephen Chenney  <schenney@chromium.org>
+
+        Chromium TestExpectations minor changes.
+        https://bugs.webkit.org/show_bug.cgi?id=103148
+
+        Unreviewed test expectations changes.
+
+        Making some tests flakey rather than actually failing.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-28  Roger Fong  <roger_fong@apple.com>
+
+        Unreviewed. Skip flaky video test media/W3C/video/readyState/readyState_during_loadedmetadata.html.
+        https://bugs.webkit.org/show_bug.cgi?id=103442
+
+        * platform/win/TestExpectations:
+
+2012-11-28  Anton Vayvod  <avayvod@chromium.org>
+
+        Text Autosizing: Clusters should use width of LCA of their text nodes
+        https://bugs.webkit.org/show_bug.cgi?id=102562
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Many pages set a max-width on their content. So especially for the
+        RenderView, instead of just taking the width of |cluster| we find
+        the lowest common ancestor of the first and last descendant text node of
+        the cluster (i.e. the deepest wrapper block that contains all the text),
+        and use its width instead.
+        Had to update a couple of existing tests since the actual width for font
+        size multiplier calculation has been changed by the patch.
+
+        * fast/text-autosizing/cluster-wide-in-narrow-expected.html:
+        * fast/text-autosizing/cluster-wide-in-narrow.html:
+        * fast/text-autosizing/cluster-with-narrow-lca-and-cluster-expected.html: Added.
+        * fast/text-autosizing/cluster-with-narrow-lca-and-cluster.html: Added.
+        * fast/text-autosizing/cluster-with-narrow-lca-expected.html: Added.
+        * fast/text-autosizing/cluster-with-narrow-lca.html: Added.
+        * fast/text-autosizing/cluster-with-wide-lca-expected.html: Added.
+        * fast/text-autosizing/cluster-with-wide-lca.html: Added.
+        * fast/text-autosizing/em-margin-border-padding-expected.html:
+        * fast/text-autosizing/em-margin-border-padding.html:
+        * fast/text-autosizing/list-item-out-of-flow-expected.html: Added.
+        * fast/text-autosizing/list-item-out-of-flow.html: Added.
+        * fast/text-autosizing/wide-child-expected.html:
+        * fast/text-autosizing/wide-child.html:
+        * fast/text-autosizing/wide-in-narrow-overflow-scroll-expected.html: Added.
+        * fast/text-autosizing/wide-in-narrow-overflow-scroll.html: Added.
+
+2012-11-28  Alexandru Chiculita  <achicu@adobe.com>
+
+        [CSS Regions] Crash when using hover and first-letter inside a flow-thread
+        https://bugs.webkit.org/show_bug.cgi?id=102957
+
+        Reviewed by David Hyatt.
+
+        Added CSS Regions tests for the firstLetter and listMarker render objects that use 
+        different destroy paths in the code.
+
+        * fast/regions/firstletter-inside-flowthread-expected.html: Added.
+        * fast/regions/firstletter-inside-flowthread.html: Added.
+        * fast/regions/listmarker-inside-flowthread-expected.html: Added.
+        * fast/regions/listmarker-inside-flowthread.html: Added.
+
+2012-11-28  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, fix duplicate expectation.
+
+        * platform/efl-wk1/TestExpectations:
+
+2012-11-28  Pravin D  <pravind.2k4@gmail.com>
+
+        LayoutTests/fast/table/css-table-max-height.html failing on Qt Linux
+        https://bugs.webkit.org/show_bug.cgi?id=103453
+
+        Reviewed by Julien Chaffraix.
+
+        The testcase failure was due to the difference in the default line-height value
+        used by Qt-linux port from other ports.
+
+        * fast/table/css-table-max-height.html:
+        * platform/qt/TestExpectations:
+
+2012-11-28  Alexandru Chiculita  <achicu@adobe.com>
+
+        [CSS Regions] Auto-height regions will not calculate the height correctly when the content changes dynamically
+        https://bugs.webkit.org/show_bug.cgi?id=102954
+
+        Reviewed by David Hyatt.
+
+        Added test to check for auto-height region size update after an element is added to the flow.
+        In this case the first region will need to resize to accommodate the size of the added elements.
+
+        * fast/regions/autoheight-dynamic-update-expected.html: Added.
+        * fast/regions/autoheight-dynamic-update.html: Added.
+
+2012-11-28  Andrew Scherkus  <scherkus@chromium.org>
+
+        [Chromium] Unreviewed. Fixing lint errors introduced in r136030.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-28  Alexandru Chiculita  <achicu@adobe.com>
+
+        [CSS Regions] InRenderFlowThread returns false in the first setStyle
+        https://bugs.webkit.org/show_bug.cgi?id=102839
+
+        Reviewed by Dave Hyatt.
+
+        Added test to check that the composited elements added to a RenderFlowThread are painted correctly.
+
+        * fast/repaint/region-painting-composited-element-expected.html: Added.
+        * fast/repaint/region-painting-composited-element.html: Added.
+
+2012-11-28  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, land updated Mac results after track limiter removal.
+
+        * fast/dom/HTMLInputElement/input-slider-update-expected.txt:
+        * fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt:
+        * fast/forms/range/input-appearance-range-expected.txt:
+        * fast/forms/range/slider-padding-expected.txt:
+        * fast/forms/range/slider-thumb-stylability-expected.txt:
+        * fast/multicol/client-rects-expected.txt:
+        * fast/repaint/slider-thumb-drag-release-expected.txt:
+        * fast/repaint/slider-thumb-float-expected.txt:
+        * platform/mac/TestExpectations:
+        * platform/mac/fast/forms/box-shadow-override-expected.txt:
+        * platform/mac/fast/forms/input-appearance-height-expected.txt:
+        * platform/mac/fast/forms/range/range-thumb-height-percentage-expected.txt:
+        * platform/mac/fast/forms/range/slider-thumb-shared-style-expected.txt:
+        * platform/mac/media/audio-controls-rendering-expected.txt:
+        * platform/mac/media/controls-after-reload-expected.txt:
+        * platform/mac/media/controls-strict-expected.txt:
+        * platform/mac/media/controls-styling-strict-expected.txt:
+        * platform/mac/media/controls-without-preload-expected.txt:
+        * platform/mac/media/video-controls-rendering-expected.txt:
+        * platform/mac/media/video-display-toggle-expected.txt:
+        * platform/mac/media/video-no-audio-expected.txt:
+        * platform/mac/media/video-playing-and-pause-expected.txt:
+
+2012-11-28  Dan Bernstein  <mitz@apple.com>
+
+        <rdar://problem/12645085> REGRESSION (r130851): With kerning enabled, a white-space: pre-wrap inline starting with tab+space has the wrong width
+        https://bugs.webkit.org/show_bug.cgi?id=103541
+
+        Reviewed by Anders Carlsson.
+
+        * fast/text/tab-with-kerning-expected.html: Added.
+        * fast/text/tab-with-kerning.html: Added.
+
+2012-11-28  Nate Chapin  <japhet@chromium.org>
+
+        Move empty loading to DocumentLoader, simplify FrameLoader::init()
+        https://bugs.webkit.org/show_bug.cgi?id=101512
+
+        Reviewed by Adam Barth.
+
+        Don't expect resource load callbacks for empty loads.
+
+        * http/tests/inspector/network/network-iframe-load-and-delete.html:
+        * http/tests/loading/redirect-methods-expected.txt:
+        * http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-expected.txt:
+        * http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-in-body-expected.txt:
+        * http/tests/security/XFrameOptions/x-frame-options-deny-meta-tag-parent-same-origin-deny-expected.txt:
+
+2012-11-28  Andrew Scherkus  <scherkus@chromium.org>
+
+        [Chromium] Unreviewed. Mark http/tests/media/video-buffered-range-contains-currentTime.html as requiring an image rebaseline.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-28  Tony Chang  <tony@chromium.org>
+
+        Unreviewed, land updated Chromium results after track limiter removal.
+
+        * fast/forms/range/range-thumb-height-percentage-expected.txt:
+        * platform/chromium-mac-lion/media/video-empty-source-expected.png:
+        * platform/chromium-mac-snowleopard/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/range/slider-thumb-stylability-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/fast/repaint/slider-thumb-float-expected.txt: Removed.
+        * platform/chromium-mac-snowleopard/media/video-empty-source-expected.png:
+        * platform/chromium-mac/fast/dom/HTMLInputElement/input-slider-update-expected.txt: Added.
+        * platform/chromium-mac/fast/forms/box-shadow-override-expected.txt:
+        * platform/chromium-mac/fast/forms/input-appearance-height-expected.txt:
+        * platform/chromium-mac/fast/forms/range/input-appearance-range-expected.txt: Added.
+        * platform/chromium-mac/fast/forms/range/range-thumb-height-percentage-expected.txt: Renamed from LayoutTests/platform/chromium/fast/forms/range/range-thumb-height-percentage-expected.txt.
+        * platform/chromium-mac/fast/forms/range/slider-padding-expected.txt: Added.
+        * platform/chromium-mac/fast/forms/range/slider-thumb-shared-style-expected.txt:
+        * platform/chromium-mac/fast/forms/range/slider-thumb-stylability-expected.txt:
+        * platform/chromium-mac/fast/hidpi/video-controls-in-hidpi-expected.txt:
+        * platform/chromium-mac/fast/layers/video-layer-expected.txt:
+        * platform/chromium-mac/fast/repaint/slider-thumb-drag-release-expected.txt: Added.
+        * platform/chromium-mac/fast/repaint/slider-thumb-float-expected.txt: Removed.
+        * platform/chromium-mac/media/audio-controls-rendering-expected.txt:
+        * platform/chromium-mac/media/audio-repaint-expected.txt:
+        * platform/chromium-mac/media/controls-after-reload-expected.txt:
+        * platform/chromium-mac/media/controls-strict-expected.txt:
+        * platform/chromium-mac/media/controls-styling-expected.txt:
+        * platform/chromium-mac/media/controls-styling-strict-expected.txt:
+        * platform/chromium-mac/media/controls-without-preload-expected.txt:
+        * platform/chromium-mac/media/media-controls-clone-expected.txt:
+        * platform/chromium-mac/media/media-document-audio-repaint-expected.txt:
+        * platform/chromium-mac/media/video-controls-rendering-expected.txt:
+        * platform/chromium-mac/media/video-display-toggle-expected.txt:
+        * platform/chromium-mac/media/video-empty-source-expected.png:
+        * platform/chromium-mac/media/video-empty-source-expected.txt:
+        * platform/chromium-mac/media/video-no-audio-expected.txt:
+        * platform/chromium-mac/media/video-playing-and-pause-expected.txt:
+        * platform/chromium-mac/media/video-zoom-controls-expected.txt:
+        * platform/chromium-mac/platform/chromium/virtual/gpu/fast/hidpi/video-controls-in-hidpi-expected.txt:
+        * platform/chromium-win-xp/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt: Removed.
+        * platform/chromium-win-xp/fast/forms/range/slider-thumb-stylability-expected.txt: Removed.
+        * platform/chromium-win-xp/fast/repaint/slider-thumb-float-expected.txt: Removed.
+        * platform/chromium-win/fast/dom/HTMLInputElement/input-slider-update-expected.txt:
+        * platform/chromium-win/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt:
+        * platform/chromium-win/fast/forms/box-shadow-override-expected.txt:
+        * platform/chromium-win/fast/forms/input-appearance-height-expected.txt:
+        * platform/chromium-win/fast/forms/range/input-appearance-range-expected.txt:
+        * platform/chromium-win/fast/forms/range/range-thumb-height-percentage-expected.txt:
+        * platform/chromium-win/fast/forms/range/slider-padding-expected.txt:
+        * platform/chromium-win/fast/forms/range/slider-thumb-shared-style-expected.txt:
+        * platform/chromium-win/fast/forms/range/slider-thumb-stylability-expected.txt:
+        * platform/chromium-win/fast/multicol/client-rects-expected.txt:
+        * platform/chromium-win/fast/repaint/slider-thumb-drag-release-expected.txt:
+        * platform/chromium-win/fast/repaint/slider-thumb-float-expected.txt:
+        * platform/chromium-win/media/video-empty-source-expected.txt:
+        * platform/chromium/TestExpectations:
+        * platform/chromium/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt: Renamed from LayoutTests/platform/chromium-mac/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt.
+        * platform/chromium/fast/forms/range/slider-thumb-shared-style-expected.txt: Removed.
+        * platform/chromium/fast/multicol/client-rects-expected.txt: Added.
+        * platform/chromium/fast/repaint/slider-thumb-float-expected.txt: Renamed from LayoutTests/platform/mac/fast/repaint/slider-thumb-float-expected.txt.
+        * platform/mac/fast/dom/HTMLInputElement/input-slider-update-styled-expected.txt: Removed.
+        * platform/mac/fast/forms/range/slider-thumb-stylability-expected.txt: Removed.
+        * platform/win-future/fast/forms/range/range-thumb-height-percentage-expected.txt: Copied from LayoutTests/fast/forms/range/range-thumb-height-percentage-expected.txt.
+
+2012-11-28  Antoine Quint  <graouts@apple.com>
+
+        Calling .removeCue() for a cue that was never added should raise a NOT_FOUND_ERR
+        https://bugs.webkit.org/show_bug.cgi?id=103412
+
+        Reviewed by Eric Carlson.
+
+        Updating the .removeCue() test checking on the exception to be NOT_FOUND_ERR instead
+        of INVALID_STATE_ERR.
+
+        * media/track/track-add-remove-cue-expected.txt:
+        * media/track/track-add-remove-cue.html:
+
+2012-11-28  Stephen Chenney  <schenney@chromium.org>
+
+        Layout Test svg/animations/mpath-remove-from-dependents-on-delete-crash.html is flaky
+        https://bugs.webkit.org/show_bug.cgi?id=103375
+
+        Unreviewed test update.
+
+        According to the original bug, at least 4 iterations were required to
+        crash (without the fix). To make the test faster, I've reduced the max
+        iteration count to 5, rather than 10. This may not fix the timeoout
+        issue because it might be a real timeout, not just a slow test.
+
+        * svg/animations/mpath-remove-from-dependents-on-delete-crash.html:
+
+2012-11-28  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        [chromium] Allow plugins to opt-in to receive synthetic mouse events out of touch events.
+        https://bugs.webkit.org/show_bug.cgi?id=103092
+
+        Reviewed by Tony Chang.
+
+        Add test for synthesized mouse events from touch (and update existing tests).
+
+        * platform/chromium/plugins/touch-events-details.html:
+        * platform/chromium/plugins/touch-events-synthesized-expected.txt: Added.
+        * platform/chromium/plugins/touch-events-synthesized.html: Copied from LayoutTests/platform/chromium/plugins/touch-events.html.
+        * platform/chromium/plugins/touch-events.html:
+        * platform/chromium/plugins/transformed-events.html:
+
+2012-11-28  Sadrul Habib Chowdhury  <sadrul@chromium.org>
+
+        Fix gesture scrolling when the target-element of scroll-begin is removed
+        https://bugs.webkit.org/show_bug.cgi?id=103355
+
+        Reviewed by Antonio Gomes.
+
+        Added a test that starts a touch-scroll, removes the initial element under the
+        touch-point, and scrolls some more, to test that the scrolling happens correctly
+        after the element is removed.
+
+        * fast/events/touch/gesture/touch-gesture-scroll-remove-node-expected.txt: Added.
+        * fast/events/touch/gesture/touch-gesture-scroll-remove-node.html: Added.
+
+2012-11-28  Jussi Kukkonen  <jussi.kukkonen@intel.com>
+
+        [EFL][WK2] add flaky results after r135935
+        https://bugs.webkit.org/show_bug.cgi?id=103514
+
+        Unreviewed gardening: add flaky results after r135935 enabled
+        loads of reftests. Also move the existing flaky results from efl
+        to efl-wk2 since this does not concern WK1.
+
+        * platform/efl-wk2/TestExpectations:
+        * platform/efl/TestExpectations:
+
+2012-11-28  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        Move childrenAffectedBy bits from RenderStyle to Element
+        https://bugs.webkit.org/show_bug.cgi?id=101448
+        https://bugs.webkit.org/show_bug.cgi?id=98021
+
+        Reviewed by Antti Koivisto.
+        New test-case by Takashi Sakamoto
+
+        * fast/css/nth-child-not-in-rightmost-expected.html: Added.
+        * fast/css/nth-child-not-in-rightmost.html: Added.
+        * touchadjustment/event-triggered-widgets.html: Fix bug exposed by patch.
+
+2012-11-28  Kent Tamura  <tkent@chromium.org>
+
+        Merge tests for date pseudo classes into one
+        https://bugs.webkit.org/show_bug.cgi?id=103489
+
+        Reviewed by Kentaro Hara.
+
+        date-appearance-pseudo-classes.html doesn't need to be a pixel
+        test because "how css properties are applied" is tested in
+        date-appearance-basic.html. Checking querySelectorAll result is
+        enough to check pseudo classes support, and we can convert the
+        test to a dumpAsText test.
+
+        Also, we should remove type=date dependencies in
+        fast/css/pseudo-*.html because some platforms don't enable
+        INPUT_TYPE_DATE and we had better put such tests into one place,
+        fast/forms/date/.
+
+        * fast/css/pseudo-in-range-expected.txt:
+        * fast/css/pseudo-in-range-invalid-value-expected.txt:
+        * fast/css/pseudo-out-of-range-expected.txt:
+        * fast/css/script-tests/pseudo-in-range-invalid-value.js:
+        * fast/css/script-tests/pseudo-in-range.js:
+        * fast/css/script-tests/pseudo-out-of-range.js:
+        * fast/forms/date/date-appearance-pseudo-classes-expected.txt: Removed.
+        * fast/forms/date/date-appearance-pseudo-classes.html: Removed.
+        * fast/forms/date/date-pseudo-classes-expected.txt: Added.
+        * fast/forms/date/date-pseudo-classes.html: Added.
+        * fast/forms/resources/common-pseudo-classes.js: Added.
+        * platform/chromium-linux/fast/forms/date/date-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/forms/date/date-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/forms/date/date-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-mac/fast/forms/date/date-appearance-pseudo-classes-expected.png: Removed.
+        * platform/chromium-win/fast/forms/date/date-appearance-pseudo-classes-expected.png: Removed.
+        * platform/efl/TestExpectations:
+        * platform/gtk/TestExpectations:
+        * platform/mac/TestExpectations:
+        * platform/qt/TestExpectations:
+        * platform/win/TestExpectations:
+
+2012-11-28  Tommy Widenflycht  <tommyw@google.com>
+
+        Add basic implementation for MediaStreamAudioDestinationNode
+        https://bugs.webkit.org/show_bug.cgi?id=101815
+
+        Reviewed by Chris Rogers.
+
+        * webaudio/mediastreamaudiodestinationnode-expected.txt: Added.
+        * webaudio/mediastreamaudiodestinationnode.html: Added.
+
+2012-11-28  Jaehun Lim  <ljaehun.lim@samsung.com>
+
+        [EFL][WK1] Gardening AC testcases in efl-wk1
+        https://bugs.webkit.org/show_bug.cgi?id=103488
+
+        Unreviewed, EFL gardening.
+
+        efl-wk1 doesn't fully support AC.
+
+        * platform/efl-wk1/TestExpectations:
+
+2012-11-27  Mike West  <mkwst@chromium.org>
+
+        Improve WebSocketChannel connection failure console messages.
+        https://bugs.webkit.org/show_bug.cgi?id=103448
+
+        Reviewed by Adam Barth.
+
+        * http/tests/websocket/tests/hybi/bad-handshake-crash-expected.txt:
+        * http/tests/websocket/tests/hybi/broken-utf8-expected.txt:
+        * http/tests/websocket/tests/hybi/close-before-open-expected.txt:
+        * http/tests/websocket/tests/hybi/close-code-and-reason-expected.txt:
+        * http/tests/websocket/tests/hybi/close-expected.txt:
+        * http/tests/websocket/tests/hybi/compressed-control-frame-expected.txt:
+        * http/tests/websocket/tests/hybi/deflate-frame-invalid-parameter-expected.txt:
+        * http/tests/websocket/tests/hybi/fragmented-control-frame-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-error-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-fail-by-extensions-header-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-fail-by-maxlength-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-fail-by-mismatch-protocol-header-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-fail-by-more-accept-header-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-fail-by-more-protocol-header-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-fail-by-no-accept-header-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-fail-by-no-connection-header-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-fail-by-no-cr-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-fail-by-no-upgrade-header-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-fail-by-prepended-null-expected.txt:
+        * http/tests/websocket/tests/hybi/handshake-fail-by-wrong-accept-header-expected.txt:
+        * http/tests/websocket/tests/hybi/interleaved-fragments-expected.txt:
+        * http/tests/websocket/tests/hybi/invalid-continuation-expected.txt:
+        * http/tests/websocket/tests/hybi/invalid-encode-length-expected.txt:
+        * http/tests/websocket/tests/hybi/invalid-masked-frames-from-server-expected.txt:
+        * http/tests/websocket/tests/hybi/long-control-frame-expected.txt:
+        * http/tests/websocket/tests/hybi/long-invalid-header-expected.txt:
+        * http/tests/websocket/tests/hybi/reserved-bits-expected.txt:
+        * http/tests/websocket/tests/hybi/reserved-opcodes-expected.txt:
+        * http/tests/websocket/tests/hybi/send-file-blob-fail-expected.txt:
+        * http/tests/websocket/tests/hybi/too-long-payload-expected.txt:
+        * http/tests/websocket/tests/hybi/websocket-event-target-expected.txt:
+        * http/tests/websocket/tests/hybi/workers/close-code-and-reason-expected.txt:
+        * http/tests/websocket/tests/hybi/workers/close-expected.txt:
+            Update test expectations with the new error messages.
+
 2012-11-27  Alexander Pavlov  <apavlov@chromium.org>
 
         [Chromium] Unreviewed, mark http/tests/inspector/indexeddb/database-data.html as flaky on Linux, too.

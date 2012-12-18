@@ -1,3 +1,216 @@
+2012-11-28  Filip Pizlo  <fpizlo@apple.com>
+
+        SpeculatedType dumping should not use the static char buffer[thingy] idiom
+        https://bugs.webkit.org/show_bug.cgi?id=103584
+
+        Reviewed by Michael Saboff.
+
+        Changed SpeculatedType to be "dumpable" by saying things like:
+        
+        dataLog("thingy = ", SpeculationDump(thingy))
+        
+        Removed the old stringification functions, and changed all code that referred to them
+        to use the new dataLog()/print() style.
+
+        * CMakeLists.txt:
+        * GNUmakefile.list.am:
+        * JavaScriptCore.xcodeproj/project.pbxproj:
+        * Target.pri:
+        * bytecode/SpeculatedType.cpp:
+        (JSC::dumpSpeculation):
+        (JSC::speculationToAbbreviatedString):
+        (JSC::dumpSpeculationAbbreviated):
+        * bytecode/SpeculatedType.h:
+        * bytecode/ValueProfile.h:
+        (JSC::ValueProfileBase::dump):
+        * bytecode/VirtualRegister.h:
+        (WTF::printInternal):
+        * dfg/DFGAbstractValue.h:
+        (JSC::DFG::AbstractValue::dump):
+        * dfg/DFGByteCodeParser.cpp:
+        (JSC::DFG::ByteCodeParser::injectLazyOperandSpeculation):
+        (JSC::DFG::ByteCodeParser::getPredictionWithoutOSRExit):
+        * dfg/DFGGraph.cpp:
+        (JSC::DFG::Graph::dump):
+        (JSC::DFG::Graph::predictArgumentTypes):
+        * dfg/DFGGraph.h:
+        (Graph):
+        * dfg/DFGStructureAbstractValue.h:
+        * dfg/DFGVariableAccessDataDump.cpp: Added.
+        (JSC::DFG::VariableAccessDataDump::VariableAccessDataDump):
+        (JSC::DFG::VariableAccessDataDump::dump):
+        * dfg/DFGVariableAccessDataDump.h: Added.
+        (VariableAccessDataDump):
+
+2012-11-28  Michael Saboff  <msaboff@apple.com>
+
+        Change Bytecompiler s_dumpsGeneratedCode to an Options value
+        https://bugs.webkit.org/show_bug.cgi?id=103588
+
+        Reviewed by Filip Pizlo.
+
+        Moved the control of dumping bytecodes to Options::dumpGeneratedBytecodes.
+
+        * bytecode/CodeBlock.cpp:
+        (JSC::CodeBlock::CodeBlock):
+        * bytecompiler/BytecodeGenerator.cpp:
+        * bytecompiler/BytecodeGenerator.h:
+        * jsc.cpp:
+        (runWithScripts):
+        * runtime/Options.h:
+
+2012-11-28  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        Copying phase should use work lists
+        https://bugs.webkit.org/show_bug.cgi?id=101390
+
+        Reviewed by Filip Pizlo.
+
+        * JavaScriptCore.xcodeproj/project.pbxproj:
+        * heap/BlockAllocator.cpp:
+        (JSC::BlockAllocator::BlockAllocator):
+        * heap/BlockAllocator.h: New RegionSet for CopyWorkListSegments.
+        (BlockAllocator):
+        (JSC::CopyWorkListSegment):
+        * heap/CopiedBlock.h: Added a per-block CopyWorkList to keep track of the JSCells that need to be revisited during the copying
+        phase to copy their backing stores.
+        (CopiedBlock):
+        (JSC::CopiedBlock::CopiedBlock): 
+        (JSC::CopiedBlock::didSurviveGC):
+        (JSC::CopiedBlock::didEvacuateBytes): There is now a one-to-one relationship between GCThreads and the CopiedBlocks they're 
+        responsible for evacuating, we no longer need any of that fancy compare and swap stuff. 
+        (JSC::CopiedBlock::pin):
+        (JSC::CopiedBlock::hasWorkList): 
+        (JSC::CopiedBlock::workList):
+        * heap/CopiedBlockInlines.h: Added.
+        (JSC::CopiedBlock::reportLiveBytes): Since we now have to grab a SpinLock to perform operations on the CopyWorkList during marking,
+        we don't need to do any of that fancy compare and swap stuff we were doing for tracking live bytes.
+        * heap/CopiedSpace.h:
+        (CopiedSpace):
+        * heap/CopiedSpaceInlines.h:
+        (JSC::CopiedSpace::pin):
+        * heap/CopyVisitor.cpp:
+        (JSC::CopyVisitor::copyFromShared): We now iterate over a range of CopiedBlocks rather than MarkedBlocks and revisit the cells in those
+        blocks' CopyWorkLists.
+        * heap/CopyVisitor.h:
+        (CopyVisitor):
+        * heap/CopyVisitorInlines.h:
+        (JSC::CopyVisitor::visitCell): The function responsible for calling the correct copyBackingStore() function for each JSCell from 
+        a CopiedBlock's CopyWorkList.
+        (JSC::CopyVisitor::didCopy): We no longer need to check if the block is empty here because we know exactly when we're done 
+        evacuating a CopiedBlock, which is when we've gone through all of the CopiedBlock's CopyWorkList.
+        * heap/CopyWorkList.h: Added.
+        (CopyWorkListSegment): Individual chunk of a CopyWorkList that is allocated from the BlockAllocator.
+        (JSC::CopyWorkListSegment::create):
+        (JSC::CopyWorkListSegment::size):
+        (JSC::CopyWorkListSegment::isFull):
+        (JSC::CopyWorkListSegment::get):
+        (JSC::CopyWorkListSegment::append):
+        (JSC::CopyWorkListSegment::CopyWorkListSegment):
+        (JSC::CopyWorkListSegment::data):
+        (JSC::CopyWorkListSegment::endOfBlock):
+        (CopyWorkListIterator): Responsible for giving CopyVisitors a contiguous notion of access across the separate CopyWorkListSegments
+        that make up each CopyWorkList.
+        (JSC::CopyWorkListIterator::get):
+        (JSC::CopyWorkListIterator::operator*):
+        (JSC::CopyWorkListIterator::operator->):
+        (JSC::CopyWorkListIterator::operator++):
+        (JSC::CopyWorkListIterator::operator==):
+        (JSC::CopyWorkListIterator::operator!=):
+        (JSC::CopyWorkListIterator::CopyWorkListIterator):
+        (CopyWorkList): Data structure that keeps track of the JSCells that need copying in a particular CopiedBlock.
+        (JSC::CopyWorkList::CopyWorkList):
+        (JSC::CopyWorkList::~CopyWorkList):
+        (JSC::CopyWorkList::append):
+        (JSC::CopyWorkList::begin):
+        (JSC::CopyWorkList::end):
+        * heap/GCThreadSharedData.cpp:
+        (JSC::GCThreadSharedData::GCThreadSharedData): We no longer use the m_blockSnapshot from the Heap during the copying phase.
+        (JSC::GCThreadSharedData::didStartCopying): We now copy the set of all blocks in the CopiedSpace to a separate vector for 
+        iterating over during the copying phase since the set stored in the CopiedSpace will change as blocks are evacuated and 
+        recycled throughout the copying phase.
+        * heap/GCThreadSharedData.h:
+        (GCThreadSharedData): 
+        * heap/Heap.h:
+        (Heap):
+        * heap/SlotVisitor.h: We now need to know the object who is being marked that has a backing store so that we can store it 
+        in a CopyWorkList to revisit later during the copying phase.
+        * heap/SlotVisitorInlines.h:
+        (JSC::SlotVisitor::copyLater):
+        * runtime/JSObject.cpp:
+        (JSC::JSObject::visitButterfly):
+
+2012-11-28  Filip Pizlo  <fpizlo@apple.com>
+
+        Disassembly methods should be able to disassemble to any PrintStream& rather than always using WTF::dataFile()
+        https://bugs.webkit.org/show_bug.cgi?id=103492
+
+        Reviewed by Mark Hahnenberg.
+
+        Switched disassembly code to use PrintStream&, and to use print() rather than printf().
+
+        * dfg/DFGDisassembler.cpp:
+        (JSC::DFG::Disassembler::dump):
+        (DFG):
+        (JSC::DFG::Disassembler::dumpDisassembly):
+        * dfg/DFGDisassembler.h:
+        (Disassembler):
+        * dfg/DFGGraph.cpp:
+        (JSC::DFG::printWhiteSpace):
+        (JSC::DFG::Graph::dumpCodeOrigin):
+        (JSC::DFG::Graph::printNodeWhiteSpace):
+        (JSC::DFG::Graph::dump):
+        (DFG):
+        (JSC::DFG::Graph::dumpBlockHeader):
+        * dfg/DFGGraph.h:
+        (Graph):
+        * jit/JITDisassembler.cpp:
+        (JSC::JITDisassembler::dump):
+        (JSC::JITDisassembler::dumpForInstructions):
+        (JSC::JITDisassembler::dumpDisassembly):
+        * jit/JITDisassembler.h:
+        (JITDisassembler):
+
+2012-11-28  Filip Pizlo  <fpizlo@apple.com>
+
+        It should be possible to say dataLog("count = ", count, "\n") instead of dataLogF("count = %d\n", count)
+        https://bugs.webkit.org/show_bug.cgi?id=103009
+
+        Reviewed by Michael Saboff.
+
+        Instead of converting all of JSC to use the new dataLog()/print() methods, I just changed
+        one place: dumping of abstract values. This is mainly just to ensure that the code I
+        added to WTF is actually doing things.
+
+        * bytecode/CodeBlock.cpp:
+        (JSC::CodeBlock::dump):
+        * dfg/DFGAbstractValue.h:
+        (JSC::DFG::AbstractValue::dump):
+        (WTF):
+        (WTF::printInternal):
+        * dfg/DFGStructureAbstractValue.h:
+        (JSC::DFG::StructureAbstractValue::dump):
+        (WTF):
+        (WTF::printInternal):
+
+2012-11-28  Oliver Hunt  <oliver@apple.com>
+
+        Make source cache include more information about the function extent.
+        https://bugs.webkit.org/show_bug.cgi?id=103552
+
+        Reviewed by Gavin Barraclough.
+
+        Add a bit more information to the source cache.
+
+        * parser/Parser.cpp:
+        (JSC::::parseFunctionInfo):
+           Store the function start offset
+        * parser/SourceProviderCacheItem.h:
+        (JSC::SourceProviderCacheItem::SourceProviderCacheItem):
+        (SourceProviderCacheItem):
+           Add additional field for the start of the real function string, and re-arrange
+           fields to avoid growing the struct.
+
 2012-11-27  Filip Pizlo  <fpizlo@apple.com>
 
         Convert some remaining uses of FILE* to PrintStream&.

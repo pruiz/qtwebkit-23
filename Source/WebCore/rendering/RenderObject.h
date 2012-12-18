@@ -241,7 +241,7 @@ public:
     // Function to return our enclosing flow thread if we are contained inside one.
     RenderFlowThread* enclosingRenderFlowThread() const;
 
-    RenderNamedFlowThread* enclosingRenderNamedFlowThread() const;
+    RenderNamedFlowThread* renderNamedFlowThreadWrapper() const;
 
     virtual bool isEmpty() const { return firstChild() == 0; }
 
@@ -985,6 +985,9 @@ protected:
     virtual void willBeRemovedFromTree();
 
 private:
+    void removeFromRenderFlowThread();
+    void removeFromRenderFlowThreadRecursive(RenderFlowThread*);
+
     RenderStyle* cachedFirstLineStyle() const;
     StyleDifference adjustStyleDifference(StyleDifference, unsigned contextSensitiveProperties) const;
 

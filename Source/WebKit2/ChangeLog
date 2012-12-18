@@ -1,3 +1,368 @@
+2012-11-28  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [Qt] The WebView should be flickable only using touch events
+        https://bugs.webkit.org/show_bug.cgi?id=100964
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Let a user interacting with the WebView using a mouse the same way that a
+        desktop browser would.
+        This allows normal behaviors like text selecting, hover events, mouse cursors
+        as well as avoid touch highlighting and touch adjustment.
+
+        To do so we let all mouse events to be handled by the page directly instead
+        of sending them to QtWebPageEventHandler. Since unhandled mouse events aren't
+        pushed back to the PageClient like touch events does, this have the intended
+        behavior of not letting mouse events affect QQuickFlickable.
+
+        * UIProcess/API/qt/qquickwebview.cpp:
+        * UIProcess/API/qt/qquickwebview_p_p.h:
+        (QQuickWebViewFlickablePrivate):
+
+2012-11-29  Andras Becsi  <andras.becsi@digia.com>
+
+        [Qt] Fix installation of QtWebProcess binary
+        https://bugs.webkit.org/show_bug.cgi?id=101735
+
+        Reviewed by Simon Hausmann.
+
+        If available use QLibraryInfo::LibraryExecutablesPath to find
+        the web process and the plugin process and deploy both helper
+        processes to QT_INSTALL_LIBEXECS.
+
+        The effective fallback used to find the helper processes becomes:
+            1. Application directory
+            2. Qt library executables directory (QLibraryInfo::LibraryExecutablesPath)
+            3. Qt binaries directory (QLibraryInfo::BinariesPath)
+            4. No absolute path used
+
+        * PluginProcess.pro:
+        * Shared/qt/ProcessExecutablePathQt.cpp:
+        (WebKit::executablePath):
+        * WebProcess.pro:
+
+2012-11-28  Ryuan Choi  <ryuan.choi@gmail.com>
+
+        [EFL] Generate big_button_theme.edj
+        https://bugs.webkit.org/show_bug.cgi?id=103511
+
+        Reviewed by Gyuyoung Kim.
+
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestEnvironment.cpp:
+        (EWK2UnitTest::EWK2UnitTestEnvironment::pathForTheme):
+        (EWK2UnitTest):
+        * UIProcess/API/efl/tests/UnitTestUtils/EWK2UnitTestEnvironment.h:
+        (EWK2UnitTestEnvironment):
+        * UIProcess/API/efl/tests/resources/big_button_theme.edj: Removed.
+        * UIProcess/API/efl/tests/test_ewk2_view.cpp: Modified to use generated big_button_theme.edj
+        (TEST_F):
+
+2012-11-28  Sheriff Bot  <webkit.review.bot@gmail.com>
+
+        Unreviewed, rolling out r135973.
+        http://trac.webkit.org/changeset/135973
+        https://bugs.webkit.org/show_bug.cgi?id=103604
+
+        It made API test crash on EFL bots (Requested by gyuyoung on
+        #webkit).
+
+        * UIProcess/API/efl/ewk_view.cpp:
+        (createEwkView):
+
+2012-11-28  Michael Pruett  <michael@68k.org>
+
+        IndexedDB: Remove duplicate toWireString() and createFromWire() methods in JSC SerializedScriptValue
+        https://bugs.webkit.org/show_bug.cgi?id=103554
+
+        Reviewed by Kentaro Hara.
+
+        In r135022, duplicate createFromWire() and toWireString() methods
+        were added to the JSC version of SerializedScriptValue. In
+        order to allow the JSC SerializedScriptValue to compile when
+        ENABLE(INDEXED_DATABASE) is turned on, these new methods have
+        been removed and the old methods have been moved outside the
+        ENABLE(INDEXED_DATABASE) guard.
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-28  Sam Weinig  <sam@webkit.org>
+
+        Fix 32bit build.
+
+        * Shared/mac/ObjCObjectGraphCoders.mm:
+        (WebKit::WebContextObjCObjectGraphDecoderImpl::decode):
+        (WebKit::InjectedBundleObjCObjectGraphDecoderImpl::decode):
+
+2012-11-28  Sam Weinig  <sam@webkit.org>
+
+        Add an objc object graph wrapper and coder for WKConnection message bodies
+        https://bugs.webkit.org/show_bug.cgi?id=103589
+
+        Reviewed by Anders Carlsson.
+
+        Adds a new type of UserMessageCoder for objc object graphs that allows encoding/decoding
+        WKBrowsingContextController across the wire.
+
+        * Shared/APIClient.h:
+        (APIClient):
+        (WebKit::APIClient::client):
+        Add accessor for the ClientInterface.
+
+        * Shared/APIObject.h:
+        Add new TypeObjCObjectGraph type.
+
+        * Shared/mac/ObjCObjectGraph.h: Added.
+        (ObjCObjectGraph):
+        (WebKit::ObjCObjectGraph::create):
+        (WebKit::ObjCObjectGraph::root):
+        (WebKit::ObjCObjectGraph::ObjCObjectGraph):
+        (WebKit::ObjCObjectGraph::type):
+        * Shared/mac/ObjCObjectGraph.mm: Added.
+        Wraps 
+
+        * Shared/mac/ObjCObjectGraphCoders.h: Added.
+        (WebContextObjCObjectGraphEncoder):
+        (WebContextObjCObjectGraphDecoder):
+        (InjectedBundleObjCObjectGraphEncoder):
+        (InjectedBundleObjCObjectGraphDecoder):
+        * Shared/mac/ObjCObjectGraphCoders.mm: Added.
+        (WebKit::typeFromObject):
+        (ObjCObjectGraphEncoder):
+        (WebKit::ObjCObjectGraphEncoder::baseEncode):
+        (WebKit::ObjCObjectGraphEncoder::ObjCObjectGraphEncoder):
+        (ObjCObjectGraphDecoder):
+        (WebKit::ObjCObjectGraphDecoder::baseDecode):
+        (WebKit::ObjCObjectGraphDecoder::ObjCObjectGraphDecoder):
+        (WebContextObjCObjectGraphEncoderImpl):
+        (WebKit::WebContextObjCObjectGraphEncoderImpl::WebContextObjCObjectGraphEncoderImpl):
+        (WebKit::WebContextObjCObjectGraphEncoderImpl::encode):
+        (WebContextObjCObjectGraphDecoderImpl):
+        (WebKit::WebContextObjCObjectGraphDecoderImpl::WebContextObjCObjectGraphDecoderImpl):
+        (WebKit::WebContextObjCObjectGraphDecoderImpl::decode):
+        (InjectedBundleObjCObjectGraphEncoderImpl):
+        (WebKit::InjectedBundleObjCObjectGraphEncoderImpl::InjectedBundleObjCObjectGraphEncoderImpl):
+        (WebKit::InjectedBundleObjCObjectGraphEncoderImpl::encode):
+        (InjectedBundleObjCObjectGraphDecoderImpl):
+        (WebKit::InjectedBundleObjCObjectGraphDecoderImpl::InjectedBundleObjCObjectGraphDecoderImpl):
+        (WebKit::InjectedBundleObjCObjectGraphDecoderImpl::decode):
+        (WebKit::WebContextObjCObjectGraphEncoder::WebContextObjCObjectGraphEncoder):
+        (WebKit::WebContextObjCObjectGraphEncoder::encode):
+        (WebKit::WebContextObjCObjectGraphDecoder::WebContextObjCObjectGraphDecoder):
+        (WebKit::WebContextObjCObjectGraphDecoder::decode):
+        (WebKit::InjectedBundleObjCObjectGraphEncoder::InjectedBundleObjCObjectGraphEncoder):
+        (WebKit::InjectedBundleObjCObjectGraphEncoder::encode):
+        (WebKit::InjectedBundleObjCObjectGraphDecoder::InjectedBundleObjCObjectGraphDecoder):
+        (WebKit::InjectedBundleObjCObjectGraphDecoder::decode):
+        Added.
+
+        * UIProcess/API/mac/WKBrowsingContextController.mm:
+        (+[WKBrowsingContextController _browsingContextControllerForPageRef:]):
+        * UIProcess/API/mac/WKBrowsingContextControllerInternal.h:
+        Expose the accessor to get the WKPageRef from a WKBrowsingContextController and add a 
+        new method to get a WKBrowsingContextController from a WKPageRef.
+
+        * UIProcess/API/mac/WKConnection.mm:
+        (-[WKConnection sendMessageWithName:body:]):
+        (didReceiveMessage):
+        Switch WKConnection to use ObjCObjectGraph to encode the messageBody.
+
+        * UIProcess/WebContextUserMessageCoders.h:
+        (WebKit::WebContextUserMessageEncoder::encode):
+        (WebKit::WebContextUserMessageDecoder::decode):
+        * WebProcess/InjectedBundle/InjectedBundleUserMessageCoders.h:
+        (WebKit::InjectedBundleUserMessageEncoder::encode):
+        (WebKit::InjectedBundleUserMessageDecoder::decode):
+        Proxy to ObjCObjectGraph coders when user message encoding/decoding ObjCObjectGraph APIObjects.
+
+        * WebProcess/InjectedBundle/API/mac/WKWebProcessPlugIn.mm:
+        (-[WKWebProcessPlugInController _browserContextControllerForBundlePageRef:]):
+        * WebProcess/InjectedBundle/API/mac/WKWebProcessPlugInInternal.h:
+        Add method to get WKWebProcessPlugInController from the WKBundlePageRef.
+
+        * WebKit2.xcodeproj/project.pbxproj:
+        Add new files.
+
+2012-11-28  Sergio Villar Senin  <svillar@igalia.com>
+
+        [WK2][Qt] Add drag&drop support to Flickable webView
+        https://bugs.webkit.org/show_bug.cgi?id=100778
+
+        Reviewed by Jocelyn Turcotte.
+
+        Enable the ItemAcceptsDrops flag in the flickable WebView. This
+        will allow the WebView to receive drag&drop events.
+
+        * UIProcess/API/qt/qquickwebview.cpp:
+        (QQuickWebViewPrivate::initialize):
+
+2012-11-28  Shinya Kawanaka  <shinyak@chromium.org>
+
+        [Shadow] Move Distribution stuffs from ShadowRoot
+        https://bugs.webkit.org/show_bug.cgi?id=103481
+
+        Reviewed by Hajime Morita.
+
+        * win/WebKit2.def:
+        * win/WebKit2CFLite.def:
+
+2012-11-28  Tim Horton  <timothy_horton@apple.com>
+
+        [mac] Dictionary lookup bubble loses intrarange formatting
+        https://bugs.webkit.org/show_bug.cgi?id=103496
+        <rdar://problem/12762172>
+
+        Reviewed by Alexey Proskuryakov.
+
+        Pass an NSAttributedString (made via WebHTMLConverter on the WebProcess side) through
+        when showing dictionary popups, so that we preserve more formatting in the yellow dictionary
+        highlight. Also, remove the fontInfo member from DictionaryPopupInfo, since we don't need it anymore.
+
+        * Shared/DictionaryPopupInfo.cpp:
+        (WebKit::DictionaryPopupInfo::encode): Don't encode the now-removed fontInfo member.
+        (WebKit::DictionaryPopupInfo::decode): Don't decode the now-removed fontInfo member.
+        * Shared/DictionaryPopupInfo.h: Remove the fontInfo member.
+        * UIProcess/API/mac/PageClientImpl.h:
+        (PageClientImpl): didPerformDictionaryLookup should take an AttributedString instead of a plain String, and
+        no longer needs to take the page scale factor.
+        * UIProcess/API/mac/PageClientImpl.mm:
+        (WebKit::PageClientImpl::didPerformDictionaryLookup): Use the AttributedString we're handed from the WebProcess
+        instead of constructing one ourselves; this way, we have all the attributes instead of just a single font.
+        * UIProcess/PageClient.h:
+        (PageClient): didPerformDictionaryLookup should take an AttributedString instead of a plain String.
+        * UIProcess/WebPageProxy.h:
+        (WebPageProxy): didPerformDictionaryLookup should take an AttributedString instead of a plain String.
+        * UIProcess/WebPageProxy.messages.in: DidPerformDictionaryLookup should take an AttributedString instead of a plain String.
+        * UIProcess/mac/WebPageProxyMac.mm:
+        (WebKit::WebPageProxy::didPerformDictionaryLookup): didPerformDictionaryLookup should take an AttributedString instead of a plain String.
+        * WebProcess/WebPage/mac/WebPageMac.mm:
+        (WebKit::WebPage::performDictionaryLookupForRange): performDictionaryLookupForRange should hand WebPageProxy an AttributedString
+        constructed via WebHTMLConverter instead of a plain text string paired with a single font descriptor.
+        Also, scale the size of every font attribute by the current pageScaleFactor.
+
+2012-11-28  peavo@outlook.com  <peavo@outlook.com>
+
+        [WinCairo] Crash when requesting favicon.
+        https://bugs.webkit.org/show_bug.cgi?id=102689
+
+        Reviewed by Brent Fulgham.
+
+        * win/WebKit2CFLite.def: Link fixes.
+        * win/WebKit2.def: Link fixes.
+
+2012-11-28  Christophe Dumez  <christophe.dumez@intel.com>
+
+        Regression(r135962): m_pendingSyncBackingStores needs to be cleared in LayerTreeRenderer::purgeGLResources()
+        https://bugs.webkit.org/show_bug.cgi?id=103527
+
+        Reviewed by Jocelyn Turcotte.
+
+        Make sure m_pendingSyncBackingStores is cleared in
+        LayerTreeRenderer::purgeGLResources() to avoid trying to assign
+        backing store to layers after everything has been invalidated.
+
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::purgeGLResources):
+
+2012-11-28  Christophe Dumez  <christophe.dumez@intel.com>
+
+        Regression(r135962): ASSERTION FAILED: !m_pedningSyncBackingStores.contains(layer)
+        https://bugs.webkit.org/show_bug.cgi?id=103498
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        We hit the !m_pedningSyncBackingStores.contains(layer) assertion
+        in LayerTreeRenderer when 2 asynchronous backing store operations
+        are pending. The current code checks if the layer already has a
+        backing store in its guard but this is insufficient as it is not
+        checking the m_pendingSyncBackingStores hash for pending backing
+        store changes.
+
+        In this patch, we improve the guards in createBackingStoreIfNeeded()
+        and removeBackingStoreIfNeeded() to check not only if the layer has
+        already a backing store but also check m_pendingSyncBackingStores
+        for pending changes. This is safer and it allows for optimizations
+        in the cases where we have both a removal and a creation pending.
+        In those cases, we can simply cancel the pending operation instead
+        of queueing a new one.
+
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::getBackingStore):
+        (WebKit::LayerTreeRenderer::createBackingStoreIfNeeded):
+        (WebKit::LayerTreeRenderer::removeBackingStoreIfNeeded):
+        (WebKit::LayerTreeRenderer::commitPendingBackingStoreOperations):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+
+2012-11-28  Kenneth Rohde Christiansen  <kenneth@webkit.org>
+
+        [EFL][WK2] MiniBrowser rendering should not get blurry when scrolled down with different scale values
+        https://bugs.webkit.org/show_bug.cgi?id=103079
+
+        Reviewed by Simon Hausmann.
+
+        The problem was caused because we moved the page inside our viewport
+        in non-discrete units.
+
+        Now instead of changing the content visible in our viewport by
+        applying scale, and then transforming the CSS offset, we now first
+        discretely position the page in UI coordinates.
+
+        This patch also removes some dead code.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::transformFromScene):
+        (EwkViewImpl::displayTimerFired):
+
+           Transform according to the page position.
+
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (EwkViewImpl::setPagePosition): Now stores a float.
+        (EwkViewImpl::discretePagePosition): Returns the discrete page position.
+        (EwkViewImpl):
+        * UIProcess/efl/PageClientLegacyImpl.cpp:
+        (WebKit::PageClientLegacyImpl::updateViewportSize):
+        (WebKit::PageClientLegacyImpl::pageDidRequestScroll):
+        * UIProcess/efl/PageViewportControllerClientEfl.cpp:
+        (WebKit::PageViewportControllerClientEfl::PageViewportControllerClientEfl):
+        (WebKit::PageViewportControllerClientEfl::setViewportPosition): Convert to page position.
+        (WebKit::PageViewportControllerClientEfl::setContentsScale):
+        (WebKit::PageViewportControllerClientEfl::didResumeContent):
+        * UIProcess/efl/PageViewportControllerClientEfl.h:
+        (WebKit::PageViewportControllerClientEfl::scaleFactor): Use the value
+        from the view directly.
+        (WebKit::PageViewportControllerClientEfl::contentPosition):
+        (PageViewportControllerClientEfl):
+
+2012-11-28  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [EFL][WK2][AC] No need to export GL properties from EwkViewImpl class
+        https://bugs.webkit.org/show_bug.cgi?id=103505
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        No need to export GL data members from EwkViewImpl class, 
+        those are internal implementation objects not used by anyone outside the class.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::displayTimerFired):
+        (EwkViewImpl::createGLSurface):
+        * UIProcess/API/efl/EwkViewImpl.h:
+        (EwkViewImpl):
+        (EwkViewImpl::evasGLContext):
+        (EwkViewImpl::evasGLSurface):
+
+2012-11-28  Joone Hur  <joone.hur@intel.com>
+
+        [EFL][WK2][AC] Clear the viewport with white color
+        https://bugs.webkit.org/show_bug.cgi?id=103495
+
+        When initializing a GL surface, we should clear the buffer with white color.
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        * UIProcess/API/efl/EwkViewImpl.cpp:
+        (EwkViewImpl::createGLSurface):
+
 2012-11-27  Jinwoo Song  <jinwoo7.song@samsung.com>
 
         [EFL][WK2] Duplicated WebPageGroup initialization

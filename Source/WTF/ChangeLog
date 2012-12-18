@@ -1,3 +1,91 @@
+2012-11-28  Filip Pizlo  <fpizlo@apple.com>
+
+        SpeculatedType dumping should not use the static char buffer[thingy] idiom
+        https://bugs.webkit.org/show_bug.cgi?id=103584
+
+        Reviewed by Michael Saboff.
+
+        Added a StringPrintStream, and made it easy to create dumpers for typedefs to primitives.
+
+        * GNUmakefile.list.am:
+        * WTF.gypi:
+        * WTF.pro:
+        * WTF.vcproj/WTF.vcproj:
+        * WTF.xcodeproj/project.pbxproj:
+        * wtf/CMakeLists.txt:
+        * wtf/PrintStream.cpp:
+        (WTF::dumpCharacter):
+        * wtf/PrintStream.h:
+        (WTF::printInternal):
+        * wtf/StringPrintStream.cpp: Added.
+        (WTF::StringPrintStream::StringPrintStream):
+        (WTF::StringPrintStream::~StringPrintStream):
+        (WTF::StringPrintStream::vprintf):
+        (WTF::StringPrintStream::toCString):
+        (WTF::StringPrintStream::increaseSize):
+        * wtf/StringPrintStream.h: Added.
+        (StringPrintStream):
+        (WTF::toCString):
+
+2012-11-28  Michael Saboff  <msaboff@apple.com>
+
+        Update String Stats for recent dataLog changes and add summary
+        https://bugs.webkit.org/show_bug.cgi?id=103583
+
+        Reviewed by Filip Pizlo.
+
+        Updated calls to dataLog() to dataLogF() as a results of r135469.
+        Added total savings from 8 bit strings in bytes and as a percentage.
+
+        * wtf/text/StringImpl.cpp:
+        (WTF::StringStats::printStats):
+
+2012-11-28  Roger Fong  <roger_fong@apple.com>
+
+        Make DataLog work/compile properly on Windows.
+        https://bugs.webkit.org/show_bug.cgi?id=103544
+
+        Reviewed by Filip Pizlo.
+
+        * wtf/DataLog.cpp:
+        (WTF::initializeLogFileOnce):
+
+2012-11-28  Filip Pizlo  <fpizlo@apple.com>
+
+        It should be possible to say dataLog("count = ", count, "\n") instead of dataLogF("count = %d\n", count)
+        https://bugs.webkit.org/show_bug.cgi?id=103009
+
+        Reviewed by Michael Saboff.
+
+        Added the ability to use out.print(...) and dataLog(...) variadically and with
+        WTF::printInternal(PrintStream&, const T&) overloads for any type T that you want
+        to be able to pass as an argument to out.print() or dataLog(). Also added one
+        example class for doing this: RawPointer, which can be used to force a pointer
+        to be printed as "%p" rather than matching any overloads that you might want to
+        introduce.
+
+        * GNUmakefile.list.am:
+        * WTF.gypi:
+        * WTF.pro:
+        * WTF.vcproj/WTF.vcproj:
+        * WTF.xcodeproj/project.pbxproj:
+        * wtf/CMakeLists.txt:
+        * wtf/DataLog.h:
+        (WTF):
+        (WTF::dataLog):
+        * wtf/PrintStream.cpp:
+        (WTF::printInternal):
+        (WTF):
+        * wtf/PrintStream.h:
+        (PrintStream):
+        (WTF::PrintStream::print):
+        (WTF):
+        * wtf/RawPointer.h: Added.
+        (WTF):
+        (RawPointer):
+        (WTF::RawPointer::RawPointer):
+        (WTF::RawPointer::value):
+
 2012-11-27  Filip Pizlo  <fpizlo@apple.com>
 
         Convert some remaining uses of FILE* to PrintStream&.

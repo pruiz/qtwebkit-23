@@ -486,7 +486,10 @@ QWebFrame::QWebFrame(QWebPage *parent, QWebFrameData *frameData)
 
     if (!frameData->url.isEmpty()) {
         WebCore::ResourceRequest request(frameData->url, frameData->referrer);
-        d->frame->loader()->load(request, frameData->name, false);
+        WebCore::FrameLoadRequest loadRequest(d->frame, request);
+        loadRequest.setFrameName(frameData->name);
+        loadRequest.setShouldCheckNewWindowPolicy(true);
+        d->frame->loader()->load(loadRequest);
     }
 #if ENABLE(ORIENTATION_EVENTS)
     connect(&d->m_orientation, SIGNAL(readingChanged()), this, SLOT(_q_orientationChanged()));
@@ -878,7 +881,7 @@ void QWebFrame::load(const QNetworkRequest &req,
     if (!body.isEmpty())
         request.setHTTPBody(WebCore::FormData::create(body.constData(), body.size()));
 
-    d->frame->loader()->load(request, false);
+    d->frame->loader()->load(FrameLoadRequest(d->frame, request));
 
     if (d->parentFrame())
         d->page->d->insideOpenCall = false;

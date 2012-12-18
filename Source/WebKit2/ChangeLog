@@ -1,3 +1,327 @@
+2012-11-29  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [CoordinatedGraphics] Use OwnPtr for LayerMap's layers in LayerTreeRenderer
+        https://bugs.webkit.org/show_bug.cgi?id=103650
+
+        Reviewed by Noam Rosenthal.
+
+        We currently store raw pointers to WebCore::GraphicsLayer in the LayerMap
+        meaning that we need to delete them manually. This patch leverages smart
+        pointers and stores layers as OwnPtr in the LayerMap so that the layers
+        are owned by the HashMap and we don't have to handle memory manually.
+
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::adjustPositionForFixedLayers):
+        (WebKit::LayerTreeRenderer::setLayerChildren):
+        (WebKit::LayerTreeRenderer::deleteLayer):
+        (WebKit::LayerTreeRenderer::ensureLayer):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+
+2012-11-29  Anders Carlsson  <andersca@apple.com>
+
+        Add a minimumLayoutWidth WKView property
+        https://bugs.webkit.org/show_bug.cgi?id=103660
+        <rdar://problem/11791729>
+
+        Reviewed by Beth Dakin.
+
+        When minimumLayoutWidth is set to a positive value, the WKView will update its intrinsic content size given the layout width.
+
+        * UIProcess/API/mac/PageClientImpl.h:
+        * UIProcess/API/mac/PageClientImpl.mm:
+        (WebKit::PageClientImpl::intrinsicContentSizeDidChange):
+        Call the WKView.
+
+        * UIProcess/API/mac/WKView.mm:
+        (-[WKView intrinsicContentSize]):
+        Override the intrinsicContentSize getter.
+
+        (-[WKView _setIntrinsicContentSize:]):
+        Update the intrinsic content size and mark it as invalid.
+
+        (-[WKView initWithFrame:contextRef:pageGroupRef:relatedToPage:]):
+        By default, the WKView should have no intrinsic size.
+
+        (-[WKView minimumLayoutWidth]):
+        (-[WKView setMinimumLayoutWidth:]):
+        Call through to the WebPageProxy object.
+
+        * UIProcess/API/mac/WKViewPrivate.h:
+        Add the SPI here.
+
+        * UIProcess/DrawingAreaProxy.h:
+        (WebKit::DrawingAreaProxy::minimumLayoutWidthDidChange):
+        (WebKit::DrawingAreaProxy::didUpdateGeometry):
+        (WebKit::DrawingAreaProxy::intrinsicContentSizeDidChange):
+        Add empty stubs.
+
+        * UIProcess/DrawingAreaProxy.messages.in:
+        Update the DidUpdateGeometry signature and add IntrinsicContentSizeDidChange.
+
+        * UIProcess/WebPageProxy.cpp:
+        (WebKit::WebPageProxy::WebPageProxy):
+        Initialize the minimum layout width.
+
+        (WebKit::WebPageProxy::setMinimumLayoutWidth):
+        Update the minimum layout width and call the drawing area proxy.
+
+        * UIProcess/WebPageProxy.h:
+        (WebKit::WebPageProxy::minimumLayoutWidth):
+        Add getter.
+
+        * UIProcess/mac/TiledCoreAnimationDrawingAreaProxy.h:
+        (TiledCoreAnimationDrawingAreaProxy):
+        * UIProcess/mac/TiledCoreAnimationDrawingAreaProxy.mm:
+        (WebKit::TiledCoreAnimationDrawingAreaProxy::minimumLayoutWidthDidChange):
+        Update the geometry if needed.
+
+        (WebKit::TiledCoreAnimationDrawingAreaProxy::didUpdateGeometry):
+        Update the intrinsic content size.
+
+        (WebKit::TiledCoreAnimationDrawingAreaProxy::intrinsicContentSizeDidChange):
+        Call through to WebPageProxy::intrinsicContentSizeDidChange.
+
+        (WebKit::TiledCoreAnimationDrawingAreaProxy::sendUpdateGeometry):
+        Pass along the minimum layout width.
+
+        * UIProcess/mac/WebPageProxyMac.mm:
+        (WebKit::WebPageProxy::intrinsicContentSizeDidChange):
+        Call through to the page client.
+
+        * WebProcess/WebCoreSupport/WebChromeClient.cpp:
+        (WebKit::WebChromeClient::contentsSizeChanged):
+        Call DrawingArea::mainFrameContentSizeChanged.
+
+        * WebProcess/WebPage/DrawingArea.h:
+        (WebKit::DrawingArea::mainFrameContentSizeChanged):
+        Add empty stub.
+
+        (WebKit::DrawingArea::updateGeometry):
+        Update signature.
+
+        * WebProcess/WebPage/DrawingArea.messages.in:
+        Add minimumLayoutWidth to UpdateGeometry.
+
+        * WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.h:
+        * WebProcess/WebPage/mac/TiledCoreAnimationDrawingArea.mm:
+        (WebKit::TiledCoreAnimationDrawingArea::mainFrameContentSizeChanged):
+        If the content size change is not coming from updateGeometry, send an InstrinsicContentSizeDidChange message.
+
+        (WebKit::TiledCoreAnimationDrawingArea::updateGeometry):
+        If m_minimumLayoutWidth is positive, do an initial layout pass to figure out the height of the page and then do another
+        layout with the viewport set to that height.
+
+2012-11-29  Anders Carlsson  <andersca@apple.com>
+
+        CoreIPC::Connection should retain its xpc_connection_t
+        https://bugs.webkit.org/show_bug.cgi?id=103671
+        <rdar://problem/12717331>
+
+        Reviewed by Beth Dakin.
+
+        * Platform/CoreIPC/mac/ConnectionMac.cpp:
+        (CoreIPC::Connection::platformInitialize):
+        Retain the xpc_connection_t object here to balance the xpc_object_release in platformInvalidate.
+
+2012-11-29  Brent Fulgham  <bfulgham@webkit.org>
+
+        [Windows, WinCairo] Unreviewed build fix.  Build was failing
+        because the export definition file included a debug-only
+        symbol.  It's not needed and shouldn't be included for export.
+
+        * win/WebKit2.def: Don't require notSolidColor to be exported.
+        * win/WebKit2CFLite.def: Ditto.
+
+2012-11-29  Tim Horton  <timothy_horton@apple.com>
+
+        PDFPlugin: Only plain text can be copied out of PDFs
+        https://bugs.webkit.org/show_bug.cgi?id=103591
+        <rdar://problem/12555161>
+
+        Reviewed by Alexey Proskuryakov.
+
+        Enable rich data to be copied from PDFKit to the pasteboard.
+
+        * WebProcess/Plugins/PDF/PDFPlugin.h:
+        (PDFPlugin): Add writeItemsToPasteboard.
+        * WebProcess/Plugins/PDF/PDFPlugin.mm:
+        (-[WKPDFLayerControllerDelegate writeItemsToPasteboard:withTypes:]): Move implementation to PDFPlugin.
+        (WebKit::PDFPlugin::writeItemsToPasteboard): Don't round-trip through WebCore for pasteboard operations,
+        use WebContext directly. This provides a simple way to hand over a buffer for complex pasteboard types
+        (RTF, HTML, etc.). Use this interface for arbitrary non-plain-text pasteboard data that PDFKit hands us.
+
+2012-11-29  Martin Robinson  <mrobinson@igalia.com>
+
+        [GTK] [WebKit2] Embed the HTTP authentication dialog into the WebView
+        https://bugs.webkit.org/show_bug.cgi?id=103277
+
+        Reviewed by Carlos Garcia Campos.
+
+        Embed the WebKit2 HTTP authentication dialog into the WebView. Add the dialog as a child
+        of the WebKitWebViewBase container (like the web inspector).
+
+        We do not yet properly handle pages that require authentication for more than one resource.
+        As that is an uncommon situation, it will be handled in another patch.
+
+        * UIProcess/API/gtk/WebKit2GtkAuthenticationDialog.cpp:
+        (WebKit::drawSignal): We have to override the draw signal of the dialog to draw
+        a GtkWindow background on the widget. This is required because the widget doesn't
+        have a real GtkWindow to draw its background.
+        (WebKit::loadChangedSignal): When a new load starts in the WebView destroy the dialog. This
+        is so that the dialog doesn't stick around when the user chooses to navigate away from the
+        page requiring authentication.
+        (WebKit::WebKit2GtkAuthenticationDialog::WebKit2GtkAuthenticationDialog): Create an eventbox
+        and frame to hold the dialog contents. Also append the 'background' widget class to the
+        event box, so that it can draw a GtkWindow background in the draw signal handler.
+        (WebKit::WebKit2GtkAuthenticationDialog::~WebKit2GtkAuthenticationDialog): Disconnect the
+        load status changed signal handler.
+        (WebKit::WebKit2GtkAuthenticationDialog::show): When it's time to show the dialog, add it to
+        WebKitWebViewBase.
+        * UIProcess/API/gtk/WebKit2GtkAuthenticationDialog.h: Add some new methods for handling the
+        embedded dialog.
+        * UIProcess/API/gtk/WebKitLoaderClient.cpp:
+        (didReceiveAuthenticationChallengeInFrame): Collapse the creation of the dialog into one line.
+        * UIProcess/API/gtk/WebKitWebViewBase.cpp:
+        (_WebKitWebViewBasePrivate): Add the dialog as a property of the private structure.
+        (webkitWebViewChildIsInternalWidget): Added this helper used for determining when a child widget
+        is "internal" (ie the web inspector or the authentication dialog).
+        (webkitWebViewBaseContainerAdd): Only add non-internal widgets to the children map.
+        (webkitWebViewBaseAddAuthenticationDialog): Added.
+        (webkitWebViewBaseAddWebInspector): Added this more-foolproof method of adding a web inspector
+        to the WebView. This also aligns it with the way the authentication dialog is added.
+        (webkitWebViewBaseContainerRemove): When removing the authentication dialog, zero out the
+        field in the private structure.
+        (webkitWebViewBaseContainerForall): Add support for the authentication dialog here too.
+        (webkitWebViewBaseChildMoveResize): Don't pass on move_resize events to internal children.
+        (webkit_web_view_base_init): Zero out the authentication dialog member on init.
+        (webkitWebViewBaseDraw): If the authentication dialog is active, draw a shadow over web content.
+        (resizeWebKitWebViewBaseFromAllocation): Make the authentication dialog centered in the view.
+        (webkitWebViewBaseKeyPressEvent): Pass on key events to the authentication dialog if active.
+        (webkitWebViewBaseButtonPressEvent): If the authentication dialog is active don't pass button events
+        to web content.
+        (webkitWebViewBaseButtonReleaseEvent):  Ditto.
+        (webkitWebViewBaseScrollEvent): Ditto.
+        (webkitWebViewBaseMotionNotifyEvent): Ditto.
+        (webkitWebViewBaseFocus): Pass on focus events to the authentication dialog so that tabbing between
+        elements in the dialog works correctly.
+        (webkit_web_view_base_class_init): Hook up the focus event.
+        * UIProcess/API/gtk/WebKitWebViewBasePrivate.h: Add new methods for adding the authentication dialog
+        and the web inspector.
+        * UIProcess/gtk/WebInspectorProxyGtk.cpp:
+        (WebKit::WebInspectorProxy::createInspectorWindow): Use the new method for adding the web inspector.
+
+2012-11-29  Andrei Bucur  <abucur@adobe.com>
+
+        Fix the build after r136095
+        https://bugs.webkit.org/show_bug.cgi?id=103629
+
+        Unreviewed.
+
+        Add a static_cast to fix the build.
+
+        * Shared/mac/ObjCObjectGraphCoders.mm:
+        (WebKit::ObjCObjectGraphEncoder::baseEncode):
+
+2012-11-29  Christophe Dumez  <christophe.dumez@intel.com>
+
+        [CoordinatedGraphics] Have LayerTreeRenderer::ensureLayer() return the layer
+        https://bugs.webkit.org/show_bug.cgi?id=103645
+
+        Reviewed by Noam Rosenthal.
+
+        The current LayerTreeRenderer code keep calling ensureLayer() and then
+        LayerMap::find() to retrieve the layer. Since ensureLayer() already has
+        a pointer to the layer, we can simply have the function return it.
+        This is slightly more efficient and it makes the code a bit simpler.
+
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.cpp:
+        (WebKit::LayerTreeRenderer::setLayerChildren):
+        (WebKit::LayerTreeRenderer::setLayerFilters):
+        (WebKit::LayerTreeRenderer::setLayerState):
+        (WebKit::LayerTreeRenderer::ensureLayer):
+        * UIProcess/CoordinatedGraphics/LayerTreeRenderer.h:
+
+2012-11-29  Mikhail Pozdnyakov  <mikhail.pozdnyakov@intel.com>
+
+        [WK2] TiledBackingStore: User events are sent to web page before it is shown
+        https://bugs.webkit.org/show_bug.cgi?id=101753
+
+        Reviewed by Jocelyn Turcotte.
+
+        User events are suppressed on WEB process side while drawing area is frozen.
+
+        * WebProcess/WebPage/WebPage.cpp:
+        (WebKit::WebPage::mouseEvent):
+        (WebKit::WebPage::wheelEvent):
+        (WebKit::WebPage::keyEvent):
+        (WebKit::WebPage::gestureEvent):
+        (WebKit::WebPage::touchEvent):
+        (WebKit::WebPage::sendIfEventCannotBeHandled):
+        (WebKit):
+        (WebKit::WebPage::didCompletePageTransition):
+        * WebProcess/WebPage/WebPage.h:
+        (WebPage):
+
+2012-11-29  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        Possible to resize out of bounds 
+        https://bugs.webkit.org/show_bug.cgi?id=103521
+
+        Reviewed by Jocelyn Turcotte.
+
+        Enforce the viewportBounds after resize, and ensure a user fitted page remains
+        fit on viewport resize, but not on content growth.
+
+        * UIProcess/API/qt/tests/qmltests/WebView/tst_resize.qml: Added.
+        * UIProcess/PageViewportController.cpp:
+        (WebKit::PageViewportController::didChangeContentsSize):
+        (WebKit::PageViewportController::didChangeViewportAttributes):
+        (WebKit::PageViewportController::updateMinimumScaleToFit):
+        * UIProcess/PageViewportController.h:
+        (PageViewportController):
+
+2012-11-29  Michael Brüning  <michael.bruning@digia.com>
+
+        [Qt][WK2] Commit the preedit string in the input method when focus is about to be moved.
+        https://bugs.webkit.org/show_bug.cgi?id=97774
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Implements the handler for willSetInputMethodState in WebKit2 in Qt.
+        This is needed to tell the input method instance in Qt to commit its
+        preedit content when the focus has moved to another node to prevent a
+        bug where the old preedit string was kept as the preedit string and
+        the editor moved focus back to the old node when continuing to enter
+        text via the input method.
+
+        This behavior is analog to the behavior of the QtQuick text input
+        elements.
+
+        * UIProcess/API/qt/raw/qrawwebview.cpp:
+        (QRawWebViewPrivate::handleWillSetInputMethodState):
+        * UIProcess/API/qt/raw/qrawwebview_p_p.h:
+        (QRawWebViewPrivate):
+        * UIProcess/PageClient.h:
+        (PageClient):
+        * UIProcess/WebPageProxy.h:
+        (WebPageProxy):
+        * UIProcess/WebPageProxy.messages.in:
+        * UIProcess/qt/QtPageClient.cpp:
+        (WebKit::QtPageClient::handleWillSetInputMethodState):
+        (WebKit):
+        * UIProcess/qt/QtPageClient.h:
+        (QtPageClient):
+        * UIProcess/qt/QtWebPageEventHandler.cpp:
+        (WebKit::QtWebPageEventHandler::handleWillSetInputMethodState):
+        (WebKit):
+        * UIProcess/qt/QtWebPageEventHandler.h:
+        (QtWebPageEventHandler):
+        * UIProcess/qt/WebPageProxyQt.cpp:
+        (WebKit::WebPageProxy::willSetInputMethodState):
+        (WebKit):
+        * WebProcess/WebCoreSupport/WebEditorClient.cpp:
+        (WebKit::WebEditorClient::willSetInputMethodState):
+
 2012-11-28  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
 
         [Qt] The WebView should be flickable only using touch events

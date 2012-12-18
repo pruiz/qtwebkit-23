@@ -231,6 +231,9 @@ webkit.org/b/92942 fast/events/constructors/device-proximity-event-constructor.h
 # Missing support in DRT for Geolocation's Coordinate attributes.
 webkit.org/b/98212 fast/dom/Geolocation/coordinates-interface-attributes.html [ Failure ]
 
+# Fails in chromium
+webkit.org/b/103667 fast/ruby/position-after.html [ Skip ]
+
 # -----------------------------------------------------------------
 # WONTFIX TESTS
 # -----------------------------------------------------------------
@@ -266,6 +269,9 @@ fast/harness/sample-fail-mismatch-reftest.html [ WontFix ]
 # long-running-script mechanism to handle very-long-running regexps too.
 # See http://code.google.com/p/v8/issues/detail?id=287
 fast/js/regexp-overflow-too-big.html [ WontFix ]
+
+# We expect V8 to crash in an orderly fashion instead of throwing a JavaScript out-of-memory error.
+webkit.org/b/103348 fast/js/string-replacement-outofmemory.html [ Crash ]
 
 # XHTML tests. These tests are all checked in with expectations that represent
 # JS errors. We skip them because they don't actually test what they set out to.
@@ -1585,8 +1591,6 @@ crbug.com/23476 [ Mac ] fast/frames/inline-object-inside-frameset.html [ ImageOn
 crbug.com/23476 [ Mac ] fast/text/font-initial.html [ ImageOnlyFailure ]
 
 crbug.com/23473 [ Mac ] fast/repaint/body-background-image.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Mac ] fast/repaint/bugzilla-6278.html [ ImageOnlyFailure ]
-crbug.com/23473 [ Lion SnowLeopard ] fast/repaint/invisible-objects.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/selection-clear.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/table-cell-overflow.html [ ImageOnlyFailure ]
 crbug.com/23473 [ Mac ] fast/repaint/table-extra-bottom-grow.html [ ImageOnlyFailure ]
@@ -2080,14 +2084,6 @@ crbug.com/2844 http/tests/appcache/top-frame-2.html
 # This test fails because there is no setAppCacheMaximumSize API yet.
 crbug.com/2844 http/tests/appcache/max-size.html
 
-# To be rebaselined after skia.gyp undefines SK_DISABLE_EXTRACTSUBSET_OPAQUE_FIX
-crbug.com/156097  fast/backgrounds/repeat/negative-offset-repeat-transformed.html [ ImageOnlyFailure ] 
-crbug.com/156097  fast/borders/border-image-rotate-transform.html [ ImageOnlyFailure ] 
-crbug.com/156097  svg/custom/clip-mask-negative-scale.svg [ ImageOnlyFailure ] 
-crbug.com/156097  svg/custom/focus-ring.svg [ ImageOnlyFailure ] 
-crbug.com/156097  svg/transforms/animated-path-inside-transformed-html.xhtml [ ImageOnlyFailure ] 
-crbug.com/156097 [ Mac ] fast/forms/select-style.html [ ImageOnlyFailure ]
-
 # Flakiness documented around Webkit Roll 51681:51711
 crbug.com/2844 http/tests/appcache/404-manifest.html [ Skip ]
 crbug.com/2844 http/tests/appcache/404-resource.html [ Skip ]
@@ -2543,7 +2539,7 @@ crbug.com/8729 [ Android Linux Mac ] http/tests/multipart/invalid-image-data.htm
 crbug.com/10370 [ Android Linux Win ] fast/css/font-weight-1.html [ Failure ]
 # Registering the fonts for this test causes other processes (Adium, Firefox)
 # to spin and become unresponsive or crash.
-webkit.org/b/50709 [ Mac ] fast/css/font-weight-1.html [ ImageOnlyFailure ]
+webkit.org/b/50709 [ Lion MountainLion ] fast/css/font-weight-1.html [ ImageOnlyFailure ]
 
 #///////////////////////////////////////////////////////////////////////////
 # End DRT failures
@@ -2938,7 +2934,7 @@ webkit.org/b/93546 platform/chromium/virtual/softwarecompositing/plugins/no-back
 webkit.org/b/74694 http/tests/cache/history-only-cached-subresource-loads.html [ Missing Pass ]
 webkit.org/b/74694 http/tests/cache/history-only-cached-subresource-loads-max-age-https.html [ Missing Pass ]
 
-webkit.org/b/67915 [ Android Linux Win ] fast/borders/borderRadiusDashed06.html [ ImageOnlyFailure ]
+webkit.org/b/67915 [ Android Linux ] fast/borders/borderRadiusDashed06.html [ ImageOnlyFailure ]
 
 webkit.org/b/95365 fast/loader/reload-zero-byte-plugin.html
 
@@ -3693,17 +3689,6 @@ webkit.org/b/94242 [ Android Debug ] media/track/track-cues-sorted-before-dispat
 # Chromium still has the CC toggle button, not the menu of tracks.
 webkit.org/b/101670 media/video-controls-captions-trackmenu.html [ Skip ]
 
-# Supposedly started failing between CR r140760 and CR r141216.  The failures
-# look like they involve antialiasing; the fact that the test clearly expects
-# these pixels not to be antialiased means these shouldn't just be rebaselined
-# blindly.
-crbug.com/131189 canvas/philip/tests/2d.line.width.basic.html [ Failure ]
-crbug.com/131189 canvas/philip/tests/2d.line.width.transformed.html [ Failure ]
-crbug.com/131189 canvas/philip/tests/2d.transformation.setTransform.skewed.html [ Failure ]
-crbug.com/131189 canvas/philip/tests/2d.transformation.transform.skewed.html [ Failure ]
-crbug.com/131189 platform/chromium/virtual/gpu/canvas/philip/tests/2d.transformation.setTransform.skewed.html [ Failure ]
-crbug.com/131189 platform/chromium/virtual/gpu/canvas/philip/tests/2d.transformation.transform.skewed.html [ Failure ]
-
 webkit.org/b/92835 [ Android Mac Win Debug ] svg/as-background-image/svg-as-background-5.html [ Pass Slow ]
 
 webkit.org/b/92850 [ Android Linux Debug ] http/tests/websocket/tests/hybi/workers/close-code-and-reason.html [ Crash Pass ]
@@ -4214,10 +4199,8 @@ webkit.org/b/85522 http/tests/security/sandboxed-iframe-form-top.html [ Skip ]
 webkit.org/b/102542 [ Win7 ] platform/chromium/virtual/softwarecompositing/checkerboard.html [ Image ]
 webkit.org/b/102542 [ Linux Mac Win ] compositing/checkerboard.html [ Image ]
 
-webkit.org/b/102724 crbug.com/9797 crbug.com/161762 [ Debug ] svg/carto.net/colourpicker.svg [ Crash ]
-webkit.org/b/102724 crbug.com/9797 crbug.com/161762 [ Release ] svg/carto.net/colourpicker.svg [ ImageOnlyFailure ]
-webkit.org/b/102724 crbug.com/161762 [ Debug ] svg/custom/gradient-stop-corner-cases.svg [ Crash ]
-webkit.org/b/102724 crbug.com/161762 [ Release ] svg/custom/gradient-stop-corner-cases.svg [ ImageOnlyFailure ]
+webkit.org/b/102724 [ Debug ] svg/carto.net/colourpicker.svg [ Crash ]
+webkit.org/b/102724 [ Debug ] svg/custom/gradient-stop-corner-cases.svg [ Crash ]
 
 # Fails until we enable the Resource Timing API.
 webkit.org/b/61138 http/tests/w3c/webperf/submission/resource-timing [ Skip ]
@@ -4244,9 +4227,7 @@ webkit.org/b/103299 [ Linux Mac Win ] fast/dom/shadow/shadow-dom-event-dispatchi
 webkit.org/b/103148 [ Linux Win ] fast/text/atsui-small-caps-punctuation-size.html [ ImageOnlyFailure Failure Pass ]
 webkit.org/b/103308 [ SnowLeopard Lion ] css3/filters/custom/custom-filter-transforms-animation.html [ Pass Timeout ]
 
-webkit.org/b/103348 fast/js/string-replacement-outofmemory.html [ Crash ]
 webkit.org/b/103363 [ Mac ] touchadjustment/touch-links-longpress.html [ Failure ]
-webkit.org/b/103376 [ Mac Debug ] svg/animations/mpath-remove-from-dependents-on-delete-crash.html [ Pass Timeout ]
 webkit.org/b/103183 [ Win7 SnowLeopard Lion ] media/video-duration-known-after-eos.html [ Pass Crash ]
 webkit.org/b/103446 [ Mac ] http/tests/canvas/canvas-slow-font-loading.html [ ImageOnlyFailure ]
 webkit.org/b/103447 [ MountainLion ] fast/canvas/font-update.html [ ImageOnlyFailure ]
@@ -4262,5 +4243,3 @@ Bug(scherkus) [ Win Mac Linux ] http/tests/media/video-buffered-range-contains-c
 webkit.org/b/103609 [ MountainLion ] fast/regions/autoheight-dynamic-update.html [ ImageOnlyFailure ]
 webkit.org/b/103609 [ MountainLion ] fast/regions/firstletter-inside-flowthread.html [ ImageOnlyFailure ]
 webkit.org/b/103609 [ MountainLion ] fast/regions/listmarker-inside-flowthread.html [ ImageOnlyFailure ]
-
-webkit.org/b/103619 [ XP ] http/tests/inspector/network/script-as-text-loading-long-url.html [ Failure ]

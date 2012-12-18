@@ -1,3 +1,282 @@
+2012-11-29  Zhenyao Mo  <zmo@google.com>
+
+        Unreviewed, WebKit gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-29  John Knottenbelt  <jknotten@chromium.org>
+
+        Use GeolocationController's last geoposition as cached position.
+        https://bugs.webkit.org/show_bug.cgi?id=103540
+
+        Reviewed by Benjamin Poulain.
+
+        The page's GeolocationController mediates access to the
+        GeolocationClient for multiple frames' Geolocation instances. This
+        patch changes the position cache to be on the GeolocationController
+        rather than on the Geolocation instance.
+
+        This fixes a bug where if one frame has has received a fresh
+        position, then a request for a cached position from a second frame
+        does not succeed because the Geolocation instance in the second
+        frame's position cache hasn't received the position update that
+        went to the first frame.
+
+        * fast/dom/Geolocation/cached-position-iframe-expected.txt: Added.
+        * fast/dom/Geolocation/cached-position-iframe.html: Added.
+        * fast/dom/Geolocation/resources/cached-position-iframe-inner.html: Added.
+        * fast/dom/Geolocation/script-tests/cached-position-iframe.js: Added.
+        (window.onmessage):
+
+2012-11-29  Zhenyao Mo  <zmo@google.com>
+
+        Unreviewed, WebKit gardening.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-29  Stephen Chenney  <schenney@chromium.org>
+
+        [Chromium] Skia rebaseline after we made kSrc_Mode go faster
+
+        Unreviewed expectations update.
+
+        Some of these are still crashing on Debug.
+
+        * platform/chromium-mac-lion/svg/W3C-SVG-1.1/filters-color-01-b-expected.png:
+        * platform/chromium-mac-lion/svg/carto.net/colourpicker-expected.png:
+        * platform/chromium-mac-lion/svg/custom/invalid-uri-stroke-expected.png:
+        * platform/chromium-mac-lion/svg/wicd/test-scalable-background-image1-expected.png:
+        * platform/chromium-mac-lion/svg/zoom/page/zoom-mask-with-percentages-expected.png:
+        * platform/chromium-mac-snowleopard/svg/carto.net/colourpicker-expected.png:
+        * platform/chromium-mac-snowleopard/svg/custom/invalid-uri-stroke-expected.png:
+        * platform/chromium-mac-snowleopard/svg/wicd/test-scalable-background-image1-expected.png:
+        * platform/chromium-mac-snowleopard/svg/zoom/page/zoom-mask-with-percentages-expected.png:
+        * platform/chromium-mac/svg/W3C-SVG-1.1/filters-color-01-b-expected.png:
+        * platform/chromium-mac/svg/carto.net/colourpicker-expected.png:
+        * platform/chromium-mac/svg/custom/gradient-stop-corner-cases-expected.png:
+        * platform/chromium-mac/svg/custom/invalid-uri-stroke-expected.png:
+        * platform/chromium-mac/svg/wicd/test-scalable-background-image1-expected.png:
+        * platform/chromium-mac/svg/zoom/page/zoom-mask-with-percentages-expected.png:
+        * platform/chromium-win-xp/svg/carto.net: Added.
+        * platform/chromium-win-xp/svg/carto.net/colourpicker-expected.png: Added.
+        * platform/chromium-win-xp/svg/zoom/page/zoom-mask-with-percentages-expected.png:
+        * platform/chromium-win/svg/W3C-SVG-1.1/filters-color-01-b-expected.png:
+        * platform/chromium-win/svg/custom/invalid-uri-stroke-expected.png:
+        * platform/chromium-win/svg/wicd/test-scalable-background-image1-expected.png:
+        * platform/chromium-win/svg/zoom/page/zoom-mask-with-percentages-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-11-29  Stephen Chenney  <schenney@chromium.org>
+
+        [Chromium] Rebaseline after removed double drawing of clipped hairlines at edges
+
+        Unreviewed expectations update
+
+        * platform/chromium-linux-x86/svg/hixie/perf/003-expected.png: Removed.
+        * platform/chromium-mac-lion/fast/repaint/list-marker-expected.png: Added.
+        * platform/chromium-mac-lion/svg/hixie/perf/001-expected.png: Added.
+        * platform/chromium-mac-lion/svg/hixie/perf/002-expected.png: Added.
+        * platform/chromium-mac-lion/svg/hixie/perf/003-expected.png:
+        * platform/chromium-mac-lion/svg/transforms/text-with-pattern-inside-transformed-html-expected.png:
+        * platform/chromium-mac-lion/svg/zoom/page/zoom-img-preserveAspectRatio-support-1-expected.png:
+        * platform/chromium-mac-snowleopard/fast/repaint/list-marker-expected.png:
+        * platform/chromium-mac-snowleopard/svg/hixie/perf/001-expected.png:
+        * platform/chromium-mac-snowleopard/svg/hixie/perf/002-expected.png:
+        * platform/chromium-mac-snowleopard/svg/transforms/text-with-pattern-inside-transformed-html-expected.png:
+        * platform/chromium-mac-snowleopard/svg/zoom/page/zoom-img-preserveAspectRatio-support-1-expected.png:
+        * platform/chromium-mac/fast/repaint/list-marker-expected.png:
+        * platform/chromium-mac/svg/hixie/perf/001-expected.png:
+        * platform/chromium-mac/svg/hixie/perf/002-expected.png:
+        * platform/chromium-mac/svg/hixie/perf/003-expected.png:
+        * platform/chromium-mac/svg/transforms/text-with-pattern-inside-transformed-html-expected.png:
+        * platform/chromium-mac/svg/zoom/page/zoom-img-preserveAspectRatio-support-1-expected.png:
+        * platform/chromium-win/fast/repaint/list-marker-expected.png:
+        * platform/chromium-win/svg/hixie/perf/001-expected.png:
+        * platform/chromium-win/svg/hixie/perf/002-expected.png:
+        * platform/chromium-win/svg/transforms/text-with-pattern-inside-transformed-html-expected.png:
+        * platform/chromium-win/svg/zoom/page/zoom-img-preserveAspectRatio-support-1-expected.png:
+        * platform/gtk/svg/transforms/text-with-pattern-inside-transformed-html-expected.png: Removed.
+        * platform/mac/svg/transforms/text-with-pattern-inside-transformed-html-expected.png: Removed.
+        * svg/transforms/text-with-pattern-inside-transformed-html-expected.png: Added.
+
+2012-11-29  Stephen Chenney  <schenney@chromium.org>
+
+        [Chromium] Rebaseline after SK_DISABLE_EXTRACTSUBSET_OPAQUE_FIX was removed
+
+        Unreviewed test expectations update.
+
+        * platform/chromium-linux-x86/fast/backgrounds/repeat/negative-offset-repeat-transformed-expected.png: Removed.
+        * platform/chromium-linux-x86/svg/custom/clip-mask-negative-scale-expected.png: Removed.
+        * platform/chromium-linux/svg/transforms/text-with-mask-with-svg-transform-expected.png:
+        * platform/chromium-mac-lion/fast/backgrounds/repeat/negative-offset-repeat-transformed-expected.png: Added.
+        * platform/chromium-mac-lion/fast/borders/border-image-rotate-transform-expected.png: Added.
+        * platform/chromium-mac-lion/fast/forms/select-style-expected.png: Added.
+        * platform/chromium-mac-lion/svg/custom/clip-mask-negative-scale-expected.png: Added.
+        * platform/chromium-mac-lion/svg/custom/focus-ring-expected.png: Added.
+        * platform/chromium-mac-lion/svg/transforms/animated-path-inside-transformed-html-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/backgrounds/repeat/negative-offset-repeat-transformed-expected.png:
+        * platform/chromium-mac-snowleopard/fast/borders/border-image-rotate-transform-expected.png:
+        * platform/chromium-mac-snowleopard/fast/forms/select-style-expected.png:
+        * platform/chromium-mac-snowleopard/svg/custom/clip-mask-negative-scale-expected.png:
+        * platform/chromium-mac-snowleopard/svg/custom/focus-ring-expected.png:
+        * platform/chromium-mac-snowleopard/svg/transforms/animated-path-inside-transformed-html-expected.png:
+        * platform/chromium-mac/fast/backgrounds/repeat/negative-offset-repeat-transformed-expected.png:
+        * platform/chromium-mac/fast/borders/border-image-rotate-transform-expected.png:
+        * platform/chromium-mac/fast/borders/border-image-side-reduction-expected.png:
+        * platform/chromium-mac/fast/forms/select-style-expected.png:
+        * platform/chromium-mac/svg/custom/clip-mask-negative-scale-expected.png:
+        * platform/chromium-mac/svg/custom/focus-ring-expected.png:
+        * platform/chromium-mac/svg/transforms/animated-path-inside-transformed-html-expected.png:
+        * platform/chromium-win-xp/svg/custom/clip-mask-negative-scale-expected.png: Removed.
+        * platform/chromium-win/fast/backgrounds/repeat/negative-offset-repeat-transformed-expected.png:
+        * platform/chromium-win/fast/borders/border-image-rotate-transform-expected.png:
+        * platform/chromium-win/fast/borders/borderRadiusDashed06-expected.png:
+        * platform/chromium-win/svg/custom/clip-mask-negative-scale-expected.png:
+        * platform/chromium-win/svg/custom/focus-ring-expected.png:
+        * platform/chromium-win/svg/transforms/animated-path-inside-transformed-html-expected.png:
+        * platform/chromium/TestExpectations:
+
+2012-11-29  Stephen Chenney  <schenney@chromium.org>
+
+        [Chromium] Expectations update
+
+        Unreviewed expectation.
+
+        These expectations seem to have been rebaselined in error or missed
+        being rebaselined during the great Skia rebaseline of Thanksgiving
+        Day. This fixes some failing expectations and removes some incorrect
+        expectations that crept in.
+
+        * fast/repaint/bugzilla-6278-expected.png: Added.
+        * fast/repaint/invisible-objects-expected.png: Added.
+        * platform/chromium-mac-lion/fast/repaint/box-shadow-h-expected.png:
+        * platform/chromium-mac-lion/fast/repaint/box-shadow-v-expected.png:
+        * platform/chromium-mac-lion/fast/repaint/bugzilla-6278-expected.png: Added.
+        * platform/chromium-mac-lion/fast/repaint/invisible-objects-expected.png: Removed.
+        * platform/chromium-mac-snowleopard/fast/repaint/box-shadow-h-expected.png:
+        * platform/chromium-mac-snowleopard/fast/repaint/box-shadow-v-expected.png:
+        * platform/chromium-mac-snowleopard/fast/repaint/bugzilla-6278-expected.png: Added.
+        * platform/chromium-mac-snowleopard/fast/text/line-initial-and-final-swashes-expected.png: Removed.
+        * platform/chromium-mac/fast/repaint/box-shadow-h-expected.png:
+        * platform/chromium-mac/fast/repaint/box-shadow-v-expected.png:
+        * platform/chromium-mac/fast/repaint/bugzilla-6278-expected.png: Added.
+        * platform/chromium-mac/fast/repaint/iframe-scroll-repaint-expected.png: Added.
+        * platform/chromium-win-xp/fast/repaint/box-shadow-h-expected.png:
+        * platform/chromium-win-xp/fast/repaint/box-shadow-v-expected.png:
+        * platform/chromium-win/fast/repaint/body-background-image-expected.png:
+        * platform/chromium-win/fast/repaint/box-shadow-h-expected.png:
+        * platform/chromium-win/fast/repaint/box-shadow-v-expected.png:
+        * platform/chromium-win/fast/repaint/invisible-objects-expected.png: Added.
+        * platform/chromium-win/fast/text/font-initial-expected.png:
+        * platform/chromium-win/fast/text/line-initial-and-final-swashes-expected.png: Removed.
+        * platform/chromium-win/fast/text/line-initial-and-final-swashes-expected.txt: Removed.
+        * platform/chromium/TestExpectations:
+        * platform/chromium/fast/js/date-toisostring-expected.txt: Removed.
+        * platform/chromium/fast/js/toString-and-valueOf-override-expected.txt: Removed.
+        * platform/chromium/fast/repaint/bugzilla-6278-expected.png: Removed.
+        * platform/chromium/fast/repaint/iframe-scroll-repaint-expected.png: Removed.
+        * platform/chromium/fast/repaint/invisible-objects-expected.png: Removed.
+        * platform/chromium/svg/custom/getBBox-path-expected.txt: Removed.
+        * platform/chromium/svg/custom/global-constructors-expected.txt: Removed.
+        * platform/efl/fast/repaint/bugzilla-6278-expected.png: Removed.
+        * platform/efl/fast/repaint/invisible-objects-expected.png: Removed.
+        * platform/gtk/fast/repaint/bugzilla-6278-expected.png: Removed.
+        * platform/gtk/fast/repaint/invisible-objects-expected.png: Removed.
+
+2012-11-28  Daniel Bates  <dbates@webkit.org>
+
+        [Chromium] LayoutTests/fast/js/string-replacement-outofmemory.html crashes
+        https://bugs.webkit.org/show_bug.cgi?id=103348
+
+        Reviewed by Abhishek Arya.
+
+        Add a comment to explain that the crash is expected and is performed in an
+        orderly fashion.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-29  Dan Bernstein  <mitz@apple.com>
+
+        <rdar://problem/12771885> Support ruby-position: {before, after}
+        https://bugs.webkit.org/show_bug.cgi?id=103569
+
+        Reviewed by Anders Carlsson.
+
+        * fast/ruby/position-after.html: Added.
+        * platform/mac/fast/ruby/position-after-expected.png: Added.
+        * platform/mac/fast/ruby/position-after-expected.txt: Added.
+
+2012-11-29  Mike West  <mkwst@chromium.org>
+
+        Typo in 'autofocus' sandboxing error message.
+        https://bugs.webkit.org/show_bug.cgi?id=103616
+
+        Reviewed by Jochen Eisinger.
+
+        * fast/frames/sandboxed-iframe-autofocus-denied-expected.txt:
+
+2012-11-29  Hajime Morrita  <morrita@google.com>
+
+        HTMLMediaElement's .textTracks property does not reflect <track> element
+        https://bugs.webkit.org/show_bug.cgi?id=103420
+        
+        Reviewed by Eric Carlson.
+
+        * media/track/track-node-add-remove-expected.txt: Added.
+        * media/track/track-node-add-remove.html: Added.
+
+2012-11-29  Alexander Pavlov  <apavlov@chromium.org>
+
+        [Chromium] Unreviewed, update Mac expectation after r136128.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-29  Stephen Chenney  <schenney@chromium.org>
+
+        Unreviewed Chromium expectations cleanup
+
+        * platform/chromium-mac-snowleopard/fast/css/font-weight-1-expected.png: Removed. Should not have been added ever.
+        * platform/chromium-mac-snowleopard/fast/css/font-weight-1-expected.txt: Removed. Should not have been added ever.
+        * platform/chromium-mac/fast/css/font-weight-1-expected.png: Removed. Should not have been added ever.
+        * platform/chromium-mac/fast/css/font-weight-1-expected.txt: Removed. Should not have been added ever.
+        * platform/chromium-win/fast/css/font-weight-1-expected.png: Removed. Should not have been added ever.
+        * platform/chromium/TestExpectations: Removed tests now passing
+        * platform/chromium/fast/css/font-weight-1-expected.png: Copied from LayoutTests/platform/chromium-win/fast/css/font-weight-1-expected.png.
+
+2012-11-29  Stephen Chenney  <schenney@chromium.org>
+
+        Layout Test svg/animations/mpath-remove-from-dependents-on-delete-crash.html is flaky
+        https://bugs.webkit.org/show_bug.cgi?id=103375
+
+        Unreviewed expectations update.
+
+        The test is no longer flakey after yeterdays test modification.
+
+        * platform/chromium/TestExpectations:
+
+2012-11-29  KwangYong Choi  <ky0.choi@samsung.com>
+
+        [EFL] Remove duplicated entries from efl-wk1/TestExpectations
+        https://bugs.webkit.org/show_bug.cgi?id=103236
+
+        Unreviewed. These entries exist in efl/TestExpectations. Remove duplication.
+
+        * platform/efl-wk1/TestExpectations:
+
+2012-11-29  Mike West  <mkwst@chromium.org>
+
+        Layout Test http/tests/inspector/network/script-as-text-loading-long-url.html is failing
+        https://bugs.webkit.org/show_bug.cgi?id=103619
+
+        Reviewed by Alexander Pavlov.
+
+        Windows doesn't like loooong filenames.
+
+        * http/tests/inspector/network/resources/script-as-text-with-a-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-url.php: Renamed from LayoutTests/http/tests/inspector/network/resources/script-as-text-with-a-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-very-long-url.php.
+        * http/tests/inspector/network/script-as-text-loading-long-url.html:
+        * platform/chromium/TestExpectations:
+            Unskipping the test on XP.
+
 2012-11-29  Jussi Kukkonen  <jussi.kukkonen@intel.com>
 
         [EFL][WK2] flaky reftests after r135935

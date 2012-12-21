@@ -491,7 +491,11 @@ int RenderTableSection::distributeExtraLogicalHeightToRows(int extraLogicalHeigh
     return extraLogicalHeight - remainingExtraLogicalHeight;
 }
 
+#if ENABLE(WKHTMLTOPDF_MODE)
+void RenderTableSection::layoutRows(int headHeight, int footHeight)
+#else
 void RenderTableSection::layoutRows()
+#endif
 {
 #ifndef NDEBUG
     setNeedsLayoutIsForbidden(true);
@@ -523,13 +527,13 @@ void RenderTableSection::layoutRows()
             logicalHeightsForPrinting[r] = childLogicalHeight;
             LayoutState* layoutState = view()->layoutState();
             const int pageLogicalHeight = layoutState->m_pageLogicalHeight;
-            if (childLogicalHeight < pageLogicalHeight) {
+            if (childLogicalHeight < pageLogicalHeight - footHeight) {
                 const IntSize delta = layoutState->m_layoutOffset - layoutState->m_pageOffset;
                 const int logicalOffset = m_rowPos[r] + pageOffset;
                 const int offset = isHorizontalWritingMode() ? delta.height() : delta.width();
                 const int remainingLogicalHeight = (pageLogicalHeight - (offset + logicalOffset) % pageLogicalHeight) % pageLogicalHeight;
-                if (remainingLogicalHeight < childLogicalHeight) {
-                    pageOffset += remainingLogicalHeight;
+                if (remainingLogicalHeight - footHeight < childLogicalHeight) {
+                    pageOffset += remainingLogicalHeight + headHeight;
                 }
             }
             m_rowPos[r] += pageOffset;

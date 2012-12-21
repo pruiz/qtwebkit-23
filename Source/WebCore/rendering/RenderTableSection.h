@@ -78,7 +78,11 @@ public:
     void addCell(RenderTableCell*, RenderTableRow* row);
 
     int calcRowLogicalHeight();
+#if ENABLE(WKHTMLTOPDF_MODE)
+    void layoutRows(int headHeight, int footHeight);
+#else
     void layoutRows();
+#endif
 
     RenderTable* table() const { return toRenderTable(parent()); }
 

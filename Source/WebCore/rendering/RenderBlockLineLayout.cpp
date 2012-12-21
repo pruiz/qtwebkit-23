@@ -1487,7 +1487,12 @@ void RenderBlock::layoutRunsAndFloatsInRange(LineLayoutState& layoutState, Inlin
                 if (layoutState.usesRepaintBounds())
                     layoutState.updateRepaintRangeFromBox(lineBox);
 
+#if ENABLE(WKHTMLTOPDF_MODE)
+                // table cell pagination is handled in RenderTableSection
+                if (paginated && !isTableCell()) {
+#else
                 if (paginated) {
+#endif
                     LayoutUnit adjustment = 0;
                     adjustLinePositionForPagination(lineBox, adjustment);
                     if (adjustment) {

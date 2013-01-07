@@ -913,7 +913,7 @@ void JIT::privateCompileGetByIdSelfList(StructureStubInfo* stubInfo, Polymorphic
     // On success return back to the hot patch code, at a point it will perform the store to dest for us.
     patchBuffer.link(success, stubInfo->hotPathBegin.labelAtOffset(stubInfo->patch.baseline.u.get.putResult));
 
-    RefPtr<JITStubRoutine> stubRoutine = createJITStubRoutine(
+    PassRefPtr<JITStubRoutine> tmp = createJITStubRoutine(
         FINALIZE_CODE(
             patchBuffer,
             ("Baseline get_by_id self list stub for %s, return point %p",
@@ -922,6 +922,7 @@ void JIT::privateCompileGetByIdSelfList(StructureStubInfo* stubInfo, Polymorphic
         *m_globalData,
         m_codeBlock->ownerExecutable(),
         needsStubLink);
+    RefPtr<JITStubRoutine> stubRoutine = tmp;
 
     polymorphicStructures->list[currentIndex].set(*m_globalData, m_codeBlock->ownerExecutable(), stubRoutine, structure, isDirect);
     
@@ -986,7 +987,7 @@ void JIT::privateCompileGetByIdProtoList(StructureStubInfo* stubInfo, Polymorphi
     // On success return back to the hot patch code, at a point it will perform the store to dest for us.
     patchBuffer.link(success, stubInfo->hotPathBegin.labelAtOffset(stubInfo->patch.baseline.u.get.putResult));
     
-    RefPtr<JITStubRoutine> stubRoutine = createJITStubRoutine(
+    PassRefPtr<JITStubRoutine> tmp = createJITStubRoutine(
         FINALIZE_CODE(
             patchBuffer,
             ("Baseline get_by_id proto list stub for %s, return point %p",
@@ -995,6 +996,7 @@ void JIT::privateCompileGetByIdProtoList(StructureStubInfo* stubInfo, Polymorphi
         *m_globalData,
         m_codeBlock->ownerExecutable(),
         needsStubLink);
+    RefPtr<JITStubRoutine> stubRoutine = tmp;
 
     prototypeStructures->list[currentIndex].set(callFrame->globalData(), m_codeBlock->ownerExecutable(), stubRoutine, structure, prototypeStructure, isDirect);
     
@@ -1064,7 +1066,7 @@ void JIT::privateCompileGetByIdChainList(StructureStubInfo* stubInfo, Polymorphi
     // On success return back to the hot patch code, at a point it will perform the store to dest for us.
     patchBuffer.link(success, stubInfo->hotPathBegin.labelAtOffset(stubInfo->patch.baseline.u.get.putResult));
     
-    RefPtr<JITStubRoutine> stubRoutine = createJITStubRoutine(
+    PassRefPtr<JITStubRoutine> tmp = createJITStubRoutine(
         FINALIZE_CODE(
             patchBuffer,
             ("Baseline get_by_id chain list stub for %s, return point %p",
@@ -1073,6 +1075,7 @@ void JIT::privateCompileGetByIdChainList(StructureStubInfo* stubInfo, Polymorphi
         *m_globalData,
         m_codeBlock->ownerExecutable(),
         needsStubLink);
+    RefPtr<JITStubRoutine> stubRoutine = tmp;
     
     // Track the stub we have created so that it will be deleted later.
     prototypeStructures->list[currentIndex].set(callFrame->globalData(), m_codeBlock->ownerExecutable(), stubRoutine, structure, chain, isDirect);
@@ -1138,7 +1141,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo, Structure* str
     patchBuffer.link(success, stubInfo->hotPathBegin.labelAtOffset(stubInfo->patch.baseline.u.get.putResult));
     
     // Track the stub we have created so that it will be deleted later.
-    RefPtr<JITStubRoutine> stubRoutine = createJITStubRoutine(
+    PassRefPtr<JITStubRoutine> tmp = createJITStubRoutine(
         FINALIZE_CODE(
             patchBuffer,
             ("Baseline get_by_id chain stub for %s, return point %p",
@@ -1147,6 +1150,7 @@ void JIT::privateCompileGetByIdChain(StructureStubInfo* stubInfo, Structure* str
         *m_globalData,
         m_codeBlock->ownerExecutable(),
         needsStubLink);
+    RefPtr<JITStubRoutine> stubRoutine = tmp;
     stubInfo->stubRoutine = stubRoutine;
     
     // Finally patch the jump to slow case back in the hot path to jump here instead.

@@ -310,7 +310,7 @@ void tst_QWebView::horizontalScrollbarTest()
     QWebView webView;
     webView.resize(600, 600);
     webView.show();
-    QTest::qWaitForWindowExposed(&webView);
+    QTest::qWaitForWindowShown(&webView);
 
     QUrl url("qrc:///resources/scrolltest_page.html");
     QWebFrame* const mainFrame = webView.page()->mainFrame();

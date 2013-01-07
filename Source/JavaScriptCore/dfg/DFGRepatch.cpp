@@ -522,7 +522,7 @@ static bool tryBuildGetByIDList(ExecState* exec, JSValue baseValue, const Identi
             patchBuffer.link(handlerCall, lookupExceptionHandlerInStub);
         }
         
-        RefPtr<JITStubRoutine> stubRoutine =
+        PassRefPtr<JITStubRoutine> tmp =
             createJITStubRoutine(
                 FINALIZE_DFG_CODE(
                     patchBuffer,
@@ -533,6 +533,7 @@ static bool tryBuildGetByIDList(ExecState* exec, JSValue baseValue, const Identi
                 codeBlock->ownerExecutable(),
                 slot.cachedPropertyType() == PropertySlot::Getter
                 || slot.cachedPropertyType() == PropertySlot::Custom);
+        RefPtr<JITStubRoutine> stubRoutine = tmp;
         
         polymorphicStructureList->list[listIndex].set(*globalData, codeBlock->ownerExecutable(), stubRoutine, structure, isDirect);
         
@@ -1228,13 +1229,14 @@ void dfgLinkClosureCall(ExecState* exec, CallLinkInfo& callLinkInfo, CodeBlock* 
     patchBuffer.link(done, callLinkInfo.callReturnLocation.labelAtOffset(0));
     patchBuffer.link(slow, CodeLocationLabel(globalData->getCTIStub(virtualCallThunkGenerator).code()));
     
-    RefPtr<ClosureCallStubRoutine> stubRoutine = adoptRef(new ClosureCallStubRoutine(
+    PassRefPtr<ClosureCallStubRoutine> tmp = adoptRef(new ClosureCallStubRoutine(
         FINALIZE_DFG_CODE(
             patchBuffer,
             ("DFG closure call stub for %s, return point %p, target %p (%s)",
                 toCString(*callerCodeBlock).data(), callLinkInfo.callReturnLocation.labelAtOffset(0).executableAddress(),
                 codePtr.executableAddress(), toCString(*calleeCodeBlock).data())),
         *globalData, callerCodeBlock->ownerExecutable(), structure, executable, callLinkInfo.codeOrigin));
+    RefPtr<ClosureCallStubRoutine> stubRoutine = tmp;
     
     RepatchBuffer repatchBuffer(callerCodeBlock);
     

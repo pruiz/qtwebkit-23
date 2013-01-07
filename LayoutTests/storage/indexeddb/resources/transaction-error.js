@@ -41,7 +41,6 @@ function testErrorFromRequest()
     evalAndLog("request = trans.objectStore('storeName').add('value2', 'key')");
     request.onsuccess = unexpectedSuccessCallback;
     request.onerror = function() {
-        shouldBe("request.errorCode", "IDBDatabaseException.CONSTRAINT_ERR");
         shouldBe("request.error.name", "'ConstraintError'");
         evalAndLog("request_error = request.error");
     };
@@ -62,7 +61,6 @@ function testErrorFromException()
     evalAndLog("request = trans.objectStore('storeName').add('value2', 'key')");
     request.onsuccess = unexpectedSuccessCallback;
     request.onerror = function() {
-        shouldBe("request.errorCode", "IDBDatabaseException.CONSTRAINT_ERR");
         shouldBe("request.error.name", "'ConstraintError'");
         debug("Throwing exception...");
 
@@ -98,7 +96,7 @@ function testErrorFromCommit()
     trans.oncomplete = function() {
         db.close();
         evalAndLog("request = indexedDB.open(dbname, 2)");
-        request.onerror = unexpectedSuccessCallback;
+        request.onsuccess = unexpectedSuccessCallback;
         request.onblocked = unexpectedBlockedCallback;
         request.onupgradeneeded = function() {
             evalAndLog("trans = request.transaction");

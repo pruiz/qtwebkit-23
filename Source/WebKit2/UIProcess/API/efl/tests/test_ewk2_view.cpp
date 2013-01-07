@@ -134,7 +134,7 @@ TEST_F(EWK2UnitTestBase, ewk_view_navigation)
     ASSERT_FALSE(ewk_view_forward_possible(webView()));
 }
 
-TEST_F(EWK2UnitTestBase, ewk_view_setting_encoding_custom)
+TEST_F(EWK2UnitTestBase, DISABLED_ewk_view_setting_encoding_custom)
 {
     ASSERT_FALSE(ewk_view_custom_encoding_get(webView()));
     ASSERT_TRUE(ewk_view_custom_encoding_set(webView(), "UTF-8"));
@@ -219,9 +219,9 @@ TEST_F(EWK2UnitTestBase, ewk_view_theme_set)
     ewk_view_html_string_load(webView(), buttonHTML, "file:///", 0);
     EXPECT_TRUE(waitUntilTitleChangedTo("30")); // the result should be same as default theme
 
-    ewk_view_theme_set(webView(), environment->pathForResource("big_button_theme.edj").data());
+    ewk_view_theme_set(webView(), environment->pathForTheme("big_button_theme.edj").data());
     ewk_view_html_string_load(webView(), buttonHTML, "file:///", 0);
-    EXPECT_TRUE(waitUntilTitleChangedTo("299")); // button of big button theme has 299px as padding (150 to -150)
+    EXPECT_TRUE(waitUntilTitleChangedTo("299")); // button of big button theme has 299px as padding (15 to -285)
 }
 
 TEST_F(EWK2UnitTestBase, ewk_view_mouse_events_enabled)

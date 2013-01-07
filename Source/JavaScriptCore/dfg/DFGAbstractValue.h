@@ -371,15 +371,14 @@ struct AbstractValue {
         // complexity of the code.
     }
     
-    void dump(FILE* out) const
+    void dump(PrintStream& out) const
     {
-        fprintf(out, "(%s, %s, ", speculationToString(m_type), arrayModesToString(m_arrayModes));
-        m_currentKnownStructure.dump(out);
-        dataLog(", ");
-        m_futurePossibleStructure.dump(out);
+        out.print(
+            "(", SpeculationDump(m_type), ", ", arrayModesToString(m_arrayModes), ", ",
+            m_currentKnownStructure, ", ", m_futurePossibleStructure);
         if (!!m_value)
-            fprintf(out, ", %s", m_value.description());
-        fprintf(out, ")");
+            out.print(", ", m_value.description());
+        out.print(")");
     }
     
     // A great way to think about the difference between m_currentKnownStructure and

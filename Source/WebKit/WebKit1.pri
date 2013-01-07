@@ -57,8 +57,4 @@ haveQt(5): {
 
 contains(DEFINES, WTF_USE_TEXTURE_MAPPER_GL=1)|contains(DEFINES, ENABLE_WEBGL=1) {
     QT *= opengl
-    # Make sure OpenGL libs are after the webcore lib so MinGW can resolve symbols
-    win32*:!win32-msvc*: LIBS += $$QMAKE_LIBS_OPENGL
 }
-
-

@@ -110,17 +110,6 @@ GraphicsContext3DPrivate::GraphicsContext3DPrivate(GraphicsContext3D* context, H
     , m_platformContext(0)
     , m_surfaceOwner(0)
 {
-    if (m_hostWindow && m_hostWindow->platformPageClient()) {
-        // This is the WebKit1 code path.
-        QWebPageClient* webPageClient = m_hostWindow->platformPageClient();
-        webPageClient->createPlatformGraphicsContext3D(&m_platformContext, &m_surface, &m_surfaceOwner);
-        if (!m_surface)
-            return;
-
-        makeCurrentIfNeeded();
-        return;
-    }
-
     if (renderStyle == GraphicsContext3D::RenderToCurrentGLContext) {
 #if HAVE(QT5)
         m_platformContext = QOpenGLContext::currentContext();
@@ -153,9 +142,8 @@ GraphicsContext3DPrivate::GraphicsContext3DPrivate(GraphicsContext3D* context, H
     m_surfaceFlags = GraphicsSurface::SupportsTextureTarget
                     | GraphicsSurface::SupportsSharing;
 
-    if (!surfaceSize.isEmpty()) {
+    if (!surfaceSize.isEmpty())
         m_graphicsSurface = GraphicsSurface::create(surfaceSize, m_surfaceFlags, m_platformContext);
-    }
 #endif
 }
 
@@ -234,10 +222,24 @@ void GraphicsContext3DPrivate::paintToTextureMapper(TextureMapper* textureMapper
     blitMultisampleFramebufferAndRestoreContext();
 
     if (textureMapper->accelerationMode() == TextureMapper::OpenGLMode) {
+#if USE(GRAPHICS_SURFACE)
+        // CGL only provides us the context, but not the view the context is currently bound to.
+        // To make sure the context is bound the the right surface we have to do a makeCurrent through QOpenGL again.
+        // FIXME: Remove this code as soon as GraphicsSurfaceMac makes use of NSOpenGL.
+        QOpenGLContext* currentContext = QOpenGLContext::currentContext();
+        QSurface* currentSurface = currentContext->surface();
+        makeCurrentIfNeeded();
+
+        m_graphicsSurface->copyFromTexture(m_context->m_texture, IntRect(0, 0, m_context->m_currentWidth, m_context->m_currentHeight));
+
+        // CGL only provides us the context, but not the view the context is currently bound to.
+        // To make sure the context is bound the the right surface we have to do a makeCurrent through QOpenGL again.
+        // FIXME: Remove this code as soon as GraphicsSurfaceMac makes use of NSOpenGL.
+        currentContext->makeCurrent(currentSurface);
+
         TextureMapperGL* texmapGL = static_cast<TextureMapperGL*>(textureMapper);
-        TextureMapperGL::Flags flags = TextureMapperGL::ShouldFlipTexture | (m_context->m_attrs.alpha ? TextureMapperGL::SupportsBlending : 0);
-        IntSize textureSize(m_context->m_currentWidth, m_context->m_currentHeight);
-        texmapGL->drawTexture(m_context->m_texture, flags, textureSize, targetRect, matrix, opacity, mask);
+        m_graphicsSurface->paintToTextureMapper(texmapGL, targetRect, matrix, opacity, mask);
+#endif
         return;
     }
 
@@ -298,10 +300,8 @@ uint32_t GraphicsContext3DPrivate::copyToGraphicsSurface()
         return 0;
 
     blitMultisampleFramebufferAndRestoreContext();
-    makeCurrentIfNeeded();
     m_graphicsSurface->copyFromTexture(m_context->m_texture, IntRect(0, 0, m_context->m_currentWidth, m_context->m_currentHeight));
-    uint32_t frontBuffer = m_graphicsSurface->swapBuffers();
-    return frontBuffer;
+    return m_graphicsSurface->frontBuffer();
 }
 
 GraphicsSurfaceToken GraphicsContext3DPrivate::graphicsSurfaceToken() const
@@ -340,7 +340,7 @@ void GraphicsContext3DPrivate::blitMultisampleFramebufferAndRestoreContext() con
         m_platformContext->makeCurrent(m_surface);
     }
     blitMultisampleFramebuffer();
-    if (currentContext)
+    if (currentContext && currentContext != m_platformContext)
         const_cast<QOpenGLContext*>(currentContext)->makeCurrent(currentSurface);
 #else
     const QGLContext* currentContext = QGLContext::currentContext();
@@ -445,7 +445,8 @@ GraphicsContext3D::GraphicsContext3D(GraphicsContext3D::Attributes attrs, HostWi
     glEnable(GL_VERTEX_PROGRAM_POINT_SIZE);
 #endif
 
-    glClearColor(0.0, 0.0, 0.0, 0.0);
+    if (renderStyle != RenderToCurrentGLContext)
+        glClearColor(0.0, 0.0, 0.0, 0.0);
 }
 
 GraphicsContext3D::~GraphicsContext3D()
@@ -533,6 +534,8 @@ bool GraphicsContext3D::getImageData(Image* image,
         qtImage = QImage::fromData(reinterpret_cast<const uchar*>(image->data()->data()), image->data()->size());
     else {
         QPixmap* nativePixmap = image->nativeImageForCurrentFrame();
+        if (!nativePixmap)
+            return false;
 #if HAVE(QT5)
         // With QPA, we can avoid a deep copy.
         qtImage = *nativePixmap->handle()->buffer();

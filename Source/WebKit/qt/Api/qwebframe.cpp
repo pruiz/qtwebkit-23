@@ -30,6 +30,7 @@
 #include "Element.h"
 #include "FocusController.h"
 #include "Frame.h"
+#include "FrameLoadRequest.h"
 #include "FrameLoaderClientQt.h"
 #include "FrameSelection.h"
 #include "FrameTree.h"
@@ -485,7 +486,10 @@ QWebFrame::QWebFrame(QWebPage *parent, QWebFrameData *frameData)
 
     if (!frameData->url.isEmpty()) {
         WebCore::ResourceRequest request(frameData->url, frameData->referrer);
-        d->frame->loader()->load(request, frameData->name, false);
+        WebCore::FrameLoadRequest loadRequest(d->frame, request);
+        loadRequest.setFrameName(frameData->name);
+        loadRequest.setShouldCheckNewWindowPolicy(true);
+        d->frame->loader()->load(loadRequest);
     }
 #if ENABLE(ORIENTATION_EVENTS)
     connect(&d->m_orientation, SIGNAL(readingChanged()), this, SLOT(_q_orientationChanged()));
@@ -877,7 +881,7 @@ void QWebFrame::load(const QNetworkRequest &req,
     if (!body.isEmpty())
         request.setHTTPBody(WebCore::FormData::create(body.constData(), body.size()));
 
-    d->frame->loader()->load(request, false);
+    d->frame->loader()->load(FrameLoadRequest(d->frame, request));
 
     if (d->parentFrame())
         d->page->d->insideOpenCall = false;
@@ -914,7 +918,7 @@ void QWebFrame::setHtml(const QString &html, const QUrl &baseUrl)
     const QByteArray utf8 = html.toUtf8();
     WTF::RefPtr<WebCore::SharedBuffer> data = WebCore::SharedBuffer::create(utf8.constData(), utf8.length());
     WebCore::SubstituteData substituteData(data, WTF::String("text/html"), WTF::String("utf-8"), KURL());
-    d->frame->loader()->load(request, substituteData, false);
+    d->frame->loader()->load(WebCore::FrameLoadRequest(d->frame, request, substituteData));
 }
 
 /*!
@@ -944,7 +948,7 @@ void QWebFrame::setContent(const QByteArray &data, const QString &mimeType, cons
         encoding = extractCharsetFromMediaType(mimeType);
     }
     WebCore::SubstituteData substituteData(buffer, WTF::String(actualMimeType), encoding, KURL());
-    d->frame->loader()->load(request, substituteData, false);
+    d->frame->loader()->load(WebCore::FrameLoadRequest(d->frame, request, substituteData));
 }
 
 /*!
@@ -1629,7 +1633,7 @@ QWebHitTestResultPrivate::QWebHitTestResultPrivate(const WebCore::HitTestResult 
 {
     if (!hitTest.innerNode())
         return;
-    pos = hitTest.roundedPoint();
+    pos = hitTest.roundedPointInInnerNodeFrame();
     WebCore::TextDirection dir;
     title = hitTest.title(dir);
     linkText = hitTest.textContent();
@@ -1655,9 +1659,9 @@ QWebHitTestResultPrivate::QWebHitTestResultPrivate(const WebCore::HitTestResult 
     isContentSelected = hitTest.isSelected();
     isScrollBar = hitTest.scrollbar();
 
-    if (innerNonSharedNode && innerNonSharedNode->document()
-        && innerNonSharedNode->document()->frame())
-        frame = QWebFramePrivate::kit(innerNonSharedNode->document()->frame());
+    WebCore::Frame *innerNodeFrame = hitTest.innerNodeFrame();
+    if (innerNodeFrame)
+        frame = QWebFramePrivate::kit(innerNodeFrame);
 
     enclosingBlock = QWebElement(WebCore::enclosingBlock(innerNode.get()));
 }
@@ -1715,7 +1719,9 @@ bool QWebHitTestResult::isNull() const
 }
 
 /*!
-    Returns the position where the hit test occured.
+    Returns the position where the hit test occured in the coordinates of frame containing the element hit.
+
+    \sa frame()
 */
 QPoint QWebHitTestResult::pos() const
 {
@@ -1879,7 +1885,7 @@ QWebElement QWebHitTestResult::element() const
 }
 
 /*!
-    Returns the frame the hit test was executed in.
+    Returns the frame of the element hit.
 */
 QWebFrame *QWebHitTestResult::frame() const
 {

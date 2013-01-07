@@ -63,7 +63,7 @@ Q_DECL_EXPORT void initializeWebKit2Theme()
 
 namespace WebCore {
 
-void initializeWebCoreQt()
+Q_DECL_EXPORT void initializeWebCoreQt()
 {
     static bool initialized = false;
     if (initialized)

@@ -8,6 +8,8 @@
 TEMPLATE = app
 TARGET = LLIntOffsetsExtractor
 
+macx: DESTDIR = $$activeBuildConfig()
+
 debug_and_release {
     CONFIG += force_build_all
     CONFIG += build_all
@@ -21,7 +23,10 @@ haveQt(5) {
     CONFIG -= qt
     LIBS =
 } else {
-    QT = core # Needed for global.h
+    INCLUDEPATH += $$[QT_INSTALL_HEADERS] $$[QT_INSTALL_HEADERS]/QtCore
+    CONFIG += console
+    CONFIG -= qt
+    LIBS =
 }
 
 defineTest(addIncludePaths) {

@@ -32,7 +32,7 @@
 
 namespace WebCore {
 
-void initializeWebCoreQt();
+Q_DECL_EXPORT void initializeWebCoreQt();
 
 }
 

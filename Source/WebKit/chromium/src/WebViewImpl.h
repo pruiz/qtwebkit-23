@@ -152,6 +152,7 @@ public:
     virtual void setNeedsRedraw();
     virtual bool isInputThrottled() const;
     virtual bool handleInputEvent(const WebInputEvent&);
+    virtual bool hasTouchEventHandlersAt(const WebPoint&);
     virtual void mouseCaptureLost();
     virtual void setFocus(bool enable);
     virtual bool setComposition(
@@ -308,6 +309,7 @@ public:
 #endif
     virtual void transferActiveWheelFlingAnimation(const WebActiveWheelFlingParameters&);
     virtual WebViewBenchmarkSupport* benchmarkSupport();
+    virtual void setShowPaintRects(bool);
     virtual void setShowFPSCounter(bool);
 
     // WebLayerTreeViewClient
@@ -315,8 +317,6 @@ public:
     virtual void didBeginFrame();
     virtual void updateAnimations(double monotonicFrameBeginTime);
     virtual void applyScrollAndScale(const WebSize&, float);
-    virtual WebGraphicsContext3D* createContext3D() OVERRIDE;
-    virtual void didRebindGraphicsContext(bool success) OVERRIDE;
     virtual WebCompositorOutputSurface* createOutputSurface() OVERRIDE;
     virtual void didRecreateOutputSurface(bool success) OVERRIDE;
     virtual WebInputHandler* createInputHandler() OVERRIDE;
@@ -325,6 +325,7 @@ public:
     virtual void didCommitAndDrawFrame();
     virtual void didCompleteSwapBuffers();
     virtual void scheduleComposite();
+    virtual void createFontAtlas(SkBitmap&, WebRect[128], int&);
 
     // WebViewImpl
 
@@ -599,6 +600,7 @@ public:
     LinkHighlight* linkHighlight() { return m_linkHighlight.get(); }
 #endif
 
+    WebSettingsImpl* settingsImpl();
 
 private:
     bool computePageScaleFactorLimits();
@@ -609,6 +611,7 @@ private:
 
     friend class WebView;  // So WebView::Create can call our constructor
     friend class WTF::RefCounted<WebViewImpl>;
+    friend void setCurrentInputEventForTest(const WebInputEvent*);
 
     enum DragAction {
       DragEnter,
@@ -677,8 +680,6 @@ private:
     virtual bool handleGestureEvent(const WebGestureEvent&) OVERRIDE;
     virtual bool handleKeyEvent(const WebKeyboardEvent&) OVERRIDE;
     virtual bool handleCharEvent(const WebKeyboardEvent&) OVERRIDE;
-
-    WebSettingsImpl* settingsImpl();
 
     WebViewClient* m_client;
     WebAutofillClient* m_autofillClient;

@@ -45,6 +45,9 @@ SET(JavaScriptCore_SOURCES
     bytecode/CallLinkInfo.cpp
     bytecode/CallLinkStatus.cpp
     bytecode/CodeBlock.cpp
+    bytecode/CodeBlockHash.cpp
+    bytecode/CodeOrigin.cpp
+    bytecode/CodeType.cpp
     bytecode/DFGExitProfile.cpp
     bytecode/ExecutionCounter.cpp
     bytecode/GetByIdStatus.cpp
@@ -100,10 +103,13 @@ SET(JavaScriptCore_SOURCES
     dfg/DFGStructureCheckHoistingPhase.cpp
     dfg/DFGThunks.cpp
     dfg/DFGValueSource.cpp
+    dfg/DFGVariableAccessDataDump.cpp
     dfg/DFGVariableEvent.cpp
     dfg/DFGVariableEventStream.cpp
     dfg/DFGValidate.cpp
     dfg/DFGVirtualRegisterAllocationPhase.cpp
+    
+    disassembler/Disassembler.cpp
 
     heap/BlockAllocator.cpp
     heap/CopiedSpace.cpp
@@ -147,7 +153,9 @@ SET(JavaScriptCore_SOURCES
     jit/JITArithmetic.cpp
     jit/JITCall32_64.cpp
     jit/JITCall.cpp
+    jit/JITCode.cpp
     jit/JIT.cpp
+    jit/JITDisassembler.cpp
     jit/JITExceptions.cpp
     jit/JITOpcodes32_64.cpp
     jit/JITOpcodes.cpp
@@ -178,6 +186,7 @@ SET(JavaScriptCore_SOURCES
     runtime/BooleanPrototype.cpp
     runtime/CallData.cpp
     runtime/CodeCache.cpp
+    runtime/CodeSpecializationKind.cpp
     runtime/CommonIdentifiers.cpp
     runtime/Completion.cpp
     runtime/ConstructData.cpp

@@ -101,16 +101,15 @@ for(dir, DIRS) {
     file = $$dir/$$EXTRACTOR_BINARY
     exists($$file): LLINT_FILES += $$file
 }
+isEmpty(LLINT_FILES): LLINT_FILES += $$OUT_PWD/$$EXTRACTOR_BINARY
 
-if(linux-*|win32) {
-    #GENERATOR: LLInt
-    llint.output = ${QMAKE_FILE_IN_PATH}$${QMAKE_DIR_SEP}LLIntAssembly.h
-    llint.script = $$PWD/offlineasm/asm.rb
-    llint.input = LLINT_FILES
-    llint.depends = $$LLINT_DEPENDENCY
-    llint.commands = ruby $$llint.script $$LLINT_ASSEMBLER ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
-    GENERATORS += llint
-}
+#GENERATOR: LLInt
+llint.output = ${QMAKE_FILE_IN_PATH}$${QMAKE_DIR_SEP}LLIntAssembly.h
+llint.script = $$PWD/offlineasm/asm.rb
+llint.input = LLINT_FILES
+llint.depends = $$LLINT_DEPENDENCY
+llint.commands = ruby $$llint.script $$LLINT_ASSEMBLER ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
+GENERATORS += llint
 
 linux-*:if(isEqual(QT_ARCH, "i386")|isEqual(QT_ARCH, "x86_64")) {
     # GENERATOR: disassembler

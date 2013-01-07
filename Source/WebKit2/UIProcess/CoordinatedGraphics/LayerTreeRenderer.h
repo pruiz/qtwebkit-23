@@ -41,6 +41,7 @@
 namespace WebCore {
 class CustomFilterProgram;
 class CustomFilterProgramInfo;
+class TextureMapperLayer;
 }
 
 namespace WebKit {
@@ -67,10 +68,8 @@ public:
     };
     explicit LayerTreeRenderer(LayerTreeCoordinatorProxy*);
     virtual ~LayerTreeRenderer();
-    void purgeGLResources();
     void paintToCurrentGLContext(const WebCore::TransformationMatrix&, float, const WebCore::FloatRect&, WebCore::TextureMapper::PaintFlags = 0);
     void paintToGraphicsContext(BackingStore::PlatformGraphicsContext);
-    void syncRemoteContent();
     void setContentsSize(const WebCore::FloatSize&);
     void setVisibleContentsRect(const WebCore::FloatRect&);
     void didChangeScrollPosition(const WebCore::IntPoint& position);
@@ -82,6 +81,10 @@ public:
 
     void detach();
     void appendUpdate(const Function<void()>&);
+
+    // The painting thread must lock the main thread to use below two methods, because two methods access members that the main thread manages. See m_layerTreeCoordinatorProxy.
+    // Currently, QQuickWebPage::updatePaintNode() locks the main thread before calling both methods.
+    void purgeGLResources();
     void setActive(bool);
 
     void deleteLayer(WebLayerID);
@@ -112,42 +115,42 @@ public:
 
 #if ENABLE(REQUEST_ANIMATION_FRAME)
     void requestAnimationFrame();
-    void animationFrameReady();
 #endif
 
-    void setAccelerationMode(WebCore::TextureMapper::AccelerationMode mode)
-    {
-        // The acceleration mode is set only before TextureMapper was created.
-        ASSERT(!m_textureMapper);
-        m_accelerationMode = mode;
-    }
 private:
     PassOwnPtr<WebCore::GraphicsLayer> createLayer(WebLayerID);
 
     WebCore::GraphicsLayer* layerByID(WebLayerID id) { return (id == InvalidWebLayerID) ? 0 : m_layers.get(id); }
     WebCore::GraphicsLayer* rootLayer() { return m_rootLayer.get(); }
 
+    void syncRemoteContent();
+    void adjustPositionForFixedLayers();
+
     // Reimplementations from WebCore::GraphicsLayerClient.
     virtual void notifyAnimationStarted(const WebCore::GraphicsLayer*, double) { }
     virtual void notifyFlushRequired(const WebCore::GraphicsLayer*) { }
-    void paintContents(const WebCore::GraphicsLayer*, WebCore::GraphicsContext&, WebCore::GraphicsLayerPaintingPhase, const WebCore::IntRect&) { }
-    void updateViewport();
+    virtual void paintContents(const WebCore::GraphicsLayer*, WebCore::GraphicsContext&, WebCore::GraphicsLayerPaintingPhase, const WebCore::IntRect&) OVERRIDE { }
+
     void dispatchOnMainThread(const Function<void()>&);
-    void adjustPositionForFixedLayers();
+    void updateViewport();
+#if ENABLE(REQUEST_ANIMATION_FRAME)
+    void animationFrameReady();
+#endif
+    void renderNextFrame();
+    void purgeBackingStores();
 
     void assignImageBackingToLayer(WebCore::GraphicsLayer*, CoordinatedImageBackingID);
     void removeReleasedImageBackingsIfNeeded();
     void ensureRootLayer();
-    void ensureLayer(WebLayerID);
-    void commitTileOperations();
-    void renderNextFrame();
-    void purgeBackingStores();
+    WebCore::GraphicsLayer* ensureLayer(WebLayerID);
+    void commitPendingBackingStoreOperations();
 
-    PassRefPtr<CoordinatedBackingStore> getBackingStore(WebCore::GraphicsLayer*);
+    CoordinatedBackingStore* getBackingStore(WebCore::GraphicsLayer*);
+    void prepareContentBackingStore(WebCore::GraphicsLayer*);
+    void createBackingStoreIfNeeded(WebCore::GraphicsLayer*);
     void removeBackingStoreIfNeeded(WebCore::GraphicsLayer*);
     void resetBackingStoreSizeToLayerSize(WebCore::GraphicsLayer*);
 
-    typedef HashMap<WebLayerID, WebCore::GraphicsLayer*> LayerMap;
     WebCore::FloatSize m_contentsSize;
     WebCore::FloatRect m_visibleContentsRect;
 
@@ -161,6 +164,9 @@ private:
     ImageBackingMap m_imageBackings;
     Vector<RefPtr<CoordinatedBackingStore> > m_releasedImageBackings;
 
+    typedef HashMap<WebCore::TextureMapperLayer*, RefPtr<CoordinatedBackingStore> > BackingStoreMap;
+    BackingStoreMap m_pendingSyncBackingStores;
+
     HashSet<RefPtr<CoordinatedBackingStore> > m_backingStoresWithPendingBuffers;
 
 #if USE(GRAPHICS_SURFACE)
@@ -168,20 +174,23 @@ private:
     SurfaceBackingStoreMap m_surfaceBackingStores;
 #endif
 
+    // Below two members are accessed by only the main thread. The painting thread must lock the main thread to access both members.
     LayerTreeCoordinatorProxy* m_layerTreeCoordinatorProxy;
+    bool m_isActive;
+
     OwnPtr<WebCore::GraphicsLayer> m_rootLayer;
 
+    typedef HashMap<WebLayerID, OwnPtr<WebCore::GraphicsLayer> > LayerMap;
     LayerMap m_layers;
-    LayerMap m_fixedLayers;
+    typedef HashMap<WebLayerID, WebCore::GraphicsLayer*> LayerRawPtrMap;
+    LayerRawPtrMap m_fixedLayers;
     WebLayerID m_rootLayerID;
     WebCore::IntPoint m_renderedContentsScrollPosition;
     WebCore::IntPoint m_pendingRenderedContentsScrollPosition;
-    bool m_isActive;
     bool m_animationsLocked;
 #if ENABLE(REQUEST_ANIMATION_FRAME)
     bool m_animationFrameRequested;
 #endif
-    WebCore::TextureMapper::AccelerationMode m_accelerationMode;
     WebCore::Color m_backgroundColor;
     bool m_setDrawsBackground;
 

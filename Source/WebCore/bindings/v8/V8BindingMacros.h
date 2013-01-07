@@ -44,7 +44,7 @@ enum ParameterDefaultPolicy {
     DefaultIsNullString
 };
 
-#define EXCEPTION_BLOCK(type, var, value) \
+#define V8TRYCATCH(type, var, value) \
     type var;                             \
     {                                     \
         v8::TryCatch block;               \
@@ -53,16 +53,15 @@ enum ParameterDefaultPolicy {
             return block.ReThrow();       \
     }
 
-#define EXCEPTION_BLOCK_VOID(type, var, value) \
-    type var;                                  \
-    {                                          \
-        v8::TryCatch block;                    \
-        var = (value);                         \
-        if (block.HasCaught()) {               \
-            block.ReThrow();                   \
-            return;                            \
-        }                                      \
-    }
+#define V8TRYCATCH_FOR_V8STRINGRESOURCE(type, var, value) \
+    type var(value);                                            \
+    if (!var.prepare())                                         \
+        return v8::Undefined();
+
+#define V8TRYCATCH_FOR_V8STRINGRESOURCE_VOID(type, var, value) \
+    type var(value);                                                 \
+    if (!var.prepare())                                              \
+        return;
 
 #define MAYBE_MISSING_PARAMETER(args, index, policy) \
     (((policy) == DefaultIsNullString && (index) >= (args).Length()) ? (v8::Local<v8::Value>()) : ((args)[(index)]))

@@ -92,11 +92,6 @@ void CoordinatedBackingStore::updateTile(int id, const IntRect& sourceRect, cons
     it->value.setBackBuffer(tileRect, sourceRect, backBuffer, offset);
 }
 
-bool CoordinatedBackingStore::isEmpty() const
-{
-    return m_tiles.size() == m_tilesToRemove.size();
-}
-
 PassRefPtr<BitmapTexture> CoordinatedBackingStore::texture() const
 {
     HashMap<int, CoordinatedBackingStoreTile>::const_iterator end = m_tiles.end();
@@ -140,6 +135,10 @@ void CoordinatedBackingStore::paintTilesToTextureMapper(Vector<TextureMapperTile
 
 void CoordinatedBackingStore::paintToTextureMapper(TextureMapper* textureMapper, const FloatRect& targetRect, const TransformationMatrix& transform, float opacity, BitmapTexture* mask)
 {
+    if (m_tiles.isEmpty())
+        return;
+    ASSERT(!m_size.isZero());
+
     Vector<TextureMapperTile*> tilesToPaint;
     Vector<TextureMapperTile*> previousTilesToPaint;
 
@@ -165,7 +164,6 @@ void CoordinatedBackingStore::paintToTextureMapper(TextureMapper* textureMapper,
         previousTilesToPaint.append(&tile);
     }
 
-    ASSERT(!m_size.isZero());
     FloatRect rectOnContents(FloatPoint::zero(), m_size);
     TransformationMatrix adjustedTransform = transform;
     // targetRect is on the contents coordinate system, so we must compare two rects on the contents coordinate system.

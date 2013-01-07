@@ -131,11 +131,12 @@ WebInspector.TimelinePanel = function()
     this._expandOffset = 15;
 
     this._headerLineCount = 1;
+    this._adjustHeaderHeight();
 
     this._mainThreadTasks = /** @type {!Array.<{startTime: number, endTime: number}>} */ ([]);
-    this._mainThreadMonitoringEnabled = false;
-    if (WebInspector.settings.showCpuOnTimelineRuler.get() && Capabilities.timelineCanMonitorMainThread)
-        this._enableMainThreadMonitoring();
+    this._cpuBarsElement = this._timelineGrid.gridHeaderElement.createChild("div", "timeline-cpu-bars");
+    this._mainThreadMonitoringEnabled = Capabilities.timelineCanMonitorMainThread && WebInspector.settings.showCpuOnTimelineRuler.get();
+    WebInspector.settings.showCpuOnTimelineRuler.addChangeListener(this._showCpuOnTimelineRulerChanged, this);
 
     this._createFileSelector();
 
@@ -155,6 +156,15 @@ WebInspector.TimelinePanel = function()
 WebInspector.TimelinePanel.rowHeight = 18;
 
 WebInspector.TimelinePanel.prototype = {
+    _showCpuOnTimelineRulerChanged: function()
+    {
+        var mainThreadMonitoringEnabled = WebInspector.settings.showCpuOnTimelineRuler.get();
+        if (this._mainThreadMonitoringEnabled !== mainThreadMonitoringEnabled) {
+            this._mainThreadMonitoringEnabled = mainThreadMonitoringEnabled;
+            this._refreshMainThreadBars();
+        }
+    },
+
     /**
      * @param {Event} event
      * @return {boolean}
@@ -312,20 +322,10 @@ WebInspector.TimelinePanel.prototype = {
 
     _registerShortcuts: function()
     {
-        var shortcut = WebInspector.KeyboardShortcut;
-        var modifiers = shortcut.Modifiers;
-        var section = WebInspector.shortcutsScreen.section(WebInspector.UIString("Timeline Panel"));
-
-        this._shortcuts[shortcut.makeKey("e", modifiers.CtrlOrMeta)] = this._toggleTimelineButtonClicked.bind(this);
-        section.addKey(shortcut.shortcutToString("e", modifiers.CtrlOrMeta), WebInspector.UIString("Start/stop recording"));
-
-        if (InspectorFrontendHost.canSave()) {
-            this._shortcuts[shortcut.makeKey("s", modifiers.CtrlOrMeta)] = this._saveToFile.bind(this);
-            section.addKey(shortcut.shortcutToString("s", modifiers.CtrlOrMeta), WebInspector.UIString("Save timeline data"));
-        }
-
-        this._shortcuts[shortcut.makeKey("o", modifiers.CtrlOrMeta)] = this._fileSelectorElement.click.bind(this._fileSelectorElement);
-        section.addKey(shortcut.shortcutToString("o", modifiers.CtrlOrMeta), WebInspector.UIString("Load timeline data"));
+        this.registerShortcuts(WebInspector.TimelinePanelDescriptor.ShortcutKeys.StartStopRecording, this._toggleTimelineButtonClicked.bind(this));
+        if (InspectorFrontendHost.canSave())
+            this.registerShortcuts(WebInspector.TimelinePanelDescriptor.ShortcutKeys.SaveToFile, this._saveToFile.bind(this));
+        this.registerShortcuts(WebInspector.TimelinePanelDescriptor.ShortcutKeys.LoadFromFile, this._fileSelectorElement.click.bind(this._fileSelectorElement));
     },
 
     _createFileSelector: function()
@@ -901,7 +901,7 @@ WebInspector.TimelinePanel.prototype = {
         var startTime = this._overviewPane.windowStartTime() - this._timelinePaddingLeft * scale;
         var endTime = startTime + width * scale;
 
-        var tasks = this._mainThreadTasks;
+        var tasks = this._mainThreadMonitoringEnabled ? this._mainThreadTasks : [];
 
         function compareEndTime(value, task)
         {
@@ -958,11 +958,8 @@ WebInspector.TimelinePanel.prototype = {
         }
     },
 
-    _enableMainThreadMonitoring: function()
+    _adjustHeaderHeight: function()
     {
-        var container = this._timelineGrid.gridHeaderElement;
-        this._cpuBarsElement = container.createChild("div", "timeline-cpu-bars");
-
         const headerBorderWidth = 1;
         const headerMargin = 2;
 
@@ -970,8 +967,6 @@ WebInspector.TimelinePanel.prototype = {
         this.sidebarElement.firstChild.style.height = headerHeight + "px";
         this._timelineGrid.dividersLabelBarElement.style.height = headerHeight + headerMargin + "px";
         this._itemsGraphsElement.style.top = headerHeight + headerBorderWidth + "px";
-
-        this._mainThreadMonitoringEnabled = true;
     },
 
     _adjustScrollPosition: function(totalHeight)

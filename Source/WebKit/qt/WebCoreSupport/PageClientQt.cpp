@@ -110,6 +110,7 @@ void TextureMapperLayerClientQt::setTextureMapper(const PassOwnPtr<TextureMapper
 {
     m_frame->d->textureMapper = textureMapper;
     m_frame->d->rootTextureMapperLayer->setTextureMapper(m_frame->d->textureMapper.get());
+    syncRootLayer();
 }
 
 TextureMapperLayerClientQt::~TextureMapperLayerClientQt()
@@ -133,7 +134,6 @@ void PageClientQWidget::setRootGraphicsLayer(GraphicsLayer* layer)
     if (layer) {
         TextureMapperLayerClient = adoptPtr(new TextureMapperLayerClientQt(page->mainFrame(), layer));
         TextureMapperLayerClient->setTextureMapper(TextureMapper::create());
-        TextureMapperLayerClient->syncRootLayer();
         return;
     }
     TextureMapperLayerClient.clear();
@@ -294,11 +294,16 @@ void PageClientQGraphicsWidget::setRootGraphicsLayer(GraphicsLayer* layer)
 {
     if (layer) {
         TextureMapperLayerClient = adoptPtr(new TextureMapperLayerClientQt(page->mainFrame(), layer));
-#if USE(TEXTURE_MAPPER_GL)
+#if USE(TEXTURE_MAPPER_GL) && defined(QT_OPENGL_LIB)
         QGraphicsView* graphicsView = view->scene()->views()[0];
-        if (graphicsView && graphicsView->viewport() && graphicsView->viewport()->inherits("QGLWidget")) {
-            TextureMapperLayerClient->setTextureMapper(TextureMapper::create(TextureMapper::OpenGLMode));
-            return;
+        if (graphicsView && graphicsView->viewport()) {
+            QGLWidget* glWidget = qobject_cast<QGLWidget*>(graphicsView->viewport());
+            if (glWidget) {
+                // The GL context belonging to the QGLWidget viewport must be current when TextureMapper is being created.
+                glWidget->makeCurrent();
+                TextureMapperLayerClient->setTextureMapper(TextureMapper::create(TextureMapper::OpenGLMode));
+                return;
+            }
         }
 #endif
         TextureMapperLayerClient->setTextureMapper(TextureMapper::create());

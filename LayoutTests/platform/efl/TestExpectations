@@ -392,6 +392,9 @@ webkit.org/b/89052 fast/css/image-orientation
 webkit.org/b/94110 fast/css3-text/css3-text-decoration/repaint/repaint-text-decoration-style.html [ ImageOnlyFailure Missing ]
 webkit.org/b/94110 fast/css3-text/css3-text-decoration/text-decoration-style.html [ ImageOnlyFailure Missing ]
 
+# CSS3 Background is not yet enabled (needs ENABLE_CSS3_BACKGROUND).
+webkit.org/b/37514 fast/backgrounds/background-position-parsing-2.html [ Text ]
+
 # Perf tests are really slow in debug builds and there are few benefits in running them.
 [ Debug ] perf [ WontFix ]
 
@@ -663,10 +666,8 @@ webkit.org/b/100519 fast/images/paletted-png-with-color-profile.html [ Skip ]
 
 webkit.org/b/85603 fast/forms/textarea-placeholder-set-attribute.html [ Failure ImageOnlyFailure Pass ]
 webkit.org/b/59801 fast/workers/storage/use-same-database-in-page-and-workers.html [ Failure Pass ]
-webkit.org/b/85180 media/audio-delete-while-step-button-clicked.html [ Failure Pass ]
 webkit.org/b/86073 ietestcenter/css3/flexbox/flexbox-layout-001.htm [ ImageOnlyFailure Pass ]
 webkit.org/b/86073 ietestcenter/css3/flexbox/flexbox-layout-003.htm [ ImageOnlyFailure Pass ]
-webkit.org/b/86074 media/svg-as-image-with-media-blocked.html [ Crash Pass ]
 webkit.org/b/86078 http/tests/misc/favicon-loads-with-icon-loading-override.html [ Failure Pass ]
 webkit.org/b/86079 http/tests/misc/link-rel-icon-beforeload.html [ Failure Pass ]
 webkit.org/b/86081 loader/navigation-while-deferring-loads.html [ Failure Pass ]
@@ -678,6 +679,10 @@ webkit.org/b/91366 fast/forms/number/number-spinbutton-gets-disabled-or-readonly
 webkit.org/b/92112 fast/overflow/overflow-height-float-not-removed-crash2.html [ Crash Pass ]
 webkit.org/b/93589 svg/dom/SVGScriptElement/script-change-externalResourcesRequired-while-loading.svg [ Failure Pass ]
 webkit.org/b/98656 fast/dynamic/window-scrollbars-test.html [ Failure Pass ]
+webkit.org/b/103439 fast/loader/submit-form-while-parsing-2.html [ Failure Pass ]
+webkit.org/b/103443 fast/parser/parser-yield-timing.html [ Failure Pass ]
+webkit.org/b/103444 http/tests/css/shared-stylesheet-mutation.html [ Failure Pass ]
+webkit.org/b/103445 http/tests/css/shared-stylesheet-mutation-preconstruct.html [ Failure Pass ]
 
 # Flaky inspector tests
 webkit.org/b/78869 http/tests/inspector/inspect-element.html [ Failure Pass ]
@@ -705,12 +710,22 @@ webkit.org/b/77631 fast/multicol/span/span-as-immediate-columns-child-removal.ht
 webkit.org/b/93213 fast/text/international/text-spliced-font.html [ Failure Pass ]
 webkit.org/b/93214 http/tests/loading/307-after-303-after-post.html [ Crash Failure Pass Timeout ]
 webkit.org/b/93212 http/tests/incremental/slow-utf8-text.pl [ Pass Timeout ]
-webkit.org/b/68878 media/video-playing-and-pause.html [ Failure Pass ]
-webkit.org/b/98621 media/video-controls-rendering.html [ Failure Pass ]
+
+webkit.org/b/85180 media/audio-delete-while-step-button-clicked.html [ Failure Pass ]
+webkit.org/b/86074 media/svg-as-image-with-media-blocked.html [ Crash Pass ]
+webkit.org/b/83878 media/track/track-mode.html [ Failure Pass ]
+webkit.org/b/68878 webkit.org/b/102993 media/video-playing-and-pause.html [ Failure Pass ]
+webkit.org/b/98621 webkit.org/b/102993 media/video-controls-rendering.html [ Failure Pass ]
+webkit.org/b/96641 media/video-seek-past-end-playing.html [ Failure Pass ]
 
 webkit.org/b/100636 [ Debug ] jquery/traversing.html [ Failure Crash Pass ]
 
-webkit.org/b/96641 media/video-seek-past-end-playing.html [ Failure Pass ]
+webkit.org/b/102928 svg/foreignObject/viewport-foreignobject-crash.html [ Crash Failure Pass ]
+
+# Issue with timing for suspend/resumeAnimations()?
+webkit.org/b/49182 animations/stop-animation-on-suspend.html [ Failure Pass ]
+
+webkit.org/b/103383 fast/css/counters/element-removal-crash.xhtml [ Failure Pass ]
 
 #////////////////////////////////////////////////////////////////////////////////////////
 # FAILING TESTS
@@ -997,9 +1012,6 @@ webkit.org/b/84589 fast/harness/show-modal-dialog.html [ Failure ]
 webkit.org/b/84589 fast/events/scroll-event-during-modal-dialog.html [ Failure ]
 webkit.org/b/84589 http/tests/security/cross-frame-access-get.html [ Failure ]
 
-# Issue with timing for suspend/resumeAnimations()?
-webkit.org/b/84592 animations/stop-animation-on-suspend.html [ Failure ]
-
 # IndexedDB is not yet enabled.
 Bug(EFL) storage/indexeddb
 Bug(EFL) http/tests/inspector/indexeddb
@@ -1170,11 +1182,6 @@ webkit.org/b/75747 fast/css/color-correction.html [ Missing Failure ]
 webkit.org/b/65536 fast/css/text-rendering.html [ Missing Failure ]
 
 webkit.org/b/49142 fast/css/style-scoped [ Skip ]
-
-# ENABLE(INPUT_TYPE_*) are not enabled.
-webkit.org/b/29359 fast/css/pseudo-in-range.html [ Failure ]
-webkit.org/b/29359 fast/css/pseudo-out-of-range.html [ Failure ]
-webkit.org/b/29359 fast/css/pseudo-in-range-invalid-value.html [ Failure ]
 
 # These tests require TOUCH_ADJUSTMENT flag to be enabled
 webkit.org/b/78801 touchadjustment
@@ -1561,9 +1568,6 @@ webkit.org/b/100424 editing/selection/user-select-all-selection.html [ Failure ]
 # Entering into full screen playback mode fails when triggered by context menu
 Bug(EFL) media/context-menu-actions.html [ Failure ]
 
-# ESC key does not cancel context menu in EFL port
-Bug(EFL) editing/selection/5354455-1.html [ Failure ]
-
 # Tests that create an extra graphics layer
 webkit.org/b/102697 compositing/overflow/overflow-auto-with-touch-no-overflow.html [ Failure ]
 webkit.org/b/102697 compositing/overflow/overflow-hidden-with-touch.html [ Failure ]
@@ -1578,8 +1582,6 @@ Bug(EFL) animations/negative-delay.html [ Failure Pass ]
 Bug(EFL) compositing/bounds-in-flipped-writing-mode.html [ Failure ]
 Bug(EFL) compositing/iframes/leave-compositing-iframe.html [ Failure ]
 Bug(EFL) compositing/iframes/scroll-grandchild-iframe.html [ ImageOnlyFailure ]
-Bug(EFL) compositing/reflections/load-video-in-reflection.html [ Failure Timeout ]
-Bug(EFL) compositing/regions/webkit-flow-renderer-layer-compositing.html [ ImageOnlyFailure ]
 Bug(EFL) compositing/repaint/invalidations-on-composited-layers.html [ Failure ]
 Bug(EFL) compositing/tiling/backface-preserve-3d-tiled.html [ ImageOnlyFailure ]
 Bug(EFL) compositing/visibility/visibility-composited.html [ Failure ]
@@ -1593,7 +1595,6 @@ Bug(EFL) editing/selection/caret-ltr-2.html [ Failure Pass ]
 Bug(EFL) editing/selection/caret-rtl-2.html [ Failure Pass ]
 Bug(EFL) fast/block/basic/020.html [ Failure ]
 Bug(EFL) fast/css/hover-update.html [ Failure Pass ]
-Bug(EFL) fast/css/text-overflow-input.html [ Missing ]
 Bug(EFL) fast/dynamic/012.html [ Failure ]
 Bug(EFL) fast/dynamic/layer-hit-test-crash.html [ Failure ]
 Bug(EFL) fast/forms/basic-textareas-quirks.html [ Missing ]
@@ -1603,31 +1604,14 @@ Bug(EFL) fast/forms/input-text-scroll-left-on-blur.html [ Missing ]
 Bug(EFL) fast/js/array-sort-modifying-tostring.html [ Crash ]
 Bug(EFL) fast/layers/layer-visibility-sublayer.html [ Failure ]
 Bug(EFL) fast/layers/layer-visibility.html [ Failure ]
-Bug(EFL) fast/layers/no-clipping-overflow-hidden-added-after-transition.html [ ImageOnlyFailure Pass ]
-Bug(EFL) fast/loader/submit-form-while-parsing-2.html [ Failure Pass ]
 Bug(EFL) fast/media/mq-transform-02.html [ Failure ]
 Bug(EFL) fast/media/mq-transform-03.html [ Failure ]
-Bug(EFL) fast/multicol/vertical-lr/nested-columns.html [ Crash Pass ]
-Bug(EFL) fast/multicol/vertical-rl/nested-columns.html [ Crash Pass ]
-Bug(EFL) fast/parser/parser-yield-timing.html [ Failure Pass ]
 Bug(EFL) fast/repaint/invisible-objects.html [ Failure ]
 Bug(EFL) fast/repaint/layer-hide-when-needs-layout.html [ Failure ]
 Bug(EFL) fast/text/whitespace/028.html [ Failure ]
-Bug(EFL) fast/multicol/nested-columns.html [ Crash ]
-Bug(EFL) fast/multicol/vertical-rl/rule-style.html [ Crash Pass ]
-Bug(EFL) fullscreen/exit-full-screen-iframe.html [ Failure Pass ]
-Bug(EFL) fullscreen/full-screen-iframe-allowed.html [ Failure Pass ]
 Bug(EFL) fullscreen/full-screen-iframe-legacy.html [ Failure Pass ]
-Bug(EFL) fullscreen/full-screen-iframe-without-allow-attribute-allowed-from-parent.html [ Failure Pass ]
-Bug(EFL) http/tests/css/shared-stylesheet-mutation-preconstruct.html [ Failure Pass ]
-Bug(EFL) http/tests/css/shared-stylesheet-mutation.html [ Failure Pass ]
-Bug(EFL) jquery/core.html [ Failure Pass ]
-Bug(EFL) jquery/event.html [ Failure Pass ]
 Bug(EFL) media/track/track-cues-pause-on-exit.html [ Failure Pass ]
 Bug(EFL) media/video-played-collapse.html [ Failure Pass ]
-Bug(EFL) sputnik/Conformance/07_Lexical_Conventions/7.8_Literals/7.8.5_Regular_Expression_Literals/S7.8.5_A1.4_T2.html [ Crash Pass ]
-Bug(EFL) sputnik/Conformance/07_Lexical_Conventions/7.8_Literals/7.8.5_Regular_Expression_Literals/S7.8.5_A1.1_T2.html [ Crash Pass ]
-Bug(EFL) sputnik/Conformance/07_Lexical_Conventions/7.8_Literals/7.8.5_Regular_Expression_Literals/S7.8.5_A2.1_T2.html [ Crash Pass ]
 Bug(EFL) svg/animations/reinserting-svg-into-document.html [ Failure Pass ]
 Bug(EFL) svg/animations/svgenum-animation-7.html [ Failure Pass ]
 Bug(EFL) transforms/3d/general/perspective-non-layer.html [ Missing ]
@@ -1645,8 +1629,8 @@ Bug(EFL) transforms/3d/point-mapping/3d-point-mapping.html [ Missing ]
 Bug(EFL) transitions/negative-delay.html [ Failure Pass ]
 
 # Media paint regressions
-webkit.org/b/102068 media/audio-repaint.html [ ImageOnlyFailure ]
-webkit.org/b/102068 media/media-document-audio-repaint.html [ ImageOnlyFailure ]
+webkit.org/b/102068 webkit.org/b/102993 media/audio-repaint.html [ Failure ]
+webkit.org/b/102068 webkit.org/b/102993 media/media-document-audio-repaint.html [ Failure ]
 
 # It may even be the case that the tests themselves are wrong.
 webkit.org/b/100859 ietestcenter/css3/bordersbackgrounds/background-repeat-space-padding-box.htm [ ImageOnlyFailure Missing ]
@@ -1677,10 +1661,23 @@ webkit.org/b/102097 svg/as-image/image-respects-deviceScaleFactor.html [ Skip ]
 webkit.org/b/102100 svg/repaint/inner-svg-change-viewBox.svg [ ImageOnlyFailure ]
 
 webkit.org/b/102190 compositing/overflow/updating-scrolling-content.html [ Failure ]
-webkit.org/b/102190 fast/events/overflow-scroll-fake-mouse-move.html [ Failure ]
 
 webkit.org/b/102364 compositing/overflow/scrolling-without-painting.html [ Failure ]
 
 webkit.org/b/102367 fast/forms/zoomed-controls.html [ ImageOnlyFailure Missing ]
 
 webkit.org/b/102493 fast/events/mouse-cursor.html [ Failure ]
+
+# EFL still has the CC toggle button, not the menu of tracks.
+webkit.org/b/101670 media/video-controls-captions-trackmenu.html [ Skip ]
+
+# Fails until we enable the Resource Timing API.
+webkit.org/b/61138 http/tests/w3c/webperf/submission/resource-timing [ Skip ]
+
+webkit.org/b/103109 fast/dom/shadow/host-wrapper-reclaimed.html [ Failure ]
+
+# No spellcheck suggestions in context menu
+Bug(EFL) editing/spelling/context-menu-suggestions.html [ Failure ]
+
+# Newly added test in r136225 fails on GTK bot too.
+webkit.org/b/103740 editing/selection/caret-alignment-for-vertical-text.html [ Failure ]

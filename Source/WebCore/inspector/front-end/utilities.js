@@ -428,12 +428,6 @@ function insertionIndexForObjectInListSortedByFunction(anObject, aList, aFunctio
     }
 }
 
-Array.convert = function(list)
-{
-    // Cast array-like object to an array.
-    return Array.prototype.slice.call(list);
-}
-
 /**
  * @param {string} format
  * @param {...*} var_arg
@@ -867,6 +861,7 @@ function importScript(scriptName)
     window.eval(xhr.responseText + "\n//@ sourceURL=" + scriptName);
 }
 
+window.isUnderTest = false;
 
 /**
  * Mutation observers leak memory. Keep track of them and disconnect
@@ -878,7 +873,7 @@ function NonLeakingMutationObserver(handler)
 {
     this._observer = new WebKitMutationObserver(handler);
     NonLeakingMutationObserver._instances.push(this);
-    if (!window.testRunner && !WebInspector.isUnderTest && !NonLeakingMutationObserver._unloadListener) {
+    if (!window.testRunner && !window.isUnderTest && !NonLeakingMutationObserver._unloadListener) {
         NonLeakingMutationObserver._unloadListener = function() {
             while (NonLeakingMutationObserver._instances.length)
                 NonLeakingMutationObserver._instances[NonLeakingMutationObserver._instances.length - 1].disconnect();

@@ -30,14 +30,15 @@
 #ifndef FrameLoaderClientQt_h
 #define FrameLoaderClientQt_h
 
-
+#include "FormState.h"
 #include "Frame.h"
 #include "FrameLoader.h"
 #include "FrameLoaderClient.h"
+#include "HTMLFormElement.h"
 #include "KURL.h"
-#include "WebCore/plugins/PluginView.h"
 #include "ResourceError.h"
 #include "ResourceResponse.h"
+#include "WebCore/plugins/PluginView.h"
 #include <QUrl>
 #include <qobject.h>
 #include <wtf/Forward.h>

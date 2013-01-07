@@ -107,7 +107,6 @@ void CoordinatedGraphicsLayer::didChangeGeometry()
 
 CoordinatedGraphicsLayer::CoordinatedGraphicsLayer(GraphicsLayerClient* client)
     : GraphicsLayer(client)
-    , m_maskTarget(0)
     , m_inUpdateMode(false)
     , m_shouldUpdateVisibleRect(true)
     , m_shouldSyncLayerState(true)
@@ -146,10 +145,6 @@ bool CoordinatedGraphicsLayer::setChildren(const Vector<GraphicsLayer*>& childre
     bool ok = GraphicsLayer::setChildren(children);
     if (!ok)
         return false;
-    for (unsigned i = 0; i < children.size(); ++i) {
-        CoordinatedGraphicsLayer* child = toCoordinatedGraphicsLayer(children[i]);
-        child->didChangeLayerState();
-    }
     didChangeChildren();
     return true;
 }
@@ -157,28 +152,24 @@ bool CoordinatedGraphicsLayer::setChildren(const Vector<GraphicsLayer*>& childre
 void CoordinatedGraphicsLayer::addChild(GraphicsLayer* layer)
 {
     GraphicsLayer::addChild(layer);
-    toCoordinatedGraphicsLayer(layer)->didChangeLayerState();
     didChangeChildren();
 }
 
 void CoordinatedGraphicsLayer::addChildAtIndex(GraphicsLayer* layer, int index)
 {
     GraphicsLayer::addChildAtIndex(layer, index);
-    toCoordinatedGraphicsLayer(layer)->didChangeLayerState();
     didChangeChildren();
 }
 
 void CoordinatedGraphicsLayer::addChildAbove(GraphicsLayer* layer, GraphicsLayer* sibling)
 {
     GraphicsLayer::addChildAbove(layer, sibling);
-    toCoordinatedGraphicsLayer(layer)->didChangeLayerState();
     didChangeChildren();
 }
 
 void CoordinatedGraphicsLayer::addChildBelow(GraphicsLayer* layer, GraphicsLayer* sibling)
 {
     GraphicsLayer::addChildBelow(layer, sibling);
-    toCoordinatedGraphicsLayer(layer)->didChangeLayerState();
     didChangeChildren();
 }
 
@@ -188,8 +179,6 @@ bool CoordinatedGraphicsLayer::replaceChild(GraphicsLayer* oldChild, GraphicsLay
     if (!ok)
         return false;
     didChangeChildren();
-    toCoordinatedGraphicsLayer(oldChild)->didChangeLayerState();
-    toCoordinatedGraphicsLayer(newChild)->didChangeLayerState();
     return true;
 }
 
@@ -198,8 +187,6 @@ void CoordinatedGraphicsLayer::removeFromParent()
     if (CoordinatedGraphicsLayer* parentLayer = toCoordinatedGraphicsLayer(parent()))
         parentLayer->didChangeChildren();
     GraphicsLayer::removeFromParent();
-
-    didChangeLayerState();
 }
 
 void CoordinatedGraphicsLayer::setPosition(const FloatPoint& p)
@@ -281,6 +268,8 @@ void CoordinatedGraphicsLayer::setContentsVisible(bool b)
     if (contentsAreVisible() == b)
         return;
     GraphicsLayer::setContentsVisible(b);
+    if (maskLayer())
+        maskLayer()->setContentsVisible(b);
 
     didChangeLayerState();
 }
@@ -402,8 +391,8 @@ void CoordinatedGraphicsLayer::setMaskLayer(GraphicsLayer* layer)
         return;
 
     layer->setSize(size());
+    layer->setContentsVisible(contentsAreVisible());
     CoordinatedGraphicsLayer* CoordinatedGraphicsLayer = toCoordinatedGraphicsLayer(layer);
-    CoordinatedGraphicsLayer->setMaskTarget(this);
     CoordinatedGraphicsLayer->didChangeLayerState();
     didChangeLayerState();
 
@@ -665,8 +654,6 @@ void CoordinatedGraphicsLayer::adjustContentsScale()
 
     // No reason to save the previous backing store for non-visible areas.
     m_previousBackingStore->removeAllNonVisibleTiles();
-
-    createBackingStore();
 }
 
 void CoordinatedGraphicsLayer::createBackingStore()
@@ -699,6 +686,19 @@ IntRect CoordinatedGraphicsLayer::tiledBackingStoreContentsRect()
     return IntRect(0, 0, size().width(), size().height());
 }
 
+static void clampToContentsRectIfRectIsInfinite(FloatRect& rect, const IntRect& contentsRect)
+{
+    if (rect.width() >= LayoutUnit::nearlyMax() || rect.width() <= LayoutUnit::nearlyMin()) {
+        rect.setX(contentsRect.x());
+        rect.setWidth(contentsRect.width());
+    }
+
+    if (rect.height() >= LayoutUnit::nearlyMax() || rect.height() <= LayoutUnit::nearlyMin()) {
+        rect.setY(contentsRect.y());
+        rect.setHeight(contentsRect.height());
+    }
+}
+
 IntRect CoordinatedGraphicsLayer::tiledBackingStoreVisibleRect()
 {
     // Non-invertible layers are not visible.
@@ -709,7 +709,9 @@ IntRect CoordinatedGraphicsLayer::tiledBackingStoreVisibleRect()
     // The resulting quad might be squewed and the visible rect is the bounding box of this quad,
     // so it might spread further than the real visible area (and then even more amplified by the cover rect multiplier).
     ASSERT(m_cachedInverseTransform == m_layerTransform.combined().inverse());
-    return enclosingIntRect(m_cachedInverseTransform.clampedBoundsOfProjectedQuad(FloatQuad(FloatRect(m_coordinator->visibleContentsRect()))));
+    FloatRect rect = m_cachedInverseTransform.clampedBoundsOfProjectedQuad(FloatQuad(FloatRect(m_coordinator->visibleContentsRect())));
+    clampToContentsRectIfRectIsInfinite(rect, tiledBackingStoreContentsRect());
+    return enclosingIntRect(rect);
 }
 
 Color CoordinatedGraphicsLayer::tiledBackingStoreBackgroundColor() const
@@ -745,7 +747,7 @@ void CoordinatedGraphicsLayer::removeTile(int tileID)
 
 void CoordinatedGraphicsLayer::updateContentBuffers()
 {
-    if (!drawsContent()) {
+    if (!drawsContent() || !contentsAreVisible() || m_size.isEmpty()) {
         m_mainBackingStore.clear();
         m_previousBackingStore.clear();
         return;
@@ -774,7 +776,6 @@ void CoordinatedGraphicsLayer::purgeBackingStores()
     releaseImageBackingIfNeeded();
 
     didChangeLayerState();
-    didChangeChildren();
 }
 
 void CoordinatedGraphicsLayer::setCoordinator(WebKit::CoordinatedGraphicsLayerClient* coordinator)
@@ -858,7 +859,10 @@ bool CoordinatedGraphicsLayer::selfOrAncestorHaveNonAffineTransforms()
     if (!m_layerTransform.combined().isAffine())
         return true;
 
-    return false;
+    if (!parent())
+        return false;
+
+    return toCoordinatedGraphicsLayer(parent())->selfOrAncestorHaveNonAffineTransforms();
 }
 
 bool CoordinatedGraphicsLayer::addAnimation(const KeyframeValueList& valueList, const IntSize& boxSize, const Animation* anim, const String& keyframesName, double delayAsNegativeTimeOffset)

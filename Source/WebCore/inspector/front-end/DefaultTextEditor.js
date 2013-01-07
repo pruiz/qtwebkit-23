@@ -417,6 +417,11 @@ WebInspector.DefaultTextEditor.prototype = {
 
     _handleKeyDown: function(e)
     {
+        // If the event was not triggered from the entire editor, then
+        // ignore it. https://bugs.webkit.org/show_bug.cgi?id=102906
+        if (e.target.enclosingNodeOrSelfWithClass("webkit-line-decorations"))
+            return;
+
         var shortcutKey = WebInspector.KeyboardShortcut.makeKeyFromEvent(e);
 
         var handler = this._shortcuts[shortcutKey];
@@ -450,7 +455,7 @@ WebInspector.DefaultTextEditor.prototype = {
 
     _handleScrollChanged: function(event)
     {
-        var visibleFrom = this._mainPanel.element.scrollTop;
+        var visibleFrom = this._mainPanel._scrollTop();
         var firstVisibleLineNumber = this._mainPanel._findFirstVisibleLineNumber(visibleFrom);
         this._delegate.scrollChanged(firstVisibleLineNumber);
     },
@@ -584,6 +589,79 @@ WebInspector.DefaultTextEditor.prototype = {
         if (!this.readOnly())
             WebInspector.markBeingEdited(this.element, false);
         this._freeCachedElements();
+    },
+
+    /**
+     * @param {Element} element
+     * @param {Array.<Object>} resultRanges
+     * @param {string} styleClass
+     * @param {Array.<Object>=} changes
+     */
+    highlightRangesWithStyleClass: function(element, resultRanges, styleClass, changes)
+    {
+        this._mainPanel.beginDomUpdates();
+        WebInspector.highlightRangesWithStyleClass(element, resultRanges, styleClass, changes);
+        this._mainPanel.endDomUpdates();
+    },
+
+    /**
+     * @param {Element} element
+     * @param {Object} skipClasses
+     * @param {Object} skipTokens
+     * @return {Element}
+     */
+    highlightExpression: function(element, skipClasses, skipTokens)
+    {
+        // Collect tokens belonging to evaluated expression.
+        var tokens = [ element ];
+        var token = element.previousSibling;
+        while (token && (skipClasses[token.className] || skipTokens[token.textContent.trim()])) {
+            tokens.push(token);
+            token = token.previousSibling;
+        }
+        tokens.reverse();
+
+        // Wrap them with highlight element.
+        this._mainPanel.beginDomUpdates();
+        var parentElement = element.parentElement;
+        var nextElement = element.nextSibling;
+        var container = document.createElement("span");
+        for (var i = 0; i < tokens.length; ++i)
+            container.appendChild(tokens[i]);
+        parentElement.insertBefore(container, nextElement);
+        this._mainPanel.endDomUpdates();
+        return container;
+    },
+
+    /**
+     * @param {Element} highlightElement
+     */
+    hideHighlightedExpression: function(highlightElement)
+    {
+        this._mainPanel.beginDomUpdates();
+        var parentElement = highlightElement.parentElement;
+        if (parentElement) {
+            var child = highlightElement.firstChild;
+            while (child) {
+                var nextSibling = child.nextSibling;
+                parentElement.insertBefore(child, highlightElement);
+                child = nextSibling;
+            }
+            parentElement.removeChild(highlightElement);
+        }
+        this._mainPanel.endDomUpdates();
+    },
+
+    /**
+     * @param {number} scrollTop
+     * @param {number} clientHeight
+     * @param {number} chunkSize
+     */
+    overrideViewportForTest: function(scrollTop, clientHeight, chunkSize)
+    {
+        this._mainPanel._scrollTopOverrideForTest = scrollTop;
+        this._mainPanel._clientHeightOverrideForTest = clientHeight;
+        this._mainPanel._defaultChunkSize = chunkSize;
     },
 
     __proto__: WebInspector.View.prototype
@@ -856,13 +934,23 @@ WebInspector.TextEditorChunkedPanel.prototype = {
         if (this._paintCoalescingLevel)
             return;
 
-        var visibleFrom = this.element.scrollTop;
-        var visibleTo = this.element.scrollTop + this.element.clientHeight;
+        var visibleFrom = this._scrollTop();
+        var visibleTo = visibleFrom + this._clientHeight();
 
         if (visibleTo) {
             var result = this._findVisibleChunks(visibleFrom, visibleTo);
             this._expandChunks(result.start, result.end);
         }
+    },
+
+    _scrollTop: function()
+    {
+        return typeof this._scrollTopOverrideForTest === "number" ? this._scrollTopOverrideForTest : this.element.scrollTop; 
+    },
+
+    _clientHeight: function()
+    {
+        return typeof this._clientHeightOverrideForTest === "number" ? this._clientHeightOverrideForTest : this.element.clientHeight; 
     },
 
     /**
@@ -1685,7 +1773,7 @@ WebInspector.TextEditorMainPanel.prototype = {
     {
         // First, paint visible lines, so that in case of long lines we should start highlighting
         // the visible area immediately, instead of waiting for the lines above the visible area.
-        var visibleFrom = this.element.scrollTop;
+        var visibleFrom = this._scrollTop();
         var firstVisibleLineNumber = this._findFirstVisibleLineNumber(visibleFrom);
 
         var chunk;
@@ -1920,7 +2008,9 @@ WebInspector.TextEditorMainPanel.prototype = {
         // We reached our container node, traverse within itself until we reach given offset.
         if (node === container && offset) {
             var text = node.textContent;
-            for (var i = 0; i < offset; ++i) {
+            // In case offset == 1 and lineRow is a chunk div, we need to traverse it all.
+            var textOffset = (node._chunk && offset === 1) ? text.length : offset;
+            for (var i = 0; i < textOffset; ++i) {
                 if (text.charAt(i) === "\n") {
                     lineNumber++;
                     column = 0;
@@ -1986,7 +2076,7 @@ WebInspector.TextEditorMainPanel.prototype = {
 
         var span = this._cachedSpans.pop() || document.createElement("span");
         span.className = "webkit-" + className;
-        if (false) // For paint debugging.
+        if (WebInspector.FALSE) // For paint debugging.
             span.addStyleClass("debug-fadeout");
         span.textContent = content;
         element.insertBefore(span, oldChild);
@@ -2150,9 +2240,6 @@ WebInspector.TextEditorMainPanel.prototype = {
                 editInfo = new WebInspector.DefaultTextEditor.EditInfo(range, lines.join("\n"));
         }
 
-        if (this._textModel.copyRange(editInfo.range) === editInfo.text)
-            return; // Noop
-
         var selection = this._getSelection(collectLinesFromNode);
 
         // Unindent after block
@@ -2306,98 +2393,68 @@ WebInspector.TextEditorMainPanel.prototype = {
      */
     _updateChunksForRanges: function(oldRange, newRange)
     {
-        // Update the chunks in range: firstChunkNumber <= index <= lastChunkNumber
-        var firstChunkNumber = this._chunkNumberForLine(oldRange.startLine);
-        var lastChunkNumber = firstChunkNumber;
-        while (lastChunkNumber + 1 < this._textChunks.length) {
-            if (this._textChunks[lastChunkNumber + 1].startLine > oldRange.endLine)
+        var firstDamagedChunkNumber = this._chunkNumberForLine(oldRange.startLine);
+        var lastDamagedChunkNumber = firstDamagedChunkNumber;
+        while (lastDamagedChunkNumber + 1 < this._textChunks.length) {
+            if (this._textChunks[lastDamagedChunkNumber + 1].startLine > oldRange.endLine)
                 break;
-            ++lastChunkNumber;
+            ++lastDamagedChunkNumber;
         }
 
-        var startLine = this._textChunks[firstChunkNumber].startLine;
-        var linesCount = this._textChunks[lastChunkNumber].startLine + this._textChunks[lastChunkNumber].linesCount - startLine;
-        var linesDiff = newRange.linesCount - oldRange.linesCount;
-        linesCount += linesDiff;
+        var firstDamagedChunk = this._textChunks[firstDamagedChunkNumber];
+        var lastDamagedChunk = this._textChunks[lastDamagedChunkNumber];
 
+        var linesDiff = newRange.linesCount - oldRange.linesCount;
+
+        // First, detect chunks that have not been modified and simply shift them.
         if (linesDiff) {
-            // Lines shifted, update the line numbers of the chunks below.
-            for (var chunkNumber = lastChunkNumber + 1; chunkNumber < this._textChunks.length; ++chunkNumber)
+            for (var chunkNumber = lastDamagedChunkNumber + 1; chunkNumber < this._textChunks.length; ++chunkNumber)
                 this._textChunks[chunkNumber].startLine += linesDiff;
         }
 
-        var firstLineRow;
-        if (firstChunkNumber) {
-            var chunk = this._textChunks[firstChunkNumber - 1];
-            firstLineRow = chunk.expanded ? chunk.expandedLineRow(chunk.startLine + chunk.linesCount - 1) : chunk.element;
-            firstLineRow = firstLineRow.nextSibling;
-        } else
-            firstLineRow = this._container.firstChild;
+        // Remove damaged chunks from DOM and from textChunks model.
+        var lastUndamagedChunk = firstDamagedChunkNumber > 0 ? this._textChunks[firstDamagedChunkNumber - 1] : null;
+        var firstUndamagedChunk = lastDamagedChunkNumber + 1 < this._textChunks.length ? this._textChunks[lastDamagedChunkNumber + 1] : null;
 
-        // Most frequent case: a chunk remained the same.
-        for (var chunkNumber = firstChunkNumber; chunkNumber <= lastChunkNumber; ++chunkNumber) {
-            var chunk = this._textChunks[chunkNumber];
-            if (chunk.startLine + chunk.linesCount > this._textModel.linesCount)
-                break;
-            var lineNumber = chunk.startLine;
-            for (var lineRow = firstLineRow; lineRow && lineNumber < chunk.startLine + chunk.linesCount; lineRow = lineRow.nextSibling) {
-                if (lineRow.lineNumber !== lineNumber || lineRow !== chunk.expandedLineRow(lineNumber) || lineRow.textContent !== this._textModel.line(lineNumber) || !lineRow.firstChild)
-                    break;
-                ++lineNumber;
+        var removeDOMFromNode = lastUndamagedChunk ? lastUndamagedChunk.lastElement().nextSibling : this._container.firstChild;
+        var removeDOMToNode = firstUndamagedChunk ? firstUndamagedChunk.firstElement() : null;
+
+        // Fast case - patch single expanded chunk that did not grow / shrink during edit.
+        if (!linesDiff && firstDamagedChunk === lastDamagedChunk && firstDamagedChunk._expandedLineRows) {
+            var lastUndamagedLineRow = lastDamagedChunk.expandedLineRow(oldRange.startLine - 1);
+            var firstUndamagedLineRow = firstDamagedChunk.expandedLineRow(oldRange.endLine + 1);
+            var localRemoveDOMFromNode = lastUndamagedLineRow ? lastUndamagedLineRow.nextSibling : removeDOMFromNode;
+            var localRemoveDOMToNode = firstUndamagedLineRow || removeDOMToNode;
+            removeSubsequentNodes(localRemoveDOMFromNode, localRemoveDOMToNode);
+            for (var i = newRange.startLine; i < newRange.endLine + 1; ++i) {
+                var row = firstDamagedChunk._createRow(i);
+                firstDamagedChunk._expandedLineRows[i - firstDamagedChunk.startLine] = row;
+                this._container.insertBefore(row, localRemoveDOMToNode);
             }
-            if (lineNumber < chunk.startLine + chunk.linesCount)
-                break;
-            chunk.updateCollapsedLineRow();
-            ++firstChunkNumber;
-            firstLineRow = lineRow;
-            startLine += chunk.linesCount;
-            linesCount -= chunk.linesCount;
-        }
-
-        if (firstChunkNumber > lastChunkNumber && linesCount === 0)
+            firstDamagedChunk.updateCollapsedLineRow();
+            this._assertDOMMatchesTextModel();
             return;
-
-        // Maybe merge with the next chunk, so that we should not create 1-sized chunks when appending new lines one by one.
-        var chunk = this._textChunks[lastChunkNumber + 1];
-        var linesInLastChunk = linesCount % this._defaultChunkSize;
-        if (chunk && !chunk.isDecorated() && linesInLastChunk > 0 && linesInLastChunk + chunk.linesCount <= this._defaultChunkSize) {
-            ++lastChunkNumber;
-            linesCount += chunk.linesCount;
         }
 
-        var scrollTop = this.element.scrollTop;
-        var scrollLeft = this.element.scrollLeft;
+        removeSubsequentNodes(removeDOMFromNode, removeDOMToNode);
+        this._textChunks.splice(firstDamagedChunkNumber, lastDamagedChunkNumber - firstDamagedChunkNumber + 1);
 
-        // Delete all DOM elements that were either controlled by the old chunks, or have just been inserted.
-        var firstUnmodifiedLineRow = null;
-        chunk = this._textChunks[lastChunkNumber + 1];
-        if (chunk)
-            firstUnmodifiedLineRow = chunk.expanded ? chunk.expandedLineRow(chunk.startLine) : chunk.element;
+        // Compute damaged chunks span
+        var startLine = firstDamagedChunk.startLine;
+        var endLine = lastDamagedChunk.endLine + linesDiff;
+        var lineSpan = endLine - startLine;
 
-        while (firstLineRow && firstLineRow !== firstUnmodifiedLineRow) {
-            var lineRow = firstLineRow;
-            firstLineRow = firstLineRow.nextSibling;
-            this._container.removeChild(lineRow);
+        // Re-create chunks for damaged area.
+        var insertionIndex = firstDamagedChunkNumber;
+        var chunkSize = Math.ceil(lineSpan / Math.ceil(lineSpan / this._defaultChunkSize));
+
+        for (var i = startLine; i < endLine; i += chunkSize) {
+            var chunk = this._createNewChunk(i, Math.min(endLine, i + chunkSize));
+            this._textChunks.splice(insertionIndex++, 0, chunk);
+            this._container.insertBefore(chunk.element, removeDOMToNode);
         }
 
-        // Replace old chunks with the new ones.
-        for (var chunkNumber = firstChunkNumber; linesCount > 0; ++chunkNumber) {
-            var chunkLinesCount = Math.min(this._defaultChunkSize, linesCount);
-            var newChunk = this._createNewChunk(startLine, startLine + chunkLinesCount);
-            this._container.insertBefore(newChunk.element, firstUnmodifiedLineRow);
-
-            if (chunkNumber <= lastChunkNumber)
-                this._textChunks[chunkNumber] = newChunk;
-            else
-                this._textChunks.splice(chunkNumber, 0, newChunk);
-            startLine += chunkLinesCount;
-            linesCount -= chunkLinesCount;
-        }
-        if (chunkNumber <= lastChunkNumber)
-            this._textChunks.splice(chunkNumber, lastChunkNumber - chunkNumber + 1);
-
-        this.element.scrollTop = scrollTop;
-        this.element.scrollLeft = scrollLeft;
+        this._assertDOMMatchesTextModel();
     },
 
     /**
@@ -2405,8 +2462,8 @@ WebInspector.TextEditorMainPanel.prototype = {
      */
     _updateHighlightsForRange: function(range)
     {
-        var visibleFrom = this.element.scrollTop;
-        var visibleTo = this.element.scrollTop + this.element.clientHeight;
+        var visibleFrom = this._scrollTop();
+        var visibleTo = visibleFrom + this._clientHeight();
 
         var result = this._findVisibleChunks(visibleFrom, visibleTo);
         var chunk = this._textChunks[result.end - 1];
@@ -2685,12 +2742,24 @@ WebInspector.TextEditorMainChunk.prototype = {
         for (var i = this.startLine; i < this.startLine + this.linesCount; ++i)
             lines.push(this._textModel.line(i));
 
+        if (WebInspector.FALSE)
+            console.log("Rebuilding chunk with " + lines.length + " lines");
+
         this.element.removeChildren();
         this.element.textContent = lines.join("\n");
-
         // The last empty line will get swallowed otherwise.
         if (!lines[lines.length - 1])
             this.element.appendChild(document.createElement("br"));
+    },
+
+    firstElement: function()
+    {
+        return this._expandedLineRows ? this._expandedLineRows[0] : this.element;
+    },
+
+    lastElement: function()
+    {
+        return this._expandedLineRows ? this._expandedLineRows[this._expandedLineRows.length - 1] : this.element;
     }
 }
 

@@ -35,6 +35,7 @@
 #include "BytecodeConventions.h"
 #include "CallLinkInfo.h"
 #include "CallReturnOffsetToBytecodeOffset.h"
+#include "CodeBlockHash.h"
 #include "CodeOrigin.h"
 #include "CodeType.h"
 #include "Comment.h"
@@ -128,6 +129,10 @@ namespace JSC {
     public:
         JS_EXPORT_PRIVATE virtual ~CodeBlock();
         
+        CodeBlockHash hash() const;
+        void dumpAssumingJITType(PrintStream&, JITCode::JITType) const;
+        void dump(PrintStream&) const;
+        
         int numParameters() const { return m_numParameters; }
         void setNumParameters(int newValue);
         
@@ -138,11 +143,9 @@ namespace JSC {
         PassOwnPtr<CodeBlock> releaseAlternative() { return m_alternative.release(); }
         void setAlternative(PassOwnPtr<CodeBlock> alternative) { m_alternative = alternative; }
         
-        CodeSpecializationKind specializationKind()
+        CodeSpecializationKind specializationKind() const
         {
-            if (m_isConstructor)
-                return CodeForConstruct;
-            return CodeForCall;
+            return specializationFromIsConstruct(m_isConstructor);
         }
         
 #if ENABLE(JIT)
@@ -163,7 +166,8 @@ namespace JSC {
 
         static void dumpStatistics();
 
-        void dump(ExecState*);
+        void dumpBytecode();
+        void dumpBytecode(unsigned bytecodeOffset);
         void printStructures(const Instruction*);
         void printStructure(const char* name, const Instruction*, int operand);
 
@@ -471,7 +475,7 @@ namespace JSC {
         }
         JITCode& getJITCode() { return m_jitCode; }
         MacroAssemblerCodePtr getJITCodeWithArityCheck() { return m_jitCodeWithArityCheck; }
-        JITCode::JITType getJITType() { return m_jitCode.jitType(); }
+        JITCode::JITType getJITType() const { return m_jitCode.jitType(); }
         ExecutableMemoryHandle* executableMemory() { return getJITCode().getExecutableMemory(); }
         virtual JSObject* compileOptimized(ExecState*, JSScope*, unsigned bytecodeIndex) = 0;
         virtual void jettison() = 0;
@@ -517,7 +521,7 @@ namespace JSC {
             return result;
         }
 #else
-        JITCode::JITType getJITType() { return JITCode::BaselineJIT; }
+        JITCode::JITType getJITType() const { return JITCode::BaselineJIT; }
 #endif
 
         ScriptExecutable* ownerExecutable() const { return m_ownerExecutable.get(); }
@@ -1211,17 +1215,17 @@ namespace JSC {
                 m_constantRegisters[i].set(*m_globalData, ownerExecutable(), constants[i].get());
         }
 
-        void dump(ExecState*, const Vector<Instruction>::const_iterator& begin, Vector<Instruction>::const_iterator&);
+        void dumpBytecode(ExecState*, const Instruction* begin, const Instruction*&);
 
         CString registerName(ExecState*, int r) const;
-        void printUnaryOp(ExecState*, int location, Vector<Instruction>::const_iterator&, const char* op);
-        void printBinaryOp(ExecState*, int location, Vector<Instruction>::const_iterator&, const char* op);
-        void printConditionalJump(ExecState*, const Vector<Instruction>::const_iterator&, Vector<Instruction>::const_iterator&, int location, const char* op);
-        void printGetByIdOp(ExecState*, int location, Vector<Instruction>::const_iterator&);
+        void printUnaryOp(ExecState*, int location, const Instruction*&, const char* op);
+        void printBinaryOp(ExecState*, int location, const Instruction*&, const char* op);
+        void printConditionalJump(ExecState*, const Instruction*, const Instruction*&, int location, const char* op);
+        void printGetByIdOp(ExecState*, int location, const Instruction*&);
         void printGetByIdCacheStatus(ExecState*, int location);
         enum CacheDumpMode { DumpCaches, DontDumpCaches };
-        void printCallOp(ExecState*, int location, Vector<Instruction>::const_iterator&, const char* op, CacheDumpMode);
-        void printPutByIdOp(ExecState*, int location, Vector<Instruction>::const_iterator&, const char* op);
+        void printCallOp(ExecState*, int location, const Instruction*&, const char* op, CacheDumpMode);
+        void printPutByIdOp(ExecState*, int location, const Instruction*&, const char* op);
         void visitStructures(SlotVisitor&, Instruction* vPC);
         
 #if ENABLE(DFG_JIT)

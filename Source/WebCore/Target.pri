@@ -394,8 +394,6 @@ SOURCES += \
     dom/DOMStringList.cpp \
     dom/DOMStringMap.cpp \
     dom/DatasetDOMStringMap.cpp \
-    dom/DynamicNodeList.cpp \
-    dom/EditingText.cpp \
     dom/Element.cpp \
     dom/ElementAttributeData.cpp \
     dom/ElementRareData.cpp \
@@ -417,6 +415,7 @@ SOURCES += \
     dom/IconURL.cpp \
     dom/IdTargetObserver.cpp \
     dom/IdTargetObserverRegistry.cpp \
+    dom/LiveNodeList.cpp \
     dom/KeyboardEvent.cpp \
     dom/MessageChannel.cpp \
     dom/MessageEvent.cpp \
@@ -701,6 +700,7 @@ SOURCES += \
     html/TextFieldInputType.cpp \
     html/TextInputType.cpp \
     html/TimeInputType.cpp \
+    html/TypeAhead.cpp \
     html/URLInputType.cpp \
     html/ValidationMessage.cpp \
     html/ValidityState.cpp \
@@ -842,6 +842,7 @@ SOURCES += \
     loader/EmptyClients.cpp \
     loader/FormState.cpp \
     loader/FormSubmission.cpp \
+    loader/FrameLoadRequest.cpp \
     loader/FrameLoader.cpp \
     loader/FrameLoaderStateMachine.cpp \
     loader/HistoryController.cpp \
@@ -1568,8 +1569,6 @@ HEADERS += \
     dom/DOMStringMap.h \
     dom/DOMTimeStamp.h \
     dom/DatasetDOMStringMap.h \
-    dom/DynamicNodeList.h \
-    dom/EditingText.h \
     dom/Element.h \
     dom/ElementShadow.h \
     dom/ElementAttributeData.h \
@@ -1588,6 +1587,7 @@ HEADERS += \
     dom/GestureEvent.h \
     dom/IdTargetObserver.h \
     dom/IdTargetObserverRegistry.h \
+    dom/LiveNodeList.h \
     dom/KeyboardEvent.h \
     dom/MessageChannel.h \
     dom/MessageEvent.h \
@@ -1628,6 +1628,7 @@ HEADERS += \
     dom/ScriptExecutionContext.h \
     dom/SelectorQuery.h \
     dom/ShadowRoot.h \
+    dom/SimulatedClickOptions.h \
     dom/SpaceSplitString.h \
     dom/StaticNodeList.h \
     dom/StyledElement.h \
@@ -1849,6 +1850,7 @@ HEADERS += \
     html/StepRange.h \
     html/TextDocument.h \
     html/TimeRanges.h \
+    html/TypeAhead.h \
     html/ValidityState.h \
     html/parser/CSSPreloadScanner.h \
     html/parser/HTMLConstructionSite.h \
@@ -1873,6 +1875,8 @@ HEADERS += \
     html/shadow/HTMLShadowElement.h \
     html/shadow/MediaControlElements.h \
     html/shadow/DetailsMarkerControl.h \
+    html/track/InbandTextTrack.h \
+    html/track/InbandTextTrackPrivate.h \
     html/track/LoadableTextTrack.h \
     html/track/TextTrack.h \
     html/track/TextTrackCue.h \
@@ -2478,6 +2482,7 @@ HEADERS += \
     rendering/style/StyleTransformData.h \
     rendering/style/StyleVariableData.h \
     rendering/style/StyleVisualData.h \
+    rendering/style/GridTrackSize.h \
     rendering/style/SVGRenderStyleDefs.h \
     rendering/style/SVGRenderStyle.h \
     rendering/svg/RenderSVGBlock.h \
@@ -4085,7 +4090,7 @@ contains(DEFINES, WTF_USE_WEBP=1) {
     SOURCES += platform/image-decoders/webp/WEBPImageDecoder.cpp
 }
 
-!system-sqlite:exists( $${SQLITE3SRCDIR}/sqlite3.c ) {
+!have?(sqlite3):exists($${SQLITE3SRCDIR}/sqlite3.c) {
     # Build sqlite3 into WebCore from source
     # somewhat copied from $$QT_SOURCE_TREE/src/plugins/sqldrivers/sqlite/sqlite.pro
     SOURCES += $${SQLITE3SRCDIR}/sqlite3.c
@@ -4113,6 +4118,17 @@ contains(CONFIG, opengl-shims) {
     HEADERS += platform/graphics/OpenGLShims.h
     SOURCES += platform/graphics/OpenGLShims.cpp
     DEFINES += QT_OPENGL_SHIMS=1
+}
+
+contains(DEFINES, ENABLE_OPENCL=1) {
+    HEADERS += \
+        platform/graphics/gpu/opencl/OpenCLHandle.h \
+        platform/graphics/gpu/opencl/FilterContextOpenCL.h
+    SOURCES += \
+        platform/graphics/gpu/opencl/FilterContextOpenCL.cpp \
+        platform/graphics/gpu/opencl/OpenCLFESourceAlpha.cpp \
+        platform/graphics/gpu/opencl/OpenCLFESourceGraphic.cpp \
+        platform/graphics/gpu/opencl/OpenCLFETurbulence.cpp
 }
 
 contains(DEFINES, WTF_USE_GRAPHICS_SURFACE=1) {

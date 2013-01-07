@@ -69,6 +69,8 @@ class DisplaySleepDisabler;
 #endif
 
 #if ENABLE(VIDEO_TRACK)
+class InbandTextTrackPrivate;
+
 typedef PODIntervalTree<double, TextTrackCue*> CueIntervalTree;
 typedef Vector<CueIntervalTree::IntervalType> CueList;
 #endif
@@ -132,7 +134,7 @@ public:
     void setPreload(const String&);
 
     PassRefPtr<TimeRanges> buffered() const;
-    void load(ExceptionCode&);
+    void load();
     String canPlayType(const String& mimeType, const String& keySystem = String(), const KURL& = KURL()) const;
 
 // ready state
@@ -213,11 +215,13 @@ public:
     PassRefPtr<TextTrack> addTextTrack(const String& kind, const String& label, ExceptionCode& ec) { return addTextTrack(kind, label, emptyString(), ec); }
     PassRefPtr<TextTrack> addTextTrack(const String& kind, ExceptionCode& ec) { return addTextTrack(kind, emptyString(), emptyString(), ec); }
 
+    void processInbandTextTracks();
+
     TextTrackList* textTracks();
     CueList currentlyActiveCues() const { return m_currentlyActiveCues; }
 
     virtual void didAddTrack(HTMLTrackElement*);
-    virtual void willRemoveTrack(HTMLTrackElement*);
+    virtual void didRemoveTrack(HTMLTrackElement*);
 
     struct TrackGroup {
         enum GroupKind { CaptionsAndSubtitles, Description, Chapter, Metadata, Other };
@@ -240,6 +244,9 @@ public:
     void configureTextTrackGroupForLanguage(const TrackGroup&) const;
     void configureTextTracks();
     void configureTextTrackGroup(const TrackGroup&) const;
+
+    void toggleTrackAtIndex(int index, bool exclusive = true);
+    static int textTracksOffIndex() { return -1; }
 
     bool userPrefersCaptions() const;
     bool userIsInterestedInThisTrackKind(String) const;
@@ -319,6 +326,8 @@ public:
     virtual bool dispatchEvent(PassRefPtr<Event>);
 
     virtual bool willRespondToMouseClickEvents() OVERRIDE;
+
+    virtual void reportMemoryUsage(MemoryObjectInfo*) const;
 
 protected:
     HTMLMediaElement(const QualifiedName&, Document*, bool);

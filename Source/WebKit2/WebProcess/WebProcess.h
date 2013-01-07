@@ -208,6 +208,8 @@ public:
     WebResourceLoadScheduler& webResourceLoadScheduler() { return m_webResourceLoadScheduler; }
 #endif
 
+    void setCacheModel(uint32_t);
+
 private:
     WebProcess();
 
@@ -234,7 +236,6 @@ private:
     void visitedLinkStateChanged(const Vector<WebCore::LinkHash>& linkHashes);
     void allVisitedLinkStateChanged();
 
-    void setCacheModel(uint32_t);
     void platformSetCacheModel(CacheModel);
     static void calculateCacheSizes(CacheModel cacheModel, uint64_t memorySize, uint64_t diskFreeSize,
         unsigned& cacheTotalCapacity, unsigned& cacheMinDeadCapacity, unsigned& cacheMaxDeadCapacity, double& deadDecodedDataDeletionInterval,
@@ -253,7 +254,7 @@ private:
     void networkProcessCrashed(CoreIPC::Connection*);
 #endif
 #if ENABLE(PLUGIN_PROCESS)
-    void pluginProcessCrashed(CoreIPC::Connection*, const String& pluginPath);
+    void pluginProcessCrashed(CoreIPC::Connection*, const String& pluginPath, uint32_t processType);
 #endif
 
     void startMemorySampler(const SandboxExtension::Handle&, const String&, const double);

@@ -221,7 +221,18 @@ contains(DEFINES, ENABLE_WEB_AUDIO=1) {
 }
 
 contains(DEFINES, WTF_USE_3D_GRAPHICS=1) {
-    contains(QT_CONFIG, opengles2):!win32: LIBS += -lEGL
+    win32: {
+        win32-g++: {
+            # Make sure OpenGL libs are after the webcore lib so MinGW can resolve symbols
+            contains(QT_CONFIG, opengles2) {
+                LIBS += $$QMAKE_LIBS_OPENGL_ES2
+            } else {
+                LIBS += $$QMAKE_LIBS_OPENGL
+            }
+        }
+    } else {
+        contains(QT_CONFIG, opengles2): LIBS += -lEGL
+    }
     haveQt(4): QT *= opengl
 }
 
@@ -233,12 +244,22 @@ contains(DEFINES, WTF_USE_GRAPHICS_SURFACE=1) {
     }
 }
 
-!system-sqlite:exists( $${SQLITE3SRCDIR}/sqlite3.c ) {
-    INCLUDEPATH += $${SQLITE3SRCDIR}
-    DEFINES += SQLITE_CORE SQLITE_OMIT_LOAD_EXTENSION SQLITE_OMIT_COMPLETE
+contains(DEFINES, HAVE_SQLITE3=1) {
+    mac {
+        LIBS += -lsqlite3
+    } else {
+        PKGCONFIG += sqlite3
+    }
 } else {
-    INCLUDEPATH += $${SQLITE3SRCDIR}
-    LIBS += -lsqlite3
+    SQLITE3SRCDIR = $$(SQLITE3SRCDIR)
+    isEmpty(SQLITE3SRCDIR): SQLITE3SRCDIR = ../../../qtbase/src/3rdparty/sqlite/
+    exists($${SQLITE3SRCDIR}/sqlite3.c) {
+        INCLUDEPATH += $${SQLITE3SRCDIR}
+        DEFINES += SQLITE_CORE SQLITE_OMIT_LOAD_EXTENSION SQLITE_OMIT_COMPLETE
+    } else {
+        INCLUDEPATH += $${SQLITE3SRCDIR}
+        LIBS += -lsqlite3
+    }
 }
 
 haveQt(5) {
@@ -316,6 +337,12 @@ linux*-g++*:QMAKE_LFLAGS += $$QMAKE_LFLAGS_NOUNDEF
 unix|win32-g++* {
     QMAKE_PKGCONFIG_REQUIRES = QtCore QtGui QtNetwork
     haveQt(5): QMAKE_PKGCONFIG_REQUIRES += QtWidgets
+}
+
+contains(DEFINES, ENABLE_OPENCL=1) {
+    LIBS += -lOpenCL
+
+    INCLUDEPATH += $$SOURCE_DIR/platform/graphics/gpu/opencl
 }
 
 # Disable C++0x mode in WebCore for those who enabled it in their Qt's mkspec

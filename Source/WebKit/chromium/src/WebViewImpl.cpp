@@ -684,13 +684,10 @@ bool WebViewImpl::handleGestureEvent(const WebGestureEvent& event)
 #endif
         break;
     case WebInputEvent::GestureTapCancel:
-        if (m_linkHighlight)
-            m_linkHighlight->startHighlightAnimationIfNeeded();
-        break;
     case WebInputEvent::GestureTap:
     case WebInputEvent::GestureLongPress:
-        // If a link highlight is active, kill it.
-        m_linkHighlight.clear();
+        if (m_linkHighlight)
+            m_linkHighlight->startHighlightAnimationIfNeeded();
         break;
     default:
         break;
@@ -849,6 +846,15 @@ void WebViewImpl::setShowFPSCounter(bool show)
         m_layerTreeView->setShowFPSCounter(show);
     }
     settingsImpl()->setShowFPSCounter(show);
+}
+
+void WebViewImpl::setShowPaintRects(bool show)
+{
+    if (isAcceleratedCompositingActive()) {
+        TRACE_EVENT0("webkit", "WebViewImpl::setShowPaintRects");
+        m_layerTreeView->setShowPaintRects(show);
+    }
+    settingsImpl()->setShowPaintRects(show);
 }
 
 bool WebViewImpl::handleKeyEvent(const WebKeyboardEvent& event)
@@ -1275,6 +1281,11 @@ void WebViewImpl::hasTouchEventHandlers(bool hasTouchHandlers)
 {
     if (m_client)
         m_client->hasTouchEventHandlers(hasTouchHandlers);
+}
+
+bool WebViewImpl::hasTouchEventHandlersAt(const WebPoint& point)
+{
+    return true;
 }
 
 #if !OS(DARWIN)
@@ -1837,7 +1848,7 @@ void WebViewImpl::paint(WebCanvas* canvas, const WebRect& rect, PaintOptions opt
         }
 
         double paintStart = currentTime();
-        PageWidgetDelegate::paint(m_page.get(), pageOverlays(), canvas, rect, isTransparent() ? PageWidgetDelegate::Translucent : PageWidgetDelegate::Opaque);
+        PageWidgetDelegate::paint(m_page.get(), pageOverlays(), canvas, rect, isTransparent() ? PageWidgetDelegate::Translucent : PageWidgetDelegate::Opaque, m_webSettings->applyDeviceScaleFactorInCompositor());
         double paintEnd = currentTime();
         double pixelsPerSec = (rect.width * rect.height) / (paintEnd - paintStart);
         WebKit::Platform::current()->histogramCustomCounts("Renderer4.SoftwarePaintDurationMS", (paintEnd - paintStart) * 1000, 0, 120, 30);
@@ -4108,17 +4119,6 @@ private:
 
 } // namespace
 
-WebGraphicsContext3D* WebViewImpl::createContext3D()
-{
-    // Temporarily, if the output surface can't be created, create a WebGraphicsContext3D
-    // directly. This allows bootstrapping the output surface system while downstream
-    // users of the API still use the old approach.
-    WebKit::WebGraphicsContext3D::Attributes attributes;
-    attributes.antialias = false;
-    attributes.shareResources = true;
-    return m_client->createGraphicsContext3D(attributes);
-}
-
 WebCompositorOutputSurface* WebViewImpl::createOutputSurface()
 {
     return m_client->createOutputSurface();
@@ -4183,11 +4183,6 @@ void WebViewImpl::didCompleteSwapBuffers()
         m_client->didCompleteSwapBuffers();
 }
 
-void WebViewImpl::didRebindGraphicsContext(bool success)
-{
-    didRecreateOutputSurface(success);
-}
-
 void WebViewImpl::didRecreateOutputSurface(bool success)
 {
     // Switch back to software rendering mode, if necessary
@@ -4215,6 +4210,12 @@ void WebViewImpl::scheduleComposite()
 
     ASSERT(!Platform::current()->compositorSupport()->isThreadingEnabled());
     m_client->scheduleComposite();
+}
+
+void WebViewImpl::createFontAtlas(SkBitmap& bitmap, WebRect asciiToRectTable[128], int& fontHeight)
+{
+    TRACE_EVENT0("webkit", "WebViewImpl::loadFontAtlas");
+    bitmap = WebCore::CompositorHUDFontAtlas::generateFontAtlas(asciiToRectTable, fontHeight);
 }
 
 void WebViewImpl::updateLayerTreeViewport()

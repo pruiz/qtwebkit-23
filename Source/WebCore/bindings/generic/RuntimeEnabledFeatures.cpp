@@ -55,6 +55,7 @@ bool RuntimeEnabledFeatures::isDeviceMotionEnabled = true;
 bool RuntimeEnabledFeatures::isDeviceOrientationEnabled = true;
 bool RuntimeEnabledFeatures::isSpeechInputEnabled = true;
 bool RuntimeEnabledFeatures::isCSSExclusionsEnabled = false;
+bool RuntimeEnabledFeatures::isCSSRegionsEnabled = false;
 bool RuntimeEnabledFeatures::isLangAttributeAwareFormControlUIEnabled = false;
 
 #if ENABLE(SCRIPTED_SPEECH)
@@ -205,11 +206,7 @@ bool RuntimeEnabledFeatures::isInputTypeDateTimeEnabled = true;
 #endif
 
 #if ENABLE(INPUT_TYPE_DATETIMELOCAL)
-#if PLATFORM(CHROMIUM) && !OS(ANDROID)
-bool RuntimeEnabledFeatures::isInputTypeDateTimeLocalEnabled = false;
-#else
 bool RuntimeEnabledFeatures::isInputTypeDateTimeLocalEnabled = true;
-#endif
 #endif
 
 #if ENABLE(INPUT_TYPE_MONTH)

@@ -55,9 +55,9 @@ static void createPlatformGraphicsContext3DFromWidget(QWidget* widget, PlatformG
 
     QGLWidget* glWidget = 0;
     if (glViewport)
-        glWidget = new QGLWidget(widget, glViewport);
+        glWidget = new QGLWidget(0, glViewport);
     else
-        glWidget = new QGLWidget(widget);
+        glWidget = new QGLWidget();
 
     if (glWidget->isValid()) {
         // Geometry can be set to zero because m_glWidget is used only for its QGLContext.

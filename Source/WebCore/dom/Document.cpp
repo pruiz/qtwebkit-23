@@ -4435,7 +4435,6 @@ PassRefPtr<XPathNSResolver> Document::createNSResolver(Node* nodeResolver)
         m_xpathEvaluator = XPathEvaluator::create();
     return m_xpathEvaluator->createNSResolver(nodeResolver);
 }
-    ASSERT(!m_inStyleRecalc);
 
 PassRefPtr<XPathResult> Document::evaluate(const String& expression,
                                            Node* contextNode,

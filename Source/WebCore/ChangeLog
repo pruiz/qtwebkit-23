@@ -1,23 +1,3 @@
-2013-01-08  Andreas Kling  <akling@apple.com>
-
-        Heap-use-after-free in bool WebCore::SelectorChecker::checkOneSelector.
-        <http://webkit.org/b/105834>
-
-        Reviewed by Antti Koivisto.
-
-        Suppress the DOMSubtreeModified event when synchronizing the "style" attribute and we've
-        instantiated an Attr node wrapper for the said attribute.
-
-        Also added an assertion that Document's StyleResolver isn't cleared during style recalc,
-        which will help us catch this kind of bug in the future.
-
-        Test: fast/dom/mutation-event-listener-with-dirty-inline-style-crash.html
-
-        * dom/Document.cpp:
-        (WebCore::Document::styleResolverThrowawayTimerFired):
-        * dom/Element.cpp:
-        (WebCore::Element::setAttributeInternal):
-
 2013-01-11  Stephen Chenney  <schenney@chromium.org>
         Objects can be re-added to the AXObjectCache during removal
         https://bugs.webkit.org/show_bug.cgi?id=104171

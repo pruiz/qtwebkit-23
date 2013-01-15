@@ -3539,6 +3539,7 @@ contains(DEFINES, ENABLE_FILTERS=1) {
         platform/graphics/filters/CustomFilterParameterList.cpp \
         platform/graphics/filters/ValidatedCustomFilterOperation.cpp \
         platform/graphics/filters/CustomFilterProgram.cpp \
+        platform/graphics/filters/CustomFilterProgramInfo.cpp \
         platform/graphics/filters/CustomFilterCompiledProgram.cpp \
         platform/graphics/filters/CustomFilterMesh.cpp \
         platform/graphics/filters/CustomFilterMeshGenerator.cpp \
@@ -4090,7 +4091,7 @@ contains(DEFINES, WTF_USE_WEBP=1) {
     SOURCES += platform/image-decoders/webp/WEBPImageDecoder.cpp
 }
 
-!have?(sqlite3):exists($${SQLITE3SRCDIR}/sqlite3.c) {
+!contains(DEFINES, HAVE_SQLITE3=1):exists($${SQLITE3SRCDIR}/sqlite3.c) {
     # Build sqlite3 into WebCore from source
     # somewhat copied from $$QT_SOURCE_TREE/src/plugins/sqldrivers/sqlite/sqlite.pro
     SOURCES += $${SQLITE3SRCDIR}/sqlite3.c

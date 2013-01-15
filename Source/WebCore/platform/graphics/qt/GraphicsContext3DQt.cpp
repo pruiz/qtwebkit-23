@@ -110,6 +110,17 @@ GraphicsContext3DPrivate::GraphicsContext3DPrivate(GraphicsContext3D* context, H
     , m_platformContext(0)
     , m_surfaceOwner(0)
 {
+    if (m_hostWindow && m_hostWindow->platformPageClient()) {
+        // This is the WebKit1 code path.
+        QWebPageClient* webPageClient = m_hostWindow->platformPageClient();
+        webPageClient->createPlatformGraphicsContext3D(&m_platformContext, &m_surface, &m_surfaceOwner);
+        if (!m_surface)
+            return;
+
+        makeCurrentIfNeeded();
+        return;
+    }
+
     if (renderStyle == GraphicsContext3D::RenderToCurrentGLContext) {
 #if HAVE(QT5)
         m_platformContext = QOpenGLContext::currentContext();
@@ -222,24 +233,10 @@ void GraphicsContext3DPrivate::paintToTextureMapper(TextureMapper* textureMapper
     blitMultisampleFramebufferAndRestoreContext();
 
     if (textureMapper->accelerationMode() == TextureMapper::OpenGLMode) {
-#if USE(GRAPHICS_SURFACE)
-        // CGL only provides us the context, but not the view the context is currently bound to.
-        // To make sure the context is bound the the right surface we have to do a makeCurrent through QOpenGL again.
-        // FIXME: Remove this code as soon as GraphicsSurfaceMac makes use of NSOpenGL.
-        QOpenGLContext* currentContext = QOpenGLContext::currentContext();
-        QSurface* currentSurface = currentContext->surface();
-        makeCurrentIfNeeded();
-
-        m_graphicsSurface->copyFromTexture(m_context->m_texture, IntRect(0, 0, m_context->m_currentWidth, m_context->m_currentHeight));
-
-        // CGL only provides us the context, but not the view the context is currently bound to.
-        // To make sure the context is bound the the right surface we have to do a makeCurrent through QOpenGL again.
-        // FIXME: Remove this code as soon as GraphicsSurfaceMac makes use of NSOpenGL.
-        currentContext->makeCurrent(currentSurface);
-
         TextureMapperGL* texmapGL = static_cast<TextureMapperGL*>(textureMapper);
-        m_graphicsSurface->paintToTextureMapper(texmapGL, targetRect, matrix, opacity, mask);
-#endif
+        TextureMapperGL::Flags flags = TextureMapperGL::ShouldFlipTexture | (m_context->m_attrs.alpha ? TextureMapperGL::SupportsBlending : 0);
+        IntSize textureSize(m_context->m_currentWidth, m_context->m_currentHeight);
+        texmapGL->drawTexture(m_context->m_texture, flags, textureSize, targetRect, matrix, opacity, mask);
         return;
     }
 
@@ -300,8 +297,10 @@ uint32_t GraphicsContext3DPrivate::copyToGraphicsSurface()
         return 0;
 
     blitMultisampleFramebufferAndRestoreContext();
+    makeCurrentIfNeeded();
     m_graphicsSurface->copyFromTexture(m_context->m_texture, IntRect(0, 0, m_context->m_currentWidth, m_context->m_currentHeight));
-    return m_graphicsSurface->frontBuffer();
+    uint32_t frontBuffer = m_graphicsSurface->swapBuffers();
+    return frontBuffer;
 }
 
 GraphicsSurfaceToken GraphicsContext3DPrivate::graphicsSurfaceToken() const

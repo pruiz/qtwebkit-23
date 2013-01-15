@@ -45,14 +45,20 @@ static void createPlatformGraphicsContext3DFromWidget(QWidget* widget, PlatformG
     *surface = 0;
     if (surfaceOwner)
         *surfaceOwner = 0;
-    QAbstractScrollArea* scrollArea = qobject_cast<QAbstractScrollArea*>(widget);
-    if (!scrollArea)
-        return;
 
-    QGLWidget* glViewport = qobject_cast<QGLWidget*>(scrollArea->viewport());
-    if (!glViewport)
-        return;
-    QGLWidget* glWidget = new QGLWidget(0, glViewport);
+    QGLWidget* glViewport = 0;
+
+    QAbstractScrollArea* scrollArea = qobject_cast<QAbstractScrollArea*>(widget);
+
+    if (scrollArea)
+        glViewport = qobject_cast<QGLWidget*>(scrollArea->viewport());
+
+    QGLWidget* glWidget = 0;
+    if (glViewport)
+        glWidget = new QGLWidget(0, glViewport);
+    else
+        glWidget = new QGLWidget();
+
     if (glWidget->isValid()) {
         // Geometry can be set to zero because m_glWidget is used only for its QGLContext.
         glWidget->setGeometry(0, 0, 0, 0);

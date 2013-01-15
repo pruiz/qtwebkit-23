@@ -140,6 +140,9 @@ haveQt(4):contains(DEFINES, ENABLE_WEBGL=1):contains(DEFINES, WTF_USE_3D_GRAPHIC
     error("WebGL requires Qt to be configured with OpenGL. Please reconfigure Qt with OpenGL, or build WebKit without WebGL.")
 }
 
+# CSS filters support
+!contains(DEFINES, ENABLE_CSS_FILTERS=.): DEFINES += ENABLE_CSS_FILTERS=1
+
 # CSS Shaders support
 !contains(DEFINES, ENABLE_CSS_SHADERS=.) {
     # Enable CSS shaders when CSS filters and WebGL are enabled.

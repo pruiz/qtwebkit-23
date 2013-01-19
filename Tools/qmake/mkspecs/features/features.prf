@@ -241,6 +241,9 @@ haveQt(5):contains(DEFINES, WTF_USE_3D_GRAPHICS=1) {
     linux-*:contains(DEFINES, HAVE_GLX=1):contains(DEFINES, HAVE_XCOMPOSITE=1):contains(DEFINES, HAVE_XRENDER=1): DEFINES += WTF_USE_GRAPHICS_SURFACE=1
 }
 
+# WebKit2 uses the shared cookiejar for persistant cookies.
+!no_webkit2: DEFINES += ENABLE_QT_SHARED_COOKIEJAR=1
+
 # -------------- Fill in static defaults --------------
 #
 # Only applies to features that don't have a dynamic default

@@ -37,18 +37,29 @@
 #include <QDateTime>
 #include <QNetworkAccessManager>
 #include <QNetworkCookie>
-#include <QSqlQuery>
+#include <QNetworkCookieJar>
 #include <QStringList>
+#include <QUrl>
 #include <QVariant>
 #include <wtf/text/WTFString.h>
 
+#if ENABLE(QT_SHARED_COOKIEJAR)
+#include <QSqlQuery>
+#endif
+
 namespace WebCore {
 
+#if ENABLE(QT_SHARED_COOKIEJAR)
 static SharedCookieJarQt* s_sharedCookieJarQt = 0;
+#endif
 
 void setCookiesFromDOM(NetworkingContext* context, const KURL& firstParty, const KURL& url, const String& value)
 {
+#if ENABLE(QT_SHARED_COOKIEJAR)
     QNetworkCookieJar* jar = context ? context->networkAccessManager()->cookieJar() : SharedCookieJarQt::shared();
+#else
+    QNetworkCookieJar* jar = context ? context->networkAccessManager()->cookieJar() : 0;
+#endif
     if (!jar)
         return;
 
@@ -71,7 +82,11 @@ void setCookiesFromDOM(NetworkingContext* context, const KURL& firstParty, const
 
 String cookiesForDOM(NetworkingContext* context, const KURL& firstParty, const KURL& url)
 {
+#if ENABLE(QT_SHARED_COOKIEJAR)
     QNetworkCookieJar* jar = context ? context->networkAccessManager()->cookieJar() : SharedCookieJarQt::shared();
+#else
+    QNetworkCookieJar* jar = context ? context->networkAccessManager()->cookieJar() : 0;
+#endif
     if (!jar)
         return String();
 
@@ -96,7 +111,11 @@ String cookiesForDOM(NetworkingContext* context, const KURL& firstParty, const K
 
 String cookieRequestHeaderFieldValue(NetworkingContext* context, const KURL& /*firstParty*/, const KURL& url)
 {
+#if ENABLE(QT_SHARED_COOKIEJAR)
     QNetworkCookieJar* jar = context ? context->networkAccessManager()->cookieJar() : SharedCookieJarQt::shared();
+#else
+    QNetworkCookieJar* jar = context ? context->networkAccessManager()->cookieJar() : 0;
+#endif
     if (!jar)
         return String();
 
@@ -113,7 +132,11 @@ String cookieRequestHeaderFieldValue(NetworkingContext* context, const KURL& /*f
 
 bool cookiesEnabled(NetworkingContext* context, const KURL& /*firstParty*/, const KURL& /*url*/)
 {
+#if ENABLE(QT_SHARED_COOKIEJAR)
     QNetworkCookieJar* jar = context ? context->networkAccessManager()->cookieJar() : SharedCookieJarQt::shared();
+#else
+    QNetworkCookieJar* jar = context ? context->networkAccessManager()->cookieJar() : 0;
+#endif
     return !!jar;
 }
 
@@ -129,6 +152,22 @@ void deleteCookie(NetworkingContext*, const KURL&, const String&)
     // FIXME: Not yet implemented
 }
 
+#if !ENABLE(QT_SHARED_COOKIEJAR)
+void getHostnamesWithCookies(NetworkingContext* context, HashSet<String>& hostnames)
+{
+    // FIXME: Not yet implemented
+}
+
+void deleteCookiesForHostname(NetworkingContext* context, const String& hostname)
+{
+    // FIXME: Not yet implemented
+}
+
+void deleteAllCookies(NetworkingContext* context)
+{
+    // FIXME: Not yet implemented
+}
+#else
 void getHostnamesWithCookies(NetworkingContext* context, HashSet<String>& hostnames)
 {
     ASSERT_UNUSED(context, !context); // Not yet implemented for cookie jars other than the shared one.
@@ -299,6 +338,7 @@ void SharedCookieJarQt::loadCookies()
         cookies.append(QNetworkCookie::parseCookies(sqlQuery.value(0).toByteArray()));
     setAllCookies(cookies);
 }
+#endif
 
 #include "moc_CookieJarQt.cpp"
 

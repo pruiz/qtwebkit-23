@@ -21,6 +21,7 @@
 #ifndef CookieJarQt_h
 #define CookieJarQt_h
 
+#if ENABLE(QT_SHARED_COOKIEJAR)
 #include <QtCore/QObject>
 #include <QtNetwork/QNetworkCookieJar>
 #include <QtSql/QSqlDatabase>
@@ -53,5 +54,7 @@ private:
 };
 
 }
+
+#endif
 
 #endif

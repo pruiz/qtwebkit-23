@@ -138,11 +138,13 @@ static void parentProcessDiedCallback(void*)
 void WebProcess::platformInitializeWebProcess(const WebProcessCreationParameters& parameters, CoreIPC::MessageDecoder&)
 {
     m_networkAccessManager = new QtNetworkAccessManager(this);
+#if ENABLE(QT_SHARED_COOKIEJAR)
     ASSERT(!parameters.cookieStorageDirectory.isEmpty() && !parameters.cookieStorageDirectory.isNull());
     WebCore::SharedCookieJarQt* jar = WebCore::SharedCookieJarQt::create(parameters.cookieStorageDirectory);
     m_networkAccessManager->setCookieJar(jar);
     // Do not let QNetworkAccessManager delete the jar.
     jar->setParent(0);
+#endif
 
     ASSERT(!parameters.diskCacheDirectory.isEmpty() && !parameters.diskCacheDirectory.isNull());
     QNetworkDiskCache* diskCache = new QNetworkDiskCache();
@@ -177,7 +179,9 @@ void WebProcess::platformTerminate()
 {
     delete m_networkAccessManager;
     m_networkAccessManager = 0;
+#if ENABLE(QT_SHARED_COOKIEJAR)
     WebCore::SharedCookieJarQt::shared()->destroy();
+#endif
 }
 
 } // namespace WebKit

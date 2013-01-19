@@ -7,7 +7,7 @@
 
 SOURCE_DIR = $${ROOT_WEBKIT_DIR}/Source/WebCore
 
-QT *= network sql
+QT *= network
 haveQt(5): QT *= core-private gui-private
 
 WEBCORE_GENERATED_SOURCES_DIR = $${ROOT_BUILD_DIR}/Source/WebCore/$${GENERATED_SOURCES_DESTDIR}
@@ -155,6 +155,10 @@ contains(DEFINES, ENABLE_NETSCAPE_PLUGIN_API=1) {
 contains(DEFINES, ENABLE_GEOLOCATION=1) {
     CONFIG *= mobility
     MOBILITY *= location
+}
+
+contains(DEFINES, ENABLE_QT_SHARED_COOKIEJAR=1) {
+    QT *= sql
 }
 
 contains(DEFINES, ENABLE_ORIENTATION_EVENTS=1)|contains(DEFINES, ENABLE_DEVICE_ORIENTATION=1) {

@@ -63,7 +63,7 @@ haveQt(5) {
 }
 
 !contains(DEFINES, HAVE_QTPRINTSUPPORT=.) {
-    haveQtModule(printsupport): DEFINES += HAVE_QTPRINTSUPPORT=1
+    haveQt(4)|haveQtModule(printsupport): DEFINES += HAVE_QTPRINTSUPPORT=1
 }
 
 !contains(DEFINES, HAVE_QTTESTLIB=.) {

@@ -7,9 +7,13 @@
 # Use SSE2 floating point math on 32 bit instead of the default
 # 387 to make layout test results same on 32 and on 64 bit builds.
 # See https://bugs.webkit.org/show_bug.cgi?id=52810#c39 for details.
-linux-g++*:isEqual(QT_ARCH,i386) {
-    QMAKE_CFLAGS += -march=pentium4 -msse2 -mfpmath=sse
-    QMAKE_CXXFLAGS += -march=pentium4 -msse2 -mfpmath=sse
+
+# Disable if CXXFLAGS have been set to something else.
+!no_sse2:contains(QMAKE_CXXFLAGS, -march): CONFIG += no_sse2
+
+!no_sse2:linux-g++*:isEqual(QT_ARCH,i386) {
+    QMAKE_CFLAGS += -march=pentium4 -msse2 -mfpmath=sse -mtune=generic
+    QMAKE_CXXFLAGS += -march=pentium4 -msse2 -mfpmath=sse -mtune=generic
 }
 
 linux-*g++* {

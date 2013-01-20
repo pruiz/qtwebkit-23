@@ -1,3 +1,81 @@
+2013-01-16  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [TexMap] Composited CSS shaders crash when using non-GL TextureMapper
+        https://bugs.webkit.org/show_bug.cgi?id=106796
+
+        Reviewed by Noam Rosenthal.
+
+        Fail gracefully when FilterEffectRenderer fails to build the filter effects.
+
+        * platform/graphics/texmap/TextureMapperImageBuffer.cpp:
+        (WebCore::BitmapTextureImageBuffer::applyFilters):
+
+2013-01-15  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] WebGL does not require accelerated compositing
+        https://bugs.webkit.org/show_bug.cgi?id=106892
+
+        Reviewed by Jocelyn Turcotte.
+
+        Allow the creation of WebGL canvas even when accelerated compositing is not enabled.
+
+        * html/HTMLCanvasElement.cpp:
+        (WebCore::HTMLCanvasElement::getContext):
+
+2013-01-16  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [Qt] Use the shared HistoryItem serialization for QWebHistory
+        https://bugs.webkit.org/show_bug.cgi?id=106671
+
+        Reviewed by Allan Sandfeld Jensen.
+
+        This allows a few things missing from the previous serialization code
+        to function while using commonly maintained code:
+        - The itemSequenceNumber and documentSequenceNumber that were needed
+          to properly restore same-document navigations
+        - The form data
+        - The navigation hierarchy mapping the frame tree
+
+        * history/HistoryItem.h:
+        (HistoryItem):
+        * history/qt/HistoryItemQt.cpp:
+        (QDataStreamCoder):
+        (WebCore):
+        (WebCore::QDataStreamCoder::QDataStreamCoder):
+        (WebCore::QDataStreamCoder::encodeBytes):
+        (WebCore::QDataStreamCoder::encodeBool):
+        (WebCore::QDataStreamCoder::encodeUInt32):
+        (WebCore::QDataStreamCoder::encodeUInt64):
+        (WebCore::QDataStreamCoder::encodeInt32):
+        (WebCore::QDataStreamCoder::encodeInt64):
+        (WebCore::QDataStreamCoder::encodeFloat):
+        (WebCore::QDataStreamCoder::encodeDouble):
+        (WebCore::QDataStreamCoder::encodeString):
+        (WebCore::QDataStreamCoder::decodeBytes):
+        (WebCore::QDataStreamCoder::decodeBool):
+        (WebCore::QDataStreamCoder::decodeUInt32):
+        (WebCore::QDataStreamCoder::decodeUInt64):
+        (WebCore::QDataStreamCoder::decodeInt32):
+        (WebCore::QDataStreamCoder::decodeInt64):
+        (WebCore::QDataStreamCoder::decodeFloat):
+        (WebCore::QDataStreamCoder::decodeDouble):
+        (WebCore::QDataStreamCoder::decodeString):
+        (WebCore::HistoryItem::restoreState):
+        (WebCore::WebCore::HistoryItem::saveState):
+
+2013-01-16  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [Qt] Crash in WebCore::CachedFrame::destroy
+        https://bugs.webkit.org/show_bug.cgi?id=104525
+
+        Reviewed by Adam Barth.
+
+        Add an assert to increase the chances of catching this crash
+        early on in the future.
+
+        * dom/Document.cpp:
+        (WebCore::Document::takeDOMWindowFrom):
+
 2012-12-12  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt] Animation fails on large layers

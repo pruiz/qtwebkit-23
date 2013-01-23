@@ -1568,14 +1568,6 @@ sub checkRequiredSystemConfig
             push @cmds, "flex";
         }
         my @missing = ();
-        my $oldPath = $ENV{PATH};
-        if (isQt() and isWindows()) {
-            chomp(my $gnuWin32Dir = `$qmakebin -query QT_HOST_DATA`);
-            $gnuWin32Dir = File::Spec->catfile($gnuWin32Dir, "..", "gnuwin32", "bin");
-            if (-d "$gnuWin32Dir") {
-                $ENV{PATH} = $gnuWin32Dir . ";" . $ENV{PATH};
-            }
-        }
         foreach my $cmd (@cmds) {
             push @missing, $cmd if not commandExists($cmd);
         }
@@ -1583,9 +1575,6 @@ sub checkRequiredSystemConfig
         if (@missing) {
             my $list = join ", ", @missing;
             die "ERROR: $list missing but required to build WebKit.\n";
-        }
-        if (isQt() and isWindows()) {
-            $ENV{PATH} = $oldPath;
         }
     }
     # Win32 and other platforms may want to check for minimum config

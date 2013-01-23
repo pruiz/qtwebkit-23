@@ -735,8 +735,8 @@ sub builtDylibPathForName
                 $libraryName .= "d";
             }
 
-            chomp(my $mkspec = `$qmakebin -query QT_HOST_DATA`);
-            $mkspec .= "/mkspecs";
+            my $mkspec = `$qmakebin -query QMAKE_MKSPECS`;
+            $mkspec =~ s/[\n|\r]$//g;
             my $qtMajorVersion = retrieveQMakespecVar("$mkspec/qconfig.pri", "QT_MAJOR_VERSION");
             if (not $qtMajorVersion) {
                 $qtMajorVersion = "";
@@ -1890,8 +1890,8 @@ sub retrieveQMakespecVar
 sub qtMakeCommand($)
 {
     my ($qmakebin) = @_;
-    chomp(my $mkspec = `$qmakebin -query QT_HOST_DATA`);
-    $mkspec .= "/mkspecs/default";
+    chomp(my $mkspec = `$qmakebin -query QMAKE_MKSPECS`);
+    $mkspec .= "/default";
     my $compiler = retrieveQMakespecVar("$mkspec/qmake.conf", "QMAKE_CC");
 
     #print "default spec: " . $mkspec . "\n";

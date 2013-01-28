@@ -453,6 +453,30 @@ void RenderTable::layout()
         }
     }
 
+#if ENABLE(WKHTLMTOPDF_MODE)
+    // Bump table to next page if we can't fit the caption, thead and first body cell
+    setPaginationStrut(0);
+    if (view()->layoutState()->pageLogicalHeight()) {
+        LayoutState* layoutState = view()->layoutState();
+        const int pageLogicalHeight = layoutState->m_pageLogicalHeight;
+        const int remainingLogicalHeight = pageLogicalHeight - layoutState->pageLogicalOffset(0) % pageLogicalHeight;
+        if (remainingLogicalHeight > 0) {
+            int requiredHeight = headHeight;
+            if (m_caption && m_caption->style()->captionSide() != CAPBOTTOM) {
+                requiredHeight += m_caption->logicalHeight() + m_caption->marginBefore() + m_caption->marginAfter();
+            }
+            if (m_firstBody) {
+                // FIXME: Calculate maximum required height across all cells in first body row
+                RenderTableCell* firstCell = m_firstBody->primaryCellAt(0, 0);
+                requiredHeight += firstCell->contentLogicalHeight() + firstCell->paddingTop(false) + firstCell->paddingBottom(false) + vBorderSpacing();
+            }
+            if (requiredHeight > remainingLogicalHeight) {
+                setPaginationStrut(remainingLogicalHeight);
+            }
+        }
+    }
+#endif
+
     // If any table section moved vertically, we will just repaint everything from that
     // section down (it is quite unlikely that any of the following sections
     // did not shift).
@@ -500,8 +524,13 @@ void RenderTable::layout()
 
     distributeExtraLogicalHeight(floorToInt(computedLogicalHeight - totalSectionLogicalHeight));
 
-    for (RenderTableSection* section = topSection(); section; section = sectionBelow(section))
-        section->layoutRows(headHeight, footHeight);
+    for (RenderTableSection* section = topSection(); section; section = sectionBelow(section)) {
+#if ENABLE(WKHTLMTOPDF_MODE)
+        section->layoutRows(section == m_head ? 0 : headHeight, section == m_foot ? 0 : footHeight);
+#else
+	section->layoutRows();
+#endif
+    }
 
     if (!topSection() && computedLogicalHeight > totalSectionLogicalHeight && !document()->inQuirksMode()) {
         // Completely empty tables (with no sections or anything) should at least honor specified height
@@ -677,7 +706,7 @@ void RenderTable::paintObject(PaintInfo& paintInfo, const LayoutPoint& paintOffs
         // re-paint header/footer if table is split over multiple pages
         if (m_head) {
             IntPoint childPoint = flipForWritingMode(m_head, IntPoint(tx, ty), ParentToChildFlippingAdjustment);
-            if (!info.rect.contains(childPoint.x() + m_head->x(), childPoint.y() + m_head->y())) {
+            if (info.rect.y() > childPoint.y() + m_head->y()) {
                 repaintedHeadPoint = IntPoint(childPoint.x(), info.rect.y() - m_head->y());
                 repaintedHead = true;
                 dynamic_cast<RenderObject*>(m_head)->paint(info, repaintedHeadPoint.x(), repaintedHeadPoint.y());
@@ -685,7 +714,7 @@ void RenderTable::paintObject(PaintInfo& paintInfo, const LayoutPoint& paintOffs
         }
         if (m_foot) {
             IntPoint childPoint = flipForWritingMode(m_foot, IntPoint(tx, ty), ParentToChildFlippingAdjustment);
-            if (!info.rect.contains(childPoint.x() + m_foot->x(), childPoint.y() + m_foot->y())) {
+            if (info.rect.y() + info.rect.height() < childPoint.y() + m_foot->y()) {
                 // find actual end of table on current page
                 int dy = 0;
                 const int max_dy = info.rect.y() + info.rect.height();

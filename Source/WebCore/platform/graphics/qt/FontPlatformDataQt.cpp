@@ -76,7 +76,10 @@ FontPlatformData::FontPlatformData(const FontDescription& description, const Ato
     font.setWeight(toQFontWeight(description.weight()));
     font.setWordSpacing(wordSpacing);
     font.setLetterSpacing(QFont::AbsoluteSpacing, letterSpacing);
+#if !ENABLE(WKHTMLTOPDF_MODE)
+    // WKHTMLTOPDF: Disabled as work around webkit bug 93263
     font.setStyleStrategy(QFont::ForceIntegerMetrics);
+#endif
 
     m_data->bold = font.bold();
 #if !HAVE(QRAWFONT)

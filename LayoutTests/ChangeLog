@@ -23,17 +23,15 @@
         * fast/repaint/overhanging-float-detach-repaint-expected.txt: Added.
         * fast/repaint/overhanging-float-detach-repaint.html: Added.
 
-2013-01-11  Stephen Chenney  <schenney@chromium.org>
+2013-01-06  Abhishek Arya  <inferno@chromium.org>
 
-        Objects can be re-added to the AXObjectCache during removal
-        https://bugs.webkit.org/show_bug.cgi?id=104171
+        Heap-use-after-free in DocumentLoader::stopLoading
+        https://bugs.webkit.org/show_bug.cgi?id=103656
 
-        Reviewed by Simon Fraser.
+        Reviewed by Eric Seidel.
 
-        New test which asserts with !m_hasAXObject in RenderObject::~RenderObject without the patch. Requires Shadow DOM enabled.
-
-        * accessibility/corresponding-control-deleted-crash-expected.txt: Added.
-        * accessibility/corresponding-control-deleted-crash.html: Added.
+        * fast/dom/ready-state-change-crash-expected.txt: Added.
+        * fast/dom/ready-state-change-crash.html: Added.
 
 2013-01-07  Justin Novosad  <junov@google.com>
 
@@ -49,25 +47,17 @@
         * fast/canvas/canvas-measureText-expected.txt: Added.
         * fast/canvas/canvas-measureText.html: Added.
 
-2013-01-06  Abhishek Arya  <inferno@chromium.org>
+2013-01-11  Stephen Chenney  <schenney@chromium.org>
 
-        Heap-use-after-free in DocumentLoader::stopLoading
-        https://bugs.webkit.org/show_bug.cgi?id=103656
+        Objects can be re-added to the AXObjectCache during removal
+        https://bugs.webkit.org/show_bug.cgi?id=104171
 
-        Reviewed by Eric Seidel.
+        Reviewed by Simon Fraser.
 
-        * fast/dom/ready-state-change-crash-expected.txt: Added.
-        * fast/dom/ready-state-change-crash.html: Added.
+        New test which asserts with !m_hasAXObject in RenderObject::~RenderObject without the patch. Requires Shadow DOM enabled.
 
-2013-01-04  Abhishek Arya  <inferno@chromium.org>
-
-        Crash in WebCore::RenderBlock::willBeDestroyed
-        https://bugs.webkit.org/show_bug.cgi?id=103455
-
-        Reviewed by Eric Seidel.
-
-        * fast/multicol/continuation-crash-expected.txt: Added.
-        * fast/multicol/continuation-crash.html: Added.
+        * accessibility/corresponding-control-deleted-crash-expected.txt: Added.
+        * accessibility/corresponding-control-deleted-crash.html: Added.
 
 2012-12-07  Robert Hogan  <robert@webkit.org>
 

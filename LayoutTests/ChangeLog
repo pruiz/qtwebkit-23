@@ -23,6 +23,20 @@
         * fast/repaint/overhanging-float-detach-repaint-expected.txt: Added.
         * fast/repaint/overhanging-float-detach-repaint.html: Added.
 
+2013-01-09  Ryosuke Niwa  <rniwa@webkit.org>
+
+        [JSC] REGRESSION(r135093): A form control with name=length overrides length property on form.elements
+        https://bugs.webkit.org/show_bug.cgi?id=105775
+
+        Reviewed by Sam Weinig.
+
+        Added a regression tests for all known HTMLCollection sublcasses except HTMLNameCollection,
+        which is used only to implement named getters on window and document objects and HTMLPropertiesCollection
+        since it's not enabled on all ports yet.
+
+        * fast/dom/collection-length-should-not-be-overridden-expected.txt: Added.
+        * fast/dom/collection-length-should-not-be-overridden.html: Added.
+
 2013-01-06  Abhishek Arya  <inferno@chromium.org>
 
         Heap-use-after-free in DocumentLoader::stopLoading

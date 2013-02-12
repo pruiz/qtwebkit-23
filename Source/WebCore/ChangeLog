@@ -313,6 +313,23 @@
         render tree. This means that the AXObject still exists during renderer
         removal, as we require.
 
+2013-01-09  Ryosuke Niwa  <rniwa@webkit.org>
+
+        [JSC] REGRESSION(r135093): A form control with name=length overrides length property on form.elements
+        https://bugs.webkit.org/show_bug.cgi?id=105775
+
+        Reviewed by Sam Weinig.
+
+        Fixed the bug by respecting properties on ancestor classes.
+
+        Test: fast/dom/collection-length-should-not-be-overridden.html
+
+        * bindings/js/JSDOMBinding.h:
+        (WebCore::getStaticValueSlotEntryWithoutCaching): Added.
+        * bindings/scripts/CodeGeneratorJS.pm:
+        (GenerateGetOwnPropertySlotBody): Use getStaticValueSlotEntryWithoutCaching to climb up the class
+        hierarchy.
+
 2012-12-12  Csaba Osztrogonác  <ossy@webkit.org>
 
         [Qt] Unreviewed typo fix after r137446.

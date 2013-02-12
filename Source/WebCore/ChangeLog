@@ -1,3 +1,18 @@
+2013-02-12  Robert Hogan  <robert@webkit.org>
+
+        REGRESSION(r136967): Combination of float and clear yields to bad layout
+        https://bugs.webkit.org/show_bug.cgi?id=109476
+
+        Reviewed by Levi Weintraub.
+
+        Test: fast/block/margin-collapse/self-collapsing-block-with-float-children.html
+
+        The change made at http://trac.webkit.org/changeset/136967 only needs to worry about the first floated
+        child of a self-collapsing block. The ones that follow are not affected by its margins.
+
+        * rendering/RenderBlockLineLayout.cpp:
+        (WebCore::RenderBlock::LineBreaker::skipLeadingWhitespace):
+
 2013-01-31  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt] Box shadows on a transparency layer is very slow

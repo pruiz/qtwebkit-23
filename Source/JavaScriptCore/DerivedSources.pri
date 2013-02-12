@@ -101,7 +101,6 @@ for(dir, DIRS) {
     file = $$dir/$$EXTRACTOR_BINARY
     exists($$file): LLINT_FILES += $$file
 }
-isEmpty(LLINT_FILES): LLINT_FILES += $$OUT_PWD/$$EXTRACTOR_BINARY
 
 #GENERATOR: LLInt
 llint.output = ${QMAKE_FILE_IN_PATH}$${QMAKE_DIR_SEP}LLIntAssembly.h

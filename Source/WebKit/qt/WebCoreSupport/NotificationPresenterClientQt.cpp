@@ -311,20 +311,27 @@ void NotificationPresenterClientQt::notificationControllerDestroyed()
 {
 }
 
+#if ENABLE(LEGACY_NOTIFICATIONS)
 void NotificationPresenterClientQt::requestPermission(ScriptExecutionContext* context, PassRefPtr<VoidCallback> callback)
 {  
     if (dumpNotification)
         printf("DESKTOP NOTIFICATION PERMISSION REQUESTED: %s\n", QString(context->securityOrigin()->toString()).toUtf8().constData());
 
+    NotificationClient::Permission permission = checkPermission(context);
+    if (permission != NotificationClient::PermissionNotAllowed) {
+        if (callback)
+            callback->handleEvent();
+        return;
+    }
+
     QHash<ScriptExecutionContext*, CallbacksInfo >::iterator iter = m_pendingPermissionRequests.find(context);
     if (iter != m_pendingPermissionRequests.end())
-        iter.value().m_callbacks.append(callback);
+        iter.value().m_voidCallbacks.append(callback);
     else {
         RefPtr<VoidCallback> cb = callback;
         CallbacksInfo info;
         info.m_frame = toFrame(context);
-        info.m_callbacks.append(cb);
-        m_pendingPermissionRequests.insert(context, info);
+        info.m_voidCallbacks.append(cb);
 
         if (toPage(context) && toFrame(context)) {
             m_pendingPermissionRequests.insert(context, info);
@@ -332,6 +339,37 @@ void NotificationPresenterClientQt::requestPermission(ScriptExecutionContext* co
         }
     }
 }
+#endif
+
+#if ENABLE(NOTIFICATIONS)
+void NotificationPresenterClientQt::requestPermission(ScriptExecutionContext* context, PassRefPtr<NotificationPermissionCallback> callback)
+{
+    if (dumpNotification)
+        printf("DESKTOP NOTIFICATION PERMISSION REQUESTED: %s\n", QString(context->securityOrigin()->toString()).toUtf8().constData());
+
+    NotificationClient::Permission permission = checkPermission(context);
+    if (permission != NotificationClient::PermissionNotAllowed) {
+        if (callback)
+            callback->handleEvent(Notification::permissionString(permission));
+        return;
+    }
+
+    QHash<ScriptExecutionContext*, CallbacksInfo >::iterator iter = m_pendingPermissionRequests.find(context);
+    if (iter != m_pendingPermissionRequests.end())
+        iter.value().m_callbacks.append(callback);
+    else {
+        RefPtr<NotificationPermissionCallback> cb = callback;
+        CallbacksInfo info;
+        info.m_frame = toFrame(context);
+        info.m_callbacks.append(cb);
+
+        if (toPage(context) && toFrame(context)) {
+            m_pendingPermissionRequests.insert(context, info);
+            emit toPage(context)->featurePermissionRequested(toFrame(context), QWebPage::Notifications);
+        }
+    }
+}
+#endif
 
 NotificationClient::Permission NotificationPresenterClientQt::checkPermission(ScriptExecutionContext* context)
 {
@@ -361,9 +399,14 @@ void NotificationPresenterClientQt::cancelRequestsForPermission(ScriptExecutionC
     emit page->featurePermissionRequestCanceled(frame, QWebPage::Notifications);
 }
 
-void NotificationPresenterClientQt::allowNotificationForFrame(Frame* frame)
+void NotificationPresenterClientQt::setNotificationsAllowedForFrame(Frame* frame, bool allowed)
 {
-    m_cachedPermissions.insert(frame->document(), NotificationClient::PermissionAllowed);
+    ASSERT(frame->document());
+    if (!frame->document())
+        return;
+
+    NotificationClient::Permission permission = allowed ? NotificationClient::PermissionAllowed : NotificationClient::PermissionDenied;
+    m_cachedPermissions.insert(frame->document(), permission);
 
     QHash<ScriptExecutionContext*,  CallbacksInfo>::iterator iter = m_pendingPermissionRequests.begin();
     while (iter != m_pendingPermissionRequests.end()) {
@@ -374,9 +417,20 @@ void NotificationPresenterClientQt::allowNotificationForFrame(Frame* frame)
     if (iter == m_pendingPermissionRequests.end())
         return;
 
-    QList<RefPtr<VoidCallback> >& callbacks = iter.value().m_callbacks;
-    for (int i = 0; i < callbacks.size(); i++)
-        callbacks.at(i)->handleEvent();
+#if ENABLE(LEGACY_NOTIFICATIONS)
+    QList<RefPtr<VoidCallback> >& voidCallbacks = iter.value().m_voidCallbacks;
+    Q_FOREACH(const RefPtr<VoidCallback>& callback, voidCallbacks) {
+        if (callback)
+            callback->handleEvent();
+    }
+#endif
+#if ENABLE(NOTIFICATIONS)
+    QList<RefPtr<NotificationPermissionCallback> >& callbacks = iter.value().m_callbacks;
+    Q_FOREACH(const RefPtr<NotificationPermissionCallback>& callback, callbacks) {
+        if (callback)
+            callback->handleEvent(Notification::permissionString(permission));
+    }
+#endif
     m_pendingPermissionRequests.remove(iter.key());
 }
 
@@ -386,7 +440,6 @@ void NotificationPresenterClientQt::sendDisplayEvent(NotificationWrapper* wrappe
     if (notification)
         sendEvent(notification, "show");
 }
-
 
 void NotificationPresenterClientQt::sendEvent(Notification* notification, const AtomicString& eventName)
 {

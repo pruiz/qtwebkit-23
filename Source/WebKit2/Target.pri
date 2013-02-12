@@ -866,6 +866,9 @@ contains(DEFINES, HAVE_QTQUICK=1) {
 mac: {
     contains(DEFINES, WTF_USE_QTKIT=1) {
         DEFINES += NSGEOMETRY_TYPES_SAME_AS_CGGEOMETRY_TYPES
+        isEqual(QT_ARCH, "i386") {
+            DEFINES+=NS_BUILD_32_LIKE_64
+        }
         INCLUDEPATH += \
             $$PWD/../../WebKitLibraries/
         HEADERS += \

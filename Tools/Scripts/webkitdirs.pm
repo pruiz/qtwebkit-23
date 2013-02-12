@@ -735,8 +735,8 @@ sub builtDylibPathForName
                 $libraryName .= "d";
             }
 
-            chomp(my $mkspec = `$qmakebin -query QT_HOST_DATA`);
-            $mkspec .= "/mkspecs";
+            my $mkspec = `$qmakebin -query QMAKE_MKSPECS`;
+            $mkspec =~ s/[\n|\r]$//g;
             my $qtMajorVersion = retrieveQMakespecVar("$mkspec/qconfig.pri", "QT_MAJOR_VERSION");
             if (not $qtMajorVersion) {
                 $qtMajorVersion = "";
@@ -1568,14 +1568,6 @@ sub checkRequiredSystemConfig
             push @cmds, "flex";
         }
         my @missing = ();
-        my $oldPath = $ENV{PATH};
-        if (isQt() and isWindows()) {
-            chomp(my $gnuWin32Dir = `$qmakebin -query QT_HOST_DATA`);
-            $gnuWin32Dir = File::Spec->catfile($gnuWin32Dir, "..", "gnuwin32", "bin");
-            if (-d "$gnuWin32Dir") {
-                $ENV{PATH} = $gnuWin32Dir . ";" . $ENV{PATH};
-            }
-        }
         foreach my $cmd (@cmds) {
             push @missing, $cmd if not commandExists($cmd);
         }
@@ -1583,9 +1575,6 @@ sub checkRequiredSystemConfig
         if (@missing) {
             my $list = join ", ", @missing;
             die "ERROR: $list missing but required to build WebKit.\n";
-        }
-        if (isQt() and isWindows()) {
-            $ENV{PATH} = $oldPath;
         }
     }
     # Win32 and other platforms may want to check for minimum config
@@ -1890,13 +1879,9 @@ sub retrieveQMakespecVar
 sub qtMakeCommand($)
 {
     my ($qmakebin) = @_;
-    chomp(my $hostDataPath = `$qmakebin -query QT_HOST_DATA`);
-    my $mkspecPath = $hostDataPath . "/mkspecs/default/qmake.conf";
-    if (! -e $mkspecPath) {
-        chomp(my $mkspec= `$qmakebin -query QMAKE_XSPEC`);
-        $mkspecPath = $hostDataPath . "/mkspecs/" . $mkspec . "/qmake.conf";
-    }
-    my $compiler = retrieveQMakespecVar($mkspecPath, "QMAKE_CC");
+    chomp(my $mkspec = `$qmakebin -query QMAKE_MKSPECS`);
+    $mkspec .= "/default";
+    my $compiler = retrieveQMakespecVar("$mkspec/qmake.conf", "QMAKE_CC");
 
     #print "default spec: " . $mkspec . "\n";
     #print "compiler found: " . $compiler . "\n";

@@ -1,3 +1,174 @@
+2013-02-12  Robert Hogan  <robert@webkit.org>
+
+        REGRESSION(r136967): Combination of float and clear yields to bad layout
+        https://bugs.webkit.org/show_bug.cgi?id=109476
+
+        Reviewed by Levi Weintraub.
+
+        Test: fast/block/margin-collapse/self-collapsing-block-with-float-children.html
+
+        The change made at http://trac.webkit.org/changeset/136967 only needs to worry about the first floated
+        child of a self-collapsing block. The ones that follow are not affected by its margins.
+
+        * rendering/RenderBlockLineLayout.cpp:
+        (WebCore::RenderBlock::LineBreaker::skipLeadingWhitespace):
+
+2013-01-31  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Box shadows on a transparency layer is very slow
+        https://bugs.webkit.org/show_bug.cgi?id=107547
+
+        Reviewed by Noam Rosenthal.
+
+        Include the window boundaries in the clip returned by GraphicsContext,
+        since QPainter may remember clips larger than the destination, but
+        ShadowBlur uses the clipBounds to determine the size of the shadow layer.
+
+        * platform/graphics/qt/GraphicsContextQt.cpp:
+        (WebCore::GraphicsContext::clipBounds):
+
+2013-01-29  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        REGRESSION: ChildrenAffectedBy flags lost between siblings which have child elements sharing style
+        https://bugs.webkit.org/show_bug.cgi?id=105672
+
+        Reviewed by Andreas Kling.
+
+        Change in how childrenAffectedBy bits were stored made it easier to trigger an issue where childrenAffectedBy bits
+        were not set due to sharing of styles between cousin elements.
+
+        This patch fixes the issue by not sharing styles from children with parents who prevent sharing.
+
+        Tests: fast/selectors/cousin-stylesharing-adjacent-selector.html
+               fast/selectors/cousin-stylesharing-last-child-selector.html
+
+        * css/StyleResolver.cpp:
+        (WebCore::parentElementPreventsSharing):
+        (WebCore::StyleResolver::locateCousinList):
+        * dom/Element.cpp:
+        (WebCore::Element::hasFlagsSetDuringStylingOfChildren):
+        * dom/Element.h:
+        (Element):
+
+2013-01-15  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt][CSS Shaders] Make custom filter render in Wk1 mode
+        https://bugs.webkit.org/show_bug.cgi?id=101532
+
+        Reviewed by Noam Rosenthal.
+
+        Handle ValidatedCustomFilterOperations which are used by WebKit1. To keep the cache of compiled programs working,
+        the cache has been updated to use CustomFilterProgramInfo as a hash key. CustomFilterProgramInfo is an existing
+        class specifically designed for this purpose.
+
+        * platform/graphics/texmap/TextureMapperGL.cpp:
+        (WebCore::getPassesRequiredForFilter):
+        (WebCore::TextureMapperGL::removeCachedCustomFilterProgram):
+        (WebCore::TextureMapperGL::drawUsingCustomFilter):
+        (WebCore::BitmapTextureGL::applyFilters):
+        * platform/graphics/texmap/TextureMapperGL.h:
+        (TextureMapperGL):
+
+2013-01-07  Justin Novosad  <junov@google.com>
+
+        Fixing memory read after free in CanvasRenderingContext2D::accessFont
+        https://bugs.webkit.org/show_bug.cgi?id=106244
+
+        Reviewed by Abhishek Arya.
+
+        Using a temporary String object to hold ref count on string that is
+        passed by reference in CanvasRenderingContext2D::accessFont.
+
+        Test: fast/canvas/canvas-measureText.html
+
+        * html/canvas/CanvasRenderingContext2D.cpp:
+        (WebCore::CanvasRenderingContext2D::accessFont):
+
+2013-01-17  Poul Sysolyatin  <psytonx@gmail.com>
+
+        32-bit build for Qt5 on Mac OS fails.
+        https://bugs.webkit.org/show_bug.cgi?id=107094
+
+        We need to define NS_BUILD_32_LIKE_64 for 32-bit build for Mac OS.
+        Fixed 32-bit build detection for support Qt5.
+
+        Reviewed by Benjamin Poulain.
+
+        * Target.pri:
+
+2013-01-10  Xianzhu Wang  <wangxianzhu@chromium.org>
+
+        Regression(r129944): Heap-use-after-free in WebCore::computeNonFastScrollableRegion
+        https://bugs.webkit.org/show_bug.cgi?id=99515
+
+        Reviewed by Simon Fraser.
+
+        The object used-after-freed is a destructed FrameView that is still in the m_scrollableAreas set of the parent FrameView. Actually it has been removed from m_scrollableAreas when setParent(0), but then is added back in updateScrollableAreaSet() because its frameViewParent() is still not 0 (though parent() is already 0).
+
+        No new tests. The heap-use-after-free doesn't always cause crash so it can't be stably tested with a test case. Memory analysis tools like asan discovered the heap-use-after-free and verified that the patch can fix the issue.
+
+        * page/FrameView.cpp:
+        (WebCore::FrameView::parentFrameView): Checks if the FrameView has been removed from the parent.
+
+2013-01-07  Abhishek Arya  <inferno@chromium.org>
+
+        Heap-buffer-overflow in WebCore::RenderBlock::clone.
+        https://bugs.webkit.org/show_bug.cgi?id=101984
+
+        Reviewed by Julien Chaffraix.
+
+        Add a global in RenderBlock to prevent recursion inside splitFlow.
+        While inside splitFlow (multi-column handling), we move many children
+        using fullRemoveInsert=true, causing RenderBlock::addChild to be called
+        and recursing in splitFlow. This messes the tree splitting happening in
+        RenderBlock::splitBlocks and can cause bad casts.
+
+        Test: fast/multicol/recursive-split-flow-crash.html
+
+        * rendering/RenderBlock.cpp:
+        (WebCore::RenderBlock::addChildIgnoringAnonymousColumnBlocks):
+
+2013-01-04  Abhishek Arya  <inferno@chromium.org>
+
+        Heap-use-after-free in WebCore::XMLDocumentParser::doEnd
+        https://bugs.webkit.org/show_bug.cgi?id=100152
+
+        Reviewed by Adam Barth.
+
+        XMLDocumentParser can be blown away inside document()->styleResolverChanged()
+        call. Protect it with a local RefPtr in Document::explitClose.
+
+        No new tests. The site specific dependencies are hard to minimize.
+
+        * dom/Document.cpp:
+        (WebCore::Document::explicitClose): RefPtr m_parser into a local, since
+        it can be detached and nulled out in DocumentWriter::end().
+        * xml/parser/XMLDocumentParser.cpp:
+        (WebCore::XMLDocumentParser::end): Bail out when we are detached.
+        * xml/parser/XMLDocumentParserLibxml2.cpp:
+        (WebCore::XMLDocumentParser::doEnd): Bail out when we are detached.
+        * xml/parser/XMLDocumentParserQt.cpp:
+        (WebCore::XMLDocumentParser::doEnd): Bail out when we are detached.
+
+2013-01-06  Abhishek Arya  <inferno@chromium.org>
+
+        Heap-use-after-free in DocumentLoader::stopLoading
+        https://bugs.webkit.org/show_bug.cgi?id=103656
+
+        Reviewed by Eric Seidel.
+
+        Test: fast/dom/ready-state-change-crash.html
+
+        * html/parser/HTMLDocumentParser.cpp:
+        (WebCore::HTMLDocumentParser::prepareToStopParsing): Bail out
+        if the parser is detached due to mutation event.
+        * loader/DocumentLoader.cpp:
+        (WebCore::DocumentLoader::stopLoading): Move the protectors for
+        frame and document loader to the start of the function. Call to
+        m_frame->loader()->stopLoading() can change document ready state
+        and fire mutation event which might blow the document loader from
+        underneath.
+
 2013-01-16  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [TexMap] Composited CSS shaders crash when using non-GL TextureMapper
@@ -76,6 +247,22 @@
         * dom/Document.cpp:
         (WebCore::Document::takeDOMWindowFrom):
 
+2013-01-14  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        REGRESSION (r132591): Underpainting @ uofmchildrenshospital.org
+        https://bugs.webkit.org/show_bug.cgi?id=105861
+
+        Reviewed by David Hyatt.
+
+        Test: fast/repaint/overhanging-float-detach-repaint.html
+
+        The issue comes from overhanging float not contributing to their containing block's
+        overflow. This meant that repaint() would ignore them leading to an under-repaint.
+        The fix is simple: force all the overhanging floats to repaint themselves.
+
+        * rendering/RenderObject.cpp:
+        (WebCore::RenderObject::destroyAndCleanupAnonymousWrappers):
+
 2012-12-12  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt] Animation fails on large layers
@@ -141,6 +328,23 @@
         render tree. This means that the AXObject still exists during renderer
         removal, as we require.
 
+2013-01-09  Ryosuke Niwa  <rniwa@webkit.org>
+
+        [JSC] REGRESSION(r135093): A form control with name=length overrides length property on form.elements
+        https://bugs.webkit.org/show_bug.cgi?id=105775
+
+        Reviewed by Sam Weinig.
+
+        Fixed the bug by respecting properties on ancestor classes.
+
+        Test: fast/dom/collection-length-should-not-be-overridden.html
+
+        * bindings/js/JSDOMBinding.h:
+        (WebCore::getStaticValueSlotEntryWithoutCaching): Added.
+        * bindings/scripts/CodeGeneratorJS.pm:
+        (GenerateGetOwnPropertySlotBody): Use getStaticValueSlotEntryWithoutCaching to climb up the class
+        hierarchy.
+
 2012-12-12  Csaba Osztrogonác  <ossy@webkit.org>
 
         [Qt] Unreviewed typo fix after r137446.
@@ -204,6 +408,23 @@
         * platform/graphics/surfaces/mac/GraphicsSurfaceMac.cpp:
         (WebCore::GraphicsSurface::platformPaintToTextureMapper):
 
+2012-12-07  Robert Hogan  <robert@webkit.org>
+
+        REGRESSION(r127163): Content is offset to the right at rea.ru
+        https://bugs.webkit.org/show_bug.cgi?id=103116
+
+        Reviewed by David Hyatt.
+
+        The top margin edge of a self-collapsing block that clears a float intrudes up into it by the height of the margin,
+        so to ensure any child floats of the self-collapsing block only go as far as the top content edge 
+        add the margin back in to the block's current height before placing them.
+
+        Tests: fast/block/margin-collapse/self-collapsing-block-with-float-child-collapsed-margins.html
+               fast/block/margin-collapse/self-collapsing-block-with-float-child.html
+
+        * rendering/RenderBlockLineLayout.cpp:
+        (WebCore::RenderBlock::LineBreaker::skipLeadingWhitespace):
+
 2012-12-07  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [TexMap] Can not do multiple accelerated animations
@@ -222,6 +443,32 @@
         * platform/graphics/GraphicsLayerAnimation.h:
         (GraphicsLayerAnimations):
 
+2012-12-06  Stephen Chenney  <schenney@chromium.org>
+
+        SVG <use> element inside an svg-as-image fails
+        https://bugs.webkit.org/show_bug.cgi?id=104007
+
+        Reviewed by Eric Seidel.
+
+        Upon redraw, SVGImage calls layout on the document it is drawing into
+        the image if the image, provided it believes the redraw does not need
+        to be delayed. Unfortunately, when an SVG <use> element is modified
+        (by animation, say) and regenerates its shadow tree, the destructors
+        invoke redraw, causing the SVGImage to call layout on something that
+        is in the process of being deleted. That's bad.
+
+        This change causes SVGImage to always delay the redraw. It is the most robust
+        way to protect against this problem, as there may be any number of
+        ways to cause this issue (a node being deleted in an svg-as-image
+        target) and this protects against them all.
+
+        The test case crashes in Asan Chromium.
+
+        Test: svg/as-image/animated-use-as-image-crash.html
+
+        * svg/graphics/SVGImageCache.cpp:
+        (WebCore::SVGImageCache::imageContentChanged): Always redraw on the timer.
+
 2012-12-03  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
 
         Document::initSecurityContext() fails to call securityOrigin().grantLoadLocalResources()
@@ -239,6 +486,26 @@
         (WebCore::Document::initSecurityContext):
         * loader/FrameLoader.cpp:
         (WebCore::FrameLoader::didBeginDocument):
+
+2012-11-30  Florin Malita  <fmalita@chromium.org>
+
+        SVG pattern data deleted while in use
+        https://bugs.webkit.org/show_bug.cgi?id=103415
+
+        Reviewed by Dirk Schulze.
+
+        Various calls in RenderSVGResourcePattern::applyResource() can trigger invalidations,
+        which may end up deleting our current pattern data (via removeAllClientsFromCache).
+        To avoid this, we should add the pattern data to the cache only after it is fully built.
+        For clarity, the patch also refactors the pattern setup code into a separate method.
+
+        Test: svg/custom/large-image-pattern-crash.html
+
+        * rendering/svg/RenderSVGResourcePattern.cpp:
+        (WebCore::RenderSVGResourcePattern::buildPattern):
+        (WebCore::RenderSVGResourcePattern::applyResource):
+        * rendering/svg/RenderSVGResourcePattern.h:
+        (RenderSVGResourcePattern):
 
 2012-11-29  Tommy Widenflycht  <tommyw@google.com>
 

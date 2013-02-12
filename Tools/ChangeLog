@@ -4096,16 +4096,6 @@
         * DumpRenderTree/blackberry/EventSender.cpp:
         (keyDownCallback):
 
-2012-11-09  Simon Hausmann  <simon.hausmann@digia.com>
-
-        Unreviewed prospective Qt/Windows build bot fix:
-
-        Make determination of qmake mkspec work with older versions of Qt that
-        still create a "mkspecs/default" directory.
-
-        * Scripts/webkitdirs.pm:
-        (qtMakeCommand):
-
 2012-11-09  Jochen Eisinger  <jochen@chromium.org>
 
         [chromium] Introduce a WebTestProxy to override methods in WebViewClient for layout tests
@@ -4142,19 +4132,6 @@
         * DumpRenderTree/chromium/WebViewHost.cpp:
         * DumpRenderTree/chromium/WebViewHost.h:
         (WebViewHost):
-
-2012-11-09  Simon Hausmann  <simon.hausmann@digia.com>
-
-        [Qt] Build with MSVC fails to use nmake instead of make
-        https://bugs.webkit.org/show_bug.cgi?id=98645
-
-        Reviewed by Tor Arne Vestbø.
-
-        Don't rely on the "default" mkspec but instead query the target
-        mkspec variable from qmake to find the right qmake.conf.
-
-        * Scripts/webkitdirs.pm:
-        (qtMakeCommand):
 
 2012-11-08  Sudarsana Nagineni  <sudarsana.nagineni@intel.com>
 

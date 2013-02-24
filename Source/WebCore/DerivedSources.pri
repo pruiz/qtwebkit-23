@@ -825,10 +825,18 @@ arrayBufferViewCustomScript.add_output_to_sources = false
 GENERATORS += arrayBufferViewCustomScript
 
 # GENERATOR 4: CSS grammar
+# FIXME: moc -E somehow fails on Linux, but seems unnecessary because bison can handle it.
+# moc -E is however both working and required on Windows.
+linux-* {
+    CSSBISON_PREPROCESSOR = 
+} else {
+    CSSBISON_PREPROCESSOR = --preprocessor \"$${QMAKE_MOC} -E\"
+}
+
 cssbison.output = CSSGrammar.cpp
 cssbison.input = CSSBISON
 cssbison.script = $$PWD/css/makegrammar.pl
-cssbison.commands = perl -I $$PWD/bindings/scripts $$cssbison.script --outputDir ${QMAKE_FUNC_FILE_OUT_PATH} --extraDefines \"$${DEFINES} $${FEATURE_DEFINES_JAVASCRIPT}\" --symbolsPrefix cssyy ${QMAKE_FILE_NAME}
+cssbison.commands = perl -I $$PWD/bindings/scripts $$cssbison.script --outputDir ${QMAKE_FUNC_FILE_OUT_PATH} --extraDefines \"$${DEFINES}  $${FEATURE_DEFINES_JAVASCRIPT}\" $$(CSSBISON_PREPROCESSOR) --symbolsPrefix cssyy ${QMAKE_FILE_NAME}
 cssbison.depends = ${QMAKE_FILE_NAME}
 GENERATORS += cssbison
 

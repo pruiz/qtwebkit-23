@@ -1,3 +1,17 @@
+2013-02-24  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] window.open passes height and width parameters even if not defined in a page
+        https://bugs.webkit.org/show_bug.cgi?id=107705
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Do not override width or height of 0, as that indicates default size, and not minimum size.
+
+        Tested by tst_qwebpage.
+
+        * page/DOMWindow.cpp:
+        (WebCore::DOMWindow::adjustWindowRect):
+
 2013-02-21  Levi Weintraub  <leviw@chromium.org>
 
         ASSERTION FAILED: !object || object->isBox(), UNKNOWN in WebCore::RenderListItem::positionListMarker

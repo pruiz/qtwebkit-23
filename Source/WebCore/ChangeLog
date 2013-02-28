@@ -1,3 +1,19 @@
+2013-02-27  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [TexMap] Flickering after transitions on Apple HTML5 demo
+        https://bugs.webkit.org/show_bug.cgi?id=102501
+
+        Reviewed by Noam Rosenthal.
+
+        Notify about animation start after the new animation is actually commited.
+
+        * platform/graphics/texmap/GraphicsLayerTextureMapper.cpp:
+        (WebCore::GraphicsLayerTextureMapper::GraphicsLayerTextureMapper):
+        (WebCore::GraphicsLayerTextureMapper::commitLayerChanges):
+        (WebCore::GraphicsLayerTextureMapper::addAnimation):
+        * platform/graphics/texmap/GraphicsLayerTextureMapper.h:
+        (GraphicsLayerTextureMapper):
+
 2013-02-28  Florin Malita  <fmalita@chromium.org>
 
         [SVG] OOB access in SVGListProperty::replaceItemValues()

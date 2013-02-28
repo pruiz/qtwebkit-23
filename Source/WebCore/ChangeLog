@@ -1,5 +1,18 @@
 2013-02-27  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
+        [TexMap] REGRESSION(144183): It make negative delay tests fails
+        https://bugs.webkit.org/show_bug.cgi?id=110989
+
+        Reviewed by Noam Rosenthal.
+
+        Do not apply a negative offset to the animation starttime send to the GraphicLayerClient,
+        it needs the actual animation start not a virtual start.
+
+        * platform/graphics/texmap/GraphicsLayerTextureMapper.cpp:
+        (WebCore::GraphicsLayerTextureMapper::addAnimation):
+
+2013-02-27  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
         [TexMap] Flickering after transitions on Apple HTML5 demo
         https://bugs.webkit.org/show_bug.cgi?id=102501
 

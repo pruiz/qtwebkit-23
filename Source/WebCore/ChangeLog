@@ -1,3 +1,45 @@
+2013-02-28  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Regression(r131539): Heap-use-after-free in WebCore::RenderBlock::willBeDestroyed
+        https://bugs.webkit.org/show_bug.cgi?id=107189
+
+        Reviewed by Abhishek Arya.
+
+        Test: fast/dynamic/continuation-detach-crash.html
+
+        This patch reverts r131539 and the following changes (r132591 and r139664).
+        This means we redo detaching from the bottom-up which solves the regression.
+        It fixes the attached test case as we re-attach child nodes before detaching
+        the parent. It seems wrong to do but this avoid a stale continuation.
+
+        * dom/ContainerNode.cpp:
+        (WebCore::ContainerNode::detach): Detach the children first, then ourself.
+        * dom/Node.cpp:
+        (WebCore::Node::detach): Clear the renderer instead of ASSERT'ing.
+        * rendering/RenderObject.cpp:
+        (WebCore::RenderObject::willBeDestroyed): Removed the code to clear the associated node's renderer.
+        (WebCore::RenderObject::destroyAndCleanupAnonymousWrappers):
+        * rendering/RenderObjectChildList.cpp:
+        (WebCore::RenderObjectChildList::removeChildNode):
+        Moved the repainting logic back into removeChildNode from destroyAndCleanupAnonymousWrappers.
+        (WebCore::RenderObjectChildList::destroyLeftoverChildren): Re-added the code to clear the associated node's
+        renderer.
+        * rendering/RenderTextFragment.cpp:
+        (WebCore::RenderTextFragment::setText): Re-added the code to set the associated node's renderer.
+
+        * dom/ContainerNode.cpp:
+        (WebCore::ContainerNode::detach):
+        * dom/Node.cpp:
+        (WebCore::Node::detach):
+        * rendering/RenderObject.cpp:
+        (WebCore::RenderObject::willBeDestroyed):
+        (WebCore::RenderObject::destroyAndCleanupAnonymousWrappers):
+        * rendering/RenderObjectChildList.cpp:
+        (WebCore::RenderObjectChildList::destroyLeftoverChildren):
+        (WebCore::RenderObjectChildList::removeChildNode):
+        * rendering/RenderTextFragment.cpp:
+        (WebCore::RenderTextFragment::setText):
+
 2013-02-28  Abhishek Arya  <inferno@chromium.org>
 
         Bad cast in RenderBlock::splitBlocks.

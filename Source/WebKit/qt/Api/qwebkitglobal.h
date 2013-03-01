@@ -29,7 +29,7 @@
 #define QTWEBKIT_VERSION_CHECK(major, minor, patch) ((major<<16)|(minor<<8)|(patch))
 
 #ifndef QT_STATIC
-#  if defined(BUILDING_WEBKIT)
+#  if defined(BUILDING_WEBKIT) && defined(QT_BUILD_WEBKIT_LIB)
 #      define QWEBKIT_EXPORT Q_DECL_EXPORT
 #  else
 #      define QWEBKIT_EXPORT Q_DECL_IMPORT

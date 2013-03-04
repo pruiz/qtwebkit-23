@@ -1,3 +1,21 @@
+2013-02-24  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] window.open passes height and width parameters even if not defined in a page
+        https://bugs.webkit.org/show_bug.cgi?id=107705
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Test that minimum size is applied only when the requested size is too small,
+        not when default is requested.
+
+        * tests/qwebpage/tst_qwebpage.cpp:
+        (tst_QWebPage):
+        (TestPage):
+        (TestPage::TestPage):
+        (TestPage::createWindow):
+        (TestPage::slotGeometryChangeRequested):
+        (tst_QWebPage::openWindowDefaultSize):
+
 2013-01-21  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt][WK1] Permission request callbacks for non-legacy notifications

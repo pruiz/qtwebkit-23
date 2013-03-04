@@ -1,3 +1,187 @@
+2013-02-27  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [TexMap] REGRESSION(144183): It make negative delay tests fails
+        https://bugs.webkit.org/show_bug.cgi?id=110989
+
+        Reviewed by Noam Rosenthal.
+
+        Do not apply a negative offset to the animation starttime send to the GraphicLayerClient,
+        it needs the actual animation start not a virtual start.
+
+        * platform/graphics/texmap/GraphicsLayerTextureMapper.cpp:
+        (WebCore::GraphicsLayerTextureMapper::addAnimation):
+
+2013-02-27  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [TexMap] Flickering after transitions on Apple HTML5 demo
+        https://bugs.webkit.org/show_bug.cgi?id=102501
+
+        Reviewed by Noam Rosenthal.
+
+        Notify about animation start after the new animation is actually commited.
+
+        * platform/graphics/texmap/GraphicsLayerTextureMapper.cpp:
+        (WebCore::GraphicsLayerTextureMapper::GraphicsLayerTextureMapper):
+        (WebCore::GraphicsLayerTextureMapper::commitLayerChanges):
+        (WebCore::GraphicsLayerTextureMapper::addAnimation):
+        * platform/graphics/texmap/GraphicsLayerTextureMapper.h:
+        (GraphicsLayerTextureMapper):
+
+2013-02-28  Florin Malita  <fmalita@chromium.org>
+
+        [SVG] OOB access in SVGListProperty::replaceItemValues()
+        https://bugs.webkit.org/show_bug.cgi?id=109293
+
+        Replacing a list property item with itself should be a no-op. This patch updates the related
+        APIs and logic to detect the self-replace case and prevent removal of the item from the list.
+
+        To avoid scanning the list multiple times, removeItemFromList() is updated to operate on
+        indices and a findItem() method is added to resolve an item to an index.
+
+        Reviewed by Dirk Schulze.
+
+        No new tests: updated existing tests cover the change.
+
+        * svg/properties/SVGAnimatedListPropertyTearOff.h:
+        (WebCore::SVGAnimatedListPropertyTearOff::findItem):
+        (SVGAnimatedListPropertyTearOff):
+        (WebCore::SVGAnimatedListPropertyTearOff::removeItemFromList):
+        * svg/properties/SVGAnimatedPathSegListPropertyTearOff.h:
+        (WebCore::SVGAnimatedPathSegListPropertyTearOff::findItem):
+        (SVGAnimatedPathSegListPropertyTearOff):
+        (WebCore::SVGAnimatedPathSegListPropertyTearOff::removeItemFromList):
+        Add a findItem() delegating method, and update removeItemFromList() to use the new
+        index-based API.
+
+        * svg/properties/SVGListProperty.h:
+        (WebCore::SVGListProperty::insertItemBeforeValues):
+        (WebCore::SVGListProperty::insertItemBeforeValuesAndWrappers):
+        (WebCore::SVGListProperty::replaceItemValues):
+        (WebCore::SVGListProperty::replaceItemValuesAndWrappers):
+        (SVGListProperty):
+        Updated to handle the no-op case for insertItemBefore() & replaceItem().
+
+        * svg/properties/SVGListPropertyTearOff.h:
+        (WebCore::SVGListPropertyTearOff::findItem):
+        (WebCore::SVGListPropertyTearOff::removeItemFromList):
+        Index-based API updates.
+
+        (WebCore::SVGListPropertyTearOff::processIncomingListItemValue):
+        (WebCore::SVGListPropertyTearOff::processIncomingListItemWrapper):
+        * svg/properties/SVGPathSegListPropertyTearOff.cpp:
+        (WebCore::SVGPathSegListPropertyTearOff::processIncomingListItemValue):
+        Detect the self-replace case and return without removing the item from the list.
+
+        * svg/properties/SVGPathSegListPropertyTearOff.h:
+        (WebCore::SVGPathSegListPropertyTearOff::findItem):
+        (WebCore::SVGPathSegListPropertyTearOff::removeItemFromList):
+        (SVGPathSegListPropertyTearOff):
+        (WebCore::SVGPathSegListPropertyTearOff::processIncomingListItemWrapper):
+        * svg/properties/SVGStaticListPropertyTearOff.h:
+        (WebCore::SVGStaticListPropertyTearOff::processIncomingListItemValue):
+        (WebCore::SVGStaticListPropertyTearOff::processIncomingListItemWrapper):
+        Index-based API updates.
+
+2013-02-28  Julien Chaffraix  <jchaffraix@webkit.org>
+
+        Regression(r131539): Heap-use-after-free in WebCore::RenderBlock::willBeDestroyed
+        https://bugs.webkit.org/show_bug.cgi?id=107189
+
+        Reviewed by Abhishek Arya.
+
+        Test: fast/dynamic/continuation-detach-crash.html
+
+        This patch reverts r131539 and the following changes (r132591 and r139664).
+        This means we redo detaching from the bottom-up which solves the regression.
+        It fixes the attached test case as we re-attach child nodes before detaching
+        the parent. It seems wrong to do but this avoid a stale continuation.
+
+        * dom/ContainerNode.cpp:
+        (WebCore::ContainerNode::detach): Detach the children first, then ourself.
+        * dom/Node.cpp:
+        (WebCore::Node::detach): Clear the renderer instead of ASSERT'ing.
+        * rendering/RenderObject.cpp:
+        (WebCore::RenderObject::willBeDestroyed): Removed the code to clear the associated node's renderer.
+        (WebCore::RenderObject::destroyAndCleanupAnonymousWrappers):
+        * rendering/RenderObjectChildList.cpp:
+        (WebCore::RenderObjectChildList::removeChildNode):
+        Moved the repainting logic back into removeChildNode from destroyAndCleanupAnonymousWrappers.
+        (WebCore::RenderObjectChildList::destroyLeftoverChildren): Re-added the code to clear the associated node's
+        renderer.
+        * rendering/RenderTextFragment.cpp:
+        (WebCore::RenderTextFragment::setText): Re-added the code to set the associated node's renderer.
+
+        * dom/ContainerNode.cpp:
+        (WebCore::ContainerNode::detach):
+        * dom/Node.cpp:
+        (WebCore::Node::detach):
+        * rendering/RenderObject.cpp:
+        (WebCore::RenderObject::willBeDestroyed):
+        (WebCore::RenderObject::destroyAndCleanupAnonymousWrappers):
+        * rendering/RenderObjectChildList.cpp:
+        (WebCore::RenderObjectChildList::destroyLeftoverChildren):
+        (WebCore::RenderObjectChildList::removeChildNode):
+        * rendering/RenderTextFragment.cpp:
+        (WebCore::RenderTextFragment::setText):
+
+2013-02-28  Abhishek Arya  <inferno@chromium.org>
+
+        Bad cast in RenderBlock::splitBlocks.
+        https://bugs.webkit.org/show_bug.cgi?id=108691
+
+        Reviewed by Levi Weintraub.
+
+        Test: fast/multicol/remove-child-split-flow-crash.html
+
+        * rendering/RenderBlock.cpp:
+        (WebCore):
+        (WebCore::RenderBlock::addChildIgnoringAnonymousColumnBlocks): rename gIsInColumnFlowSplit to gColumnFlowSplitEnabled
+        and use it to decide when to do the column flow split or not.
+        (WebCore::RenderBlock::removeChild): Do not allow column flow split inside removeChild
+        since we might be merging anonymous blocks.
+
+2013-02-24  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] window.open passes height and width parameters even if not defined in a page
+        https://bugs.webkit.org/show_bug.cgi?id=107705
+
+        Reviewed by Kenneth Rohde Christiansen.
+
+        Do not override width or height of 0, as that indicates default size, and not minimum size.
+
+        Tested by tst_qwebpage.
+
+        * page/DOMWindow.cpp:
+        (WebCore::DOMWindow::adjustWindowRect):
+
+2013-02-21  Levi Weintraub  <leviw@chromium.org>
+
+        ASSERTION FAILED: !object || object->isBox(), UNKNOWN in WebCore::RenderListItem::positionListMarker
+        https://bugs.webkit.org/show_bug.cgi?id=108699
+
+        Reviewed by Abhishek Arya.
+
+        RenderListItems performs special management of its children to maintain list markers. Splitting a flow
+        through a list item results in assumptions made inside RenderListItem failing, so for now, avoid splitting
+        flows when inside one.
+
+        Test: fast/multicol/span/list-multi-column-crash.html
+
+        * rendering/RenderBlock.cpp:
+        (WebCore::RenderBlock::containingColumnsBlock):
+
+2012-09-12  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        [Qt] Drastically shorten length of commandline needed for JS bindings generator
+        https://bugs.webkit.org/show_bug.cgi?id=96266
+
+        Reviewed by Tor Arne Vestbø.
+
+        The generate-bindings script supports the SOURCE_ROOT environment variable for IDL include file
+        lookups, which allows specifying relative include search directories.
+
+        * DerivedSources.pri:
+
 2013-02-12  Robert Hogan  <robert@webkit.org>
 
         REGRESSION(r136967): Combination of float and clear yields to bad layout
@@ -26,6 +210,31 @@
 
         * platform/graphics/qt/GraphicsContextQt.cpp:
         (WebCore::GraphicsContext::clipBounds):
+
+2013-01-29  Justin Novosad  <junov@google.com>
+
+        REGRESSION (r135628-135632): Double box shadow failure to render
+        https://bugs.webkit.org/show_bug.cgi?id=107833
+
+        Reviewed by Simon Fraser.
+
+        Regression caused by http://trac.webkit.org/changeset/135629
+        The regression was due to faulty occlusion logic that was assuming
+        that drawing the background color of a render box background layer
+        could be skipped when the same layer also has an opaque image attached.
+        In the case where the background color is drawn for the purpose of
+        rendering a box shadow, the shadow is typically not
+        completely occluded by the background image because of the shadow
+        blur and/or offset.  This patch fixes the problem by not culling a
+        background draw if it is used to draw a box shadow.
+
+        Test: fast/backgrounds/gradient-background-shadow.html
+
+        * rendering/RenderBoxModelObject.cpp:
+        (WebCore::RenderBoxModelObject::paintFillLayerExtended):
+        Changing occlusion culling test to never cull background color
+        draw if it is used to draw a box shadow. This is because box shadows
+        can draw outside the border fill region.
 
 2013-01-29  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 

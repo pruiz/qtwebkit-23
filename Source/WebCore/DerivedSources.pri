@@ -725,16 +725,10 @@ preprocessIdls.add_output_to_sources = false
 preprocessIdls.depends = $$PWD/bindings/scripts/IDLParser.pm $$IDL_BINDINGS
 GENERATORS += preprocessIdls
 
-win32 {
-    env_export = set
-} else {
-    env_export = export
-}
-
 # GENERATOR 1: Generate .h and .cpp from IDLs
 generateBindings.input = IDL_BINDINGS
 generateBindings.script = $$PWD/bindings/scripts/generate-bindings.pl
-generateBindings.commands = $$env_export \"SOURCE_ROOT=$$toSystemPath($$PWD)\" && perl -I$$PWD/bindings/scripts $$generateBindings.script \
+generateBindings.commands = $$setEnvironmentVariable(SOURCE_ROOT, $$toSystemPath($$PWD)) && perl -I$$PWD/bindings/scripts $$generateBindings.script \
                             --defines \"$${FEATURE_DEFINES_JAVASCRIPT}\" \
                             --generator JS \
                             --include Modules/filesystem \
@@ -831,10 +825,17 @@ arrayBufferViewCustomScript.add_output_to_sources = false
 GENERATORS += arrayBufferViewCustomScript
 
 # GENERATOR 4: CSS grammar
+# Moc from Qt4 can not handle YACC files. Fortunately it seems preprocessing is not always required.
+win32-* {
+    CSSBISON_PREPROCESSOR = --preprocessor \"cl -E\"
+} else {
+    CSSBISON_PREPROCESSOR = 
+}
+
 cssbison.output = CSSGrammar.cpp
 cssbison.input = CSSBISON
 cssbison.script = $$PWD/css/makegrammar.pl
-cssbison.commands = perl -I $$PWD/bindings/scripts $$cssbison.script --outputDir ${QMAKE_FUNC_FILE_OUT_PATH} --extraDefines \"$${DEFINES} $${FEATURE_DEFINES_JAVASCRIPT}\" --symbolsPrefix cssyy ${QMAKE_FILE_NAME}
+cssbison.commands = perl -I $$PWD/bindings/scripts $$cssbison.script --outputDir ${QMAKE_FUNC_FILE_OUT_PATH} --extraDefines \"$${DEFINES}  $${FEATURE_DEFINES_JAVASCRIPT}\" $$CSSBISON_PREPROCESSOR --symbolsPrefix cssyy ${QMAKE_FILE_NAME}
 cssbison.depends = ${QMAKE_FILE_NAME}
 GENERATORS += cssbison
 

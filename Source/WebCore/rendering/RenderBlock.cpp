@@ -113,7 +113,7 @@ typedef WTF::HashSet<RenderBlock*> DelayedUpdateScrollInfoSet;
 static int gDelayUpdateScrollInfo = 0;
 static DelayedUpdateScrollInfoSet* gDelayedUpdateScrollInfoSet = 0;
 
-static bool gIsInColumnFlowSplit = false;
+static bool gColumnFlowSplitEnabled = true;
 
 bool RenderBlock::s_canPropagateFloatIntoSibling = false;
 
@@ -533,13 +533,10 @@ RenderBlock* RenderBlock::containingColumnsBlock(bool allowAnonymousColumnBlock)
             || curr->isInlineBlockOrInlineTable())
             return 0;
 
-        // FIXME: Table manages its own table parts, most of which are RenderBoxes.
-        // Multi-column code cannot handle splitting the flow in table. Disabling it
-        // to prevent crashes.
-        // Similarly, RenderButton maintains an anonymous block child and overrides
-        // addChild() to prevent itself from having additional direct children. This
-        // causes problems for split flows.
-        if (curr->isTable() || curr->isRenderButton())
+        // FIXME: Tables, RenderButtons, and RenderListItems all do special management
+        // of their children that breaks when the flow is split through them. Disabling
+        // multi-column for them to avoid this problem.
+        if (curr->isTable() || curr->isRenderButton() || curr->isListItem())
             return 0;
         
         RenderBlock* currBlock = toRenderBlock(curr);
@@ -862,10 +859,11 @@ void RenderBlock::addChildIgnoringAnonymousColumnBlocks(RenderObject* newChild, 
     if (beforeChild && beforeChild->isRunIn() && runInIsPlacedIntoSiblingBlock(beforeChild))
         beforeChild = beforeChild->nextSibling();
 
-    if (!gIsInColumnFlowSplit) {
+    // Check for a spanning element in columns.
+    if (gColumnFlowSplitEnabled) {
         RenderBlock* columnsBlockAncestor = columnsBlockForSpanningElement(newChild);
         if (columnsBlockAncestor) {
-            TemporaryChange<bool> isInColumnFlowSplit(gIsInColumnFlowSplit, true);
+            TemporaryChange<bool> columnFlowSplitEnabled(gColumnFlowSplitEnabled, false);
             // We are placing a column-span element inside a block.
             RenderBlock* newBox = createAnonymousColumnSpanBlock();
 
@@ -1189,6 +1187,9 @@ void RenderBlock::removeChild(RenderObject* oldChild)
         RenderBox::removeChild(oldChild);
         return;
     }
+
+    // This protects against column split flows when anonymous blocks are getting merged.
+    TemporaryChange<bool> columnFlowSplitEnabled(gColumnFlowSplitEnabled, false);
 
     // If this child is a block, and if our previous and next siblings are
     // both anonymous blocks with inline content, then we can go ahead and

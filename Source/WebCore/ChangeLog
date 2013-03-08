@@ -13,6 +13,19 @@
 
 2013-02-27  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
+        [Qt] Flash objects won't load until scrolling page
+        https://bugs.webkit.org/show_bug.cgi?id=110149
+
+        Reviewed by Simon Hausmann.
+
+        Revert r134222. The issue from bug 101836 is no longer reproducable,
+        and the fix was causing flash objects to not load properly.
+
+        * plugins/PluginPackage.cpp:
+        (WebCore::PluginPackage::determineQuirks):
+
+2013-02-27  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
         [TexMap] Flickering after transitions on Apple HTML5 demo
         https://bugs.webkit.org/show_bug.cgi?id=102501
 

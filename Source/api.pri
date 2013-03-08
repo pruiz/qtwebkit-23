@@ -105,6 +105,11 @@ haveQt(5) {
     # Install rules handled by Qt's module system
 } else {
     # For Qt4 we have to set up install rules manually
+    modulefile.files = $${ROOT_WEBKIT_DIR}/Tools/qmake/qt_webkit.pri
+    mkspecs = $$[QMAKE_MKSPECS]
+    mkspecs = $$split(mkspecs, :)
+    modulefile.path = $$last(mkspecs)/modules
+    INSTALLS += modulefile
 
     # Syncqt has already run at this point, so we can use headers.pri
     # as a basis for our install-rules

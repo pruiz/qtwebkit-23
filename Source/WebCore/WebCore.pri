@@ -289,6 +289,10 @@ haveQt(5) {
         DEFINES += WTF_USE_LIBJPEG=1 WTF_USE_LIBPNG=1
         LIBS += -ljpeg -lpng
     }
+    contains(DEFINES, HAVE_LIBWEBP=1) {
+        DEFINES += WTF_USE_WEBP=1
+        LIBS += -lwebp
+    }
 }
 
 mac {

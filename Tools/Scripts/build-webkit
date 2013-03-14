@@ -60,7 +60,7 @@ my $makeArgs = "";
 my $cmakeArgs;
 my $onlyWebKitProject = 0;
 my $noWebKit2 = 0;
-my $noSSE2 = 0;
+my $noForceSSE2 = 0;
 my $coverageSupport = 0;
 my $startTime = time();
 
@@ -136,7 +136,7 @@ Usage: $programName [options] [options to pass to build system]
   --only-webkit                     Build only the WebKit project
   --no-webkit2                      Omit WebKit2 code from the build
 
-  --no-sse2                         Do not force the use of SSE2 on i386 (QtWebKit 2.3 only)
+  --no-force-sse2                   Do not force the use of SSE2 on x86 (QtWebKit 2.3 only)
 
 EOF
 
@@ -153,7 +153,8 @@ my %options = (
     'only-webkit' => \$onlyWebKitProject,
     'no-webkit2' => \$noWebKit2,
     'coverage' => \$coverageSupport,
-    'no-sse2' => \$noSSE2,
+    'no-sse2' => \$noForceSSE2,
+    'no-force-sse2' => \$noForceSSE2,
 );
 
 # Build usage text and options list from features
@@ -259,7 +260,7 @@ if (isGtk()) {
     push @options, "--install-libs=" . $installLibs if defined($installLibs);
     push @options, "--makeargs=" . $makeArgs if $makeArgs;
     push @options, "--qmakearg=CONFIG+=no_webkit2" if $noWebKit2;
-    push @options, "--qmakearg=CONFIG+=no_sse2" if $noSSE2;
+    push @options, "--qmakearg=CONFIG+=no_force_sse2" if $noForceSSE2;
 
     if (checkForArgumentAndRemoveFromARGV("-2")) {
         print "Note: WebKit2 is now built by default, you don't need to pass -2. Disable using --no-webkit2\n";

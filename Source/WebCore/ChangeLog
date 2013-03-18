@@ -222,6 +222,32 @@
         * rendering/RenderFrameSet.cpp:
         (WebCore::RenderFrameSet::paint):
 
+2013-02-01  Philip Rogers  <pdr@google.com>
+
+        Prevent skipped repaints for children of inner SVG elements
+        https://bugs.webkit.org/show_bug.cgi?id=108429
+
+        Reviewed by Eric Seidel.
+
+        This patch fixes a bug caused by r108699 and r133786 where we would not repaint children
+        of inner SVG elements because "m_didTransformToRootUpdate" was never reset on viewport
+        containers. The stale m_didTransformToRootUpdate variable caused us to skip child repaints.
+
+        I verified that the Robohornet SVG benchmark performance gains in r133786 are not regressed
+        with this patch.
+
+        Test: svg/repaint/svgsvgelement-repaint-children.html
+
+        * rendering/svg/RenderSVGViewportContainer.cpp:
+        (WebCore::RenderSVGViewportContainer::calcViewport):
+
+            This can be removed because setNeedsTransformUpdate() will set m_needsTransformUpdate.
+
+        (WebCore::RenderSVGViewportContainer::calculateLocalTransform):
+
+            This change is straightforward and is similar to the equivalent assignment in
+            RenderSVGTransformableContainer::calculateLocalTransform().
+
 2013-01-31  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt] Box shadows on a transparency layer is very slow

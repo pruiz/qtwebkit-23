@@ -210,6 +210,44 @@
         * rendering/RenderBlockLineLayout.cpp:
         (WebCore::RenderBlock::LineBreaker::skipLeadingWhitespace):
 
+2013-02-11  Emil A Eklund  <eae@chromium.org>
+
+        Change RenderFrameSet::paint to use m-rows/m_cols directly.
+        https://bugs.webkit.org/show_bug.cgi?id=108503
+
+        Reviewed by Eric Seidel.
+
+        Test: fast/frames/invalid-frameset.html
+
+        * rendering/RenderFrameSet.cpp:
+        (WebCore::RenderFrameSet::paint):
+
+2013-02-01  Philip Rogers  <pdr@google.com>
+
+        Prevent skipped repaints for children of inner SVG elements
+        https://bugs.webkit.org/show_bug.cgi?id=108429
+
+        Reviewed by Eric Seidel.
+
+        This patch fixes a bug caused by r108699 and r133786 where we would not repaint children
+        of inner SVG elements because "m_didTransformToRootUpdate" was never reset on viewport
+        containers. The stale m_didTransformToRootUpdate variable caused us to skip child repaints.
+
+        I verified that the Robohornet SVG benchmark performance gains in r133786 are not regressed
+        with this patch.
+
+        Test: svg/repaint/svgsvgelement-repaint-children.html
+
+        * rendering/svg/RenderSVGViewportContainer.cpp:
+        (WebCore::RenderSVGViewportContainer::calcViewport):
+
+            This can be removed because setNeedsTransformUpdate() will set m_needsTransformUpdate.
+
+        (WebCore::RenderSVGViewportContainer::calculateLocalTransform):
+
+            This change is straightforward and is similar to the equivalent assignment in
+            RenderSVGTransformableContainer::calculateLocalTransform().
+
 2013-01-31  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt] Box shadows on a transparency layer is very slow
@@ -567,6 +605,22 @@
         (GenerateGetOwnPropertySlotBody): Use getStaticValueSlotEntryWithoutCaching to climb up the class
         hierarchy.
 
+2012-12-13  Filip Pizlo  <fpizlo@apple.com>
+
+        Named lookups on HTML documents produce inconsistent results in JavaScriptCore bindings
+        https://bugs.webkit.org/show_bug.cgi?id=104623
+
+        Reviewed by Geoffrey Garen.
+
+        All DOM objects that have named getters or directly override getOwnPropertySlot are now marked as
+        HasImpureGetOwnPropertySlot.
+
+        Tests: fast/js/prototype-chain-caching-with-impure-get-own-property-slot-traps
+               fast/js/dfg-prototype-chain-caching-with-impure-get-own-property-slot-traps
+
+        * bindings/scripts/CodeGeneratorJS.pm:
+        (GenerateHeader):
+
 2012-12-12  Csaba Osztrogonác  <ossy@webkit.org>
 
         [Qt] Unreviewed typo fix after r137446.
@@ -708,6 +762,21 @@
         (WebCore::Document::initSecurityContext):
         * loader/FrameLoader.cpp:
         (WebCore::FrameLoader::didBeginDocument):
+
+2012-11-30  Abhishek Arya  <inferno@chromium.org>
+
+        Crash due to intruding float not removed after writing mode changed.
+        https://bugs.webkit.org/show_bug.cgi?id=100149
+
+        Reviewed by Levi Weintraub.
+
+        When RenderView writing mode changes, make sure to mark all descendants
+        with floats for layout.
+
+        Test: fast/block/float/intruding-float-not-removed-writing-mode.xhtml
+
+        * rendering/RenderBox.cpp:
+        (WebCore::RenderBox::styleDidChange):
 
 2012-11-30  Florin Malita  <fmalita@chromium.org>
 

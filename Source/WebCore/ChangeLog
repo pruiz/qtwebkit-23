@@ -1,3 +1,27 @@
+2013-03-11  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Enable tiled shadow blur for inset box shadows
+        https://bugs.webkit.org/show_bug.cgi?id=111736
+
+        Reviewed by Noam Rosenthal.
+
+        Paint inset box-shadows using the optimized tiled shadow blur, instead of
+        applying shadow blur to the entire painted rect.
+
+        This optimizes the default CSS on common pastebin sites.
+
+        Tested by existing tests.
+
+        * platform/graphics/GraphicsContext.cpp:
+        * platform/graphics/ShadowBlur.cpp:
+        (WebCore::ShadowBlur::drawInsetShadowWithTiling):
+            Must set fill color before calling clearShadow, as that might clear m_color.
+        (WebCore::ShadowBlur::drawLayerPieces):
+            Ditto.
+        * platform/graphics/qt/GraphicsContextQt.cpp:
+        (WebCore::GraphicsContext::fillPath):
+        (WebCore::GraphicsContext::fillRectWithRoundedHole):
+
 2013-02-27  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [TexMap] REGRESSION(144183): It make negative delay tests fails

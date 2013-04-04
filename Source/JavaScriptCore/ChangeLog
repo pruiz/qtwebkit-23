@@ -1,3 +1,92 @@
+2013-03-20  Cosmin Truta  <ctruta@blackberry.com>
+
+        [QNX][ARM] REGRESSION(r135330): Various failures in Octane
+        https://bugs.webkit.org/show_bug.cgi?id=112863
+
+        Reviewed by Yong Li.
+
+        This was fixed in http://trac.webkit.org/changeset/146396 on Linux only.
+        Enable this fix on QNX.
+
+        * assembler/ARMv7Assembler.h:
+        (ARMv7Assembler):
+        (JSC::ARMv7Assembler::replaceWithJump):
+        (JSC::ARMv7Assembler::maxJumpReplacementSize):
+        * assembler/MacroAssemblerARMv7.h:
+        (JSC::MacroAssemblerARMv7::revertJumpReplacementToBranchPtrWithPatch):
+
+2013-03-20  Zoltan Herczeg  <zherczeg@webkit.org>
+
+        ARMv7 replaceWithJump ASSERT failure after r135330.
+        https://bugs.webkit.org/show_bug.cgi?id=103146
+
+        Reviewed by Filip Pizlo.
+
+        On Linux, the 24 bit distance range of jumps sometimes does not
+        enough to cover all targets addresses. This patch supports jumps
+        outside of this range using a mov/movt/bx 10 byte long sequence.
+
+        * assembler/ARMv7Assembler.h:
+        (ARMv7Assembler):
+        (JSC::ARMv7Assembler::revertJumpTo_movT3movtcmpT2):
+        (JSC::ARMv7Assembler::nopw):
+        (JSC::ARMv7Assembler::label):
+        (JSC::ARMv7Assembler::replaceWithJump):
+        (JSC::ARMv7Assembler::maxJumpReplacementSize):
+        * assembler/MacroAssemblerARMv7.h:
+        (JSC::MacroAssemblerARMv7::revertJumpReplacementToBranchPtrWithPatch):
+
+2013-03-12  Gabor Rapcsanyi  <rgabor@webkit.org>
+
+        https://bugs.webkit.org/show_bug.cgi?id=112141
+        LLInt CLoop backend misses Double2Ints() on 32bit architectures
+
+        Reviewed by Filip Pizlo.
+
+        Implement Double2Ints() in CLoop backend of LLInt on 32bit architectures.
+
+        * llint/LowLevelInterpreter.cpp:
+        (LLInt):
+        (JSC::LLInt::Double2Ints):
+        * offlineasm/cloop.rb:
+
+2013-03-07  Peter Gal  <galpeter@inf.u-szeged.hu>
+
+        Children method in LLINT AST Not class should return [@child]
+        https://bugs.webkit.org/show_bug.cgi?id=90740
+
+        Reviewed by Filip Pizlo.
+
+        * offlineasm/ast.rb: Fixed the return value of the children method in the Not AST class.
+
+2013-02-05  Michael Saboff  <msaboff@apple.com>
+
+        Crash at JSC::call when loading www.gap.com with JSVALUE32_64 Enabled
+        https://bugs.webkit.org/show_bug.cgi?id=108991
+
+        Reviewed by Oliver Hunt.
+
+        Changed the restoration from calleeGPR to nonArgGPR0 because the restoration of the return location
+        may step on calleeGPR is it happen to be nonArgGPR2.
+
+        * dfg/DFGRepatch.cpp:
+        (JSC::DFG::dfgLinkClosureCall):
+
+2013-01-16  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG 32_64 backend doesn't check for hasArrayStorage() in NewArrayWithSize
+        https://bugs.webkit.org/show_bug.cgi?id=107081
+
+        Reviewed by Michael Saboff.
+
+        This bug led to the 32_64 backend emitting contiguous allocation code to allocate
+        ArrayStorage arrays. This then led to all manner of heap corruption, since
+        subsequent array accesses would be accessing the contiguous array "as if" it was
+        an arraystorage array.
+
+        * dfg/DFGSpeculativeJIT32_64.cpp:
+        (JSC::DFG::SpeculativeJIT::compile):
+
 2012-12-18  Mark Hahnenberg  <mhahnenberg@apple.com>
 
         Restrictions on oversize CopiedBlock allocations should be relaxed
@@ -49,6 +138,46 @@
         * runtime/JSObject.cpp:
         (JSC::JSObject::copyButterfly):
 
+2012-12-17  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG is too aggressive eliding overflow checks for additions involving large constants
+        https://bugs.webkit.org/show_bug.cgi?id=105239
+
+        Reviewed by Gavin Barraclough.
+
+        If we elide overflow checks on an addition (or subtraction) involving a larger-than-2^32 immediate,
+        then make sure that the non-constant child of the addition knows that he's got to do an overflow
+        check, by flowing the UsedAsNumber property at him.
+
+        * dfg/DFGGraph.h:
+        (JSC::DFG::Graph::addSpeculationMode):
+        (Graph):
+        (JSC::DFG::Graph::addShouldSpeculateInteger):
+        (JSC::DFG::Graph::addImmediateShouldSpeculateInteger):
+        * dfg/DFGPredictionPropagationPhase.cpp:
+        (JSC::DFG::PredictionPropagationPhase::propagate):
+
+2012-12-17  Filip Pizlo  <fpizlo@apple.com>
+
+        DFG is too aggressive with eliding overflow checks in loops
+        https://bugs.webkit.org/show_bug.cgi?id=105226
+
+        Reviewed by Mark Hahnenberg and Oliver Hunt.
+
+        If we see a variable's live range cross basic block boundaries, conservatively assume that it may
+        be part of a data-flow back-edge, and as a result, we may have entirely integer operations that
+        could lead to the creation of an integer that is out of range of 2^52 (the significand of a double
+        float). This does not seem to regress any of the benchmarks we care about, and it fixes the bug.
+
+        In future we may want to actually look at whether or not there was a data-flow back-edge instead
+        of being super conservative about it. But we have no evidence, yet, that this would help us on
+        real code.
+
+        * dfg/DFGNodeFlags.h:
+        (DFG):
+        * dfg/DFGPredictionPropagationPhase.cpp:
+        (JSC::DFG::PredictionPropagationPhase::propagate):
+
 2012-12-17  Mark Hahnenberg  <mhahnenberg@apple.com>
 
         Butterfly::growArrayRight shouldn't be called on null Butterfly objects
@@ -69,6 +198,18 @@
         * runtime/JSObject.cpp:
         (JSC::JSObject::createInitialIndexedStorage):
         (JSC::JSObject::createArrayStorage):
+
+2012-12-17  Filip Pizlo  <fpizlo@apple.com>
+
+        javascript integer overflow
+        https://bugs.webkit.org/show_bug.cgi?id=104967
+
+        Reviewed by Mark Hahnenberg.
+
+        Fix PutScopedVar backward flow.
+
+        * dfg/DFGPredictionPropagationPhase.cpp:
+        (JSC::DFG::PredictionPropagationPhase::propagate):
 
 2012-12-13  Filip Pizlo  <fpizlo@apple.com>
 

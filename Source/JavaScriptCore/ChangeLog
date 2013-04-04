@@ -87,6 +87,16 @@
         * dfg/DFGSpeculativeJIT32_64.cpp:
         (JSC::DFG::SpeculativeJIT::compile):
 
+2013-01-08  Filip Pizlo  <fpizlo@apple.com>
+
+        If array allocation profiling causes a new_array to allocate double arrays, then the holes should end up being correctly initialized
+        https://bugs.webkit.org/show_bug.cgi?id=106363
+
+        Reviewed by Mark Hahnenberg.
+
+        * runtime/JSArray.h:
+        (JSC::JSArray::tryCreateUninitialized):
+
 2012-12-18  Mark Hahnenberg  <mhahnenberg@apple.com>
 
         Restrictions on oversize CopiedBlock allocations should be relaxed

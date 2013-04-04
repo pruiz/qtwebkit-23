@@ -87,6 +87,17 @@
         * dfg/DFGSpeculativeJIT32_64.cpp:
         (JSC::DFG::SpeculativeJIT::compile):
 
+2013-01-09  Filip Pizlo  <fpizlo@apple.com>
+
+        Dont use a node reference after appending to the graph.
+        https://bugs.webkit.org/show_bug.cgi?id=103305
+        <rdar://problem/12753096>
+
+        Reviewed by Mark Hahnenberg.
+
+        * dfg/DFGArgumentsSimplificationPhase.cpp:
+        (JSC::DFG::ArgumentsSimplificationPhase::run):
+
 2013-01-08  Filip Pizlo  <fpizlo@apple.com>
 
         If array allocation profiling causes a new_array to allocate double arrays, then the holes should end up being correctly initialized

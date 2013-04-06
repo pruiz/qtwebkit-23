@@ -207,6 +207,18 @@
         * rendering/RenderBlock.cpp:
         (WebCore::RenderBlock::containingColumnsBlock):
 
+2013-02-19  Andras Becsi  <andras.becsi@digia.com>
+
+        [Qt] Fix compilation if Qt was configured with -no-rtti
+        https://bugs.webkit.org/show_bug.cgi?id=110234
+
+        Reviewed by Noam Rosenthal.
+
+        Availability of dynamic_cast should be checked.
+
+        * platform/graphics/texmap/GraphicsLayerTextureMapper.cpp:
+        (WebCore::GraphicsLayerTextureMapper::updateBackingStoreIfNeeded):
+
 2012-09-12  Simon Hausmann  <simon.hausmann@nokia.com>
 
         [Qt] Drastically shorten length of commandline needed for JS bindings generator

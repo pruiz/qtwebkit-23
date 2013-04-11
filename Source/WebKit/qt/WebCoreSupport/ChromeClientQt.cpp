@@ -591,7 +591,8 @@ void ChromeClientQt::reachedApplicationCacheOriginQuota(SecurityOrigin* origin, 
     if (!WebCore::cacheStorage().calculateQuotaForOrigin(origin, quota))
        WebCore::cacheStorage().storeUpdatedQuotaForOrigin(origin, defaultOriginQuota);
 
-    emit m_webPage->applicationCacheQuotaExceeded(securityOrigin, defaultOriginQuota, static_cast<quint64>(totalSpaceNeeded));
+    emit m_webPage->applicationCacheQuotaExceeded(securityOrigin, defaultOriginQuota);
+    emit m_webPage->applicationCacheQuotaExceeded(securityOrigin, defaultOriginQuota, totalSpaceNeeded);
 }
 
 #if ENABLE(INPUT_TYPE_COLOR)

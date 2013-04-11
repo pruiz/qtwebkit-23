@@ -1,3 +1,17 @@
+2013-04-04  Andras Becsi  <andras.becsi@digia.com>
+
+        Fix the build with GCC 4.8
+        https://bugs.webkit.org/show_bug.cgi?id=113147
+
+        Reviewed by Allan Sandfeld Jensen.
+
+        Initialize JSObject* exception to suppress warnings that make
+        the build fail because of -Werror=maybe-uninitialized.
+
+        * runtime/Executable.cpp:
+        (JSC::FunctionExecutable::compileForCallInternal):
+        (JSC::FunctionExecutable::compileForConstructInternal):
+
 2013-03-20  Cosmin Truta  <ctruta@blackberry.com>
 
         [QNX][ARM] REGRESSION(r135330): Various failures in Octane
@@ -59,6 +73,29 @@
 
         * offlineasm/ast.rb: Fixed the return value of the children method in the Not AST class.
 
+2013-02-19  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        WeakSet::removeAllocator leaks WeakBlocks
+        https://bugs.webkit.org/show_bug.cgi?id=110228
+
+        Reviewed by Geoffrey Garen.
+
+        We need to return the WeakBlock to the BlockAllocator after the call to WeakBlock::destroy.
+
+        * heap/WeakSet.cpp:
+        (JSC::WeakSet::removeAllocator):
+
+2013-02-12  Gabor Rapcsanyi  <rgabor@webkit.org>
+
+        JSC asserting with long parameter list functions in debug mode on ARM traditional
+        https://bugs.webkit.org/show_bug.cgi?id=109565
+
+        Reviewed by Zoltan Herczeg.
+
+        Increase the value of sequenceGetByIdSlowCaseInstructionSpace to 80.
+
+        * jit/JIT.h:
+
 2013-02-05  Michael Saboff  <msaboff@apple.com>
 
         Crash at JSC::call when loading www.gap.com with JSVALUE32_64 Enabled
@@ -71,6 +108,92 @@
 
         * dfg/DFGRepatch.cpp:
         (JSC::DFG::dfgLinkClosureCall):
+
+2013-01-22  Tobias Netzel  <tobias.netzel@googlemail.com>
+
+        Yarr JIT isn't big endian compatible
+        https://bugs.webkit.org/show_bug.cgi?id=102897
+
+        Reviewed by Oliver Hunt.
+
+        This patch was tested in the current mozilla codebase only and has passed the regexp tests there.
+
+        * yarr/YarrJIT.cpp:
+        (JSC::Yarr::YarrGenerator::generatePatternCharacterOnce):
+
+2013-01-18  Michael Saboff  <msaboff@apple.com>
+
+        Change set r140201 broke editing/selection/move-by-word-visually-multi-line.html
+        https://bugs.webkit.org/show_bug.cgi?id=107340
+
+        Reviewed by Filip Pizlo.
+
+        Due to the change landed in r140201, more nodes might end up
+        generating Int32ToDouble nodes.  Therefore, changed the JSVALUE64
+        constant path of compileInt32ToDouble() to use the more
+        restrictive isInt32Constant() check on the input.  This check was
+        the same as the existing ASSERT() so the ASSERT was eliminated.
+
+        * dfg/DFGSpeculativeJIT.cpp:
+        (JSC::DFG::SpeculativeJIT::compileInt32ToDouble):
+
+2013-01-18  Michael Saboff  <msaboff@apple.com>
+
+        Harden ArithDiv of integers fix-up by inserting Int32ToDouble node directly
+        https://bugs.webkit.org/show_bug.cgi?id=107321
+
+        Reviewed by  Filip Pizlo.
+
+        Split out the Int32ToDouble node insertion from fixDoubleEdge() and used it directly when we're fixing up
+        an ArithDiv node with integer inputs and output for platforms that don't have integer division.
+        Since we are checking that our inputs should be ints, we can just insert the Int32ToDouble node
+        without any further checks.
+
+        * dfg/DFGFixupPhase.cpp:
+        (JSC::DFG::FixupPhase::fixupNode):
+        (JSC::DFG::FixupPhase::fixDoubleEdge):
+        (FixupPhase):
+        (JSC::DFG::FixupPhase::injectInt32ToDoubleNode):
+
+2013-01-18  Michael Saboff  <msaboff@apple.com>
+
+        Fix up of ArithDiv nodes for non-x86 CPUs is broken
+        https://bugs.webkit.org/show_bug.cgi?id=107309
+
+        Reviewed by  Filip Pizlo.
+
+        Changed the logic so that we insert an Int32ToDouble node when the existing edge is not SpecDouble.
+
+        * dfg/DFGFixupPhase.cpp:
+        (JSC::DFG::FixupPhase::fixDoubleEdge):
+
+2013-01-18  Balazs Kilvady  <kilvadyb@homejinni.com>
+
+        r134080 causes heap problem on linux systems where PAGESIZE != 4096
+        https://bugs.webkit.org/show_bug.cgi?id=102828
+
+        Reviewed by Mark Hahnenberg.
+
+        Make MarkStackSegment::blockSize as the capacity of segments of a MarkStackArray.
+
+        * JavaScriptCore.vcproj/JavaScriptCore/JavaScriptCoreExports.def:
+        * heap/MarkStack.cpp:
+        (JSC):
+        (JSC::MarkStackArray::MarkStackArray):
+        (JSC::MarkStackArray::expand):
+        (JSC::MarkStackArray::donateSomeCellsTo):
+        (JSC::MarkStackArray::stealSomeCellsFrom):
+        * heap/MarkStack.h:
+        (JSC::MarkStackSegment::data):
+        (CapacityFromSize):
+        (MarkStackArray):
+        * heap/MarkStackInlines.h:
+        (JSC::MarkStackArray::setTopForFullSegment):
+        (JSC::MarkStackArray::append):
+        (JSC::MarkStackArray::isEmpty):
+        (JSC::MarkStackArray::size):
+        * runtime/Options.h:
+        (JSC):
 
 2013-01-16  Filip Pizlo  <fpizlo@apple.com>
 
@@ -86,6 +209,27 @@
 
         * dfg/DFGSpeculativeJIT32_64.cpp:
         (JSC::DFG::SpeculativeJIT::compile):
+
+2013-01-09  Filip Pizlo  <fpizlo@apple.com>
+
+        Dont use a node reference after appending to the graph.
+        https://bugs.webkit.org/show_bug.cgi?id=103305
+        <rdar://problem/12753096>
+
+        Reviewed by Mark Hahnenberg.
+
+        * dfg/DFGArgumentsSimplificationPhase.cpp:
+        (JSC::DFG::ArgumentsSimplificationPhase::run):
+
+2013-01-08  Filip Pizlo  <fpizlo@apple.com>
+
+        If array allocation profiling causes a new_array to allocate double arrays, then the holes should end up being correctly initialized
+        https://bugs.webkit.org/show_bug.cgi?id=106363
+
+        Reviewed by Mark Hahnenberg.
+
+        * runtime/JSArray.h:
+        (JSC::JSArray::tryCreateUninitialized):
 
 2012-12-18  Mark Hahnenberg  <mhahnenberg@apple.com>
 

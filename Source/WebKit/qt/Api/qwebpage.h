@@ -401,6 +401,7 @@ Q_SIGNALS:
     void contentsChanged();
     void databaseQuotaExceeded(QWebFrame* frame, QString databaseName);
     void applicationCacheQuotaExceeded(QWebSecurityOrigin* origin, quint64 defaultOriginQuota);
+    void applicationCacheQuotaExceeded(QWebSecurityOrigin* origin, quint64 defaultOriginQuota, quint64 totalSpaceNeeded);
 
     void saveFrameStateRequested(QWebFrame* frame, QWebHistoryItem* item);
     void restoreFrameStateRequested(QWebFrame* frame);

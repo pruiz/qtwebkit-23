@@ -26,7 +26,7 @@ haveQt(4):contains(DEFINES, HAVE_QQUICK1=1): SUBDIRS += declarative
 haveQt(5):contains(DEFINES, HAVE_QTQUICK=1): SUBDIRS += declarative
 
 !no_webkit1 {
-    contains(DEFINES, HAVE_QTTESTLIB=1) {
+    !production_build:contains(DEFINES, HAVE_QTTESTLIB=1) {
         tests.file = tests.pri
         SUBDIRS += tests
     }

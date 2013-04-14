@@ -1,3 +1,44 @@
+2013-04-05  Simon Fraser  <simon.fraser@apple.com>
+
+        ASSERTION FAILED: m_repaintRect == renderer()->clippedOverflowRectForRepaint(renderer()->containerForRepaint()) after r135816
+        https://bugs.webkit.org/show_bug.cgi?id=103432
+
+        Reviewed by Allan Sandfeld Jensen.
+
+        Remove optimization added in r99752 that attempted to avoid clip rect
+        updates for table cells. As the assertions show, this optimization
+        is not always correct, so remove it. Bug 108272 tracks adding it back in.
+
+        * rendering/RenderLayer.cpp:
+        (WebCore::RenderLayer::RenderLayer):
+        (WebCore::RenderLayer::updateLayerPositionsAfterScroll): Remove m_canSkipRepaintRectsUpdateOnScroll
+        check when updating clip rects.
+        * rendering/RenderLayer.h: Remove the m_canSkipRepaintRectsUpdateOnScroll bit.
+
+2013-03-11  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Enable tiled shadow blur for inset box shadows
+        https://bugs.webkit.org/show_bug.cgi?id=111736
+
+        Reviewed by Noam Rosenthal.
+
+        Paint inset box-shadows using the optimized tiled shadow blur, instead of
+        applying shadow blur to the entire painted rect.
+
+        This optimizes the default CSS on common pastebin sites.
+
+        Tested by existing tests.
+
+        * platform/graphics/GraphicsContext.cpp:
+        * platform/graphics/ShadowBlur.cpp:
+        (WebCore::ShadowBlur::drawInsetShadowWithTiling):
+            Must set fill color before calling clearShadow, as that might clear m_color.
+        (WebCore::ShadowBlur::drawLayerPieces):
+            Ditto.
+        * platform/graphics/qt/GraphicsContextQt.cpp:
+        (WebCore::GraphicsContext::fillPath):
+        (WebCore::GraphicsContext::fillRectWithRoundedHole):
+
 2013-02-27  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [TexMap] REGRESSION(144183): It make negative delay tests fails
@@ -183,6 +224,18 @@
         * rendering/RenderBlock.cpp:
         (WebCore::RenderBlock::containingColumnsBlock):
 
+2013-02-19  Andras Becsi  <andras.becsi@digia.com>
+
+        [Qt] Fix compilation if Qt was configured with -no-rtti
+        https://bugs.webkit.org/show_bug.cgi?id=110234
+
+        Reviewed by Noam Rosenthal.
+
+        Availability of dynamic_cast should be checked.
+
+        * platform/graphics/texmap/GraphicsLayerTextureMapper.cpp:
+        (WebCore::GraphicsLayerTextureMapper::updateBackingStoreIfNeeded):
+
 2012-09-12  Simon Hausmann  <simon.hausmann@nokia.com>
 
         [Qt] Drastically shorten length of commandline needed for JS bindings generator
@@ -210,6 +263,44 @@
         * rendering/RenderBlockLineLayout.cpp:
         (WebCore::RenderBlock::LineBreaker::skipLeadingWhitespace):
 
+2013-02-11  Emil A Eklund  <eae@chromium.org>
+
+        Change RenderFrameSet::paint to use m-rows/m_cols directly.
+        https://bugs.webkit.org/show_bug.cgi?id=108503
+
+        Reviewed by Eric Seidel.
+
+        Test: fast/frames/invalid-frameset.html
+
+        * rendering/RenderFrameSet.cpp:
+        (WebCore::RenderFrameSet::paint):
+
+2013-02-01  Philip Rogers  <pdr@google.com>
+
+        Prevent skipped repaints for children of inner SVG elements
+        https://bugs.webkit.org/show_bug.cgi?id=108429
+
+        Reviewed by Eric Seidel.
+
+        This patch fixes a bug caused by r108699 and r133786 where we would not repaint children
+        of inner SVG elements because "m_didTransformToRootUpdate" was never reset on viewport
+        containers. The stale m_didTransformToRootUpdate variable caused us to skip child repaints.
+
+        I verified that the Robohornet SVG benchmark performance gains in r133786 are not regressed
+        with this patch.
+
+        Test: svg/repaint/svgsvgelement-repaint-children.html
+
+        * rendering/svg/RenderSVGViewportContainer.cpp:
+        (WebCore::RenderSVGViewportContainer::calcViewport):
+
+            This can be removed because setNeedsTransformUpdate() will set m_needsTransformUpdate.
+
+        (WebCore::RenderSVGViewportContainer::calculateLocalTransform):
+
+            This change is straightforward and is similar to the equivalent assignment in
+            RenderSVGTransformableContainer::calculateLocalTransform().
+
 2013-01-31  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt] Box shadows on a transparency layer is very slow
@@ -223,6 +314,18 @@
 
         * platform/graphics/qt/GraphicsContextQt.cpp:
         (WebCore::GraphicsContext::clipBounds):
+
+2013-01-29  Hayato Ito  <hayato@chromium.org>
+
+        Revert an accidentally changed line of EventHander::handleMousePressEvent(PlatformMouseEvent&) in r135650.
+        https://bugs.webkit.org/show_bug.cgi?id=108165
+
+        Reviewed by Hajime Morita.
+
+        No new tests.
+
+        * page/EventHandler.cpp:
+        (WebCore::EventHandler::handleMousePressEvent):
 
 2013-01-29  Justin Novosad  <junov@google.com>
 
@@ -567,6 +670,22 @@
         (GenerateGetOwnPropertySlotBody): Use getStaticValueSlotEntryWithoutCaching to climb up the class
         hierarchy.
 
+2012-12-13  Filip Pizlo  <fpizlo@apple.com>
+
+        Named lookups on HTML documents produce inconsistent results in JavaScriptCore bindings
+        https://bugs.webkit.org/show_bug.cgi?id=104623
+
+        Reviewed by Geoffrey Garen.
+
+        All DOM objects that have named getters or directly override getOwnPropertySlot are now marked as
+        HasImpureGetOwnPropertySlot.
+
+        Tests: fast/js/prototype-chain-caching-with-impure-get-own-property-slot-traps
+               fast/js/dfg-prototype-chain-caching-with-impure-get-own-property-slot-traps
+
+        * bindings/scripts/CodeGeneratorJS.pm:
+        (GenerateHeader):
+
 2012-12-12  Csaba Osztrogonác  <ossy@webkit.org>
 
         [Qt] Unreviewed typo fix after r137446.
@@ -708,6 +827,21 @@
         (WebCore::Document::initSecurityContext):
         * loader/FrameLoader.cpp:
         (WebCore::FrameLoader::didBeginDocument):
+
+2012-11-30  Abhishek Arya  <inferno@chromium.org>
+
+        Crash due to intruding float not removed after writing mode changed.
+        https://bugs.webkit.org/show_bug.cgi?id=100149
+
+        Reviewed by Levi Weintraub.
+
+        When RenderView writing mode changes, make sure to mark all descendants
+        with floats for layout.
+
+        Test: fast/block/float/intruding-float-not-removed-writing-mode.xhtml
+
+        * rendering/RenderBox.cpp:
+        (WebCore::RenderBox::styleDidChange):
 
 2012-11-30  Florin Malita  <fmalita@chromium.org>
 

@@ -917,10 +917,10 @@
 #define ENABLE_DISASSEMBLER 1
 #endif
 
-/* On the GTK+ port we take an extra precaution for LLINT support:
+/* On the GTK+ and Qt port we take an extra precaution for LLINT support:
  * We disable it on x86 builds if the build target doesn't support SSE2
  * instructions (LLINT requires SSE2 on this platform). */
-#if !defined(ENABLE_LLINT) && PLATFORM(GTK) && CPU(X86) && COMPILER(GCC) \
+#if !defined(ENABLE_LLINT) && CPU(X86) && COMPILER(GCC) \
     && !defined(__SSE2__)
 #define ENABLE_LLINT 0
 #endif

@@ -275,18 +275,6 @@
         (audio::-webkit-media-controls-return-to-realtime-button, video::-webkit-media-controls-return-to-realtime-button):
         (audio::-webkit-media-controls-toggle-closed-captions-button, video::-webkit-media-controls-toggle-closed-captions-button):
 
-2012-09-12  Simon Hausmann  <simon.hausmann@nokia.com>
-
-        [Qt] Drastically shorten length of commandline needed for JS bindings generator
-        https://bugs.webkit.org/show_bug.cgi?id=96266
-
-        Reviewed by Tor Arne Vestbø.
-
-        The generate-bindings script supports the SOURCE_ROOT environment variable for IDL include file
-        lookups, which allows specifying relative include search directories.
-
-        * DerivedSources.pri:
-
 2013-02-12  Robert Hogan  <robert@webkit.org>
 
         REGRESSION(r136967): Combination of float and clear yields to bad layout
@@ -313,6 +301,15 @@
 
         * rendering/RenderFrameSet.cpp:
         (WebCore::RenderFrameSet::paint):
+
+2013-02-05  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [Qt] REGRESSION(r137436): It made all inspector tests timeout on developer builds
+        https://bugs.webkit.org/show_bug.cgi?id=106554
+
+        Reviewed by Simon Hausmann.
+
+        * Target.pri:
 
 2013-02-01  Philip Rogers  <pdr@google.com>
 
@@ -70817,5 +70814,17 @@ ayer
 
         * platform/graphics/WOFFFileFormat.cpp:
         * platform/graphics/chromium/VDMXParser.cpp:
+
+2012-09-12  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        [Qt] Drastically shorten length of commandline needed for JS bindings generator
+        https://bugs.webkit.org/show_bug.cgi?id=96266
+
+        Reviewed by Tor Arne Vestbø.
+
+        The generate-bindings script supports the SOURCE_ROOT environment variable for IDL include file
+        lookups, which allows specifying relative include search directories.
+
+        * DerivedSources.pri:
 
 == Rolled over to ChangeLog-2012-10-19 ==

@@ -1635,12 +1635,12 @@ void JSArray::compactForSorting(unsigned& numDefined, unsigned& newRelevantLengt
     newRelevantLength = numDefined + numUndefined;
     
     if (hasArrayStorage(indexingType))
-        RELEASE_ASSERT(!arrayStorage()->m_sparseMap);
+        ASSERT(!arrayStorage()->m_sparseMap);
     
     switch (indexingType) {
     case ArrayWithInt32:
     case ArrayWithDouble:
-        RELEASE_ASSERT(numDefined == newRelevantLength);
+        ASSERT(numDefined == newRelevantLength);
         break;
         
     default:

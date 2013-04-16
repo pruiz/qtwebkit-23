@@ -99,6 +99,19 @@ QMAKE_DOCS = $$PWD/qtwebkit.qdocconf
 !no_webkit1: WEBKIT += webkit1
 !no_webkit2: WEBKIT += webkit2
 
+# Resources have to be included directly in the final binary for MSVC.
+# The linker won't pick them from a static library since they aren't referenced.
+win* {
+    RESOURCES += $$PWD/WebCore/WebCore.qrc
+    include_webinspector {
+        # WEBCORE_GENERATED_SOURCES_DIR is defined in WebCore.pri, included by
+        # load(webkit_modules) if WEBKIT contains webcore.
+        RESOURCES += \
+            $$PWD/WebCore/inspector/front-end/WebKit.qrc \
+            $${WEBCORE_GENERATED_SOURCES_DIR}/InspectorBackendCommands.qrc
+    }
+}
+
 # ------------- Install rules -------------
 
 haveQt(5) {

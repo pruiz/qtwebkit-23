@@ -1,3 +1,16 @@
+2013-04-12  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        Apply our MSVC 2012 optimizer bug workaround to all minor releases
+        https://bugs.webkit.org/show_bug.cgi?id=114436
+
+        Reviewed by Alexey Proskuryakov.
+
+        The bug has only been partially fixed in Update 2 but our Update 1 workaround
+        still avoids the crash.
+
+        * platform/text/TextEncodingRegistry.cpp:
+        (WebCore::TextEncodingNameHash::equal):
+
 2013-04-05  Simon Fraser  <simon.fraser@apple.com>
 
         ASSERTION FAILED: m_repaintRect == renderer()->clippedOverflowRectForRepaint(renderer()->containerForRepaint()) after r135816
@@ -236,17 +249,31 @@
         * platform/graphics/texmap/GraphicsLayerTextureMapper.cpp:
         (WebCore::GraphicsLayerTextureMapper::updateBackingStoreIfNeeded):
 
-2012-09-12  Simon Hausmann  <simon.hausmann@nokia.com>
+2013-02-18  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
-        [Qt] Drastically shorten length of commandline needed for JS bindings generator
-        https://bugs.webkit.org/show_bug.cgi?id=96266
+        [Qt] HTML5 video - sound volume bar out of widget
+        https://bugs.webkit.org/show_bug.cgi?id=108213
 
-        Reviewed by Tor Arne Vestbø.
+        Reviewed by NOBODY (OOPS!).
 
-        The generate-bindings script supports the SOURCE_ROOT environment variable for IDL include file
-        lookups, which allows specifying relative include search directories.
+        Since we use Safari shadow DOM for media controls, follow
+        the overall layout of Safari media control CSS.
 
-        * DerivedSources.pri:
+        * css/mediaControlsQt.css:
+        (audio::-webkit-media-controls-panel, video::-webkit-media-controls-panel):
+        (audio::-webkit-media-controls-mute-button, video::-webkit-media-controls-mute-button):
+        (audio::-webkit-media-controls-play-button, video::-webkit-media-controls-play-button):
+        (audio::-webkit-media-controls-timeline-container, video::-webkit-media-controls-timeline-container):
+        (audio::-webkit-media-controls-current-time-display, video::-webkit-media-controls-current-time-display):
+        (audio::-webkit-media-controls-time-remaining-display, video::-webkit-media-controls-time-remaining-display):
+        (audio::-webkit-media-controls-timeline, video::-webkit-media-controls-timeline):
+        (audio::-webkit-media-controls-volume-slider-container, video::-webkit-media-controls-volume-slider-container):
+        (audio::-webkit-media-controls-volume-slider, video::-webkit-media-controls-volume-slider):
+        (audio::-webkit-media-controls-seek-back-button, video::-webkit-media-controls-seek-back-button):
+        (audio::-webkit-media-controls-seek-forward-button, video::-webkit-media-controls-seek-forward-button):
+        (audio::-webkit-media-controls-rewind-button, video::-webkit-media-controls-rewind-button):
+        (audio::-webkit-media-controls-return-to-realtime-button, video::-webkit-media-controls-return-to-realtime-button):
+        (audio::-webkit-media-controls-toggle-closed-captions-button, video::-webkit-media-controls-toggle-closed-captions-button):
 
 2013-02-12  Robert Hogan  <robert@webkit.org>
 
@@ -274,6 +301,15 @@
 
         * rendering/RenderFrameSet.cpp:
         (WebCore::RenderFrameSet::paint):
+
+2013-02-05  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [Qt] REGRESSION(r137436): It made all inspector tests timeout on developer builds
+        https://bugs.webkit.org/show_bug.cgi?id=106554
+
+        Reviewed by Simon Hausmann.
+
+        * Target.pri:
 
 2013-02-01  Philip Rogers  <pdr@google.com>
 
@@ -70778,5 +70814,17 @@ ayer
 
         * platform/graphics/WOFFFileFormat.cpp:
         * platform/graphics/chromium/VDMXParser.cpp:
+
+2012-09-12  Simon Hausmann  <simon.hausmann@nokia.com>
+
+        [Qt] Drastically shorten length of commandline needed for JS bindings generator
+        https://bugs.webkit.org/show_bug.cgi?id=96266
+
+        Reviewed by Tor Arne Vestbø.
+
+        The generate-bindings script supports the SOURCE_ROOT environment variable for IDL include file
+        lookups, which allows specifying relative include search directories.
+
+        * DerivedSources.pri:
 
 == Rolled over to ChangeLog-2012-10-19 ==

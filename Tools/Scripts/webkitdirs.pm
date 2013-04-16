@@ -2270,6 +2270,9 @@ sub buildQMakeProjects
     }
     push @buildArgs, "CONFIG-=debug_and_release" if ($passedConfig && isDarwin());
 
+    # This is the qtwebkit-2.3-release branch, which means we expect to be doing production_build
+    push @buildArgs, "CONFIG+=production_build";
+
     my $originalCwd = getcwd();
     my $dir = File::Spec->canonpath(productDir());
     File::Path::mkpath($dir);

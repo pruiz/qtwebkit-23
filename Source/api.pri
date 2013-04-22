@@ -104,8 +104,7 @@ QMAKE_DOCS = $$PWD/qtwebkit.qdocconf
 win* {
     RESOURCES += $$PWD/WebCore/WebCore.qrc
     include_webinspector {
-        # WEBCORE_GENERATED_SOURCES_DIR is defined in WebCore.pri, included by
-        # load(webkit_modules) if WEBKIT contains webcore.
+        WEBCORE_GENERATED_SOURCES_DIR = $${ROOT_BUILD_DIR}/Source/WebCore/$${GENERATED_SOURCES_DESTDIR}
         RESOURCES += \
             $$PWD/WebCore/inspector/front-end/WebKit.qrc \
             $${WEBCORE_GENERATED_SOURCES_DIR}/InspectorBackendCommands.qrc

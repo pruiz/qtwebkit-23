@@ -1,3 +1,13 @@
+2013-04-22  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt4] QtWebKit 2.3.1 broke compilation on MSVC
+        https://bugs.webkit.org/show_bug.cgi?id=114880
+
+        Since we do not load webkit_modules the same way as trunk, we need to
+        define WEBCORE_GENERATED_SOURCES_DIR ourselves
+
+        * Source/api.pri:
+
 2013-02-05  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
 
         [Qt] REGRESSION(r137436): It made all inspector tests timeout on developer builds

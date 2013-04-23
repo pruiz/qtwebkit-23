@@ -521,6 +521,24 @@
         * page/FrameView.cpp:
         (WebCore::FrameView::parentFrameView): Checks if the FrameView has been removed from the parent.
 
+2013-01-08  Kent Tamura  <tkent@chromium.org>
+
+        REGRESSION(r135836): Invalid user input for input[type=number] should be cleared by input.value=""
+        https://bugs.webkit.org/show_bug.cgi?id=106284
+
+        Reviewed by Hajime Morita.
+
+        No new tests. Updates fast/forms/number/number/validity-badinput.html.
+
+        * html/NumberInputType.cpp:
+        (WebCore::NumberInputType::setValue):
+        If the new sanitized value is empty and innerTextValue is a bad input
+        (it means !valueChanged && !innerTextValue().isEmpty() because the new
+        sanitized value is empty), we need to update innerTextValue with the
+        empty string.
+        * html/NumberInputType.h:
+        (NumberInputType): Declare setValue.
+
 2013-01-07  Abhishek Arya  <inferno@chromium.org>
 
         Heap-buffer-overflow in WebCore::RenderBlock::clone.

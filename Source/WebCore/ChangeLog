@@ -388,6 +388,32 @@
         * rendering/RenderFrameSet.cpp:
         (WebCore::RenderFrameSet::paint):
 
+2013-02-05  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] RGB -> BGR is wrong on big endian
+        https://bugs.webkit.org/show_bug.cgi?id=107560
+
+        Reviewed by Jocelyn Turcotte.
+
+        Replace the conversion to methods that make it clearer what is going on.
+        The routines are also optimized compared to the existing by avoiding going
+        over slow Color constructor.
+
+        Tested by existing tests in canvas and fast/canvas.
+
+        * platform/graphics/Color.cpp:
+        (WebCore::colorFromPremultipliedARGB):
+            Cleanup.
+        (WebCore::premultipliedARGBFromColor):
+            Cleanup and correct for alpha = 0.
+        * platform/graphics/Color.h:
+        (WebCore):
+        * platform/graphics/qt/ImageBufferQt.cpp:
+        (WebCore::copyColorToRGBA):
+        (WebCore::copyRGBAToColor):
+        (WebCore::getImageData):
+        (WebCore::ImageBuffer::putByteArray):
+
 2013-02-05  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
 
         [Qt] REGRESSION(r137436): It made all inspector tests timeout on developer builds

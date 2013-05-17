@@ -235,7 +235,7 @@ contains(DEFINES, WTF_USE_3D_GRAPHICS=1) {
             }
         }
     } else {
-        contains(QT_CONFIG, opengles2): LIBS += -lEGL
+        contains(QT_CONFIG, opengles2): CONFIG += egl
     }
     haveQt(4): QT *= opengl
 }

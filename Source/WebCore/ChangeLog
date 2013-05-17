@@ -1,3 +1,28 @@
+2013-04-26  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        Assert in JSC::Heap::unprotect when closing facebook.com web site
+        https://bugs.webkit.org/show_bug.cgi?id=115058
+
+        Reviewed by Darin Adler.
+
+        Grab a JSLock before calling RootObject::invalidate().
+
+        * bindings/js/ScriptController.cpp:
+        (WebCore::ScriptController::~ScriptController):
+
+2013-04-25  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Animated opacity does not trigger accelerated compositing
+        https://bugs.webkit.org/show_bug.cgi?id=115107
+
+        Reviewed by Simon Fraser.
+
+        Add extra option to also trigger compositing on animated opacity.
+
+        * page/ChromeClient.h:
+        * rendering/RenderLayerCompositor.cpp:
+        (WebCore::RenderLayerCompositor::requiresCompositingForAnimation):
+
 2013-04-12  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
 
         Apply our MSVC 2012 optimizer bug workaround to all minor releases
@@ -10,6 +35,52 @@
 
         * platform/text/TextEncodingRegistry.cpp:
         (WebCore::TextEncodingNameHash::equal):
+
+2013-04-10  JungJik Lee  <jungjik.lee@samsung.com>
+
+        [Texmap] Update a dirty region which is not covered with keepRect.
+        https://bugs.webkit.org/show_bug.cgi?id=113752
+
+        Reviewed by Jocelyn Turcotte.
+
+        There can be a dirty region which is not covered with keepRect. 
+        However the dirty could be inside the tile area. In this case, 
+        currently we ignore the dirty by intersecting with keepRect 
+        and the dirty region will not be invalidated until the tile is 
+        recreated. We must expand the keep rect to its intersecting tiles 
+        to make sure that the dirty region is applied to existing tiles. 
+
+        No tests needed, change is unobservable.
+
+        * platform/graphics/TiledBackingStore.cpp:
+        (WebCore::TiledBackingStore::invalidate):
+
+2013-04-08  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [Qt] Avoid "QFont::setPixelSize: Pixel size <= 0 (0)"
+        https://bugs.webkit.org/show_bug.cgi?id=114175
+
+        Reviewed by Allan Sandfeld Jensen.
+
+        QFont doesn't support a 0-size but WebCore does.
+        Leave our QFont in its default state in this case to avoid the warning.
+
+        * platform/graphics/qt/FontPlatformDataQt.cpp:
+        (WebCore::FontPlatformData::FontPlatformData):
+
+2013-04-05  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [Qt] PluginsX11: exposedRect offset is applied twice when painting windowless
+        https://bugs.webkit.org/show_bug.cgi?id=114020
+
+        Reviewed by Simon Hausmann.
+
+        Both XGetImage and QPainter::drawImage would apply the offset.
+        Since the XImage will only contain the exposed rect, no need to specify
+        the source rect to drawImage.
+
+        * plugins/qt/PluginViewQt.cpp:
+        (WebCore::PluginView::paintUsingXPixmap):
 
 2013-04-05  Simon Fraser  <simon.fraser@apple.com>
 
@@ -27,6 +98,21 @@
         (WebCore::RenderLayer::updateLayerPositionsAfterScroll): Remove m_canSkipRepaintRectsUpdateOnScroll
         check when updating clip rects.
         * rendering/RenderLayer.h: Remove the m_canSkipRepaintRectsUpdateOnScroll bit.
+
+2013-03-12  Floris Bos  <bos@je-eigen-domein.nl>
+
+        [Qt] WebKit fails to compile if EGL headers are not in default INCLUDEPATH
+        https://bugs.webkit.org/show_bug.cgi?id=111859
+
+        Reviewed by Jocelyn Turcotte.
+
+        The 3D graphics code wants to include EGL header files.
+        But on some platforms such as the Raspberry Pi those are not in /usr/include
+        but in another folder.
+        Fix adds "egl" to CONFIG when OpenGL ES2 is used, so the right include
+        paths are added.
+
+        * WebCore.pri:
 
 2013-03-11  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
@@ -302,6 +388,32 @@
         * rendering/RenderFrameSet.cpp:
         (WebCore::RenderFrameSet::paint):
 
+2013-02-05  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] RGB -> BGR is wrong on big endian
+        https://bugs.webkit.org/show_bug.cgi?id=107560
+
+        Reviewed by Jocelyn Turcotte.
+
+        Replace the conversion to methods that make it clearer what is going on.
+        The routines are also optimized compared to the existing by avoiding going
+        over slow Color constructor.
+
+        Tested by existing tests in canvas and fast/canvas.
+
+        * platform/graphics/Color.cpp:
+        (WebCore::colorFromPremultipliedARGB):
+            Cleanup.
+        (WebCore::premultipliedARGBFromColor):
+            Cleanup and correct for alpha = 0.
+        * platform/graphics/Color.h:
+        (WebCore):
+        * platform/graphics/qt/ImageBufferQt.cpp:
+        (WebCore::copyColorToRGBA):
+        (WebCore::copyRGBAToColor):
+        (WebCore::getImageData):
+        (WebCore::ImageBuffer::putByteArray):
+
 2013-02-05  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
 
         [Qt] REGRESSION(r137436): It made all inspector tests timeout on developer builds
@@ -350,6 +462,24 @@
 
         * platform/graphics/qt/GraphicsContextQt.cpp:
         (WebCore::GraphicsContext::clipBounds):
+
+2013-01-29  Michael Brüning  <michael.bruning@digia.com>
+
+        [Qt][WK1] Reflect recursion limit and loop checks also for list conversions.
+        https://bugs.webkit.org/show_bug.cgi?id=107950
+
+        Reviewed by Allan Sandfeld Jensen.
+
+        No new tests, bugfix, no behavioral change.
+
+        Make conversions from Javascript values to QLists take the maximum
+        recursion depth into consideration and check for objects that were
+        already visited. Otherwise, the conversion may recurse until the
+        stack is full and then cause a segmentation fault.
+
+        * bridge/qt/qt_runtime.cpp:
+        (JSC::Bindings::convertToList):
+        (JSC::Bindings::convertValueToQVariant):
 
 2013-01-29  Hayato Ito  <hayato@chromium.org>
 
@@ -470,6 +600,24 @@
 
         * page/FrameView.cpp:
         (WebCore::FrameView::parentFrameView): Checks if the FrameView has been removed from the parent.
+
+2013-01-08  Kent Tamura  <tkent@chromium.org>
+
+        REGRESSION(r135836): Invalid user input for input[type=number] should be cleared by input.value=""
+        https://bugs.webkit.org/show_bug.cgi?id=106284
+
+        Reviewed by Hajime Morita.
+
+        No new tests. Updates fast/forms/number/number/validity-badinput.html.
+
+        * html/NumberInputType.cpp:
+        (WebCore::NumberInputType::setValue):
+        If the new sanitized value is empty and innerTextValue is a bad input
+        (it means !valueChanged && !innerTextValue().isEmpty() because the new
+        sanitized value is empty), we need to update innerTextValue with the
+        empty string.
+        * html/NumberInputType.h:
+        (NumberInputType): Declare setValue.
 
 2013-01-07  Abhishek Arya  <inferno@chromium.org>
 
@@ -863,6 +1011,47 @@
         (WebCore::Document::initSecurityContext):
         * loader/FrameLoader.cpp:
         (WebCore::FrameLoader::didBeginDocument):
+
+2012-11-30  Simon Fraser  <simon.fraser@apple.com>
+
+        Late-loading stylesheets can cause composited layers to be blank
+        https://bugs.webkit.org/show_bug.cgi?id=103773
+
+        Reviewed by Tim Horton.
+
+        Early painting can be short-circuited in RenderBlock::paintContents() if we know a stylesheet
+        is pending, which is done to avoid a flash of unstyled content (FOUC). When the stylesheet
+        finally loaded, Document::styleResolverChanged() would try to repaint everything by calling
+        repaint() on the RenderView(). In a composited world, however, this repaint() doesn't repaint
+        composited layers.
+
+        This was particularly prevalent on this specific URL because it failed to load
+        a CSS file from typekit.com, so Document::styleResolverChanged()
+        just did the repaint and returned (rather than doing a recalc style as would
+        happen for correctly loaded stylesheets).
+
+        Fix by making a way to repaint all compositing layers, and calling it
+        from Document::styleResolverChanged().
+
+        No tests because this is timing-dependant.
+
+        * dom/Document.cpp:
+        (WebCore::Document::styleResolverChanged): Call repaintViewAndCompositedLayers().
+        * rendering/RenderBlock.cpp:
+        (WebCore::RenderBlock::paintContents): Fix the comment.
+        * rendering/RenderLayerCompositor.cpp: Convert repaintCompositedLayersAbsoluteRect()
+        and associated recursiveRepaintLayerRect() to allow the rect to be null, which indicates
+        that we should just repaint the entire layer, and improve their names.
+        (WebCore::RenderLayerCompositor::repaintCompositedLayers):
+        (WebCore::RenderLayerCompositor::recursiveRepaintLayer):
+        * rendering/RenderLayerCompositor.h:
+        * rendering/RenderView.cpp:
+        (WebCore::RenderView::repaintRectangleInViewAndCompositedLayers): repaintCompositedLayersAbsoluteRect()
+        was renamed to repaintCompositedLayers().
+        (WebCore::RenderView::repaintViewAndCompositedLayers):
+        * rendering/RenderView.h:
+        (RenderView): repaintViewRectangle() and repaintRectangleInViewAndCompositedLayers() should not
+        be virtual. Add repaintViewAndCompositedLayers().
 
 2012-11-30  Abhishek Arya  <inferno@chromium.org>
 

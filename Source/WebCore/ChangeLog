@@ -463,6 +463,22 @@
         * platform/graphics/qt/GraphicsContextQt.cpp:
         (WebCore::GraphicsContext::clipBounds):
 
+2013-01-29  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Implement GCActivityCallback
+        https://bugs.webkit.org/show_bug.cgi?id=103998
+
+        Reviewed by Simon Hausmann.
+
+        Implements the activity triggered garbage collector,
+        and disables the timer based fallback.
+
+        * bindings/js/GCController.cpp:
+        (WebCore::GCController::GCController):
+        (WebCore::GCController::garbageCollectSoon):
+        * bindings/js/GCController.h:
+        (GCController):
+
 2013-01-29  Michael Brüning  <michael.bruning@digia.com>
 
         [Qt][WK1] Reflect recursion limit and loop checks also for list conversions.

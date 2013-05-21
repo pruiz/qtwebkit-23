@@ -27,14 +27,25 @@
 #if !HAVE(QRAWFONT)
 #include <QFontDatabase>
 #endif
+#include <QHash>
 #include <QStringList>
 
 namespace WebCore {
 
+#if !HAVE(QRAWFONT)
+static QHash<int, int> s_customFontUseCount;
+#endif
+
 FontCustomPlatformData::~FontCustomPlatformData()
 {
 #if !HAVE(QRAWFONT)
-    QFontDatabase::removeApplicationFont(m_handle);
+    int useCount = s_customFontUseCount.value(m_handle);
+    Q_ASSERT(useCount >= 1);
+    if (useCount <= 1) {
+        QFontDatabase::removeApplicationFont(m_handle);
+        s_customFontUseCount.remove(m_handle);
+    } else
+        s_customFontUseCount.insert(m_handle, useCount - 1);
 #endif
 }
 
@@ -42,7 +53,10 @@ FontPlatformData FontCustomPlatformData::fontPlatformData(int size, bool bold, b
 {
 #if !HAVE(QRAWFONT)
     QFont font;
-    font.setFamily(QFontDatabase::applicationFontFamilies(m_handle)[0]);
+    QStringList families = QFontDatabase::applicationFontFamilies(m_handle);
+    if (!families.isEmpty())
+        font.setFamily(families.first());
+
     font.setPixelSize(size);
     if (bold)
         font.setWeight(QFont::Bold);
@@ -64,6 +78,10 @@ FontCustomPlatformData* createFontCustomPlatformData(SharedBuffer* buffer)
     int id = QFontDatabase::addApplicationFontFromData(fontData);
     if (id == -1)
         return 0;
+    if (s_customFontUseCount.contains(id))
+        s_customFontUseCount.insert(id, s_customFontUseCount.value(id) + 1);
+    else
+        s_customFontUseCount.insert(id, 1);
     Q_ASSERT(QFontDatabase::applicationFontFamilies(id).size() > 0);
 #else
     // Pixel size doesn't matter at this point, it is set in FontCustomPlatformData::fontPlatformData.

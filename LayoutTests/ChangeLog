@@ -1,3 +1,17 @@
+2013-04-02  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        get_by_pname can become confused when iterating over objects with static properties
+        https://bugs.webkit.org/show_bug.cgi?id=113831
+
+        Reviewed by Geoffrey Garen.
+
+        get_by_pname doesn't take static properties into account when using a JSPropertyNameIterator to directly 
+        access an object's backing store. One way to fix this is to not cache any properties when iterating over 
+        objects with static properties. This patch fixes the bug that was originally reported on swisscom.ch.
+
+        * fast/js/dom-static-property-for-in-iteration-expected.txt: Added.
+        * fast/js/dom-static-property-for-in-iteration.html: Added.
+
 2013-02-28  Florin Malita  <fmalita@chromium.org>
 
         [SVG] OOB access in SVGListProperty::replaceItemValues()

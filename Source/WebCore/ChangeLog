@@ -161,6 +161,30 @@
         check when updating clip rects.
         * rendering/RenderLayer.h: Remove the m_canSkipRepaintRectsUpdateOnScroll bit.
 
+2013-03-14  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Add support for tiled shadow blur
+        https://bugs.webkit.org/show_bug.cgi?id=90082
+
+        Reviewed by Noam Rosenthal.
+
+        Use the optimized ShadowBlur::drawRectShadow as long as we do not
+        have a rotating transform. Such a transform would go through the
+        slow path in ShadowBlur anyway, and would end up using a transformed
+        TransparencyLayer with an alphaMap which causes scaling artifacts
+        for us.
+
+        Tested by fast/canvas/canvas-scale-fillRect-shadow.html
+        and fast/canvas/canvas-transforms-fillRect-shadow.html
+
+        * platform/graphics/ShadowBlur.cpp:
+        (WebCore::ShadowBlur::drawInsetShadowWithTiling):
+            Handle scaling transforms when shadows ignore transforms.
+        (WebCore::ShadowBlur::drawRectShadowWithTiling):
+            Ditto.
+        * platform/graphics/qt/GraphicsContextQt.cpp:
+        (WebCore::GraphicsContext::fillRect):
+
 2013-03-12  Floris Bos  <bos@je-eigen-domein.nl>
 
         [Qt] WebKit fails to compile if EGL headers are not in default INCLUDEPATH

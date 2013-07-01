@@ -1,3 +1,18 @@
+2013-04-10  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        JSObject::getOwnNonIndexPropertyNames calculates numCacheableSlots incorrectly
+        https://bugs.webkit.org/show_bug.cgi?id=114235
+
+        Reviewed by Filip Pizlo.
+
+        If the object doesn't have any properties but the prototype does, we'll assume those prototype properties are 
+        accessible in the base object's backing store, which is bad.
+
+        * fast/js/get-by-pname-only-prototype-properties-expected.txt: Added.
+        * fast/js/get-by-pname-only-prototype-properties.html: Added.
+        * fast/js/script-tests/get-by-pname-only-prototype-properties.js: Added.
+        (foo):
+
 2013-04-03  Mark Hahnenberg  <mhahnenberg@apple.com>
 
         get_by_pname can become confused when iterating over objects with static properties

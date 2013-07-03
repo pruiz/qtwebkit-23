@@ -1,3 +1,14 @@
+2013-04-20  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        LLint should be able to use x87 instead of SSE for floating pointer
+        https://bugs.webkit.org/show_bug.cgi?id=112239
+
+        Reviewed by Filip Pizlo.
+
+        Disable GTK workaround now that LLInt does not require SSE2.
+
+        * wtf/Platform.h:
+
 2013-04-04  Andras Becsi  <andras.becsi@digia.com>
 
         Fix the build with GCC 4.8
@@ -73,12 +84,101 @@
         (HashMap):
         (WTF): Factor out nested class definition from enclosing class.
 
+2013-02-27  Balazs Kilvady  <kilvadyb@homejinni.com>
+
+        Bug in atomicIncrement implementation for MIPS GCC
+        https://bugs.webkit.org/show_bug.cgi?id=110969
+
+        Reviewed by Csaba Osztrogonác.
+
+        Fix of __sync_[add|sub]_and_fetch_8 for GCC patch.
+
+        * wtf/Atomics.cpp:
+
+2013-02-26  Balazs Kilvady  <kilvadyb@homejinni.com>
+
+        Fix the atomicIncrement implementation for MIPS GCC
+        https://bugs.webkit.org/show_bug.cgi?id=106739
+
+        Reviewed by Oliver Hunt.
+
+        Implementation of missing __sync_[add|sub]_and_fetch_8 functions.
+
+        Some architectures, like MIPS32, don't have GCC implementation for
+        builtin __sync_* functions with 64 bits variable size. GCC answer
+        for the problem: If a target doesn't support atomic operations on
+        certain variable sizes, you are out of luck with atomicity in that
+        case (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=56296). GCC >= 4.8
+        will support __atomic_* builtin functions for this purpose for all
+        the GCC targets, but for current compilers we have to include our
+        own implementation.
+
+        * GNUmakefile.list.am:
+        * WTF.pro:
+        * wtf/Atomics.cpp: Added.
+        (WTF):
+        (WTF::getSwapLock):
+        (WTF::atomicStep):
+        * wtf/CMakeLists.txt:
+
 2013-02-26  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
 
         Implement JIT on Windows 64 bits
         https://bugs.webkit.org/show_bug.cgi?id=107965
 
         Reviewed by Simon Hausmann.
+
+        * wtf/Platform.h:
+
+2013-02-18  Balazs Kilvady  <kilvadyb@homejinni.com>
+
+        MIPS DFG implementation.
+        https://bugs.webkit.org/show_bug.cgi?id=101328
+
+        Reviewed by Oliver Hunt.
+
+        DFG implementation for MIPS.
+
+        * wtf/Platform.h:
+
+2013-01-16  Benjamin Poulain  <benjamin@webkit.org>
+
+        Use GCC's implementation of atomicIncrement/Decrement on Mac
+        https://bugs.webkit.org/show_bug.cgi?id=106976
+
+        Reviewed by Filip Pizlo.
+
+        * wtf/Atomics.h:
+        GCC and LLVM have builtin for atomic ADD and SUB: __sync_add_and_fetch,
+        __sync_sub_and_fetch.
+
+        Using them let the compiler just generate the atomic operations inline
+        instead of generating a function call to LibC. It also simplify the
+        code a bit.
+
+2013-01-12  Csaba Osztrogonác  <ossy@webkit.org>
+
+        Use __sync_add_and_fetch instead of __gnu_cxx::__exchange_and_add
+        https://bugs.webkit.org/show_bug.cgi?id=106729
+
+        After r139514 we need atomicIncrement(int64_t volatile*) for all platform. Now the
+        GCC implementation of atomicIncrement() is based on __gnu_cxx::__exchange_and_add,
+        which doesn't support int64_t type, but __sync_add_and_fetch does.
+
+        Reviewed by Benjamin Poulain.
+
+        * wtf/Atomics.h:
+        (WTF::atomicIncrement):
+        (WTF::atomicDecrement):
+
+2013-01-07  Balazs Kilvady  <kilvadyb@homejinni.com>
+
+        MIPS LLInt implementation.
+        https://bugs.webkit.org/show_bug.cgi?id=99706
+
+        Reviewed by Filip Pizlo.
+
+        LLInt implementation for MIPS.
 
         * wtf/Platform.h:
 

@@ -1,3 +1,87 @@
+2013-04-23  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        REGRESSION(r148790) Made 7 tests fail on x86 32bit
+        https://bugs.webkit.org/show_bug.cgi?id=114913
+
+        Reviewed by NOBODY (OOPS!).
+        The X87 register was not freed before some calls. Instead
+        of inserting resetX87Registers to the last call sites,
+        the two X87 registers are now freed in every call.
+
+        * llint/LowLevelInterpreter32_64.asm:
+        * llint/LowLevelInterpreter64.asm:
+        * offlineasm/instructions.rb:
+        * offlineasm/x86.rb:
+
+2013-04-20  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        LLint should be able to use x87 instead of SSE for floating pointer
+        https://bugs.webkit.org/show_bug.cgi?id=112239
+
+        Reviewed by Filip Pizlo.
+
+        Implements LLInt floating point operations in x87, to ensure we support
+        x86 without SSE2.
+
+        X86 (except 64bit) now defaults to using x87 instructions in order to
+        support all 32bit x86 back to i686. The implementation uses the fucomi
+        instruction from i686 which sets the new minimum.
+
+        The FPU registers must always be empty on entering or exiting a function.
+        We make sure to only use two X87 registers, and they are always emptied
+        before calling deeper functions or returning from the LLInt.
+
+        * jit/JITStubs.cpp:
+        (JSC): Empty FPU registers before exiting.
+        * llint/LowLevelInterpreter32_64.asm:
+        * llint/LowLevelInterpreter64.asm:
+        * offlineasm/instructions.rb:
+        * offlineasm/x86.rb:
+
+2013-04-18  Jonathan Liu  <net147@gmail.com>
+
+        Implement JIT for MinGW-w64 64-bit
+        https://bugs.webkit.org/show_bug.cgi?id=114580
+
+        Reviewed by Jocelyn Turcotte.
+
+        * jit/JITStubs.cpp:
+        (JSC):
+
+2013-04-10  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        JSObject::getOwnNonIndexPropertyNames calculates numCacheableSlots incorrectly
+        https://bugs.webkit.org/show_bug.cgi?id=114235
+
+        Reviewed by Filip Pizlo.
+
+        If the object doesn't have any properties but the prototype does, we'll assume those prototype properties are 
+        accessible in the base object's backing store, which is bad.
+
+        * runtime/JSObject.cpp:
+        (JSC::JSObject::getPropertyNames):
+        (JSC::JSObject::getOwnNonIndexPropertyNames):
+        * runtime/PropertyNameArray.h:
+        (JSC::PropertyNameArray::PropertyNameArray):
+        (JSC::PropertyNameArray::setNumCacheableSlotsForObject):
+        (JSC::PropertyNameArray::setBaseObject):
+        (PropertyNameArray):
+
+2013-04-08  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        JSObject::getOwnNonIndexPropertyNames calculates numCacheableSlots incorrectly
+        https://bugs.webkit.org/show_bug.cgi?id=114235
+
+        Reviewed by Geoffrey Garen.
+
+        Due to the way that numCacheableSlots is currently calculated, checking an object's prototype for enumerable 
+        properties causes us not to cache any properties at all. We should only cache properties on the object itself
+        since we currently don't take advantage of any sort of name caching for properties in the prototype chain.
+        This fix undoes a ~2% SunSpider regression caused by http://trac.webkit.org/changeset/147570.
+
+        * runtime/JSObject.cpp:
+        (JSC::JSObject::getOwnNonIndexPropertyNames):
+
 2013-04-04  Andras Becsi  <andras.becsi@digia.com>
 
         Fix the build with GCC 4.8
@@ -11,6 +95,27 @@
         * runtime/Executable.cpp:
         (JSC::FunctionExecutable::compileForCallInternal):
         (JSC::FunctionExecutable::compileForConstructInternal):
+
+2013-04-02  Mark Hahnenberg  <mhahnenberg@apple.com>
+
+        get_by_pname can become confused when iterating over objects with static properties
+        https://bugs.webkit.org/show_bug.cgi?id=113831
+
+        Reviewed by Geoffrey Garen.
+
+        get_by_pname doesn't take static properties into account when using a JSPropertyNameIterator to directly 
+        access an object's backing store. One way to fix this is to not cache any properties when iterating over 
+        objects with static properties. This patch fixes the bug that was originally reported on swisscom.ch.
+
+        * runtime/JSObject.cpp:
+        (JSC::JSObject::getOwnNonIndexPropertyNames):
+        * runtime/JSPropertyNameIterator.cpp:
+        (JSC::JSPropertyNameIterator::create):
+        * runtime/PropertyNameArray.h:
+        (JSC::PropertyNameArray::PropertyNameArray):
+        (JSC::PropertyNameArray::numCacheableSlots):
+        (JSC::PropertyNameArray::setNumCacheableSlots):
+        (PropertyNameArray):
 
 2013-03-20  Cosmin Truta  <ctruta@blackberry.com>
 
@@ -73,6 +178,38 @@
 
         * offlineasm/ast.rb: Fixed the return value of the children method in the Not AST class.
 
+2013-02-26  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        Implement JIT on Windows 64 bits
+        https://bugs.webkit.org/show_bug.cgi?id=107965
+
+        Reviewed by Simon Hausmann.
+
+        1. MSVC doesn't support inline assembly for 64 bits, implements the trampoline in a separate ASM file.
+
+        2. Windows 64 bits has a different calling convention than other OSes following the AMD64 ABI.
+        Differences that we have to handle here:
+        - Registers passed parameters are RCX, RDX, R8 and R9 instead of RDI, RSI, RDX, RCX, R8 and R9
+        - RDI and RSI must be preserved by callee
+        - Only return values <= 8 bytes can be returned by register (RDX can't be used to return a second word)
+        - There is no red-zone after RIP on the stack, but instead 4 reserved words before it
+
+        * Target.pri:
+        * jit/JITStubs.cpp:
+        * jit/JITStubs.h:
+        (JSC):
+        (JITStackFrame):
+        (JSC::JITStackFrame::returnAddressSlot):
+        * jit/JITStubsMSVC64.asm: Added.
+        * jit/JSInterfaceJIT.h:
+        (JSInterfaceJIT):
+        * jit/ThunkGenerators.cpp:
+        (JSC::nativeForGenerator):
+        * yarr/YarrJIT.cpp:
+        (YarrGenerator):
+        (JSC::Yarr::YarrGenerator::generateEnter):
+        (JSC::Yarr::YarrGenerator::generateReturn):
+
 2013-02-19  Mark Hahnenberg  <mhahnenberg@apple.com>
 
         WeakSet::removeAllocator leaks WeakBlocks
@@ -84,6 +221,96 @@
 
         * heap/WeakSet.cpp:
         (JSC::WeakSet::removeAllocator):
+
+2013-02-18  Balazs Kilvady  <kilvadyb@homejinni.com>
+
+        MIPS DFG implementation.
+        https://bugs.webkit.org/show_bug.cgi?id=101328
+
+        Reviewed by Oliver Hunt.
+
+        DFG implementation for MIPS.
+
+        * assembler/MIPSAssembler.h:
+        (JSC::MIPSAssembler::MIPSAssembler):
+        (JSC::MIPSAssembler::sllv):
+        (JSC::MIPSAssembler::movd):
+        (MIPSAssembler):
+        (JSC::MIPSAssembler::negd):
+        (JSC::MIPSAssembler::labelForWatchpoint):
+        (JSC::MIPSAssembler::label):
+        (JSC::MIPSAssembler::vmov):
+        (JSC::MIPSAssembler::linkDirectJump):
+        (JSC::MIPSAssembler::maxJumpReplacementSize):
+        (JSC::MIPSAssembler::revertJumpToMove):
+        (JSC::MIPSAssembler::replaceWithJump):
+        * assembler/MacroAssembler.h:
+        (MacroAssembler):
+        (JSC::MacroAssembler::poke):
+        * assembler/MacroAssemblerMIPS.h:
+        (JSC::MacroAssemblerMIPS::add32):
+        (MacroAssemblerMIPS):
+        (JSC::MacroAssemblerMIPS::and32):
+        (JSC::MacroAssemblerMIPS::lshift32):
+        (JSC::MacroAssemblerMIPS::mul32):
+        (JSC::MacroAssemblerMIPS::or32):
+        (JSC::MacroAssemblerMIPS::rshift32):
+        (JSC::MacroAssemblerMIPS::urshift32):
+        (JSC::MacroAssemblerMIPS::sub32):
+        (JSC::MacroAssemblerMIPS::xor32):
+        (JSC::MacroAssemblerMIPS::store32):
+        (JSC::MacroAssemblerMIPS::jump):
+        (JSC::MacroAssemblerMIPS::branchAdd32):
+        (JSC::MacroAssemblerMIPS::branchMul32):
+        (JSC::MacroAssemblerMIPS::branchSub32):
+        (JSC::MacroAssemblerMIPS::branchNeg32):
+        (JSC::MacroAssemblerMIPS::call):
+        (JSC::MacroAssemblerMIPS::loadDouble):
+        (JSC::MacroAssemblerMIPS::moveDouble):
+        (JSC::MacroAssemblerMIPS::swapDouble):
+        (JSC::MacroAssemblerMIPS::subDouble):
+        (JSC::MacroAssemblerMIPS::mulDouble):
+        (JSC::MacroAssemblerMIPS::divDouble):
+        (JSC::MacroAssemblerMIPS::negateDouble):
+        (JSC::MacroAssemblerMIPS::branchEqual):
+        (JSC::MacroAssemblerMIPS::branchNotEqual):
+        (JSC::MacroAssemblerMIPS::branchTruncateDoubleToInt32):
+        (JSC::MacroAssemblerMIPS::branchTruncateDoubleToUint32):
+        (JSC::MacroAssemblerMIPS::truncateDoubleToInt32):
+        (JSC::MacroAssemblerMIPS::truncateDoubleToUint32):
+        (JSC::MacroAssemblerMIPS::branchDoubleNonZero):
+        (JSC::MacroAssemblerMIPS::branchDoubleZeroOrNaN):
+        (JSC::MacroAssemblerMIPS::invert):
+        (JSC::MacroAssemblerMIPS::replaceWithJump):
+        (JSC::MacroAssemblerMIPS::maxJumpReplacementSize):
+        * dfg/DFGAssemblyHelpers.h:
+        (AssemblyHelpers):
+        (JSC::DFG::AssemblyHelpers::preserveReturnAddressAfterCall):
+        (JSC::DFG::AssemblyHelpers::restoreReturnAddressBeforeReturn):
+        (JSC::DFG::AssemblyHelpers::debugCall):
+        * dfg/DFGCCallHelpers.h:
+        (CCallHelpers):
+        (JSC::DFG::CCallHelpers::setupArguments):
+        (JSC::DFG::CCallHelpers::setupArgumentsWithExecState):
+        * dfg/DFGFPRInfo.h:
+        (DFG):
+        (FPRInfo):
+        (JSC::DFG::FPRInfo::toRegister):
+        (JSC::DFG::FPRInfo::toIndex):
+        (JSC::DFG::FPRInfo::debugName):
+        * dfg/DFGGPRInfo.h:
+        (DFG):
+        (GPRInfo):
+        (JSC::DFG::GPRInfo::toRegister):
+        (JSC::DFG::GPRInfo::toIndex):
+        (JSC::DFG::GPRInfo::debugName):
+        * dfg/DFGSpeculativeJIT.h:
+        (SpeculativeJIT):
+        * jit/JSInterfaceJIT.h:
+        (JSInterfaceJIT):
+        * runtime/JSGlobalData.h:
+        (JSC::ScratchBuffer::allocationSize):
+        (ScratchBuffer):
 
 2013-02-12  Gabor Rapcsanyi  <rgabor@webkit.org>
 
@@ -108,6 +335,87 @@
 
         * dfg/DFGRepatch.cpp:
         (JSC::DFG::dfgLinkClosureCall):
+
+2013-02-01  Balazs Kilvady  <kilvadyb@homejinni.com>
+
+        offlineasm BaseIndex handling is broken on ARM due to MIPS changes
+        https://bugs.webkit.org/show_bug.cgi?id=108261
+
+        Reviewed by Filip Pizlo.
+
+        offlineasm BaseIndex handling fix on MIPS.
+
+        * offlineasm/mips.rb:
+        * offlineasm/risc.rb:
+
+2013-01-29  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Implement GCActivityCallback
+        https://bugs.webkit.org/show_bug.cgi?id=103998
+
+        Reviewed by Simon Hausmann.
+
+        Implements the activity triggered garbage collector.
+
+        * runtime/GCActivityCallback.cpp:
+        (JSC::DefaultGCActivityCallback::DefaultGCActivityCallback):
+        (JSC::DefaultGCActivityCallback::scheduleTimer):
+        (JSC::DefaultGCActivityCallback::cancelTimer):
+        * runtime/GCActivityCallback.h:
+        (GCActivityCallback):
+        (DefaultGCActivityCallback):
+
+2013-01-29  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [Qt] Fix the JSC build on Mac
+
+        Unreviewed, build fix.
+
+        * heap/HeapTimer.h:
+        Qt on Mac has USE(CF) true, and should use the CF HeapTimer in that case.
+
+2013-01-29  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Implement IncrementalSweeper and HeapTimer
+        https://bugs.webkit.org/show_bug.cgi?id=103996
+
+        Reviewed by Simon Hausmann.
+
+        Implements the incremental sweeping garbage collection for the Qt platform.
+
+        * heap/HeapTimer.cpp:
+        (JSC::HeapTimer::HeapTimer):
+        (JSC::HeapTimer::~HeapTimer):
+        (JSC::HeapTimer::timerEvent):
+        (JSC::HeapTimer::synchronize):
+        (JSC::HeapTimer::invalidate):
+        (JSC::HeapTimer::didStartVMShutdown):
+        * heap/HeapTimer.h:
+        (HeapTimer):
+        * heap/IncrementalSweeper.cpp:
+        (JSC::IncrementalSweeper::IncrementalSweeper):
+        (JSC::IncrementalSweeper::scheduleTimer):
+        * heap/IncrementalSweeper.h:
+        (IncrementalSweeper):
+
+2013-01-28  Oliver Hunt  <oliver@apple.com>
+
+        Add more assertions to the property storage use in arrays
+        https://bugs.webkit.org/show_bug.cgi?id=107728
+
+        Reviewed by Filip Pizlo.
+
+        Add a bunch of assertions to array and object butterfly
+        usage.  This should make debugging somewhat easier.
+
+        I also converted a couple of assertions to release asserts
+        as they were so low cost it seemed a sensible thing to do.
+
+        * runtime/JSArray.cpp:
+        (JSC::JSArray::sortVector):
+        (JSC::JSArray::compactForSorting):
+        * runtime/JSObject.h:
+        (JSC::JSObject::getHolyIndexQuickly):
 
 2013-01-22  Tobias Netzel  <tobias.netzel@googlemail.com>
 
@@ -244,6 +552,30 @@
 
         * runtime/JSArray.h:
         (JSC::JSArray::tryCreateUninitialized):
+
+2013-01-07  Balazs Kilvady  <kilvadyb@homejinni.com>
+
+        MIPS LLInt implementation.
+        https://bugs.webkit.org/show_bug.cgi?id=99706
+
+        Reviewed by Filip Pizlo.
+
+        LLInt implementation for MIPS.
+
+        * assembler/MacroAssemblerMIPS.h:
+        (JSC::MacroAssemblerMIPS::jump):
+        * dfg/DFGOperations.cpp:
+        (JSC):
+        * jit/JITStubs.cpp:
+        (JSC):
+        * jit/JITStubs.h:
+        (JITStackFrame):
+        * llint/LLIntOfflineAsmConfig.h:
+        * llint/LowLevelInterpreter.asm:
+        * llint/LowLevelInterpreter32_64.asm:
+        * offlineasm/backends.rb:
+        * offlineasm/instructions.rb:
+        * offlineasm/mips.rb: Added.
 
 2012-12-18  Mark Hahnenberg  <mhahnenberg@apple.com>
 

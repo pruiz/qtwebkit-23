@@ -97,6 +97,9 @@ SYMBOL_STRING(ctiTrampoline) ":" "\n"
     "pushl %edi" "\n"
     "pushl %ebx" "\n"
     "subl $0x3c, %esp" "\n"
+    "movw $0x02FF, %bx" "\n"
+    "movw %bx, 0(%esp)" "\n"
+    "fldcw 0(%esp)" "\n"
     "movl 0x58(%esp), %edi" "\n"
     "call *0x50(%esp)" "\n"
     "addl $0x3c, %esp" "\n"
@@ -104,6 +107,7 @@ SYMBOL_STRING(ctiTrampoline) ":" "\n"
     "popl %edi" "\n"
     "popl %esi" "\n"
     "popl %ebp" "\n"
+    "ffree %st(1)" "\n"
     "ret" "\n"
 ".globl " SYMBOL_STRING(ctiTrampolineEnd) "\n"
 HIDE_SYMBOL(ctiTrampolineEnd) "\n"
@@ -280,11 +284,13 @@ extern "C" {
 #define PRESERVED_S0_OFFSET         64
 #define PRESERVED_S1_OFFSET         68
 #define PRESERVED_S2_OFFSET         72
-#define PRESERVED_RETURN_ADDRESS_OFFSET 76
-#define THUNK_RETURN_ADDRESS_OFFSET 80
-#define REGISTER_FILE_OFFSET        84
-#define GLOBAL_DATA_OFFSET         100
-#define STACK_LENGTH               104
+#define PRESERVED_S3_OFFSET         76
+#define PRESERVED_S4_OFFSET         80
+#define PRESERVED_RETURN_ADDRESS_OFFSET 84
+#define THUNK_RETURN_ADDRESS_OFFSET 88
+#define REGISTER_FILE_OFFSET        92
+#define GLOBAL_DATA_OFFSET         108
+#define STACK_LENGTH               112
 #elif CPU(SH4)
 #define SYMBOL_STRING(name) #name
 /* code (r4), JSStack* (r5), CallFrame* (r6), void* unused1 (r7), void* unused2(sp), JSGlobalData (sp)*/
@@ -364,7 +370,7 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
 
 #else // USE(JSVALUE32_64)
 
-#if COMPILER(GCC) && CPU(X86_64)
+#if COMPILER(GCC) && CPU(X86_64) && !OS(WINDOWS)
 
 // These ASSERTs remind you that, if you change the layout of JITStackFrame, you
 // need to change the assembly trampolines below to match.
@@ -433,6 +439,82 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "ret" "\n"
 );
 
+#elif COMPILER(GCC) && CPU(X86_64) && OS(WINDOWS)
+
+// These ASSERTs remind you that, if you change the layout of JITStackFrame, you
+// need to change the assembly trampolines below to match.
+COMPILE_ASSERT(offsetof(struct JITStackFrame, code) % 16 == 0x0, JITStackFrame_maintains_16byte_stack_alignment);
+COMPILE_ASSERT(offsetof(struct JITStackFrame, savedRBX) == 0x58, JITStackFrame_stub_argument_space_matches_ctiTrampoline);
+
+asm (
+".text\n"
+".globl " SYMBOL_STRING(ctiTrampoline) "\n"
+HIDE_SYMBOL(ctiTrampoline) "\n"
+SYMBOL_STRING(ctiTrampoline) ":" "\n"
+    // Dump register parameters to their home address
+    "movq %r9, 0x20(%rsp)" "\n"
+    "movq %r8, 0x18(%rsp)" "\n"
+    "movq %rdx, 0x10(%rsp)" "\n"
+    "movq %rcx, 0x8(%rsp)" "\n"
+
+    "pushq %rbp" "\n"
+    "movq %rsp, %rbp" "\n"
+    "pushq %r12" "\n"
+    "pushq %r13" "\n"
+    "pushq %r14" "\n"
+    "pushq %r15" "\n"
+    "pushq %rbx" "\n"
+
+    // Decrease rsp to point to the start of our JITStackFrame
+    "subq $0x58, %rsp" "\n"
+    "movq $512, %r12" "\n"
+    "movq $0xFFFF000000000000, %r14" "\n"
+    "movq $0xFFFF000000000002, %r15" "\n"
+    "movq %r8, %r13" "\n"
+    "call *%rcx" "\n"
+    "addq $0x58, %rsp" "\n"
+    "popq %rbx" "\n"
+    "popq %r15" "\n"
+    "popq %r14" "\n"
+    "popq %r13" "\n"
+    "popq %r12" "\n"
+    "popq %rbp" "\n"
+    "ret" "\n"
+".globl " SYMBOL_STRING(ctiTrampolineEnd) "\n"
+HIDE_SYMBOL(ctiTrampolineEnd) "\n"
+SYMBOL_STRING(ctiTrampolineEnd) ":" "\n"
+);
+
+asm (
+".globl " SYMBOL_STRING(ctiVMThrowTrampoline) "\n"
+HIDE_SYMBOL(ctiVMThrowTrampoline) "\n"
+SYMBOL_STRING(ctiVMThrowTrampoline) ":" "\n"
+    "movq %rsp, %rcx" "\n"
+    "call " LOCAL_REFERENCE(cti_vm_throw) "\n"
+    "int3" "\n"
+);
+
+asm (
+".globl " SYMBOL_STRING(ctiOpThrowNotCaught) "\n"
+HIDE_SYMBOL(ctiOpThrowNotCaught) "\n"
+SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
+    "addq $0x58, %rsp" "\n"
+    "popq %rbx" "\n"
+    "popq %r15" "\n"
+    "popq %r14" "\n"
+    "popq %r13" "\n"
+    "popq %r12" "\n"
+    "popq %rbp" "\n"
+    "ret" "\n"
+);
+
+#elif COMPILER(MSVC) && CPU(X86_64)
+
+// These ASSERTs remind you that, if you change the layout of JITStackFrame, you
+// need to change the assembly trampolines in JITStubsMSVC64.asm to match.
+COMPILE_ASSERT(offsetof(struct JITStackFrame, code) % 16 == 0x0, JITStackFrame_maintains_16byte_stack_alignment);
+COMPILE_ASSERT(offsetof(struct JITStackFrame, savedRBX) == 0x58, JITStackFrame_stub_argument_space_matches_ctiTrampoline);
+
 #else
     #error "JIT not supported on this platform."
 #endif
@@ -451,6 +533,8 @@ asm (
 SYMBOL_STRING(ctiTrampoline) ":" "\n"
     "addiu $29,$29,-" STRINGIZE_VALUE_OF(STACK_LENGTH) "\n"
     "sw    $31," STRINGIZE_VALUE_OF(PRESERVED_RETURN_ADDRESS_OFFSET) "($29)" "\n"
+    "sw    $20," STRINGIZE_VALUE_OF(PRESERVED_S4_OFFSET) "($29)" "\n"
+    "sw    $19," STRINGIZE_VALUE_OF(PRESERVED_S3_OFFSET) "($29)" "\n"
     "sw    $18," STRINGIZE_VALUE_OF(PRESERVED_S2_OFFSET) "($29)" "\n"
     "sw    $17," STRINGIZE_VALUE_OF(PRESERVED_S1_OFFSET) "($29)" "\n"
     "sw    $16," STRINGIZE_VALUE_OF(PRESERVED_S0_OFFSET) "($29)" "\n"
@@ -467,12 +551,17 @@ SYMBOL_STRING(ctiTrampoline) ":" "\n"
     "lw    $16," STRINGIZE_VALUE_OF(PRESERVED_S0_OFFSET) "($29)" "\n"
     "lw    $17," STRINGIZE_VALUE_OF(PRESERVED_S1_OFFSET) "($29)" "\n"
     "lw    $18," STRINGIZE_VALUE_OF(PRESERVED_S2_OFFSET) "($29)" "\n"
+    "lw    $19," STRINGIZE_VALUE_OF(PRESERVED_S3_OFFSET) "($29)" "\n"
+    "lw    $20," STRINGIZE_VALUE_OF(PRESERVED_S4_OFFSET) "($29)" "\n"
     "lw    $31," STRINGIZE_VALUE_OF(PRESERVED_RETURN_ADDRESS_OFFSET) "($29)" "\n"
     "jr    $31" "\n"
     "addiu $29,$29," STRINGIZE_VALUE_OF(STACK_LENGTH) "\n"
 ".set reorder" "\n"
 ".set macro" "\n"
 ".end " SYMBOL_STRING(ctiTrampoline) "\n"
+".globl " SYMBOL_STRING(ctiTrampolineEnd) "\n"
+HIDE_SYMBOL(ctiTrampolineEnd) "\n"
+SYMBOL_STRING(ctiTrampolineEnd) ":" "\n"
 );
 
 asm (
@@ -485,8 +574,8 @@ asm (
 ".ent " SYMBOL_STRING(ctiVMThrowTrampoline) "\n"
 SYMBOL_STRING(ctiVMThrowTrampoline) ":" "\n"
 #if WTF_MIPS_PIC
-    "lw    $28," STRINGIZE_VALUE_OF(PRESERVED_GP_OFFSET) "($29)" "\n"
 ".set macro" "\n"
+".cpload $31" "\n"
     "la    $25," SYMBOL_STRING(cti_vm_throw) "\n"
 ".set nomacro" "\n"
     "bal " SYMBOL_STRING(cti_vm_throw) "\n"
@@ -498,6 +587,8 @@ SYMBOL_STRING(ctiVMThrowTrampoline) ":" "\n"
     "lw    $16," STRINGIZE_VALUE_OF(PRESERVED_S0_OFFSET) "($29)" "\n"
     "lw    $17," STRINGIZE_VALUE_OF(PRESERVED_S1_OFFSET) "($29)" "\n"
     "lw    $18," STRINGIZE_VALUE_OF(PRESERVED_S2_OFFSET) "($29)" "\n"
+    "lw    $19," STRINGIZE_VALUE_OF(PRESERVED_S3_OFFSET) "($29)" "\n"
+    "lw    $20," STRINGIZE_VALUE_OF(PRESERVED_S4_OFFSET) "($29)" "\n"
     "lw    $31," STRINGIZE_VALUE_OF(PRESERVED_RETURN_ADDRESS_OFFSET) "($29)" "\n"
     "jr    $31" "\n"
     "addiu $29,$29," STRINGIZE_VALUE_OF(STACK_LENGTH) "\n"
@@ -518,6 +609,8 @@ SYMBOL_STRING(ctiOpThrowNotCaught) ":" "\n"
     "lw    $16," STRINGIZE_VALUE_OF(PRESERVED_S0_OFFSET) "($29)" "\n"
     "lw    $17," STRINGIZE_VALUE_OF(PRESERVED_S1_OFFSET) "($29)" "\n"
     "lw    $18," STRINGIZE_VALUE_OF(PRESERVED_S2_OFFSET) "($29)" "\n"
+    "lw    $19," STRINGIZE_VALUE_OF(PRESERVED_S3_OFFSET) "($29)" "\n"
+    "lw    $20," STRINGIZE_VALUE_OF(PRESERVED_S4_OFFSET) "($29)" "\n"
     "lw    $31," STRINGIZE_VALUE_OF(PRESERVED_RETURN_ADDRESS_OFFSET) "($29)" "\n"
     "jr    $31" "\n"
     "addiu $29,$29," STRINGIZE_VALUE_OF(STACK_LENGTH) "\n"
@@ -1118,9 +1211,9 @@ template<typename T> static T throwExceptionFromOpCall(JITStackFrame& jitStackFr
         ".globl " SYMBOL_STRING(cti_##op) "\n" \
         ".ent " SYMBOL_STRING(cti_##op) "\n" \
         SYMBOL_STRING(cti_##op) ":" "\n" \
-        "lw    $28," STRINGIZE_VALUE_OF(PRESERVED_GP_OFFSET) "($29)" "\n" \
-        "sw    $31," STRINGIZE_VALUE_OF(THUNK_RETURN_ADDRESS_OFFSET) "($29)" "\n" \
         ".set macro" "\n" \
+        ".cpload $25" "\n" \
+        "sw    $31," STRINGIZE_VALUE_OF(THUNK_RETURN_ADDRESS_OFFSET) "($29)" "\n" \
         "la    $25," SYMBOL_STRING(JITStubThunked_##op) "\n" \
         ".set nomacro" "\n" \
         ".reloc 1f,R_MIPS_JALR," SYMBOL_STRING(JITStubThunked_##op) "\n" \

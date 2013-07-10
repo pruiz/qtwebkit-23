@@ -1,3 +1,63 @@
+2013-06-05  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Handle Return key without key text
+        https://bugs.webkit.org/show_bug.cgi?id=117239
+
+        Reviewed by Andreas Kling.
+
+        Test for QKeyEvent(Return_Key) without key text.
+
+        * tests/qwebpage/tst_qwebpage.cpp:
+        (tst_QWebPage::inputMethods):
+
+2013-05-15  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [Qt] Fix a crash under ~PingLoader when the QNAM on the page has been destroyed.
+        https://bugs.webkit.org/show_bug.cgi?id=116035
+
+        Reviewed by Allan Sandfeld Jensen.
+
+        * tests/qwebpage/tst_qwebpage.cpp:
+        (tst_QWebPage::networkReplyParentDidntChange): Change test to match the new expectation.
+        (tst_QWebPage::destroyQNAMBeforeAbortDoesntCrash):
+
+2013-05-14  Jocelyn Turcotte  <jocelyn.turcotte@digia.com>
+
+        [Qt] Fix a crash under ~PingLoader when the QNAM on the page has been destroyed.
+        https://bugs.webkit.org/show_bug.cgi?id=116035
+
+        Reviewed by Simon Hausmann.
+
+        * tests/qwebpage/tst_qwebpage.cpp:
+        (tst_QWebPage::networkReplyParentChanged):
+
+2013-05-07  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        Crash when calling QWebFrame::evaluateJavaScript
+        https://bugs.webkit.org/show_bug.cgi?id=113434
+
+        Reviewed by Simon Hausmann.
+
+        Ensure we hold the JSLock when converting JSValue to JSValueRef.
+
+        * Api/qwebelement.cpp:
+        (setupScriptContext):
+        (QWebElement::evaluateJavaScript):
+        * WebCoreSupport/QWebFrameAdapter.cpp:
+        (QWebFrameAdapter::evaluateJavaScript):
+
+2013-04-25  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Animated opacity does not trigger accelerated compositing
+        https://bugs.webkit.org/show_bug.cgi?id=115107
+
+        Reviewed by Simon Fraser.
+
+        We should trigger compositing on animated opacity as it is always faster on Qt.
+
+        * WebCoreSupport/ChromeClientQt.cpp:
+        VideoTrigger removed because we have already disabled AC for video in qwebsettings.
+
 2013-02-24  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt] window.open passes height and width parameters even if not defined in a page

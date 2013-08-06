@@ -777,6 +777,26 @@
         * platform/graphics/texmap/TextureMapperGL.h:
         (TextureMapperGL):
 
+2013-01-09  Yongjun Zhang  <yongjun_zhang@apple.com>
+
+        If ImageLoader's loadEventSender or errorEventSender fires after document is detached, the document will be leaked.
+
+        https://bugs.webkit.org/show_bug.cgi?id=106394
+
+        Reviewed by Alexey Proskuryakov.
+
+        ImageLoader's loadEventSender and errorEventSender schedule event dispatching in separate timers and refs
+        the Element in updatedHasPendingEvent.  If the Document is detached before either eventSender dispatches,
+        we would leak the Document since we bail out early in dispatchPendingLoadEvent or dispatchPendingErrorEvent,
+        without deref-ing the Element itself.
+
+        No new tests.  Verified manually by using heap tool to count the living HTMLDocuments.
+
+        * loader/ImageLoader.cpp:
+        (WebCore::ImageLoader::dispatchPendingLoadEvent): also call updatedHasPendingEvent to deref the Element if
+                    the document is detached.
+        (WebCore::ImageLoader::dispatchPendingErrorEvent): ditto.
+
 2013-01-07  Justin Novosad  <junov@google.com>
 
         Fixing memory read after free in CanvasRenderingContext2D::accessFont

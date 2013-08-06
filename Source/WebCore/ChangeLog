@@ -650,6 +650,17 @@
             This change is straightforward and is similar to the equivalent assignment in
             RenderSVGTransformableContainer::calculateLocalTransform().
 
+2013-01-31  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Fix minor memory leak in slot execution
+
+        Reviewed by Allan Sandfeld Jensen.
+
+        Don't leak the "length" string when executing a slot in JavaScript.
+
+        * bridge/qt/qt_runtime.cpp:
+        (JSC::Bindings::QtConnectionObject::execute):
+
 2013-01-31  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt] Box shadows on a transparency layer is very slow

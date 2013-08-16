@@ -133,13 +133,6 @@ PassRefPtr<ResourceBuffer> DocumentLoader::mainResourceData() const
     return 0;
 }
 
-Document* DocumentLoader::document() const
-{
-    if (m_frame && m_frame->loader()->documentLoader() == this)
-        return m_frame->document();
-    return 0;
-}
-
 const ResourceRequest& DocumentLoader::originalRequest() const
 {
     return m_originalRequest;
@@ -280,8 +273,8 @@ void DocumentLoader::stopLoading()
     // We always need to explicitly cancel the Document's parser when stopping the load.
     // Otherwise cancelling the parser while starting the next page load might result
     // in unexpected side effects such as erroneous event dispatch. ( http://webkit.org/b/117112 )
-    if (Document* doc = document())
-        doc->cancelParsing();
+    if (Document* document = m_frame->document())
+        document->cancelParsing();
     
     stopLoadingSubresources();
     stopLoadingPlugIns();

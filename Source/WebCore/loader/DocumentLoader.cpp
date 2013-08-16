@@ -261,12 +261,6 @@ void DocumentLoader::stopLoading()
     if (m_mainResourceLoader) {
         // Stop the main resource loader and let it send the cancelled message.
         m_mainResourceLoader->cancel();
-    
-        // When cancelling the main resource load, we need to also cancel the Document's parser.
-        // Otherwise cancelling the parser when starting the next page load might result
-        // in unexpected side effects such as erroneous event dispatch. ( http://webkit.org/b/117112 )
-        if (Document* doc = document())
-            doc->cancelParsing();
     } else if (!m_subresourceLoaders.isEmpty())
         // The main resource loader already finished loading. Set the cancelled error on the 
         // document and let the subresourceLoaders send individual cancelled messages below.
@@ -275,6 +269,12 @@ void DocumentLoader::stopLoading()
         // If there are no resource loaders, we need to manufacture a cancelled message.
         // (A back/forward navigation has no resource loaders because its resources are cached.)
         mainReceivedError(frameLoader->cancelledError(m_request));
+
+    // We always need to explicitly cancel the Document's parser when stopping the load.
+    // Otherwise cancelling the parser while starting the next page load might result
+    // in unexpected side effects such as erroneous event dispatch. ( http://webkit.org/b/117112 )
+    if (Document* document = m_frame->document())
+        document->cancelParsing();
     
     stopLoadingSubresources();
     stopLoadingPlugIns();

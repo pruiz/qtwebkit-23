@@ -838,6 +838,21 @@
         * dom/Element.h:
         (Element):
 
+2013-01-21  ChangSeok Oh  <shivamidow@gmail.com>
+
+        [Texmap][GTK] The poster-circle doesn't appear.
+        https://bugs.webkit.org/show_bug.cgi?id=106672
+
+        Reviewed by Noam Rosenthal.
+
+        We need to call setNeedsDisplay to redraw GraphicsLayer after we set drawsContent
+        a new value for the layer. Otherwise we can't get a chance for first drawing the layer.
+
+        Test: compositing/visibility/visibility-composited-animation.html
+
+        * platform/graphics/texmap/TextureMapperLayer.cpp:
+        (WebCore::TextureMapperLayer::flushCompositingStateForThisLayerOnly):
+
 2013-01-15  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt][CSS Shaders] Make custom filter render in Wk1 mode

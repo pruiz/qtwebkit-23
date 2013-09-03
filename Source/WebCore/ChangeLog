@@ -1,3 +1,105 @@
+2013-08-19  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] QtWebKit (using the Arora browser) displays the border radii (radius) of a button very ugly
+        https://bugs.webkit.org/show_bug.cgi?id=28113
+
+        Reviewed by Jocelyn Turcotte.
+
+        StylePainter::init() was called twice making it clobber the previous antialiasing setting.
+
+        This patch cleans up the construction so we only have one constructor with init inlined.
+
+        * platform/qt/RenderThemeQStyle.cpp:
+        (WebCore::StylePainterQStyle::StylePainterQStyle):
+        (WebCore::StylePainterQStyle::setupStyleOption):
+        * platform/qt/RenderThemeQStyle.h:
+        * platform/qt/RenderThemeQt.cpp:
+        (WebCore::StylePainter::StylePainter):
+        * platform/qt/RenderThemeQt.h:
+        * platform/qt/RenderThemeQtMobile.cpp:
+        (WebCore::StylePainterMobile::StylePainterMobile):
+
+2013-08-12  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        Resource leak related to gstreamer and videos
+        https://bugs.webkit.org/show_bug.cgi?id=109350
+
+        Reviewed by Eric Carlson.
+
+        Since active DOM object are only stopped once and can not be restarted, we can
+        unreference the media player there, instead of waiting for garbage collection.
+
+        If the r152778 is rolled back, this also breaks a circular reference between
+        GStreamer and WebKit which prevented garbage collecting from triggering.
+
+        * html/HTMLMediaElement.cpp:
+        (WebCore::HTMLMediaElement::stop):
+
+2013-08-08  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [WK1] NPStream::headers not initialized
+        https://bugs.webkit.org/show_bug.cgi?id=119574
+
+        Reviewed by Alexey Proskuryakov.
+
+        Initialize the header field. According to user feedback that should solve some
+        cases of random crashes when loading plugins on Mac and Windows.
+
+        * plugins/PluginStream.cpp:
+        (WebCore::PluginStream::PluginStream):
+
+2013-07-31  Allan Sandfeld Jensen  <allan.jensen@digia.com>
+
+        [Qt] Images are down-scaled badly
+        https://bugs.webkit.org/show_bug.cgi?id=119263
+
+        Reviewed by Jocelyn Turcotte.
+
+        QPainter only does bilinear filtering, which means it will downscaling beyond
+        0.5x will start skipping pixel and start to degrade the end result. Scaling in
+        QImage and QPixmap however uses a better but much more expensive sampling that
+        counts all pixels.
+
+        To get the high quality downscaling we must therefore prescale the images before
+        painting them. To avoid a performance impact on repeated paints the prescaled
+        image are saved in the QPixmapCache.
+
+        * platform/graphics/qt/ImageQt.cpp:
+        (WebCore::BitmapImage::draw):
+
+2013-06-14  Eric Carlson  <eric.carlson@apple.com>
+
+        Potential use-after-free with an event fired at a HTMLMediaElement which is currently being deleted
+        https://bugs.webkit.org/show_bug.cgi?id=117466
+
+        Reviewed by Oliver Hunt.
+        
+        Merge https://chromium.googlesource.com/chromium/blink/+/f4200a0093b3d9376f703961615359ec7fb712b4
+        
+        If an event is created using as target an HTMLMediaElement which is
+        currently being deleted it becomes a heap-use-after free situation.
+
+        The GenericEventQueue instance is already owned by the HTMLMediaElement,
+        and there already is an underlying mechanism to set the target of the
+        event to NULL, if their target is owner of the queue.
+
+        In order to avoid creating this reference in the first place, we enqueue
+        the event with a NULL target to defer the refcount increment until the
+        timer for dispatching the event happens (which won't happen at all if
+        garbage collection is already destroying the objects).
+
+        Test: media/track/media-element-enqueue-event-crash.html
+
+        * dom/GenericEventQueue.cpp:
+        (WebCore::GenericEventQueue::enqueueEvent): Don't ASSERT if the event has no target.
+
+        * html/HTMLMediaElement.cpp:
+        (WebCore::HTMLMediaElement::~HTMLMediaElement): Close the event queue so it won't try to
+            dispatch any pending events.
+        (WebCore::HTMLMediaElement::scheduleEvent): Don't set the event target, it will happen just
+            prior to event dispatch.
+        (WebCore::HTMLMediaElement::stop): Close the event queue.
+
 2013-06-14  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt] Map rewind and fast forward keys to match GoogleTV
@@ -617,6 +719,17 @@
             This change is straightforward and is similar to the equivalent assignment in
             RenderSVGTransformableContainer::calculateLocalTransform().
 
+2013-01-31  Simon Hausmann  <simon.hausmann@digia.com>
+
+        [Qt] Fix minor memory leak in slot execution
+
+        Reviewed by Allan Sandfeld Jensen.
+
+        Don't leak the "length" string when executing a slot in JavaScript.
+
+        * bridge/qt/qt_runtime.cpp:
+        (JSC::Bindings::QtConnectionObject::execute):
+
 2013-01-31  Allan Sandfeld Jensen  <allan.jensen@digia.com>
 
         [Qt] Box shadows on a transparency layer is very slow
@@ -743,6 +856,26 @@
         (WebCore::BitmapTextureGL::applyFilters):
         * platform/graphics/texmap/TextureMapperGL.h:
         (TextureMapperGL):
+
+2013-01-09  Yongjun Zhang  <yongjun_zhang@apple.com>
+
+        If ImageLoader's loadEventSender or errorEventSender fires after document is detached, the document will be leaked.
+
+        https://bugs.webkit.org/show_bug.cgi?id=106394
+
+        Reviewed by Alexey Proskuryakov.
+
+        ImageLoader's loadEventSender and errorEventSender schedule event dispatching in separate timers and refs
+        the Element in updatedHasPendingEvent.  If the Document is detached before either eventSender dispatches,
+        we would leak the Document since we bail out early in dispatchPendingLoadEvent or dispatchPendingErrorEvent,
+        without deref-ing the Element itself.
+
+        No new tests.  Verified manually by using heap tool to count the living HTMLDocuments.
+
+        * loader/ImageLoader.cpp:
+        (WebCore::ImageLoader::dispatchPendingLoadEvent): also call updatedHasPendingEvent to deref the Element if
+                    the document is detached.
+        (WebCore::ImageLoader::dispatchPendingErrorEvent): ditto.
 
 2013-01-07  Justin Novosad  <junov@google.com>
 

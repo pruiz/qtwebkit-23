@@ -234,7 +234,14 @@ void QWebFramePrivate::renderCompositedLayers(GraphicsContext* context, const In
         return;
 
     textureMapper->setGraphicsContext(context);
-    textureMapper->setImageInterpolationQuality(context->imageInterpolationQuality());
+    // GraphicsContext::imageInterpolationQuality is always InterpolationDefault here,
+    // but 'default' may be interpreted differently due to a different backend QPainter,
+    // so we need to set an explicit imageInterpolationQuality.
+    if (context->platformContext()->renderHints() & QPainter::SmoothPixmapTransform)
+        textureMapper->setImageInterpolationQuality(WebCore::InterpolationMedium);
+    else
+        textureMapper->setImageInterpolationQuality(WebCore::InterpolationNone);
+
     textureMapper->setTextDrawingMode(context->textDrawingMode());
     QPainter* painter = context->platformContext();
     const QTransform transform = painter->worldTransform();

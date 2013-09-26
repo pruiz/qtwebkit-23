@@ -162,6 +162,7 @@ void PageClientQWidget::syncLayers(Timer<PageClientQWidget>*)
     if (TextureMapperLayerClient->rootLayer()->descendantsOrSelfHaveRunningAnimations() && !syncTimer.isActive())
         syncTimer.startOneShot(1.0 / 60.0);
     update(view->rect());
+    QMetaObject::invokeMethod(page, "repaintRequested", Qt::QueuedConnection, Q_ARG(QRect, view->rect()));
 }
 #endif
 
@@ -294,6 +295,7 @@ void PageClientQGraphicsWidget::syncLayers()
     if (TextureMapperLayerClient->rootLayer()->descendantsOrSelfHaveRunningAnimations() && !syncTimer.isActive())
         syncTimer.startOneShot(1.0 / 60.0);
     update(view->boundingRect().toAlignedRect());
+    QMetaObject::invokeMethod(page, "repaintRequested", Qt::QueuedConnection, Q_ARG(QRect, view->boundingRect().toAlignedRect()));
 }
 
 void PageClientQGraphicsWidget::setRootGraphicsLayer(GraphicsLayer* layer)

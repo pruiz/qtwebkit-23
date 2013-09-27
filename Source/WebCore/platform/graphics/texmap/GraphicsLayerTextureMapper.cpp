@@ -123,18 +123,13 @@ void GraphicsLayerTextureMapper::setNeedsDisplayInRect(const FloatRect& rect)
 
 /* \reimp (GraphicsLayer.h)
 */
-void GraphicsLayerTextureMapper::setParent(GraphicsLayer* layer)
-{
-    notifyChange(TextureMapperLayer::ParentChange);
-    GraphicsLayer::setParent(layer);
-}
-
-/* \reimp (GraphicsLayer.h)
-*/
 bool GraphicsLayerTextureMapper::setChildren(const Vector<GraphicsLayer*>& children)
 {
-    notifyChange(TextureMapperLayer::ChildrenChange);
-    return GraphicsLayer::setChildren(children);
+    if (GraphicsLayer::setChildren(children)) {
+        notifyChange(TextureMapperLayer::ChildrenChange);
+        return true;
+    }
+    return false;
 }
 
 /* \reimp (GraphicsLayer.h)
@@ -178,16 +173,6 @@ bool GraphicsLayerTextureMapper::replaceChild(GraphicsLayer* oldChild, GraphicsL
         return true;
     }
     return false;
-}
-
-/* \reimp (GraphicsLayer.h)
-*/
-void GraphicsLayerTextureMapper::removeFromParent()
-{
-    if (!parent())
-        return;
-    notifyChange(TextureMapperLayer::ParentChange);
-    GraphicsLayer::removeFromParent();
 }
 
 /* \reimp (GraphicsLayer.h)

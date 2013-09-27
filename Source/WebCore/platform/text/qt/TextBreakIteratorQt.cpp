@@ -25,6 +25,7 @@
 #include <algorithm>
 #include <qdebug.h>
 #include <wtf/Atomics.h>
+#include <wtf/ThreadingPrimitives.h>
 
 // #define DEBUG_TEXT_ITERATORS
 #ifdef DEBUG_TEXT_ITERATORS
@@ -70,10 +71,24 @@ namespace WebCore {
 
     static TextBreakIterator* nonSharedCharacterBreakIterator;
 
+    static inline bool compareAndSwapNonSharedCharacterBreakIterator(TextBreakIterator* expected, TextBreakIterator* newValue)
+    {
+#if ENABLE(COMPARE_AND_SWAP)
+        return weakCompareAndSwap(reinterpret_cast<void**>(&nonSharedCharacterBreakIterator), expected, newValue);
+#else
+        DEFINE_STATIC_LOCAL(Mutex, nonSharedCharacterBreakIteratorMutex, ());
+        MutexLocker locker(nonSharedCharacterBreakIteratorMutex);
+        if (nonSharedCharacterBreakIterator != expected)
+            return false;
+        nonSharedCharacterBreakIterator = newValue;
+        return true;
+#endif
+    }
+
     NonSharedCharacterBreakIterator::NonSharedCharacterBreakIterator(const UChar* buffer, int length)
     {
         m_iterator = nonSharedCharacterBreakIterator;
-        bool createdIterator = m_iterator && weakCompareAndSwap(reinterpret_cast<void**>(&nonSharedCharacterBreakIterator), m_iterator, 0);
+        bool createdIterator = m_iterator && compareAndSwapNonSharedCharacterBreakIterator(m_iterator, 0);
         if (!createdIterator)
             m_iterator = new TextBreakIterator();
         if (!setUpIterator(*m_iterator, QTextBoundaryFinder::Grapheme, buffer, length)) {
@@ -84,7 +99,7 @@ namespace WebCore {
 
     NonSharedCharacterBreakIterator::~NonSharedCharacterBreakIterator()
     {
-        if (!weakCompareAndSwap(reinterpret_cast<void**>(&nonSharedCharacterBreakIterator), 0, m_iterator))
+        if (!compareAndSwapNonSharedCharacterBreakIterator(m_iterator, 0))
             delete m_iterator;
     }
 

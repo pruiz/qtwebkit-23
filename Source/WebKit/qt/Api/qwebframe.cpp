@@ -200,25 +200,24 @@ void QWebFramePrivate::renderFromTiledBackingStore(GraphicsContext* context, con
     if (vector.isEmpty())
         return;
 
-    QPainter* painter = context->platformContext();
-
     WebCore::FrameView* view = frame->view();
-    
+
     int scrollX = view->scrollX();
     int scrollY = view->scrollY();
-    context->translate(-scrollX, -scrollY);
+    QRect frameRect = view->frameRect();
 
     for (int i = 0; i < vector.size(); ++i) {
         const QRect& clipRect = vector.at(i);
 
-        painter->save();
-        
-        QRect rect = clipRect.translated(scrollX, scrollY);
-        painter->setClipRect(rect, Qt::IntersectClip);
+        context->save();
+        QRect rect = clipRect.intersected(frameRect);
+        context->translate(-scrollX, -scrollY);
+        rect.translate(scrollX, scrollY);
+        context->clip(rect);
 
         frame->tiledBackingStore()->paint(context, rect);
 
-        painter->restore();
+        context->restore();
     }
 
 #if USE(ACCELERATED_COMPOSITING)
@@ -235,7 +234,14 @@ void QWebFramePrivate::renderCompositedLayers(GraphicsContext* context, const In
         return;
 
     textureMapper->setGraphicsContext(context);
-    textureMapper->setImageInterpolationQuality(context->imageInterpolationQuality());
+    // GraphicsContext::imageInterpolationQuality is always InterpolationDefault here,
+    // but 'default' may be interpreted differently due to a different backend QPainter,
+    // so we need to set an explicit imageInterpolationQuality.
+    if (context->platformContext()->renderHints() & QPainter::SmoothPixmapTransform)
+        textureMapper->setImageInterpolationQuality(WebCore::InterpolationMedium);
+    else
+        textureMapper->setImageInterpolationQuality(WebCore::InterpolationNone);
+
     textureMapper->setTextDrawingMode(context->textDrawingMode());
     QPainter* painter = context->platformContext();
     const QTransform transform = painter->worldTransform();

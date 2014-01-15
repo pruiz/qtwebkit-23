@@ -37,7 +37,7 @@ using QTM_NAMESPACE::QOrientationSensor;
 #include "wtf/RefPtr.h"
 #include "Frame.h"
 #include "ViewportArguments.h"
-#ifdef WKHTMLTOPDF_MODE
+#if ENABLE(WKHTMLTOPDF_MODE)
 #include <qpainter.h>
 #include "PrintContext.h"
 #include "GraphicsContext.h"
@@ -77,7 +77,7 @@ public:
     int marginHeight;
 };
 
-#ifdef WKHTMLTOPDF_MODE
+#if ENABLE(WKHTMLTOPDF_MODE)
 class QWebPrinterPrivate {
 public:
     WebCore::PrintContext printContext;

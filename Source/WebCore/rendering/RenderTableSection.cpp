@@ -532,18 +532,18 @@ void RenderTableSection::layoutRows()
 
         for (int r = 0; r < totalRows; ++r) {
             int rowLogicalOffset = m_rowPos[r] + pageOffset;
-            int remainingLogicalHeight = pageLogicalHeight - layoutState->pageLogicalOffset(rowLogicalOffset) % pageLogicalHeight;
+            int remainingLogicalHeight = pageLogicalHeight - layoutState->pageLogicalOffset(this, rowLogicalOffset) % pageLogicalHeight;
 
             for (int c = 0; c < nEffCols; c++) {
                 CellStruct& cs = cellAt(r, c);
                 RenderTableCell* cell = cs.primaryCell();
 
-                if (!cell || cs.inColSpan || cell->row() != r)
+                if (!cell || cs.inColSpan || cell->rowIndex() != r)
                     continue;
 
-                int cellRequiredHeight = cell->contentLogicalHeight() + cell->paddingTop(false) + cell->paddingBottom(false);
+                int cellRequiredHeight = cell->contentLogicalHeight() + cell->paddingTop() + cell->paddingBottom();
                 if (max(logicalRowHeights[r], cellRequiredHeight) > remainingLogicalHeight - footHeight - vspacing) {
-                    pageOffset += remainingL gicalHeight + headHeight;
+                    pageOffset += remainingLogicalHeight + headHeight;
                     break;
                 }
             }
@@ -577,7 +577,7 @@ void RenderTableSection::layoutRows()
 
             int rowIndex = cell->rowIndex();
 #if ENABLE(WKHTMLTOPDF_MODE)
-            int rHeight = (cell->rowSpan() == 1) ? logicalRowHeights[rindx] : m_rowPos[rindx + cell->rowSpan()] - m_rowPos[rindx] - vspacing;
+            int rHeight = (cell->rowSpan() == 1) ? logicalRowHeights[rowIndex] : m_rowPos[rowIndex + cell->rowSpan()] - m_rowPos[rowIndex] - vspacing;
 #else
             int rHeight = m_rowPos[rowIndex + cell->rowSpan()] - m_rowPos[rowIndex] - vspacing;
 #endif

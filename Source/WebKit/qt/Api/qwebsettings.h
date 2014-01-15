@@ -126,7 +126,7 @@ public:
     void setDefaultTextEncoding(const QString &encoding);
     QString defaultTextEncoding() const;
 
-#if ENABLE(WKHTMLTOPDF_MODE)
+#if defined(ENABLE_WKHTMLTOPDF_MODE) && ENABLE_WKHTMLTOPDF_MODE
 
     void setPrintingMediaType(const QString &type);
     QString printingMediaType() const;

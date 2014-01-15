@@ -421,7 +421,7 @@ void RenderTable::layout()
 
     bool collapsing = collapseBorders();
 
-#if ENABLE(WKHTLMTOPDF_MODE)
+#if ENABLE(WKHTMLTOPDF_MODE)
     // repeat header and footer on each page
     int headHeight = 0;
     int footHeight = 0;
@@ -433,7 +433,7 @@ void RenderTable::layout()
             if (m_columnLogicalWidthChanged)
                 section->setChildNeedsLayout(true, MarkOnlyThis);
             section->layoutIfNeeded();
-#if ENABLE(WKHTLMTOPDF_MODE)
+#if ENABLE(WKHTMLTOPDF_MODE)
             int rowHeight = section->calcRowLogicalHeight();
             if (child == m_head) {
                 headHeight = rowHeight;
@@ -453,23 +453,24 @@ void RenderTable::layout()
         }
     }
 
-#if ENABLE(WKHTLMTOPDF_MODE)
+#if ENABLE(WKHTMLTOPDF_MODE)
     // Bump table to next page if we can't fit the caption, thead and first body cell
     setPaginationStrut(0);
     if (view()->layoutState()->pageLogicalHeight()) {
         LayoutState* layoutState = view()->layoutState();
         const int pageLogicalHeight = layoutState->m_pageLogicalHeight;
-        const int remainingLogicalHeight = pageLogicalHeight - layoutState->pageLogicalOffset(0) % pageLogicalHeight;
+        const int remainingLogicalHeight = pageLogicalHeight - layoutState->pageLogicalOffset(this, 0) % pageLogicalHeight;
         if (remainingLogicalHeight > 0) {
             int requiredHeight = headHeight;
-            if (m_caption && m_caption->style()->captionSide() != CAPBOTTOM) {
-                requiredHeight += m_caption->logicalHeight() + m_caption->marginBefore() + m_caption->marginAfter();
+            for (unsigned i = 0; i < m_captions.size(); i++) {
+                if (m_captions[i]->style()->captionSide() != CAPBOTTOM)
+                    m_captions[i]->logicalHeight() + m_captions[i]->marginBefore() + m_captions[i]->marginAfter();
             }
             if (m_firstBody) {
                 // FIXME: Calculate maximum required height across all cells in first body row
                 RenderTableCell* firstCell = m_firstBody->primaryCellAt(0, 0);
                 if (firstCell) {
-                    requiredHeight += firstCell->contentLogicalHeight() + firstCell->paddingTop(false) + firstCell->paddingBottom(false) + vBorderSpacing();
+                    requiredHeight += roundToInt(firstCell->contentLogicalHeight() + firstCell->paddingTop() + firstCell->paddingBottom()) + vBorderSpacing();
                 }
             }
             if (requiredHeight > remainingLogicalHeight) {
@@ -527,7 +528,7 @@ void RenderTable::layout()
     distributeExtraLogicalHeight(floorToInt(computedLogicalHeight - totalSectionLogicalHeight));
 
     for (RenderTableSection* section = topSection(); section; section = sectionBelow(section)) {
-#if ENABLE(WKHTLMTOPDF_MODE)
+#if ENABLE(WKHTMLTOPDF_MODE)
         section->layoutRows(section == m_head ? 0 : headHeight, section == m_foot ? 0 : footHeight);
 #else
 	section->layoutRows();
@@ -699,23 +700,23 @@ void RenderTable::paintObject(PaintInfo& paintInfo, const LayoutPoint& paintOffs
         }
     }
 
-#if ENABLE(WKHTLMTOPDF_MODE)
+#if ENABLE(WKHTMLTOPDF_MODE)
     bool repaintedHead = false;
-    IntPoint repaintedHeadPoint;
+    LayoutPoint repaintedHeadPoint;
     bool repaintedFoot = false;
-    IntPoint repaintedFootPoint;
+    LayoutPoint repaintedFootPoint;
     if (view()->pageLogicalHeight()) {
         // re-paint header/footer if table is split over multiple pages
         if (m_head) {
-            IntPoint childPoint = flipForWritingMode(m_head, IntPoint(tx, ty), ParentToChildFlippingAdjustment);
+            LayoutPoint childPoint = flipForWritingModeForChild(m_head, paintOffset);
             if (info.rect.y() > childPoint.y() + m_head->y()) {
-                repaintedHeadPoint = IntPoint(childPoint.x(), info.rect.y() - m_head->y());
+                repaintedHeadPoint = LayoutPoint(childPoint.x(), info.rect.y() - m_head->y());
                 repaintedHead = true;
-                dynamic_cast<RenderObject*>(m_head)->paint(info, repaintedHeadPoint.x(), repaintedHeadPoint.y());
+                dynamic_cast<RenderObject*>(m_head)->paint(info, repaintedHeadPoint);
             }
         }
         if (m_foot) {
-            IntPoint childPoint = flipForWritingMode(m_foot, IntPoint(tx, ty), ParentToChildFlippingAdjustment);
+            LayoutPoint childPoint = flipForWritingModeForChild(m_foot, paintOffset);
             if (info.rect.y() + info.rect.height() < childPoint.y() + m_foot->y()) {
                 // find actual end of table on current page
                 int dy = 0;
@@ -734,7 +735,7 @@ void RenderTable::paintObject(PaintInfo& paintInfo, const LayoutPoint& paintOffs
                             // get actual bottom-y position of this row - pretty complicated, how could this be simplified?
                             // note how we have to take the rowPoint and section's y-offset into account, see e.g.
                             // RenderTableSection::paint where this is also done...
-                            IntPoint rowPoint = flipForWritingMode(toRenderBox(row), IntPoint(tx, ty), ParentToChildFlippingAdjustment);
+                            LayoutPoint rowPoint = flipForWritingModeForChild(toRenderBox(row), paintOffset);
                             int row_dy = rowPoint.y() + toRenderBox(row)->y() + toRenderBox(row)->logicalHeight() + toRenderBox(section)->y();
                             if (row_dy < max_dy && row_dy > dy) {
                                 dy = row_dy;
@@ -747,7 +748,7 @@ void RenderTable::paintObject(PaintInfo& paintInfo, const LayoutPoint& paintOffs
                 }
                 repaintedFoot = true;
                 repaintedFootPoint = IntPoint(childPoint.x(), dy - m_foot->y());
-                dynamic_cast<RenderObject*>(m_foot)->paint(info, repaintedFootPoint.x(), repaintedFootPoint.y());
+                dynamic_cast<RenderObject*>(m_foot)->paint(info, repaintedFootPoint);
             }
         }
     }
@@ -763,12 +764,14 @@ void RenderTable::paintObject(PaintInfo& paintInfo, const LayoutPoint& paintOffs
             m_currentBorder = &m_collapsedBorders[i];
             for (RenderTableSection* section = bottomSection(); section; section = sectionAbove(section)) {
                 LayoutPoint childPoint = flipForWritingModeForChild(section, paintOffset);
+#if ENABLE(WKHTMLTOPDF_MODE)
                 // also repaint borders of header/footer if required
                 if (section == m_head && repaintedHead) {
                     childPoint = repaintedHeadPoint;
                 } else if (section == m_foot && repaintedFoot) {
                     childPoint = repaintedFootPoint;
                 }
+#endif
                 section->paint(info, childPoint);
             }
         }

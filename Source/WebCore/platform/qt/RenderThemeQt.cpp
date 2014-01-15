@@ -89,12 +89,13 @@ static ScrollbarTheme* scrollbarTheme;
 RenderThemeQt::RenderThemeQt(Page* page)
     : RenderTheme()
     , m_page(page)
-    , m_fallbackStyle(0)
 {
+#if ENABLE(WKHTMLTOPDF_MODE)
     if (QApplication::type() == QApplication::Tty) {
         m_buttonFontFamily = "sans-serif";
         return;
     }
+#endif
 
     m_buttonFontFamily = QGuiApplication::font().family();
 }

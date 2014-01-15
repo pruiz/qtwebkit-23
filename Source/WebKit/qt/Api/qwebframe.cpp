@@ -126,8 +126,7 @@ static inline ResourceRequestCachePolicy cacheLoadControlToCachePolicy(uint cach
     return WebCore::UseProtocolCachePolicy;
 }
 
-#ifdef WKHTMLTOPDF_MODE
-#ifndef QT_NO_PRINTER
+#if ENABLE(WKHTMLTOPDF_MODE) && !defined(QT_NO_PRINTER)
 QWebPrinterPrivate::QWebPrinterPrivate(const QWebFrame *f, QPaintDevice *printer, QPainter &p)
     : printContext(f->d->frame)
     , painter(p)
@@ -233,8 +232,7 @@ QPair<int, QRectF> QWebPrinter::elementLocation(const QWebElement & e)
 QPainter * QWebPrinter::painter() {
     return &d->painter;
 }
-#endif //QT_NO_PRINTER
-#endif // WKHTMLTOPDF_MODE
+#endif // WKHTMLTOPDF_MODE && !QT_NO_PRINTER
 
 QWebFrameData::QWebFrameData(WebCore::Page* parentPage, WebCore::Frame* parentFrame,
                              WebCore::HTMLFrameOwnerElement* ownerFrameElement,
@@ -1499,7 +1497,7 @@ void QWebFrame::print(QPrinter *printer) const
 #if HAVE(QTPRINTSUPPORT)
     QPainter painter;
 
-#ifdef WKHTMLTOPDF_MODE
+#if ENABLE(WKHTMLTOPDF_MODE)
     painter.begin(printer);
     QWebPrinter p(this, printer, painter);
 #else
@@ -1539,11 +1537,19 @@ void QWebFrame::print(QPrinter *printer) const
 
     if (fromPage == 0 && toPage == 0) {
         fromPage = 1;
+#if ENABLE(WKHTMLTOPDF_MODE)
         toPage = p.pageCount();
+#else
+	toPage = printContext.pageCount();
+#endif
     }
     // paranoia check
     fromPage = qMax(1, fromPage);
+#if ENABLE(WKHTMLTOPDF_MODE)
     toPage = qMin(static_cast<int>(p.pageCount()), toPage);
+#else
+    toPage = qMin(static_cast<int>(printContext.pageCount()), toPage);
+#endif
 
     if (toPage < fromPage) {
         // if the user entered a page range outside the actual number
@@ -1557,15 +1563,28 @@ void QWebFrame::print(QPrinter *printer) const
         toPage = tmp;
         ascending = false;
     }
+
+#if !ENABLE(WKHTMLTOPDF_MODE)
+    painter.scale(zoomFactorX, zoomFactorY);
+    GraphicsContext ctx(&painter);
+#endif
+
     for (int i = 0; i < docCopies; ++i) {
         int page = fromPage;
         while (true) {
             for (int j = 0; j < pageCopies; ++j) {
                 if (printer->printerState() == QPrinter::Aborted
                     || printer->printerState() == QPrinter::Error) {
+#if !ENABLE(WKHTMLTOPDF_MODE)
+                    printContext.end();
+#endif
                     return;
                 }
+#if ENABLE(WKHTMLTOPDF_MODE)
                 p.spoolPage(page);
+#else
+                printContext.spoolPage(ctx, page - 1, pageRect.width());
+#endif
                 if (j < pageCopies - 1)
                     printer->newPage();
             }
@@ -1585,7 +1604,7 @@ void QWebFrame::print(QPrinter *printer) const
             printer->newPage();
     }
 
-#ifdef WKHTMLTOPDF_MODE
+#if ENABLE(WKHTMLTOPDF_MODE)
     painter.end();
 #else
     printContext.end();

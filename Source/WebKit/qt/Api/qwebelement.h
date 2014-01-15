@@ -25,6 +25,7 @@
 #include <QtCore/qrect.h>
 #include <QtCore/qvariant.h>
 #include <QtCore/qshareddata.h>
+#include <WTF/wtf/Platform.h>
 
 #include "qwebkitglobal.h"
 namespace WebCore {
@@ -157,7 +158,7 @@ private:
     friend class QWebPage;
     friend class QWebPagePrivate;
     friend class QtWebElementRuntime;
-#ifdef WKHTMLTOPDF_MODE
+#if ENABLE(WKHTMLTOPDF_MODE)
     friend class QWebPrinter;
 #endif
 

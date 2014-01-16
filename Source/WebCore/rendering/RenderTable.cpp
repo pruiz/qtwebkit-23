@@ -466,7 +466,7 @@ void RenderTable::layout()
                 if (m_captions[i]->style()->captionSide() != CAPBOTTOM)
                     m_captions[i]->logicalHeight() + m_captions[i]->marginBefore() + m_captions[i]->marginAfter();
             }
-            if (m_firstBody) {
+            if (m_firstBody && m_firstBody->numRows() > 0) {
                 // FIXME: Calculate maximum required height across all cells in first body row
                 RenderTableCell* firstCell = m_firstBody->primaryCellAt(0, 0);
                 if (firstCell) {
